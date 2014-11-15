@@ -1,0 +1,58 @@
+# French translations for minarca.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the minarca project.
+# Patrik Dufresne <info@patrikdufresne.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-11-16 14:27-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Patrik Dufresne <info@patrikdufresne.com>\n"
+"Language-Team: fr <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: com/patrikdufresne/minarca/Main.java:135
+#: com/patrikdufresne/minarca/Main.java:164
+#: com/patrikdufresne/minarca/Main.java:168
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:58
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:107
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:127
+msgid "minarca"
+msgstr "minarca"
+
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:113
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:133
+#, fuzzy
+msgid ""
+"<doc><p>If you already have an Minarca account,enter your username and "
+"password.</p></doc>"
+msgstr ""
+"Si vous pocédez déjà un compte Retinobox, entrez votre nom d'usager et votre "
+"mot de passe."
+
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:144
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:151
+msgid "Password"
+msgstr "Mot de passe"
+
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:156
+msgid "Sign In"
+msgstr "Se connecter"
+
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:224
+#, fuzzy
+msgid "<b>Warning!</b> Invalid credentials !"
+msgstr "Nom d'usager ou mot de passe invalides !"
+
+#: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:227
+#, fuzzy
+msgid "Unknown error occurred !"
+msgstr "Une erreur inconnue s'est produite !"

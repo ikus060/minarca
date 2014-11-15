@@ -1,0 +1,9 @@
+**/target
+*~
+*.trace.db
+.project
+.classpath
+.settings
+*.h2.db
+*.pdf
+*.h2.lock
