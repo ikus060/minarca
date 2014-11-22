@@ -1,7 +1,8 @@
-package com.patrikdufresne.minarca.core;
+package com.patrikdufresne.minarca.core.internal;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -192,34 +193,6 @@ public class Keygen {
 	}
 
 	/**
-	 * Entrypoint to generate a rsa key.
-	 * 
-	 * @param args
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
-	 * @throws InvalidKeyException
-	 */
-	public static void main(String[] args) throws NoSuchAlgorithmException,
-			IOException, InvalidKeyException {
-
-		// Generate a key pair.
-		KeyPair pair = generateRSA(KEYSIZE);
-
-		// Generate a simple PEM file.
-		FileWriter pem = new FileWriter("mykey.pem");
-		toPrivatePEM((RSAPrivateKey) pair.getPrivate(), pem);
-		pem.close();
-
-		// Generate a simple id_rsa.pub file.
-		toPublicIdRsa((RSAPublicKey) pair.getPublic(), "imported-openssh-key",
-				"id_rsa.pub");
-
-		// Generate a Putty private key file.
-		toPrivatePuttyKey(pair, "imported-openssh-key", "mykey.ppk");
-
-	}
-
-	/**
 	 * Generate a PEM file.
 	 * 
 	 * @param privateKey
@@ -331,16 +304,15 @@ public class Keygen {
 	 *            the key pair
 	 * @param comment
 	 *            the comment.
-	 * @param filename
+	 * @param file
 	 *            the filename
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
 	 */
-	public static void toPrivatePuttyKey(KeyPair pair, String comment,
-			String filename) throws IOException, NoSuchAlgorithmException,
-			InvalidKeyException {
-		FileWriter writer = new FileWriter(filename);
+	public static void toPrivatePuttyKey(KeyPair pair, String comment, File file)
+			throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+		FileWriter writer = new FileWriter(file);
 		toPrivatePuttyKey(pair, comment, writer);
 		writer.close();
 	}
@@ -354,15 +326,14 @@ public class Keygen {
 	 *            the public key
 	 * @param comment
 	 *            the comment
-	 * @param filename
-	 *            the filename
+	 * @param file
+	 *            location where to create the file.
 	 * @throws IOException
 	 */
 	public static void toPublicIdRsa(RSAPublicKey publicKey, String comment,
-			String filename) throws IOException {
-		FileWriterWithEncoding idrsa = new FileWriterWithEncoding(filename,
-				UTF_8);
-		toPublicIdRsa(publicKey, "imported-openssh-key", idrsa);
+			File file) throws IOException {
+		FileWriterWithEncoding idrsa = new FileWriterWithEncoding(file, UTF_8);
+		toPublicIdRsa(publicKey, comment, idrsa);
 		idrsa.close();
 	}
 

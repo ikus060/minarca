@@ -99,6 +99,11 @@ public class SetupDialog extends Dialog {
 
 	}
 
+	/**
+	 * Page used to sign-in, check credentials.
+	 * 
+	 * @param parent
+	 */
 	private void createPage1(Composite parent) {
 		// Dispose previous page.
 		disposeChildren(parent);
@@ -108,13 +113,9 @@ public class SetupDialog extends Dialog {
 				SWT.CENTER);
 		appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Alert label.
-		final FormText alertLabel = ft.createFormText(parent, "", true);
-		alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
 		// Introduction message
 		String introText = _("<h2>Sign In</h2><br/>"
-				+ "If you have an Minarca account,"
+				+ "If you have an minarca account,"
 				+ "enter your username and password.");
 		FormText introLabel = ft.createFormText(parent, introText, false);
 		introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
@@ -135,6 +136,10 @@ public class SetupDialog extends Dialog {
 		Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
 		signInButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
 		getShell().setDefaultButton(signInButton);
+
+		// Alert label.
+		final FormText alertLabel = ft.createFormText(parent, "", true);
+		alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
 		// Add event binding.
 		signInButton.addSelectionListener(new SelectionAdapter() {
@@ -162,6 +167,11 @@ public class SetupDialog extends Dialog {
 
 	}
 
+	/**
+	 * Page used to link the computer (SSH key exchange).
+	 * 
+	 * @param parent
+	 */
 	private void createPage2(Composite parent) {
 		// Dispose previous page.
 		disposeChildren(parent);
@@ -170,10 +180,6 @@ public class SetupDialog extends Dialog {
 		Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"),
 				SWT.CENTER);
 		appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-		// Alert label.
-		final FormText alertLabel = ft.createFormText(parent, "", true);
-		alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
 		// Introduction message
 		String introText = _("<h2>Link your computer</h2><br/>"
@@ -188,29 +194,77 @@ public class SetupDialog extends Dialog {
 		final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
 		computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
 		computerNameText.setMessage(_("Computer name"));
-		computerNameText.setText(API.INSTANCE.getDefaultComputerName());
+		computerNameText.setText(API.getDefaultComputerName());
 		computerNameText.setFocus();
 
 		// Sign in button
-		Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
-		signInButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
-		getShell().setDefaultButton(signInButton);
+		Button linkButton = ft.createButton(parent, _("Link computer"),
+				SWT.PUSH);
+		linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
+		getShell().setDefaultButton(linkButton);
+
+		// Alert label.
+		final FormText alertLabel = ft.createFormText(parent, "", true);
+		alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
 		// Add event binding.
-		signInButton.addSelectionListener(new SelectionAdapter() {
+		linkButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				String computerName = computerNameText.getText();
 
 				// Check credentials.
-				String message = handleRegisterComputer(computerName);
+				String message = handleLinkComputer(computerName);
 				if (message != null) {
 					alertLabel.setText(message, true, true);
 					alertLabel.getParent().layout();
 					ft.decorateWarningLabel(alertLabel);
+				} else {
+					createPage3(comp);
 				}
 
+			}
+
+		});
+
+		// Relayout to update content.
+		parent.layout();
+
+	}
+
+	/**
+	 * Page used to show sucessful config.
+	 * 
+	 * @param parent
+	 */
+	private void createPage3(Composite parent) {
+		// Dispose previous page.
+		disposeChildren(parent);
+
+		// App name
+		Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"),
+				SWT.CENTER);
+		appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+		// Introduction message
+		String introText = _("<h2>Success !</h2><br/>"
+				+ "Your computer is now configure to backup if self once a "
+				+ "day with minarca!");
+		FormText introLabel = ft.createFormText(parent, introText, false);
+		introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+		// Sign in button
+		Button linkButton = ft.createButton(parent, _("Close"), SWT.PUSH);
+		linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
+		getShell().setDefaultButton(linkButton);
+
+		// Add event binding.
+		linkButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// Close the setup dialog.
+				close();
 			}
 
 		});
@@ -235,7 +289,7 @@ public class SetupDialog extends Dialog {
 	@Override
 	protected Point getInitialSize() {
 		// Sets fixed window size.
-		return new Point(375, 575);
+		return new Point(325, 575);
 	}
 
 	/**
@@ -252,6 +306,7 @@ public class SetupDialog extends Dialog {
 	 */
 	protected String handleSignIn(String username, String password) {
 		// Try to establish communication with HTTP first.
+		LOGGER.info("sign in as {}", username);
 		try {
 			this.client = API.INSTANCE.connect(username, password);
 		} catch (ApplicationException e) {
@@ -269,21 +324,35 @@ public class SetupDialog extends Dialog {
 	 * <p>
 	 * This step is used to exchange the SSH keys.
 	 * 
-	 * @param computerName
+	 * @param name
 	 *            the computer name.
 	 * @return an error message or null if OK.
 	 */
-	protected String handleRegisterComputer(String computerName) {
-
+	protected String handleLinkComputer(String name) {
+		// Link the computer
+		LOGGER.info("link computer {}", name);
 		try {
-			this.client.registerComputer(computerName);
+			this.client.link(name);
 		} catch (ApplicationException e) {
 			LOGGER.warn("fail to register computer", e);
 			return e.getMessage();
 		} catch (APIException e) {
 			LOGGER.warn("fail to register computer", e);
-			return _("Unknown error occurred !");
+			return _("<strong>Unknown error occurred !</strong> If the problem persists, try to re-install mirarca.");
+		} catch (IllegalArgumentException e) {
+			LOGGER.warn("invalid computername: " + name, e);
+			return _("Invalid computer name !");
 		}
+
+		// Set other settings to default.
+		LOGGER.info("set default config");
+		try {
+			API.INSTANCE.defaultConfig();
+		} catch (APIException e) {
+			LOGGER.warn("fail to schedule task", e);
+			return _("Can't schedule backup task ! If the problem persists, try to re-install mirarca.");
+		}
+
 		return null;
 
 	}

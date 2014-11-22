@@ -17,6 +17,8 @@ package com.patrikdufresne.minarca;
 
 import static com.patrikdufresne.minarca.Localized._;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.IStatus;
@@ -24,12 +26,16 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.ILogger;
 import org.eclipse.jface.util.Policy;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.window.WindowManager;
 import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.API;
+import com.patrikdufresne.minarca.core.APIException;
+import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
+import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.ui.PreferenceDialog;
 import com.patrikdufresne.minarca.ui.setup.SetupDialog;
 
@@ -121,6 +127,7 @@ public class Main {
 		Locale.setDefault(Locale.CANADA_FRENCH);
 
 		Display.setAppName(_("minarca"));
+		Display.setAppVersion(getCurrentVersion());
 		final Display display = new Display();
 
 		// Sets default windows images
@@ -129,13 +136,9 @@ public class Main {
 		// Update logger
 		updateJFacePolicy();
 
-		// Check if configured.
-		if (!API.INSTANCE.isConfigured()) {
-			// If not configured, show wizard.
-			if (!SetupDialog.open(null)) {
-				// If user cancel, lose application.
-				return;
-			}
+		// Check configuration or re-configured
+		if (!configure()) {
+			return;
 		}
 
 		WindowManager winManager = new WindowManager();
@@ -151,16 +154,68 @@ public class Main {
 						display.sleep();
 				} catch (RuntimeException e) {
 					Policy.getStatusHandler().show(
-							new Status(IStatus.ERROR, _("minarca"),
+							new Status(IStatus.ERROR, Display.getAppName(),
 									e.getMessage(), e), null);
 				}
 			}
 		} catch (Exception e) {
-			MessageDialog.openWarning(null, _("minarca"), e.getMessage());
+			MessageDialog.openWarning(null, Display.getAppName(),
+					e.getMessage());
 		} finally {
 			winManager.close();
 			display.dispose();
 		}
 
+	}
+
+	/**
+	 * Check if the application is configured. If not show a setup dialog. If
+	 * miss configured try to repair.
+	 * 
+	 * @return True if configured or miss configured. False if not configured
+	 *         and user cancel configuration.
+	 */
+	private boolean configure() {
+		// Check if configured.
+		try {
+			LOGGER.debug("checking minarca configuration");
+			API.INSTANCE.checkConfig();
+			LOGGER.debug("configuration is OK");
+		} catch (NotConfiguredException e) {
+			// If not configured, show wizard.
+			LOGGER.debug("not configured -- show setup dialog");
+			if (!SetupDialog.open(null)) {
+				// If user cancel, lose application.
+				return false;
+			}
+		} catch (MissConfiguredException e) {
+			// The configuration is broken. Ask use if we can fix it.
+			LOGGER.debug("miss-configured -- ask to repair", e);
+			if (MessageDialog
+					.openQuestion(
+							null,
+							Display.getAppName(),
+							_("Your minarca installation seams broken! "
+									+ "Do you want to restore default configuration? "
+									+ "If you answer Yes, all your personal configuration will be lost. "
+									+ "If you answer no, this application may misbehave."))) {
+				try {
+					LOGGER.debug("repair configuration");
+					API.INSTANCE.defaultConfig();
+				} catch (APIException e1) {
+					MessageDialog
+							.openWarning(
+									null,
+									Display.getAppName(),
+									_("Can't repair minarca configuration. "
+											+ "If the problem persist, you may try to reinstall minarca."));
+				}
+			} else {
+				return true;
+			}
+		} catch (APIException e) {
+			return false;
+		}
+		return true;
 	}
 }
