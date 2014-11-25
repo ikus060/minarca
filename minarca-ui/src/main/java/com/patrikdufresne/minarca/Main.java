@@ -129,9 +129,6 @@ public class Main {
 	 */
 	private void start(String[] args) {
 
-		// Sets the local
-		Locale.setDefault(Locale.CANADA_FRENCH);
-
 		Display.setAppName(_("minarca"));
 		Display.setAppVersion(getCurrentVersion());
 		final Display display = new Display();
