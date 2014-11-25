@@ -34,362 +34,354 @@ import com.patrikdufresne.minarca.ui.AppFormToolkit;
  * It's similar to a wizard.
  * 
  * @author ikus060-vm
- *
+ * 
  */
 public class SetupDialog extends Dialog {
 
-	private static final transient Logger LOGGER = LoggerFactory
-			.getLogger(SetupDialog.class);
+    private static final transient Logger LOGGER = LoggerFactory.getLogger(SetupDialog.class);
 
-	/**
-	 * Open this dialog.
-	 * 
-	 * @param parentShell
-	 * @return True if the setup is a success. False if cancel by user.
-	 */
-	public static boolean open(Shell parentShell) {
-		SetupDialog dlg = new SetupDialog(parentShell);
-		dlg.setBlockOnOpen(true);
-		return dlg.open() == Window.OK;
-	}
+    /**
+     * Open this dialog.
+     * 
+     * @param parentShell
+     * @return True if the setup is a success. False if cancel by user.
+     */
+    public static boolean open(Shell parentShell) {
+        SetupDialog dlg = new SetupDialog(parentShell);
+        dlg.setBlockOnOpen(true);
+        return dlg.open() == Window.OK;
+    }
 
-	/**
-	 * Connection to minarca.
-	 */
-	private Client client;
-	/**
-	 * The composite holding the page.
-	 */
-	private Composite comp;
-	/**
-	 * Form tool kit to provide a webpage style.
-	 */
-	private AppFormToolkit ft;
+    /**
+     * Connection to minarca.
+     */
+    private Client client;
+    /**
+     * The composite holding the page.
+     */
+    private Composite comp;
+    /**
+     * Form tool kit to provide a webpage style.
+     */
+    private AppFormToolkit ft;
 
-	/**
-	 * Default constructor
-	 * 
-	 * @param parentShell
-	 */
-	protected SetupDialog(Shell parentShell) {
-		super(parentShell);
-	}
+    /**
+     * Default constructor
+     * 
+     * @param parentShell
+     */
+    protected SetupDialog(Shell parentShell) {
+        super(parentShell);
+    }
 
-	/**
-	 * Add a ticlet to the dialog.
-	 */
-	@Override
-	protected void configureShell(Shell newShell) {
-		super.configureShell(newShell);
-		newShell.setText(_("Setup minarca"));
-	}
+    /**
+     * Add a ticlet to the dialog.
+     */
+    @Override
+    protected void configureShell(Shell newShell) {
+        super.configureShell(newShell);
+        newShell.setText(_("Setup minarca"));
+    }
 
-	/**
-	 * Replace the default implementation to create a Form
-	 */
-	@Override
-	protected Control createContents(Composite parent) {
+    /**
+     * Replace the default implementation to create a Form
+     */
+    @Override
+    protected Control createContents(Composite parent) {
 
-		this.ft = new AppFormToolkit(parent.getDisplay());
+        this.ft = new AppFormToolkit(parent.getDisplay());
 
-		// Create the Form.
-		Form form = ft.createForm(parent);
+        // Create the Form.
+        Form form = ft.createForm(parent);
 
-		// create the top level composite for the dialog
-		// Composite composite = new Composite(parent, 0);
-		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		layout.verticalSpacing = 0;
-		form.getBody().setLayout(layout);
-		form.setLayoutData(new GridData(GridData.FILL_BOTH));
-		// applyDialogFont(composite);
-		// initialize the dialog units
-		// initializeDialogUnits(composite);
-		// create the dialog area and button bar
-		dialogArea = createDialogArea(form.getBody());
-		// buttonBar = createButtonBar(form.getBody());
+        // create the top level composite for the dialog
+        // Composite composite = new Composite(parent, 0);
+        GridLayout layout = new GridLayout();
+        layout.marginHeight = 0;
+        layout.marginWidth = 0;
+        layout.verticalSpacing = 0;
+        form.getBody().setLayout(layout);
+        form.setLayoutData(new GridData(GridData.FILL_BOTH));
+        // applyDialogFont(composite);
+        // initialize the dialog units
+        // initializeDialogUnits(composite);
+        // create the dialog area and button bar
+        dialogArea = createDialogArea(form.getBody());
+        // buttonBar = createButtonBar(form.getBody());
 
-		return form;
-	}
+        return form;
+    }
 
-	/**
-	 * Create the first page.
-	 */
-	@Override
-	protected Control createDialogArea(Composite parent) {
+    /**
+     * Create the first page.
+     */
+    @Override
+    protected Control createDialogArea(Composite parent) {
 
-		this.comp = ft.createComposite(parent, SWT.NONE);
-		this.comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		TableWrapLayout layout = new TableWrapLayout();
-		layout.topMargin = layout.rightMargin = layout.bottomMargin = layout.leftMargin = 25;
-		this.comp.setLayout(layout);
+        this.comp = ft.createComposite(parent, SWT.NONE);
+        this.comp.setLayoutData(new GridData(GridData.FILL_BOTH));
+        TableWrapLayout layout = new TableWrapLayout();
+        layout.topMargin = layout.rightMargin = layout.bottomMargin = layout.leftMargin = 25;
+        this.comp.setLayout(layout);
 
-		createPage1(this.comp);
+        createPage1(this.comp);
 
-		return comp;
+        return comp;
 
-	}
+    }
 
-	/**
-	 * Page used to sign-in, check credentials.
-	 * 
-	 * @param parent
-	 */
-	private void createPage1(Composite parent) {
-		// Dispose previous page.
-		disposeChildren(parent);
+    /**
+     * Page used to sign-in, check credentials.
+     * 
+     * @param parent
+     */
+    private void createPage1(Composite parent) {
+        // Dispose previous page.
+        disposeChildren(parent);
 
-		// App name
-		Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"),
-				SWT.CENTER);
-		appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // App name
+        Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
+        appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Introduction message
-		String introText = _("<h2>Sign In</h2><br/>"
-				+ "If you have an minarca account,"
-				+ "enter your username and password.");
-		FormText introLabel = ft.createFormText(parent, introText, false);
-		introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // Introduction message
+        String introText = "<h2>" + _("Sign In") + "</h2><br/>";
+        introText += _("If you have an minarca account, " + "enter your username and password.");
+        FormText introLabel = ft.createFormText(parent, introText, false);
+        introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Username
-		final Text usernameText = ft.createText(parent, "", SWT.BORDER);
-		usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-		usernameText.setMessage(_("Username"));
-		usernameText.setFocus();
+        // Username
+        final Text usernameText = ft.createText(parent, "", SWT.BORDER);
+        usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        usernameText.setMessage(_("Username"));
+        usernameText.setFocus();
 
-		// Password
-		final Text passwordText = ft.createText(parent, "", SWT.BORDER
-				| SWT.PASSWORD);
-		passwordText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-		passwordText.setMessage(_("Password"));
+        // Password
+        final Text passwordText = ft.createText(parent, "", SWT.BORDER | SWT.PASSWORD);
+        passwordText.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        passwordText.setMessage(_("Password"));
 
-		// Sign in button
-		Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
-		signInButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
-		getShell().setDefaultButton(signInButton);
+        // Sign in button
+        Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
+        signInButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        getShell().setDefaultButton(signInButton);
 
-		// Alert label.
-		final FormText alertLabel = ft.createFormText(parent, "", true);
-		alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // Alert label.
+        final FormText alertLabel = ft.createFormText(parent, "", true);
+        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Add event binding.
-		signInButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
+        // Add event binding.
+        signInButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
 
-				String username = usernameText.getText();
-				String password = passwordText.getText();
+                String username = usernameText.getText();
+                String password = passwordText.getText();
 
-				// Check credentials.
-				String message = handleSignIn(username, password);
-				if (message != null) {
-					alertLabel.setText(message, true, true);
-					alertLabel.getParent().layout();
-					ft.decorateWarningLabel(alertLabel);
-				} else {
-					createPage2(comp);
-				}
+                // Check credentials.
+                String message = handleSignIn(username, password);
+                if (message != null) {
+                    alertLabel.setText(message, true, true);
+                    alertLabel.getParent().layout();
+                    ft.decorateWarningLabel(alertLabel);
+                } else {
+                    createPage2(comp);
+                }
 
-			}
-		});
+            }
+        });
 
-		// Relayout to update content.
-		parent.layout();
+        // Relayout to update content.
+        parent.layout();
 
-	}
+    }
 
-	/**
-	 * Page used to link the computer (SSH key exchange).
-	 * 
-	 * @param parent
-	 */
-	private void createPage2(Composite parent) {
-		// Dispose previous page.
-		disposeChildren(parent);
+    /**
+     * Page used to link the computer (SSH key exchange).
+     * 
+     * @param parent
+     */
+    private void createPage2(Composite parent) {
+        // Dispose previous page.
+        disposeChildren(parent);
 
-		// App name
-		Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"),
-				SWT.CENTER);
-		appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // App name
+        Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
+        appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Introduction message
-		String introText = _("<h2>Link your computer</h2><br/>"
-				+ "You need to link this computer to your account. Please, "
-				+ "provide a friendly name to represent it. "
-				+ "Once selected, you won't be able to change it.<br/>"
-				+ "<br/><b>Provide a computer name</b>");
-		FormText introLabel = ft.createFormText(parent, introText, false);
-		introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // Introduction message
+        String introText = _("<h2>Link your computer</h2><br/>"
+                + "You need to link this computer to your account. Please, "
+                + "provide a friendly name to represent it. "
+                + "Once selected, you won't be able to change it.<br/>"
+                + "<br/><b>Provide a computer name</b>");
+        FormText introLabel = ft.createFormText(parent, introText, false);
+        introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Computer name
-		final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
-		computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-		computerNameText.setMessage(_("Computer name"));
-		computerNameText.setText(API.getDefaultComputerName());
-		computerNameText.setFocus();
+        // Computer name
+        final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
+        computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        computerNameText.setMessage(_("Computer name"));
+        computerNameText.setText(API.getDefaultComputerName());
+        computerNameText.setFocus();
 
-		// Sign in button
-		Button linkButton = ft.createButton(parent, _("Link computer"),
-				SWT.PUSH);
-		linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
-		getShell().setDefaultButton(linkButton);
+        // Sign in button
+        Button linkButton = ft.createButton(parent, _("Link computer"), SWT.PUSH);
+        linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        getShell().setDefaultButton(linkButton);
 
-		// Alert label.
-		final FormText alertLabel = ft.createFormText(parent, "", true);
-		alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // Alert label.
+        final FormText alertLabel = ft.createFormText(parent, "", true);
+        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Add event binding.
-		linkButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
+        // Add event binding.
+        linkButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
 
-				String computerName = computerNameText.getText();
+                String computerName = computerNameText.getText();
 
-				// Check credentials.
-				String message = handleLinkComputer(computerName);
-				if (message != null) {
-					alertLabel.setText(message, true, true);
-					alertLabel.getParent().layout();
-					ft.decorateWarningLabel(alertLabel);
-				} else {
-					createPage3(comp);
-				}
+                // Check credentials.
+                String message = handleLinkComputer(computerName);
+                if (message != null) {
+                    alertLabel.setText(message, true, true);
+                    alertLabel.getParent().layout();
+                    ft.decorateWarningLabel(alertLabel);
+                } else {
+                    createPage3(comp);
+                }
 
-			}
+            }
 
-		});
+        });
 
-		// Relayout to update content.
-		parent.layout();
+        // Relayout to update content.
+        parent.layout();
 
-	}
+    }
 
-	/**
-	 * Page used to show sucessful config.
-	 * 
-	 * @param parent
-	 */
-	private void createPage3(Composite parent) {
-		// Dispose previous page.
-		disposeChildren(parent);
+    /**
+     * Page used to show sucessful config.
+     * 
+     * @param parent
+     */
+    private void createPage3(Composite parent) {
+        // Dispose previous page.
+        disposeChildren(parent);
 
-		// App name
-		Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"),
-				SWT.CENTER);
-		appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // App name
+        Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
+        appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Introduction message
-		String introText = _("<h2>Success !</h2><br/>"
-				+ "Your computer is now configure to backup if self once a "
-				+ "day with minarca!");
-		FormText introLabel = ft.createFormText(parent, introText, false);
-		introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // Introduction message
+        String introText = "<h2>" + _("Success !") + "</h2><br/>";
+        introText += _("Your computer is now configure to backup if " + "self once a day with minarca!");
+        FormText introLabel = ft.createFormText(parent, introText, false);
+        introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-		// Sign in button
-		Button linkButton = ft.createButton(parent, _("Close"), SWT.PUSH);
-		linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
-		getShell().setDefaultButton(linkButton);
+        // Sign in button
+        Button linkButton = ft.createButton(parent, _("Close"), SWT.PUSH);
+        linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        getShell().setDefaultButton(linkButton);
 
-		// Add event binding.
-		linkButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				// Close the setup dialog.
-				close();
-			}
+        // Add event binding.
+        linkButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                // Close the setup dialog.
+                close();
+            }
 
-		});
+        });
 
-		// Relayout to update content.
-		parent.layout();
+        // Relayout to update content.
+        parent.layout();
 
-	}
+    }
 
-	/**
-	 * Used to dispose every children of the given composite
-	 * 
-	 * @param composite
-	 */
-	private void disposeChildren(Composite composite) {
-		Control[] children = composite.getChildren();
-		for (Control c : children) {
-			c.dispose();
-		}
-	}
+    /**
+     * Used to dispose every children of the given composite
+     * 
+     * @param composite
+     */
+    private void disposeChildren(Composite composite) {
+        Control[] children = composite.getChildren();
+        for (Control c : children) {
+            c.dispose();
+        }
+    }
 
-	/**
-	 * Return a fixed dialog size.
-	 */
-	@Override
-	protected Point getInitialSize() {
-		// Sets fixed window size.
-		return new Point(325, 575);
-	}
+    /**
+     * Return a fixed dialog size.
+     */
+    @Override
+    protected Point getInitialSize() {
+        // Sets fixed window size.
+        return new Point(325, 575);
+    }
 
-	/**
-	 * Called to handle user sign in.
-	 * <p>
-	 * This implementation will establish a connection via HTTP and or SSH to
-	 * make sure the connection and credentials are valid.
-	 * 
-	 * @param username
-	 *            the username for authentication
-	 * @param password
-	 *            the password for authentication.
-	 * @return an error message or null if OK.
-	 */
-	protected String handleSignIn(String username, String password) {
-		// Try to establish communication with HTTP first.
-		LOGGER.info("sign in as {}", username);
-		try {
-			this.client = API.INSTANCE.connect(username, password);
-		} catch (ApplicationException e) {
-			LOGGER.warn("fail to sign in", e);
-			return e.getMessage();
-		} catch (APIException e) {
-			LOGGER.warn("fail to sign in", e);
-			return _("Unknown error occurred !");
-		}
-		return null;
-	}
+    /**
+     * Called to handle user sign in.
+     * <p>
+     * This implementation will establish a connection via HTTP and or SSH to
+     * make sure the connection and credentials are valid.
+     * 
+     * @param username
+     *            the username for authentication
+     * @param password
+     *            the password for authentication.
+     * @return an error message or null if OK.
+     */
+    protected String handleSignIn(String username, String password) {
+        // Try to establish communication with HTTP first.
+        LOGGER.info("sign in as {}", username);
+        try {
+            this.client = API.INSTANCE.connect(username, password);
+        } catch (ApplicationException e) {
+            LOGGER.warn("fail to sign in", e);
+            return e.getMessage();
+        } catch (APIException e) {
+            LOGGER.warn("fail to sign in", e);
+            return _("Unknown error occurred!");
+        }
+        return null;
+    }
 
-	/**
-	 * Called to handle computer registration.
-	 * <p>
-	 * This step is used to exchange the SSH keys.
-	 * 
-	 * @param name
-	 *            the computer name.
-	 * @return an error message or null if OK.
-	 */
-	protected String handleLinkComputer(String name) {
-		// Link the computer
-		LOGGER.info("link computer {}", name);
-		try {
-			this.client.link(name);
-		} catch (ApplicationException e) {
-			LOGGER.warn("fail to register computer", e);
-			return e.getMessage();
-		} catch (APIException e) {
-			LOGGER.warn("fail to register computer", e);
-			return _("<strong>Unknown error occurred !</strong> If the problem persists, try to re-install mirarca.");
-		} catch (IllegalArgumentException e) {
-			LOGGER.warn("invalid computername: " + name, e);
-			return _("Invalid computer name !");
-		}
+    /**
+     * Called to handle computer registration.
+     * <p>
+     * This step is used to exchange the SSH keys.
+     * 
+     * @param name
+     *            the computer name.
+     * @return an error message or null if OK.
+     */
+    protected String handleLinkComputer(String name) {
+        // Link the computer
+        LOGGER.info("link computer {}", name);
+        try {
+            this.client.link(name);
+        } catch (ApplicationException e) {
+            LOGGER.warn("fail to register computer", e);
+            return e.getMessage();
+        } catch (APIException e) {
+            LOGGER.warn("fail to register computer", e);
+            return _("<strong>Unknown error occurred !</strong> If the problem persists, try to re-install mirarca.");
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("invalid computername: " + name, e);
+            return _("Invalid computer name !");
+        }
 
-		// Set other settings to default.
-		LOGGER.info("set default config");
-		try {
-			API.INSTANCE.defaultConfig();
-		} catch (APIException e) {
-			LOGGER.warn("fail to schedule task", e);
-			return _("Can't schedule backup task ! If the problem persists, try to re-install mirarca.");
-		}
+        // Set other settings to default.
+        LOGGER.info("set default config");
+        try {
+            API.INSTANCE.defaultConfig();
+        } catch (APIException e) {
+            LOGGER.warn("fail to schedule task", e);
+            return _("Can't schedule backup task ! If the problem persists, try to re-install mirarca.");
+        }
 
-		return null;
+        return null;
 
-	}
+    }
 
 }

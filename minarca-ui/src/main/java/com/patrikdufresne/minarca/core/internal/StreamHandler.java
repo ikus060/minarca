@@ -20,98 +20,96 @@ import org.slf4j.LoggerFactory;
  */
 public class StreamHandler extends Thread {
 
-	private static final int CR = 10;
+    private static final int CR = 10;
 
-	private static final int LF = 13;
-	/**
-	 * Logger
-	 */
-	private static final transient Logger LOGGER = LoggerFactory
-			.getLogger(StreamHandler.class);
-	/**
-	 * Data return from the process execution.
-	 */
-	private StringBuilder buf = new StringBuilder();
-	/**
-	 * Process to monitor.
-	 */
-	private Process p;
+    private static final int LF = 13;
+    /**
+     * Logger
+     */
+    private static final transient Logger LOGGER = LoggerFactory.getLogger(StreamHandler.class);
+    /**
+     * Data return from the process execution.
+     */
+    private StringBuilder buf = new StringBuilder();
+    /**
+     * Process to monitor.
+     */
+    private Process p;
 
-	/**
-	 * Password value to answer.
-	 */
-	private String password;
+    /**
+     * Password value to answer.
+     */
+    private String password;
 
-	/**
-	 * Process stream handler.
-	 * 
-	 * @param p
-	 */
-	public StreamHandler(Process p) {
-		this(p, null);
-	}
+    /**
+     * Process stream handler.
+     * 
+     * @param p
+     */
+    public StreamHandler(Process p) {
+        this(p, null);
+    }
 
-	/**
-	 * The process to be linked to.
-	 * 
-	 * @param p
-	 */
-	public StreamHandler(Process p, String password) {
-		Validate.notNull(this.p = p);
-		this.password = password;
-	}
+    /**
+     * The process to be linked to.
+     * 
+     * @param p
+     */
+    public StreamHandler(Process p, String password) {
+        Validate.notNull(this.p = p);
+        this.password = password;
+    }
 
-	/**
-	 * Get data return by plink.
-	 * 
-	 * @return
-	 */
-	public String getOutput() {
-		synchronized (buf) {
-			return buf.toString();
-		}
-	}
+    /**
+     * Get data return by plink.
+     * 
+     * @return
+     */
+    public String getOutput() {
+        synchronized (buf) {
+            return buf.toString();
+        }
+    }
 
-	@Override
-	public void run() {
-		synchronized (buf) {
-			boolean answered = false;
-			Writer out = new BufferedWriter(new OutputStreamWriter(
-					this.p.getOutputStream()));
-			InputStream in = this.p.getInputStream();
-			// Read stream line by line without buffer (otherwise it block).
-			try {
-				ByteArrayOutputStream data = new ByteArrayOutputStream();
-				int b;
-				while ((b = in.read()) != -1) {
-					// Write the byte into a buffer
-					if (b == CR || b == LF) {
-						String line = new String(data.toByteArray());
-						if (!line.isEmpty()) {
-							LOGGER.debug(line);
-							buf.append(line);
-							buf.append(SystemUtils.LINE_SEPARATOR);
-						}
-						data.reset();
-					} else {
-						data.write(b);
-					}
-					if (!answered && this.password != null) {
-						String prompt = new String(data.toByteArray());
-						if (prompt.endsWith("password: ")) {
-							LOGGER.debug(prompt);
-							out.append(password);
-							out.append(SystemUtils.LINE_SEPARATOR);
-							out.flush();
-							// Reset the buffer
-							data.reset();
-							answered = true;
-						}
-					}
-				}
-			} catch (IOException e) {
-				LOGGER.warn("unknown IO error", e);
-			}
-		}
-	}
+    @Override
+    public void run() {
+        synchronized (buf) {
+            boolean answered = false;
+            Writer out = new BufferedWriter(new OutputStreamWriter(this.p.getOutputStream()));
+            InputStream in = this.p.getInputStream();
+            // Read stream line by line without buffer (otherwise it block).
+            try {
+                ByteArrayOutputStream data = new ByteArrayOutputStream();
+                int b;
+                while ((b = in.read()) != -1) {
+                    // Write the byte into a buffer
+                    if (b == CR || b == LF) {
+                        String line = new String(data.toByteArray());
+                        if (!line.isEmpty()) {
+                            LOGGER.debug(line);
+                            buf.append(line);
+                            buf.append(SystemUtils.LINE_SEPARATOR);
+                        }
+                        data.reset();
+                    } else {
+                        data.write(b);
+                    }
+                    if (!answered && this.password != null) {
+                        String prompt = new String(data.toByteArray());
+                        if (prompt.endsWith("password: ")) {
+                            LOGGER.debug(prompt);
+                            out.append(password);
+                            out.append(SystemUtils.LINE_SEPARATOR);
+                            out.flush();
+                            // Reset the buffer
+                            data.reset();
+                            answered = true;
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.warn("unknown IO error", e);
+            }
+        }
+    }
 }

@@ -15,76 +15,74 @@ import com.patrikdufresne.minarca.core.internal.InternalHttpClient;
  * 
  */
 public class Client {
-	/**
-	 * The logger.
-	 */
-	private static final transient Logger LOGGER = LoggerFactory
-			.getLogger(Client.class);
-	/**
-	 * Locations page.
-	 */
-	private static final String PAGE_LOCATIONS = "/";
-	/**
-	 * Reference to the internal HTTP client used to request pages.
-	 */
-	private InternalHttpClient http;
+    /**
+     * The logger.
+     */
+    private static final transient Logger LOGGER = LoggerFactory.getLogger(Client.class);
+    /**
+     * Locations page.
+     */
+    private static final String PAGE_LOCATIONS = "/";
+    /**
+     * Reference to the internal HTTP client used to request pages.
+     */
+    private InternalHttpClient http;
 
-	private String password;
+    private String password;
 
-	private String username;
+    private String username;
 
-	/**
-	 * Create a new minarca client.
-	 * 
-	 * @param username
-	 *            the username.
-	 * @param password
-	 *            the password.
-	 * @throws APIException
-	 * @throws MalformedURLException
-	 */
-	protected Client(String username, String password) throws APIException {
-		this(API.BASE_URL, username, password);
-	}
+    /**
+     * Create a new minarca client.
+     * 
+     * @param username
+     *            the username.
+     * @param password
+     *            the password.
+     * @throws APIException
+     * @throws MalformedURLException
+     */
+    protected Client(String username, String password) throws APIException {
+        this(API.BASE_URL, username, password);
+    }
 
-	/**
-	 * Private constructor providing default URL.
-	 * 
-	 * @param url
-	 * @param username
-	 * @param password
-	 * @throws APIException
-	 */
-	private Client(String url, String username, String password)
-			throws APIException {
-		Validate.notNull(this.username = username);
-		Validate.notNull(this.password = password);
-		// Check credentials by requesting the locations page.
-		LOGGER.debug("authentication to minarca as {}", username);
-		this.http = new InternalHttpClient(API.BASE_URL, username, password);
-		this.http.get(PAGE_LOCATIONS);
-	}
+    /**
+     * Private constructor providing default URL.
+     * 
+     * @param url
+     * @param username
+     * @param password
+     * @throws APIException
+     */
+    private Client(String url, String username, String password) throws APIException {
+        Validate.notNull(this.username = username);
+        Validate.notNull(this.password = password);
+        // Check credentials by requesting the locations page.
+        LOGGER.debug("authentication to minarca as {}", username);
+        this.http = new InternalHttpClient(API.BASE_URL, username, password);
+        this.http.get(PAGE_LOCATIONS);
+    }
 
-	/**
-	 * Register a new computer.
-	 * <p>
-	 * A successful link of this computer will generate a new configuration
-	 * file.
-	 * <p>
-	 * This implementation will generate public and private keys for putty. The
-	 * public key will be sent to minarca. The computer name is added to the
-	 * comments.
-	 * 
-	 * 
-	 * @param computername
-	 *            friendly name to represent this computer.
-	 * @throws APIException
-	 *             if the keys can't be created.
-	 * @throws IllegalAccessException
-	 *             if the computer name is not valid.
-	 */
-	public void link(String computername) throws APIException {
-		API.INSTANCE.link(this.username, this.password, computername);
-	}
+    /**
+     * Register a new computer.
+     * <p>
+     * A successful link of this computer will generate a new configuration
+     * file.
+     * <p>
+     * This implementation will generate public and private keys for putty. The
+     * public key will be sent to minarca. The computer name is added to the
+     * comments.
+     * 
+     * 
+     * @param computername
+     *            friendly name to represent this computer.
+     * @throws APIException
+     *             if the keys can't be created.
+     * @throws IllegalAccessException
+     *             if the computer name is not valid.
+     */
+    public void link(String computername) throws APIException {
+        API.INSTANCE.link(this.username, this.password, computername);
+    }
 
 }

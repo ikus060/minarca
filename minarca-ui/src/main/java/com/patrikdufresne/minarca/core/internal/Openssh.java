@@ -8,19 +8,19 @@ import com.patrikdufresne.minarca.core.APIException;
 
 public class Openssh extends SSH {
 
-	private String remotehost;
-	private String username;
-	private String password;
+    private String remotehost;
+    private String username;
+    private String password;
 
-	public Openssh(String remotehost, String username, String password) {
-		Validate.notNull(this.remotehost = remotehost);
-		Validate.notNull(this.username = username);
-		Validate.notNull(this.password = password);
-	}
+    public Openssh(String remotehost, String username, String password) {
+        Validate.notNull(this.remotehost = remotehost);
+        Validate.notNull(this.username = username);
+        Validate.notNull(this.password = password);
+    }
 
-	@Override
-	public void sendPublicKey(File publicKey) throws APIException {
-		// TODO Use ssh-copy-id
-	}
+    @Override
+    public void sendPublicKey(File publicKey) throws APIException {
+        // TODO Use ssh-copy-id
+    }
 
 }
