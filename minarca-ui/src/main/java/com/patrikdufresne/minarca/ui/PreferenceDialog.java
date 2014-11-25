@@ -17,7 +17,6 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -25,9 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.TableWrapData;
@@ -46,7 +43,6 @@ import com.patrikdufresne.minarca.core.GlobPattern;
  * 
  */
 public class PreferenceDialog extends Dialog {
-
 	private static final transient Logger LOGGER = LoggerFactory
 			.getLogger(PreferenceDialog.class);
 
@@ -81,12 +77,34 @@ public class PreferenceDialog extends Dialog {
 	}
 
 	/**
+	 * Handle close button.
+	 */
+	@Override
+	protected void buttonPressed(int buttonId) {
+		if (IDialogConstants.CLOSE_ID == buttonId) {
+			setReturnCode(IDialogConstants.CLOSE_ID);
+			close();
+		} else {
+			super.buttonPressed(buttonId);
+		}
+	}
+
+	/**
 	 * Sets dialog title
 	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(_("Minarca preferences"));
+	}
+
+	/**
+	 * Create a single Close button
+	 */
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		createButton(parent, IDialogConstants.CLOSE_ID,
+				IDialogConstants.CLOSE_LABEL, true);
 	}
 
 	@Override
