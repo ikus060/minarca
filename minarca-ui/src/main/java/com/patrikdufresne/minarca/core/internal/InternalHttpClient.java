@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.Client;
-import com.patrikdufresne.minarca.ui.setup.SetupDialog;
 
 /**
  * This class is used by the {@link Client} to execute HTTP request.

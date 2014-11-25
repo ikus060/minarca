@@ -11,6 +11,10 @@ import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,12 +23,16 @@ import java.util.Properties;
 
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
+import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
-import com.patrikdufresne.minarca.core.internal.Schtasks;
+import com.patrikdufresne.minarca.core.internal.Keygen;
+import com.patrikdufresne.minarca.core.internal.Plink;
+import com.patrikdufresne.minarca.core.internal.Scheduler;
 
 /**
  * This class is the main entry point to do everything related to minarca.
@@ -38,6 +46,12 @@ public enum API {
 	 * Application name used for sub folder
 	 */
 	private static final String APPNAME = "minarca";
+
+	/**
+	 * Base URL. TODO change this.
+	 */
+	protected static final String BASE_URL = "http://rdiffweb.patrikdufresne.com";
+
 	/**
 	 * Property name.
 	 */
@@ -48,6 +62,11 @@ public enum API {
 	 * file.
 	 */
 	private static final String CONF_FILENAME = "conf";
+
+	/**
+	 * The remote host.
+	 */
+	private static final String DEFAULT_REMOTEHOST = "fente.patrikdufresne.com";
 
 	/**
 	 * Exclude filename.
@@ -66,26 +85,9 @@ public enum API {
 			.getLogger(API.class);
 
 	/**
-	 * Executable script to run backup.
-	 */
-	private static final String MINARCA_BATCH = "minarca.bat";
-
-	/**
-	 * New line separator.
-	 */
-	private static final String NEW_LINE = System.getProperty("line.separator");
-
-	/**
-	 * Property used to define the location of minarca.bat file.
-	 */
-	private static final String PROPERTY_MINARCA_BATCH_LOCATION = "minarca.bat.location";
-
-	/**
 	 * Property name.
 	 */
 	private static final String REMOTEHOST = "remotehost";
-
-	private static final String TASK_NAME = "minarca backup";
 
 	/**
 	 * Property name.
@@ -98,17 +100,18 @@ public enum API {
 	 * @return return a File instance.
 	 */
 	public static File getConfigDirFile() {
-		String osName = System.getProperty("os.name"); //$NON-NLS-1$
-		String homeDir = System.getProperty("user.home"); //$NON-NLS-1$
-		if (osName.equals("Linux")) { //$NON-NLS-1$
-			File configDir = new File(homeDir, ".config/" + APPNAME); //$NON-NLS-1$
+		if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
+			File configDir = new File(SystemUtils.getUserHome(),
+					"AppData/Local/" + APPNAME); //$NON-NLS-1$
 			configDir.mkdirs();
 			return configDir;
-		} else {
-			File configDir = new File(homeDir, "AppData/Local/" + APPNAME); //$NON-NLS-1$
+		} else if (SystemUtils.IS_OS_LINUX) {
+			File configDir = new File(SystemUtils.getUserHome(),
+					".config/" + APPNAME); //$NON-NLS-1$
 			configDir.mkdirs();
 			return configDir;
 		}
+		throw unsupportedOS();
 	}
 
 	/**
@@ -127,7 +130,7 @@ public enum API {
 		host = System.getenv("HOSTNAME");
 		if (host != null)
 			return host.toLowerCase();
-
+		// Fallback and use Inet interface.
 		try {
 			String result = InetAddress.getLocalHost().getHostName();
 			if (StringUtils.isNotEmpty(result))
@@ -139,43 +142,75 @@ public enum API {
 	}
 
 	public static List<GlobPattern> getDefaultExcludes() {
-		String osName = System.getProperty("os.name");
-		if (osName.equals("Linux")) { //$NON-NLS-1$
+		if (SystemUtils.IS_OS_WINDOWS) {
+			String userHome = System.getProperty("user.home");
+			List<GlobPattern> list = new ArrayList<GlobPattern>();
+			list.add(new GlobPattern("**/pagefile.sys"));
+			list.add(new GlobPattern("**/NTUSER.DAT*"));
+			list.add(new GlobPattern("**/desktop.ini"));
+			list.add(new GlobPattern("**/ntuser.ini"));
+			list.add(new GlobPattern("**/Thumbs.db"));
+			list.add(new GlobPattern("**/Default.rdp"));
+			list.add(new GlobPattern("**/ntuser.dat*"));
+			list.add(new GlobPattern("C:/Recovery/"));
+			list.add(new GlobPattern("C:/$Recycle.Bin/"));
+			String windowDir = System.getenv("SystemRoot");
+			if (windowDir != null) {
+				list.add(new GlobPattern(windowDir));
+			}
+			String temp = System.getenv("TEMP");
+			if (temp != null) {
+				list.add(new GlobPattern(temp));
+			}
+			list.add(new GlobPattern(userHome + "/AppData/"));
+			list.add(new GlobPattern(userHome + "/Tracing/"));
+			list.add(new GlobPattern(userHome + "/Recent/"));
+			list.add(new GlobPattern(userHome + "/PrintHood/"));
+			list.add(new GlobPattern(userHome + "/NetHood/"));
+			list.add(new GlobPattern(userHome + "/Searches/"));
+			return list;
+		} else if (SystemUtils.IS_OS_LINUX) {
 			return Arrays.asList(new GlobPattern(".*"), new GlobPattern("*~"));
 		}
-		String userHome = System.getProperty("user.home");
-		List<GlobPattern> list = new ArrayList<GlobPattern>();
-		list.add(new GlobPattern("**/pagefile.sys"));
-		list.add(new GlobPattern("**/NTUSER.DAT*"));
-		list.add(new GlobPattern("**/desktop.ini"));
-		list.add(new GlobPattern("**/ntuser.ini"));
-		list.add(new GlobPattern("**/Thumbs.db"));
-		list.add(new GlobPattern("**/Default.rdp"));
-		list.add(new GlobPattern("**/ntuser.dat*"));
-		list.add(new GlobPattern("C:/Recovery/"));
-		String windowDir = System.getenv("SystemRoot");
-		if (windowDir != null) {
-			list.add(new GlobPattern(windowDir));
-		}
-		String temp = System.getenv("TEMP");
-		if (temp != null) {
-			list.add(new GlobPattern(temp));
-		}
-		list.add(new GlobPattern(userHome + "/AppData/"));
-		list.add(new GlobPattern(userHome + "/Tracing/"));
-		return list;
-
+		throw unsupportedOS();
 	}
 
 	public static List<GlobPattern> getDefaultIncludes() {
-		// Return user directory.
-		return Arrays.asList(new GlobPattern(System.getProperty("user.home")));
+		if (SystemUtils.IS_OS_WINDOWS) {
+			// Return user directory.
+			return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
+		} else if (SystemUtils.IS_OS_LINUX) {
+			// Return user directory.
+			return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
+		}
+		throw unsupportedOS();
+	}
+
+	/**
+	 * Return the home driver ( the only drive to be backup.
+	 * 
+	 * @return
+	 */
+	public static File getHomeDrive() {
+		String homedrive = System.getenv("HOMEDRIVER");
+		// Check if env variable contains something takt make senses
+		File file = new File(homedrive + SystemUtils.PATH_SEPARATOR);
+		if (file.exists() && file.isDirectory()) {
+			return file;
+		}
+		return new File("C:\\");
+	}
+
+	private static UnsupportedOperationException unsupportedOS() {
+		return new UnsupportedOperationException(SystemUtils.OS_NAME
+				+ " not supported");
 	}
 
 	/**
 	 * Reference to the configuration file.
 	 */
 	private File confFile;
+
 	/**
 	 * Reference to exclude file list.
 	 */
@@ -223,7 +258,7 @@ public enum API {
 	public void checkConfig() throws APIException {
 		// Basic sanity check to make sure it's configured. If not, display the
 		// setup dialog.
-		if (StringUtils.isEmpty(getComputername())
+		if (StringUtils.isEmpty(getComputerName())
 				|| StringUtils.isEmpty(getRemotehost())
 				|| StringUtils.isEmpty(getUsername())) {
 			throw new NotConfiguredException(_("minarca is not configured"));
@@ -232,7 +267,7 @@ public enum API {
 			throw new MissConfiguredException(
 					_("includes or excludes pattern are missing"));
 		}
-		if (!new Schtasks().exists(TASK_NAME)) {
+		if (!Scheduler.getInstance().exists()) {
 			throw new MissConfiguredException(_("scheduled tasks is missing"));
 		}
 	}
@@ -260,33 +295,17 @@ public enum API {
 		setExcludes(getDefaultExcludes());
 
 		// Delete & create schedule tasks.
-		Schtasks scheduler = new Schtasks();
-		if (scheduler.exists(TASK_NAME)) {
-			scheduler.delete(TASK_NAME);
-		}
-		scheduler.create(TASK_NAME, getBackupCommand().getAbsolutePath());
+		Scheduler scheduler = Scheduler.getInstance();
+		scheduler.create();
 	}
 
 	/**
-	 * Return the command line to be executed to run a backup.
+	 * Return default browse URL for the current computer.
 	 * 
 	 * @return
-	 * @throws APIException
 	 */
-	private File getBackupCommand() throws APIException {
-		List<String> locations = new ArrayList<String>();
-		String value = System.getProperty(PROPERTY_MINARCA_BATCH_LOCATION);
-		if (value != null) {
-			locations.add(value);
-		}
-		locations.add(".");
-		for (String location : locations) {
-			File batch = new File(location, MINARCA_BATCH);
-			if (batch.isFile() && batch.canRead()) {
-				return batch;
-			}
-		}
-		throw new APIException(_("{} is missing ", MINARCA_BATCH));
+	public String getBrowseUrl() {
+		return BASE_URL + "/browse/" + getComputerName();
 	}
 
 	/**
@@ -294,7 +313,7 @@ public enum API {
 	 * 
 	 * @return the computer name.
 	 */
-	public String getComputername() {
+	public String getComputerName() {
 		return this.properties.getProperty(COMPUTERNAME);
 	}
 
@@ -336,6 +355,19 @@ public enum API {
 	}
 
 	/**
+	 * Return the remote host to be used for SSH communication.
+	 * <p>
+	 * Current implementation return the same SSH server. In future, this
+	 * implementation might changed to request the web server for a specific
+	 * URL.
+	 * 
+	 * @return
+	 */
+	protected String getRemoteHost() {
+		return DEFAULT_REMOTEHOST;
+	}
+
+	/**
 	 * Get the username used for the backup (username used to authentication
 	 * with SSH server).
 	 * 
@@ -343,6 +375,71 @@ public enum API {
 	 */
 	public String getUsername() {
 		return this.properties.getProperty(USERNAME);
+	}
+
+	/**
+	 * Register a new computer.
+	 * <p>
+	 * A successful link of this computer will generate a new configuration
+	 * file.
+	 * <p>
+	 * This implementation will generate public and private keys for putty. The
+	 * public key will be sent to minarca. The computer name is added to the
+	 * comments.
+	 * 
+	 * 
+	 * @param computername
+	 *            friendly name to represent this computer.
+	 * @throws APIException
+	 *             if the keys can't be created.
+	 * @throws IllegalAccessException
+	 *             if the computer name is not valid.
+	 */
+	public void link(String username, String password, String computername)
+			throws APIException {
+		Validate.notNull(username);
+		Validate.notNull(password);
+		Validate.notEmpty(computername);
+		Validate.isTrue(computername.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
+
+		/*
+		 * Generate the keys
+		 */
+		LOGGER.debug("generating public and private key for {}", computername);
+		File idrsaFile = new File(API.getConfigDirFile(), "id_rsa.pub");
+		File identityFile = new File(API.getConfigDirFile(), "key.ppk");
+		try {
+			// Generate a key pair.
+			KeyPair pair = Keygen.generateRSA();
+			// Generate a simple id_rsa.pub file.
+			Keygen.toPublicIdRsa((RSAPublicKey) pair.getPublic(), computername,
+					idrsaFile);
+			// Generate a Putty private key file.
+			Keygen.toPrivatePuttyKey(pair, computername, identityFile);
+		} catch (NoSuchAlgorithmException e) {
+			throw new APIException("fail to generate the keys", e);
+		} catch (IOException e) {
+			throw new APIException("fail to generate the keys", e);
+		} catch (InvalidKeyException e) {
+			throw new APIException("fail to generate the keys", e);
+		}
+
+		/*
+		 * Share them via ssh.
+		 */
+		LOGGER.debug("sending public key trought SSH");
+		Plink ssh = new Plink(getRemoteHost(), username, password, identityFile);
+		ssh.sendPublicKey(idrsaFile);
+
+		/*
+		 * Generate configuration file.
+		 */
+		LOGGER.debug("saving configuration [{}][{}][{}]", computername,
+				username, getRemoteHost());
+		API.INSTANCE.setUsername(username);
+		API.INSTANCE.setComputerName(computername);
+		API.INSTANCE.setRemotehost(getRemoteHost());
+
 	}
 
 	/**
@@ -460,6 +557,22 @@ public enum API {
 	}
 
 	/**
+	 * Used to unlink this computer.
+	 * 
+	 * @throws APIException
+	 */
+	public void unlink() throws APIException {
+		// To unlink, delete the configuration and schedule task.
+		setComputerName(null);
+		setUsername(null);
+		setRemotehost(null);
+
+		// Delete task
+		Scheduler scheduler = Scheduler.getInstance();
+		scheduler.delete();
+	}
+
+	/**
 	 * Internal method used to write the patterns into a file.
 	 * 
 	 * @param file
@@ -471,10 +584,9 @@ public enum API {
 		FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
 				"ISO-8859-1");
 		for (GlobPattern line : pattern) {
-			writer.append(line.toString());
-			writer.append(NEW_LINE);
+			writer.append(line.value());
+			writer.append(SystemUtils.LINE_SEPARATOR);
 		}
 		writer.close();
 	}
-
 }

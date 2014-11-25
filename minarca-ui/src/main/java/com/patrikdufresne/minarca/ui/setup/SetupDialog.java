@@ -29,35 +29,64 @@ import com.patrikdufresne.minarca.core.APIException.ApplicationException;
 import com.patrikdufresne.minarca.core.Client;
 import com.patrikdufresne.minarca.ui.AppFormToolkit;
 
+/**
+ * Dialog used to configure the application the first time the user open it.
+ * It's similar to a wizard.
+ * 
+ * @author ikus060-vm
+ *
+ */
 public class SetupDialog extends Dialog {
 
 	private static final transient Logger LOGGER = LoggerFactory
 			.getLogger(SetupDialog.class);
 
+	/**
+	 * Open this dialog.
+	 * 
+	 * @param parentShell
+	 * @return True if the setup is a success. False if cancel by user.
+	 */
 	public static boolean open(Shell parentShell) {
-
 		SetupDialog dlg = new SetupDialog(parentShell);
 		dlg.setBlockOnOpen(true);
 		return dlg.open() == Window.OK;
-
 	}
 
+	/**
+	 * Connection to minarca.
+	 */
 	private Client client;
-
+	/**
+	 * The composite holding the page.
+	 */
 	private Composite comp;
-
+	/**
+	 * Form tool kit to provide a webpage style.
+	 */
 	private AppFormToolkit ft;
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param parentShell
+	 */
 	protected SetupDialog(Shell parentShell) {
 		super(parentShell);
 	}
 
+	/**
+	 * Add a ticlet to the dialog.
+	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText(_("minarca"));
+		newShell.setText(_("Setup minarca"));
 	}
 
+	/**
+	 * Replace the default implementation to create a Form
+	 */
 	@Override
 	protected Control createContents(Composite parent) {
 
@@ -84,6 +113,9 @@ public class SetupDialog extends Dialog {
 		return form;
 	}
 
+	/**
+	 * Create the first page.
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 
@@ -286,6 +318,9 @@ public class SetupDialog extends Dialog {
 		}
 	}
 
+	/**
+	 * Return a fixed dialog size.
+	 */
 	@Override
 	protected Point getInitialSize() {
 		// Sets fixed window size.

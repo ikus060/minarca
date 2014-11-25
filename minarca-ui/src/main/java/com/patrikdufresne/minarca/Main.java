@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -56,7 +58,11 @@ public class Main {
 	 */
 	public static String getCurrentVersion() {
 		// Get the version from the package manifest
-		return Main.class.getPackage().getImplementationVersion();
+		String version = Main.class.getPackage().getImplementationVersion();
+		if (version == null) {
+			return "DEV";
+		}
+		return version;
 	}
 
 	/**
@@ -136,6 +142,14 @@ public class Main {
 		// Update logger
 		updateJFacePolicy();
 
+		// Check OS
+		if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
+			MessageDialog.openError(null, Display.getAppName(),
+					_("Minarca doesn't support you OS. "
+							+ "This application will close."));
+			return;
+		}
+
 		// Check configuration or re-configured
 		if (!configure()) {
 			return;
@@ -159,6 +173,7 @@ public class Main {
 				}
 			}
 		} catch (Exception e) {
+			LOGGER.error("unknown error", e);
 			MessageDialog.openWarning(null, Display.getAppName(),
 					e.getMessage());
 		} finally {
