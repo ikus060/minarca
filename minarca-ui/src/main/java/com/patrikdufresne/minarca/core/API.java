@@ -32,6 +32,7 @@ import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.Plink;
+import com.patrikdufresne.minarca.core.internal.SSH;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 
 /**
@@ -428,7 +429,7 @@ public enum API {
 		 * Share them via ssh.
 		 */
 		LOGGER.debug("sending public key trought SSH");
-		Plink ssh = new Plink(getRemoteHost(), username, password, identityFile);
+		SSH ssh = SSH.getInstance(getRemoteHost(), username, password);
 		ssh.sendPublicKey(idrsaFile);
 
 		/*

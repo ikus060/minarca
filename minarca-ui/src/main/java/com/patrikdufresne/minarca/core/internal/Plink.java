@@ -20,9 +20,9 @@ import com.patrikdufresne.minarca.core.APIException;
  * locating plink, authentication, data buffering.
  * 
  * @author ikus060-vm
- *
+ * 
  */
-public class Plink {
+public class Plink extends SSH {
 
 	private static final transient Logger LOGGER = LoggerFactory
 			.getLogger(Plink.class);
@@ -41,10 +41,6 @@ public class Plink {
 	 */
 	private String user;
 	/**
-	 * Location of the identity file
-	 */
-	private File identityFile;
-	/**
 	 * Password for authentication.
 	 */
 	private String password;
@@ -60,13 +56,10 @@ public class Plink {
 	 * @param remoteHost
 	 *            the remove host
 	 */
-	public Plink(String remoteHost, String user, String password,
-			File identityFile) {
+	public Plink(String remoteHost, String user, String password) {
 		Validate.notNull(this.remoteHost = remoteHost);
 		Validate.notNull(this.user = user);
-		this.password = password;
-		this.identityFile = identityFile;
-		Validate.isTrue(this.password != null || this.identityFile != null);
+		Validate.notNull(this.password = password);
 	}
 
 	/**
