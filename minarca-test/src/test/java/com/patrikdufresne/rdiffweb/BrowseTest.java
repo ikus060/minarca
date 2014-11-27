@@ -115,7 +115,9 @@ public class BrowseTest extends AbstractRdiffwebTest {
 		 * Check restore
 		 */
 		data = browse(REPO_NAME, "Répertoire%20Supprimé/", true);
-		assertContains("Download ZIP", data);
+		assertContains("Download", data);
+		assertContains("ZIP", data);
+		assertContains("TAR.GZ", data);
 		assertContains("2014-11-01 15:51", data);
 		assertContains("/restore/" + REPO_NAME
 				+ "/R%C3%A9pertoire%20Supprim%C3%A9/?date=1414871475", data);
@@ -149,7 +151,9 @@ public class BrowseTest extends AbstractRdiffwebTest {
 				REPO_NAME,
 				"R%C3%A9pertoire%20%28%40vec%29%20%7Bc%C3%A0ra%C3%A7t%23%C3%A8r%C3%AB%7D%20%24%C3%A9p%C3%AAcial/",
 				true);
-		assertContains("Download ZIP", data);
+		assertContains("Download", data);
+		assertContains("ZIP", data);
+		assertContains("TAR.GZ", data);
 		assertContains("2014-11-05 16:05", data);
 
 	}
@@ -187,13 +191,13 @@ public class BrowseTest extends AbstractRdiffwebTest {
 			browse("/invalide", "");
 			fail("shoudl fail");
 		} catch (ApplicationException e) {
-			assertEquals("Access is denied.", e.getMessage());
+			assertContains("Access is denied.", e.getMessage());
 		}
 		try {
 			browse("invalide", "");
 			fail("shoudl fail");
 		} catch (ApplicationException e) {
-			assertEquals("Access is denied.", e.getMessage());
+			assertContains("Access is denied.", e.getMessage());
 		}
 	}
 
@@ -210,7 +214,8 @@ public class BrowseTest extends AbstractRdiffwebTest {
 			browse(REPO_NAME, "invalid");
 			fail("shoudl fail");
 		} catch (ApplicationException e) {
-			assertEquals("The backup location does not exist.", e.getMessage());
+			assertContains("The backup location does not exist.",
+					e.getMessage());
 		}
 	}
 
@@ -229,7 +234,8 @@ public class BrowseTest extends AbstractRdiffwebTest {
 			browse(REPO_NAME, "rdiff-backup-data");
 			fail("should fail");
 		} catch (ApplicationException e) {
-			assertEquals("The backup location does not exist.", e.getMessage());
+			assertContains("The backup location does not exist.",
+					e.getMessage());
 		}
 
 	}

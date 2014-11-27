@@ -8,11 +8,27 @@
     </parent>
     <artifactId>minarca-test</artifactId>
     <name>Integration test for rdiffweb</name>
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
+    <build>
+        <plugins>
+            <!-- Declare surefire explicitly to skip test by default. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18</version>
+                <configuration>
+                    <skipTests>${skipTests}</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.1.1</version>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <!-- jsoup HTML parser library @ http://jsoup.org/ -->

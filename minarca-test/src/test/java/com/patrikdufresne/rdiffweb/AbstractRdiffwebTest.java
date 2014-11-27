@@ -1,6 +1,6 @@
 package com.patrikdufresne.rdiffweb;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -17,12 +18,13 @@ import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.ProtocolException;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,9 +33,9 @@ import org.jsoup.select.Elements;
 
 public class AbstractRdiffwebTest {
 
-	private static String BASE_URL = "http://rdiffweb.patrikdufresne.com";
+	protected static String BASE_URL = "http://rdiffweb.patrikdufresne.com";
 
-	private static final String LOGIN = "/login/";
+	protected static final String LOGIN = "/login/";
 
 	protected static final String USERNAME = "rtest";
 
@@ -59,11 +61,22 @@ public class AbstractRdiffwebTest {
 		}
 	}
 
-	private HttpClient client = new DefaultHttpClient();
+	private DefaultHttpClient client;
 
 	private String cookies;
 
 	private final String USER_AGENT = "Mozilla/5.0";
+
+	public AbstractRdiffwebTest() {
+		client = new DefaultHttpClient();
+		client.setRedirectStrategy(new DefaultRedirectStrategy() {
+			@Override
+			protected URI createLocationURI(String location)
+					throws ProtocolException {
+				return super.createLocationURI(location);
+			}
+		});
+	}
 
 	/**
 	 * Check if the page return any error.
@@ -85,7 +98,8 @@ public class AbstractRdiffwebTest {
 		}
 	}
 
-	public String get(String url) throws ClientProtocolException, IOException {
+	protected synchronized String get(String url)
+			throws ClientProtocolException, IOException {
 
 		String page = getPageContent(BASE_URL + url);
 		if (page.contains("<title>Login")) {
@@ -146,7 +160,7 @@ public class AbstractRdiffwebTest {
 		return getFormParams(html, null, table);
 	}
 
-	private String getPageContent(String url) throws ClientProtocolException,
+	protected String getPageContent(String url) throws ClientProtocolException,
 			IOException {
 
 		HttpGet request = new HttpGet(url);
@@ -183,7 +197,7 @@ public class AbstractRdiffwebTest {
 
 	}
 
-	public String post(String url, Map<String, String> data)
+	protected synchronized String post(String url, Map<String, String> data)
 			throws ClientProtocolException, IOException {
 		// Build the post data.
 		List<NameValuePair> postParams = new ArrayList<NameValuePair>();
@@ -205,7 +219,7 @@ public class AbstractRdiffwebTest {
 		return page;
 	}
 
-	private String sendPost(String url, List<NameValuePair> postParams)
+	protected String sendPost(String url, List<NameValuePair> postParams)
 			throws ClientProtocolException, IOException {
 
 		HttpPost post = new HttpPost(url);

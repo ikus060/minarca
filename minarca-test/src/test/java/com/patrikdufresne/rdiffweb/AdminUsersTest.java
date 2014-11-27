@@ -90,8 +90,8 @@ public class AdminUsersTest extends AbstractRdiffwebTest {
 			throws ClientProtocolException, IOException {
 
 		// Add user to be listed
-		String data = addUser("Éric", "éric@test.com", "Éric",
-				"/var/backups/", false);
+		String data = addUser("Éric", "éric@test.com", "Éric", "/var/backups/",
+				false);
 		assertContains("User added successfully.", data);
 		assertContains("Éric", data);
 		assertContains("éric@test.com", data);
@@ -140,6 +140,12 @@ public class AdminUsersTest extends AbstractRdiffwebTest {
 	@Test
 	public void testAddUser_WithInvalidRootDirectory()
 			throws ClientProtocolException, IOException {
+		try {
+			deleteUser("test5");
+		} catch (ApplicationException e) {
+			// Swallow
+		}
+
 		// Add user with invalid path
 		String data = addUser("test5", "test1@test.com", "test5",
 				"/var/invalid/", false);
