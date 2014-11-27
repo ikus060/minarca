@@ -75,4 +75,16 @@ public class LoginTest extends AbstractRdiffwebTest {
 
 	}
 
+	@Test
+	public void testLogin_WithEmptyPassword() throws ClientProtocolException,
+			IOException {
+
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("login", USERNAME));
+		params.add(new BasicNameValuePair("password", ""));
+
+		String page = sendPost(BASE_URL + LOGIN, params);
+		assertContains("Invalid username or password.", page);
+	}
+
 }
