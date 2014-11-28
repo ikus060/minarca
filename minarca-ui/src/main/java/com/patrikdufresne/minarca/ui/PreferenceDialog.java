@@ -70,7 +70,7 @@ public class PreferenceDialog extends Dialog {
         return layoutData;
     }
 
-    private Button excludeDefaultsButton;
+    private Button excludeSysFilesButton;
 
     private AppFormToolkit ft;
 
@@ -258,19 +258,31 @@ public class PreferenceDialog extends Dialog {
         this.ft.createFormText(comp, "<h3>" + _("Ignore") + "</h3>", false);
 
         List<GlobPattern> excludes = API.INSTANCE.getExcludes();
-        boolean ignoreSysFiles = excludes.containsAll(API.getDefaultExcludes());
+        boolean excludeSysFiles = excludes.containsAll(API.getSysFilesExcludes());
+        boolean excludeDownloads = excludes.containsAll(API.getDownloadsExcludes());
 
         // Excludes defaults
-        this.excludeDefaultsButton = this.ft.createButton(comp, _("Ignore operating system files (recommended)"), SWT.CHECK);
-        this.excludeDefaultsButton.setSelection(ignoreSysFiles);
-        this.excludeDefaultsButton.setLayoutData(createTableWrapData());
-        this.excludeDefaultsButton.addSelectionListener(new SelectionAdapter() {
+        this.excludeSysFilesButton = this.ft.createButton(comp, _("Ignore operating system files (recommended)"), SWT.CHECK);
+        this.excludeSysFilesButton.setSelection(excludeSysFiles);
+        this.excludeSysFilesButton.setLayoutData(createTableWrapData());
+        this.excludeSysFilesButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handleExcludeDetaults(e);
+                handleExcludeDetaults(e, API.getSysFilesExcludes());
             }
         });
 
+         // Excludes 
+        this.excludeSysFilesButton = this.ft.createButton(comp, _("Ignore download folder (recommended)"), SWT.CHECK);
+        this.excludeSysFilesButton.setSelection(excludeDownloads);
+        this.excludeSysFilesButton.setLayoutData(createTableWrapData());
+        this.excludeSysFilesButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleExcludeDetaults(e, API.getDownloadsExcludes());
+            }
+        });
+        
         // Advance button
         Button advanceButton = this.ft.createButton(comp, _("Advance..."), SWT.PUSH);
         advanceButton.addSelectionListener(new SelectionAdapter() {
@@ -296,10 +308,23 @@ public class PreferenceDialog extends Dialog {
      * Called when user want to select advance filter.
      */
     protected void handleAdvancePatterns() {
-        // Open a dialog to edit filters.
+    	List<GlobPattern> excludes = API.INSTANCE.getExcludes();
+    	List<GlobPattern> defaultExcludes = new ArrayList<GlobPattern>();
+        boolean excludeSysFiles = excludes.containsAll(API.getSysFilesExcludes());
+        if(excludeSysFiles) {
+        	defaultExcludes.addAll(API.getSysFilesExcludes());
+        }
+        boolean excludeDownloads = excludes.containsAll(API.getDownloadsExcludes());
+        if(excludeDownloads){
+        	defaultExcludes.addAll(API.getDownloadsExcludes());
+        }
+        
+    	// Open a dialog to edit filters.
         IncludesDialog dlg = new IncludesDialog(this.getShell());
         dlg.setIncludes(API.INSTANCE.getIncludes());
-        dlg.setExcludes(API.INSTANCE.getExcludes());
+        dlg.setExcludes(excludes);
+        dlg.setDefaultIncludes(API.getDefaultIncludes());
+        dlg.setDefaultExcludes(defaultExcludes);
         if (dlg.open() != Window.OK) {
             return;
         }
@@ -316,12 +341,12 @@ public class PreferenceDialog extends Dialog {
      * 
      * @param event
      */
-    protected void handleExcludeDetaults(SelectionEvent event) {
+    protected void handleExcludeDetaults(SelectionEvent event, List<GlobPattern> list) {
         Set<GlobPattern> excludes = new LinkedHashSet<GlobPattern>(API.INSTANCE.getExcludes());
-        if (this.excludeDefaultsButton.getSelection()) {
-            excludes.addAll(API.getDefaultExcludes());
+        if (this.excludeSysFilesButton.getSelection()) {
+            excludes.addAll(list);
         } else {
-            excludes.removeAll(API.getDefaultExcludes());
+            excludes.removeAll(list);
         }
         try {
             API.INSTANCE.setExcludes(new ArrayList<GlobPattern>(excludes));
