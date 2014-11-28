@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core;
 
 public class APIException extends Exception {
@@ -8,7 +13,7 @@ public class APIException extends Exception {
      * Exception used to represent an application error. Message return in
      * alert-danger.
      * 
-     * @author ikus060
+     * @author Patrik Dufresne
      * 
      */
     public static class ApplicationException extends APIException {
@@ -20,7 +25,7 @@ public class APIException extends Exception {
     /**
      * Thrown when the application is not configured.
      * 
-     * @author ikus060-vm
+     * @author Patrik Dufresne
      *
      */
     public static class NotConfiguredException extends APIException {
@@ -32,7 +37,7 @@ public class APIException extends Exception {
     /**
      * Thrown when the application is miss configured
      * 
-     * @author ikus060-vm
+     * @author Patrik Dufresne
      *
      */
     public static class MissConfiguredException extends APIException {

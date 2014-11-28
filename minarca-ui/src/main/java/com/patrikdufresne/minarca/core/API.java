@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core;
 
 import static com.patrikdufresne.minarca.Localized._;
@@ -38,7 +43,7 @@ import com.patrikdufresne.minarca.core.internal.Scheduler;
 /**
  * This class is the main entry point to do everything related to minarca.
  * 
- * @author ikus060
+ * @author Patrik Dufresne
  * 
  */
 public enum API {

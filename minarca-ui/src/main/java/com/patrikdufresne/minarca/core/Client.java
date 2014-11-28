@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core;
 
 import java.net.MalformedURLException;
@@ -11,7 +16,7 @@ import com.patrikdufresne.minarca.core.internal.InternalHttpClient;
 /**
  * Used to represent a connection to minarca. Either via HTTP or SSH or both.
  * 
- * @author ikus060
+ * @author Patrik Dufresne
  * 
  */
 public class Client {

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
@@ -39,7 +44,7 @@ import com.patrikdufresne.minarca.core.GlobPattern;
 /**
  * This is the main windows of the application used to configure the backup.
  * 
- * @author ikus060
+ * @author Patrik Dufresne
  * 
  */
 public class PreferenceDialog extends Dialog {

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core.internal;
 
 import org.apache.commons.lang.SystemUtils;
@@ -11,7 +16,7 @@ import com.patrikdufresne.minarca.core.APIException;
  * the current operating system. This interface is indented to represent a
  * subset of the feature provided by the scheduler.
  * 
- * @author ikus060-vm
+ * @author Patrik Dufresne
  *
  */
 public abstract class Scheduler {

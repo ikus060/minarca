@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.ui.setup;
 
 import static com.patrikdufresne.minarca.Localized._;
@@ -33,7 +38,7 @@ import com.patrikdufresne.minarca.ui.AppFormToolkit;
  * Dialog used to configure the application the first time the user open it.
  * It's similar to a wizard.
  * 
- * @author ikus060-vm
+ * @author Patrik Dufresne
  * 
  */
 public class SetupDialog extends Dialog {

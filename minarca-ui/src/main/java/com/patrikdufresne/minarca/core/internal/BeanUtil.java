@@ -2,6 +2,11 @@
  * Copyright (c) 2013, Bell Canada All rights reserved.
  * Bell Canada PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core.internal;
 
 import java.beans.BeanInfo;

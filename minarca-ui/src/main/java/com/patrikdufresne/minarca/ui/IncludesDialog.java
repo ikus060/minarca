@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
@@ -54,7 +59,7 @@ import com.patrikdufresne.minarca.core.GlobPattern;
 /**
  * Dialog used to display and change includes patterns.
  * 
- * @author ikus060-vm
+ * @author Patrik Dufresne
  *
  */
 public class IncludesDialog extends TrayDialog {

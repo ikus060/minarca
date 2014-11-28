@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core.internal;
 
 import static com.patrikdufresne.minarca.Localized._;
@@ -22,7 +27,7 @@ import com.patrikdufresne.minarca.core.APIException;
 /**
  * Wrapper around "schtasks" command line.
  * 
- * @author ikus060-vm
+ * @author Patrik Dufresne
  *
  */
 public class SchedulerWindows extends Scheduler {

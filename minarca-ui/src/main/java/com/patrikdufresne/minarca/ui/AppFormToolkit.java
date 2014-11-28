@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.ui;
 
 import org.eclipse.jface.resource.FontRegistry;
@@ -23,7 +28,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * Customized implementation of FormToolkit to provide more font and color
  * related to this application.
  * 
- * @author ikus060
+ * @author Patrik Dufresne
  * 
  */
 public class AppFormToolkit extends FormToolkit {

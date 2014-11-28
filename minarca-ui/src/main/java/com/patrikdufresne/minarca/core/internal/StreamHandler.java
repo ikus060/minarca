@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core.internal;
 
 import java.io.BufferedWriter;
@@ -15,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Used to answer the password for putty process.
  * 
- * @author ikus060-vm
+ * @author Patrik Dufresne
  *
  */
 public class StreamHandler extends Thread {

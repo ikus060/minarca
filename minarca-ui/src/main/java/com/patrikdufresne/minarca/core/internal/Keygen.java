@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core.internal;
 
 import java.io.ByteArrayOutputStream;
@@ -31,7 +36,7 @@ import org.bouncycastle.openssl.PEMWriter;
  * <p>
  * Current implementation doesn't support passphrase (since I don't need it).
  * 
- * @author ikus060
+ * @author Patrik Dufresne
  * 
  */
 public class Keygen {

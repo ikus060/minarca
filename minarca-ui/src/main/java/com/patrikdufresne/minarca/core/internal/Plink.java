@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core.internal;
 
 import java.io.File;
@@ -19,7 +24,7 @@ import com.patrikdufresne.minarca.core.APIException;
  * This class is intented to hide all the complexity to communicate via ssh:
  * locating plink, authentication, data buffering.
  * 
- * @author ikus060-vm
+ * @author Patrik Dufresne
  * 
  */
 public class Plink extends SSH {

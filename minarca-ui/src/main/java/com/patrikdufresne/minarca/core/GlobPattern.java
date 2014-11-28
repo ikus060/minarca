@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core;
 
 import java.io.File;
@@ -14,7 +19,7 @@ import ch.qos.logback.core.joran.spi.Pattern;
 /**
  * Instance of this class represent a globbing pattern for include or exclude.
  * 
- * @author ikus060-vm
+ * @author Patrik Dufresne
  * @see http://www.nongnu.org/rdiff-backup/rdiff-backup.1.html
  */
 public class GlobPattern {
