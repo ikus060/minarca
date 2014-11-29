@@ -1,11 +1,11 @@
-!define AppName "Retienobox"
-!define ShortName "Retienobox"
+!define AppName "minarca"
+!define ShortName "minarca"
 !define Vendor "Patrik Dufresne Service Logiciel"
 !define LicenseFile "LICENSE.txt"
 !ifndef IS_64
-	!define AppExeFile "bin\retineobox.exe"
+	!define AppExeFile "bin\minarca.exe"
 !else
-	!define AppExeFile "bin\retineobox64.exe"
+	!define AppExeFile "bin\minarca64.exe"
 !endif
  
 !include "MUI.nsh"
