@@ -138,6 +138,10 @@ public class IncludesDialog extends TrayDialog {
         return new Image(Display.getDefault(), convertToSWT(bufferedImage));
     }
 
+    private List<GlobPattern> defaultExcludes = Collections.emptyList();
+    		
+	private List<GlobPattern> defaultIncludes = Collections.emptyList();
+    
     private List<GlobPattern> excludes = Collections.emptyList();
 
     private AppFormToolkit ft;
@@ -477,13 +481,23 @@ public class IncludesDialog extends TrayDialog {
             this.includes.add(include);
         }
     }
-
+    
+    /**
+     * Check if the given pattern is a "default" pattern. Those patterns should not be removed.
+     * @param p
+     * @return
+     */
     private boolean isDefaultExclude(GlobPattern p) {
-        return API.getDefaultExcludes().contains(p);
+        return defaultExcludes.contains(p);
     }
-
+    
+    /**
+     * Check if the given pattern is a "default" pattern. Those patterns should not be removed.
+     * @param p
+     * @return
+     */
     private boolean isDefaultInclude(GlobPattern p) {
-        return API.getDefaultIncludes().contains(p);
+        return defaultIncludes.contains(p);
     }
 
     /**
@@ -521,6 +535,14 @@ public class IncludesDialog extends TrayDialog {
         return true;
     }
 
+    public void setDefaultExcludes(List<GlobPattern> list) {
+    	this.defaultExcludes = new ArrayList<GlobPattern>(list);
+    }
+    
+    public void setDefaultIncludes(List<GlobPattern> list) {
+    	this.defaultIncludes = new ArrayList<GlobPattern>(list);
+    }
+    
     public void setExcludes(List<GlobPattern> excludes) {
         this.excludes = new ArrayList<GlobPattern>(excludes);
     }
