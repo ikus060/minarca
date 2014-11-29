@@ -8,13 +8,10 @@ package com.patrikdufresne.minarca.core;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 
 import org.jsoup.helper.Validate;
-
-import ch.qos.logback.core.joran.spi.Pattern;
 
 /**
  * Instance of this class represent a globbing pattern for include or exclude.

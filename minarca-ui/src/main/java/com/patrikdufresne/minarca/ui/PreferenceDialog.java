@@ -272,7 +272,7 @@ public class PreferenceDialog extends Dialog {
             }
         });
 
-         // Excludes 
+        // Excludes 
         this.excludeSysFilesButton = this.ft.createButton(comp, _("Ignore download folder (recommended)"), SWT.CHECK);
         this.excludeSysFilesButton.setSelection(excludeDownloads);
         this.excludeSysFilesButton.setLayoutData(createTableWrapData());
@@ -282,7 +282,7 @@ public class PreferenceDialog extends Dialog {
                 handleExcludeDetaults(e, API.getDownloadsExcludes());
             }
         });
-        
+
         // Advance button
         Button advanceButton = this.ft.createButton(comp, _("Advance..."), SWT.PUSH);
         advanceButton.addSelectionListener(new SelectionAdapter() {
@@ -308,18 +308,18 @@ public class PreferenceDialog extends Dialog {
      * Called when user want to select advance filter.
      */
     protected void handleAdvancePatterns() {
-    	List<GlobPattern> excludes = API.INSTANCE.getExcludes();
-    	List<GlobPattern> defaultExcludes = new ArrayList<GlobPattern>();
+        List<GlobPattern> excludes = API.INSTANCE.getExcludes();
+        List<GlobPattern> defaultExcludes = new ArrayList<GlobPattern>();
         boolean excludeSysFiles = excludes.containsAll(API.getSysFilesExcludes());
-        if(excludeSysFiles) {
-        	defaultExcludes.addAll(API.getSysFilesExcludes());
+        if (excludeSysFiles) {
+            defaultExcludes.addAll(API.getSysFilesExcludes());
         }
         boolean excludeDownloads = excludes.containsAll(API.getDownloadsExcludes());
-        if(excludeDownloads){
-        	defaultExcludes.addAll(API.getDownloadsExcludes());
+        if (excludeDownloads) {
+            defaultExcludes.addAll(API.getDownloadsExcludes());
         }
-        
-    	// Open a dialog to edit filters.
+
+        // Open a dialog to edit filters.
         IncludesDialog dlg = new IncludesDialog(this.getShell());
         dlg.setIncludes(API.INSTANCE.getIncludes());
         dlg.setExcludes(excludes);
