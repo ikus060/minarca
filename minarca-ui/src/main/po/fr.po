@@ -171,7 +171,7 @@ msgstr "Se connecter"
 #: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:150
 msgid "If you have an minarca account, enter your username and password."
 msgstr ""
-"Si vous pocédez déjà un compte Retinobox, entrez votre nom d'usager et votre "
+"Si vous pocédez déjà un compte minarca, entrez votre nom d'usager et votre "
 "mot de passe."
 
 #: com/patrikdufresne/minarca/ui/setup/SetupDialog.java:158

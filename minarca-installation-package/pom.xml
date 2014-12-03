@@ -10,6 +10,9 @@
     <artifactId>minarca-installation-package</artifactId>
     <packaging>pom</packaging>
     <name>minarca-installation-package</name>
+    <properties>
+        <icon.directory>${project.basedir}/src/main/icon</icon.directory>
+    </properties>
     <build>
         <plugins>
             <!--Generate the shell script to start the application from command 
@@ -156,54 +159,70 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Generate PNG from SVG -->
+            <plugin>
+                <groupId>net.trajano.mojo</groupId>
+                <artifactId>batik-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <svgResources>
+                                <resource>
+                                    <directory>${basedir}/src/main/svg</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>*.svg</include>
+                                    </includes>
+                                </resource>
+                            </svgResources>
+                            <destDir>${project.build.directory}/package</destDir>
+                        </configuration>
+                        <goals>
+                            <goal>rasterizer</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
                 <executions>
-                    <!-- Create the windows installer x86 -->
+                    <!-- Generate ICO from PNGs -->
                     <execution>
-                        <id>package-win-x86</id>
-                        <phase>package</phase>
+                        <id>create-icons</id>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <!-- Convert the license file into Window 
-                                    encoding -->
-                                <copy
-                                    file="${project.build.directory}/package/LICENSE"
-                                    tofile="${project.build.directory}/package/LICENSE.txt"
-                                    encoding="UTF-8" outputencoding="ISO-8859-1" />
-                                <exec osfamily="unix" executable="makensis"
-                                    dir="${project.build.directory}/package"
+                                <!-- Require icotool -->
+                                <exec executable="icotool"
+                                    dir="${project.build.directory}/package/"
                                     failonerror="true">
-                                    <!-- Avoid changing working directory -->
-                                    <arg value="-NOCD" />
-                                    <arg
-                                        value="${basedir}/src/main/nsis/setup.nsi" />
+                                    <arg value="-c" />
+                                    <arg value="-o" />
+                                    <arg value="minarca.ico" />
+                                    <arg value="minarca_16.png" />
+                                    <arg value="minarca_32.png" />
+                                    <arg value="minarca.png" />
                                 </exec>
-                                <exec osfamily="Windows"
-                                    executable="makensis.exe"
-                                    dir="${project.build.directory}/package"
-                                    failonerror="true">
-                                    <!-- Avoid changing working directory -->
-                                    <arg value="-NOCD" />
-                                    <arg
-                                        value="${basedir}/src/main/nsis/setup.nsi" />
-                                </exec>
-                                <move
-                                    file="${project.build.directory}/package/setup.exe"
-                                    tofile="${project.build.directory}/retienobox-${project.version}-install-x86.exe" />
                             </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
                         </goals>
                     </execution>
-                    <!-- Create the windows installer x86-64 -->
+                    <!-- Create Windows Installer (32bits & 64 bits) -->
                     <execution>
-                        <id>package-win-x86-64</id>
+                        <id>package-win</id>
                         <phase>package</phase>
                         <configuration>
                             <target>
+                                <taskdef resource="net/sf/antcontrib/antlib.xml"
+                                    classpathref="maven.plugin.classpath" />
+                                <propertyregex property="AppVersion"
+                                    input="0.0.0.${project.version}"
+                                    regexp=".*([0-9]+.[0-9]+.[0-9]+.[0-9]+)"
+                                    select="\1" />
                                 <!-- Convert the license file into Window 
                                     encoding -->
                                 <copy
@@ -215,23 +234,13 @@
                                     failonerror="true">
                                     <!-- Avoid changing working directory -->
                                     <arg value="-NOCD" />
-                                    <arg value="-DIS_64" />
-                                    <arg
-                                        value="${basedir}/src/main/nsis/setup.nsi" />
-                                </exec>
-                                <exec osfamily="Windows"
-                                    executable="makensis.exe"
-                                    dir="${project.build.directory}/package"
-                                    failonerror="true">
-                                    <!-- Avoid changing working directory -->
-                                    <arg value="-NOCD" />
-                                    <arg value="-DIS_64" />
+                                    <arg value="-DAppVersion=${AppVersion}" />
                                     <arg
                                         value="${basedir}/src/main/nsis/setup.nsi" />
                                 </exec>
                                 <move
                                     file="${project.build.directory}/package/setup.exe"
-                                    tofile="${project.build.directory}/retienobox-${project.version}-install-x86_64.exe" />
+                                    tofile="${project.build.directory}/minarca-${project.version}-install.exe" />
                             </target>
                         </configuration>
                         <goals>
@@ -239,6 +248,25 @@
                         </goals>
                     </execution>
                 </executions>
+                <!-- Add dependencies for ant plugin. -->
+                <dependencies>
+                    <dependency>
+                        <groupId>ant-contrib</groupId>
+                        <artifactId>ant-contrib</artifactId>
+                        <version>1.0b3</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>ant</groupId>
+                                <artifactId>ant</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-nodeps</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

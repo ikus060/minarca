@@ -1,15 +1,17 @@
-!define AppName "minarca"
+; Displayed to the user
+!define AppName "Minarca"
+; Used for paths
 !define ShortName "minarca"
 !define Vendor "Patrik Dufresne Service Logiciel"
 !define LicenseFile "LICENSE.txt"
-!ifndef IS_64
-	!define AppExeFile "bin\minarca.exe"
-!else
-	!define AppExeFile "bin\minarca64.exe"
-!endif
+!define AppExeFile ""
  
-!include "MUI.nsh"
-!include "Sections.nsh"
+;--------------------------------
+;Includes
+
+  !include "MUI2.nsh"
+  !include "Sections.nsh"
+  !include "x64.nsh"
 
 SetCompressor bzip2
  
@@ -18,20 +20,43 @@ SetCompressor bzip2
  
   ;General
   Name "${AppName}"
+  VIProductVersion "${AppVersion}"
+  VIAddVersionKey "ProductName" "${AppName}"
+  VIAddVersionKey "Comments" "A test comment"
+  VIAddVersionKey "CompanyName" "${Vendor}"
+  VIAddVersionKey "LegalCopyright" "© ${Vendor}"
+  VIAddVersionKey "FileDescription" "${AppName} ${AppVersion} Installer"
+  VIAddVersionKey "FileVersion" "${AppVersion}"
   OutFile "setup.exe"
+  
+  ; Define icon
+  !define MUI_ICON "minarca.ico"
+  !define MUI_UNICON "minarca.ico"
  
   ;Folder selection page
-  !ifndef IS_64
-      InstallDir "$PROGRAMFILES\${SHORTNAME}"
-  !else
-	  InstallDir "$PROGRAMFILES64\${SHORTNAME}"
-  !endif
+  InstallDir ""
  
   ;Get install folder from registry if available
   InstallDirRegKey HKLM "SOFTWARE\${Vendor}\${ShortName}" ""
  
-; Installation types
-;InstType "full"	; Uncomment if you want Installation types
+  ;Request application privileges for Windows Vista
+  RequestExecutionLevel admin
+ 
+;--------------------------------
+;Interface Settings
+
+  !define MUI_ABORTWARNING
+
+  ;Show all languages, despite user's codepage
+  !define MUI_LANGDLL_ALLLANGUAGES
+
+;--------------------------------
+;Language Selection Dialog Settings
+
+  ;Remember the installer language
+  !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
+  !define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\${Vendor}\${ShortName}" 
+  !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
  
 ;--------------------------------
 ;Pages
@@ -39,59 +64,54 @@ SetCompressor bzip2
   ; License page
   !insertmacro MUI_PAGE_LICENSE "${LicenseFile}"
  
-  !insertmacro MUI_PAGE_INSTFILES
-  !define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "Installation complete"
-  !define MUI_PAGE_HEADER_TEXT "Installing"
-  !define MUI_PAGE_HEADER_SUBTEXT "Please wait while ${AppName} is being installed."
-  ;Uncomment the next line if you want optional components to be selectable
-  ;!insertmacro MUI_PAGE_COMPONENTS
-  !define MUI_PAGE_CUSTOMFUNCTION_PRE myPreInstfiles
-  !define MUI_PAGE_CUSTOMFUNCTION_LEAVE RestoreSections
+  ; Installation directory selection
   !insertmacro MUI_PAGE_DIRECTORY
+  
+  ; Installation...
   !insertmacro MUI_PAGE_INSTFILES
+  
+  ; Finish Page
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_TEXT "Start ${AppName}"
+  !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH
+  
+  ; Uninstall confirmation
   !insertmacro MUI_UNPAGE_CONFIRM
+  
+  ;Uninstall
   !insertmacro MUI_UNPAGE_INSTFILES
- 
-;--------------------------------
-;Modern UI Configuration
- 
-  !define MUI_ABORTWARNING
  
 ;--------------------------------
 ;Languages
  
+  !insertmacro MUI_LANGUAGE "English"
   !insertmacro MUI_LANGUAGE "French"
+ 
+;--------------------------------
+;Reserve Files
+  
+  ;If you are using solid compression, files that are required before
+  ;the actual installation should be stored first in the data block,
+  ;because this will make your installer start faster.
+  
+  !insertmacro MUI_RESERVEFILE_LANGDLL
  
 ;--------------------------------
 ;Language Strings
  
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
- 
-  ;Header
-  LangString TEXT_PRODVER_TITLE ${LANG_ENGLISH} "Installed version of ${AppName}"
-  LangString TEXT_PRODVER_SUBTITLE ${LANG_ENGLISH} "Installation cancelled"
- 
-;--------------------------------
-;Reserve Files
- 
-  ;Only useful for BZIP2 compression
- 
-  !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+  LangString DESC_SecAppFiles ${LANG_FRENCH} "Copie des fichiers"
  
 ;--------------------------------
 ;Installer Sections
  
 Section "Installation of ${AppName}" SecAppFiles
-  ; Remove files
-  RMDir /r "$INSTDIR\lib"
-  
-  SectionIn 1 RO	; Full install, cannot be unselected
-			; If you add more sections be sure to add them here as well
   
   ; Add files
   SetOutPath $INSTDIR
+  SetOverwrite on
   File /r ".\"
   
   ;Store install folder
@@ -109,10 +129,15 @@ SectionEnd
  
  
 Section "Start menu shortcuts" SecCreateShortcut
+
   SectionIn 1	; Can be unselected
   CreateDirectory "$SMPROGRAMS\${AppName}"
-  CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\${AppExeFile}" "" "$INSTDIR\${AppExeFile}" 0
-;Etc
+  ${If} ${RunningX64}
+    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarca64.exe" "" "$INSTDIR\bin\minarca64.exe" 0
+  ${Else}
+    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarca.exe" "" "$INSTDIR\bin\minarca.exe" 0
+  ${EndIf}
+  
 SectionEnd
  
 ;--------------------------------
@@ -126,24 +151,26 @@ SectionEnd
 ;Installer Functions
  
 Function .onInit
-  Call SetupSections
+
+  ; Set installation directory accoding to bitness
+  ${If} $InstDir == ""
+  	StrCpy $InstDir "$PROGRAMFILES\${SHORTNAME}"
+    ${If} ${RunningX64}
+        StrCpy $InstDir "$PROGRAMFILES64\${SHORTNAME}"
+    ${EndIf}
+  ${EndIf}
+  
+  !insertmacro MUI_LANGDLL_DISPLAY
+  
 FunctionEnd
- 
-Function myPreInstfiles
-  Call RestoreSections
-  SetAutoClose true
+
+;--------------------------------
+;Finish Section
+
+Function LaunchLink
+	ExecShell "" "$SMPROGRAMS\${AppName}\${AppName}.lnk"
 FunctionEnd
- 
-Function RestoreSections
-  !insertmacro SelectSection ${SecAppFiles}
-  !insertmacro SelectSection ${SecCreateShortcut}
-FunctionEnd
- 
-Function SetupSections
-  !insertmacro UnselectSection ${SecAppFiles}
-  !insertmacro UnselectSection ${SecCreateShortcut}
-FunctionEnd
- 
+
 ;--------------------------------
 ;Uninstaller Section
  
@@ -158,3 +185,12 @@ Section "Uninstall"
   RMDir /r "$INSTDIR"
  
 SectionEnd
+
+;--------------------------------
+;Uninstaller Functions
+
+Function un.onInit
+
+  !insertmacro MUI_UNGETLANGUAGE
+  
+FunctionEnd

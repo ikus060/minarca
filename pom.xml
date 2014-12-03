@@ -8,7 +8,7 @@
     <name>minarca-root</name>
     <modules>
         <module>minarca-ui</module>
-        <module>minarca-scripts</module>
+        
         <module>minarca-test</module>
         <module>minarca-installation-package</module>
     </modules>

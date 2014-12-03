@@ -119,7 +119,7 @@ public class Plink extends SSH {
             throw new APIException("missing plink");
         }
 
-        // "C:\Program Files (x86)\retinobox\putty-0.63\plink.exe"
+        // "C:\Program Files (x86)\minarca\putty-0.63\plink.exe"
         List<String> args = new ArrayList<String>();
         args.add(plink.getAbsolutePath());
         // username@fente.patrikfresne.com
