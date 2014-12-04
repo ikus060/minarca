@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -37,6 +38,7 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.minarca.Main;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.GlobPattern;
@@ -151,6 +153,11 @@ public class PreferenceDialog extends Dialog {
         form.getBody().setLayout(GridLayoutFactory.swtDefaults().margins(15, 15).create());
         form.setLayoutData(new GridData(GridData.FILL_BOTH));
         Composite comp = form.getBody();
+
+        // App icon
+        Label icon = this.ft.createLabel(comp, null);
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_PNG));
+        icon.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 
         // App name
         FormText appNameText = this.ft.createFormText(comp, "<h1>" + Display.getAppName() + "</h1>", false);
@@ -272,7 +279,7 @@ public class PreferenceDialog extends Dialog {
             }
         });
 
-        // Excludes 
+        // Excludes
         this.excludeSysFilesButton = this.ft.createButton(comp, _("Ignore download folder (recommended)"), SWT.CHECK);
         this.excludeSysFilesButton.setSelection(excludeDownloads);
         this.excludeSysFilesButton.setLayoutData(createTableWrapData());
@@ -403,8 +410,7 @@ public class PreferenceDialog extends Dialog {
     }
 
     /**
-     * Used to display error message to user when it's impossible to save
-     * configuration.
+     * Used to display error message to user when it's impossible to save configuration.
      * 
      * @param e
      */
