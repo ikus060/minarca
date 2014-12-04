@@ -34,6 +34,8 @@ public class SchedulerWindows extends Scheduler {
 
     private static class SchTaskEntry {
 
+        private static final String TASK_TO_RUN = "Task To Run";
+
         private static final String TASKNAME = "TaskName";
 
         // ["HostName", "TaskName", "Next Run Time", "Status", "Logon Mode",
@@ -53,6 +55,10 @@ public class SchedulerWindows extends Scheduler {
 
         public String get(String key) {
             return this.data.get(key);
+        }
+
+        public String getCommand() {
+            return get(TASK_TO_RUN);
         }
 
         public String getTaskname() {
@@ -87,16 +93,6 @@ public class SchedulerWindows extends Scheduler {
     private static final String TASK_NAME = "minarca backup";
 
     /**
-     * Return the command line to be executed to run a backup.
-     * 
-     * @return
-     * @throws APIException
-     */
-    public String getCommand() throws APIException {
-        return "'" + search(MINARCA_LAUNCH_VBS) + "' '" + search(MINARCA_BAT) + "'";
-    }
-
-    /**
      * Search for a binary file.
      * 
      * @return
@@ -116,28 +112,17 @@ public class SchedulerWindows extends Scheduler {
                 return batch;
             }
         }
-        throw new APIException(_("{} is missing ", filename));
+        throw new APIException(_("{0} is missing ", filename));
     }
 
     /**
-     * Remove leadin and ending quote.
+     * Remove leading and ending quote.
      * 
      * @param string
      * @return
      */
     private static String trimQuote(String string) {
-        int len = string.length();
-        int st = 0;
-        int off = 0; /* avoid getfield opcode */
-        char[] val = string.toCharArray(); /* avoid getfield opcode */
-
-        while ((st < len) && (val[off + st] == '"')) {
-            st++;
-        }
-        while ((st < len) && (val[off + len - 1] == '"')) {
-            len--;
-        }
-        return ((st > 0) || (len < string.length())) ? string.substring(st, len) : string;
+        return string.replaceAll("^\"", "").replaceAll("\"$", "");
     }
 
     public SchedulerWindows() {
@@ -156,8 +141,7 @@ public class SchedulerWindows extends Scheduler {
      * 
      * @throws APIException
      * 
-     * @see http 
-     *      ://www.windowsnetworking.com/kbase/WindowsTips/WindowsXP/AdminTips
+     * @see http ://www.windowsnetworking.com/kbase/WindowsTips/WindowsXP/AdminTips
      *      /Utilities/XPschtaskscommandlineutilityreplacesAT.exe.html
      */
     public void create() throws APIException {
@@ -229,10 +213,23 @@ public class SchedulerWindows extends Scheduler {
      */
     public boolean exists() {
         try {
-            return query(TASK_NAME) != null;
+            SchTaskEntry task = query(TASK_NAME);
+            String curCommand = task.getCommand();
+            return task != null && getCommand().equals(curCommand);
         } catch (APIException e) {
+            LOGGER.warn("can't detect the task", e);
             return false;
         }
+    }
+
+    /**
+     * Return the command line to be executed to run a backup.
+     * 
+     * @return
+     * @throws APIException
+     */
+    public String getCommand() throws APIException {
+        return "\"" + search(MINARCA_LAUNCH_VBS) + "\" \"" + search(MINARCA_BAT) + "\"";
     }
 
     private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
