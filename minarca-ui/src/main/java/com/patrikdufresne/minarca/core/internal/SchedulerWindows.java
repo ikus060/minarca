@@ -93,6 +93,16 @@ public class SchedulerWindows extends Scheduler {
     private static final String TASK_NAME = "minarca backup";
 
     /**
+     * Return the command line to be executed to run a backup.
+     * 
+     * @return
+     * @throws APIException
+     */
+    public String getCommand() throws APIException {
+        return "'" + search(MINARCA_LAUNCH_VBS) + "' '" + search(MINARCA_BAT) + "'";
+    }
+
+    /**
      * Search for a binary file.
      * 
      * @return
@@ -214,22 +224,12 @@ public class SchedulerWindows extends Scheduler {
     public boolean exists() {
         try {
             SchTaskEntry task = query(TASK_NAME);
-            String curCommand = task.getCommand();
+            String curCommand = task.getCommand().replace("\"", "'");
             return task != null && getCommand().equals(curCommand);
         } catch (APIException e) {
             LOGGER.warn("can't detect the task", e);
             return false;
         }
-    }
-
-    /**
-     * Return the command line to be executed to run a backup.
-     * 
-     * @return
-     * @throws APIException
-     */
-    public String getCommand() throws APIException {
-        return "\"" + search(MINARCA_LAUNCH_VBS) + "\" \"" + search(MINARCA_BAT) + "\"";
     }
 
     private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
