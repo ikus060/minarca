@@ -7,8 +7,8 @@
     <packaging>pom</packaging>
     <name>minarca-root</name>
     <modules>
+        <module>minarca-icons</module>
         <module>minarca-ui</module>
-        
         <module>minarca-test</module>
         <module>minarca-installation-package</module>
     </modules>

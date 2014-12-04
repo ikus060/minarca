@@ -105,6 +105,11 @@
             <artifactId>gettext-commons</artifactId>
             <version>0.9.8</version>
         </dependency>
+        <dependency>
+            <groupId>com.patrikdufresne</groupId>
+            <artifactId>minarca-icons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <!-- Include the .properties file located in /src/main/java -->
@@ -120,6 +125,54 @@
             </resource>
         </resources>
         <plugins>
+            <!-- Generate PNG from SVG -->
+            <plugin>
+                <groupId>net.trajano.mojo</groupId>
+                <artifactId>batik-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <svgResources>
+                                <resource>
+                                    <directory>${basedir}/src/main/svg</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>*.svg</include>
+                                    </includes>
+                                </resource>
+                            </svgResources>
+                            <destDir>${project.build.directory}/generated-resources/batik</destDir>
+                        </configuration>
+                        <goals>
+                            <goal>rasterizer</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Add PNGs to ressources -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-resources/batik</directory>
+                                    <targetPath>com/patrikdufresne/minarca</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Write version in Manifest -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

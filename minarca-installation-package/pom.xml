@@ -45,6 +45,31 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Extract Icons -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.9</version>
+                <executions>
+                    <execution>
+                        <id>unpack-icons</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.patrikdufresne</groupId>
+                                    <artifactId>minarca-icons</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/generated-resources/icons</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Copy SWT jars for supported platform. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -117,11 +142,30 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Copy /src/main/root into /target/package -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
+                    <!-- Copy icons into /target/package -->
+                    <execution>
+                        <id>copy-icons-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <filtering>false</filtering>
+                                    <directory>${project.build.directory}/generated-resources/icons/com/patrikdufresne/minarca</directory>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/package</outputDirectory>
+                            <filtering>false</filtering>
+                        </configuration>
+                    </execution>
+                    <!-- Copy /src/main/root into /target/package -->
                     <execution>
                         <id>copy-root-resources</id>
                         <phase>generate-resources</phase>
@@ -159,58 +203,10 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Generate PNG from SVG -->
-            <plugin>
-                <groupId>net.trajano.mojo</groupId>
-                <artifactId>batik-maven-plugin</artifactId>
-                <version>1.0.1</version>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <svgResources>
-                                <resource>
-                                    <directory>${basedir}/src/main/svg</directory>
-                                    <filtering>false</filtering>
-                                    <includes>
-                                        <include>*.svg</include>
-                                    </includes>
-                                </resource>
-                            </svgResources>
-                            <destDir>${project.build.directory}/package</destDir>
-                        </configuration>
-                        <goals>
-                            <goal>rasterizer</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
                 <executions>
-                    <!-- Generate ICO from PNGs -->
-                    <execution>
-                        <id>create-icons</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <!-- Require icotool -->
-                                <exec executable="icotool"
-                                    dir="${project.build.directory}/package/"
-                                    failonerror="true">
-                                    <arg value="-c" />
-                                    <arg value="-o" />
-                                    <arg value="minarca.ico" />
-                                    <arg value="minarca_16.png" />
-                                    <arg value="minarca_32.png" />
-                                    <arg value="minarca.png" />
-                                </exec>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
                     <!-- Create Windows Installer (32bits & 64 bits) -->
                     <execution>
                         <id>package-win</id>

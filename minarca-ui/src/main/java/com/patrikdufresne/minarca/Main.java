@@ -22,19 +22,21 @@ package com.patrikdufresne.minarca;
 
 import static com.patrikdufresne.minarca.Localized._;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.ILogger;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.window.WindowManager;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,10 @@ import com.patrikdufresne.minarca.ui.setup.SetupDialog;
  * 
  */
 public class Main {
+
+    public static final String MINARCA_16_PNG = "minarca_16.png";
+    public static final String MINARCA_32_PNG = "minarca_32.png";
+    public static final String MINARCA_PNG = "minarca.png";
 
     static final transient Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -120,11 +126,19 @@ public class Main {
     }
 
     protected void setDefaultImages() {
-        // TODO Sets the default application Icon.
-        // Image[] images = new Image[] {
-        // Resources.getImage(Resources.APP_ICON_24),
-        // Resources.getImage(Resources.APP_ICON_128) };
-        // Window.setDefaultImages(images);
+        // Register image
+        ImageRegistry ir = JFaceResources.getImageRegistry();
+        ir.put(MINARCA_16_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_16_PNG));
+        ir.put(MINARCA_32_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_32_PNG));
+        ir.put(MINARCA_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_PNG));
+
+        List<Image> images = new ArrayList<Image>();
+        images.add(ir.get(MINARCA_PNG));
+        images.add(ir.get(MINARCA_32_PNG));
+        images.add(ir.get(MINARCA_16_PNG));
+
+        // Sets images.
+        Window.setDefaultImages(images.toArray(new Image[images.size()]));
     }
 
     /**
@@ -180,11 +194,9 @@ public class Main {
     }
 
     /**
-     * Check if the application is configured. If not show a setup dialog. If
-     * miss configured try to repair.
+     * Check if the application is configured. If not show a setup dialog. If miss configured try to repair.
      * 
-     * @return True if configured or miss configured. False if not configured
-     *         and user cancel configuration.
+     * @return True if configured or miss configured. False if not configured and user cancel configuration.
      */
     private boolean configure() {
         // Check if configured.
