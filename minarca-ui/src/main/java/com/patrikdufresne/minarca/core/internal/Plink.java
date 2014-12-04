@@ -78,6 +78,8 @@ public class Plink extends SSH {
         if (value != null) {
             locations.add(value);
         }
+        locations.add("./putty-0.63/");
+        locations.add("./bin/");
         locations.add(".");
         for (String location : locations) {
             File plink = new File(location, PLINK_EXE);

@@ -115,6 +115,7 @@ public class SchedulerWindows extends Scheduler {
         if (value != null) {
             locations.add(value);
         }
+        locations.add("./bin/");
         locations.add(".");
         for (String location : locations) {
             File batch = new File(location, filename);
