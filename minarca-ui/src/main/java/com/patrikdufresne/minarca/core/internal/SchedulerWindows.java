@@ -28,7 +28,7 @@ import com.patrikdufresne.minarca.core.APIException;
  * Wrapper around "schtasks" command line.
  * 
  * @author Patrik Dufresne
- *
+ * 
  */
 public class SchedulerWindows extends Scheduler {
 
@@ -118,9 +118,13 @@ public class SchedulerWindows extends Scheduler {
         locations.add("./bin/");
         locations.add(".");
         for (String location : locations) {
-            File batch = new File(location, filename);
-            if (batch.isFile() && batch.canRead()) {
-                return batch;
+            File file = new File(location, filename);
+            if (file.isFile() && file.canRead()) {
+                try {
+                    return file.getCanonicalFile();
+                } catch (IOException e) {
+                    return file.getAbsoluteFile();
+                }
             }
         }
         throw new APIException(_("{0} is missing ", filename));
