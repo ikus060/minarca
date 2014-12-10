@@ -3,7 +3,6 @@
 ; Used for paths
 !define ShortName "minarca"
 !define Vendor "Patrik Dufresne Service Logiciel"
-!define LicenseFile "LICENSE.txt"
 !define AppExeFile ""
  
 ;--------------------------------
@@ -22,9 +21,9 @@ SetCompressor bzip2
   Name "${AppName}"
   VIProductVersion "${AppVersion}"
   VIAddVersionKey "ProductName" "${AppName}"
-  VIAddVersionKey "Comments" "A test comment"
+  VIAddVersionKey "Comments" "An all integrated backup solution."
   VIAddVersionKey "CompanyName" "${Vendor}"
-  VIAddVersionKey "LegalCopyright" "Â© ${Vendor}"
+  VIAddVersionKey "LegalCopyright" "© ${Vendor}"
   VIAddVersionKey "FileDescription" "${AppName} ${AppVersion} Installer"
   VIAddVersionKey "FileVersion" "${AppVersion}"
   OutFile "setup.exe"
@@ -62,7 +61,7 @@ SetCompressor bzip2
 ;Pages
  
   ; License page
-  !insertmacro MUI_PAGE_LICENSE "${LicenseFile}"
+  !insertmacro MUI_PAGE_LICENSE $(license)
  
   ; Installation directory selection
   !insertmacro MUI_PAGE_DIRECTORY
@@ -72,7 +71,7 @@ SetCompressor bzip2
   
   ; Finish Page
   !define MUI_FINISHPAGE_RUN
-  !define MUI_FINISHPAGE_RUN_TEXT "Start ${AppName}"
+  !define MUI_FINISHPAGE_RUN_TEXT $(RunMinarca)
   !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH
   
@@ -88,6 +87,9 @@ SetCompressor bzip2
   !insertmacro MUI_LANGUAGE "English"
   !insertmacro MUI_LANGUAGE "French"
  
+  LicenseLangString license ${LANG_ENGLISH} "Licence_en.rtf"
+  LicenseLangString license ${LANG_FRENCH} "Licence_fr.rtf"
+  
 ;--------------------------------
 ;Reserve Files
   
@@ -103,6 +105,9 @@ SetCompressor bzip2
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
   LangString DESC_SecAppFiles ${LANG_FRENCH} "Copie des fichiers"
+  
+  LangString RunMinarca ${LANG_ENGLISH} "Start ${AppName}"
+  LangString RunMinarca ${LANG_FRENCH} "Démarrer ${AppName}"
  
 ;--------------------------------
 ;Installer Sections
@@ -117,10 +122,14 @@ Section "Installation of ${AppName}" SecAppFiles
   ;Store install folder
   WriteRegStr HKLM "SOFTWARE\${Vendor}\${ShortName}" "" $INSTDIR
  
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}" "DisplayName" "${AppName}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}" "NoModify" "1"
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}" "NoRepair" "1"
+  !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "${AppName}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\minarca.ico"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${AppVersion}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${Vendor}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "${REG_UNINSTALL}" "NoModify" "1"
+  WriteRegDWORD HKLM "${REG_UNINSTALL}" "NoRepair" "1"
  
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"

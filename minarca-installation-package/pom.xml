@@ -221,10 +221,6 @@
                                     select="\1" />
                                 <!-- Convert the license file into Window 
                                     encoding -->
-                                <copy
-                                    file="${project.build.directory}/package/LICENSE"
-                                    tofile="${project.build.directory}/package/LICENSE.txt"
-                                    encoding="UTF-8" outputencoding="ISO-8859-1" />
                                 <exec osfamily="unix" executable="makensis"
                                     dir="${project.build.directory}/package"
                                     failonerror="true">
