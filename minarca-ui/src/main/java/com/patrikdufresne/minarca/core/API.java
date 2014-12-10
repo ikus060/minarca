@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.internal.Keygen;
-import com.patrikdufresne.minarca.core.internal.Plink;
 import com.patrikdufresne.minarca.core.internal.SSH;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 
@@ -156,6 +155,7 @@ public enum API {
             list.add(new GlobPattern("**/Default.rdp"));
             list.add(new GlobPattern("**/ntuser.dat*"));
             list.add(new GlobPattern("C:/Recovery/"));
+            list.add(new GlobPattern("C:/ProgramData/"));
             list.add(new GlobPattern("C:/$Recycle.Bin/"));
             String windowDir = System.getenv("SystemRoot");
             if (windowDir != null) {
