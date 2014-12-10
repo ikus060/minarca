@@ -74,10 +74,6 @@ public class SchedulerWindows extends Scheduler {
 
     private static final transient Logger LOGGER = LoggerFactory.getLogger(SchedulerWindows.class);
     /**
-     * Executable script to run backup.
-     */
-    private static final String MINARCA_BAT = "minarca.bat";
-    /**
      * Script being called by the scheduler to start a bat file hidden.
      */
     private static final String MINARCA_LAUNCH_VBS = "launch.vbs";
@@ -99,7 +95,7 @@ public class SchedulerWindows extends Scheduler {
      * @throws APIException
      */
     public String getCommand() throws APIException {
-        return "'" + search(MINARCA_LAUNCH_VBS) + "' '" + search(MINARCA_BAT) + "'";
+        return "'" + search(MINARCA_LAUNCH_VBS) + "'";
     }
 
     /**
