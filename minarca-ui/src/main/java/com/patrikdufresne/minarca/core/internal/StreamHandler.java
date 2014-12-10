@@ -17,11 +17,13 @@ import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.minarca.core.API;
+
 /**
  * Used to answer the password for putty process.
  * 
  * @author Patrik Dufresne
- *
+ * 
  */
 public class StreamHandler extends Thread {
 
@@ -80,6 +82,7 @@ public class StreamHandler extends Thread {
     public void run() {
         synchronized (buf) {
             boolean answered = false;
+            boolean validFingerPrint = false;
             Writer out = new BufferedWriter(new OutputStreamWriter(this.p.getOutputStream()));
             InputStream in = this.p.getInputStream();
             // Read stream line by line without buffer (otherwise it block).
@@ -101,6 +104,7 @@ public class StreamHandler extends Thread {
                     }
                     if (!answered && this.password != null) {
                         String prompt = new String(data.toByteArray());
+                        //
                         if (prompt.endsWith("password: ")) {
                             LOGGER.debug(prompt);
                             out.append(password);
@@ -109,6 +113,22 @@ public class StreamHandler extends Thread {
                             // Reset the buffer
                             data.reset();
                             answered = true;
+                        }
+                        // Plink might ask us to accept a fingerprint.
+                        for (String fp : API.DEFAULT_REMOTEHOST_FINGERPRINT) {
+                            if (prompt.contains(fp)) {
+                                validFingerPrint = true;
+                            }
+                        }
+                        // Check if asking for finger print confirmation.
+                        if (prompt.contains("Store key in cache? (y/n)")) {
+                            // Press enter to abandon.
+                            if (validFingerPrint) {
+                                out.append("y");
+                            }
+                            out.append(SystemUtils.LINE_SEPARATOR);
+                            out.flush();
+                            data.reset();
                         }
                     }
                 }

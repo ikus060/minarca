@@ -63,8 +63,7 @@ public enum API {
     private static final String COMPUTERNAME = "computername";
 
     /**
-     * Filename used for configuration file. Notice, this is also read by batch
-     * file.
+     * Filename used for configuration file. Notice, this is also read by batch file.
      */
     private static final String CONF_FILENAME = "conf";
 
@@ -72,6 +71,11 @@ public enum API {
      * The remote host.
      */
     private static final String DEFAULT_REMOTEHOST = "fente.patrikdufresne.com";
+
+    /**
+     * List of finger print accepted by minarca. For security reason, we only accept known finger print.
+     */
+    public static final String[] DEFAULT_REMOTEHOST_FINGERPRINT = new String[] { "05:16:1c:49:37:58:87:a5:5c:16:31:bc:a9:95:2c:c2" };
 
     /**
      * Exclude filename.
@@ -270,9 +274,8 @@ public enum API {
     }
 
     /**
-     * Used to check if the configuration is OK. Called as a sanity check to
-     * make sure "minarca" is properly configured. If not, it throw an
-     * exception.
+     * Used to check if the configuration is OK. Called as a sanity check to make sure "minarca" is properly configured.
+     * If not, it throw an exception.
      * 
      * @return
      */
@@ -301,8 +304,7 @@ public enum API {
     }
 
     /**
-     * This method is called to sets the default configuration for includes,
-     * excludes and scheduled task.
+     * This method is called to sets the default configuration for includes, excludes and scheduled task.
      * 
      * @throws APIException
      */
@@ -378,9 +380,8 @@ public enum API {
     /**
      * Return the remote host to be used for SSH communication.
      * <p>
-     * Current implementation return the same SSH server. In future, this
-     * implementation might changed to request the web server for a specific
-     * URL.
+     * Current implementation return the same SSH server. In future, this implementation might changed to request the
+     * web server for a specific URL.
      * 
      * @return
      */
@@ -389,8 +390,7 @@ public enum API {
     }
 
     /**
-     * Get the username used for the backup (username used to authentication
-     * with SSH server).
+     * Get the username used for the backup (username used to authentication with SSH server).
      * 
      * @return
      */
@@ -401,12 +401,10 @@ public enum API {
     /**
      * Register a new computer.
      * <p>
-     * A successful link of this computer will generate a new configuration
-     * file.
+     * A successful link of this computer will generate a new configuration file.
      * <p>
-     * This implementation will generate public and private keys for putty. The
-     * public key will be sent to minarca. The computer name is added to the
-     * comments.
+     * This implementation will generate public and private keys for putty. The public key will be sent to minarca. The
+     * computer name is added to the comments.
      * 
      * 
      * @param computername
