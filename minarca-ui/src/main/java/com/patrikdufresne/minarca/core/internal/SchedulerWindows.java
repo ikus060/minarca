@@ -225,7 +225,7 @@ public class SchedulerWindows extends Scheduler {
     public boolean exists() {
         try {
             SchTaskEntry task = query(TASK_NAME);
-            String curCommand = task.getCommand().replace("\"", "'");
+            String curCommand = task.getCommand().replace("\"", "'").trim();
             return task != null && getCommand().equals(curCommand);
         } catch (APIException e) {
             LOGGER.warn("can't detect the task", e);
