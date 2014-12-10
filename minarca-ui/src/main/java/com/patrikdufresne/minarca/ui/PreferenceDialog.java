@@ -308,7 +308,7 @@ public class PreferenceDialog extends Dialog {
     @Override
     protected Point getInitialSize() {
         // Sets fixed window size.
-        return new Point(500, 575);
+        return new Point(425, 500);
     }
 
     /**
