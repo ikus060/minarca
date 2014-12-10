@@ -38,6 +38,36 @@ Function expand(name)
 	expand = oShell.ExpandEnvironmentStrings(name)
 End Function
 
+Function getLastBackup()
+	' Get string similar to .../current_mirror.2014-12-10T08:33:40-05:00.data
+	Dim strCurrentMirror
+	strCurrentMirror = execPlink("ls /home/" + USERNAME + "/backup/" + COMPUTER + "/rdiff-backup-data/current_mirror.*.data")
+	'Parse the string
+	Dim re
+	Set re = New RegExp
+	re.Pattern = ".*([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)-([0-9]+):00.data"
+	re.IgnoreCase = True
+	re.Global = True
+	re.MultiLine = False
+	'Apply regEx
+	Dim m
+	Set m = re.Execute(strCurrentMirror)
+	If m.Count > 0 Then
+		Dim year, month, day, hour, minute
+		year = m.Item(0).SubMatches(0)
+		month = m.Item(0).SubMatches(1)
+		day = m.Item(0).SubMatches(2)
+		hour = m.Item(0).SubMatches(3)
+		minute = m.Item(0).SubMatches(4)
+		Dim lastDate, lastTime
+		lastDate = DateSerial(year,month,day)
+		lastDate = lastDate + TimeSerial(hour, minute, 0)
+		getLastBackup = lastDate
+	Else
+		getLastBackup = DateSerial(1970, 1, 1)
+	End If
+End Function
+
 ' Log a message
 Function log(strLevel, strMessage)
     ' Validate the file exits before attempting to write, create if it does not
@@ -71,6 +101,10 @@ Function logExec(command)
 			Call log("EXEC", oExec.StdOut.ReadLine())
 		End If
 	Loop
+End Function
+
+Function execPlink(command)
+	execPlink = exec(PLINK & " -batch -i """ & USER_PPK & """ " & USERNAME & "@" & REMOTE_HOST & " " + command)
 End Function
 
 Call log("INFO", "minarca starting")
@@ -143,7 +177,7 @@ Call log("INFO", "computer: " + COMPUTER)
 ' CHECK RDIFF-BACKUP VERSION
 Call log("INFO", "check remote host connectivity")
 Dim strRdiffBackupVersion
-strRdiffBackupVersion = exec(PLINK & " -batch -i """ & USER_PPK & """ " & USERNAME & "@" & REMOTE_HOST & " rdiff-backup --version")
+strRdiffBackupVersion = execPlink("rdiff-backup --version")
 Call log("INFO", "check remote rdiff-backup version")
 If InStr(RDIFF_BACKUP_VERSION, strRdiffBackupVersion) > 0 Then
 	Call log("INFO", "remote host connectivity error:")
@@ -152,6 +186,16 @@ If InStr(RDIFF_BACKUP_VERSION, strRdiffBackupVersion) > 0 Then
 End If
 Call log("INFO", strRdiffBackupVersion)
 
+' Check last backup date
+Dim lastBackup
+lastBackup = getLastBackup()
+Call log("INFO", "Last backup: " + cstr(lastBackup))
+If DateDiff("h", Now(), lastBackup) < 12 Then
+	Call log("INFO", "Backup not required")
+	WScript.Quit 0
+End If
+
+' Run the backup
 Call log("INFO", "start backup")
 Dim CMDS
 CMDS = """" + RDIFF_BACKUP + """"
@@ -161,6 +205,6 @@ CMDS = CMDS + " --exclude-globbing-filelist """ + EXCLUDES_FILE + """"
 CMDS = CMDS + " --include-globbing-filelist """ + INCLUDES_FILE + """"
 CMDS = CMDS + " --exclude ""C:/**"""
 CMDS = CMDS + " ""C:/"""
-CMDS = CMDS + " """ + USERNAME + "@" + REMOTE_HOST + "::/home/ikus060/backup/" + COMPUTER + """"
+CMDS = CMDS + " """ + USERNAME + "@" + REMOTE_HOST + "::/home/" + USERNAME + "/backup/" + COMPUTER + """"
 logexec(CMDS)
 Call log("INFO", "backup completed")
