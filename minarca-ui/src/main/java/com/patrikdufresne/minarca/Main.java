@@ -25,7 +25,7 @@ import static com.patrikdufresne.minarca.Localized._;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -164,13 +164,14 @@ public class Main {
             return;
         }
 
-        // Check configuration or re-configured
-        if (!configure()) {
-            return;
-        }
-
-        WindowManager winManager = new WindowManager();
+        WindowManager winManager = null;
         try {
+            // Check configuration or re-configured
+            if (!configure()) {
+                return;
+            }
+
+            winManager = new WindowManager();
             // Open Main Window
             PreferenceDialog win = new PreferenceDialog();
             win.setWindowManager(winManager);
@@ -187,7 +188,9 @@ public class Main {
             LOGGER.error("unknown error", e);
             MessageDialog.openWarning(null, Display.getAppName(), e.getMessage());
         } finally {
-            winManager.close();
+            if (winManager != null) {
+                winManager.close();
+            }
             display.dispose();
         }
 
