@@ -11,7 +11,7 @@
 			<maxFileSize>5MB</maxFileSize>
 		</triggeringPolicy>
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSZZZ}][%-5level][%thread][%logger{36}] %msg%n</pattern>
 		</encoder>
 	</appender>
 

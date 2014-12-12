@@ -18,7 +18,7 @@
 <configuration>
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+      <Pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.SSZZZ}][%-5level][%thread][%logger{36}] %msg%n</Pattern>
     </layout>
   </appender>
 
@@ -26,10 +26,6 @@
     <level value="debug"/>
   </logger>
   
-  <logger name="org.hibernate">
-    <level value="warn"/>
-  </logger>	
-
   <root level="warn">
     <appender-ref ref="STDOUT" />
   </root>
