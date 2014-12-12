@@ -1,47 +1,82 @@
 Option Explicit
 
+' By default windows will show a window when running this script with wscript,
+' because we are using exec(). To avoid displaying command line windows to
+' the user, we need to run the process with hidden window.
+If Right(LCase(WScript.FullName), 11) <> "cscript.exe" Then
+	Dim oShell, returnCode
+	Set oShell = CreateObject("WScript.Shell")
+	returnCode = oShell.Run("cscript.exe //B //nologo """ & WScript.ScriptFullName & """ -ok", 0, true)
+	Set oShell = Nothing
+	WScript.Quit returnCode
+End If
+
 ' Return current working directory (where the script is running).
-Function cwd()
+Function Cwd()
 	Dim oShell, strPath, oFSO, oFile
 	Set oShell = CreateObject("Wscript.Shell")
 	strPath = Wscript.ScriptFullName
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
 	Set oFile = oFSO.GetFile(strPath)
-	cwd = oFSO.GetParentFolderName(oFSO.GetParentFolderName(oFile))
-	cwd = "C:\Program Files\minarca\"
+	Cwd = oFSO.GetParentFolderName(oFSO.GetParentFolderName(oFile)) & "\"
 End Function
 
 ' Execute a command line
-Function exec(command)
-	Call log("INFO", "running: " + command)
+Function Exec(command)
+	Call Log("INFO", "running: " + command)
 	Dim oShell, oExec
 	Set oShell = CreateObject("Wscript.Shell")
 	oShell.CurrentDirectory = "C:/"
-	Set oExec = oShell.Exec(command)
+	Set oExec = oShell.Exec("cmd /S /C """ &  command  & """ 2>&1")
 	Do While oExec.Status = 0
 		Wscript.sleep 10
 	Loop
-	exec = oExec.StdOut.ReadAll() + oExec.StdErr.ReadAll()
+	Exec = oExec.StdOut.ReadAll() + oExec.StdErr.ReadAll()
 End Function
 
-' Check if file exists.
-Function exists(filename)
-	Dim oFSO
-	Set oFSO = CreateObject("Scripting.FileSystemObject")
-	exists = oFSO.FileExists(filename)
+Function ExecPlink(command)
+	ExecPlink = Exec("""" & PLINK & """ -batch -i """ & USER_PPK & """ " & USERNAME & "@" & REMOTE_HOST & " " + command)
 End Function
 
 ' Get value of an environment variable.
-Function expand(name)
+Function Expand(name)
 	Dim oShell
 	Set oShell = CreateObject("WScript.Shell")
-	expand = oShell.ExpandEnvironmentStrings(name)
+	Expand = oShell.ExpandEnvironmentStrings(name)
 End Function
 
-Function getLastBackup()
+' Used to format a date to a string. This implementation was inspired by
+' java Formatter.
+' %H
+Function FormatDate(format, d)
+	format = Replace(format, "%Y", Right(Year(d), 4))
+    format = Replace(format, "%m", LPad(Month(d), 2, "0"))
+    format = Replace(format, "%d", LPad(Day(d), 2, "0"))
+    format = Replace(format, "%H", LPad(Hour(d), 2, "0"))
+    format = Replace(format, "%M", LPad(Minute(d), 2, "0"))
+    format = Replace(format, "%S", LPad(Second(d),2, "0"))
+	FormatDate = format
+End Function
+
+' Return the configuration directory of minarca.
+Function GetConfigDir()
+	Dim arrDirs, strDir
+	' For WinXP & Win7
+	arrDirs = Array(Expand("%PROGRAMDATA%") & "\minarca\", _
+					Expand("%ALLUSERSPROFILE%") & "\Application Data\minarca\")
+	For Each strDir In arrDirs
+		Call Log("DEBUG", "check if config diretory [" & strDir & "] exists")
+		If IsDir(strDir) Then
+			GetConfigDir = strDir
+			Exit For
+		End If
+	Next
+End Function
+
+Function GetLastBackup()
 	' Get string similar to .../current_mirror.2014-12-10T08:33:40-05:00.data
 	Dim strCurrentMirror
-	strCurrentMirror = execPlink("ls /home/" + USERNAME + "/backup/" + COMPUTER + "/rdiff-backup-data/current_mirror.*.data")
+	strCurrentMirror = ExecPlink("ls /home/" + USERNAME + "/backup/" + COMPUTER + "/rdiff-backup-data/current_mirror.*.data")
 	'Parse the string
 	Dim re
 	Set re = New RegExp
@@ -62,23 +97,48 @@ Function getLastBackup()
 		Dim lastDate, lastTime
 		lastDate = DateSerial(year,month,day)
 		lastDate = lastDate + TimeSerial(hour, minute, 0)
-		getLastBackup = lastDate
+		GetLastBackup = lastDate
 	Else
-		getLastBackup = DateSerial(1970, 1, 1)
+		GetLastBackup = DateSerial(1970, 1, 1)
 	End If
 End Function
 
+'Get TMEP directory
+Function GetTempDir()
+    ' Get TEMP from SYSTEM
+	Dim oShell, oEnv
+	Set oShell = CreateObject("WScript.Shell")
+	Set oEnv = oShell.Environment("SYSTEM")
+	GetTempDir = Expand(oEnv("TEMP"))
+End Function
+
+' Check if file exists.
+Function IsFile(filename)
+	Dim oFSO
+	Set oFSO = CreateObject("Scripting.FileSystemObject")
+	IsFile = oFSO.FileExists(filename)
+End Function
+
+' Check if folder exists.
+Function IsDir(filename)
+	Dim oFSO
+	Set oFSO = CreateObject("Scripting.FileSystemObject")
+	IsDir = oFSO.FolderExists(filename)
+End Function
+
 ' Log a message
-Function log(strLevel, strMessage)
+Function Log(strLevel, strMessage)
     ' Validate the file exits before attempting to write, create if it does not
-	Dim strLogFile
-	strLogFile = expand("%TEMP%") + "/minarca.log"
+	Dim strDate, strLogFile
+	' Create date 2014-12-10T13:47:04.545
+	strDate = FormatDate("%Y-%m-%dT%H:%M:%S", Now())
+	strLogFile = GetTempDir() & "/minarca.log"
 	On Error Resume Next
-	Call logunsafe("[" + cstr(now()) + "] [" + strLevel + "] " + strMessage, strLogFile)
+	Call LogUnsafe("[" + strDate + "][" + strLevel + "] " + strMessage, strLogFile)
 	On Error GoTo 0
 End Function
 
-Function logunsafe(strLine, strFileName)
+Function LogUnsafe(strLine, strFileName)
 	Dim oFSO, oFile
 	' Write the log into the file
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
@@ -89,8 +149,22 @@ Function logunsafe(strLine, strFileName)
 	Set oFile = Nothing
 End Function
 
-Function logExec(command)
-	Call log("INFO", "running: " + command)
+' Log all the environment variable for debugging purpose.
+Function LogEnvironmentVariables()
+	Dim oShell, env, strItem, arrEnvs, strEnv
+	Set oShell = CreateObject("WScript.Shell")
+	arrEnvs = Array("PROCESS", "SYSTEM", "USER")
+	For Each strEnv In arrEnvs
+		Call Log("DEBUG", " " & strEnv)
+		Set env = oShell.Environment(strEnv)
+		For Each strItem In env
+			Call Log("DEBUG", "   " & strItem)
+		Next
+	Next
+End Function
+
+Function LogExec(command)
+	Call Log("INFO", "running: " + command)
 	Dim oShell, oExec
 	Set oShell = CreateObject("Wscript.Shell")
 	oShell.CurrentDirectory = "C:/"
@@ -98,33 +172,44 @@ Function logExec(command)
 	Do While oExec.Status = 0
 		'log("hello3")
 	    If Not oExec.StdOut.AtEndOfStream Then
-			Call log("EXEC", oExec.StdOut.ReadLine())
+			Call Log("EXEC", oExec.StdOut.ReadLine())
 		End If
 	Loop
 End Function
 
-Function execPlink(command)
-	execPlink = exec(PLINK & " -batch -i """ & USER_PPK & """ " & USERNAME & "@" & REMOTE_HOST & " " + command)
+' Left pad a string
+Function LPad(strValue, length, padChar)
+  Dim n : n = 0
+  If length > Len(strValue) Then n = length - Len(strValue)
+  LPad = String(n, padChar) & strValue
 End Function
 
-Call log("INFO", "minarca starting")
+' Script starting !
+Call Log("INFO", "minarca starting")
+
+' For debug purpose, print environment variable
+Call LogEnvironmentVariables()
 
 'Declare constants
 Dim MINARCA_CONF_DIR,CONF_FILE,INCLUDES_FILE,EXCLUDES_FILE,USER_PPK,RDIFF_BACKUP_VERSION
 Dim RDIFF_BACKUP,PLINK
-MINARCA_CONF_DIR=expand("%LOCALAPPDATA%") + "\minarca\"
+MINARCA_CONF_DIR=GetConfigDir()
 CONF_FILE=MINARCA_CONF_DIR + "conf"
 INCLUDES_FILE=MINARCA_CONF_DIR + "includes"
 EXCLUDES_FILE=MINARCA_CONF_DIR + "excludes"
 USER_PPK=MINARCA_CONF_DIR + "key.ppk"
 RDIFF_BACKUP_VERSION="rdiff-backup 1.2.8"
-RDIFF_BACKUP=cwd() + "rdiff-backup-1.2.8\rdiff-backup.exe"
-PLINK=cwd() + "putty-0.63\plink.exe"
+RDIFF_BACKUP=Cwd() + "rdiff-backup-1.2.8\rdiff-backup.exe"
+PLINK=Cwd() + "putty-0.63\plink.exe"
 
 ' Configuration variables
 Dim REMOTE_HOST, USERNAME, COMPUTER
 ' Read configuration file
-Call log("INFO", "read config " + CONF_FILE)
+Call Log("INFO", "read config " + CONF_FILE)
+If Not IsFile(CONF_FILE) Then
+	Call Log("ERROR", "config file is missing: " + CONF_FILE)
+	WScript.Quit 1
+End If
 Dim oFSO, oFile
 Set oFSO = CreateObject("Scripting.FileSystemObject")
 Set oFile = oFSO.OpenTextFile(CONF_FILE)
@@ -145,58 +230,58 @@ Loop
 oFile.Close
 
 ' CHECK CONFIGURATION
-Call log("INFO", "check configuration")
-If Not exists(RDIFF_BACKUP) Then
-	Call log("ERROR", "rdiffbackup is missing: " + RDIFF_BACKUP)
+Call Log("INFO", "check configuration")
+If Not IsFile(RDIFF_BACKUP) Then
+	Call Log("ERROR", "rdiffbackup is missing: " + RDIFF_BACKUP)
 	WScript.Quit 1
 End If
-If Not exists(PLINK) Then
-	Call log("ERROR", "plink is missing: " + PLINK)
+If Not IsFile(PLINK) Then
+	Call Log("ERROR", "plink is missing: " + PLINK)
 	WScript.Quit 1
 End If
-If Not exists(USER_PPK) Then
-	Call log("ERROR", "ppk file is missing: " + USER_PPK)
+If Not IsFile(USER_PPK) Then
+	Call Log("ERROR", "ppk file is missing: " + USER_PPK)
 	WScript.Quit 1
 End If
 If Len(Trim(REMOTE_HOST)) = 0 Then
-	Call log("ERROR", "configuration doesn't define the remote host - please reconfigure minarca.")
+	Call Log("ERROR", "configuration doesn't define the remote host - please reconfigure minarca.")
 	WScript.Quit 1
 End If
-Call log("INFO", "remote-host: " + REMOTE_HOST)
+Call Log("INFO", "remote-host: " + REMOTE_HOST)
 If Len(Trim(USERNAME)) = 0 Then
-	Call log("ERROR", "configuration doesn't define a username - please reconfigure minarca.")
+	Call Log("ERROR", "configuration doesn't define a username - please reconfigure minarca.")
 	WScript.Quit 1
 End If
-Call log("INFO", "username: " + USERNAME)
+Call Log("INFO", "username: " + USERNAME)
 If Len(Trim(COMPUTER)) = 0 Then
-	Call log("ERROR", "configuration doesn't define a computer - please reconfigure minarca.")
+	Call Log("ERROR", "configuration doesn't define a computer - please reconfigure minarca.")
 	WScript.Quit 1
 End If
-Call log("INFO", "computer: " + COMPUTER)
+Call Log("INFO", "computer: " + COMPUTER)
 
 ' CHECK RDIFF-BACKUP VERSION
-Call log("INFO", "check remote host connectivity")
+Call Log("INFO", "check remote host connectivity")
 Dim strRdiffBackupVersion
-strRdiffBackupVersion = execPlink("rdiff-backup --version")
-Call log("INFO", "check remote rdiff-backup version")
+strRdiffBackupVersion = ExecPlink("rdiff-backup --version")
+Call Log("INFO", "check remote rdiff-backup version")
 If InStr(RDIFF_BACKUP_VERSION, strRdiffBackupVersion) > 0 Then
-	Call log("INFO", "remote host connectivity error:")
-	Call log("INFO", strRdiffBackupVersion)
+	Call Log("INFO", "remote host connectivity error:")
+	Call Log("INFO", strRdiffBackupVersion)
 	WScript.Quit 1
 End If
-Call log("INFO", strRdiffBackupVersion)
+Call Log("INFO", strRdiffBackupVersion)
 
 ' Check last backup date
 Dim lastBackup
-lastBackup = getLastBackup()
-Call log("INFO", "Last backup: " + cstr(lastBackup))
-If DateDiff("h", Now(), lastBackup) < 12 Then
-	Call log("INFO", "Backup not required")
+lastBackup = GetLastBackup()
+Call Log("INFO", "Last backup: " + cstr(lastBackup))
+If DateDiff("h", lastBackup, Now()) < 12 Then
+	Call Log("INFO", "backup not required")
 	WScript.Quit 0
 End If
 
 ' Run the backup
-Call log("INFO", "start backup")
+Call Log("INFO", "start backup")
 Dim CMDS
 CMDS = """" + RDIFF_BACKUP + """"
 CMDS = CMDS + " -v 5 --no-hard-links --exclude-symbolic-links --no-acls"
@@ -206,5 +291,5 @@ CMDS = CMDS + " --include-globbing-filelist """ + INCLUDES_FILE + """"
 CMDS = CMDS + " --exclude ""C:/**"""
 CMDS = CMDS + " ""C:/"""
 CMDS = CMDS + " """ + USERNAME + "@" + REMOTE_HOST + "::/home/" + USERNAME + "/backup/" + COMPUTER + """"
-logexec(CMDS)
-Call log("INFO", "backup completed")
+LogExec(CMDS)
+Call Log("INFO", "backup completed")
