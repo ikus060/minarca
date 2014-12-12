@@ -7,7 +7,7 @@ package com.patrikdufresne.minarca.core.internal;
 
 import java.io.File;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import com.patrikdufresne.minarca.core.APIException;
 

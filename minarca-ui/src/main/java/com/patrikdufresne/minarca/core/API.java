@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.output.FileWriterWithEncoding;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +109,13 @@ public enum API {
      */
     public static File getConfigDirFile() {
         if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
-            File configDir = new File(SystemUtils.getUserHome(), "AppData/Local/" + APPNAME); //$NON-NLS-1$
+            File configDir;
+            if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
+                configDir = new File(System.getenv("ALLUSERSPROFILE") + "/Application Data/minarca");
+            } else {
+                configDir = new File(System.getenv("PROGRAMDATA") + "/minarca");
+            }
+            //$NON-NLS-1$
             configDir.mkdirs();
             return configDir;
         } else if (SystemUtils.IS_OS_LINUX) {
