@@ -271,6 +271,7 @@ public enum API {
         // Load the configuration
         this.properties = new Properties();
         try {
+            LoggerFactory.getLogger(API.class).debug("reading config from [{}]", confFile);
             FileInputStream in = new FileInputStream(confFile);
             this.properties.load(in);
             in.close();
@@ -353,6 +354,7 @@ public enum API {
      */
     public List<GlobPattern> getExcludes() {
         try {
+            LOGGER.debug("reading excludes from [{}]", excludesFile);
             return readPatterns(excludesFile);
         } catch (IOException e) {
             LOGGER.warn("error reading excludes patterns", e);
@@ -367,6 +369,7 @@ public enum API {
      */
     public List<GlobPattern> getIncludes() {
         try {
+            LOGGER.debug("reading includes from [{}]", includesFile);
             return readPatterns(includesFile);
         } catch (IOException e) {
             LOGGER.warn("error reading includes patterns", e);
@@ -497,6 +500,7 @@ public enum API {
      * @throws IOException
      */
     private void save() throws IOException {
+        LOGGER.debug("writing config to [{}]", confFile);
         Writer writer = new FileWriterWithEncoding(confFile, Charset.forName("ISO-8859-1"));
         this.properties.store(writer, "Backup configuration. Please do " + "not change this configuration file manually.");
         writer.close();
@@ -525,6 +529,7 @@ public enum API {
      */
     public void setExcludes(List<GlobPattern> patterns) throws APIException {
         try {
+            LOGGER.debug("writing excludes to [{}]", excludesFile);
             writePatterns(excludesFile, patterns);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
@@ -539,6 +544,7 @@ public enum API {
      */
     public void setIncludes(List<GlobPattern> patterns) throws APIException {
         try {
+            LOGGER.debug("writing includes to [{}]", includesFile);
             writePatterns(includesFile, patterns);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
