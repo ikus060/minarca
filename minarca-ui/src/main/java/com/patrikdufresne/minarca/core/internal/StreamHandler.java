@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.helper.Validate;
@@ -92,7 +93,7 @@ public class StreamHandler extends Thread {
                 while ((b = in.read()) != -1) {
                     // Write the byte into a buffer
                     if (b == CR || b == LF) {
-                        String line = new String(data.toByteArray());
+                        String line = new String(data.toByteArray(), Charset.defaultCharset());
                         if (!line.isEmpty()) {
                             LOGGER.debug(line);
                             buf.append(line);
@@ -103,7 +104,7 @@ public class StreamHandler extends Thread {
                         data.write(b);
                     }
                     if (!answered && this.password != null) {
-                        String prompt = new String(data.toByteArray());
+                        String prompt = new String(data.toByteArray(), Charset.defaultCharset());
                         //
                         if (prompt.endsWith("password: ")) {
                             LOGGER.debug(prompt);
