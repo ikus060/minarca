@@ -13,7 +13,15 @@
   !include "x64.nsh"
 
 SetCompressor bzip2
- 
+
+  ; Include Java Install
+  !addincludedir ${includedir}
+  !addplugindir ${plugindir}
+  !define JRE_VERSION "1.7"
+  !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98426"
+  !define JRE_URL_64 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98428"
+  !include "JREDyna_Inetc.nsh"
+
 ;--------------------------------
 ;Configuration
  
@@ -40,7 +48,7 @@ SetCompressor bzip2
  
   ;Request application privileges for Windows Vista
   RequestExecutionLevel admin
- 
+  
 ;--------------------------------
 ;Interface Settings
 
@@ -56,12 +64,15 @@ SetCompressor bzip2
   !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
   !define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\${Vendor}\${ShortName}" 
   !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
- 
+
 ;--------------------------------
 ;Pages
  
   ; License page
   !insertmacro MUI_PAGE_LICENSE $(license)
+ 
+  ; Java download page 
+  !insertmacro CUSTOM_PAGE_JREINFO
  
   ; Installation directory selection
   !insertmacro MUI_PAGE_DIRECTORY
@@ -89,6 +100,8 @@ SetCompressor bzip2
  
   LicenseLangString license ${LANG_ENGLISH} "Licence_en.rtf"
   LicenseLangString license ${LANG_FRENCH} "Licence_fr.rtf"
+  
+  !insertmacro JREINFO_LANGUAGE
   
 ;--------------------------------
 ;Reserve Files
@@ -133,6 +146,9 @@ Section "Installation of ${AppName}" SecAppFiles
  
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
+  
+  ; Download and install java.
+  call DownloadAndInstallJREIfNecessary
  
 SectionEnd
  
@@ -161,7 +177,12 @@ SectionEnd
  
 Function .onInit
 
-  ; Set installation directory accoding to bitness
+  ; When running 64bits, read and write to 64bits registry.
+  SetRegView 64
+  ; Install for all user
+  SetShellVarContext all
+
+  ; Set installation directory according to bitness
   ${If} $InstDir == ""
   	StrCpy $InstDir "$PROGRAMFILES\${SHORTNAME}"
     ${If} ${RunningX64}
@@ -184,12 +205,13 @@ FunctionEnd
 ;Uninstaller Section
  
 Section "Uninstall"
- 
+
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   DeleteRegKey HKLM  "SOFTWARE\${Vendor}\${AppName}"
   ; remove shortcuts, if any.
   Delete "$SMPROGRAMS\${AppName}\*.*"
+  RMDir /r "$SMPROGRAMS\${AppName}"
   ; remove files
   RMDir /r "$INSTDIR"
  
@@ -199,6 +221,11 @@ SectionEnd
 ;Uninstaller Functions
 
 Function un.onInit
+
+  ; When running 64bits, read and write to 64bits registry.
+  SetRegView 64
+  ; Uninstall for all user
+  SetShellVarContext all
 
   !insertmacro MUI_UNGETLANGUAGE
   

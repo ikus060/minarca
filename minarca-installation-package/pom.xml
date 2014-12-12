@@ -226,6 +226,10 @@
                                     failonerror="true">
                                     <!-- Avoid changing working directory -->
                                     <arg value="-NOCD" />
+                                    <arg
+                                        value="-Dincludedir=${basedir}/src/main/nsis/include" />
+                                    <arg
+                                        value="-Dplugindir=${basedir}/src/main/nsis/plugin" />
                                     <arg value="-DAppVersion=${AppVersion}" />
                                     <arg
                                         value="${basedir}/src/main/nsis/setup.nsi" />
