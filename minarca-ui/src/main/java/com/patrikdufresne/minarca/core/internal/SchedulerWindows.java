@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +96,7 @@ public class SchedulerWindows extends Scheduler {
      * @throws APIException
      */
     public String getCommand() throws APIException {
-        return "'" + search(MINARCA_LAUNCH_VBS) + "'";
+        return "\\\"" + search(MINARCA_LAUNCH_VBS) + "\\\"";
     }
 
     /**
@@ -157,8 +158,17 @@ public class SchedulerWindows extends Scheduler {
      */
     public void create() throws APIException {
         LOGGER.debug("creating schedule task [{}]", TASK_NAME);
-        String data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/F");
-        if (!data.contains("SUCCESS")) {
+        String data;
+        if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
+            // Delete the tasks (if exists). The /F option doesn't exists in WinXP.
+            delete();
+            // Create the task.
+            data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM");
+        } else {
+            data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM", "/F");
+        }
+        // FIXME looking at command output is not the best since it change according to user language.
+        if (data.contains("ERROR") || data.contains("ERREUR")) {
             throw new APIException("fail to schedule task");
         }
     }
@@ -225,8 +235,12 @@ public class SchedulerWindows extends Scheduler {
     public boolean exists() {
         try {
             SchTaskEntry task = query(TASK_NAME);
-            String curCommand = task.getCommand().replace("\"", "'").trim();
-            return task != null && getCommand().equals(curCommand);
+            if (task == null) {
+                return false;
+            }
+            // Replace the " by \" to match our command line
+            String curCommand = task.getCommand().replace("\"", "\\\"").trim();
+            return getCommand().equals(curCommand);
         } catch (APIException e) {
             LOGGER.warn("can't detect the task", e);
             return false;
@@ -235,7 +249,7 @@ public class SchedulerWindows extends Scheduler {
 
     private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
         String data;
-        if (taskname != null) {
+        if (taskname != null && !SystemUtils.IS_OS_WINDOWS_XP && !SystemUtils.IS_OS_WINDOWS_2003) {
             // Query a specific taskname.
             data = execute("/Query", "/FO", "CSV", "/V", "/TN", taskname);
         } else {
