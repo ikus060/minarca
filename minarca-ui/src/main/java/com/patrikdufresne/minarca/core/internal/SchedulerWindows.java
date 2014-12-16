@@ -12,9 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,27 +33,18 @@ public class SchedulerWindows extends Scheduler {
 
     private static class SchTaskEntry {
 
-        private static final String TASK_TO_RUN = "Task To Run";
+        private static final int TASK_TO_RUN = 8;
 
-        private static final String TASKNAME = "TaskName";
+        private static final int TASKNAME = 1;
 
-        // ["HostName", "TaskName", "Next Run Time", "Status", "Logon Mode",
-        // "Last Run Time", "Last Result", "Author", "Task To Run", "Start In",
-        // "Comment", "Scheduled Task State", "Idle Time", "Power Management",
-        // "Run As User", "Delete Task If Not Rescheduled",
-        // "Stop Task If Runs X Hours and X Mins", "Schedule", "Schedule Type",
-        // "Start Time", "Start Date", "End Date", "Days", "Months",
-        // "Repeat: Every", "Repeat: Until: Time", "Repeat: Until: Duration",
-        // "Repeat: Stop If Still Running"]
+        List<String> data;
 
-        Map<String, String> data;
-
-        private SchTaskEntry(Map<String, String> data) {
+        private SchTaskEntry(List<String> data) {
             Validate.notNull(this.data = data);
         }
 
-        public String get(String key) {
-            return this.data.get(key);
+        private String get(int index) {
+            return this.data.get(index);
         }
 
         public String getCommand() {
@@ -238,9 +227,24 @@ public class SchedulerWindows extends Scheduler {
             if (task == null) {
                 return false;
             }
-            // Replace the " by \" to match our command line
-            String curCommand = task.getCommand().replace("\"", "\\\"").trim();
-            return getCommand().equals(curCommand);
+            String curCommand;
+            String expectedCommand;
+            if (SystemUtils.IS_OS_WINDOWS_XP) {
+                // For WinXP
+                // The current command won't contains any quote or single quote. It's a shame.
+                curCommand = task.getCommand().trim();
+                expectedCommand = getCommand().replace("\\\"", "");
+            } else {
+                // For Win 7
+                // Replace the " by \" to match our command line
+                curCommand = task.getCommand().trim();
+                expectedCommand = getCommand().replace("\\\"", "\"");
+            }
+            if (!curCommand.equals(expectedCommand)) {
+                LOGGER.warn("command [{}] doesn't matched expected command [{}]", curCommand, expectedCommand);
+                return false;
+            }
+            return true;
         } catch (APIException e) {
             LOGGER.warn("can't detect the task", e);
             return false;
@@ -263,16 +267,16 @@ public class SchedulerWindows extends Scheduler {
         }
         List<SchTaskEntry> list = new ArrayList<SchedulerWindows.SchTaskEntry>();
         String line = scanner.nextLine();
-        String[] columns = line.split(",");
+        String[] columns = line.split("\",\"");
         while (scanner.hasNextLine()) {
-            Map<String, String> map = new LinkedHashMap<String, String>();
+            List<String> map = new ArrayList<String>();
             line = scanner.nextLine();
-            String[] values = line.split(",");
+            String[] values = line.split("\",\"");
             if (Arrays.equals(columns, values)) {
                 continue;
             }
             for (int i = 0; i < columns.length && i < values.length; i++) {
-                map.put(trimQuote(columns[i]), trimQuote(values[i]));
+                map.add(trimQuote(values[i]));
             }
             SchTaskEntry task = new SchTaskEntry(map);
             list.add(task);
