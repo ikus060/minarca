@@ -394,6 +394,7 @@ public class PreferenceDialog extends Dialog {
                         + "backup data will not be lost."),
                 null);
         if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
+            LOGGER.info("unlink opperation cancel by user");
             return;
         }
 

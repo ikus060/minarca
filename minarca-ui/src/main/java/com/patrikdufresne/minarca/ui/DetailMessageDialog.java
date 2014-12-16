@@ -46,9 +46,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * This class display a message dialog with a message, a short detail message
- * and a long detail message. It's useful to provide different level of
- * information to the user.
+ * This class display a message dialog with a message, a short detail message and a long detail message. It's useful to
+ * provide different level of information to the user.
  * 
  * @author Patrik Dufresne
  * 
@@ -56,8 +55,7 @@ import org.eclipse.swt.widgets.Text;
 public class DetailMessageDialog extends MessageDialog {
 
     /**
-     * Convenience method to open a standard error dialog without long detail
-     * message.
+     * Convenience method to open a standard error dialog without long detail message.
      * 
      * @param parent
      *            the parent shell of the dialog, or <code>null</code> if none
@@ -67,9 +65,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            a general message
      * @param shortDetail
      *            a show details message to give more precision about the error
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openError(Shell parent, String title, String message, String shortDetail) {
         return openError(parent, title, message, shortDetail, (String) null);
@@ -88,9 +85,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            a show details message to give more precision about the error
      * @param longDetail
      *            a long description of the error.
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openError(Shell parent, String title, String message, String shortDetail, String longDetail) {
         DetailMessageDialog dialog = new DetailMessageDialog(
@@ -120,9 +116,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            a show details message to give more precision about the error
      * @param longDetail
      *            the exception to show
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openError(Shell parent, String title, String message, String shortDetail, Throwable longDetail) {
         StringWriter sw = new StringWriter();
@@ -141,9 +136,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            the message
      * @param shortDetail
      *            a show details message to give more precision about the error
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openInformation(Shell parent, String title, String message, String shortDetail) {
         return openInformation(parent, title, message, shortDetail, (String) null);
@@ -159,13 +153,11 @@ public class DetailMessageDialog extends MessageDialog {
      * @param message
      *            the message
      * @param shortDetail
-     *            a show details message to give more precision about the
-     *            warning
+     *            a show details message to give more precision about the warning
      * @param longDetail
      *            a long description of the warning.
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openInformation(Shell parent, String title, String message, String shortDetail, String longDetail) {
         DetailMessageDialog dialog = new DetailMessageDialog(
@@ -195,9 +187,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            a show details message to give more precision about the error
      * @param longDetail
      *            the exception to show
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openInformation(Shell parent, String title, String message, String shortDetail, Throwable longDetail) {
         StringWriter sw = new StringWriter();
@@ -215,20 +206,17 @@ public class DetailMessageDialog extends MessageDialog {
      * @param message
      *            the message
      * @param toggleMessage
-     *            the message for the toggle control, or <code>null</code> for
-     *            the default message
+     *            the message for the toggle control, or <code>null</code> for the default message
      * @param toggleState
      *            the initial state for the toggle
      * @param store
-     *            the IPreference store in which the user's preference should be
-     *            persisted; <code>null</code> if you don't want it persisted
-     *            automatically.
+     *            the IPreference store in which the user's preference should be persisted; <code>null</code> if you
+     *            don't want it persisted automatically.
      * @param key
-     *            the key to use when persisting the user's preference;
-     *            <code>null</code> if you don't want it persisted.
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     *            the key to use when persisting the user's preference; <code>null</code> if you don't want it
+     *            persisted.
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openOkCancelConfirm(Shell parent, String title, String message, String shortDetail, String longDetail) {
         DetailMessageDialog dialog = new DetailMessageDialog(parent, title, null, message, shortDetail, longDetail, QUESTION, new String[] {
@@ -239,8 +227,7 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * Convenient method to open a standard warning dialog without long
-     * description message.
+     * Convenient method to open a standard warning dialog without long description message.
      * 
      * @param parent
      *            the parent shell of the dialog, or <code>null</code> if none
@@ -248,9 +235,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            the dialog's title, or <code>null</code> if none
      * @param message
      *            the message
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openWarning(Shell parent, String title, String message, String shortDetail) {
         return openWarning(parent, title, message, shortDetail, (String) null);
@@ -265,9 +251,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            the dialog's title, or <code>null</code> if none
      * @param message
      *            the message
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openWarning(Shell parent, String title, String message, String shortDetail, String longDetail) {
         DetailMessageDialog dialog = new DetailMessageDialog(
@@ -285,8 +270,7 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * Convenient method to open a standard warning dialog without long
-     * description message.
+     * Convenient method to open a standard warning dialog without long description message.
      * 
      * @param parent
      *            the parent shell of the dialog, or <code>null</code> if none
@@ -294,9 +278,8 @@ public class DetailMessageDialog extends MessageDialog {
      *            the dialog's title, or <code>null</code> if none
      * @param message
      *            the message
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openWarning(Shell parent, String title, String message, String shortDetail, Throwable longDetail) {
         StringWriter sw = new StringWriter();
@@ -314,20 +297,17 @@ public class DetailMessageDialog extends MessageDialog {
      * @param message
      *            the message
      * @param toggleMessage
-     *            the message for the toggle control, or <code>null</code> for
-     *            the default message
+     *            the message for the toggle control, or <code>null</code> for the default message
      * @param toggleState
      *            the initial state for the toggle
      * @param store
-     *            the IPreference store in which the user's preference should be
-     *            persisted; <code>null</code> if you don't want it persisted
-     *            automatically.
+     *            the IPreference store in which the user's preference should be persisted; <code>null</code> if you
+     *            don't want it persisted automatically.
      * @param key
-     *            the key to use when persisting the user's preference;
-     *            <code>null</code> if you don't want it persisted.
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     *            the key to use when persisting the user's preference; <code>null</code> if you don't want it
+     *            persisted.
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openYesNoCancelQuestion(Shell parent, String title, String message, String shortDetail, String longDetail) {
         DetailMessageDialog dialog = new DetailMessageDialog(parent, title, null, message, shortDetail, longDetail, QUESTION, new String[] {
@@ -350,9 +330,8 @@ public class DetailMessageDialog extends MessageDialog {
      * @param shortDetail
      * @param longDetail
      * 
-     * @return the dialog, after being closed by the user, which the client can
-     *         only call <code>getReturnCode()</code> or
-     *         <code>getToggleState()</code>
+     * @return the dialog, after being closed by the user, which the client can only call <code>getReturnCode()</code>
+     *         or <code>getToggleState()</code>
      */
     public static DetailMessageDialog openYesNoQuestion(Shell parent, String title, String message, String shortDetail, String longDetail) {
         DetailMessageDialog dialog = new DetailMessageDialog(parent, title, null, message, shortDetail, longDetail, QUESTION, new String[] {
@@ -392,8 +371,8 @@ public class DetailMessageDialog extends MessageDialog {
     protected Text detailsText;
 
     /**
-     * Creates a message dialog with a toggle and detailed message. See the
-     * superclass constructor for info on the other parameters.
+     * Creates a message dialog with a toggle and detailed message. See the superclass constructor for info on the other
+     * parameters.
      * 
      * @param parentShell
      *            the parent shell
@@ -410,24 +389,18 @@ public class DetailMessageDialog extends MessageDialog {
      * @param dialogImageType
      *            one of the following values:
      *            <ul>
-     *            <li><code>MessageDialog.NONE</code> for a dialog with no image
-     *            </li>
-     *            <li><code>MessageDialog.ERROR</code> for a dialog with an
-     *            error image</li>
-     *            <li><code>MessageDialog.INFORMATION</code> for a dialog with
-     *            an information image</li>
-     *            <li><code>MessageDialog.QUESTION </code> for a dialog with a
-     *            question image</li>
-     *            <li><code>MessageDialog.WARNING</code> for a dialog with a
-     *            warning image</li>
+     *            <li><code>MessageDialog.NONE</code> for a dialog with no image</li>
+     *            <li><code>MessageDialog.ERROR</code> for a dialog with an error image</li>
+     *            <li><code>MessageDialog.INFORMATION</code> for a dialog with an information image</li>
+     *            <li><code>MessageDialog.QUESTION </code> for a dialog with a question image</li>
+     *            <li><code>MessageDialog.WARNING</code> for a dialog with a warning image</li>
      *            </ul>
      * @param dialogButtonLabels
      *            an array of labels for the buttons in the button bar
      * @param defaultIndex
      *            the index in the button label array of the default button
      * @param toggleMessage
-     *            the message for the toggle control, or <code>null</code> for
-     *            the default message
+     *            the message for the toggle control, or <code>null</code> for the default message
      * @param toggleState
      *            the initial state for the toggle
      * 
@@ -482,7 +455,27 @@ public class DetailMessageDialog extends MessageDialog {
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        super.createButtonsForButtonBar(parent);
+        final String[] buttonLabels = getButtonLabels();
+        final Button[] buttons = new Button[buttonLabels.length];
+        final int defaultButtonIndex = getDefaultButtonIndex();
+
+        int suggestedId = IDialogConstants.INTERNAL_ID;
+        for (int i = 0; i < buttonLabels.length; i++) {
+            String label = buttonLabels[i];
+            // get the JFace button ID that matches the label, or use the specified
+            // id if there is no match.
+            int id = mapButtonLabelToButtonID(label, suggestedId);
+
+            // if the suggested id was used, increment the default for next use
+            if (id == suggestedId) {
+                suggestedId++;
+            }
+
+            Button button = createButton(parent, id, label, defaultButtonIndex == i);
+            buttons[i] = button;
+
+        }
+        setButtons(buttons);
         createDetailsButton(parent);
     }
 
@@ -556,11 +549,10 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * Creates and returns the contents of an area of the dialog which appears
-     * below the message and above the button bar.
+     * Creates and returns the contents of an area of the dialog which appears below the message and above the button
+     * bar.
      * <p>
-     * The default implementation of this framework method returns
-     * <code>null</code>. Subclasses may override.
+     * The default implementation of this framework method returns <code>null</code>. Subclasses may override.
      * </p>
      * 
      * @param parent
@@ -628,8 +620,109 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * Sets the short detail message. This function may be used by subclasses to
-     * redefine the original message value if it wasn't null.
+     * Attempt to find a standard JFace button id that matches the specified button label. If no match can be found, use
+     * the default id provided.
+     * 
+     * @param buttonLabel
+     *            the button label whose id is sought
+     * @param defaultId
+     *            the id to use for the button if there is no standard id
+     * @return the id for the specified button label
+     */
+    private int mapButtonLabelToButtonID(String buttonLabel, int defaultId) {
+        // Not pretty but does the job...
+        if (IDialogConstants.OK_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.OK_ID;
+        }
+
+        if (IDialogConstants.YES_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.YES_ID;
+        }
+
+        if (IDialogConstants.NO_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.NO_ID;
+        }
+
+        if (IDialogConstants.CANCEL_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.CANCEL_ID;
+        }
+
+        if (IDialogConstants.YES_TO_ALL_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.YES_TO_ALL_ID;
+        }
+
+        if (IDialogConstants.SKIP_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.SKIP_ID;
+        }
+
+        if (IDialogConstants.STOP_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.STOP_ID;
+        }
+
+        if (IDialogConstants.ABORT_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.ABORT_ID;
+        }
+
+        if (IDialogConstants.RETRY_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.RETRY_ID;
+        }
+
+        if (IDialogConstants.IGNORE_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.IGNORE_ID;
+        }
+
+        if (IDialogConstants.PROCEED_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.PROCEED_ID;
+        }
+
+        if (IDialogConstants.OPEN_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.OPEN_ID;
+        }
+
+        if (IDialogConstants.CLOSE_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.CLOSE_ID;
+        }
+
+        if (IDialogConstants.BACK_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.BACK_ID;
+        }
+
+        if (IDialogConstants.NEXT_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.NEXT_ID;
+        }
+
+        if (IDialogConstants.FINISH_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.FINISH_ID;
+        }
+
+        if (IDialogConstants.HELP_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.HELP_ID;
+        }
+
+        if (IDialogConstants.NO_TO_ALL_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.NO_TO_ALL_ID;
+        }
+
+        if (IDialogConstants.SHOW_DETAILS_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.DETAILS_ID;
+        }
+
+        if (IDialogConstants.HIDE_DETAILS_LABEL.equals(buttonLabel)) {
+            return IDialogConstants.DETAILS_ID;
+        }
+
+        // No XXX_LABEL in IDialogConstants for these. Unlikely
+        // they would be used in a message dialog though.
+        // public int SELECT_ALL_ID = 18;
+        // public int DESELECT_ALL_ID = 19;
+        // public int SELECT_TYPES_ID = 20;
+
+        return defaultId;
+    }
+
+    /**
+     * Sets the short detail message. This function may be used by subclasses to redefine the original message value if
+     * it wasn't null.
      * 
      * @param value
      *            the new detail message.
@@ -643,8 +736,8 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * Sets the details. This function may be used by subclasses to redefine the
-     * original details value if it wasn't null.
+     * Sets the details. This function may be used by subclasses to redefine the original details value if it wasn't
+     * null.
      * 
      * @param value
      *            the new details value
@@ -658,9 +751,8 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * This method sets the message in the message label. This function may be
-     * called by subclasses to redefine the original message value if it wasn't
-     * null.
+     * This method sets the message in the message label. This function may be called by subclasses to redefine the
+     * original message value if it wasn't null.
      * 
      * @param value
      *            the String for the message area
@@ -676,11 +768,9 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * Return whether the Details button should be included. This method is
-     * invoked once when the dialog is built. By default, the Details button is
-     * only included if the status used when creating the dialog was a
-     * multi-status or if the status contains an exception. Subclasses may
-     * override.
+     * Return whether the Details button should be included. This method is invoked once when the dialog is built. By
+     * default, the Details button is only included if the status used when creating the dialog was a multi-status or if
+     * the status contains an exception. Subclasses may override.
      * 
      * @return whether the Details button should be included
      * 
@@ -690,8 +780,7 @@ public class DetailMessageDialog extends MessageDialog {
     }
 
     /**
-     * Toggles the unfolding of the details area. This is triggered by the user
-     * pressing the details button.
+     * Toggles the unfolding of the details area. This is triggered by the user pressing the details button.
      */
     protected void toggleDetailsArea() {
         Point windowSize = getShell().getSize();
