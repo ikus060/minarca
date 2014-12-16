@@ -6,9 +6,8 @@
 package com.patrikdufresne.minarca.core.internal;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -17,8 +16,6 @@ import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.patrikdufresne.minarca.core.API;
 
 /**
  * Used to answer the password for putty process.
@@ -38,24 +35,53 @@ public class StreamHandler extends Thread {
     /**
      * Data return from the process execution.
      */
-    private StringBuilder buf = new StringBuilder();
+    private StringBuilder output = new StringBuilder();
     /**
      * Process to monitor.
      */
-    private Process p;
+    private final Process p;
 
     /**
      * Password value to answer.
      */
-    private String password;
+    private final String password;
+    /**
+     * Charset used to read process output.
+     */
+    private final Charset charset;
 
     /**
      * Process stream handler.
      * 
      * @param p
+     *            the process.
      */
     public StreamHandler(Process p) {
-        this(p, null);
+        this(p, null, ProcessCharset.defaultCharset());
+    }
+
+    /**
+     * Process stream handler.
+     * 
+     * @param p
+     *            the process
+     * @param charset
+     *            the charset to be used.
+     */
+    public StreamHandler(Process p, Charset charset) {
+        this(p, null, charset);
+    }
+
+    /**
+     * Process stream handler.
+     * 
+     * @param p
+     *            the process
+     * @param password
+     *            the password
+     */
+    public StreamHandler(Process p, String password) {
+        this(p, password, ProcessCharset.defaultCharset());
     }
 
     /**
@@ -63,9 +89,10 @@ public class StreamHandler extends Thread {
      * 
      * @param p
      */
-    public StreamHandler(Process p, String password) {
+    public StreamHandler(Process p, String password, Charset charset) {
         Validate.notNull(this.p = p);
         this.password = password;
+        Validate.notNull(this.charset = charset);
     }
 
     /**
@@ -74,62 +101,58 @@ public class StreamHandler extends Thread {
      * @return
      */
     public String getOutput() {
-        synchronized (buf) {
-            return buf.toString();
+        synchronized (output) {
+            return output.toString();
         }
     }
 
     @Override
     public void run() {
-        synchronized (buf) {
+        synchronized (output) {
             boolean answered = false;
-            boolean validFingerPrint = false;
-            Writer out = new BufferedWriter(new OutputStreamWriter(this.p.getOutputStream()));
-            InputStream in = this.p.getInputStream();
             // Read stream line by line without buffer (otherwise it block).
             try {
-                ByteArrayOutputStream data = new ByteArrayOutputStream();
+                Writer out = new BufferedWriter(new OutputStreamWriter(this.p.getOutputStream()));
+                InputStreamReader in = new InputStreamReader(this.p.getInputStream(), charset);
+
+                if (password == null) {
+                    out.close();
+                }
+
+                StringBuilder buf = new StringBuilder();
                 int b;
                 while ((b = in.read()) != -1) {
                     // Write the byte into a buffer
                     if (b == CR || b == LF) {
-                        String line = new String(data.toByteArray(), Charset.defaultCharset());
+                        String line = buf.toString();
                         if (!line.isEmpty()) {
                             LOGGER.debug(line);
-                            buf.append(line);
-                            buf.append(SystemUtils.LINE_SEPARATOR);
+                            output.append(line);
+                            output.append(SystemUtils.LINE_SEPARATOR);
                         }
-                        data.reset();
+                        buf.setLength(0);
                     } else {
-                        data.write(b);
+                        buf.append((char) b);
                     }
                     if (!answered && this.password != null) {
-                        String prompt = new String(data.toByteArray(), Charset.defaultCharset());
+                        String prompt = buf.toString();
                         //
                         if (prompt.endsWith("password: ")) {
                             LOGGER.debug(prompt);
                             out.append(password);
                             out.append(SystemUtils.LINE_SEPARATOR);
                             out.flush();
+                            out.close();
                             // Reset the buffer
-                            data.reset();
+                            buf.setLength(0);
                             answered = true;
-                        }
-                        // Plink might ask us to accept a fingerprint.
-                        for (String fp : API.DEFAULT_REMOTEHOST_FINGERPRINT) {
-                            if (prompt.contains(fp)) {
-                                validFingerPrint = true;
-                            }
                         }
                         // Check if asking for finger print confirmation.
                         if (prompt.contains("Store key in cache? (y/n)")) {
                             // Press enter to abandon.
-                            if (validFingerPrint) {
-                                out.append("y");
-                            }
                             out.append(SystemUtils.LINE_SEPARATOR);
                             out.flush();
-                            data.reset();
+                            buf.setLength(0);
                         }
                     }
                 }

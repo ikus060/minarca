@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.internal.Keygen;
+import com.patrikdufresne.minarca.core.internal.ProcessCharset;
 import com.patrikdufresne.minarca.core.internal.SSH;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 
@@ -259,6 +260,7 @@ public enum API {
     private API() {
         // Log the default charset
         LoggerFactory.getLogger(API.class).info("using default charset [{}]", Charset.defaultCharset().name());
+        LoggerFactory.getLogger(API.class).info("using process charset [{}]", ProcessCharset.defaultCharset().name());
 
         File configDir = getConfigDirFile();
         this.confFile = new File(configDir, CONF_FILENAME); //$NON-NLS-1$
