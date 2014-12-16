@@ -19,7 +19,7 @@ public class Localized {
 
     static {
         LoggerFactory.getLogger(Localized.class).info("using default locale {}", Locale.getDefault());
-        i18n = I18nFactory.getI18n(Localized.class, BUNDLE_NAME, Locale.getDefault(), I18nFactory.DEFAULT);
+        i18n = I18nFactory.getI18n(Localized.class, BUNDLE_NAME, Locale.getDefault(), I18nFactory.FALLBACK);
     }
 
     public static String _(String text) {
