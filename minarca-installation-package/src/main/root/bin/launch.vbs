@@ -80,7 +80,7 @@ Function GetLastBackup()
 	'Parse the string
 	Dim re
 	Set re = New RegExp
-	re.Pattern = ".*([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)-([0-9]+):00.data"
+	re.Pattern = "\.([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)-([0-9]+):00.data"
 	re.IgnoreCase = True
 	re.Global = True
 	re.MultiLine = False
