@@ -35,8 +35,7 @@ import com.patrikdufresne.minarca.core.Client;
 import com.patrikdufresne.minarca.ui.AppFormToolkit;
 
 /**
- * Dialog used to configure the application the first time the user open it.
- * It's similar to a wizard.
+ * Dialog used to configure the application the first time the user open it. It's similar to a wizard.
  * 
  * @author Patrik Dufresne
  * 
@@ -279,7 +278,7 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Success !") + "</h2><br/>";
-        introText += _("Your computer is now configure to backup if " + "self once a day with minarca!");
+        introText += _("Your computer is now configure to backup it self once a day with minarca!");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -327,8 +326,8 @@ public class SetupDialog extends Dialog {
     /**
      * Called to handle user sign in.
      * <p>
-     * This implementation will establish a connection via HTTP and or SSH to
-     * make sure the connection and credentials are valid.
+     * This implementation will establish a connection via HTTP and or SSH to make sure the connection and credentials
+     * are valid.
      * 
      * @param username
      *            the username for authentication
