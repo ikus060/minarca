@@ -28,6 +28,18 @@ public abstract class SSH {
         throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
     }
 
+    /**
+     * Add minarca servers host public key to known host list. This is to avoid SSH or PLink to prompt use about known
+     * server.
+     */
+    public abstract void addKnownHosts() throws APIException;
+
+    /**
+     * Send our public key to minarca server to setup a password-less SSH.
+     * 
+     * @param publicKey
+     * @throws APIException
+     */
     public abstract void sendPublicKey(File publicKey) throws APIException;
 
 }

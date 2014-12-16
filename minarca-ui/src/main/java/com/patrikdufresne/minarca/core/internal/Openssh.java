@@ -24,6 +24,11 @@ public class Openssh extends SSH {
     }
 
     @Override
+    public void addKnownHosts() throws APIException {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
     public void sendPublicKey(File publicKey) throws APIException {
         // TODO Use ssh-copy-id
     }

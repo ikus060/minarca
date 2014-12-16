@@ -73,11 +73,6 @@ public enum API {
     private static final String DEFAULT_REMOTEHOST = "fente.patrikdufresne.com";
 
     /**
-     * List of finger print accepted by minarca. For security reason, we only accept known finger print.
-     */
-    public static final String[] DEFAULT_REMOTEHOST_FINGERPRINT = new String[] { "05:16:1c:49:37:58:87:a5:5c:16:31:bc:a9:95:2c:c2" };
-
-    /**
      * Exclude filename.
      */
     private static final String EXCLUDES_FILENAME = "excludes";
@@ -262,6 +257,8 @@ public enum API {
      * Default constructor.
      */
     private API() {
+        // Log the default charset
+        LoggerFactory.getLogger(API.class).info("using default charset [{}]", Charset.defaultCharset().name());
 
         File configDir = getConfigDirFile();
         this.confFile = new File(configDir, CONF_FILENAME); //$NON-NLS-1$
@@ -455,6 +452,7 @@ public enum API {
          */
         LOGGER.debug("sending public key trought SSH");
         SSH ssh = SSH.getInstance(getRemoteHost(), username, password);
+        ssh.addKnownHosts();
         ssh.sendPublicKey(idrsaFile);
 
         /*
@@ -513,7 +511,11 @@ public enum API {
      * @throws APIException
      */
     public void setComputerName(String value) throws APIException {
-        this.properties.setProperty(COMPUTERNAME, value);
+        if (value == null) {
+            this.properties.remove(COMPUTERNAME);
+        } else {
+            this.properties.setProperty(COMPUTERNAME, value);
+        }
         try {
             save();
         } catch (IOException e) {
@@ -558,7 +560,11 @@ public enum API {
      * @throws APIException
      */
     public void setRemotehost(String value) throws APIException {
-        this.properties.setProperty(REMOTEHOST, value);
+        if (value == null) {
+            this.properties.remove(REMOTEHOST);
+        } else {
+            this.properties.setProperty(REMOTEHOST, value);
+        }
         try {
             save();
         } catch (IOException e) {
@@ -573,7 +579,11 @@ public enum API {
      * @throws APIException
      */
     public void setUsername(String value) throws APIException {
-        this.properties.setProperty(USERNAME, value);
+        if (value == null) {
+            this.properties.remove(USERNAME);
+        } else {
+            this.properties.setProperty(USERNAME, value);
+        }
         try {
             save();
         } catch (IOException e) {
