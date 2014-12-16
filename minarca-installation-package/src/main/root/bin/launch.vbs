@@ -285,7 +285,7 @@ Call Log("INFO", "start backup")
 Dim CMDS
 CMDS = """" + RDIFF_BACKUP + """"
 CMDS = CMDS + " -v 5 --no-hard-links --exclude-symbolic-links --no-acls"
-CMDS = CMDS + " --remote-schema """ + PLINK + " -batch -i " + USER_PPK + " %s rdiff-backup --server"""
+CMDS = CMDS + " --remote-schema """ + PLINK + " -batch -i \""" + USER_PPK + "\"" %s rdiff-backup --server"""
 CMDS = CMDS + " --exclude-globbing-filelist """ + EXCLUDES_FILE + """"
 CMDS = CMDS + " --include-globbing-filelist """ + INCLUDES_FILE + """"
 CMDS = CMDS + " --exclude ""C:/**"""
