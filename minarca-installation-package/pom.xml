@@ -68,14 +68,7 @@
                             <outputDirectory>${project.build.directory}/generated-resources/icons</outputDirectory>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <!-- Copy SWT jars for supported platform. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.7</version>
-                <executions>
+                    <!-- Copy SWT jars for supported platform. -->
                     <execution>
                         <id>copy-swt-win-x86</id>
                         <phase>generate-resources</phase>
@@ -110,10 +103,10 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
                 <executions>
                     <!-- Copy icons into /target/package -->
                     <execution>
