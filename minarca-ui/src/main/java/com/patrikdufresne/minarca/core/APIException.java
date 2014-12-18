@@ -10,8 +10,7 @@ public class APIException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Exception used to represent an application error. Message return in
-     * alert-danger.
+     * Exception used to represent an application error. Message return in alert-danger.
      * 
      * @author Patrik Dufresne
      * 
@@ -26,7 +25,7 @@ public class APIException extends Exception {
      * Thrown when the application is not configured.
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public static class NotConfiguredException extends APIException {
         public NotConfiguredException(String message) {
@@ -38,7 +37,7 @@ public class APIException extends Exception {
      * Thrown when the application is miss configured
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public static class MissConfiguredException extends APIException {
         public MissConfiguredException(String message) {

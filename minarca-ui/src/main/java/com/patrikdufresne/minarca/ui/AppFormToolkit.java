@@ -25,8 +25,7 @@ import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * Customized implementation of FormToolkit to provide more font and color
- * related to this application.
+ * Customized implementation of FormToolkit to provide more font and color related to this application.
  * 
  * @author Patrik Dufresne
  * 

@@ -11,7 +11,7 @@ import org.apache.commons.lang3.SystemUtils;
  * Used to get the default charset from process.
  * 
  * @author vmuser
- *
+ * 
  */
 public class ProcessCharset {
     /**

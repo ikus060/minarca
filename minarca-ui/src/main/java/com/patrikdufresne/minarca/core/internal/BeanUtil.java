@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class to read / write property. This implementation is specifically
- * design to lowercase the first letter of the property name.
+ * Utility class to read / write property. This implementation is specifically design to lowercase the first letter of
+ * the property name.
  * 
  * @author Patrik Dufresne
  * 
@@ -28,12 +28,10 @@ import java.util.List;
 public class BeanUtil {
 
     /**
-     * Goes recursively into the interface and gets all defined
-     * propertyDescriptors
+     * Goes recursively into the interface and gets all defined propertyDescriptors
      * 
      * @param propertyDescriptors
-     *            The result list of all PropertyDescriptors the given interface
-     *            defines (hierarchical)
+     *            The result list of all PropertyDescriptors the given interface defines (hierarchical)
      * @param iface
      *            The interface to fetch the PropertyDescriptors
      * @throws IntrospectionException
@@ -54,8 +52,7 @@ public class BeanUtil {
     /**
      * @param beanClass
      * @param propertyName
-     * @return the PropertyDescriptor for the named property on the given bean
-     *         class
+     * @return the PropertyDescriptor for the named property on the given bean class
      */
     public static PropertyDescriptor getPropertyDescriptor(Class beanClass, String propertyName) {
         if (!beanClass.isInterface()) {

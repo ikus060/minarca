@@ -219,8 +219,7 @@ public class Keygen {
      * @throws IOException
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
-     * @see https 
-     *      ://github.com/hierynomus/sshj/blob/master/src/main/java/net/schmizz
+     * @see https ://github.com/hierynomus/sshj/blob/master/src/main/java/net/schmizz
      *      /sshj/userauth/keyprovider/PuTTYKeyFile.java
      * @see https://github.com/Yasushi/putty/blob/master/sshpubk.c
      */

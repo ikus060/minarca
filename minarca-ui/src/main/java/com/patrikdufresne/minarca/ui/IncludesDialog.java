@@ -60,7 +60,7 @@ import com.patrikdufresne.minarca.core.GlobPattern;
  * Dialog used to display and change includes patterns.
  * 
  * @author Patrik Dufresne
- *
+ * 
  */
 public class IncludesDialog extends TrayDialog {
 
@@ -403,8 +403,8 @@ public class IncludesDialog extends TrayDialog {
     }
 
     /**
-     * Get file icon for the given file. This method used a file registry to
-     * cahed the image and handle disposable of the resources.
+     * Get file icon for the given file. This method used a file registry to cahed the image and handle disposable of
+     * the resources.
      * 
      * @param file
      *            the file
@@ -484,6 +484,7 @@ public class IncludesDialog extends TrayDialog {
 
     /**
      * Check if the given pattern is a "default" pattern. Those patterns should not be removed.
+     * 
      * @param p
      * @return
      */
@@ -493,6 +494,7 @@ public class IncludesDialog extends TrayDialog {
 
     /**
      * Check if the given pattern is a "default" pattern. Those patterns should not be removed.
+     * 
      * @param p
      * @return
      */

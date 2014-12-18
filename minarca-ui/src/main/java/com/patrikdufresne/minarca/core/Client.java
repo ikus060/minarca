@@ -71,12 +71,10 @@ public class Client {
     /**
      * Register a new computer.
      * <p>
-     * A successful link of this computer will generate a new configuration
-     * file.
+     * A successful link of this computer will generate a new configuration file.
      * <p>
-     * This implementation will generate public and private keys for putty. The
-     * public key will be sent to minarca. The computer name is added to the
-     * comments.
+     * This implementation will generate public and private keys for putty. The public key will be sent to minarca. The
+     * computer name is added to the comments.
      * 
      * 
      * @param computername

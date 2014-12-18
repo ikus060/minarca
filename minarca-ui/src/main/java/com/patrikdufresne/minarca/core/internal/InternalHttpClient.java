@@ -38,12 +38,11 @@ import com.patrikdufresne.minarca.core.Client;
 /**
  * This class is used by the {@link Client} to execute HTTP request.
  * <p>
- * This class hide all the complexity related to user session, authentication
- * and page validation. This class is not indented to be used directly. User
- * should use the {@link Client} interface.
+ * This class hide all the complexity related to user session, authentication and page validation. This class is not
+ * indented to be used directly. User should use the {@link Client} interface.
  * 
  * @author Patrik Dufresne
- *
+ * 
  */
 public class InternalHttpClient {
     /**

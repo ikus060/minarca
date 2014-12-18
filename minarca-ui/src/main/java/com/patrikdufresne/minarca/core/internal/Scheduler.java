@@ -12,12 +12,11 @@ import com.patrikdufresne.minarca.core.APIException;
 /**
  * Interface used to represent a scheduler.
  * <p>
- * Class implementing this interface represent the scheduling service used by
- * the current operating system. This interface is indented to represent a
- * subset of the feature provided by the scheduler.
+ * Class implementing this interface represent the scheduling service used by the current operating system. This
+ * interface is indented to represent a subset of the feature provided by the scheduler.
  * 
  * @author Patrik Dufresne
- *
+ * 
  */
 public abstract class Scheduler {
     /**
