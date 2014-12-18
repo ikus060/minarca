@@ -78,54 +78,6 @@ public class SchedulerWindows extends Scheduler {
      */
     private static final String TASK_NAME = "minarca backup";
 
-    /**
-     * Return the command line to be executed to run a backup.
-     * 
-     * @return
-     * @throws APIException
-     */
-    public String getCommand() throws APIException {
-        return "\\\"" + search(MINARCA_LAUNCH_VBS) + "\\\"";
-    }
-
-    /**
-     * Search for a binary file.
-     * 
-     * @return
-     * @throws APIException
-     */
-    private static File search(String filename) throws APIException {
-        // Search minarca.bat file
-        List<String> locations = new ArrayList<String>();
-        String value = System.getProperty(PROPERTY_MINARCA_BATCH_LOCATION);
-        if (value != null) {
-            locations.add(value);
-        }
-        locations.add("./bin/");
-        locations.add(".");
-        for (String location : locations) {
-            File file = new File(location, filename);
-            if (file.isFile() && file.canRead()) {
-                try {
-                    return file.getCanonicalFile();
-                } catch (IOException e) {
-                    return file.getAbsoluteFile();
-                }
-            }
-        }
-        throw new APIException(_("{0} is missing ", filename));
-    }
-
-    /**
-     * Remove leading and ending quote.
-     * 
-     * @param string
-     * @return
-     */
-    private static String trimQuote(String string) {
-        return string.replaceAll("^\"", "").replaceAll("\"$", "");
-    }
-
     public SchedulerWindows() {
 
     }
@@ -180,7 +132,7 @@ public class SchedulerWindows extends Scheduler {
      * 
      * @throws APIException
      */
-    private String execute(List<String> args) throws APIException {
+    String execute(List<String> args) throws APIException {
         List<String> command = new ArrayList<String>();
         command.add("schtasks.exe");
         if (args != null) {
@@ -251,6 +203,16 @@ public class SchedulerWindows extends Scheduler {
         }
     }
 
+    /**
+     * Return the command line to be executed to run a backup.
+     * 
+     * @return
+     * @throws APIException
+     */
+    public String getCommand() throws APIException {
+        return "\\\"" + search(MINARCA_LAUNCH_VBS) + "\\\"";
+    }
+
     private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
         String data;
         if (taskname != null && !SystemUtils.IS_OS_WINDOWS_XP && !SystemUtils.IS_OS_WINDOWS_2003) {
@@ -271,12 +233,13 @@ public class SchedulerWindows extends Scheduler {
         while (scanner.hasNextLine()) {
             List<String> map = new ArrayList<String>();
             line = scanner.nextLine();
-            String[] values = line.split("\",\"");
+            // Remove leading and ending double-quote then split the line.
+            String[] values = line.replaceFirst("^\"", "").replaceFirst("\"$", "").split("\",\"");
             if (Arrays.equals(columns, values)) {
                 continue;
             }
             for (int i = 0; i < columns.length && i < values.length; i++) {
-                map.add(trimQuote(values[i]));
+                map.add((values[i]));
             }
             SchTaskEntry task = new SchTaskEntry(map);
             list.add(task);
@@ -299,5 +262,33 @@ public class SchedulerWindows extends Scheduler {
             }
         }
         return null;
+    }
+
+    /**
+     * Search for a binary file.
+     * 
+     * @return
+     * @throws APIException
+     */
+    String search(String filename) throws APIException {
+        // Search minarca.bat file
+        List<String> locations = new ArrayList<String>();
+        String value = System.getProperty(PROPERTY_MINARCA_BATCH_LOCATION);
+        if (value != null) {
+            locations.add(value);
+        }
+        locations.add("./bin/");
+        locations.add(".");
+        for (String location : locations) {
+            File file = new File(location, filename);
+            if (file.isFile() && file.canRead()) {
+                try {
+                    return file.getCanonicalPath();
+                } catch (IOException e) {
+                    return file.getAbsolutePath();
+                }
+            }
+        }
+        throw new APIException(_("{0} is missing ", filename));
     }
 }
