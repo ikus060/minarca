@@ -62,10 +62,10 @@ End Function
 Function GetConfigDir()
 	Dim arrDirs, strDir
 	' For WinXP & Win7
-	arrDirs = Array(Expand("%PROGRAMDATA%") & "\minarca\", _
-					Expand("%ALLUSERSPROFILE%") & "\Application Data\minarca\")
+	arrDirs = Array(Expand("%WINDIR%") & "\System32\config\systemprofile\Application Data\minarca\", _
+					Expand("%WINDIR%") & "\System32\config\systemprofile\AppData\Local\minarca\")
 	For Each strDir In arrDirs
-		Call Log("DEBUG", "check if config diretory [" & strDir & "] exists")
+		Call Log("DEBUG", "check if config directory [" & strDir & "] exists")
 		If IsDir(strDir) Then
 			GetConfigDir = strDir
 			Exit For
@@ -134,7 +134,7 @@ Function Log(strLevel, strMessage)
 	strDate = FormatDate("%Y-%m-%dT%H:%M:%S", Now())
 	strLogFile = GetTempDir() & "/minarca.log"
 	On Error Resume Next
-	Call LogUnsafe("[" + strDate + "][" + strLevel + "] " + strMessage, strLogFile)
+	Call LogUnsafe("[" + strDate + "][" + LPad(strLevel, 5, " ") + "] " + strMessage, strLogFile)
 	On Error GoTo 0
 End Function
 
@@ -147,20 +147,6 @@ Function LogUnsafe(strLine, strFileName)
 	oFile.WriteLine(strLine)
 	Set oFSO = Nothing
 	Set oFile = Nothing
-End Function
-
-' Log all the environment variable for debugging purpose.
-Function LogEnvironmentVariables()
-	Dim oShell, env, strItem, arrEnvs, strEnv
-	Set oShell = CreateObject("WScript.Shell")
-	arrEnvs = Array("PROCESS", "SYSTEM", "USER")
-	For Each strEnv In arrEnvs
-		Call Log("DEBUG", " " & strEnv)
-		Set env = oShell.Environment(strEnv)
-		For Each strItem In env
-			Call Log("DEBUG", "   " & strItem)
-		Next
-	Next
 End Function
 
 Function LogExec(command)
@@ -186,9 +172,6 @@ End Function
 
 ' Script starting !
 Call Log("INFO", "minarca starting")
-
-' For debug purpose, print environment variable
-Call LogEnvironmentVariables()
 
 'Declare constants
 Dim MINARCA_CONF_DIR,CONF_FILE,INCLUDES_FILE,EXCLUDES_FILE,USER_PPK,RDIFF_BACKUP_VERSION

@@ -107,9 +107,9 @@ public enum API {
         if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
             File configDir;
             if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-                configDir = new File(System.getenv("ALLUSERSPROFILE") + "/Application Data/minarca");
+                configDir = new File(System.getenv("WINDIR") + "/System32/config/systemprofile/Application Data/minarca");
             } else {
-                configDir = new File(System.getenv("PROGRAMDATA") + "/minarca");
+                configDir = new File(System.getenv("WINDIR") + "/System32/config/systemprofile/AppData/Local/minarca");
             }
             //$NON-NLS-1$
             configDir.mkdirs();
