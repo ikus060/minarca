@@ -3,7 +3,7 @@
  * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
  * Use is subject to license terms.
  */
-package com.patrikdufresne.minarca.ui.setup;
+package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
 
@@ -32,7 +32,6 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.ApplicationException;
 import com.patrikdufresne.minarca.core.Client;
-import com.patrikdufresne.minarca.ui.AppFormToolkit;
 
 /**
  * Dialog used to configure the application the first time the user open it. It's similar to a wizard.

@@ -46,7 +46,7 @@ import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.ui.PreferenceDialog;
-import com.patrikdufresne.minarca.ui.setup.SetupDialog;
+import com.patrikdufresne.minarca.ui.SetupDialog;
 
 /**
  * This class is the main entry point to the software.
