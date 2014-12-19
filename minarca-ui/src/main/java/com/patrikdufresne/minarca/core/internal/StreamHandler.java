@@ -57,7 +57,7 @@ public class StreamHandler extends Thread {
      *            the process.
      */
     public StreamHandler(Process p) {
-        this(p, null, ProcessCharset.defaultCharset());
+        this(p, null, OSUtils.PROCESS_CHARSET);
     }
 
     /**
@@ -81,7 +81,7 @@ public class StreamHandler extends Thread {
      *            the password
      */
     public StreamHandler(Process p, String password) {
-        this(p, password, ProcessCharset.defaultCharset());
+        this(p, password, OSUtils.PROCESS_CHARSET);
     }
 
     /**

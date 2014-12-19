@@ -16,7 +16,6 @@ import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 
 /**
@@ -162,7 +161,7 @@ public class Plink extends SSH {
 
         try {
             // Execute the process.
-            Process p = new ProcessBuilder().command(command).directory(API.getConfigDirFile()).redirectErrorStream(true).start();
+            Process p = new ProcessBuilder().command(command).directory(new File(OSUtils.CONFIG_PATH)).redirectErrorStream(true).start();
             // Attach stream handle to answer a password when prompted
             StreamHandler sh = new StreamHandler(p, password);
             sh.start();

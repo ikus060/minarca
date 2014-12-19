@@ -13,8 +13,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -37,7 +35,6 @@ import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.OSUtils;
-import com.patrikdufresne.minarca.core.internal.ProcessCharset;
 import com.patrikdufresne.minarca.core.internal.SSH;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 
@@ -48,10 +45,6 @@ import com.patrikdufresne.minarca.core.internal.Scheduler;
  * 
  */
 public class API {
-    /**
-     * Application name used for sub folder
-     */
-    private static final String APPNAME = "minarca";
 
     /**
      * Base URL. TODO change this.
@@ -103,54 +96,6 @@ public class API {
      */
     private static final String USERNAME = "username";
 
-    /**
-     * Return the location of the configuration.
-     * 
-     * @return return a File instance.
-     */
-    public static File getConfigDirFile() {
-        if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
-            File configDir;
-            if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-                configDir = new File(OSUtils.WINDOWS_SYSTEMPROFILE_PATH + "/Application Data/minarca");
-            } else {
-                configDir = new File(OSUtils.WINDOWS_SYSTEMPROFILE_PATH + "/AppData/Local/minarca");
-            }
-            //$NON-NLS-1$
-            configDir.mkdirs();
-            return configDir;
-        } else if (SystemUtils.IS_OS_LINUX) {
-            File configDir = new File(SystemUtils.getUserHome(), ".config/" + APPNAME); //$NON-NLS-1$
-            configDir.mkdirs();
-            return configDir;
-        }
-        throw unsupportedOS();
-    }
-
-    /**
-     * Return a default computer name to represent this computer.
-     * <p>
-     * Current implementation gets the hostname.
-     * 
-     * @return an empty string or a hostname
-     */
-    public static String getDefaultComputerName() {
-        // For windows
-        String host = System.getenv("COMPUTERNAME");
-        if (host != null) return host.toLowerCase();
-        // For linux
-        host = System.getenv("HOSTNAME");
-        if (host != null) return host.toLowerCase();
-        // Fallback and use Inet interface.
-        try {
-            String result = InetAddress.getLocalHost().getHostName();
-            if (StringUtils.isNotEmpty(result)) return result.toLowerCase();
-        } catch (UnknownHostException e) {
-            // failed; try alternate means.
-        }
-        return "";
-    }
-
     public static List<GlobPattern> getDefaultIncludes() {
         if (SystemUtils.IS_OS_WINDOWS) {
             // Return user directory.
@@ -159,7 +104,7 @@ public class API {
             // Return user directory.
             return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
         }
-        throw unsupportedOS();
+        return Collections.emptyList();
     }
 
     /**
@@ -179,22 +124,7 @@ public class API {
             list.add(new GlobPattern(userHome + "/Downloads/"));
             return list;
         }
-        throw unsupportedOS();
-    }
-
-    /**
-     * Return the home driver ( the only drive to be backup.
-     * 
-     * @return
-     */
-    public static File getHomeDrive() {
-        String homedrive = System.getenv("HOMEDRIVER");
-        // Check if env variable contains something takt make senses
-        File file = new File(homedrive + SystemUtils.PATH_SEPARATOR);
-        if (file.exists() && file.isDirectory()) {
-            return file;
-        }
-        return new File("C:\\");
+        return Collections.emptyList();
     }
 
     /**
@@ -232,7 +162,7 @@ public class API {
         } else if (SystemUtils.IS_OS_LINUX) {
             return Arrays.asList(new GlobPattern(".*"), new GlobPattern("*~"));
         }
-        throw unsupportedOS();
+        return Collections.emptyList();
     }
 
     /**
@@ -245,10 +175,6 @@ public class API {
             instance = new API();
         }
         return instance;
-    }
-
-    private static UnsupportedOperationException unsupportedOS() {
-        return new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
     }
 
     /**
@@ -277,12 +203,11 @@ public class API {
     private API() {
         // Log the default charset
         LoggerFactory.getLogger(API.class).info("using default charset [{}]", Charset.defaultCharset().name());
-        LoggerFactory.getLogger(API.class).info("using process charset [{}]", ProcessCharset.defaultCharset().name());
+        LoggerFactory.getLogger(API.class).info("using process charset [{}]", OSUtils.PROCESS_CHARSET.name());
 
-        File configDir = getConfigDirFile();
-        this.confFile = new File(configDir, CONF_FILENAME); //$NON-NLS-1$
-        this.includesFile = new File(configDir, INCLUDES_FILENAME); //$NON-NLS-1$
-        this.excludesFile = new File(configDir, EXCLUDES_FILENAME); //$NON-NLS-1$
+        this.confFile = new File(OSUtils.CONFIG_PATH, CONF_FILENAME); //$NON-NLS-1$
+        this.includesFile = new File(OSUtils.CONFIG_PATH, INCLUDES_FILENAME); //$NON-NLS-1$
+        this.excludesFile = new File(OSUtils.CONFIG_PATH, EXCLUDES_FILENAME); //$NON-NLS-1$
 
         // Load the configuration
         this.properties = new Properties();
@@ -449,8 +374,8 @@ public class API {
          * Generate the keys
          */
         LOGGER.debug("generating public and private key for {}", computername);
-        File idrsaFile = new File(API.getConfigDirFile(), "id_rsa.pub");
-        File identityFile = new File(API.getConfigDirFile(), "key.ppk");
+        File idrsaFile = new File(OSUtils.CONFIG_PATH, "id_rsa.pub");
+        File identityFile = new File(OSUtils.CONFIG_PATH, "key.ppk");
         try {
             // Generate a key pair.
             KeyPair pair = Keygen.generateRSA();

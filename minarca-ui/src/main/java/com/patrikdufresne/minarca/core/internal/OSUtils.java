@@ -2,9 +2,14 @@ package com.patrikdufresne.minarca.core.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +20,8 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.APIException;
 
 /**
- * This utility class provide different method to ease access to Windows OS ressources: scheduler, registry, execute
- * process, etc.
+ * This utility class eases access to OS resources: scheduler, registry, execute process, directory location,
+ * permission, access, os charset, etc.
  * 
  * @author ikus060
  * 
@@ -24,9 +29,14 @@ import com.patrikdufresne.minarca.core.APIException;
 public class OSUtils {
 
     /**
+     * The name of this computer (may be null in some edge case).
+     */
+    public static final String COMPUTER_NAME;
+
+    /**
      * Location where to store configuration for minarca.
      */
-    public static String ADMIN_CONFIG_PATH;
+    public static String CONFIG_PATH;
 
     /**
      * True if the user is admin.
@@ -39,6 +49,16 @@ public class OSUtils {
     private static final transient Logger LOGGER;
 
     /**
+     * Default charset.
+     */
+    public static Charset PROCESS_CHARSET;
+
+    /**
+     * The root path. Under windows it should be "C:" under linux it should be "/".
+     */
+    public static final String ROOT_PATH;
+
+    /**
      * Path to system profile for Windows OS.
      * <p>
      * Under non-windows OS, this constant is null.
@@ -48,9 +68,44 @@ public class OSUtils {
     static {
         // Use a static block to declare constant value in the right order.
         LOGGER = LoggerFactory.getLogger(OSUtils.class);
+        COMPUTER_NAME = getComputerName();
+        ROOT_PATH = getRootPath();
+        PROCESS_CHARSET = getProcessCharset();
         WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
-        ADMIN_CONFIG_PATH = getAdminConfigPath();
+        CONFIG_PATH = getAdminConfigPath();
         IS_ADMIN = getIsAdmin();
+    }
+
+    /**
+     * Execute chcp process.
+     * 
+     * @return the code page or null
+     * 
+     */
+    private static String chcp() {
+        try {
+            Process p = new ProcessBuilder().command("cmd.exe", "/c", "chcp").redirectErrorStream(true).start();
+            StreamHandler sh = new StreamHandler(p, Charset.defaultCharset());
+            sh.start();
+            if (p.waitFor() != 0) {
+                return null;
+            }
+            // Parse a line similar to
+            // Page de codes active : 850
+            String output = sh.getOutput();
+            Matcher m = Pattern.compile("[0-9]+").matcher(output);
+            if (!m.find()) {
+                return null;
+            }
+            return m.group(0);
+        } catch (IOException e) {
+            // Swallow
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // Swallow. Should no happen
+            Thread.currentThread().interrupt();
+        }
+        return null;
     }
 
     /**
@@ -67,7 +122,31 @@ public class OSUtils {
         } else if (SystemUtils.IS_OS_LINUX) {
             return "/etc/minarca";
         }
-        throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
+        return null;
+    }
+
+    /**
+     * Return a computer name to represent this computer.
+     * <p>
+     * Current implementation gets the hostname from environment variable and use Inet interface to get a hostname.
+     * 
+     * @return an empty string or a hostname
+     */
+    private static String getComputerName() {
+        // For Windows
+        String host = System.getenv("COMPUTERNAME");
+        if (host != null) return host.toLowerCase();
+        // For Linux
+        host = System.getenv("HOSTNAME");
+        if (host != null) return host.toLowerCase();
+        // Fallback and use Inet interface.
+        try {
+            String result = InetAddress.getLocalHost().getHostName();
+            if (StringUtils.isNotEmpty(result)) return result.toLowerCase();
+        } catch (UnknownHostException e) {
+            // failed; try alternate means.
+        }
+        return null;
     }
 
     /**
@@ -88,7 +167,7 @@ public class OSUtils {
             }
             // Check if the minarca directory can be created.
             try {
-                File file = new File(ADMIN_CONFIG_PATH);
+                File file = new File(CONFIG_PATH);
                 FileUtils.forceMkdir(file);
                 if (!file.canRead() || !file.canWrite()) {
                     return false;
@@ -103,7 +182,50 @@ public class OSUtils {
             // TODO Need to implements this for linux.
             return false;
         }
-        throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
+        return false;
+    }
+
+    /**
+     * Return the default charset used by command line process.
+     * 
+     * @return
+     */
+    private static Charset getProcessCharset() {
+        // For windows
+        if (SystemUtils.IS_OS_WINDOWS) {
+            // Used chcp command line to get code page
+            String codepage = chcp();
+            if (codepage != null) {
+                codepage = "cp" + codepage;
+                if (Charset.isSupported(codepage)) {
+                    return Charset.forName(codepage);
+                }
+            }
+        }
+        // Default to default encoding
+        return Charset.defaultCharset();
+    }
+
+    /**
+     * Return the home driver ( the only drive to be backup.
+     * 
+     * @return
+     */
+    private static String getRootPath() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            String homedrive = System.getenv("HOMEDRIVER");
+            // Check if env variable contains something takt make senses
+            File file = new File(homedrive + SystemUtils.PATH_SEPARATOR);
+            if (file.exists() && file.isDirectory()) {
+                return file.getAbsolutePath();
+            }
+            // At last return hardcoded value.
+            return "C:\\";
+        } else if (SystemUtils.IS_OS_LINUX) {
+            // Under linux it's always /.
+            return "/";
+        }
+        return null;
     }
 
     /**

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.ApplicationException;
+import com.patrikdufresne.minarca.core.internal.OSUtils;
 import com.patrikdufresne.minarca.core.Client;
 
 /**
@@ -224,7 +225,7 @@ public class SetupDialog extends Dialog {
         final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
         computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         computerNameText.setMessage(_("Computer name"));
-        computerNameText.setText(API.getDefaultComputerName());
+        computerNameText.setText(OSUtils.COMPUTER_NAME);
         computerNameText.setFocus();
 
         // Sign in button
