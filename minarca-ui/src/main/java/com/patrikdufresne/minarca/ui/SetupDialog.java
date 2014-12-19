@@ -338,7 +338,7 @@ public class SetupDialog extends Dialog {
         // Try to establish communication with HTTP first.
         LOGGER.info("sign in as {}", username);
         try {
-            this.client = API.INSTANCE.connect(username, password);
+            this.client = API.instance().connect(username, password);
         } catch (ApplicationException e) {
             LOGGER.warn("fail to sign in", e);
             return e.getMessage();
@@ -377,7 +377,7 @@ public class SetupDialog extends Dialog {
         // Set other settings to default.
         LOGGER.info("set default config");
         try {
-            API.INSTANCE.defaultConfig();
+            API.instance().defaultConfig();
         } catch (APIException e) {
             LOGGER.warn("fail to schedule task", e);
             return _("Can't schedule backup task ! If the problem persists, try to re-install mirarca.");

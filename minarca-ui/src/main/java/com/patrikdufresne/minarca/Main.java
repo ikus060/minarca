@@ -45,6 +45,8 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
+import com.patrikdufresne.minarca.core.internal.OSUtils;
+import com.patrikdufresne.minarca.ui.DetailMessageDialog;
 import com.patrikdufresne.minarca.ui.PreferenceDialog;
 import com.patrikdufresne.minarca.ui.SetupDialog;
 
@@ -163,7 +165,20 @@ public class Main {
 
         // Check OS
         if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
-            MessageDialog.openError(null, Display.getAppName(), _("Minarca doesn't support you OS. " + "This application will close."));
+            LOGGER.warn("unsupported OS");
+            MessageDialog.openError(null, Display.getAppName(), _("Minarca doesn't support you OS. This application will close."));
+            return;
+        }
+
+        // Check user permission
+        if (!OSUtils.IS_ADMIN) {
+            LOGGER.warn("user is not admin");
+            DetailMessageDialog
+                    .openWarning(
+                            null,
+                            Display.getAppName(),
+                            _("You don't have sufficient permissions to execute this application!"),
+                            _("Minarca required to be run with administrator privilege. You may try to execute this application with a different user. This application will close."));
             return;
         }
 
@@ -208,7 +223,7 @@ public class Main {
         // Check if configured.
         try {
             LOGGER.debug("checking minarca configuration");
-            API.INSTANCE.checkConfig();
+            API.instance().checkConfig();
             LOGGER.debug("configuration is OK");
         } catch (NotConfiguredException e) {
             // If not configured, show wizard.
@@ -226,7 +241,7 @@ public class Main {
                     + "If you answer no, this application may misbehave."))) {
                 try {
                     LOGGER.debug("repair configuration");
-                    API.INSTANCE.defaultConfig();
+                    API.instance().defaultConfig();
                 } catch (APIException e1) {
                     MessageDialog.openWarning(null, Display.getAppName(), _("Can't repair minarca configuration. "
                             + "If the problem persist, you may try to reinstall minarca."));

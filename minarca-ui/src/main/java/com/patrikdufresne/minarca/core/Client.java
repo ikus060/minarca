@@ -85,7 +85,7 @@ public class Client {
      *             if the computer name is not valid.
      */
     public void link(String computername) throws APIException {
-        API.INSTANCE.link(this.username, this.password, computername);
+        API.instance().link(this.username, this.password, computername);
     }
 
 }

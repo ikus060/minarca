@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.internal.Keygen;
+import com.patrikdufresne.minarca.core.internal.OSUtils;
 import com.patrikdufresne.minarca.core.internal.ProcessCharset;
 import com.patrikdufresne.minarca.core.internal.SSH;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
@@ -46,8 +47,7 @@ import com.patrikdufresne.minarca.core.internal.Scheduler;
  * @author Patrik Dufresne
  * 
  */
-public enum API {
-    INSTANCE;
+public class API {
     /**
      * Application name used for sub folder
      */
@@ -84,6 +84,11 @@ public enum API {
     private static final String INCLUDES_FILENAME = "includes";
 
     /**
+     * Singleton instance of API
+     */
+    private static API instance;
+
+    /**
      * The logger.
      */
     private static final transient Logger LOGGER = LoggerFactory.getLogger(API.class);
@@ -107,9 +112,9 @@ public enum API {
         if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
             File configDir;
             if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-                configDir = new File(System.getenv("WINDIR") + "/System32/config/systemprofile/Application Data/minarca");
+                configDir = new File(OSUtils.WINDOWS_SYSTEMPROFILE_PATH + "/Application Data/minarca");
             } else {
-                configDir = new File(System.getenv("WINDIR") + "/System32/config/systemprofile/AppData/Local/minarca");
+                configDir = new File(OSUtils.WINDOWS_SYSTEMPROFILE_PATH + "/AppData/Local/minarca");
             }
             //$NON-NLS-1$
             configDir.mkdirs();
@@ -144,6 +149,52 @@ public enum API {
             // failed; try alternate means.
         }
         return "";
+    }
+
+    public static List<GlobPattern> getDefaultIncludes() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            // Return user directory.
+            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
+        } else if (SystemUtils.IS_OS_LINUX) {
+            // Return user directory.
+            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
+        }
+        throw unsupportedOS();
+    }
+
+    /**
+     * Represent the default location where files are downloaded.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> getDownloadsExcludes() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            String userHome = System.getProperty("user.home");
+            List<GlobPattern> list = new ArrayList<GlobPattern>();
+            list.add(new GlobPattern(userHome + "/Downloads/"));
+            return list;
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String userHome = System.getProperty("user.home");
+            List<GlobPattern> list = new ArrayList<GlobPattern>();
+            list.add(new GlobPattern(userHome + "/Downloads/"));
+            return list;
+        }
+        throw unsupportedOS();
+    }
+
+    /**
+     * Return the home driver ( the only drive to be backup.
+     * 
+     * @return
+     */
+    public static File getHomeDrive() {
+        String homedrive = System.getenv("HOMEDRIVER");
+        // Check if env variable contains something takt make senses
+        File file = new File(homedrive + SystemUtils.PATH_SEPARATOR);
+        if (file.exists() && file.isDirectory()) {
+            return file;
+        }
+        return new File("C:\\");
     }
 
     /**
@@ -185,49 +236,15 @@ public enum API {
     }
 
     /**
-     * Represent the default location where files are downloaded.
+     * Return the single instance of API.
      * 
      * @return
      */
-    public static List<GlobPattern> getDownloadsExcludes() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            String userHome = System.getProperty("user.home");
-            List<GlobPattern> list = new ArrayList<GlobPattern>();
-            list.add(new GlobPattern(userHome + "/Downloads/"));
-            return list;
-        } else if (SystemUtils.IS_OS_LINUX) {
-            String userHome = System.getProperty("user.home");
-            List<GlobPattern> list = new ArrayList<GlobPattern>();
-            list.add(new GlobPattern(userHome + "/Downloads/"));
-            return list;
+    public static API instance() {
+        if (instance == null) {
+            instance = new API();
         }
-        throw unsupportedOS();
-    }
-
-    public static List<GlobPattern> getDefaultIncludes() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            // Return user directory.
-            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
-        } else if (SystemUtils.IS_OS_LINUX) {
-            // Return user directory.
-            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
-        }
-        throw unsupportedOS();
-    }
-
-    /**
-     * Return the home driver ( the only drive to be backup.
-     * 
-     * @return
-     */
-    public static File getHomeDrive() {
-        String homedrive = System.getenv("HOMEDRIVER");
-        // Check if env variable contains something takt make senses
-        File file = new File(homedrive + SystemUtils.PATH_SEPARATOR);
-        if (file.exists() && file.isDirectory()) {
-            return file;
-        }
-        return new File("C:\\");
+        return instance;
     }
 
     private static UnsupportedOperationException unsupportedOS() {
@@ -461,9 +478,9 @@ public enum API {
          * Generate configuration file.
          */
         LOGGER.debug("saving configuration [{}][{}][{}]", computername, username, getRemoteHost());
-        API.INSTANCE.setUsername(username);
-        API.INSTANCE.setComputerName(computername);
-        API.INSTANCE.setRemotehost(getRemoteHost());
+        setUsername(username);
+        setComputerName(computername);
+        setRemotehost(getRemoteHost());
 
     }
 

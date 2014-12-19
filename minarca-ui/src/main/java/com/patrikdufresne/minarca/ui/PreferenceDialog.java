@@ -12,7 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -51,20 +50,6 @@ import com.patrikdufresne.minarca.core.GlobPattern;
  */
 public class PreferenceDialog extends Dialog {
     private static final transient Logger LOGGER = LoggerFactory.getLogger(PreferenceDialog.class);
-
-    /**
-     * Used to convert patterns into strings representation.
-     * 
-     * @param patterns
-     *            the patterns
-     * @return a string representation.
-     */
-    private static String convertPatterns(List<GlobPattern> patterns) {
-        if (patterns.isEmpty()) {
-            return _("Nothing");
-        }
-        return StringUtils.join(patterns, ", ");
-    }
 
     private static TableWrapData createTableWrapData() {
         TableWrapData layoutData = new TableWrapData();
@@ -203,9 +188,9 @@ public class PreferenceDialog extends Dialog {
 
         // General information
         String text = _("Username: ");
-        text += "<b>" + API.INSTANCE.getUsername() + "</b><br/>";
+        text += "<b>" + API.instance().getUsername() + "</b><br/>";
         text += _("Computer name: ");
-        text += "<b>" + API.INSTANCE.getComputerName() + "</b><br/>";
+        text += "<b>" + API.instance().getComputerName() + "</b><br/>";
         this.ft.createFormText(accountComp, text, true);
 
         // Unlink button
@@ -218,7 +203,7 @@ public class PreferenceDialog extends Dialog {
             }
         });
 
-        text = "<a href='" + API.INSTANCE.getBrowseUrl() + "'>" + _("Browse backup data") + "</a>";
+        text = "<a href='" + API.instance().getBrowseUrl() + "'>" + _("Browse backup data") + "</a>";
         this.ft.createFormText(comp, text, true);
 
         // General information about backup
@@ -248,7 +233,7 @@ public class PreferenceDialog extends Dialog {
         this.ft.createFormText(comp, "<h3>" + _("What to backup ?") + "</h3>", false);
 
         // Includes defaults
-        boolean includeDefaults = API.INSTANCE.getIncludes().containsAll(API.getDefaultIncludes());
+        boolean includeDefaults = API.instance().getIncludes().containsAll(API.getDefaultIncludes());
         this.includeDefaultsButton = this.ft.createButton(comp, _("Personal files (recommended)"), SWT.CHECK);
         this.includeDefaultsButton.setSelection(includeDefaults);
         this.includeDefaultsButton.setLayoutData(createTableWrapData());
@@ -264,7 +249,7 @@ public class PreferenceDialog extends Dialog {
          */
         this.ft.createFormText(comp, "<h3>" + _("Ignore") + "</h3>", false);
 
-        List<GlobPattern> excludes = API.INSTANCE.getExcludes();
+        List<GlobPattern> excludes = API.instance().getExcludes();
         boolean excludeSysFiles = excludes.containsAll(API.getSysFilesExcludes());
         boolean excludeDownloads = excludes.containsAll(API.getDownloadsExcludes());
 
@@ -315,7 +300,7 @@ public class PreferenceDialog extends Dialog {
      * Called when user want to select advance filter.
      */
     protected void handleAdvancePatterns() {
-        List<GlobPattern> excludes = API.INSTANCE.getExcludes();
+        List<GlobPattern> excludes = API.instance().getExcludes();
         List<GlobPattern> defaultExcludes = new ArrayList<GlobPattern>();
         boolean excludeSysFiles = excludes.containsAll(API.getSysFilesExcludes());
         if (excludeSysFiles) {
@@ -328,7 +313,7 @@ public class PreferenceDialog extends Dialog {
 
         // Open a dialog to edit filters.
         IncludesDialog dlg = new IncludesDialog(this.getShell());
-        dlg.setIncludes(API.INSTANCE.getIncludes());
+        dlg.setIncludes(API.instance().getIncludes());
         dlg.setExcludes(excludes);
         dlg.setDefaultIncludes(API.getDefaultIncludes());
         dlg.setDefaultExcludes(defaultExcludes);
@@ -336,8 +321,8 @@ public class PreferenceDialog extends Dialog {
             return;
         }
         try {
-            API.INSTANCE.setIncludes(dlg.getIncludes());
-            API.INSTANCE.setExcludes(dlg.getExcludes());
+            API.instance().setIncludes(dlg.getIncludes());
+            API.instance().setExcludes(dlg.getExcludes());
         } catch (APIException e) {
             showError(e);
         }
@@ -349,14 +334,14 @@ public class PreferenceDialog extends Dialog {
      * @param event
      */
     protected void handleExcludeDetaults(SelectionEvent event, List<GlobPattern> list) {
-        Set<GlobPattern> excludes = new LinkedHashSet<GlobPattern>(API.INSTANCE.getExcludes());
+        Set<GlobPattern> excludes = new LinkedHashSet<GlobPattern>(API.instance().getExcludes());
         if (this.excludeSysFilesButton.getSelection()) {
             excludes.addAll(list);
         } else {
             excludes.removeAll(list);
         }
         try {
-            API.INSTANCE.setExcludes(new ArrayList<GlobPattern>(excludes));
+            API.instance().setExcludes(new ArrayList<GlobPattern>(excludes));
         } catch (APIException e) {
             showError(e);
         }
@@ -366,14 +351,14 @@ public class PreferenceDialog extends Dialog {
      * Called when user select or un-select "include defaults".
      */
     protected void handleIncludeDetaults(SelectionEvent event) {
-        Set<GlobPattern> includes = new LinkedHashSet<GlobPattern>(API.INSTANCE.getIncludes());
+        Set<GlobPattern> includes = new LinkedHashSet<GlobPattern>(API.instance().getIncludes());
         if (this.includeDefaultsButton.getSelection()) {
             includes.addAll(API.getDefaultIncludes());
         } else {
             includes.removeAll(API.getDefaultIncludes());
         }
         try {
-            API.INSTANCE.setIncludes(new ArrayList<GlobPattern>(includes));
+            API.instance().setIncludes(new ArrayList<GlobPattern>(includes));
         } catch (APIException e) {
             showError(e);
         }
@@ -400,7 +385,7 @@ public class PreferenceDialog extends Dialog {
 
         // Unlink this computer.
         try {
-            API.INSTANCE.unlink();
+            API.instance().unlink();
         } catch (APIException e) {
             DetailMessageDialog.openError(this.getShell(), _("Error"), _("Can't unlink this computer!"), _("An error occurred while unlinking this computer."));
         }

@@ -8,7 +8,6 @@ package com.patrikdufresne.minarca.core.internal;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -56,35 +55,6 @@ public class Plink extends SSH {
     private static final String REG_VALUE = "rsa2@22:fente.patrikdufresne.com";
 
     /**
-     * Execute "reg"
-     * 
-     * @param command
-     * @throws APIException
-     */
-    private static void reg(String... args) throws APIException {
-        List<String> command = new ArrayList<String>();
-        command.add("reg.exe");
-        if (args != null) {
-            command.addAll(Arrays.asList(args));
-        }
-        LOGGER.debug("executing {}", StringUtils.join(command, " "));
-        try {
-            Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
-            StreamHandler sh = new StreamHandler(p);
-            sh.start();
-            if (p.waitFor() != 0) {
-                throw new APIException(sh.getOutput());
-            }
-        } catch (IOException e) {
-            throw new APIException("fail to create subprocess", e);
-        } catch (InterruptedException e) {
-            // Swallow. Should no happen
-            LOGGER.warn("process interupted", e);
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /**
      * Password for authentication.
      */
     private String password;
@@ -122,9 +92,9 @@ public class Plink extends SSH {
     @Override
     public void addKnownHosts() throws APIException {
         // Add key to SYSTEM user
-        reg("add", "HKU\\S-1-5-18\\Software\\SimonTatham\\PuTTY\\SshHostKeys", "/v", REG_VALUE, "/d", REG_DATA, "/f");
+        OSUtils.reg("add", "HKU\\S-1-5-18\\Software\\SimonTatham\\PuTTY\\SshHostKeys", "/v", REG_VALUE, "/d", REG_DATA, "/f");
         // Add key to current user
-        reg("add", "HKCU\\Software\\SimonTatham\\PuTTY\\SshHostKeys", "/v", REG_VALUE, "/d", REG_DATA, "/f");
+        OSUtils.reg("add", "HKCU\\Software\\SimonTatham\\PuTTY\\SshHostKeys", "/v", REG_VALUE, "/d", REG_DATA, "/f");
     }
 
     /**
