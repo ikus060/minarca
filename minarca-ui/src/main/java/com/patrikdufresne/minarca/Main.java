@@ -58,7 +58,8 @@ public class Main {
 
     public static final String MINARCA_16_PNG = "minarca_16.png";
     public static final String MINARCA_32_PNG = "minarca_32.png";
-    public static final String MINARCA_PNG = "minarca.png";
+    public static final String MINARCA_48_PNG = "minarca_48.png";
+    public static final String MINARCA_128_PNG = "minarca_128.png";
 
     static final transient Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -130,10 +131,12 @@ public class Main {
         ImageRegistry ir = JFaceResources.getImageRegistry();
         ir.put(MINARCA_16_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_16_PNG));
         ir.put(MINARCA_32_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_32_PNG));
-        ir.put(MINARCA_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_PNG));
+        ir.put(MINARCA_48_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_48_PNG));
+        ir.put(MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_128_PNG));
 
         List<Image> images = new ArrayList<Image>();
-        images.add(ir.get(MINARCA_PNG));
+        images.add(ir.get(MINARCA_128_PNG));
+        images.add(ir.get(MINARCA_48_PNG));
         images.add(ir.get(MINARCA_32_PNG));
         images.add(ir.get(MINARCA_16_PNG));
 

@@ -156,7 +156,7 @@ public class PreferenceDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(comp, null);
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_PNG));
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
         icon.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 
         // App name
