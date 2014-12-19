@@ -32,7 +32,8 @@ public class SchedulerWindowsTest {
 
     @Test
     public void testExists_ForWin7() throws Exception {
-        // Enforce WinXP
+        // Enforce Win7
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
         Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) true);
 
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7.data"));
