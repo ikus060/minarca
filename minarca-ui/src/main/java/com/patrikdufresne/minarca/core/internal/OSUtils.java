@@ -158,6 +158,11 @@ public class OSUtils {
      * @return
      */
     private static boolean getIsAdmin() {
+        // Check if the verification is forced (usually used for testing).
+        boolean forceIsAdmin = Boolean.getBoolean("com.patrikdufresne.minarca.isAdmin");
+        if (forceIsAdmin) {
+            return true;
+        }
         if (SystemUtils.IS_OS_WINDOWS) {
             // Query the SYSTEM registry hive.
             try {
