@@ -127,6 +127,9 @@ SetCompressor bzip2
  
 Section "Installation of ${AppName}" SecAppFiles
   
+  ; Remove files
+  RMDir /r "$INSTDIR\lib"
+  
   ; Add files
   SetOutPath $INSTDIR
   SetOverwrite on
