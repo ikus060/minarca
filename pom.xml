@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Fix SCM server id to allow username / password in settings.xml -->
         <project.scm.id>git.patrikdufresne.com</project.scm.id>
-        <swt.version>4.2.1</swt.version>
+        <swt.version>4.4.27</swt.version>
     </properties>
     <scm>
         <!-- Set release SCM -->

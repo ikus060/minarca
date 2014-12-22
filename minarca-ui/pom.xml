@@ -66,12 +66,12 @@
         <dependency>
             <groupId>org.eclipse.jface</groupId>
             <artifactId>org.eclipse.jface</artifactId>
-            <version>3.8.0.v20120521-2329</version>
+            <version>3.10.0.v20140604-0740</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.ui</groupId>
             <artifactId>org.eclipse.ui.forms</artifactId>
-            <version>3.5.200.v20120521-2329</version>
+            <version>3.6.100.v20140422-1825</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
