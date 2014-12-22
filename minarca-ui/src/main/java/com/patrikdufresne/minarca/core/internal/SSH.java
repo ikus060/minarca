@@ -42,4 +42,11 @@ public abstract class SSH {
      */
     public abstract void sendPublicKey(File publicKey) throws APIException;
 
+    /**
+     * Used to create a text file.
+     * 
+     * @throws APIException
+     */
+    public abstract void createTextFile(String path, String data) throws APIException;
+
 }

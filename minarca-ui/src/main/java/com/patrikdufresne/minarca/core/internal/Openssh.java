@@ -13,9 +13,9 @@ import com.patrikdufresne.minarca.core.APIException;
 
 public class Openssh extends SSH {
 
+    private String password;
     private String remotehost;
     private String username;
-    private String password;
 
     public Openssh(String remotehost, String username, String password) {
         Validate.notNull(this.remotehost = remotehost);
@@ -26,6 +26,12 @@ public class Openssh extends SSH {
     @Override
     public void addKnownHosts() throws APIException {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void createTextFile(String path, String data) throws APIException {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

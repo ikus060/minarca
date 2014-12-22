@@ -399,6 +399,9 @@ public class API {
         ssh.addKnownHosts();
         ssh.sendPublicKey(idrsaFile);
 
+        // Create a hint file for rdiffweb (with encoding information)
+        ssh.createTextFile("/home/" + username + "/backup/" + computername + "/rdiff-backup-data/rdiffweb", "encoding=" + Charset.defaultCharset().name());
+
         /*
          * Generate configuration file.
          */

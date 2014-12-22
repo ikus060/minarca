@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
@@ -97,6 +98,31 @@ public class Plink extends SSH {
     }
 
     /**
+     * Used to create text file on remote host.
+     */
+    @Override
+    public void createTextFile(String filepath, String data) throws APIException {
+        Validate.notNull(filepath);
+        Validate.notNull(data);
+        Validate.isFalse(filepath.contains("'"));
+        Validate.isFalse(data.contains("data"));
+
+        // Need to get the directory name, but without
+        String path = FilenameUtils.getFullPath(filepath);
+
+        List<String> args = new ArrayList<String>();
+        // username@fente.patrikfresne.com
+        args.add(this.user + "@" + this.remoteHost);
+        // the command to execute remotely.
+        // the following is taken from ssh-copy-id
+        args.add("mkdir -p '" + path + "' && echo '" + data + "' > '" + filepath + "'");
+
+        // Execute the command,
+        plink(args);
+
+    }
+
+    /**
      * Determine the location of plink.exe.
      * <p>
      * This implementation look into into the follow directory: putty location, local directory,
@@ -143,20 +169,39 @@ public class Plink extends SSH {
             throw new APIException("fail to read public key");
         }
 
+        List<String> args = new ArrayList<String>();
+        // username@fente.patrikfresne.com
+        args.add(this.user + "@" + this.remoteHost);
+        // the command to execute remotely.
+        // the following is taken from ssh-copy-id
+        args.add("umask 077 ; mkdir -p .ssh && echo '" + publickey + "' >> .ssh/authorized_keys");
+
+        // Execute the command,
+        plink(args);
+
+    }
+
+    /**
+     * Execute plink with the given arguments.
+     * 
+     * @param args
+     *            the arguments
+     * @throws APIException
+     *             in case of error.
+     */
+    private String plink(List<String> args) throws APIException {
+        Validate.notNull(args);
+
         // Get location of plink.
         File plink = getPlinkLocation();
         if (plink == null) {
             throw new APIException("missing plink");
         }
-
-        // "C:\Program Files (x86)\minarca\putty-0.63\plink.exe"
+        // Build the command line.
         List<String> command = new ArrayList<String>();
         command.add(plink.getAbsolutePath());
-        // username@fente.patrikfresne.com
-        command.add(this.user + "@" + this.remoteHost);
-        // the command to execute remotely.
-        // the following is taken from ssh-copy-id
-        command.add("umask 077 ; mkdir -p .ssh && echo '" + publickey + "' >> .ssh/authorized_keys");
+        command.addAll(args);
+
         LOGGER.debug("executing {}", StringUtils.join(command, " "));
 
         try {
@@ -168,15 +213,19 @@ public class Plink extends SSH {
             // Wait for process to complete
             int returnCode = p.waitFor();
             String output = sh.getOutput();
-            if (returnCode != 0 || output.contains(ERROR_CONNECTION_ABANDONED)) {
+            if (returnCode != 0) {
                 throw new APIException(sh.getOutput());
             }
+            if (output.contains(ERROR_CONNECTION_ABANDONED)) {
+                throw new APIException(sh.getOutput());
+            }
+            return output;
         } catch (IOException e) {
             throw new APIException("fail to create subprocess", e);
         } catch (InterruptedException e) {
-            // Swallow. Should no happen
+            // Swallow. Should not happen
             LOGGER.warn("process interupted", e);
+            return null;
         }
-
     }
 }
