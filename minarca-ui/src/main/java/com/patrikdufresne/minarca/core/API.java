@@ -418,7 +418,7 @@ public class API {
      */
     private List<GlobPattern> readPatterns(File file) throws IOException {
         FileInputStream in = new FileInputStream(file);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()));
         List<GlobPattern> list = new ArrayList<GlobPattern>();
         String line;
         while ((line = reader.readLine()) != null) {
@@ -443,7 +443,7 @@ public class API {
      */
     private void save() throws IOException {
         LOGGER.debug("writing config to [{}]", confFile);
-        Writer writer = new FileWriterWithEncoding(confFile, Charset.forName("ISO-8859-1"));
+        Writer writer = new FileWriterWithEncoding(confFile, Charset.defaultCharset());
         this.properties.store(writer, "Backup configuration. Please do " + "not change this configuration file manually.");
         writer.close();
     }
@@ -559,7 +559,7 @@ public class API {
      * @throws IOException
      */
     private void writePatterns(File file, List<GlobPattern> pattern) throws IOException {
-        FileWriterWithEncoding writer = new FileWriterWithEncoding(file, "ISO-8859-1");
+        FileWriterWithEncoding writer = new FileWriterWithEncoding(file, Charset.defaultCharset());
         for (GlobPattern line : pattern) {
             writer.append(line.value());
             writer.append(SystemUtils.LINE_SEPARATOR);
