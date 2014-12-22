@@ -114,6 +114,11 @@ public class OSUtils {
      * @return
      */
     private static String getAdminConfigPath() {
+        // Check if config path is forced (usually used for testing).
+        String configPath = System.getProperty("com.patrikdufresne.minarca.configPath");
+        if (configPath != null) {
+            return configPath;
+        }
         if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
             if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
                 return OSUtils.WINDOWS_SYSTEMPROFILE_PATH + "/Application Data/minarca";
