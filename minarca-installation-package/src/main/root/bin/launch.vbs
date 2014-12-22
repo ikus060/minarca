@@ -145,8 +145,19 @@ Function LogUnsafe(strLine, strFileName)
 	WScript.Echo(strLine)
 	Set oFile = oFSO.OpentextFile(strFileName, 8, True) 
 	oFile.WriteLine(strLine)
-	Set oFSO = Nothing
 	Set oFile = Nothing
+	' Check file size (after writing to log)
+	Set oFile = oFSO.GetFile(strFileName)
+	If oFile.Size >= 5242880 Then
+		' Delete previous log
+		If oFSO.FileExists(strFileName & ".0") Then
+			oFSO.DeleteFile(strFileName & ".0")
+		End If
+		' Move log file.
+		oFile.Move(strFileName & ".0")
+	End If
+	Set oFile = Nothing
+	Set oFSO = Nothing
 End Function
 
 Function LogExec(command)
