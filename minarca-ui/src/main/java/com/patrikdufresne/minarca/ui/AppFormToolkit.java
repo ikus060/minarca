@@ -14,7 +14,9 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.FormColors;
@@ -32,7 +34,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  */
 public class AppFormToolkit extends FormToolkit {
 
+    private static final String BG = "BG";
+    private static final String FG = "FG";
     private static final int FORM_TEXT_MARGNIN = 15;
+    private static final String H = "H";
+    private static final String H_HOVER = "H_HOVER";
     private static final String H1 = "h1";
     private static final String H2 = "h2";
     private static final String H3 = "h3";
@@ -71,8 +77,57 @@ public class AppFormToolkit extends FormToolkit {
 
     private IHyperlinkListener hyperlinkListener;
 
+    /**
+     * True to use alt color (for setup dialog).
+     */
+    private final boolean useAltColor;
+
+    /**
+     * Create a form tool kit using default color.
+     * 
+     * @param display
+     */
     public AppFormToolkit(Display display) {
+        this(display, false);
+    }
+
+    /**
+     * Create a form tool kit for minarca.
+     * 
+     * @param display
+     * @param useAltColor
+     *            True to use alternative colors.
+     */
+    public AppFormToolkit(Display display, boolean useAltColor) {
         super(display);
+        this.useAltColor = useAltColor;
+        refreshHyperlinkColors();
+    }
+
+    /**
+     * This implementation adjust the colors according to the control type.
+     */
+    public void adapt(Composite composite) {
+        super.adapt(composite);
+        if (this.useAltColor) {
+            composite.setBackground(getAltBackground());
+        }
+    }
+
+    /**
+     * This implementation adjust the colors according to the control type.
+     */
+    public void adapt(Control control, boolean trackFocus, boolean trackKeyboard) {
+        super.adapt(control, trackFocus, trackKeyboard);
+        if (this.useAltColor) {
+            if (control instanceof Label || control instanceof FormText) {
+                control.setBackground(getAltBackground());
+                control.setForeground(getAltForeground());
+            }
+            if (control instanceof Button) {
+                control.setBackground(getAltBackground());
+            }
+        }
     }
 
     public Label createAppnameLabel(Composite parent, String text, int style) {
@@ -142,18 +197,19 @@ public class AppFormToolkit extends FormToolkit {
             engine.marginHeight = FORM_TEXT_MARGNIN;
         }
         // Add styles
+        Color fg = this.useAltColor ? getAltForeground() : getColors().getForeground();
         // H1,
-        engine.setFont(H1, getFont(JFaceResources.DIALOG_FONT, 2.6f, false));
-        engine.setColor(H1, getColors().getForeground());
+        engine.setFont(H1, getFont(JFaceResources.DIALOG_FONT, 3.25f, false));
+        engine.setColor(H1, fg);
         // H2
-        engine.setFont(H2, getFont(JFaceResources.DIALOG_FONT, 2.15f, false));
-        engine.setColor(H2, getColors().getForeground());
+        engine.setFont(H2, getFont(JFaceResources.DIALOG_FONT, 2.6f, false));
+        engine.setColor(H2, fg);
         // H3
         engine.setFont(H3, getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
-        engine.setColor(H3, getColors().getForeground());
+        engine.setColor(H3, fg);
         // H4
         engine.setFont(H4, getFont(JFaceResources.DIALOG_FONT, 1.25f, false));
-        engine.setColor(H4, getColors().getForeground());
+        engine.setColor(H4, fg);
         // LIGHT
         engine.setColor(LIGHT, getLightColor());
 
@@ -173,6 +229,14 @@ public class AppFormToolkit extends FormToolkit {
     @Override
     public void dispose() {
         super.dispose();
+    }
+
+    private Color getAltBackground() {
+        return getColors().createColor(BG, rgb("#008cba"));
+    }
+
+    private Color getAltForeground() {
+        return getColors().createColor(FG, rgb("#ffffff"));
     }
 
     /**
@@ -198,6 +262,16 @@ public class AppFormToolkit extends FormToolkit {
 
     private Color getLightColor() {
         return getColors().createColor(LIGHT, FormColors.blend(rgb("#ffffff"), getColors().getForeground().getRGB(), 25));
+    }
+
+    public void refreshHyperlinkColors() {
+        super.refreshHyperlinkColors();
+        if (this.useAltColor) {
+
+        } else {
+            getHyperlinkGroup().setForeground(getColors().createColor(H, rgb("#008cba")));
+            getHyperlinkGroup().setActiveForeground(getColors().createColor(H_HOVER, FormColors.blend(rgb("#008cba"), rgb("#000000"), 15)));
+        }
     }
 
 }

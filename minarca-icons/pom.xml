@@ -57,6 +57,8 @@
                                     pngFile="minarca_48.png" size="48" />
                                 <batik svgFile="minarca_48.svg"
                                     pngFile="minarca_128.png" size="128" />
+                                <batik svgFile="minarca_48_w.svg"
+                                    pngFile="minarca_128_w.png" size="128" />
                                 <!-- Generate ICO from PNGs -->
                                 <!-- Require icotool -->
                                 <mkdir dir="${icotoolDestDir}" />

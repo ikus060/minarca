@@ -14,7 +14,7 @@
    id="svg3344"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="minarca3_16.svg"
+   sodipodi:docname="minarca_16.svg"
    inkscape:export-filename="/home/ikus060/Documents/Notes/Entreprise/minarca/minarca3_16.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
@@ -28,17 +28,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.627417"
-     inkscape:cx="6.5666021"
-     inkscape:cy="4.7172145"
+     inkscape:cx="9.6336164"
+     inkscape:cy="5.9038401"
      inkscape:current-layer="layer1"
-     showgrid="false"
+     showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="1920"
-     inkscape:window-height="1014"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1">
+     inkscape:window-width="868"
+     inkscape:window-height="754"
+     inkscape:window-x="1557"
+     inkscape:window-y="506"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid3570"
@@ -55,7 +55,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -66,39 +66,39 @@
      transform="translate(0,-32)">
     <path
        sodipodi:nodetypes="ccccccccccccccccccccccccscccccccccccc"
-       style="fill:#000000;fill-opacity:1;stroke:none"
+       style="fill:#2e3436;fill-opacity:1;stroke:none"
        d="M 2.999999,35 3,45 l 10.000001,0 0,-1 -0.333333,0 0,-2 0.333333,0 0,-4 -0.333333,0 0,-2 0.333333,0 L 13,35 z m 4.6979176,1.28125 0.3750001,1.385417 c 0.532848,0.01638 1.0397088,0.215489 1.4374998,0.552083 l 1.1979175,-0.770833 0.729167,1.114583 -1.208334,0.78125 c 0.0052,0.01788 0.01598,0.03399 0.02083,0.05208 0.137653,0.513729 0.09407,1.03297 -0.09375,1.489583 l 1.114583,0.90625 -0.84375,1.03125 -1.1145835,-0.895833 c -0.210276,0.14273 -0.44901,0.253431 -0.7083338,0.322916 -0.2617684,0.07014 -0.5255327,0.09235 -0.7812501,0.07292 l -0.5104166,1.34375 -1.2500001,-0.479167 0.5104167,-1.34375 c -0.3905093,-0.30149 -0.6853717,-0.726258 -0.8229167,-1.239583 -0.00561,-0.02094 -0.00541,-0.04155 -0.010417,-0.0625 l -1.4375001,-0.07292 0.072917,-1.322916 1.4270834,0.07292 c 0.175786,-0.49334 0.512998,-0.916209 0.96875,-1.197916 L 6.40625,36.635417 z"
        id="rect3024-2"
        inkscape:connector-curvature="0" />
     <path
        transform="matrix(0.12074073,-0.03235238,0.03235238,0.12074073,1.0137528,35.660303)"
-       d="m 53,48 a 8,8 0 1 1 -16,0 8,8 0 1 1 16,0 z"
+       d="m 53,48 c 0,4.418278 -3.581722,8 -8,8 -4.418278,0 -8,-3.581722 -8,-8 0,-4.418278 3.581722,-8 8,-8 4.418278,0 8,3.581722 8,8 z"
        sodipodi:ry="8"
        sodipodi:rx="8"
        sodipodi:cy="48"
        sodipodi:cx="45"
        id="path3387"
-       style="fill:#000000;fill-opacity:1;stroke:none"
+       style="fill:#2e3436;fill-opacity:1;stroke:none"
        sodipodi:type="arc" />
     <path
        inkscape:connector-curvature="0"
-       style="fill:#000000;fill-opacity:1;stroke:none"
+       style="fill:#2e3436;fill-opacity:1;stroke:none"
        d="m 1.6666655,32.666667 c -0.5539999,0 -1.00000004,0.446 -1,1 l 1e-6,12.666667 c 4e-8,0.554 0.4460001,0.666666 1,0.666666 l 12.6666675,0 c 0.554,0 1,-0.112666 1,-0.666666 l -1e-6,-12.666667 c 0,-0.554 -0.446,-1 -1,-1 z M 1.9999989,34 14,34 l 10e-7,2 0.333333,0 0,2 -0.333333,0 0,4 0.333333,0 0,2 -0.333333,0 0,2 -12.0000011,0 z"
        id="rect3020"
        sodipodi:nodetypes="sssssssssccccccccccccc" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:none"
+       style="fill:#2e3436;fill-opacity:1;stroke:none"
        id="rect3028"
-       width="1.9999993"
-       height="1.0000048"
+       width="3"
+       height="1"
        x="3"
        y="47" />
     <rect
        y="47"
-       x="11"
-       height="0.99999535"
-       width="2.000001"
+       x="10"
+       height="0.99999619"
+       width="3.0000019"
        id="rect3030"
-       style="fill:#000000;fill-opacity:1;stroke:none" />
+       style="fill:#2e3436;fill-opacity:1;stroke:none" />
   </g>
 </svg>

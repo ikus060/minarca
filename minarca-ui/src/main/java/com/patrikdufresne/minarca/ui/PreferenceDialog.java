@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
-import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,12 +49,6 @@ import com.patrikdufresne.minarca.core.GlobPattern;
  */
 public class PreferenceDialog extends Dialog {
     private static final transient Logger LOGGER = LoggerFactory.getLogger(PreferenceDialog.class);
-
-    private static TableWrapData createTableWrapData() {
-        TableWrapData layoutData = new TableWrapData();
-        layoutData.indent = 15;
-        return layoutData;
-    }
 
     private Button excludeSysFilesButton;
 
@@ -139,14 +132,14 @@ public class PreferenceDialog extends Dialog {
         form.setLayoutData(new GridData(GridData.FILL_BOTH));
         Composite comp = form.getBody();
 
+        // App name
+        FormText appNameText = this.ft.createFormText(comp, "<h1>" + Display.getAppName() + "</h1>", false);
+        appNameText.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
+
         // App icon
         Label icon = this.ft.createLabel(comp, null);
         icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
         icon.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
-
-        // App name
-        FormText appNameText = this.ft.createFormText(comp, "<h1>" + Display.getAppName() + "</h1>", false);
-        appNameText.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 
         // App name
         FormText appVersionText = this.ft.createFormText(comp, "<h4>" + Display.getAppVersion() + "</h4>", false);
@@ -179,32 +172,30 @@ public class PreferenceDialog extends Dialog {
         form.getBody().setLayout(GridLayoutFactory.swtDefaults().margins(15, 15).create());
         form.setLayoutData(new GridData(GridData.FILL_BOTH));
         Composite comp = form.getBody();
+        TableWrapLayout layout = new TableWrapLayout();
+        layout.topMargin = layout.rightMargin = layout.bottomMargin = layout.leftMargin = 15;
+        layout.verticalSpacing = layout.horizontalSpacing = 15;
+        comp.setLayout(layout);
 
         // Account section
         this.ft.createFormText(comp, "<h3>" + _("Account") + "</h3>", false);
-        Composite accountComp = this.ft.createComposite(comp, SWT.NONE);
-        accountComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
-        accountComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
         // General information
         String text = _("Username: ");
         text += "<b>" + API.instance().getUsername() + "</b><br/>";
         text += _("Computer name: ");
         text += "<b>" + API.instance().getComputerName() + "</b><br/>";
-        this.ft.createFormText(accountComp, text, true);
+        text += "<a href='" + API.instance().getBrowseUrl() + "'>" + _("Browse backup data") + "</a>";
+        this.ft.createFormText(comp, text, false);
 
         // Unlink button
-        Button unlinkButton = this.ft.createButton(accountComp, _("Unlink this computer..."), SWT.PUSH);
-        unlinkButton.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, true, false));
+        Button unlinkButton = this.ft.createButton(comp, _("Unlink this computer..."), SWT.PUSH);
         unlinkButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 handleUnlinkComputer();
             }
         });
-
-        text = "<a href='" + API.instance().getBrowseUrl() + "'>" + _("Browse backup data") + "</a>";
-        this.ft.createFormText(comp, text, true);
 
         // General information about backup
 
@@ -236,7 +227,6 @@ public class PreferenceDialog extends Dialog {
         boolean includeDefaults = API.instance().getIncludes().containsAll(API.getDefaultIncludes());
         this.includeDefaultsButton = this.ft.createButton(comp, _("Personal files (recommended)"), SWT.CHECK);
         this.includeDefaultsButton.setSelection(includeDefaults);
-        this.includeDefaultsButton.setLayoutData(createTableWrapData());
         this.includeDefaultsButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -256,7 +246,6 @@ public class PreferenceDialog extends Dialog {
         // Excludes defaults
         this.excludeSysFilesButton = this.ft.createButton(comp, _("Ignore operating system files (recommended)"), SWT.CHECK);
         this.excludeSysFilesButton.setSelection(excludeSysFiles);
-        this.excludeSysFilesButton.setLayoutData(createTableWrapData());
         this.excludeSysFilesButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -267,7 +256,6 @@ public class PreferenceDialog extends Dialog {
         // Excludes
         this.excludeSysFilesButton = this.ft.createButton(comp, _("Ignore download folder (recommended)"), SWT.CHECK);
         this.excludeSysFilesButton.setSelection(excludeDownloads);
-        this.excludeSysFilesButton.setLayoutData(createTableWrapData());
         this.excludeSysFilesButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

@@ -8,6 +8,8 @@ package com.patrikdufresne.minarca.ui;
 import static com.patrikdufresne.minarca.Localized._;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -28,6 +30,7 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.minarca.Main;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.ApplicationException;
@@ -93,7 +96,7 @@ public class SetupDialog extends Dialog {
     @Override
     protected Control createContents(Composite parent) {
 
-        this.ft = new AppFormToolkit(parent.getDisplay());
+        this.ft = new AppFormToolkit(parent.getDisplay(), true);
 
         // Create the Form.
         Form form = ft.createForm(parent);
@@ -106,12 +109,8 @@ public class SetupDialog extends Dialog {
         layout.verticalSpacing = 0;
         form.getBody().setLayout(layout);
         form.setLayoutData(new GridData(GridData.FILL_BOTH));
-        // applyDialogFont(composite);
-        // initialize the dialog units
-        // initializeDialogUnits(composite);
         // create the dialog area and button bar
         dialogArea = createDialogArea(form.getBody());
-        // buttonBar = createButtonBar(form.getBody());
 
         return form;
     }
@@ -125,10 +124,12 @@ public class SetupDialog extends Dialog {
         this.comp = ft.createComposite(parent, SWT.NONE);
         this.comp.setLayoutData(new GridData(GridData.FILL_BOTH));
         TableWrapLayout layout = new TableWrapLayout();
-        layout.topMargin = layout.rightMargin = layout.bottomMargin = layout.leftMargin = 25;
+        layout.topMargin = layout.bottomMargin = 5;
+        layout.rightMargin = layout.leftMargin = 25;
         this.comp.setLayout(layout);
 
         createPage1(this.comp);
+        ft.paintBordersFor(this.comp);
 
         return comp;
 
@@ -147,6 +148,12 @@ public class SetupDialog extends Dialog {
         Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
         appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
+        // App icon
+        Label icon = this.ft.createLabel(parent, null);
+        JFaceResources.getImageRegistry().put(Main.MINARCA_128_WHITE_PNG, ImageDescriptor.createFromFile(Main.class, Main.MINARCA_128_WHITE_PNG));
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_WHITE_PNG));
+        icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
+
         // Introduction message
         String introText = "<h2>" + _("Sign In") + "</h2><br/>";
         introText += _("If you have an minarca account, " + "enter your username and password.");
@@ -154,13 +161,13 @@ public class SetupDialog extends Dialog {
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Username
-        final Text usernameText = ft.createText(parent, "", SWT.BORDER);
+        final Text usernameText = ft.createText(parent, "", SWT.NONE);
         usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         usernameText.setMessage(_("Username"));
         usernameText.setFocus();
 
         // Password
-        final Text passwordText = ft.createText(parent, "", SWT.BORDER | SWT.PASSWORD);
+        final Text passwordText = ft.createText(parent, "", SWT.PASSWORD);
         passwordText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         passwordText.setMessage(_("Password"));
 
@@ -212,6 +219,11 @@ public class SetupDialog extends Dialog {
         Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
         appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
+        // App icon
+        Label icon = this.ft.createLabel(parent, null);
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_WHITE_PNG));
+        icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
+
         // Introduction message
         String introText = _("<h2>Link your computer</h2><br/>"
                 + "You need to link this computer to your account. Please, "
@@ -222,7 +234,7 @@ public class SetupDialog extends Dialog {
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Computer name
-        final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
+        final Text computerNameText = ft.createText(parent, "", SWT.NONE);
         computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         computerNameText.setMessage(_("Computer name"));
         computerNameText.setText(OSUtils.COMPUTER_NAME);
@@ -275,6 +287,11 @@ public class SetupDialog extends Dialog {
         // App name
         Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
         appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+        // App icon
+        Label icon = this.ft.createLabel(parent, null);
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_WHITE_PNG));
+        icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
         String introText = "<h2>" + _("Success !") + "</h2><br/>";

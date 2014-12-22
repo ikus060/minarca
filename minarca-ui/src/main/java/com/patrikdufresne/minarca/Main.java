@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -62,6 +63,7 @@ public class Main {
     public static final String MINARCA_32_PNG = "minarca_32.png";
     public static final String MINARCA_48_PNG = "minarca_48.png";
     public static final String MINARCA_128_PNG = "minarca_128.png";
+    public static final String MINARCA_128_WHITE_PNG = "minarca_128_w.png";
 
     static final transient Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -135,6 +137,7 @@ public class Main {
         ir.put(MINARCA_32_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_32_PNG));
         ir.put(MINARCA_48_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_48_PNG));
         ir.put(MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_128_PNG));
+        ir.put(MINARCA_128_WHITE_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_128_WHITE_PNG));
 
         List<Image> images = new ArrayList<Image>();
         images.add(ir.get(MINARCA_128_PNG));
@@ -235,10 +238,14 @@ public class Main {
         } catch (MissConfiguredException e) {
             // The configuration is broken. Ask use if we can fix it.
             LOGGER.debug("miss-configured -- ask to repair", e);
-            if (MessageDialog.openQuestion(null, Display.getAppName(), _("Your minarca installation seams broken! "
-                    + "Do you want to restore default configuration? "
-                    + "If you answer Yes, all your personal configuration will be lost. "
-                    + "If you answer no, this application may misbehave."))) {
+            if (DetailMessageDialog.openYesNoQuestion(
+                    null,
+                    Display.getAppName(),
+                    _("Do you want to restore default configuration ?"),
+                    _("Your minarca installation seams broken."
+                            + "If you answer Yes, all your personal configuration will be lost. "
+                            + "If you answer no, this application may misbehave."),
+                    null).getReturnCode() == IDialogConstants.YES_ID) {
                 try {
                     LOGGER.debug("repair configuration");
                     API.instance().defaultConfig();
