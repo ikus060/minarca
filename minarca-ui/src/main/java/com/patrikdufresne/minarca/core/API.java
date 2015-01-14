@@ -153,11 +153,14 @@ public class API {
                 list.add(new GlobPattern(temp));
             }
             list.add(new GlobPattern(userHome + "/AppData/"));
+            list.add(new GlobPattern(userHome + "/Application Data/"));
             list.add(new GlobPattern(userHome + "/Tracing/"));
             list.add(new GlobPattern(userHome + "/Recent/"));
             list.add(new GlobPattern(userHome + "/PrintHood/"));
             list.add(new GlobPattern(userHome + "/NetHood/"));
             list.add(new GlobPattern(userHome + "/Searches/"));
+            list.add(new GlobPattern(userHome + "/Cookies/"));
+            list.add(new GlobPattern(userHome + "/Local Settings/Temporary Internet Files/"));
             return list;
         } else if (SystemUtils.IS_OS_LINUX) {
             return Arrays.asList(new GlobPattern(".*"), new GlobPattern("*~"));
