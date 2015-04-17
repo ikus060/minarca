@@ -1,0 +1,28 @@
+{#
+Minarca disk space rdiffweb plugin
+
+Copyright (C) 2015 Patrik Dufresne Service Logiciel. All rights reserved.
+Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+Use is subject to license terms.
+#}
+{% if minarca_disk_space and not error %}
+<div class="well well-sm">
+  {% set used_pct = minarca_disk_space.used / minarca_disk_space.size * 100 %}
+  {% set used_str = minarca_disk_space.used | filesize %}
+  {% set size_str = minarca_disk_space.size | filesize %}
+  {% set avail_str = minarca_disk_space.avail | filesize %}
+  <b>{% trans %}Usage{% endtrans %}</b>
+  {{ _("%(used)s used | %(size)s total | %(avail)s free",
+       used=used_str, avail=avail_str, size=size_str) }}
+  <div class="progress">
+    <div class="progress-bar {% if used_pct > 90 %}progress-bar-warning{% else %}progress-bar-info{% endif %}"
+         role="progressbar"
+         aria-valuenow="{{ used_pct }}"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         style="width: {{ used_pct }}%">
+      <span class="sr-only">{{ _("%(used_pct)%% full", used_pct=used_pct) }}</span>
+    </div>
+  </div>
+</div>
+{% endif %}
