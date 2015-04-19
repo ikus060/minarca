@@ -6,7 +6,12 @@ Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 Use is subject to license terms.
 #}
 {% if minarca_disk_space and not error %}
-<div class="well well-sm">
+<div itemscope
+    itemtype="https://schema.org/Filesystem"
+    class="well well-sm">
+  <meta itemprop="freeSpace" content="{{ minarca_disk_space.avail }}" />
+  <meta itemprop="occupiedSpace" content="{{ minarca_disk_space.used }}" />
+  <meta itemprop="totalSpace" content="{{ minarca_disk_space.size }}" />
   {% set used_pct = minarca_disk_space.used / minarca_disk_space.size * 100 %}
   {% set used_str = minarca_disk_space.used | filesize %}
   {% set size_str = minarca_disk_space.size | filesize %}
