@@ -12,7 +12,7 @@ try:
 except ImportError:
     import ez_setup
     ez_setup.use_setuptools()
-    from setuptools import setup, find_packages, Extension
+    from setuptools import setup, find_packages, Extension  # @UnusedImport
 
 import os
 from ConfigParser import SafeConfigParser
@@ -85,7 +85,9 @@ config.read(plugin_file)
 # Create recursive data_files
 dest = "/etc/rdiffweb/plugins"
 datadir = plugin_name
-data_files = [(os.path.join(dest, root), [os.path.join(root, f) for f in files]) for root, dirs, files in os.walk(datadir)]
+data_files = [
+    (os.path.join(dest, root), [os.path.join(root, f) for f in files])
+    for root, dirs, files in os.walk(datadir)]
 data_files.append((dest, [plugin_file]))
 
 setup(
