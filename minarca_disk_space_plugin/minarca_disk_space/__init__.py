@@ -13,9 +13,6 @@ import logging
 import os
 
 from rdiffweb.rdw_plugin import ILocationsPagePlugin
-from rdiffweb.rdw_helpers import encode_s, decode_s
-from rdiffweb.rdw_app import RdiffwebApp
-from rdiffweb import rdw_templating
 
 # Define logger for this module
 logger = logging.getLogger(__name__)

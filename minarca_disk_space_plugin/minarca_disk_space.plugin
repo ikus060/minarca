@@ -5,7 +5,7 @@ Module = minarca_disk_space
 [Documentation]
 Author = Patrik Dufresne
 Version = 0.8.0
-Website = http://www.patrikdufresne.com/en/rdiffweb/
+Website = http://www.patrikdufresne.com/
 Description: Provide additional information about the disk space used and
     available for each repository.
 Copyright: Copyright (C) 2015 Patrik Dufresne Service Logiciel. All rights reserved.
