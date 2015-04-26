@@ -41,14 +41,6 @@ setup(
     author=config.get("Documentation", "Author"),
     url=config.get("Documentation", "Website"),
     data_files=data_files,
-    cmdclass={
-        'build': build,
-        'compile_catalog': compile_catalog,
-        'extract_messages': extract_messages,
-        'update_catalog': update_catalog,
-        'init_catalog': init_catalog,
-        'compile_all_catalogs': compile_all_catalogs,
-        },
     install_requires=["rdiffweb>=0.8.0"],
     # required packages for build process
     setup_requires=["babel>=0.9"]
