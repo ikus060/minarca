@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 import logging
 import os
 
-from rdiffweb.rdw_plugin import ILocationsPagePlugin
+from rdiffweb.rdw_plugins import ILocationsPagePlugin  # @UnresolvedImport
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
@@ -29,14 +29,14 @@ class MinarcaDiskSpace(ILocationsPagePlugin):
         Get current user disk space usage.
         """
         # Get reference to current user.
-        username = self.get_username()
+        username = self.app.currentuser.username
         if username is None:
             raise ValueError("username is not defined, can't get disk usages.")
 
         logger.debug("get disk space usages for [%s]", username)
         # On linux use statvfs()
         # FIXME statvfs is not available on python3
-        rootdir = self.app.userdb.get_root_dir(username)
+        rootdir = self.app.currentuser.root_dir
         if not rootdir:
             return dict()
         try:
