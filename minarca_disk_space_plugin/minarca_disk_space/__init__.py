@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 import logging
 import os
 
-from rdiffweb.rdw_plugins import ILocationsPagePlugin  # @UnresolvedImport
+from rdiffweb.rdw_plugin import ILocationsPagePlugin  # @UnresolvedImport
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
