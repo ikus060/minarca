@@ -105,8 +105,8 @@ setup(
         'update_catalog': update_catalog,
         'init_catalog': init_catalog,
         'compile_all_catalogs': compile_all_catalogs,
-        },
+    },
     install_requires=["rdiffweb>=0.8.0"],
     # required packages for build process
     setup_requires=["babel>=0.9"]
-    )
+)
