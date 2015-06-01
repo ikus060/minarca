@@ -8,7 +8,6 @@ package com.patrikdufresne.minarca.ui;
 import static com.patrikdufresne.minarca.Localized._;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -25,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
@@ -34,8 +34,8 @@ import com.patrikdufresne.minarca.Main;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.ApplicationException;
-import com.patrikdufresne.minarca.core.internal.OSUtils;
 import com.patrikdufresne.minarca.core.Client;
+import com.patrikdufresne.minarca.core.internal.OSUtils;
 
 /**
  * Dialog used to configure the application the first time the user open it. It's similar to a wizard.
@@ -96,7 +96,7 @@ public class SetupDialog extends Dialog {
     @Override
     protected Control createContents(Composite parent) {
 
-        this.ft = new AppFormToolkit(parent.getDisplay(), true);
+        this.ft = new AppFormToolkit(parent.getDisplay(), false);
 
         // Create the Form.
         Form form = ft.createForm(parent);
@@ -129,7 +129,6 @@ public class SetupDialog extends Dialog {
         this.comp.setLayout(layout);
 
         createPage1(this.comp);
-        ft.paintBordersFor(this.comp);
 
         return comp;
 
@@ -150,8 +149,7 @@ public class SetupDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(parent, null);
-        JFaceResources.getImageRegistry().put(Main.MINARCA_128_WHITE_PNG, ImageDescriptor.createFromFile(Main.class, Main.MINARCA_128_WHITE_PNG));
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_WHITE_PNG));
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
@@ -161,13 +159,13 @@ public class SetupDialog extends Dialog {
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Username
-        final Text usernameText = ft.createText(parent, "", SWT.NONE);
+        final Text usernameText = ft.createText(parent, "", SWT.BORDER);
         usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         usernameText.setMessage(_("Username"));
         usernameText.setFocus();
 
         // Password
-        final Text passwordText = ft.createText(parent, "", SWT.PASSWORD);
+        final Text passwordText = ft.createText(parent, "", SWT.PASSWORD | SWT.BORDER);
         passwordText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         passwordText.setMessage(_("Password"));
 
@@ -221,7 +219,7 @@ public class SetupDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(parent, null);
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_WHITE_PNG));
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
@@ -234,7 +232,7 @@ public class SetupDialog extends Dialog {
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Computer name
-        final Text computerNameText = ft.createText(parent, "", SWT.NONE);
+        final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
         computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         computerNameText.setMessage(_("Computer name"));
         computerNameText.setText(OSUtils.COMPUTER_NAME);
@@ -290,7 +288,7 @@ public class SetupDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(parent, null);
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_WHITE_PNG));
+        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
@@ -357,6 +355,8 @@ public class SetupDialog extends Dialog {
         LOGGER.info("sign in as {}", username);
         try {
             this.client = API.instance().connect(username, password);
+            // If credentials are valid, safe the username
+            API.instance().setUsername(username);
         } catch (ApplicationException e) {
             LOGGER.warn("fail to sign in", e);
             return e.getMessage();
