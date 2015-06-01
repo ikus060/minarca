@@ -189,7 +189,6 @@ public class PreferenceDialog extends Dialog {
         text += "<b>" + API.instance().getUsername() + "</b><br/>";
         text += _("Computer name: ");
         text += "<b>" + API.instance().getComputerName() + "</b><br/>";
-        text += "<a href='" + API.instance().getBrowseUrl() + "'>" + _("Browse backup data") + "</a>";
         this.ft.createFormText(comp, text, false);
 
         // Unlink button
@@ -201,7 +200,15 @@ public class PreferenceDialog extends Dialog {
             }
         });
 
-        // General information about backup
+        // Backup info
+        this.ft.createFormText(comp, "<h3>" + _("Backup Information") + "</h3>", false);
+        text = "<a href='" + API.instance().getBrowseUrl() + "'>" + _("Browse backup data") + "</a>";
+        this.ft.createFormText(comp, text, false);
+
+        // TODO General information about backup:
+        // TODO Last backup date.
+        // TODO Running.
+        // TODO Disk usage.
 
         return form;
     }
@@ -285,7 +292,7 @@ public class PreferenceDialog extends Dialog {
     @Override
     protected Point getInitialSize() {
         // Sets fixed window size.
-        return new Point(425, 500);
+        return new Point(450, 550);
     }
 
     /**
