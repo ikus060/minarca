@@ -17,13 +17,16 @@ import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -35,7 +38,7 @@ import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.OSUtils;
-import com.patrikdufresne.minarca.core.internal.SSH;
+import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 
 /**
@@ -49,7 +52,7 @@ public class API {
     /**
      * Base URL. TODO change this.
      */
-    protected static final String BASE_URL = "http://rdiffweb.patrikdufresne.com";
+    protected static final String BASE_URL = "https://www.minarca.net";
 
     /**
      * Property name.
@@ -64,7 +67,7 @@ public class API {
     /**
      * The remote host.
      */
-    private static final String DEFAULT_REMOTEHOST = "fente.patrikdufresne.com";
+    private static final String DEFAULT_REMOTEHOST = "minarca.net";
 
     /**
      * Exclude filename.
@@ -236,12 +239,90 @@ public class API {
         if (StringUtils.isEmpty(getComputerName()) || StringUtils.isEmpty(getRemotehost()) || StringUtils.isEmpty(getUsername())) {
             throw new NotConfiguredException(_("minarca is not configured"));
         }
+        // Check if SSH keys exists.
+        File identityFile = getIdentityFile();
+        if (!identityFile.isFile() || !identityFile.canRead()) {
+            throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
+        }
         if (getIncludes().isEmpty() || getExcludes().isEmpty()) {
             throw new MissConfiguredException(_("includes or excludes pattern are missing"));
         }
         if (!Scheduler.getInstance().exists()) {
             throw new MissConfiguredException(_("scheduled tasks is missing"));
         }
+    }
+
+    /**
+     * Check if a backup task is running.
+     * 
+     * @return True if a backup task is running.
+     */
+    public boolean isBackupRunning() {
+        return false;
+    }
+
+    /**
+     * Used to start a backup task.
+     * 
+     * @throws APIException
+     */
+    public void backup() throws APIException {
+
+        // Get the config value.
+        String username = this.getUsername();
+        String remotehost = this.getRemotehost();
+        String computerName = this.getComputerName();
+
+        // Compute the path.
+        String path = "/home/" + username + "/" + computerName;
+
+        // Get reference to the identity file to be used by ssh or plink.
+        File identityFile = getIdentityFile();
+
+        // Create a new instance of rdiff backup to test and run the backup.
+        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, path, identityFile);
+
+        // Check the remote server.
+        rdiffbackup.testServer();
+
+        // Run backup.
+        rdiffbackup.backup(excludesFile, includesFile);
+
+        // TODO If it's our first backup for this computer, we need to refresh the repository list.
+
+    }
+
+    /**
+     * Return the location of the identify file.
+     * 
+     * @return the identity file.
+     */
+    private File getIdentityFile() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new File(OSUtils.CONFIG_PATH, "key.ppk");
+        }
+        return new File(OSUtils.CONFIG_PATH, "id_rsa");
+    }
+
+    /**
+     * Generate a finger print from id_rsa file.
+     * 
+     * @return the finger print.
+     * @throws APIException
+     */
+    public String getIdentityFingerPrint() {
+        File file = new File(OSUtils.CONFIG_PATH, "id_rsa.pub");
+        if (!file.isFile() || !file.canRead()) {
+            LOGGER.warn("public key [{}] is not accessible", file);
+            return "";
+        }
+        try {
+            RSAPublicKey publicKey = Keygen.fromPublicIdRsa(file);
+            return Keygen.getFingerPrint(publicKey);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
+            LOGGER.warn("cannot read key [{}] ", file, e);
+        }
+        return "";
     }
 
     /**
@@ -367,10 +448,9 @@ public class API {
      * @throws IllegalAccessException
      *             if the computer name is not valid.
      */
-    public void link(String username, String password, String computername) throws APIException {
-        Validate.notNull(username);
-        Validate.notNull(password);
+    public void link(String computername, Client client) throws APIException {
         Validate.notEmpty(computername);
+        Validate.notNull(client);
         Validate.isTrue(computername.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
 
         /*
@@ -378,14 +458,32 @@ public class API {
          */
         LOGGER.debug("generating public and private key for {}", computername);
         File idrsaFile = new File(OSUtils.CONFIG_PATH, "id_rsa.pub");
-        File identityFile = new File(OSUtils.CONFIG_PATH, "key.ppk");
+        File identityFile = new File(OSUtils.CONFIG_PATH, "id_rsa");
+        File puttyFile = new File(OSUtils.CONFIG_PATH, "key.ppk");
+        String rsadata = null;
         try {
             // Generate a key pair.
             KeyPair pair = Keygen.generateRSA();
             // Generate a simple id_rsa.pub file.
             Keygen.toPublicIdRsa((RSAPublicKey) pair.getPublic(), computername, idrsaFile);
+            idrsaFile.setExecutable(false, false);
+            idrsaFile.setReadable(false, false);
+            idrsaFile.setWritable(false, false);
+            idrsaFile.setReadable(true, true);
+            // Generate a private key file.
+            Keygen.toPrivatePEM((RSAPrivateKey) pair.getPrivate(), identityFile);
+            identityFile.setExecutable(false, false);
+            identityFile.setReadable(false, false);
+            identityFile.setWritable(false, false);
+            identityFile.setReadable(true, true);
             // Generate a Putty private key file.
-            Keygen.toPrivatePuttyKey(pair, computername, identityFile);
+            Keygen.toPrivatePuttyKey(pair, computername, puttyFile);
+            puttyFile.setExecutable(false, false);
+            puttyFile.setReadable(false, false);
+            puttyFile.setWritable(false, false);
+            puttyFile.setReadable(true, true);
+            // Read RSA pub key.
+            rsadata = FileUtils.readFileToString(idrsaFile);
         } catch (NoSuchAlgorithmException e) {
             throw new APIException("fail to generate the keys", e);
         } catch (IOException e) {
@@ -395,21 +493,19 @@ public class API {
         }
 
         /*
-         * Share them via ssh.
+         * Send SSH key to minarca.
          */
-        LOGGER.debug("sending public key trought SSH");
-        SSH ssh = SSH.getInstance(getRemoteHost(), username, password);
-        ssh.addKnownHosts();
-        ssh.sendPublicKey(idrsaFile);
-
-        // Create a hint file for rdiffweb (with encoding information)
-        ssh.createTextFile("/home/" + username + "/backup/" + computername + "/rdiff-backup-data/rdiffweb", "encoding=" + Charset.defaultCharset().name());
+        try {
+            client.addSSHKey(computername, rsadata);
+        } catch (IOException e) {
+            throw new APIException("fail to send SSH key to minarca", e);
+        }
 
         /*
          * Generate configuration file.
          */
-        LOGGER.debug("saving configuration [{}][{}][{}]", computername, username, getRemoteHost());
-        setUsername(username);
+        LOGGER.debug("saving configuration [{}][{}][{}]", computername, client.getUsername(), getRemoteHost());
+        setUsername(client.getUsername());
         setComputerName(computername);
         setRemotehost(getRemoteHost());
 
@@ -551,6 +647,10 @@ public class API {
         setComputerName(null);
         setUsername(null);
         setRemotehost(null);
+
+        // TODO Remove RSA keys
+
+        // TODO Remove RSA key from client too.
 
         // Delete task
         Scheduler scheduler = Scheduler.getInstance();

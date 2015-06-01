@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Use is subject to license terms.
+ */
 package com.patrikdufresne.minarca.core.internal;
 
 import java.io.File;
@@ -14,6 +19,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +29,7 @@ import com.patrikdufresne.minarca.core.APIException;
  * This utility class eases access to OS resources: scheduler, registry, execute process, directory location,
  * permission, access, os charset, etc.
  * 
- * @author ikus060
+ * @author Patrik Dufresne
  * 
  */
 public class OSUtils {
@@ -284,4 +290,28 @@ public class OSUtils {
         }
     }
 
+    public static File getExecutableLocation(String executableName, List<String> asList) {
+        Validate.notEmpty(executableName);
+        List<String> locations = new ArrayList<String>();
+        locations.addAll(asList);
+        locations.add(".");
+        // Add PATH location.
+        String paths = System.getenv("PATH");
+        if (paths != null) {
+            for (String path : paths.split(SystemUtils.PATH_SEPARATOR)) {
+                locations.add(path);
+            }
+        }
+        for (String location : locations) {
+            if (location == null || location.isEmpty()) {
+                continue;
+            }
+            File file = new File(location, executableName);
+            if (file.isFile() && file.canRead()) {
+                return file;
+            }
+        }
+        return null;
+
+    }
 }

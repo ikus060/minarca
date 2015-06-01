@@ -42,10 +42,6 @@ public class StreamHandler extends Thread {
     private final Process p;
 
     /**
-     * Password value to answer.
-     */
-    private final String password;
-    /**
      * Charset used to read process output.
      */
     private final Charset charset;
@@ -57,31 +53,7 @@ public class StreamHandler extends Thread {
      *            the process.
      */
     public StreamHandler(Process p) {
-        this(p, null, OSUtils.PROCESS_CHARSET);
-    }
-
-    /**
-     * Process stream handler.
-     * 
-     * @param p
-     *            the process
-     * @param charset
-     *            the charset to be used.
-     */
-    public StreamHandler(Process p, Charset charset) {
-        this(p, null, charset);
-    }
-
-    /**
-     * Process stream handler.
-     * 
-     * @param p
-     *            the process
-     * @param password
-     *            the password
-     */
-    public StreamHandler(Process p, String password) {
-        this(p, password, OSUtils.PROCESS_CHARSET);
+        this(p, OSUtils.PROCESS_CHARSET);
     }
 
     /**
@@ -89,9 +61,8 @@ public class StreamHandler extends Thread {
      * 
      * @param p
      */
-    public StreamHandler(Process p, String password, Charset charset) {
+    public StreamHandler(Process p, Charset charset) {
         Validate.notNull(this.p = p);
-        this.password = password;
         Validate.notNull(this.charset = charset);
     }
 
@@ -113,11 +84,9 @@ public class StreamHandler extends Thread {
             // Read stream line by line without buffer (otherwise it block).
             try {
                 Writer out = new BufferedWriter(new OutputStreamWriter(this.p.getOutputStream()));
-                InputStreamReader in = new InputStreamReader(this.p.getInputStream(), charset);
+                out.close();
 
-                if (password == null) {
-                    out.close();
-                }
+                InputStreamReader in = new InputStreamReader(this.p.getInputStream(), charset);
 
                 StringBuilder buf = new StringBuilder();
                 int b;
@@ -134,12 +103,12 @@ public class StreamHandler extends Thread {
                     } else {
                         buf.append((char) b);
                     }
-                    if (!answered && this.password != null) {
+                    if (!answered) {
                         String prompt = buf.toString();
                         //
                         if (prompt.endsWith("password: ")) {
                             LOGGER.debug(prompt);
-                            out.append(password);
+                            // out.append(password);
                             out.append(SystemUtils.LINE_SEPARATOR);
                             out.flush();
                             out.close();

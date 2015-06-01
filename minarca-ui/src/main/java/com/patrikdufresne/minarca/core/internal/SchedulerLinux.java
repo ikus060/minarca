@@ -5,6 +5,8 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
+import com.patrikdufresne.minarca.core.APIException;
+
 public class SchedulerLinux extends Scheduler {
 
     @Override
@@ -22,7 +24,13 @@ public class SchedulerLinux extends Scheduler {
     @Override
     public boolean exists() {
         // TODO Auto-generated method stub
-        return false;
+        return true;
+    }
+
+    @Override
+    public void run() throws APIException {
+        // TODO Auto-generated method stub
+
     }
 
 }

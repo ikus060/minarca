@@ -129,6 +129,7 @@ public class SetupDialog extends Dialog {
         this.comp.setLayout(layout);
 
         createPage1(this.comp);
+        //ft.paintBordersFor(this.comp);
 
         return comp;
 
@@ -149,6 +150,7 @@ public class SetupDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(parent, null);
+        //JFaceResources.getImageRegistry().put(Main.MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class, Main.MINARCA_128_PNG));
         icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
@@ -380,7 +382,9 @@ public class SetupDialog extends Dialog {
         // Link the computer
         LOGGER.info("link computer {}", name);
         try {
-            this.client.link(name);
+
+            API.instance().link(name, this.client);
+
         } catch (ApplicationException e) {
             LOGGER.warn("fail to register computer", e);
             return e.getMessage();

@@ -87,7 +87,94 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-        new Main().start(args);
+        // Process the arguments.
+        boolean backup = false;
+        for (String arg : args) {
+            // TODO add arguments to link, unlink computer.
+            if (arg.equals("--backup") || arg.equals("-b")) {
+                backup = true;
+            } else if (arg.equals("--version") || arg.equals("-v")) {
+                printVersion();
+                System.exit(0);
+            } else if (arg.equals("--help") || arg.equals("-h")) {
+                printUsage();
+                System.exit(0);
+            } else {
+                System.err.println("Unknown options: " + arg);
+            }
+        }
+
+        // Start minarca.
+        Main main = new Main();
+        if (backup) {
+            main.backup();
+        } else {
+            main.startui(args);
+        }
+
+    }
+
+    /**
+     * Called when minarca executable is start with <code>--help</code> or <code>-h</code> arguments.
+     */
+    private static void printUsage() {
+        System.out.println("Usage:");
+        System.out.println("    minarca --backup");
+        System.out.println("    minarca --help");
+        System.out.println("    minarca --version");
+        System.out.println("");
+        System.out.println("    --backup  used to run the minarca backup.");
+        System.out.println("    --help    display this help message.");
+        System.out.println("    --version show minarca version.");
+    }
+
+    /**
+     * Called when minarca executable is start with <code>--version</code> or <code>-v</code> arguments.
+     */
+    private static void printVersion() {
+        System.out.println("Minarca version " + getCurrentVersion());
+        System.out.println("Copyright (C) 2015 Patrik Dufresne Service Logiciel Inc.");
+    }
+
+    /**
+     * This if the main function being called when minarca application is called with --backup or -b arguments.
+     */
+    private void backup() {
+
+        // Check OS
+        if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
+            LOGGER.warn("unsupported OS");
+            System.err.println(_("Minarca doesn't support you OS. This application will close."));
+            return;
+        }
+
+        // Check user permission
+        if (!OSUtils.IS_ADMIN) {
+            LOGGER.warn("user is not admin");
+            System.err.println(_("You don't have sufficient permissions to execute this application!"));
+            System.err.println(_("Minarca required to be run with administrator privilege. You may try to execute this application with a different user."));
+            System.err.println(_("This application will close."));
+            return;
+        }
+
+        // Check if minarca is properly configure (from our point of view).
+        try {
+            API.instance().checkConfig();
+        } catch (APIException e) {
+            // Show error message (usually localized).
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+
+        // Run the backup.
+        try {
+            API.instance().backup();
+        } catch (APIException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            System.exit(2);
+        }
+
     }
 
     /**
@@ -154,7 +241,7 @@ public class Main {
      * 
      * @param args
      */
-    private void start(String[] args) {
+    private void startui(String[] args) {
 
         Display.setAppName(_("minarca"));
         Display.setAppVersion(getCurrentVersion());

@@ -5,13 +5,19 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
@@ -20,12 +26,16 @@ import java.security.Security;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -66,13 +76,15 @@ public class Keygen {
     private static final String ENCRYPTION = "none";
 
     /**
-     * Default RSA keysize (value: 1024).
+     * Default RSA keysize (value: 2048).
      */
-    private static final int KEYSIZE = 1024;
+    private static final int KEYSIZE = 2048;
+
     /**
      * Putty Key type
      */
     private static final String TYPE = "ssh-rsa";
+
     /**
      * UTF-8 charset name.
      */
@@ -103,6 +115,16 @@ public class Keygen {
      */
     private static String encodeBase64(byte[] bytes) {
         return new String(Base64.encodeBase64(bytes));
+    }
+
+    /**
+     * From Base64 to bytes.
+     * 
+     * @param base64
+     * @return
+     */
+    private static byte[] decodeBase64(String base64) {
+        return Base64.decodeBase64(base64);
     }
 
     /**
@@ -193,6 +215,42 @@ public class Keygen {
     }
 
     /**
+     * Generate a MD5 finger print for a public key.
+     * 
+     * @param publicKey
+     * 
+     * @return the md5 finger print.
+     * @throws IOException
+     */
+    public static String getFingerPrint(RSAPublicKey publicKey) throws NoSuchAlgorithmException, IOException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        byte[] bytes = md5.digest(encodePublicKey(publicKey));
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < bytes.length; ++i) {
+            if (sb.length() > 0) {
+                sb.append(":");
+            }
+            sb.append(Integer.toHexString((bytes[i] & 0xFF) | 0x100).substring(1, 3));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Generate a PEM file.
+     * 
+     * @param privateKey
+     *            the private key
+     * @param file
+     *            where to write the key
+     * @throws IOException
+     */
+    public static void toPrivatePEM(RSAPrivateKey privateKey, File file) throws IOException {
+        FileWriterWithEncoding idrsa = new FileWriterWithEncoding(file, UTF_8);
+        toPrivatePEM(privateKey, idrsa);
+        idrsa.close();
+    }
+
+    /**
      * Generate a PEM file.
      * 
      * @param privateKey
@@ -205,6 +263,27 @@ public class Keygen {
         PEMWriter pemFormatWriter = new PEMWriter(writer);
         pemFormatWriter.writeObject(privateKey);
         pemFormatWriter.close();
+    }
+
+    /**
+     * Generate a Putty private key file (ppk).
+     * <p>
+     * This implementation use default encoding.
+     * 
+     * @param pair
+     *            the key pair
+     * @param comment
+     *            the comment.
+     * @param file
+     *            the filename
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     */
+    public static void toPrivatePuttyKey(KeyPair pair, String comment, File file) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        FileWriter writer = new FileWriter(file);
+        toPrivatePuttyKey(pair, comment, writer);
+        writer.close();
     }
 
     /**
@@ -288,27 +367,6 @@ public class Keygen {
     }
 
     /**
-     * Generate a Putty private key file (ppk).
-     * <p>
-     * This implementation use default encoding.
-     * 
-     * @param pair
-     *            the key pair
-     * @param comment
-     *            the comment.
-     * @param file
-     *            the filename
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     */
-    public static void toPrivatePuttyKey(KeyPair pair, String comment, File file) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        FileWriter writer = new FileWriter(file);
-        toPrivatePuttyKey(pair, comment, writer);
-        writer.close();
-    }
-
-    /**
      * Generate an id_rsa file data.
      * <p>
      * This implementation will use the utf-8 encoding.
@@ -344,4 +402,61 @@ public class Keygen {
         writer.write("ssh-rsa " + base64 + " " + comment);
     }
 
+    public static RSAPublicKey fromPublicIdRsa(File file) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        FileReader reader = new FileReader(file);
+        try {
+            return fromPublicIdRsa(reader);
+        } finally {
+            reader.close();
+        }
+
+    }
+
+    /**
+     * Read a public RSA key.
+     * 
+     * @param file
+     *            the file to be read.
+     * @return
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    public static RSAPublicKey fromPublicIdRsa(Reader reader) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        List<String> lines = IOUtils.readLines(reader);
+        if (lines.size() > 2) {
+            throw new IOException("two many line in file");
+        }
+        String fields[] = lines.get(0).split("\\s");
+        if (!fields[0].equals("ssh-rsa")) {
+            throw new IOException("unsupported key: " + fields[1]);
+        }
+        byte[] bytes = decodeBase64(fields[1]);
+
+        // Read the bytes.
+        int length;
+        byte[] data;
+        DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
+        // String "ssh-rsa"
+        length = in.readInt();
+        data = new byte[length];
+        in.read(data);
+        String keytype = new String(data);
+        if (!keytype.equals("ssh-rsa")) {
+            throw new IOException("unsupported key: " + keytype);
+        }
+        // mpint exponent
+        length = in.readInt();
+        data = new byte[length];
+        in.read(data);
+        BigInteger e = new BigInteger(data);
+        // mpint modulus
+        length = in.readInt();
+        data = new byte[length];
+        in.read(data);
+        BigInteger n = new BigInteger(data);
+        // Convert the integers to Java object key,
+        final RSAPublicKeySpec rsaPubSpec = new RSAPublicKeySpec(n, e);
+        return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(rsaPubSpec);
+    }
 }

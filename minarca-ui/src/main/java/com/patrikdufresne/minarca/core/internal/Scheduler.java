@@ -58,4 +58,10 @@ public abstract class Scheduler {
      */
     public abstract boolean exists() throws APIException;
 
+    /**
+     * Run the task.
+     * 
+     * @throws APIException
+     */
+    public abstract void run() throws APIException;
 }

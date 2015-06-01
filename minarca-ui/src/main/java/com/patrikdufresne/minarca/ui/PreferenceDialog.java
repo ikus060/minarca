@@ -189,6 +189,8 @@ public class PreferenceDialog extends Dialog {
         text += "<b>" + API.instance().getUsername() + "</b><br/>";
         text += _("Computer name: ");
         text += "<b>" + API.instance().getComputerName() + "</b><br/>";
+        text += _("Fingerprint: ");
+        text += "" + API.instance().getIdentityFingerPrint() + "<br/>";
         this.ft.createFormText(comp, text, false);
 
         // Unlink button

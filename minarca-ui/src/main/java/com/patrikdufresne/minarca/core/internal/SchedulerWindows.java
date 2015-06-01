@@ -264,6 +264,12 @@ public class SchedulerWindows extends Scheduler {
         return null;
     }
 
+    @Override
+    public void run() throws APIException {
+        // TODO Auto-generated method stub
+
+    }
+
     /**
      * Search for a binary file.
      * 
