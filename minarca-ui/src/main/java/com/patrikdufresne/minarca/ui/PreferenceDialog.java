@@ -154,8 +154,12 @@ public class PreferenceDialog extends Dialog {
         appCopyrightText.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 
         // Application web site
-        FormText websiteText = this.ft.createFormText(comp, "http://patrikdufresne.com/minarca/", false);
+        FormText websiteText = this.ft.createFormText(comp, _("http://www.patrikdufresne.com/en/minarca/"), false);
         websiteText.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
+
+        // Minarca link
+        FormText minarcaWebSiteText = this.ft.createFormText(comp, "https://www.minarca.net/", false);
+        minarcaWebSiteText.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 
         return form;
     }
