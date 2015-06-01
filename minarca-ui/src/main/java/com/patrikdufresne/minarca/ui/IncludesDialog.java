@@ -476,7 +476,7 @@ public class IncludesDialog extends TrayDialog {
         if (include == null) {
             // Need to add an include for the given file.
             include = new GlobPattern(file);
-            LOGGER.debug("add exclude pattern [{}]", include);
+            LOGGER.debug("add include pattern [{}]", include);
             this.includes.add(include);
         }
     }
