@@ -251,7 +251,7 @@ public class AppFormToolkit extends FormToolkit {
                 @Override
                 public void linkActivated(HyperlinkEvent e) {
                     String href = e.getHref() != null ? e.getHref().toString() : null;
-                    if (href != null && href.startsWith("http://")) {
+                    if (href != null && (href.startsWith("http://") || href.startsWith("https://"))) {
                         Program.launch(href);
                     }
                 }
