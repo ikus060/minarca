@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -294,7 +295,10 @@ public class PreferenceDialog extends Dialog {
     @Override
     protected Point getInitialSize() {
         // Sets fixed window size.
-        return new Point(450, 550);
+        if (SystemUtils.IS_OS_LINUX) {
+            return new Point(450, 550);
+        }
+        return new Point(425, 500);
     }
 
     /**
