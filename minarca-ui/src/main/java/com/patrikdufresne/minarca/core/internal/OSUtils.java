@@ -319,7 +319,12 @@ public class OSUtils {
             }
             File file = new File(location, filename);
             if (file.isFile() && file.canRead()) {
-                return file;
+                try {
+                    return file.getCanonicalFile();
+                } catch (IOException e) {
+                    LOGGER.warn("fail to get canonical path for [{}]", file);
+                    return null;
+                }
             }
         }
         return null;
