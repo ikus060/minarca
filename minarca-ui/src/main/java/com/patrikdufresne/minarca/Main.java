@@ -337,8 +337,13 @@ public class Main {
                     LOGGER.debug("repair configuration");
                     API.instance().defaultConfig();
                 } catch (APIException e1) {
-                    MessageDialog.openWarning(null, Display.getAppName(), _("Can't repair minarca configuration. "
-                            + "If the problem persist, you may try to reinstall minarca."));
+                    LOGGER.warn("fail to repair configuration", e1);
+                    DetailMessageDialog.openWarning(
+                            null,
+                            Display.getAppName(),
+                            _("Can't repair minarca configuration!"),
+                            _("This application may misbehave. If the problem persist, you may try to reinstall minarca."),
+                            e1);
                 }
             } else {
                 return true;
