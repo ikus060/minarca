@@ -195,6 +195,7 @@ public class SchedulerWindows extends Scheduler {
                 // For WinXP
                 // The current command won't contains any quote or single quote. It's a shame.
                 curCommand = task.getCommand().trim();
+                curCommand = curCommand.replace("  --backup", " --backup");
                 expectedCommand = getCommand().replace("\\\"", "");
             } else {
                 // For Win 7
