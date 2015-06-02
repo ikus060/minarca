@@ -290,23 +290,34 @@ public class OSUtils {
         }
     }
 
-    public static File getExecutableLocation(String executableName, List<String> asList) {
-        Validate.notEmpty(executableName);
+    /**
+     * Search for the given filename in multiple locations. Current implementation search in the given
+     * <code>paths</code> then search in PATH environment variables.
+     * 
+     * @param filename
+     *            the filename (e.g.: minarca.exe, rdiffweb.exe)
+     * @param paths
+     *            extra path where to look.
+     * 
+     * @return the first matching file.
+     */
+    public static File getFileLocation(String filename, String... paths) {
+        Validate.notEmpty(filename);
         List<String> locations = new ArrayList<String>();
-        locations.addAll(asList);
+        locations.addAll(Arrays.asList(paths));
         locations.add(".");
         // Add PATH location.
-        String paths = System.getenv("PATH");
-        if (paths != null) {
-            for (String path : paths.split(SystemUtils.PATH_SEPARATOR)) {
-                locations.add(path);
+        String path = System.getenv("PATH");
+        if (path != null) {
+            for (String i : path.split(SystemUtils.PATH_SEPARATOR)) {
+                locations.add(i);
             }
         }
         for (String location : locations) {
             if (location == null || location.isEmpty()) {
                 continue;
             }
-            File file = new File(location, executableName);
+            File file = new File(location, filename);
             if (file.isFile() && file.canRead()) {
                 return file;
             }

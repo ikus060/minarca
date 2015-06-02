@@ -2,6 +2,8 @@ package com.patrikdufresne.minarca.core.internal;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
@@ -25,7 +27,7 @@ public class SchedulerWindowsTest {
 
         SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
         PowerMockito.doReturn(winxpdata).when(s).execute(Mockito.anyList());
-        PowerMockito.doReturn("C:\\Program Files\\minarca\\bin\\launch.vbs").when(s).search("launch.vbs");
+        PowerMockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
     }
@@ -40,9 +42,8 @@ public class SchedulerWindowsTest {
 
         SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
         PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
-        PowerMockito.doReturn("C:\\Program Files\\minarca\\bin\\launch.vbs").when(s).search("launch.vbs");
+        PowerMockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
     }
-
 }

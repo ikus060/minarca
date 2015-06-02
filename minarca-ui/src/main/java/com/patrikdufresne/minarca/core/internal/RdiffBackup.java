@@ -168,8 +168,7 @@ public class RdiffBackup {
      * This implementation look into into the follow directory: putty location, local directory,
      */
     private File getPlinkLocation() {
-        List<String> locations = Arrays.asList(System.getProperty(PROPERTY_PUTTY_LOCATION), "./putty-0.63/", "./bin/");
-        return OSUtils.getExecutableLocation(PLINK_EXE, locations);
+        return OSUtils.getFileLocation(PLINK_EXE, System.getProperty(PROPERTY_PUTTY_LOCATION), "./putty-0.63/", "./bin/");
     }
 
     /**
@@ -178,8 +177,7 @@ public class RdiffBackup {
      * @return
      */
     private File getRdiffbackupLocation() {
-        List<String> locations = Arrays.asList(System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
-        return OSUtils.getExecutableLocation(RDIFF_BACKUP, locations);
+        return OSUtils.getFileLocation(RDIFF_BACKUP, System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
     }
 
     /**

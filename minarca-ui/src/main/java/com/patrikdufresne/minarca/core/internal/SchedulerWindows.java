@@ -31,6 +31,8 @@ import com.patrikdufresne.minarca.core.APIException;
  */
 public class SchedulerWindows extends Scheduler {
 
+    private static final String PATTERN_ERROR = "(ERROR|ERREUR)";
+
     private static class SchTaskEntry {
 
         private static final int TASK_TO_RUN = 8;
@@ -63,15 +65,23 @@ public class SchedulerWindows extends Scheduler {
     }
 
     private static final transient Logger LOGGER = LoggerFactory.getLogger(SchedulerWindows.class);
-    /**
-     * Script being called by the scheduler to start a bat file hidden.
-     */
-    private static final String MINARCA_LAUNCH_VBS = "launch.vbs";
 
     /**
      * Property used to define the location of minarca.bat file.
      */
-    private static final String PROPERTY_MINARCA_BATCH_LOCATION = "minarca.bat.location";
+    private static final String PROPERTY_MINARCA_EXE_LOCATION = "minarca.exe.location";
+
+    /**
+     * Executable launch to start backup.
+     */
+    private static final String MINARCA_EXE;
+    static {
+        if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
+            MINARCA_EXE = "minarca64.exe";
+        } else {
+            MINARCA_EXE = "minarca.exe";
+        }
+    }
 
     /**
      * Windows task name.
@@ -109,7 +119,7 @@ public class SchedulerWindows extends Scheduler {
             data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM", "/F");
         }
         // FIXME looking at command output is not the best since it change according to user language.
-        if (data.contains("ERROR") || data.contains("ERREUR")) {
+        if (data.matches(PATTERN_ERROR)) {
             throw new APIException("fail to schedule task");
         }
     }
@@ -209,8 +219,16 @@ public class SchedulerWindows extends Scheduler {
      * @return
      * @throws APIException
      */
-    public String getCommand() throws APIException {
-        return "\\\"" + search(MINARCA_LAUNCH_VBS) + "\\\"";
+    private String getCommand() throws APIException {
+        File file = getExeLocation();
+        if (file == null) {
+            throw new APIException(_("{0} is missing ", MINARCA_EXE));
+        }
+        StringBuilder buf = new StringBuilder();
+        buf.append("\\\"");
+        buf.append(file);
+        buf.append("\\\" --backup");
+        return buf.toString();
     }
 
     private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
@@ -270,31 +288,8 @@ public class SchedulerWindows extends Scheduler {
 
     }
 
-    /**
-     * Search for a binary file.
-     * 
-     * @return
-     * @throws APIException
-     */
-    String search(String filename) throws APIException {
-        // Search minarca.bat file
-        List<String> locations = new ArrayList<String>();
-        String value = System.getProperty(PROPERTY_MINARCA_BATCH_LOCATION);
-        if (value != null) {
-            locations.add(value);
-        }
-        locations.add("./bin/");
-        locations.add(".");
-        for (String location : locations) {
-            File file = new File(location, filename);
-            if (file.isFile() && file.canRead()) {
-                try {
-                    return file.getCanonicalPath();
-                } catch (IOException e) {
-                    return file.getAbsolutePath();
-                }
-            }
-        }
-        throw new APIException(_("{0} is missing ", filename));
+    protected File getExeLocation() {
+        return OSUtils.getFileLocation(MINARCA_EXE, System.getProperty(PROPERTY_MINARCA_EXE_LOCATION), "./bin/", ".");
     }
+
 }
