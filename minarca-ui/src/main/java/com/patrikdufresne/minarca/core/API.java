@@ -253,6 +253,32 @@ public class API {
     }
 
     /**
+     * Check if this computer is properly link to minarca.net.
+     * 
+     * @throws APIException
+     */
+    public void testServer() throws APIException {
+
+        // Get the config value.
+        String username = this.getUsername();
+        String remotehost = this.getRemotehost();
+        String computerName = this.getComputerName();
+
+        // Compute the path.
+        String path = "/home/" + username + "/" + computerName;
+
+        // Get reference to the identity file to be used by ssh or plink.
+        File identityFile = getIdentityFile();
+
+        // Create a new instance of rdiff backup to test and run the backup.
+        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, path, identityFile);
+
+        // Check the remote server.
+        rdiffbackup.testServer();
+
+    }
+
+    /**
      * Check if a backup task is running.
      * 
      * @return True if a backup task is running.

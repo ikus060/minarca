@@ -194,6 +194,11 @@ public class PreferenceDialog extends Dialog {
         text += "<b>" + API.instance().getIdentityFingerPrint() + "</b><br/>";
         this.ft.createFormText(comp, text, false);
 
+        // Check link
+        text = _("Checking link...");
+        FormText formtext = this.ft.createFormText(comp, text, false);
+        checkLink(formtext);
+
         // Unlink button
         Button unlinkButton = this.ft.createButton(comp, _("Unlink this computer..."), SWT.PUSH);
         unlinkButton.addSelectionListener(new SelectionAdapter() {
@@ -214,6 +219,49 @@ public class PreferenceDialog extends Dialog {
         // TODO Disk usage.
 
         return form;
+    }
+
+    /**
+     * Asynchronously check link with minarca.
+     * 
+     * @param formtext
+     */
+    private void checkLink(final FormText formtext) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Wait 5 sec to avoid useless CPU stress.
+                try {
+                    Thread.sleep(2500);
+                } catch (InterruptedException e1) {
+                    return;
+                }
+                if (formtext.isDisposed()) {
+                    return;
+                }
+                String msg;
+                try {
+                    API.instance().testServer();
+                    msg = _("This computer is linked to minarca.");
+                } catch (APIException e) {
+                    msg = _("This computer doesn't seams to be linked with minarca!");
+                }
+                if (formtext.isDisposed()) {
+                    return;
+                }
+                final String text = msg;
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!formtext.isDisposed()) {
+                            formtext.setText(text, true, true);
+                        }
+                    }
+                });
+            }
+        }, "check-link");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     /**
