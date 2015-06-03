@@ -236,9 +236,10 @@ public class API {
     public void checkConfig() throws APIException {
         // Basic sanity check to make sure it's configured. If not, display the
         // setup dialog.
-        if (StringUtils.isEmpty(getComputerName()) || StringUtils.isEmpty(getRemotehost()) || StringUtils.isEmpty(getUsername())) {
+        if (StringUtils.isEmpty(getComputerName()) || StringUtils.isEmpty(getUsername())) {
             throw new NotConfiguredException(_("minarca is not configured"));
         }
+        // NOTICE: remotehosts is optional.
         // Check if SSH keys exists.
         File identityFile = getIdentityFile();
         if (!identityFile.isFile() || !identityFile.canRead()) {
@@ -429,15 +430,6 @@ public class API {
     }
 
     /**
-     * Get the remote host used for the backup (SSH server).
-     * 
-     * @return the hostname.
-     */
-    public String getRemotehost() {
-        return this.properties.getProperty(REMOTEHOST);
-    }
-
-    /**
      * Return the remote host to be used for SSH communication.
      * <p>
      * Current implementation return the same SSH server. In future, this implementation might changed to request the
@@ -445,8 +437,8 @@ public class API {
      * 
      * @return
      */
-    protected String getRemoteHost() {
-        return DEFAULT_REMOTEHOST;
+    protected String getRemotehost() {
+        return this.properties.getProperty(REMOTEHOST, DEFAULT_REMOTEHOST);
     }
 
     /**
@@ -530,10 +522,10 @@ public class API {
         /*
          * Generate configuration file.
          */
-        LOGGER.debug("saving configuration [{}][{}][{}]", computername, client.getUsername(), getRemoteHost());
+        LOGGER.debug("saving configuration [{}][{}][{}]", computername, client.getUsername(), getRemotehost());
         setUsername(client.getUsername());
         setComputerName(computername);
-        setRemotehost(getRemoteHost());
+        setRemotehost(getRemotehost());
 
     }
 
@@ -632,7 +624,7 @@ public class API {
      * @throws APIException
      */
     public void setRemotehost(String value) throws APIException {
-        if (value == null) {
+        if (value == null || value.equals(DEFAULT_REMOTEHOST)) {
             this.properties.remove(REMOTEHOST);
         } else {
             this.properties.setProperty(REMOTEHOST, value);
