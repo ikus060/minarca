@@ -2,7 +2,7 @@
 !define AppName "Minarca"
 ; Used for paths
 !define ShortName "minarca"
-!define Vendor "Patrik Dufresne Service Logiciel"
+!define Vendor "Patrik Dufresne Service Logiciel inc."
 !define AppExeFile ""
  
 ;--------------------------------
