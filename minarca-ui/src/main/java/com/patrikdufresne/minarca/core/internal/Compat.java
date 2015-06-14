@@ -32,7 +32,7 @@ import com.patrikdufresne.minarca.core.APIException;
  * @author Patrik Dufresne
  * 
  */
-public class OSUtils {
+public class Compat {
 
     /**
      * The name of this computer (may be null in some edge case).
@@ -42,7 +42,7 @@ public class OSUtils {
     /**
      * Location where to store configuration for minarca.
      */
-    public static String CONFIG_PATH;
+    public static final String CONFIG_PATH;
 
     /**
      * True if the user is admin.
@@ -55,14 +55,19 @@ public class OSUtils {
     private static final transient Logger LOGGER;
 
     /**
-     * Default charset.
+     * Charset used for process.
      */
-    public static Charset PROCESS_CHARSET;
+    public static Charset CHARSET_PROCESS;
 
     /**
      * The root path. Under windows it should be "C:" under linux it should be "/".
      */
-    public static final String ROOT_PATH;
+    public static final String ROOT;
+
+    /**
+     * The root path. Under windows it should be "C:" under linux it should be "/".
+     */
+    public static final File ROOT_FILE;
 
     /**
      * Path to system profile for Windows OS.
@@ -71,19 +76,25 @@ public class OSUtils {
      */
     public static final String WINDOWS_SYSTEMPROFILE_PATH;
 
+    /**
+     * Default charset.
+     */
+    public static final Charset CHARSET_DEFAULT = Charset.defaultCharset();
+
     static {
         // Use a static block to declare constant value in the right order.
-        LOGGER = LoggerFactory.getLogger(OSUtils.class);
-        COMPUTER_NAME = getComputerName();
-        ROOT_PATH = getRootPath();
-        PROCESS_CHARSET = getProcessCharset();
-        WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
-        CONFIG_PATH = getAdminConfigPath();
+        LOGGER = LoggerFactory.getLogger(Compat.class);
+        CHARSET_PROCESS = getProcessCharset();
         IS_ADMIN = getIsAdmin();
+        COMPUTER_NAME = getComputerName();
+        ROOT = getRootPath();
+        ROOT_FILE = new File(ROOT);
+        WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
+        CONFIG_PATH = getConfigPath(IS_ADMIN);
     }
 
     /**
-     * Execute chcp process.
+     * Execute chcp process. This command line is used to determine the process charset in Windows OS.
      * 
      * @return the code page or null
      * 
@@ -119,19 +130,32 @@ public class OSUtils {
      * 
      * @return
      */
-    private static String getAdminConfigPath() {
+    private static String getConfigPath(boolean isAdmin) {
         // Check if config path is forced (usually used for testing).
         String configPath = System.getProperty("com.patrikdufresne.minarca.configPath");
         if (configPath != null) {
             return configPath;
         }
         if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
-            if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-                return OSUtils.WINDOWS_SYSTEMPROFILE_PATH + "/Application Data/minarca";
+            if (isAdmin) {
+                if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
+                    return Compat.WINDOWS_SYSTEMPROFILE_PATH + "/Application Data/minarca";
+                }
+                return Compat.WINDOWS_SYSTEMPROFILE_PATH + "/AppData/Local/minarca";
+            } else {
+                if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
+                    // C:\Documents and Settings\ikus060\Local Settings\Application Data
+                    return System.getenv("APPDATA") + "/Local Settings/Application Data/minarca";
+                }
+                // C:\Users\ikus060\AppData\Local\minarca
+                return System.getenv("LOCALAPPDATA") + "/minarca";
             }
-            return OSUtils.WINDOWS_SYSTEMPROFILE_PATH + "/AppData/Local/minarca";
         } else if (SystemUtils.IS_OS_LINUX) {
-            return "/etc/minarca";
+            if (isAdmin) {
+                return "/etc/minarca";
+            } else {
+                return System.getenv("HOME") + "/.minarca";
+            }
         }
         return null;
     }
@@ -161,6 +185,47 @@ public class OSUtils {
     }
 
     /**
+     * Search for the given filename in multiple locations. Current implementation search in the given
+     * <code>paths</code> then search in PATH environment variables.
+     * 
+     * @param filename
+     *            the filename (e.g.: minarca.exe, rdiffweb.exe)
+     * @param paths
+     *            extra path where to look.
+     * 
+     * @return the first matching file.
+     */
+    public static File searchFile(String filename, String... paths) {
+        Validate.notEmpty(filename);
+        List<String> locations = new ArrayList<String>();
+        locations.addAll(Arrays.asList(paths));
+        locations.add(".");
+        // Add PATH location.
+        String path = System.getenv("PATH");
+        if (path != null) {
+            for (String i : path.split(SystemUtils.PATH_SEPARATOR)) {
+                locations.add(i);
+            }
+        }
+        for (String location : locations) {
+            if (location == null || location.isEmpty()) {
+                continue;
+            }
+            File file = new File(location, filename);
+            if (file.isFile() && file.canRead()) {
+                try {
+                    return file.getCanonicalFile();
+                } catch (IOException e) {
+                    LOGGER.warn("fail to get canonical path for [{}]", file);
+                    return null;
+                }
+            }
+        }
+        return null;
+
+    }
+
+    /**
      * Return true if the user is admin.
      * <p>
      * This implementation make multiple assumption about administrator right. It checks if user can access the "SYSTEM"
@@ -174,7 +239,7 @@ public class OSUtils {
         if (forceIsAdmin) {
             return true;
         }
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (SystemUtils.IS_OS_WINDOWS_XP) {
             // Query the SYSTEM registry hive.
             try {
                 reg("query", "HKU\\S-1-5-18");
@@ -183,7 +248,7 @@ public class OSUtils {
             }
             // Check if the minarca directory can be created.
             try {
-                File file = new File(CONFIG_PATH);
+                File file = new File(getConfigPath(true));
                 FileUtils.forceMkdir(file);
                 if (!file.canRead() || !file.canWrite()) {
                     return false;
@@ -198,6 +263,7 @@ public class OSUtils {
             // TODO Need to implements this for linux.
             return false;
         }
+        // Otherwise: Windows 7 not running as Admin.
         return false;
     }
 
@@ -218,18 +284,18 @@ public class OSUtils {
                 }
             }
         }
-        // Default to default encoding
+        // Linux: default to default encoding (usually UTF-8)
         return Charset.defaultCharset();
     }
 
     /**
-     * Return the home driver ( the only drive to be backup.
+     * Return the home drive. On Windows usually return <code>C:\</code>. On linux always return <code>/</code>.
      * 
      * @return
      */
     private static String getRootPath() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            String homedrive = System.getenv("HOMEDRIVER");
+            String homedrive = System.getenv("HOMEDRIVE");
             // Check if env variable contains something takt make senses
             File file = new File(homedrive + SystemUtils.PATH_SEPARATOR);
             if (file.exists() && file.isDirectory()) {
@@ -265,7 +331,7 @@ public class OSUtils {
      * @throws APIException
      *             if the process didn't complete successfully.
      */
-    public static String reg(String... args) throws APIException {
+    private static String reg(String... args) throws APIException {
         List<String> command = new ArrayList<String>();
         command.add("reg.exe");
         if (args != null) {
@@ -288,46 +354,5 @@ public class OSUtils {
             Thread.currentThread().interrupt();
             return null;
         }
-    }
-
-    /**
-     * Search for the given filename in multiple locations. Current implementation search in the given
-     * <code>paths</code> then search in PATH environment variables.
-     * 
-     * @param filename
-     *            the filename (e.g.: minarca.exe, rdiffweb.exe)
-     * @param paths
-     *            extra path where to look.
-     * 
-     * @return the first matching file.
-     */
-    public static File getFileLocation(String filename, String... paths) {
-        Validate.notEmpty(filename);
-        List<String> locations = new ArrayList<String>();
-        locations.addAll(Arrays.asList(paths));
-        locations.add(".");
-        // Add PATH location.
-        String path = System.getenv("PATH");
-        if (path != null) {
-            for (String i : path.split(SystemUtils.PATH_SEPARATOR)) {
-                locations.add(i);
-            }
-        }
-        for (String location : locations) {
-            if (location == null || location.isEmpty()) {
-                continue;
-            }
-            File file = new File(location, filename);
-            if (file.isFile() && file.canRead()) {
-                try {
-                    return file.getCanonicalFile();
-                } catch (IOException e) {
-                    LOGGER.warn("fail to get canonical path for [{}]", file);
-                    return null;
-                }
-            }
-        }
-        return null;
-
     }
 }

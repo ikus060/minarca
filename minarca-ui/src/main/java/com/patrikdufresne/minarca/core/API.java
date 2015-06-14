@@ -7,13 +7,10 @@ package com.patrikdufresne.minarca.core;
 
 import static com.patrikdufresne.minarca.Localized._;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
@@ -36,8 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
+import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
+import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
-import com.patrikdufresne.minarca.core.internal.OSUtils;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 
@@ -50,34 +48,24 @@ import com.patrikdufresne.minarca.core.internal.Scheduler;
 public class API {
 
     /**
-     * Base URL. TODO change this.
+     * Base URL.
      */
     protected static final String BASE_URL = "https://www.minarca.net";
 
     /**
-     * Property name.
-     */
-    private static final String COMPUTERNAME = "computername";
-
-    /**
      * Filename used for configuration file. Notice, this is also read by batch file.
      */
-    private static final String CONF_FILENAME = "conf";
-
-    /**
-     * The remote host.
-     */
-    private static final String DEFAULT_REMOTEHOST = "minarca.net";
+    private static final String FILENAME_CONF = "minarca.properties";
 
     /**
      * Exclude filename.
      */
-    private static final String EXCLUDES_FILENAME = "excludes";
+    private static final String FILENAME_EXCLUDES = "excludes";
 
     /**
      * Includes filename.
      */
-    private static final String INCLUDES_FILENAME = "includes";
+    private static final String FILENAME_INCLUDES = "includes";
 
     /**
      * Singleton instance of API
@@ -92,12 +80,42 @@ public class API {
     /**
      * Property name.
      */
-    private static final String REMOTEHOST = "remotehost";
+    private static final String PROPERTY_COMPUTERNAME = "computername";
 
     /**
      * Property name.
      */
-    private static final String USERNAME = "username";
+    private static final String PROPERTY_REMOTEHOST = "remotehost";
+
+    /**
+     * Property name.
+     */
+    private static final String PROPERTY_USERNAME = "username";
+
+    /**
+     * The remote host.
+     */
+    private static final String REMOTEHOST_DEFAULT = "minarca.net";
+
+    /**
+     * Used to check if the current running environment is valid. Check supported OS, check permissions, etc. May also
+     * check running application version.
+     * 
+     * @throws APIException
+     */
+    public static void checkEnv() throws APIException {
+        // Check OS
+        if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
+            LOGGER.warn("unsupported OS");
+            throw new UnsupportedOS();
+        }
+        // TODO: Windows XP required Admin previledge.
+        // Check user permission
+        // if (!Compat.IS_ADMIN) {
+        // LOGGER.warn("user is not admin");
+        // throw new UnsufficientPermissons();
+        // }
+    }
 
     public static List<GlobPattern> getDefaultIncludes() {
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -208,12 +226,12 @@ public class API {
      */
     private API() {
         // Log the default charset
-        LoggerFactory.getLogger(API.class).info("using default charset [{}]", Charset.defaultCharset().name());
-        LoggerFactory.getLogger(API.class).info("using process charset [{}]", OSUtils.PROCESS_CHARSET.name());
+        LoggerFactory.getLogger(API.class).info("using default charset [{}]", Compat.CHARSET_DEFAULT.name());
+        LoggerFactory.getLogger(API.class).info("using process charset [{}]", Compat.CHARSET_PROCESS.name());
 
-        this.confFile = new File(OSUtils.CONFIG_PATH, CONF_FILENAME); //$NON-NLS-1$
-        this.includesFile = new File(OSUtils.CONFIG_PATH, INCLUDES_FILENAME); //$NON-NLS-1$
-        this.excludesFile = new File(OSUtils.CONFIG_PATH, EXCLUDES_FILENAME); //$NON-NLS-1$
+        this.confFile = new File(Compat.CONFIG_PATH, FILENAME_CONF); //$NON-NLS-1$
+        this.includesFile = new File(Compat.CONFIG_PATH, FILENAME_INCLUDES); //$NON-NLS-1$
+        this.excludesFile = new File(Compat.CONFIG_PATH, FILENAME_EXCLUDES); //$NON-NLS-1$
 
         // Load the configuration
         this.properties = new Properties();
@@ -225,67 +243,6 @@ public class API {
         } catch (IOException e) {
             LoggerFactory.getLogger(API.class).warn(_("can't load properties {}"), confFile);
         }
-    }
-
-    /**
-     * Used to check if the configuration is OK. Called as a sanity check to make sure "minarca" is properly configured.
-     * If not, it throw an exception.
-     * 
-     * @return
-     */
-    public void checkConfig() throws APIException {
-        // Basic sanity check to make sure it's configured. If not, display the
-        // setup dialog.
-        if (StringUtils.isEmpty(getComputerName()) || StringUtils.isEmpty(getUsername())) {
-            throw new NotConfiguredException(_("minarca is not configured"));
-        }
-        // NOTICE: remotehosts is optional.
-        // Check if SSH keys exists.
-        File identityFile = getIdentityFile();
-        if (!identityFile.isFile() || !identityFile.canRead()) {
-            throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
-        }
-        if (getIncludes().isEmpty() || getExcludes().isEmpty()) {
-            throw new MissConfiguredException(_("includes or excludes pattern are missing"));
-        }
-        if (!Scheduler.getInstance().exists()) {
-            throw new MissConfiguredException(_("scheduled tasks is missing"));
-        }
-    }
-
-    /**
-     * Check if this computer is properly link to minarca.net.
-     * 
-     * @throws APIException
-     */
-    public void testServer() throws APIException {
-
-        // Get the config value.
-        String username = this.getUsername();
-        String remotehost = this.getRemotehost();
-        String computerName = this.getComputerName();
-
-        // Compute the path.
-        String path = "/home/" + username + "/" + computerName;
-
-        // Get reference to the identity file to be used by ssh or plink.
-        File identityFile = getIdentityFile();
-
-        // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, path, identityFile);
-
-        // Check the remote server.
-        rdiffbackup.testServer();
-
-    }
-
-    /**
-     * Check if a backup task is running.
-     * 
-     * @return True if a backup task is running.
-     */
-    public boolean isBackupRunning() {
-        return false;
     }
 
     /**
@@ -320,36 +277,29 @@ public class API {
     }
 
     /**
-     * Return the location of the identify file.
+     * Used to check if the configuration is OK. Called as a sanity check to make sure "minarca" is properly configured.
+     * If not, it throw an exception.
      * 
-     * @return the identity file.
+     * @return
      */
-    private File getIdentityFile() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return new File(OSUtils.CONFIG_PATH, "key.ppk");
+    public void checkConfig() throws APIException {
+        // Basic sanity check to make sure it's configured. If not, display the
+        // setup dialog.
+        if (StringUtils.isEmpty(getComputerName()) || StringUtils.isEmpty(getUsername())) {
+            throw new NotConfiguredException(_("minarca is not configured"));
         }
-        return new File(OSUtils.CONFIG_PATH, "id_rsa");
-    }
-
-    /**
-     * Generate a finger print from id_rsa file.
-     * 
-     * @return the finger print.
-     * @throws APIException
-     */
-    public String getIdentityFingerPrint() {
-        File file = new File(OSUtils.CONFIG_PATH, "id_rsa.pub");
-        if (!file.isFile() || !file.canRead()) {
-            LOGGER.warn("public key [{}] is not accessible", file);
-            return "";
+        // NOTICE: remotehosts is optional.
+        // Check if SSH keys exists.
+        File identityFile = getIdentityFile();
+        if (!identityFile.isFile() || !identityFile.canRead()) {
+            throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
         }
-        try {
-            RSAPublicKey publicKey = Keygen.fromPublicIdRsa(file);
-            return Keygen.getFingerPrint(publicKey);
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
-            LOGGER.warn("cannot read key [{}] ", file, e);
+        if (getIncludes().isEmpty() || getExcludes().isEmpty()) {
+            throw new MissConfiguredException(_("includes or excludes pattern are missing"));
         }
-        return "";
+        if (!Scheduler.getInstance().exists()) {
+            throw new MissConfiguredException(_("scheduled tasks is missing"));
+        }
     }
 
     /**
@@ -396,7 +346,7 @@ public class API {
      * @return the computer name.
      */
     public String getComputerName() {
-        return this.properties.getProperty(COMPUTERNAME);
+        return this.properties.getProperty(PROPERTY_COMPUTERNAME);
     }
 
     /**
@@ -407,11 +357,44 @@ public class API {
     public List<GlobPattern> getExcludes() {
         try {
             LOGGER.debug("reading excludes from [{}]", excludesFile);
-            return readPatterns(excludesFile);
+            return GlobPattern.readPatterns(excludesFile);
         } catch (IOException e) {
             LOGGER.warn("error reading excludes patterns", e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Return the location of the identify file.
+     * 
+     * @return the identity file.
+     */
+    private File getIdentityFile() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new File(Compat.CONFIG_PATH, "key.ppk");
+        }
+        return new File(Compat.CONFIG_PATH, "id_rsa");
+    }
+
+    /**
+     * Generate a finger print from id_rsa file.
+     * 
+     * @return the finger print.
+     * @throws APIException
+     */
+    public String getIdentityFingerPrint() {
+        File file = new File(Compat.CONFIG_PATH, "id_rsa.pub");
+        if (!file.isFile() || !file.canRead()) {
+            LOGGER.warn("public key [{}] is not accessible", file);
+            return "";
+        }
+        try {
+            RSAPublicKey publicKey = Keygen.fromPublicIdRsa(file);
+            return Keygen.getFingerPrint(publicKey);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
+            LOGGER.warn("cannot read key [{}] ", file, e);
+        }
+        return "";
     }
 
     /**
@@ -422,7 +405,7 @@ public class API {
     public List<GlobPattern> getIncludes() {
         try {
             LOGGER.debug("reading includes from [{}]", includesFile);
-            return readPatterns(includesFile);
+            return GlobPattern.readPatterns(includesFile);
         } catch (IOException e) {
             LOGGER.warn("error reading includes patterns", e);
             return Collections.emptyList();
@@ -438,7 +421,7 @@ public class API {
      * @return
      */
     protected String getRemotehost() {
-        return this.properties.getProperty(REMOTEHOST, DEFAULT_REMOTEHOST);
+        return this.properties.getProperty(PROPERTY_REMOTEHOST, REMOTEHOST_DEFAULT);
     }
 
     /**
@@ -447,7 +430,16 @@ public class API {
      * @return
      */
     public String getUsername() {
-        return this.properties.getProperty(USERNAME);
+        return this.properties.getProperty(PROPERTY_USERNAME);
+    }
+
+    /**
+     * Check if a backup task is running.
+     * 
+     * @return True if a backup task is running.
+     */
+    public boolean isBackupRunning() {
+        return false;
     }
 
     /**
@@ -475,31 +467,19 @@ public class API {
          * Generate the keys
          */
         LOGGER.debug("generating public and private key for {}", computername);
-        File idrsaFile = new File(OSUtils.CONFIG_PATH, "id_rsa.pub");
-        File identityFile = new File(OSUtils.CONFIG_PATH, "id_rsa");
-        File puttyFile = new File(OSUtils.CONFIG_PATH, "key.ppk");
+        File idrsaFile = new File(Compat.CONFIG_PATH, "id_rsa.pub");
+        File identityFile = new File(Compat.CONFIG_PATH, "id_rsa");
+        File puttyFile = new File(Compat.CONFIG_PATH, "key.ppk");
         String rsadata = null;
         try {
             // Generate a key pair.
             KeyPair pair = Keygen.generateRSA();
             // Generate a simple id_rsa.pub file.
             Keygen.toPublicIdRsa((RSAPublicKey) pair.getPublic(), computername, idrsaFile);
-            idrsaFile.setExecutable(false, false);
-            idrsaFile.setReadable(false, false);
-            idrsaFile.setWritable(false, false);
-            idrsaFile.setReadable(true, true);
             // Generate a private key file.
             Keygen.toPrivatePEM((RSAPrivateKey) pair.getPrivate(), identityFile);
-            identityFile.setExecutable(false, false);
-            identityFile.setReadable(false, false);
-            identityFile.setWritable(false, false);
-            identityFile.setReadable(true, true);
             // Generate a Putty private key file.
             Keygen.toPrivatePuttyKey(pair, computername, puttyFile);
-            puttyFile.setExecutable(false, false);
-            puttyFile.setReadable(false, false);
-            puttyFile.setWritable(false, false);
-            puttyFile.setReadable(true, true);
             // Read RSA pub key.
             rsadata = FileUtils.readFileToString(idrsaFile);
         } catch (NoSuchAlgorithmException e) {
@@ -510,50 +490,29 @@ public class API {
             throw new APIException("fail to generate the keys", e);
         }
 
-        /*
-         * Send SSH key to minarca.
-         */
+        // Set permissions (otherwise SSH complains about file permissions)
+        if (SystemUtils.IS_OS_LINUX) {
+            for (File f : Arrays.asList(idrsaFile, identityFile, puttyFile)) {
+                f.setExecutable(false, false);
+                f.setReadable(false, false);
+                f.setWritable(false, false);
+                f.setReadable(true, true);
+            }
+        }
+
+        // Send SSH key to minarca server using web service.
         try {
             client.addSSHKey(computername, rsadata);
         } catch (IOException e) {
             throw new APIException("fail to send SSH key to minarca", e);
         }
 
-        /*
-         * Generate configuration file.
-         */
+        // Generate configuration file.
         LOGGER.debug("saving configuration [{}][{}][{}]", computername, client.getUsername(), getRemotehost());
         setUsername(client.getUsername());
         setComputerName(computername);
         setRemotehost(getRemotehost());
 
-    }
-
-    /**
-     * Internal method used to read patterns.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
-     */
-    private List<GlobPattern> readPatterns(File file) throws IOException {
-        FileInputStream in = new FileInputStream(file);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()));
-        List<GlobPattern> list = new ArrayList<GlobPattern>();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (line.startsWith("#")) {
-                continue;
-            }
-            try {
-                list.add(new GlobPattern(line));
-            } catch (IllegalArgumentException e) {
-                // Swallow
-                LOGGER.warn("invalid pattern [{}] discarded", line);
-            }
-        }
-        reader.close();
-        return list;
     }
 
     /**
@@ -563,7 +522,7 @@ public class API {
      */
     private void save() throws IOException {
         LOGGER.debug("writing config to [{}]", confFile);
-        Writer writer = new FileWriterWithEncoding(confFile, Charset.defaultCharset());
+        Writer writer = new FileWriterWithEncoding(confFile, Compat.CHARSET_DEFAULT);
         this.properties.store(writer, "Backup configuration. Please do " + "not change this configuration file manually.");
         writer.close();
     }
@@ -576,9 +535,9 @@ public class API {
      */
     public void setComputerName(String value) throws APIException {
         if (value == null) {
-            this.properties.remove(COMPUTERNAME);
+            this.properties.remove(PROPERTY_COMPUTERNAME);
         } else {
-            this.properties.setProperty(COMPUTERNAME, value);
+            this.properties.setProperty(PROPERTY_COMPUTERNAME, value);
         }
         try {
             save();
@@ -596,7 +555,7 @@ public class API {
     public void setExcludes(List<GlobPattern> patterns) throws APIException {
         try {
             LOGGER.debug("writing excludes to [{}]", excludesFile);
-            writePatterns(excludesFile, patterns);
+            GlobPattern.writePatterns(excludesFile, patterns);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
@@ -611,7 +570,7 @@ public class API {
     public void setIncludes(List<GlobPattern> patterns) throws APIException {
         try {
             LOGGER.debug("writing includes to [{}]", includesFile);
-            writePatterns(includesFile, patterns);
+            GlobPattern.writePatterns(includesFile, patterns);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
@@ -624,10 +583,10 @@ public class API {
      * @throws APIException
      */
     public void setRemotehost(String value) throws APIException {
-        if (value == null || value.equals(DEFAULT_REMOTEHOST)) {
-            this.properties.remove(REMOTEHOST);
+        if (value == null || value.equals(REMOTEHOST_DEFAULT)) {
+            this.properties.remove(PROPERTY_REMOTEHOST);
         } else {
-            this.properties.setProperty(REMOTEHOST, value);
+            this.properties.setProperty(PROPERTY_REMOTEHOST, value);
         }
         try {
             save();
@@ -644,15 +603,41 @@ public class API {
      */
     public void setUsername(String value) throws APIException {
         if (value == null) {
-            this.properties.remove(USERNAME);
+            this.properties.remove(PROPERTY_USERNAME);
         } else {
-            this.properties.setProperty(USERNAME, value);
+            this.properties.setProperty(PROPERTY_USERNAME, value);
         }
         try {
             save();
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
+    }
+
+    /**
+     * Check if this computer is properly link to minarca.net.
+     * 
+     * @throws APIException
+     */
+    public void testServer() throws APIException {
+
+        // Get the config value.
+        String username = this.getUsername();
+        String remotehost = this.getRemotehost();
+        String computerName = this.getComputerName();
+
+        // Compute the path.
+        String path = "/home/" + username + "/" + computerName;
+
+        // Get reference to the identity file to be used by ssh or plink.
+        File identityFile = getIdentityFile();
+
+        // Create a new instance of rdiff backup to test and run the backup.
+        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, path, identityFile);
+
+        // Check the remote server.
+        rdiffbackup.testServer();
+
     }
 
     /**
@@ -673,21 +658,5 @@ public class API {
         // Delete task
         Scheduler scheduler = Scheduler.getInstance();
         scheduler.delete();
-    }
-
-    /**
-     * Internal method used to write the patterns into a file.
-     * 
-     * @param file
-     * @param pattern
-     * @throws IOException
-     */
-    private void writePatterns(File file, List<GlobPattern> pattern) throws IOException {
-        FileWriterWithEncoding writer = new FileWriterWithEncoding(file, Charset.defaultCharset());
-        for (GlobPattern line : pattern) {
-            writer.append(line.value());
-            writer.append(SystemUtils.LINE_SEPARATOR);
-        }
-        writer.close();
     }
 }

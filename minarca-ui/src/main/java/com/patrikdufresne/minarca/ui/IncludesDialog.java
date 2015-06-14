@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.GlobPattern;
-import com.patrikdufresne.minarca.core.internal.OSUtils;
+import com.patrikdufresne.minarca.core.internal.Compat;
 
 /**
  * Dialog used to display and change includes patterns.
@@ -280,7 +280,7 @@ public class IncludesDialog extends TrayDialog {
         this.viewer.setContentProvider(createContentProvider());
         this.viewer.setLabelProvider(createLabelProvider());
         this.viewer.setCheckStateProvider(createCheckStateProvider());
-        this.viewer.setInput(new File[] { new File(OSUtils.ROOT_PATH) });
+        this.viewer.setInput(new File[] { Compat.ROOT_FILE });
         this.viewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         this.viewer.addCheckStateListener(createCheckStateListener());
 

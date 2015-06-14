@@ -8,9 +8,7 @@ package com.patrikdufresne.minarca.core.internal;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -20,6 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
 
+import static com.patrikdufresne.minarca.core.APIException.*;
+
+import com.patrikdufresne.minarca.core.internal.StreamHandler.PromptHandler;
+
 /**
  * Utility class to run rdiffbackup command line.
  * 
@@ -28,14 +30,12 @@ import com.patrikdufresne.minarca.core.APIException;
  */
 public class RdiffBackup {
 
-    private static final String ERROR_CONNECTION_ABANDONED = "Connection abandoned.";
-
     private static final transient Logger LOGGER = LoggerFactory.getLogger(RdiffBackup.class);
 
     /**
      * Executable name representing plink.
      */
-    private static final String PLINK_EXE = "plink.exe";
+    private static final String PLINK = "plink.exe";
     /**
      * Property used to define the location of putty. Mainly used for development.
      */
@@ -44,7 +44,7 @@ public class RdiffBackup {
     /**
      * Property used to define the location of rdiff-backup.
      */
-    private static final String PROPERTY_RDIFF_BACKUP_LOCATION = "putty.location";
+    private static final String PROPERTY_RDIFF_BACKUP_LOCATION = "rdiffbackup.location";
 
     /**
      * Executable name to launch rdiff-backup (for current platform)
@@ -53,21 +53,31 @@ public class RdiffBackup {
     static {
         if (SystemUtils.IS_OS_WINDOWS) {
             RDIFF_BACKUP = "rdiff-backup.exe";
-        } else if (SystemUtils.IS_OS_LINUX) {
-            RDIFF_BACKUP = "rdiff-backup";
         } else {
+            // Otherwise Linux
             RDIFF_BACKUP = "rdiff-backup";
         }
     }
 
     /**
-     * Registry data (Hardcoded public key).
+     * Determine the location of plink.exe.
+     * <p>
+     * This implementation look into into the follow directory: putty location, local directory,
      */
-    private static final String REG_DATA = "0x10001,0xe6a143f2d6946bee9bba486e7ce60a896985d2ab91065b26d9bf0872188540a56e76bf535f825a1e80506ca3c573a84fc590b4b4d75d2934adb4dbabcb55e07d1edb83ab9688fce8523f48f335ef55a1adaf5daba1ac6cf82709ab0d1570a3f67f5c91b4d7a30f7945c6e5f720911d75958413acc0bc6cd09418ee1f332a8466bfe10a31d116faffd51ed066045119708205a799817587bedd150620d71b62d481618eeefe39fbb7d098dddf83e6e163e3c1ef9edf70dcbf641cf1e36386b89c437452df2886d1f2ea3a0ba5aae76a17f9853b28521df7ff0f9920a5e4b74a64b8509050c9e619779f0fc738cd9b30a9262bea307338708ef583726cf68d7d4f";
+    private static File getPlinkLocation() {
+        return Compat.searchFile(PLINK, System.getProperty(PROPERTY_PUTTY_LOCATION), "./putty-0.63/", "./bin/");
+    }
+
     /**
-     * Registry value (Hardcoded public key)
+     * Determine the location of rdiff-backup executable.
+     * 
+     * @return
      */
-    private static final String REG_VALUE = "rsa2@22:fente.patrikdufresne.com";
+    private static File getRdiffbackupLocation() {
+        return Compat.searchFile(RDIFF_BACKUP, System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
+    }
+
+    private File identityFile;
 
     /**
      * The computer name to be backup.
@@ -83,8 +93,6 @@ public class RdiffBackup {
      * The username for authentication.
      */
     private String username;
-
-    private File identityFile;
 
     /**
      * Create a new instance of rdiffbackup.
@@ -110,18 +118,45 @@ public class RdiffBackup {
     }
 
     /**
-     * Add minarca host public key to registry.
-     * <p>
-     * PLink store the known host to registry. Since we are using current user and SYSTEM user to connect to minarca, we
-     * need to add the key to both hives.
-     * 
-     * @throws APIException
+     * This method is called when the host ssh key must be accepted.
      */
-    public void addKnownHosts() throws APIException {
-        // Add key to SYSTEM user
-        OSUtils.reg("add", "HKU\\S-1-5-18\\Software\\SimonTatham\\PuTTY\\SshHostKeys", "/v", REG_VALUE, "/d", REG_DATA, "/f");
-        // Add key to current user
-        OSUtils.reg("add", "HKCU\\Software\\SimonTatham\\PuTTY\\SshHostKeys", "/v", REG_VALUE, "/d", REG_DATA, "/f");
+    private void acceptServerKey() throws APIException {
+        // Construct the command line.
+        List<String> args = new ArrayList<String>();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            File plink = getPlinkLocation();
+            if (plink == null) throw new APIException.PlinkMissingException();
+            args.add(plink.toString());
+            args.add("-2");
+            args.add("-i");
+            args.add(identityFile.toString());
+        } else {
+            args.add("ssh");
+            args.add("-i");
+            args.add(identityFile.toString());
+        }
+        args.add(this.username + "@" + this.remotehost + "::" + this.path);
+
+        // Create a prompt handle to accept of refused the key according to it's fingerprint.
+        PromptHandler handler = new PromptHandler() {
+
+            boolean accepthostkey = false;
+
+            @Override
+            public String handle(String prompt) {
+                if (prompt.contains("ssh-rsa 2048 7d:c7:dd:d4:72:22:10:f4:a3:a5:b5:5d:de:2f:83:39")) {
+                    accepthostkey = true;
+                } else if (prompt.contains("Store key in cache? (y/n)")) {
+                    if (accepthostkey) {
+                        return "y" + SystemUtils.LINE_SEPARATOR;
+                    } else {
+                        return "n" + SystemUtils.LINE_SEPARATOR;
+                    }
+                }
+                return null;
+            }
+        };
+        execute(args, null, handler);
     }
 
     /**
@@ -130,7 +165,14 @@ public class RdiffBackup {
      * @throws APIException
      */
     public void backup(File excludes, File includes) throws APIException {
+        // Get location of rdiff-backup.
+        File rdiffbackup = getRdiffbackupLocation();
+        if (rdiffbackup == null) {
+            throw new APIException("missing rdiff-backup");
+        }
+        // Construct the command line.
         List<String> args = new ArrayList<String>();
+        args.add(rdiffbackup.toString());
         args.add("-v");
         args.add("5");
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -139,11 +181,10 @@ public class RdiffBackup {
             args.add("--no-acls");
             File plink = getPlinkLocation();
             args.add("--remote-schema");
-            args.add(plink + " -batch -i '" + identityFile + "' %s rdiff-backup --server");
+            args.add(plink + " -2 -batch -i \"" + identityFile + "\" %s rdiff-backup --server");
         } else {
-            // TODO I'm questioning the compress here, since rdiff-backup is already compressing everything.
             args.add("--remote-schema");
-            args.add("ssh -C -i '" + identityFile + "' %s rdiff-backup --server");
+            args.add("ssh -i '" + identityFile + "' %s rdiff-backup --server");
         }
         args.add("--exclude-globbing-filelist");
         args.add(excludes.toString());
@@ -151,33 +192,17 @@ public class RdiffBackup {
         args.add(includes.toString());
         if (SystemUtils.IS_OS_WINDOWS) {
             args.add("--exclude");
-            args.add("C:/**");
-            args.add("C:/");
+            // C:/**
+            args.add(Compat.ROOT.replace("\\", "/") + "**");
+            // C:/
+            args.add(Compat.ROOT.replace("\\", "/"));
         } else {
             args.add("--exclude");
             args.add("/*");
             args.add("/");
         }
         args.add(this.username + "@" + this.remotehost + "::" + this.path);
-        rdiffbackup(args, new File("/"));
-    }
-
-    /**
-     * Determine the location of plink.exe.
-     * <p>
-     * This implementation look into into the follow directory: putty location, local directory,
-     */
-    private File getPlinkLocation() {
-        return OSUtils.getFileLocation(PLINK_EXE, System.getProperty(PROPERTY_PUTTY_LOCATION), "./putty-0.63/", "./bin/");
-    }
-
-    /**
-     * Determine the location of rdiff-backup executable.
-     * 
-     * @return
-     */
-    private File getRdiffbackupLocation() {
-        return OSUtils.getFileLocation(RDIFF_BACKUP, System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
+        execute(args, Compat.ROOT_FILE, null);
     }
 
     /**
@@ -187,34 +212,31 @@ public class RdiffBackup {
      *            the arguments list.
      * @throws APIException
      */
-    private void rdiffbackup(List<String> args, File wd) throws APIException {
-        Validate.notNull(args);
-
-        // Get location of rdiff-backup.
-        File rdiffbackup = getRdiffbackupLocation();
-        if (rdiffbackup == null) {
-            throw new APIException("missing rdiff-backup");
-        }
-        // Build the command line.
-        List<String> command = new ArrayList<String>();
-        command.add(rdiffbackup.getAbsolutePath());
-        command.addAll(args);
-
+    private void execute(List<String> command, File workingDir, PromptHandler handler) throws APIException {
+        Validate.notNull(command);
+        Validate.isTrue(command.size() > 0);
         LOGGER.debug("executing {}", StringUtils.join(command, " "));
-
         try {
             // Execute the process.
-            Process p = new ProcessBuilder().command(command).directory(wd).redirectErrorStream(true).start();
+            ProcessBuilder builder = new ProcessBuilder();
+            if (workingDir != null) {
+                builder.directory(workingDir);
+            }
+            Process p = builder.command(command).redirectErrorStream(true).start();
             // Attach stream handle to answer a password when prompted
-            StreamHandler sh = new StreamHandler(p);
+            StreamHandler sh = new StreamHandler(p, handler);
             sh.start();
             // Wait for process to complete
             int returnCode = p.waitFor();
             String output = sh.getOutput();
-            if (returnCode != 0) {
+            // Check for error message.
+            if (output.contains("The server's host key is not cached in the registry.")) {
+                throw new UntrustedHostKey();
+            } else if (output.contains("Connection abandoned.")) {
                 throw new APIException(sh.getOutput());
             }
-            if (output.contains(ERROR_CONNECTION_ABANDONED)) {
+            // Check return code,
+            if (returnCode != 0) {
                 throw new APIException(sh.getOutput());
             }
         } catch (IOException e) {
@@ -231,18 +253,39 @@ public class RdiffBackup {
      * @throws APIException
      */
     public void testServer() throws APIException {
+        // Get location of rdiff-backup.
+        File rdiffbackup = getRdiffbackupLocation();
+        if (rdiffbackup == null) {
+            throw new APIException("missing rdiff-backup");
+        }
+        // Construct the command line.
         List<String> args = new ArrayList<String>();
+        args.add(rdiffbackup.toString());
+        args.add("-v");
+        args.add("5");
         args.add("--remote-schema");
         if (SystemUtils.IS_OS_WINDOWS) {
             File plink = getPlinkLocation();
-            args.add(plink + " -batch -i '" + identityFile + "' %s rdiff-backup --server");
+            args.add(plink + " -2 -batch -i \"" + identityFile + "\" %s rdiff-backup --server");
+            // -2 : Force SSHv2
+            // batch : avoid user interaction
+            // -i : identity file, ssh private key
         } else {
             // TODO I'm questioning the compress here, since rdiff-backup is already compressing everything.
             args.add("ssh -C -i '" + identityFile + "' %s rdiff-backup --server");
         }
         args.add("--test-server");
         args.add(this.username + "@" + this.remotehost + "::" + this.path);
-        rdiffbackup(args, new File("/"));
-    }
 
+        // Run the test.
+        try {
+            execute(args, new File("/"), null);
+        } catch (UntrustedHostKey e) {
+            // Try to accept the key
+            acceptServerKey();
+            // Re run the operation
+            execute(args, Compat.ROOT_FILE, null);
+        }
+
+    }
 }

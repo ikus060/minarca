@@ -31,8 +31,6 @@ import com.patrikdufresne.minarca.core.APIException;
  */
 public class SchedulerWindows extends Scheduler {
 
-    private static final String PATTERN_ERROR = "(ERROR|ERREUR)";
-
     private static class SchTaskEntry {
 
         private static final int TASK_TO_RUN = 8;
@@ -74,12 +72,16 @@ public class SchedulerWindows extends Scheduler {
     /**
      * Executable launch to start backup.
      */
-    private static final String MINARCA_EXE;
+    private static final String MINARCA;
     static {
-        if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
-            MINARCA_EXE = "minarca64.exe";
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
+                MINARCA = "minarca64.exe";
+            } else {
+                MINARCA = "minarca.exe";
+            }
         } else {
-            MINARCA_EXE = "minarca.exe";
+            MINARCA = "minarca.sh";
         }
     }
 
@@ -116,10 +118,17 @@ public class SchedulerWindows extends Scheduler {
             // Create the task.
             data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM");
         } else {
-            data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM", "/F");
+            // Otherwise 
+            if (Compat.IS_ADMIN) {
+                // If running in admin mode, run minarca backup as SYSTEM user.
+                data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM", "/F");
+            } else {
+                // Otherwise, run minarca backup as current user.
+                data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/F");
+            }
         }
         // FIXME looking at command output is not the best since it change according to user language.
-        if (data.matches(PATTERN_ERROR)) {
+        if (data.matches("(ERROR|ERREUR)")) {
             throw new APIException("fail to schedule task");
         }
     }
@@ -223,7 +232,7 @@ public class SchedulerWindows extends Scheduler {
     private String getCommand() throws APIException {
         File file = getExeLocation();
         if (file == null) {
-            throw new APIException(_("{0} is missing ", MINARCA_EXE));
+            throw new APIException(_("{0} is missing ", MINARCA));
         }
         StringBuilder buf = new StringBuilder();
         buf.append("\\\"");
@@ -290,7 +299,7 @@ public class SchedulerWindows extends Scheduler {
     }
 
     protected File getExeLocation() {
-        return OSUtils.getFileLocation(MINARCA_EXE, System.getProperty(PROPERTY_MINARCA_EXE_LOCATION), "./bin/", ".");
+        return Compat.searchFile(MINARCA, System.getProperty(PROPERTY_MINARCA_EXE_LOCATION), "./bin/", ".");
     }
 
 }

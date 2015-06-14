@@ -22,22 +22,13 @@ package com.patrikdufresne.minarca;
 
 import static com.patrikdufresne.minarca.Localized._;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.ILogger;
 import org.eclipse.jface.util.Policy;
-import org.eclipse.jface.window.Window;
 import org.eclipse.jface.window.WindowManager;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +37,8 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
-import com.patrikdufresne.minarca.core.internal.OSUtils;
 import com.patrikdufresne.minarca.ui.DetailMessageDialog;
+import com.patrikdufresne.minarca.ui.Images;
 import com.patrikdufresne.minarca.ui.PreferenceDialog;
 import com.patrikdufresne.minarca.ui.SetupDialog;
 
@@ -58,12 +49,6 @@ import com.patrikdufresne.minarca.ui.SetupDialog;
  * 
  */
 public class Main {
-
-    public static final String MINARCA_16_PNG = "minarca_16.png";
-    public static final String MINARCA_32_PNG = "minarca_32.png";
-    public static final String MINARCA_48_PNG = "minarca_48.png";
-    public static final String MINARCA_128_PNG = "minarca_128.png";
-    public static final String MINARCA_128_WHITE_PNG = "minarca_128_w.png";
 
     static final transient Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -140,21 +125,12 @@ public class Main {
      * This if the main function being called when minarca application is called with --backup or -b arguments.
      */
     private void backup() {
-
-        // Check OS
-        if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
-            LOGGER.warn("unsupported OS");
-            System.err.println(_("Minarca doesn't support you OS. This application will close."));
-            return;
-        }
-
-        // Check user permission
-        if (!OSUtils.IS_ADMIN) {
-            LOGGER.warn("user is not admin");
-            System.err.println(_("You don't have sufficient permissions to execute this application!"));
-            System.err.println(_("Minarca required to be run with administrator privilege. You may try to execute this application with a different user."));
-            System.err.println(_("This application will close."));
-            return;
+        // Check if current OS and running environment is valid.
+        try {
+            API.checkEnv();
+        } catch (APIException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
 
         // Check if minarca is properly configure (from our point of view).
@@ -163,7 +139,7 @@ public class Main {
         } catch (APIException e) {
             // Show error message (usually localized).
             System.err.println(e.getMessage());
-            System.exit(1);
+            System.exit(2);
         }
 
         // Run the backup.
@@ -172,7 +148,7 @@ public class Main {
         } catch (APIException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            System.exit(2);
+            System.exit(3);
         }
 
     }
@@ -217,25 +193,6 @@ public class Main {
         });
     }
 
-    protected void setDefaultImages() {
-        // Register image
-        ImageRegistry ir = JFaceResources.getImageRegistry();
-        ir.put(MINARCA_16_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_16_PNG));
-        ir.put(MINARCA_32_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_32_PNG));
-        ir.put(MINARCA_48_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_48_PNG));
-        ir.put(MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_128_PNG));
-        ir.put(MINARCA_128_WHITE_PNG, ImageDescriptor.createFromFile(Main.class, MINARCA_128_WHITE_PNG));
-
-        List<Image> images = new ArrayList<Image>();
-        images.add(ir.get(MINARCA_128_PNG));
-        images.add(ir.get(MINARCA_48_PNG));
-        images.add(ir.get(MINARCA_32_PNG));
-        images.add(ir.get(MINARCA_16_PNG));
-
-        // Sets images.
-        Window.setDefaultImages(images.toArray(new Image[images.size()]));
-    }
-
     /**
      * This function start the application.
      * 
@@ -248,28 +205,17 @@ public class Main {
         final Display display = new Display();
 
         // Sets default windows images
-        setDefaultImages();
+        Images.setDefaultImages();
 
         // Update logger
         updateJFacePolicy();
 
-        // Check OS
-        if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
-            LOGGER.warn("unsupported OS");
-            MessageDialog.openError(null, Display.getAppName(), _("Minarca doesn't support you OS. This application will close."));
-            return;
-        }
-
-        // Check user permission
-        if (!OSUtils.IS_ADMIN) {
-            LOGGER.warn("user is not admin");
-            DetailMessageDialog
-                    .openWarning(
-                            null,
-                            Display.getAppName(),
-                            _("You don't have sufficient permissions to execute this application!"),
-                            _("Minarca required to be run with administrator privilege. You may try to execute this application with a different user. This application will close."));
-            return;
+        // Check running environment.
+        try {
+            API.checkEnv();
+        } catch (APIException e) {
+            MessageDialog.openError(null, Display.getAppName(), e.getMessage());
+            System.exit(1);
         }
 
         WindowManager winManager = null;

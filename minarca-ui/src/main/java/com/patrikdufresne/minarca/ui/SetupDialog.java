@@ -24,18 +24,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.patrikdufresne.minarca.Main;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.ApplicationException;
 import com.patrikdufresne.minarca.core.Client;
-import com.patrikdufresne.minarca.core.internal.OSUtils;
+import com.patrikdufresne.minarca.core.internal.Compat;
 
 /**
  * Dialog used to configure the application the first time the user open it. It's similar to a wizard.
@@ -151,7 +149,7 @@ public class SetupDialog extends Dialog {
         // App icon
         Label icon = this.ft.createLabel(parent, null);
         //JFaceResources.getImageRegistry().put(Main.MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class, Main.MINARCA_128_PNG));
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
+        icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
@@ -221,7 +219,7 @@ public class SetupDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(parent, null);
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
+        icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
@@ -237,7 +235,7 @@ public class SetupDialog extends Dialog {
         final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
         computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
         computerNameText.setMessage(_("Computer name"));
-        computerNameText.setText(OSUtils.COMPUTER_NAME);
+        computerNameText.setText(Compat.COMPUTER_NAME);
         computerNameText.setFocus();
 
         // Sign in button
@@ -290,7 +288,7 @@ public class SetupDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(parent, null);
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
+        icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message

@@ -25,9 +25,28 @@ import org.slf4j.LoggerFactory;
  */
 public class StreamHandler extends Thread {
 
-    private static final int CR = 10;
+    /**
+     * Interface used to allow client to send data to the stream.
+     * 
+     * @author Patrik Dufresne
+     *
+     */
+    public interface PromptHandler {
 
+        /**
+         * Called everytime the prompt is updated (may be called for each new char added to the stream.)
+         * 
+         * @param prompt
+         *            the current prompt line.
+         * @return The value to be send (or null if nothing to sent).
+         */
+        public String handle(String prompt);
+
+    }
+
+    private static final int CR = 10;
     private static final int LF = 13;
+
     /**
      * Logger
      */
@@ -40,11 +59,14 @@ public class StreamHandler extends Thread {
      * Process to monitor.
      */
     private final Process p;
-
     /**
      * Charset used to read process output.
      */
     private final Charset charset;
+    /**
+     * Use to prompt.
+     */
+    private PromptHandler handler;
 
     /**
      * Process stream handler.
@@ -53,7 +75,15 @@ public class StreamHandler extends Thread {
      *            the process.
      */
     public StreamHandler(Process p) {
-        this(p, OSUtils.PROCESS_CHARSET);
+        this(p, Compat.CHARSET_PROCESS, null);
+    }
+
+    public StreamHandler(Process p, PromptHandler handler) {
+        this(p, Compat.CHARSET_PROCESS, handler);
+    }
+
+    public StreamHandler(Process p, Charset charset) {
+        this(p, charset, null);
     }
 
     /**
@@ -61,9 +91,10 @@ public class StreamHandler extends Thread {
      * 
      * @param p
      */
-    public StreamHandler(Process p, Charset charset) {
+    public StreamHandler(Process p, Charset charset, PromptHandler handler) {
         Validate.notNull(this.p = p);
         Validate.notNull(this.charset = charset);
+        this.handler = handler;
     }
 
     /**
@@ -80,11 +111,12 @@ public class StreamHandler extends Thread {
     @Override
     public void run() {
         synchronized (output) {
-            boolean answered = false;
             // Read stream line by line without buffer (otherwise it block).
             try {
                 Writer out = new BufferedWriter(new OutputStreamWriter(this.p.getOutputStream()));
-                out.close();
+                if (handler == null) {
+                    out.close();
+                }
 
                 InputStreamReader in = new InputStreamReader(this.p.getInputStream(), charset);
 
@@ -103,23 +135,13 @@ public class StreamHandler extends Thread {
                     } else {
                         buf.append((char) b);
                     }
-                    if (!answered) {
+                    if (handler != null) {
                         String prompt = buf.toString();
-                        //
-                        if (prompt.endsWith("password: ")) {
+                        String answer = handler.handle(prompt);
+                        if (answer != null) {
                             LOGGER.debug(prompt);
-                            // out.append(password);
-                            out.append(SystemUtils.LINE_SEPARATOR);
-                            out.flush();
-                            out.close();
-                            // Reset the buffer
-                            buf.setLength(0);
-                            answered = true;
-                        }
-                        // Check if asking for finger print confirmation.
-                        if (prompt.contains("Store key in cache? (y/n)")) {
-                            // Press enter to abandon.
-                            out.append(SystemUtils.LINE_SEPARATOR);
+                            // LOGGER.debug(answer);
+                            out.append(answer);
                             out.flush();
                             buf.setLength(0);
                         }

@@ -5,6 +5,8 @@
  */
 package com.patrikdufresne.minarca.core;
 
+import static com.patrikdufresne.minarca.Localized._;
+
 public class APIException extends Exception {
 
     private static final long serialVersionUID = 1L;
@@ -47,6 +49,48 @@ public class APIException extends Exception {
         public MissConfiguredException(String message, Exception cause) {
             super(message, cause);
         }
+    }
+
+    /**
+     * Raised when plink.exe is missing.
+     * 
+     * @author Patrik Dufresne
+     *
+     */
+    public static class PlinkMissingException extends APIException {
+
+        public PlinkMissingException() {
+            super("plink is missing");
+        }
+
+    }
+
+    public static class UntrustedHostKey extends APIException {
+
+        // TODO Add mos arguments: fingerprint, hostname
+        public UntrustedHostKey() {
+            super("remote SSH host is not trusted");
+        }
+
+    }
+
+    /**
+     * Raised when the running OS is not supported.
+     */
+    public static class UnsupportedOS extends APIException {
+
+        public UnsupportedOS() {
+            super(_("Minarca doesn't support you OS. This application will close."));
+        }
+
+    }
+
+    public static class UnsufficientPermissons extends APIException {
+
+        public UnsufficientPermissons() {
+            super(_("You don't have sufficient permissions to execute this application!"));
+        }
+
     }
 
     public APIException(String message) {

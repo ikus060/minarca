@@ -37,7 +37,6 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.patrikdufresne.minarca.Main;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.GlobPattern;
@@ -139,7 +138,7 @@ public class PreferenceDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(comp, null);
-        icon.setImage(JFaceResources.getImage(Main.MINARCA_128_PNG));
+        icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
         icon.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 
         // App name
