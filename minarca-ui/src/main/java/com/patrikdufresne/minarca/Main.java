@@ -125,6 +125,9 @@ public class Main {
      * This if the main function being called when minarca application is called with --backup or -b arguments.
      */
     private void backup() {
+
+        LOGGER.info("starting backup");
+
         // Check if current OS and running environment is valid.
         try {
             API.checkEnv();
@@ -149,6 +152,8 @@ public class Main {
             // TODO Auto-generated catch block
             e.printStackTrace();
             System.exit(3);
+        } finally {
+            LOGGER.info("backup completed");
         }
 
     }
@@ -200,6 +205,8 @@ public class Main {
      */
     private void startui(String[] args) {
 
+        LOGGER.info("starting ui");
+        
         Display.setAppName(_("minarca"));
         Display.setAppVersion(getCurrentVersion());
         final Display display = new Display();
@@ -246,6 +253,7 @@ public class Main {
                 winManager.close();
             }
             display.dispose();
+            LOGGER.info("closing");
         }
 
     }
