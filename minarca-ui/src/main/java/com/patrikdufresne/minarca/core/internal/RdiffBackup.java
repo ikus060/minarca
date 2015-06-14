@@ -184,7 +184,7 @@ public class RdiffBackup {
             args.add("--no-acls");
             File plink = getPlinkLocation();
             args.add("--remote-schema");
-            args.add(plink + " -2 -batch -i \"" + identityFile + "\" %s rdiff-backup --server");
+            args.add(plink + " -2 -batch -i \\\"" + identityFile + "\\\" %s rdiff-backup --server");
         } else {
             args.add("--remote-schema");
             args.add("ssh -i '" + identityFile + "' %s rdiff-backup --server");
@@ -278,7 +278,7 @@ public class RdiffBackup {
         args.add("--remote-schema");
         if (SystemUtils.IS_OS_WINDOWS) {
             File plink = getPlinkLocation();
-            args.add(plink + " -2 -batch -i \"" + identityFile + "\" %s rdiff-backup --server");
+            args.add(plink + " -2 -batch -i \\\"" + identityFile + "\\\" %s rdiff-backup --server");
             // -2 : Force SSHv2
             // batch : avoid user interaction
             // -i : identity file, ssh private key
@@ -291,7 +291,7 @@ public class RdiffBackup {
         // Run the test.
         try {
             LOGGER.info("test server");
-            execute(args, new File("/"), null);
+            execute(args, Compat.ROOT_FILE, null);
         } catch (UntrustedHostKey e) {
             // Try to accept the key
             acceptServerKey();
