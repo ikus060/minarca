@@ -182,15 +182,13 @@ Function .onInit
 
   ; When running 64bits, read and write to 64bits registry.
   SetRegView 64
-  ; Install for all user
-  SetShellVarContext all
+  
+  ; Install for current user
+  SetShellVarContext current
 
   ; Set installation directory according to bitness
   ${If} $InstDir == ""
-  	StrCpy $InstDir "$PROGRAMFILES\${SHORTNAME}"
-    ${If} ${RunningX64}
-        StrCpy $InstDir "$PROGRAMFILES64\${SHORTNAME}"
-    ${EndIf}
+  	StrCpy $InstDir "$LOCALAPPDATA\${SHORTNAME}"
   ${EndIf}
   
   !insertmacro MUI_LANGDLL_DISPLAY
@@ -227,8 +225,9 @@ Function un.onInit
 
   ; When running 64bits, read and write to 64bits registry.
   SetRegView 64
+  
   ; Uninstall for all user
-  SetShellVarContext all
+  SetShellVarContext current
 
   !insertmacro MUI_UNGETLANGUAGE
   
