@@ -15,11 +15,4 @@
 			<supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"/> 
 		</application> 
 	</compatibility>
-	<v3:trustInfo xmlns:v3="urn:schemas-microsoft-com:asm.v3">
-		<v3:security>
-			<v3:requestedPrivileges>
-			<v3:requestedExecutionLevel level="highestAvailable"/>
-			</v3:requestedPrivileges>
-		</v3:security>
-	</v3:trustInfo>
 </assembly>
