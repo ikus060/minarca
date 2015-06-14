@@ -148,14 +148,17 @@ public class RdiffBackup {
                     accepthostkey = true;
                 } else if (prompt.contains("Store key in cache? (y/n)")) {
                     if (accepthostkey) {
+                        LOGGER.info("accepting remote host key");
                         return "y" + SystemUtils.LINE_SEPARATOR;
                     } else {
+                        LOGGER.info("refusing remote host key");
                         return "n" + SystemUtils.LINE_SEPARATOR;
                     }
                 }
                 return null;
             }
         };
+        LOGGER.info("try to accept remote host key");
         execute(args, null, handler);
     }
 
@@ -202,7 +205,16 @@ public class RdiffBackup {
             args.add("/");
         }
         args.add(this.username + "@" + this.remotehost + "::" + this.path);
-        execute(args, Compat.ROOT_FILE, null);
+        // Run command.
+        try {
+            LOGGER.info("start backup");
+            execute(args, Compat.ROOT_FILE, null);
+        } catch (UntrustedHostKey e) {
+            // Try to accept the key
+            acceptServerKey();
+            // Re run the operation
+            execute(args, Compat.ROOT_FILE, null);
+        }
     }
 
     /**
@@ -276,9 +288,9 @@ public class RdiffBackup {
         }
         args.add("--test-server");
         args.add(this.username + "@" + this.remotehost + "::" + this.path);
-
         // Run the test.
         try {
+            LOGGER.info("test server");
             execute(args, new File("/"), null);
         } catch (UntrustedHostKey e) {
             // Try to accept the key
