@@ -135,7 +135,10 @@ public class RdiffBackup {
             args.add("-i");
             args.add(identityFile.toString());
         }
-        args.add(this.username + "@" + this.remotehost + "::" + this.path);
+        // Remote host
+        args.add(this.username + "@" + this.remotehost);
+        // Command line
+        args.add("exit");
 
         // Create a prompt handle to accept of refused the key according to it's fingerprint.
         PromptHandler handler = new PromptHandler() {
@@ -159,7 +162,11 @@ public class RdiffBackup {
             }
         };
         LOGGER.info("try to accept remote host key");
-        execute(args, null, handler);
+        try {
+            execute(args, null, handler);
+        } catch (UntrustedHostKey e) {
+            // Swallow exception.
+        }
     }
 
     /**
