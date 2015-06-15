@@ -3,7 +3,7 @@
 #
 # Minarca brand plugin
 #
-# Copyright (c) 2015 Patrik Dufresne Service Logiciel All rights reserved.
+# Copyright (C) 2015 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
