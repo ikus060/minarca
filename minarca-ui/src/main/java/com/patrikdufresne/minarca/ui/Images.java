@@ -20,7 +20,7 @@ import com.patrikdufresne.minarca.Main;
  * Utility class to manage images.
  * 
  * @author Patrik Dufresne
- *
+ * 
  */
 public class Images {
 

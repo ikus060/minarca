@@ -55,7 +55,7 @@ public class APIException extends Exception {
      * Raised when plink.exe is missing.
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public static class PlinkMissingException extends APIException {
 

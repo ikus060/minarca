@@ -118,7 +118,7 @@ public class SchedulerWindows extends Scheduler {
             // Create the task.
             data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM");
         } else {
-            // Otherwise 
+            // Otherwise
             if (Compat.IS_ADMIN) {
                 // If running in admin mode, run minarca backup as SYSTEM user.
                 data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM", "/F");

@@ -206,7 +206,7 @@ public class Main {
     private void startui(String[] args) {
 
         LOGGER.info("starting ui");
-        
+
         Display.setAppName(_("minarca"));
         Display.setAppVersion(getCurrentVersion());
         final Display display = new Display();

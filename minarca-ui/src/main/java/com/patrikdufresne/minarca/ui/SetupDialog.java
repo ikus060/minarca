@@ -127,7 +127,7 @@ public class SetupDialog extends Dialog {
         this.comp.setLayout(layout);
 
         createPage1(this.comp);
-        //ft.paintBordersFor(this.comp);
+        // ft.paintBordersFor(this.comp);
 
         return comp;
 
@@ -148,7 +148,8 @@ public class SetupDialog extends Dialog {
 
         // App icon
         Label icon = this.ft.createLabel(parent, null);
-        //JFaceResources.getImageRegistry().put(Main.MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class, Main.MINARCA_128_PNG));
+        // JFaceResources.getImageRegistry().put(Main.MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class,
+        // Main.MINARCA_128_PNG));
         icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 

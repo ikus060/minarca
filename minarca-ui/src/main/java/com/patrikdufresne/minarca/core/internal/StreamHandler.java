@@ -29,7 +29,7 @@ public class StreamHandler extends Thread {
      * Interface used to allow client to send data to the stream.
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public interface PromptHandler {
 
