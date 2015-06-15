@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Patrik Dufresne Service Logiciel. All rights reserved.
+ * Copyright (C) 2015, Patrik Dufresne Service Logiciel inc. All rights reserved.
  * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
  * Use is subject to license terms.
  */
@@ -523,7 +523,7 @@ public class API {
     private void save() throws IOException {
         LOGGER.debug("writing config to [{}]", confFile);
         Writer writer = new FileWriterWithEncoding(confFile, Compat.CHARSET_DEFAULT);
-        this.properties.store(writer, "Copyright (c) 2015 Patrik Dufresne Service Logiciel inc.\r\n"
+        this.properties.store(writer, "Copyright (C) 2015 Patrik Dufresne Service Logiciel inc.\r\n"
                 + "Minarca backup configuration.\r\n"
                 + "Please do not change this configuration file manually.");
         writer.close();
