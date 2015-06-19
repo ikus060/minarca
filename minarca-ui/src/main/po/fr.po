@@ -91,7 +91,7 @@ msgstr "Compte"
 
 #: com/patrikdufresne/minarca/ui/PreferenceDialog.java:184
 msgid "Username: "
-msgstr "Nom d'utilisateur :"
+msgstr "Nom d'utilisateur : "
 
 #: com/patrikdufresne/minarca/ui/PreferenceDialog.java:186
 msgid "Computer name: "
@@ -265,11 +265,11 @@ msgstr ""
 
 #: com/patrikdufresne/minarca/ui/IncludesDialog.java:329
 msgid "(Exclude)"
-msgstr "(Exclure)"
+msgstr "(Exclut)"
 
 #: com/patrikdufresne/minarca/ui/IncludesDialog.java:332
 msgid "(Include)"
-msgstr "(Inclure)"
+msgstr "(Inclut)"
 
 #: com/patrikdufresne/minarca/ui/IncludesDialog.java:380
 #, java-format
