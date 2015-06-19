@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -31,26 +33,72 @@ import com.patrikdufresne.minarca.core.APIException;
  */
 public class SchedulerWindows extends Scheduler {
 
+    /**
+     * Instance of this class represent a task in Windows scheduler.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
     private static class SchTaskEntry {
+
+        private static final int LAST_RESULT = 7;
+
+        private static final int STATUS = 4;
 
         private static final int TASK_TO_RUN = 8;
 
         private static final int TASKNAME = 1;
 
-        List<String> data;
+        private final List<String> data;
 
+        /**
+         * Create a new task entry.
+         * 
+         * @param data
+         *            raw data.
+         */
         private SchTaskEntry(List<String> data) {
-            Validate.notNull(this.data = data);
+            Validate.notNull(data);
+            this.data = Collections.unmodifiableList(new ArrayList<String>(data));
         }
 
         private String get(int index) {
             return this.data.get(index);
         }
 
+        /**
+         * Return the command being run by the task. It doesn't return it in a compatible way. Extra processing may be
+         * required.
+         * 
+         * @return
+         */
         public String getCommand() {
             return get(TASK_TO_RUN);
         }
 
+        /**
+         * Return the last known return code.
+         * 
+         * @return
+         */
+        public String getLastResult() {
+            return get(LAST_RESULT);
+        }
+
+        /**
+         * Return the state of the task. If it's running or not. etc.
+         * 
+         * @return
+         */
+        public String getStatus() {
+            return get(STATUS);
+        }
+
+        /**
+         * Return the task name.
+         * 
+         * @return
+         */
         public String getTaskname() {
             return get(TASKNAME);
         }
@@ -65,14 +113,24 @@ public class SchedulerWindows extends Scheduler {
     private static final transient Logger LOGGER = LoggerFactory.getLogger(SchedulerWindows.class);
 
     /**
-     * Property used to define the location of minarca.bat file.
-     */
-    private static final String PROPERTY_MINARCA_EXE_LOCATION = "minarca.exe.location";
-
-    /**
      * Executable launch to start backup.
      */
     private static final String MINARCA;
+
+    /**
+     * Regex pattern used to check if the task is running.
+     */
+    private static final Pattern PATTERN_TASK_RUNNING = Pattern.compile("(En cours d'exécution|Running)");
+
+    /**
+     * Property used to define the location of minarca.bat file.
+     */
+    private static final String PROPERTY_MINARCA_EXE_LOCATION = "minarca.exe.location";
+    /**
+     * Windows task name.
+     */
+    private static final String TASK_NAME = "minarca backup";
+
     static {
         if (SystemUtils.IS_OS_WINDOWS) {
             if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
@@ -84,11 +142,6 @@ public class SchedulerWindows extends Scheduler {
             MINARCA = "minarca.sh";
         }
     }
-
-    /**
-     * Windows task name.
-     */
-    private static final String TASK_NAME = "minarca backup";
 
     public SchedulerWindows() {
 
@@ -162,6 +215,7 @@ public class SchedulerWindows extends Scheduler {
             Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
             StreamHandler sh = new StreamHandler(p);
             sh.start();
+            // TODO Check return code.
             p.waitFor();
             return sh.getOutput();
         } catch (IOException e) {
@@ -241,6 +295,10 @@ public class SchedulerWindows extends Scheduler {
         return buf.toString();
     }
 
+    protected File getExeLocation() {
+        return Compat.searchFile(MINARCA, System.getProperty(PROPERTY_MINARCA_EXE_LOCATION), "./bin/", ".");
+    }
+
     private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
         String data;
         if (taskname != null && !SystemUtils.IS_OS_WINDOWS_XP && !SystemUtils.IS_OS_WINDOWS_2003) {
@@ -276,6 +334,26 @@ public class SchedulerWindows extends Scheduler {
         return list;
     }
 
+    @Override
+    public boolean isRunning() {
+        LOGGER.info("check if task is running");
+        try {
+            // Get reference to our task
+            SchTaskEntry task = query(TASK_NAME);
+            if (task == null) {
+                return false;
+            }
+            // Get the status and check if it run.
+            String status = task.getStatus();
+            LOGGER.debug("task status[{}]", status);
+            Matcher m = PATTERN_TASK_RUNNING.matcher(status);
+            return m.find();
+        } catch (APIException e) {
+            LOGGER.warn("can't detect the task", e);
+            return false;
+        }
+    }
+
     /**
      * Query the given taskname.
      * 
@@ -294,12 +372,14 @@ public class SchedulerWindows extends Scheduler {
 
     @Override
     public void run() throws APIException {
-        // TODO Auto-generated method stub
-
+        LOGGER.info("starting the task");
+        String output = execute("/Run", "/TN", TASK_NAME);
     }
 
-    protected File getExeLocation() {
-        return Compat.searchFile(MINARCA, System.getProperty(PROPERTY_MINARCA_EXE_LOCATION), "./bin/", ".");
+    @Override
+    public void terminate() throws APIException {
+        LOGGER.info("terminating the task");
+        String output = execute("/End", "/TN", TASK_NAME);
     }
 
 }

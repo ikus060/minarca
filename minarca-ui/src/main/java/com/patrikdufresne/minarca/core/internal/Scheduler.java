@@ -59,9 +59,24 @@ public abstract class Scheduler {
     public abstract boolean exists() throws APIException;
 
     /**
+     * Check if the task is running.
+     * 
+     * @return True if the task is running.
+     * @throws APIException
+     */
+    public abstract boolean isRunning() throws APIException;
+
+    /**
      * Run the task.
      * 
      * @throws APIException
      */
     public abstract void run() throws APIException;
+
+    /**
+     * Terminate the task. Has no effect if the task is not running.
+     * 
+     * @throws APIException
+     */
+    public abstract void terminate() throws APIException;
 }

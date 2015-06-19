@@ -33,4 +33,16 @@ public class SchedulerLinux extends Scheduler {
 
     }
 
+    @Override
+    public boolean isRunning() throws APIException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void terminate() throws APIException {
+        // TODO Auto-generated method stub
+
+    }
+
 }
