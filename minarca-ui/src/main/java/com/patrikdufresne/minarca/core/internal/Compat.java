@@ -55,6 +55,16 @@ public class Compat {
     public static final String CONFIG_PATH;
 
     /**
+     * The user's home directory.
+     */
+    public static final String HOME;
+
+    /**
+     * The user's home directory.
+     */
+    public static final File HOME_FILE;
+
+    /**
      * True if the user is admin.
      */
     public static final boolean IS_ADMIN;
@@ -103,6 +113,8 @@ public class Compat {
         CONFIG_PATH = getConfigPath(IS_ADMIN);
         TEMP = getTemp();
         TEMP_FILE = new File(TEMP);
+        HOME = getHome(IS_ADMIN);
+        HOME_FILE = new File(HOME);
     }
 
     /**
@@ -173,19 +185,7 @@ public class Compat {
             return configPath;
         }
         if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
-            if (isAdmin) {
-                if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-                    return Compat.WINDOWS_SYSTEMPROFILE_PATH + "/Application Data/minarca";
-                }
-                return Compat.WINDOWS_SYSTEMPROFILE_PATH + "/AppData/Local/minarca";
-            } else {
-                if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-                    // C:\Documents and Settings\ikus060\Local Settings\Application Data
-                    return System.getenv("APPDATA") + "/Local Settings/Application Data/minarca";
-                }
-                // C:\Users\ikus060\AppData\Local\minarca
-                return System.getenv("LOCALAPPDATA") + "/minarca";
-            }
+            return getLocalAppData(isAdmin) + "/minarca";
         } else if (SystemUtils.IS_OS_LINUX) {
             if (isAdmin) {
                 return "/etc/minarca";
@@ -194,6 +194,20 @@ public class Compat {
             }
         }
         return null;
+    }
+
+    /**
+     * Return user's home.
+     * 
+     * @param isAdmin
+     *            True if admin.
+     * @return
+     */
+    private static String getHome(boolean isAdmin) {
+        if (isAdmin) {
+            return Compat.WINDOWS_SYSTEMPROFILE_PATH;
+        }
+        return SystemUtils.USER_HOME;
     }
 
     /**
@@ -236,6 +250,21 @@ public class Compat {
         }
         // Otherwise: Windows 7 not running as Admin.
         return false;
+    }
+
+    /**
+     * Return Local application data (for Windows).
+     * 
+     * @param isAdmin
+     *            True if admin.
+     * @return
+     */
+    private static String getLocalAppData(boolean isAdmin) {
+        if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
+            // C:\Documents and Settings\ikus060\Local Settings\Application Data
+            return getHome(isAdmin) + "/Local Settings/Application Data/minarca";
+        }
+        return getHome(isAdmin) + "/AppData/Local/minarca";
     }
 
     /**
