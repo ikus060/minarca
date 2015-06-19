@@ -285,7 +285,7 @@ public class PreferenceDialog extends Dialog {
         this.ft.createFormText(comp, "<h3>" + _("What to backup ?") + "</h3>", false);
 
         // Includes defaults
-        boolean includeDefaults = API.instance().getIncludes().containsAll(API.getDefaultIncludes());
+        boolean includeDefaults = API.instance().getIncludes().containsAll(GlobPattern.includesDefault());
         this.includeDefaultsButton = this.ft.createButton(comp, _("Personal files (recommended)"), SWT.CHECK);
         this.includeDefaultsButton.setSelection(includeDefaults);
         this.includeDefaultsButton.addSelectionListener(new SelectionAdapter() {
@@ -301,8 +301,8 @@ public class PreferenceDialog extends Dialog {
         this.ft.createFormText(comp, "<h3>" + _("Ignore") + "</h3>", false);
 
         List<GlobPattern> excludes = API.instance().getExcludes();
-        boolean excludeSysFiles = excludes.containsAll(API.getSysFilesExcludes());
-        boolean excludeDownloads = excludes.containsAll(API.getDownloadsExcludes());
+        boolean excludeSysFiles = excludes.containsAll(GlobPattern.excludesSystem());
+        boolean excludeDownloads = excludes.containsAll(GlobPattern.excludesDownloads());
 
         // Excludes defaults
         this.excludeSysFilesButton = this.ft.createButton(comp, _("Ignore operating system files (recommended)"), SWT.CHECK);
@@ -310,7 +310,7 @@ public class PreferenceDialog extends Dialog {
         this.excludeSysFilesButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handleExcludeDetaults(e, API.getSysFilesExcludes());
+                handleExcludeDetaults(e, GlobPattern.excludesSystem());
             }
         });
 
@@ -320,7 +320,7 @@ public class PreferenceDialog extends Dialog {
         this.excludeSysFilesButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handleExcludeDetaults(e, API.getDownloadsExcludes());
+                handleExcludeDetaults(e, GlobPattern.excludesDownloads());
             }
         });
 
@@ -354,20 +354,20 @@ public class PreferenceDialog extends Dialog {
     protected void handleAdvancePatterns() {
         List<GlobPattern> excludes = API.instance().getExcludes();
         List<GlobPattern> defaultExcludes = new ArrayList<GlobPattern>();
-        boolean excludeSysFiles = excludes.containsAll(API.getSysFilesExcludes());
+        boolean excludeSysFiles = excludes.containsAll(GlobPattern.excludesSystem());
         if (excludeSysFiles) {
-            defaultExcludes.addAll(API.getSysFilesExcludes());
+            defaultExcludes.addAll(GlobPattern.excludesSystem());
         }
-        boolean excludeDownloads = excludes.containsAll(API.getDownloadsExcludes());
+        boolean excludeDownloads = excludes.containsAll(GlobPattern.excludesDownloads());
         if (excludeDownloads) {
-            defaultExcludes.addAll(API.getDownloadsExcludes());
+            defaultExcludes.addAll(GlobPattern.excludesDownloads());
         }
 
         // Open a dialog to edit filters.
         IncludesDialog dlg = new IncludesDialog(this.getShell());
         dlg.setIncludes(API.instance().getIncludes());
         dlg.setExcludes(excludes);
-        dlg.setDefaultIncludes(API.getDefaultIncludes());
+        dlg.setDefaultIncludes(GlobPattern.includesDefault());
         dlg.setDefaultExcludes(defaultExcludes);
         if (dlg.open() != Window.OK) {
             return;
@@ -405,9 +405,9 @@ public class PreferenceDialog extends Dialog {
     protected void handleIncludeDetaults(SelectionEvent event) {
         Set<GlobPattern> includes = new LinkedHashSet<GlobPattern>(API.instance().getIncludes());
         if (this.includeDefaultsButton.getSelection()) {
-            includes.addAll(API.getDefaultIncludes());
+            includes.addAll(GlobPattern.includesDefault());
         } else {
-            includes.removeAll(API.getDefaultIncludes());
+            includes.removeAll(GlobPattern.includesDefault());
         }
         try {
             API.instance().setIncludes(new ArrayList<GlobPattern>(includes));

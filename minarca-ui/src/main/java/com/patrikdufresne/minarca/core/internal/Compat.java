@@ -35,6 +35,16 @@ import com.patrikdufresne.minarca.core.APIException;
 public class Compat {
 
     /**
+     * Default charset.
+     */
+    public static final Charset CHARSET_DEFAULT = Charset.defaultCharset();
+
+    /**
+     * Charset used for process.
+     */
+    public static Charset CHARSET_PROCESS;
+
+    /**
      * The name of this computer (may be null in some edge case).
      */
     public static final String COMPUTER_NAME;
@@ -55,19 +65,24 @@ public class Compat {
     private static final transient Logger LOGGER;
 
     /**
-     * Charset used for process.
-     */
-    public static Charset CHARSET_PROCESS;
-
-    /**
-     * The root path. Under windows it should be "C:" under linux it should be "/".
+     * The root path. Under windows it should be "C:/" under linux it should be "/".
      */
     public static final String ROOT;
 
     /**
-     * The root path. Under windows it should be "C:" under linux it should be "/".
+     * The root path. Under windows it should be "C:/" under linux it should be "/".
      */
     public static final File ROOT_FILE;
+
+    /**
+     * Define temp directory.
+     */
+    public static final String TEMP;
+
+    /**
+     * Define temp directory.
+     */
+    public static final File TEMP_FILE;
 
     /**
      * Path to system profile for Windows OS.
@@ -75,11 +90,6 @@ public class Compat {
      * Under non-windows OS, this constant is null.
      */
     public static final String WINDOWS_SYSTEMPROFILE_PATH;
-
-    /**
-     * Default charset.
-     */
-    public static final Charset CHARSET_DEFAULT = Charset.defaultCharset();
 
     static {
         // Use a static block to declare constant value in the right order.
@@ -91,6 +101,8 @@ public class Compat {
         ROOT_FILE = new File(ROOT);
         WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
         CONFIG_PATH = getConfigPath(IS_ADMIN);
+        TEMP = getTemp();
+        TEMP_FILE = new File(TEMP);
     }
 
     /**
@@ -121,6 +133,30 @@ public class Compat {
         } catch (InterruptedException e) {
             // Swallow. Should no happen
             Thread.currentThread().interrupt();
+        }
+        return null;
+    }
+
+    /**
+     * Return a computer name to represent this computer.
+     * <p>
+     * Current implementation gets the hostname from environment variable and use Inet interface to get a hostname.
+     * 
+     * @return an empty string or a hostname
+     */
+    private static String getComputerName() {
+        // For Windows
+        String host = System.getenv("COMPUTERNAME");
+        if (host != null) return host.toLowerCase();
+        // For Linux
+        host = System.getenv("HOSTNAME");
+        if (host != null) return host.toLowerCase();
+        // Fallback and use Inet interface.
+        try {
+            String result = InetAddress.getLocalHost().getHostName();
+            if (StringUtils.isNotEmpty(result)) return result.toLowerCase();
+        } catch (UnknownHostException e) {
+            // failed; try alternate means.
         }
         return null;
     }
@@ -158,71 +194,6 @@ public class Compat {
             }
         }
         return null;
-    }
-
-    /**
-     * Return a computer name to represent this computer.
-     * <p>
-     * Current implementation gets the hostname from environment variable and use Inet interface to get a hostname.
-     * 
-     * @return an empty string or a hostname
-     */
-    private static String getComputerName() {
-        // For Windows
-        String host = System.getenv("COMPUTERNAME");
-        if (host != null) return host.toLowerCase();
-        // For Linux
-        host = System.getenv("HOSTNAME");
-        if (host != null) return host.toLowerCase();
-        // Fallback and use Inet interface.
-        try {
-            String result = InetAddress.getLocalHost().getHostName();
-            if (StringUtils.isNotEmpty(result)) return result.toLowerCase();
-        } catch (UnknownHostException e) {
-            // failed; try alternate means.
-        }
-        return null;
-    }
-
-    /**
-     * Search for the given filename in multiple locations. Current implementation search in the given
-     * <code>paths</code> then search in PATH environment variables.
-     * 
-     * @param filename
-     *            the filename (e.g.: minarca.exe, rdiffweb.exe)
-     * @param paths
-     *            extra path where to look.
-     * 
-     * @return the first matching file.
-     */
-    public static File searchFile(String filename, String... paths) {
-        Validate.notEmpty(filename);
-        List<String> locations = new ArrayList<String>();
-        locations.addAll(Arrays.asList(paths));
-        locations.add(".");
-        // Add PATH location.
-        String path = System.getenv("PATH");
-        if (path != null) {
-            for (String i : path.split(SystemUtils.PATH_SEPARATOR)) {
-                locations.add(i);
-            }
-        }
-        for (String location : locations) {
-            if (location == null || location.isEmpty()) {
-                continue;
-            }
-            File file = new File(location, filename);
-            if (file.isFile() && file.canRead()) {
-                try {
-                    return file.getCanonicalFile();
-                } catch (IOException e) {
-                    LOGGER.warn("fail to get canonical path for [{}]", file);
-                    return null;
-                }
-            }
-        }
-        return null;
-
     }
 
     /**
@@ -310,6 +281,22 @@ public class Compat {
         return null;
     }
 
+    private static String getTemp() {
+        // Check if system property return a valid value.
+        if (SystemUtils.getJavaIoTmpDir() != null) {
+            return SystemUtils.JAVA_IO_TMPDIR;
+        }
+        // Fall back to TEMP
+        String temp = System.getenv("TEMP");
+        if (temp != null && temp.length() > 0 && new File(temp).exists()) {
+            return temp;
+        }
+        if (SystemUtils.IS_OS_LINUX) {
+            return "/tmp";
+        }
+        return null;
+    }
+
     /**
      * Return the location of the System profile.
      * 
@@ -354,5 +341,46 @@ public class Compat {
             Thread.currentThread().interrupt();
             return null;
         }
+    }
+
+    /**
+     * Search for the given filename in multiple locations. Current implementation search in the given
+     * <code>paths</code> then search in PATH environment variables.
+     * 
+     * @param filename
+     *            the filename (e.g.: minarca.exe, rdiffweb.exe)
+     * @param paths
+     *            extra path where to look.
+     * 
+     * @return the first matching file.
+     */
+    public static File searchFile(String filename, String... paths) {
+        Validate.notEmpty(filename);
+        List<String> locations = new ArrayList<String>();
+        locations.addAll(Arrays.asList(paths));
+        locations.add(".");
+        // Add PATH location.
+        String path = System.getenv("PATH");
+        if (path != null) {
+            for (String i : path.split(SystemUtils.PATH_SEPARATOR)) {
+                locations.add(i);
+            }
+        }
+        for (String location : locations) {
+            if (location == null || location.isEmpty()) {
+                continue;
+            }
+            File file = new File(location, filename);
+            if (file.isFile() && file.canRead()) {
+                try {
+                    return file.getCanonicalFile();
+                } catch (IOException e) {
+                    LOGGER.warn("fail to get canonical path for [{}]", file);
+                    return null;
+                }
+            }
+        }
+        return null;
+
     }
 }

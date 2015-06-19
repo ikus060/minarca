@@ -18,7 +18,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -115,78 +114,6 @@ public class API {
         // LOGGER.warn("user is not admin");
         // throw new UnsufficientPermissons();
         // }
-    }
-
-    public static List<GlobPattern> getDefaultIncludes() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            // Return user directory.
-            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
-        } else if (SystemUtils.IS_OS_LINUX) {
-            // Return user directory.
-            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
-        }
-        return Collections.emptyList();
-    }
-
-    /**
-     * Represent the default location where files are downloaded.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> getDownloadsExcludes() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            String userHome = System.getProperty("user.home");
-            List<GlobPattern> list = new ArrayList<GlobPattern>();
-            list.add(new GlobPattern(userHome + "/Downloads/"));
-            return list;
-        } else if (SystemUtils.IS_OS_LINUX) {
-            String userHome = System.getProperty("user.home");
-            List<GlobPattern> list = new ArrayList<GlobPattern>();
-            list.add(new GlobPattern(userHome + "/Downloads/"));
-            return list;
-        }
-        return Collections.emptyList();
-    }
-
-    /**
-     * Represent the operating system file to be ignored.
-     */
-    public static List<GlobPattern> getSysFilesExcludes() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            String userHome = System.getProperty("user.home");
-            List<GlobPattern> list = new ArrayList<GlobPattern>();
-            list.add(new GlobPattern("**/pagefile.sys"));
-            list.add(new GlobPattern("**/NTUSER.DAT*"));
-            list.add(new GlobPattern("**/desktop.ini"));
-            list.add(new GlobPattern("**/ntuser.ini"));
-            list.add(new GlobPattern("**/Thumbs.db"));
-            list.add(new GlobPattern("**/Default.rdp"));
-            list.add(new GlobPattern("**/ntuser.dat*"));
-            list.add(new GlobPattern("C:/Recovery/"));
-            list.add(new GlobPattern("C:/ProgramData/"));
-            list.add(new GlobPattern("C:/$Recycle.Bin/"));
-            String windowDir = System.getenv("SystemRoot");
-            if (windowDir != null) {
-                list.add(new GlobPattern(windowDir));
-            }
-            String temp = System.getenv("TEMP");
-            if (temp != null) {
-                list.add(new GlobPattern(temp));
-            }
-            list.add(new GlobPattern(userHome + "/AppData/"));
-            list.add(new GlobPattern(userHome + "/Application Data/"));
-            list.add(new GlobPattern(userHome + "/Tracing/"));
-            list.add(new GlobPattern(userHome + "/Recent/"));
-            list.add(new GlobPattern(userHome + "/PrintHood/"));
-            list.add(new GlobPattern(userHome + "/NetHood/"));
-            list.add(new GlobPattern(userHome + "/Searches/"));
-            list.add(new GlobPattern(userHome + "/Cookies/"));
-            list.add(new GlobPattern(userHome + "/Local Settings/Temporary Internet Files/"));
-            return list;
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return Arrays.asList(new GlobPattern(".*"), new GlobPattern("*~"));
-        }
-        return Collections.emptyList();
     }
 
     /**
@@ -320,10 +247,10 @@ public class API {
     public void defaultConfig() throws APIException {
         LOGGER.debug("restore default config");
         // Sets the default includes / excludes.
-        setIncludes(getDefaultIncludes());
+        setIncludes(GlobPattern.includesDefault());
         List<GlobPattern> excludes = new ArrayList<GlobPattern>();
-        excludes.addAll(getSysFilesExcludes());
-        excludes.addAll(getDownloadsExcludes());
+        excludes.addAll(GlobPattern.excludesSystem());
+        excludes.addAll(GlobPattern.excludesDownloads());
         setExcludes(excludes);
 
         // Delete & create schedule tasks.
@@ -488,16 +415,6 @@ public class API {
             throw new APIException("fail to generate the keys", e);
         } catch (InvalidKeyException e) {
             throw new APIException("fail to generate the keys", e);
-        }
-
-        // Set permissions (otherwise SSH complains about file permissions)
-        if (SystemUtils.IS_OS_LINUX) {
-            for (File f : Arrays.asList(idrsaFile, identityFile, puttyFile)) {
-                f.setExecutable(false, false);
-                f.setReadable(false, false);
-                f.setWritable(false, false);
-                f.setReadable(true, true);
-            }
         }
 
         // Send SSH key to minarca server using web service.

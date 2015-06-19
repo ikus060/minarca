@@ -11,7 +11,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -37,6 +36,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
@@ -108,16 +108,6 @@ public class Keygen {
     }
 
     /**
-     * From bytes to Base64 string
-     * 
-     * @param bytes
-     * @return
-     */
-    private static String encodeBase64(byte[] bytes) {
-        return new String(Base64.encodeBase64(bytes));
-    }
-
-    /**
      * From Base64 to bytes.
      * 
      * @param base64
@@ -125,6 +115,16 @@ public class Keygen {
      */
     private static byte[] decodeBase64(String base64) {
         return Base64.decodeBase64(base64);
+    }
+
+    /**
+     * From bytes to Base64 string
+     * 
+     * @param bytes
+     * @return
+     */
+    private static String encodeBase64(byte[] bytes) {
+        return new String(Base64.encodeBase64(bytes));
     }
 
     /**
@@ -191,6 +191,63 @@ public class Keygen {
         return byteOs.toByteArray();
     }
 
+    public static RSAPublicKey fromPublicIdRsa(File file) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        FileReader reader = new FileReader(file);
+        try {
+            return fromPublicIdRsa(reader);
+        } finally {
+            reader.close();
+        }
+    }
+
+    /**
+     * Read a public RSA key.
+     * 
+     * @param file
+     *            the file to be read.
+     * @return
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    public static RSAPublicKey fromPublicIdRsa(Reader reader) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        List<String> lines = IOUtils.readLines(reader);
+        if (lines.size() > 2) {
+            throw new IOException("two many line in file");
+        }
+        String fields[] = lines.get(0).split("\\s");
+        if (!fields[0].equals("ssh-rsa")) {
+            throw new IOException("unsupported key: " + fields[1]);
+        }
+        byte[] bytes = decodeBase64(fields[1]);
+
+        // Read the bytes.
+        int length;
+        byte[] data;
+        DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
+        // String "ssh-rsa"
+        length = in.readInt();
+        data = new byte[length];
+        in.read(data);
+        String keytype = new String(data);
+        if (!keytype.equals("ssh-rsa")) {
+            throw new IOException("unsupported key: " + keytype);
+        }
+        // mpint exponent
+        length = in.readInt();
+        data = new byte[length];
+        in.read(data);
+        BigInteger e = new BigInteger(data);
+        // mpint modulus
+        length = in.readInt();
+        data = new byte[length];
+        in.read(data);
+        BigInteger n = new BigInteger(data);
+        // Convert the integers to Java object key,
+        final RSAPublicKeySpec rsaPubSpec = new RSAPublicKeySpec(n, e);
+        return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(rsaPubSpec);
+    }
+
     /**
      * Generate an RSA key pair (of 1024 bytes).
      * 
@@ -236,6 +293,40 @@ public class Keygen {
     }
 
     /**
+     * Open a file as FileWriter with the given encoding.
+     * 
+     * @param file
+     *            the file
+     * @param encoding
+     *            the encoding to be used to read the file
+     * @return the file writer.
+     * @throws IOException
+     */
+    private static FileWriterWithEncoding openFileWriter(File file, String encoding) throws IOException {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new IOException("File '" + file + "' exists but is a directory");
+            }
+            if (!file.canWrite()) {
+                // Try to change permission
+                file.setWritable(true, true);
+            }
+            if (!file.canWrite()) {
+
+                throw new IOException("File '" + file + "' cannot be written to");
+            }
+        } else {
+            File parent = file.getParentFile();
+            if (parent != null) {
+                if (!parent.mkdirs() && !parent.isDirectory()) {
+                    throw new IOException("Directory '" + parent + "' could not be created");
+                }
+            }
+        }
+        return new FileWriterWithEncoding(file, UTF_8);
+    }
+
+    /**
      * Generate a PEM file.
      * 
      * @param privateKey
@@ -245,9 +336,17 @@ public class Keygen {
      * @throws IOException
      */
     public static void toPrivatePEM(RSAPrivateKey privateKey, File file) throws IOException {
-        FileWriterWithEncoding idrsa = new FileWriterWithEncoding(file, UTF_8);
+        FileWriterWithEncoding idrsa = openFileWriter(file, UTF_8);
         toPrivatePEM(privateKey, idrsa);
         idrsa.close();
+        // Set permissions (otherwise SSH complains about file permissions)
+        if (SystemUtils.IS_OS_LINUX) {
+            file.setExecutable(false, false);
+            file.setReadable(false, false);
+            file.setWritable(false, false);
+            file.setWritable(true, true);
+            file.setReadable(true, true);
+        }
     }
 
     /**
@@ -281,9 +380,17 @@ public class Keygen {
      * @throws InvalidKeyException
      */
     public static void toPrivatePuttyKey(KeyPair pair, String comment, File file) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        FileWriter writer = new FileWriter(file);
+        FileWriterWithEncoding writer = openFileWriter(file, Compat.CHARSET_DEFAULT.name());
         toPrivatePuttyKey(pair, comment, writer);
         writer.close();
+        // Set permissions (otherwise SSH complains about file permissions)
+        if (SystemUtils.IS_OS_LINUX) {
+            file.setExecutable(false, false);
+            file.setReadable(false, false);
+            file.setWritable(false, false);
+            file.setWritable(true, true);
+            file.setReadable(true, true);
+        }
     }
 
     /**
@@ -302,7 +409,7 @@ public class Keygen {
      *      /sshj/userauth/keyprovider/PuTTYKeyFile.java
      * @see https://github.com/Yasushi/putty/blob/master/sshpubk.c
      */
-    public static void toPrivatePuttyKey(KeyPair pair, String comment, FileWriter writer) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public static void toPrivatePuttyKey(KeyPair pair, String comment, Writer writer) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         Validate.notNull(pair);
         Validate.notNull(comment);
         Validate.notNull(writer);
@@ -380,9 +487,17 @@ public class Keygen {
      * @throws IOException
      */
     public static void toPublicIdRsa(RSAPublicKey publicKey, String comment, File file) throws IOException {
-        FileWriterWithEncoding idrsa = new FileWriterWithEncoding(file, UTF_8);
+        FileWriterWithEncoding idrsa = openFileWriter(file, UTF_8);
         toPublicIdRsa(publicKey, comment, idrsa);
         idrsa.close();
+        // Set permissions (otherwise SSH complains about file permissions)
+        if (SystemUtils.IS_OS_LINUX) {
+            file.setExecutable(false, false);
+            file.setReadable(false, false);
+            file.setWritable(false, false);
+            file.setWritable(true, true);
+            file.setReadable(true, true);
+        }
     }
 
     /**
@@ -400,63 +515,5 @@ public class Keygen {
         byte[] encoded = encodePublicKey(publicKey);
         String base64 = encodeBase64(encoded);
         writer.write("ssh-rsa " + base64 + " " + comment);
-    }
-
-    public static RSAPublicKey fromPublicIdRsa(File file) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-        FileReader reader = new FileReader(file);
-        try {
-            return fromPublicIdRsa(reader);
-        } finally {
-            reader.close();
-        }
-
-    }
-
-    /**
-     * Read a public RSA key.
-     * 
-     * @param file
-     *            the file to be read.
-     * @return
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
-     */
-    public static RSAPublicKey fromPublicIdRsa(Reader reader) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-        List<String> lines = IOUtils.readLines(reader);
-        if (lines.size() > 2) {
-            throw new IOException("two many line in file");
-        }
-        String fields[] = lines.get(0).split("\\s");
-        if (!fields[0].equals("ssh-rsa")) {
-            throw new IOException("unsupported key: " + fields[1]);
-        }
-        byte[] bytes = decodeBase64(fields[1]);
-
-        // Read the bytes.
-        int length;
-        byte[] data;
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
-        // String "ssh-rsa"
-        length = in.readInt();
-        data = new byte[length];
-        in.read(data);
-        String keytype = new String(data);
-        if (!keytype.equals("ssh-rsa")) {
-            throw new IOException("unsupported key: " + keytype);
-        }
-        // mpint exponent
-        length = in.readInt();
-        data = new byte[length];
-        in.read(data);
-        BigInteger e = new BigInteger(data);
-        // mpint modulus
-        length = in.readInt();
-        data = new byte[length];
-        in.read(data);
-        BigInteger n = new BigInteger(data);
-        // Convert the integers to Java object key,
-        final RSAPublicKeySpec rsaPubSpec = new RSAPublicKeySpec(n, e);
-        return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(rsaPubSpec);
     }
 }

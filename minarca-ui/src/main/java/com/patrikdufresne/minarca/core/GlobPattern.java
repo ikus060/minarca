@@ -9,12 +9,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.SystemUtils;
@@ -60,9 +66,18 @@ public class GlobPattern {
     public static List<GlobPattern> readPatterns(File file) throws IOException {
         FileInputStream in = new FileInputStream(file);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, Compat.CHARSET_DEFAULT));
+        try {
+            return readPatterns(reader);
+        } finally {
+            reader.close();
+        }
+    }
+
+    private static List<GlobPattern> readPatterns(Reader reader) throws IOException {
+        BufferedReader buf = new BufferedReader(reader);
         List<GlobPattern> list = new ArrayList<GlobPattern>();
         String line;
-        while ((line = reader.readLine()) != null) {
+        while ((line = buf.readLine()) != null) {
             if (line.startsWith("#")) {
                 continue;
             }
@@ -73,7 +88,6 @@ public class GlobPattern {
                 LOGGER.warn("invalid pattern [{}] discarded", line);
             }
         }
-        reader.close();
         return list;
     }
 
@@ -91,6 +105,103 @@ public class GlobPattern {
             writer.append(SystemUtils.LINE_SEPARATOR);
         }
         writer.close();
+    }
+
+    /**
+     * Return a default include pattern.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> includesDefault() {
+        try {
+            return readResource("includes");
+        } catch (IOException e) {
+            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
+        }
+    }
+
+    /**
+     * Represent the default location where files are downloaded.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> excludesDownloads() {
+        try {
+            return readResource("excludes_downloads");
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Search a resource.
+     * 
+     * @param location
+     * @return
+     * @throws IOException
+     */
+    private static List<GlobPattern> readResource(String location) throws IOException {
+        LOGGER.trace("read glob pattern from [{}]", location);
+        List<String> locations = new ArrayList<String>();
+        locations.add(location);
+        // Add OS name.
+        String osname = SystemUtils.OS_NAME.replaceAll("\\s", "").trim().toLowerCase();
+        if (osname.contains("win")) {
+            locations.add(location + "_win");
+        }
+        if (osname != null) {
+            locations.add(location + "_" + osname);
+        }
+        // Add local
+        String lang = Locale.getDefault().getLanguage();
+        if (lang != null) {
+            locations.add(location + "_" + lang);
+            if (osname != null) {
+                locations.add(location + "_" + osname + "_" + lang);
+            }
+        }
+
+        LinkedHashSet<GlobPattern> list = new LinkedHashSet<GlobPattern>();
+        for (String l : locations) {
+            LOGGER.trace("try to load glob pattern from [{}]", l);
+            InputStream in = GlobPattern.class.getResourceAsStream(l);
+            if (in == null) {
+                continue;
+            }
+            LOGGER.trace("reading glob pattern from [{}]", l);
+            try {
+                for (GlobPattern p : readPatterns(new InputStreamReader(in))) {
+                    p = new GlobPattern(expand(p.value()));
+                    list.add(p);
+                }
+            } finally {
+                in.close();
+            }
+        }
+
+        return new ArrayList<GlobPattern>(list);
+    }
+
+    /**
+     * Replace ${} by real value.
+     * 
+     * @param value
+     * 
+     * @return
+     */
+    private static String expand(String value) {
+        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.ROOT).replace("${temp}", Compat.TEMP);
+    }
+
+    /**
+     * Represent the operating system file to be ignored.
+     */
+    public static List<GlobPattern> excludesSystem() {
+        try {
+            return readResource("excludes_system");
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
     }
 
     private PathMatcher matcher;
