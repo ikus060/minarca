@@ -190,7 +190,7 @@ public class Compat {
             if (isAdmin) {
                 return "/etc/minarca";
             } else {
-                return System.getenv("HOME") + "/.minarca";
+                return System.getenv("HOME") + "/.config/minarca/";
             }
         }
         return null;
@@ -205,7 +205,11 @@ public class Compat {
      */
     private static String getHome(boolean isAdmin) {
         if (isAdmin) {
-            return Compat.WINDOWS_SYSTEMPROFILE_PATH;
+            if (SystemUtils.IS_OS_WINDOWS) {
+                return Compat.WINDOWS_SYSTEMPROFILE_PATH;
+            } else {
+                return "/root";
+            }
         }
         return SystemUtils.USER_HOME;
     }
