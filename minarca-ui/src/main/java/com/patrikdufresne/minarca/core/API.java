@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.helper.Validate;
@@ -439,7 +438,7 @@ public class API {
      */
     private void save() throws IOException {
         LOGGER.debug("writing config to [{}]", confFile);
-        Writer writer = new FileWriterWithEncoding(confFile, Compat.CHARSET_DEFAULT);
+        Writer writer = Compat.openFileWriter(confFile, Compat.CHARSET_DEFAULT);
         this.properties.store(writer, "Copyright (C) 2015 Patrik Dufresne Service Logiciel inc.\r\n"
                 + "Minarca backup configuration.\r\n"
                 + "Please do not change this configuration file manually.");

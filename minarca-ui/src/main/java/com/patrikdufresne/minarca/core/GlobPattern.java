@@ -99,7 +99,7 @@ public class GlobPattern {
      * @throws IOException
      */
     public static void writePatterns(File file, List<GlobPattern> pattern) throws IOException {
-        FileWriterWithEncoding writer = new FileWriterWithEncoding(file, Compat.CHARSET_DEFAULT);
+        FileWriterWithEncoding writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
         for (GlobPattern line : pattern) {
             writer.append(line.value());
             writer.append(SystemUtils.LINE_SEPARATOR);

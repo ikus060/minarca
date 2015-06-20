@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.jsoup.helper.Validate;
@@ -266,9 +267,9 @@ public class Compat {
     private static String getLocalAppData(boolean isAdmin) {
         if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
             // C:\Documents and Settings\ikus060\Local Settings\Application Data
-            return getHome(isAdmin) + "/Local Settings/Application Data/minarca";
+            return getHome(isAdmin) + "/Local Settings/Application Data/";
         }
-        return getHome(isAdmin) + "/AppData/Local/minarca";
+        return getHome(isAdmin) + "/AppData/Local/";
     }
 
     /**
@@ -343,6 +344,54 @@ public class Compat {
     }
 
     /**
+     * Open a file as FileWriter with the given encoding.
+     * 
+     * @param file
+     *            the file
+     * @param encoding
+     *            the encoding to be used to read the file
+     * @return the file writer.
+     * @throws IOException
+     */
+    public static FileWriterWithEncoding openFileWriter(File file, String encoding) throws IOException {
+        return openFileWriter(file, Charset.forName(encoding));
+    }
+
+    /**
+     * Open a file as FileWriter with the given encoding.
+     * 
+     * @param file
+     *            the file
+     * @param encoding
+     *            the encoding to be used to read the file
+     * @return the file writer.
+     * @throws IOException
+     */
+    public static FileWriterWithEncoding openFileWriter(File file, Charset encoding) throws IOException {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new IOException("File '" + file + "' exists but is a directory");
+            }
+            if (!file.canWrite()) {
+                // Try to change permission
+                file.setWritable(true, true);
+            }
+            if (!file.canWrite()) {
+
+                throw new IOException("File '" + file + "' cannot be written to");
+            }
+        } else {
+            File parent = file.getParentFile();
+            if (parent != null) {
+                if (!parent.mkdirs() && !parent.isDirectory()) {
+                    throw new IOException("Directory '" + parent + "' could not be created");
+                }
+            }
+        }
+        return new FileWriterWithEncoding(file, encoding);
+    }
+
+    /**
      * Execute "reg.exe" with the given arguments.
      * 
      * @param args
@@ -414,6 +463,5 @@ public class Compat {
             }
         }
         return null;
-
     }
 }

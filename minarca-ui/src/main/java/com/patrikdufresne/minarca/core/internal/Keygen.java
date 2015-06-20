@@ -293,40 +293,6 @@ public class Keygen {
     }
 
     /**
-     * Open a file as FileWriter with the given encoding.
-     * 
-     * @param file
-     *            the file
-     * @param encoding
-     *            the encoding to be used to read the file
-     * @return the file writer.
-     * @throws IOException
-     */
-    private static FileWriterWithEncoding openFileWriter(File file, String encoding) throws IOException {
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                throw new IOException("File '" + file + "' exists but is a directory");
-            }
-            if (!file.canWrite()) {
-                // Try to change permission
-                file.setWritable(true, true);
-            }
-            if (!file.canWrite()) {
-
-                throw new IOException("File '" + file + "' cannot be written to");
-            }
-        } else {
-            File parent = file.getParentFile();
-            if (parent != null) {
-                if (!parent.mkdirs() && !parent.isDirectory()) {
-                    throw new IOException("Directory '" + parent + "' could not be created");
-                }
-            }
-        }
-        return new FileWriterWithEncoding(file, UTF_8);
-    }
-
-    /**
      * Generate a PEM file.
      * 
      * @param privateKey
@@ -336,7 +302,7 @@ public class Keygen {
      * @throws IOException
      */
     public static void toPrivatePEM(RSAPrivateKey privateKey, File file) throws IOException {
-        FileWriterWithEncoding idrsa = openFileWriter(file, UTF_8);
+        FileWriterWithEncoding idrsa = Compat.openFileWriter(file, UTF_8);
         toPrivatePEM(privateKey, idrsa);
         idrsa.close();
         // Set permissions (otherwise SSH complains about file permissions)
@@ -380,7 +346,7 @@ public class Keygen {
      * @throws InvalidKeyException
      */
     public static void toPrivatePuttyKey(KeyPair pair, String comment, File file) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        FileWriterWithEncoding writer = openFileWriter(file, Compat.CHARSET_DEFAULT.name());
+        FileWriterWithEncoding writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT.name());
         toPrivatePuttyKey(pair, comment, writer);
         writer.close();
         // Set permissions (otherwise SSH complains about file permissions)
@@ -487,7 +453,7 @@ public class Keygen {
      * @throws IOException
      */
     public static void toPublicIdRsa(RSAPublicKey publicKey, String comment, File file) throws IOException {
-        FileWriterWithEncoding idrsa = openFileWriter(file, UTF_8);
+        FileWriterWithEncoding idrsa = Compat.openFileWriter(file, UTF_8);
         toPublicIdRsa(publicKey, comment, idrsa);
         idrsa.close();
         // Set permissions (otherwise SSH complains about file permissions)
