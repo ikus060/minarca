@@ -1,10 +1,10 @@
-pagefile.sys
-NTUSER.DAT*
-ntuser.dat*
-desktop.ini
-ntuser.ini
-Thumbs.db
-Default.rdp
+**/pagefile.sys
+**/NTUSER.DAT*
+**/ntuser.dat*
+**/desktop.ini
+**/ntuser.ini
+**/Thumbs.db
+**/Default.rdp
 ${root}Recovery/
 ${root}ProgramData/
 ${root}$Recycle.Bin/
