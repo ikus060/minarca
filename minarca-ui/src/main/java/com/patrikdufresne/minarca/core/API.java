@@ -31,11 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
+import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
+import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
 
 /**
  * This class is the main entry point to do everything related to minarca.
@@ -223,7 +225,9 @@ public class API {
         if (getIncludes().isEmpty() || getExcludes().isEmpty()) {
             throw new MissConfiguredException(_("includes or excludes pattern are missing"));
         }
-        if (!Scheduler.getInstance().exists()) {
+        try {
+            Scheduler.getInstance().info();
+        } catch (TaskNotFoundException e) {
             throw new MissConfiguredException(_("scheduled tasks is missing"));
         }
     }
@@ -363,9 +367,21 @@ public class API {
      * Check if a backup task is running.
      * 
      * @return True if a backup task is running.
+     * 
+     * @throws APIException
      */
-    public boolean isBackupRunning() {
-        return false;
+    public TaskInfo getScheduleTaskInfo() throws APIException {
+        return Scheduler.getInstance().info();
+    }
+
+    /**
+     * Used to asynchronously start the backup process. This operation usually used the system scheduler to run the
+     * backup task in background.
+     * 
+     * @throws APIException
+     */
+    public void runBackup() throws APIException {
+        Scheduler.getInstance().run();
     }
 
     /**

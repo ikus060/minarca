@@ -9,9 +9,12 @@ import static com.patrikdufresne.minarca.Localized._;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -24,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
+import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 
 /**
  * Wrapper around "schtasks" command line.
@@ -43,7 +47,9 @@ public class SchedulerWindows extends Scheduler {
 
         private static final int LAST_RESULT = 7;
 
-        private static final int STATUS = 4;
+        private static final int LAST_RUN_TIME = 2;
+
+        private static final int STATUS = 3;
 
         private static final int TASK_TO_RUN = 8;
 
@@ -79,10 +85,29 @@ public class SchedulerWindows extends Scheduler {
         /**
          * Return the last known return code.
          * 
-         * @return
+         * @return the return code.
          */
-        public String getLastResult() {
-            return get(LAST_RESULT);
+        public Integer getLastResult() {
+            String value = get(LAST_RESULT);
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        /**
+         * Return the last run time.
+         * 
+         * @return the last run time date.
+         */
+        public Date getLastRunTime() {
+            String value = get(LAST_RUN_TIME);
+            try {
+                return DateFormat.getDateTimeInstance().parse(value);
+            } catch (ParseException e) {
+                return null;
+            }
         }
 
         /**
@@ -141,10 +166,6 @@ public class SchedulerWindows extends Scheduler {
         } else {
             MINARCA = "minarca.sh";
         }
-    }
-
-    public SchedulerWindows() {
-
     }
 
     /**
@@ -334,24 +355,24 @@ public class SchedulerWindows extends Scheduler {
         return list;
     }
 
+    /**
+     * Get information about the task.
+     */
     @Override
-    public boolean isRunning() {
-        LOGGER.info("check if task is running");
-        try {
-            // Get reference to our task
-            SchTaskEntry task = query(TASK_NAME);
-            if (task == null) {
-                return false;
-            }
-            // Get the status and check if it run.
-            String status = task.getStatus();
-            LOGGER.debug("task status[{}]", status);
-            Matcher m = PATTERN_TASK_RUNNING.matcher(status);
-            return m.find();
-        } catch (APIException e) {
-            LOGGER.warn("can't detect the task", e);
-            return false;
+    public TaskInfo info() throws TaskNotFoundException, APIException {
+        LOGGER.info("check task info");
+        // Get reference to our task
+        SchTaskEntry task = query(TASK_NAME);
+        if (task == null) {
+            throw new TaskNotFoundException();
         }
+        // Get the status and check if it run.
+        String status = task.getStatus();
+        LOGGER.debug("task status [{}]", status);
+        Matcher m = PATTERN_TASK_RUNNING.matcher(status);
+        Boolean running = m.find();
+
+        return new TaskInfo(running, task.getLastRunTime(), task.getLastResult());
     }
 
     /**
@@ -370,16 +391,22 @@ public class SchedulerWindows extends Scheduler {
         return null;
     }
 
+    /**
+     * Start the task.
+     */
     @Override
     public void run() throws APIException {
         LOGGER.info("starting the task");
-        String output = execute("/Run", "/TN", TASK_NAME);
+        execute("/Run", "/TN", TASK_NAME);
     }
 
+    /**
+     * End the task.
+     */
     @Override
     public void terminate() throws APIException {
         LOGGER.info("terminating the task");
-        String output = execute("/End", "/TN", TASK_NAME);
+        execute("/End", "/TN", TASK_NAME);
     }
 
 }

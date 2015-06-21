@@ -93,6 +93,20 @@ public class APIException extends Exception {
 
     }
 
+    /**
+     * Raised when the task is not found.
+     * 
+     * @author Patrik Dufresne
+     *
+     */
+    public static class TaskNotFoundException extends APIException {
+
+        public TaskNotFoundException() {
+            super(_("Scheduled task not found"));
+        }
+
+    }
+
     public APIException(String message) {
         super(message);
     }

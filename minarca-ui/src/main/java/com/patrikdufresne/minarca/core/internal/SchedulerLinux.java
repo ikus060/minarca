@@ -6,6 +6,7 @@
 package com.patrikdufresne.minarca.core.internal;
 
 import com.patrikdufresne.minarca.core.APIException;
+import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 
 public class SchedulerLinux extends Scheduler {
 
@@ -22,21 +23,15 @@ public class SchedulerLinux extends Scheduler {
     }
 
     @Override
-    public boolean exists() {
+    public TaskInfo info() throws APIException, TaskNotFoundException {
         // TODO Auto-generated method stub
-        return true;
+        return null;
     }
 
     @Override
     public void run() throws APIException {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public boolean isRunning() throws APIException {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

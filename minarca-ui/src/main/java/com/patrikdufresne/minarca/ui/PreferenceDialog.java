@@ -11,8 +11,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.Validate;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -21,6 +25,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -40,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.GlobPattern;
+import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
 
 /**
  * This is the main windows of the application used to configure the backup.
@@ -48,7 +55,17 @@ import com.patrikdufresne.minarca.core.GlobPattern;
  * 
  */
 public class PreferenceDialog extends Dialog {
+
     private static final transient Logger LOGGER = LoggerFactory.getLogger(PreferenceDialog.class);
+
+    /**
+     * Create an executor service to asynchronously update the UI.
+     */
+    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+    private FormText backupinfo;
+
+    private Button backupNowButton;
 
     private Button excludeSysFilesButton;
 
@@ -56,8 +73,41 @@ public class PreferenceDialog extends Dialog {
 
     private Button includeDefaultsButton;
 
+    /**
+     * Create a new preference dialog.
+     */
     public PreferenceDialog() {
         super((Shell) null);
+    }
+
+    /**
+     * Asynchronously check backup info.
+     * 
+     * @param backupinfo
+     */
+    private void asynchCheckBackupInfo(final FormText backupinfo, final Button backupnow) {
+        executor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                // Then check link.
+                checkBackupInfo(backupinfo, backupnow);
+            }
+        }, 1000, 15000, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Asynchronously check link with minarca.
+     * 
+     * @param formtext
+     */
+    private void asynchCheckLink(final FormText formtext) {
+        executor.schedule(new Runnable() {
+            @Override
+            public void run() {
+                // Then check link.
+                checkLink(formtext);
+            }
+        }, 1000, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -71,6 +121,71 @@ public class PreferenceDialog extends Dialog {
         } else {
             super.buttonPressed(buttonId);
         }
+    }
+
+    /**
+     * Check backup info and update the UI accordingly.
+     * 
+     * @param backupinfo
+     */
+    private void checkBackupInfo(final FormText backupinfo, final Button backupnow) {
+        Validate.notNull(backupinfo);
+        Validate.notNull(backupnow);
+        // Get backup info.
+        String msg;
+        Boolean running1;
+        try {
+            TaskInfo info = API.instance().getScheduleTaskInfo();
+            running1 = info.isRunning();
+            if (running1) {
+                msg = _("Backup is running.");
+            } else {
+                msg = _("Backup is not running.");
+            }
+        } catch (APIException e) {
+            msg = "";
+            running1 = false;
+        }
+        // Update UI
+        final String text = msg;
+        final Boolean running2 = running1;
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (!backupinfo.isDisposed()) {
+                    backupinfo.setText(text, true, true);
+                }
+                if (!backupnow.isDisposed()) {
+                    backupnow.setEnabled(!running2);
+                }
+            }
+        });
+    }
+
+    /**
+     * Asynchronously check link with minarca.
+     * 
+     * @param textlink
+     */
+    private void checkLink(final FormText formtext) {
+        Validate.notNull(formtext);
+        // Test the connectivity with minarca using test.
+        String msg;
+        try {
+            API.instance().testServer();
+            msg = _("This computer is linked to minarca.");
+        } catch (APIException e) {
+            msg = _("This computer doesn't seams to be linked with minarca!");
+        }
+        final String text = msg;
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (!formtext.isDisposed()) {
+                    formtext.setText(text, true, true);
+                }
+            }
+        });
     }
 
     /**
@@ -117,7 +232,26 @@ public class PreferenceDialog extends Dialog {
         Label l = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
         l.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
+        // Add dispose listener
+        parent.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent arg0) {
+                handleDispose();
+            }
+        });
+
         return tab;
+    }
+
+    /**
+     * Called when the dialog is about to be disposed.
+     */
+    protected void handleDispose() {
+        // Stop the executor service.
+        if (this.executor != null) {
+            this.executor.shutdown();
+        }
+        this.executor = null;
     }
 
     /**
@@ -195,8 +329,7 @@ public class PreferenceDialog extends Dialog {
 
         // Check link
         text = _("Checking link...");
-        FormText formtext = this.ft.createFormText(comp, text, false);
-        checkLink(formtext);
+        FormText textlink = this.ft.createFormText(comp, text, false);
 
         // Unlink button
         Button unlinkButton = this.ft.createButton(comp, _("Unlink this computer..."), SWT.PUSH);
@@ -208,9 +341,27 @@ public class PreferenceDialog extends Dialog {
         });
 
         // Backup info
-        this.ft.createFormText(comp, "<h3>" + _("Backup Information") + "</h3>", false);
+        this.ft.createFormText(comp, "<h3>" + _("Backup information") + "</h3>", false);
         text = "<a href='" + API.instance().getBrowseUrl() + "'>" + _("Browse backup data") + "</a>";
         this.ft.createFormText(comp, text, false);
+
+        // General information
+        text = _("Checking if backup is running...");
+        this.backupinfo = this.ft.createFormText(comp, text, false);
+
+        // Backup now button
+        this.backupNowButton = this.ft.createButton(comp, _("Backup now"), SWT.PUSH);
+        this.backupNowButton.setEnabled(false);
+        this.backupNowButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleBackupNow();
+            }
+        });
+
+        // Asyn update
+        asynchCheckLink(textlink);
+        asynchCheckBackupInfo(this.backupinfo, this.backupNowButton);
 
         // TODO General information about backup:
         // TODO Last backup date.
@@ -218,49 +369,6 @@ public class PreferenceDialog extends Dialog {
         // TODO Disk usage.
 
         return form;
-    }
-
-    /**
-     * Asynchronously check link with minarca.
-     * 
-     * @param formtext
-     */
-    private void checkLink(final FormText formtext) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // Wait 5 sec to avoid useless CPU stress.
-                try {
-                    Thread.sleep(2500);
-                } catch (InterruptedException e1) {
-                    return;
-                }
-                if (formtext.isDisposed()) {
-                    return;
-                }
-                String msg;
-                try {
-                    API.instance().testServer();
-                    msg = _("This computer is linked to minarca.");
-                } catch (APIException e) {
-                    msg = _("This computer doesn't seams to be linked with minarca!");
-                }
-                if (formtext.isDisposed()) {
-                    return;
-                }
-                final String text = msg;
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!formtext.isDisposed()) {
-                            formtext.setText(text, true, true);
-                        }
-                    }
-                });
-            }
-        }, "check-link");
-        thread.setDaemon(true);
-        thread.start();
     }
 
     /**
@@ -378,6 +486,52 @@ public class PreferenceDialog extends Dialog {
         } catch (APIException e) {
             showError(e);
         }
+    }
+
+    /**
+     * Start backup now.
+     */
+    protected void handleBackupNow() {
+        // Check if backup is running
+        Boolean running;
+        try {
+            running = API.instance().getScheduleTaskInfo().isRunning();
+        } catch (APIException e) {
+            running = false;
+        }
+        if (Boolean.TRUE.equals(running)) {
+            DetailMessageDialog.openInformation(
+                    this.getShell(),
+                    _("Backup now"),
+                    _("Backup is already running!"),
+                    _("You can't start another backup process because there is one already running."),
+                    (String) null);
+            return;
+        }
+
+        // Show a confirmation message.
+        DetailMessageDialog dlg = DetailMessageDialog
+                .openYesNoQuestion(
+                        this.getShell(),
+                        _("Backup now"),
+                        _("Do you want to backup your system?"),
+                        _("You are about to backup your system to minarca. This operation may take some time. While this operation is running you may safely close the minarca application."),
+                        null);
+        if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
+            LOGGER.info("backup cancel by user");
+            return;
+        }
+
+        // Unlink this computer.
+        try {
+            API.instance().runBackup();
+        } catch (APIException e) {
+            DetailMessageDialog.openError(this.getShell(), _("Error"), _("Can't backup this computer!"), _("An error occurred while backuping this computer."));
+        }
+
+        // Asynchronously update the interface.
+        asynchCheckBackupInfo(this.backupinfo, this.backupNowButton);
+
     }
 
     /**

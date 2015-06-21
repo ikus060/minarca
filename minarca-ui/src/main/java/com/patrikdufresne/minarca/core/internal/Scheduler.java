@@ -5,9 +5,12 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import com.patrikdufresne.minarca.core.APIException;
+import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 
 /**
  * Interface used to represent a scheduler.
@@ -19,6 +22,53 @@ import com.patrikdufresne.minarca.core.APIException;
  * 
  */
 public abstract class Scheduler {
+
+    /**
+     * Create a task info.
+     * 
+     * @author Patrik Dufresne
+     */
+    public static class TaskInfo {
+
+        private Boolean running;
+        private Date lastRun;
+        private Integer lastResult;
+
+        public TaskInfo(Boolean running, Date lastRun, Integer lastResult) {
+            this.running = running;
+            this.lastRun = lastRun;
+            this.lastResult = lastResult;
+        }
+
+        /**
+         * True if the task is running.
+         * 
+         * @return
+         */
+        public Boolean isRunning() {
+            return running;
+        }
+
+        /**
+         * The last known running date.
+         * 
+         * @return
+         */
+        public Date getLastRun() {
+            return lastRun;
+        }
+
+        /**
+         * The last result of the task.
+         * 
+         * @return
+         */
+        public Integer getLastResult() {
+            return lastResult;
+        }
+
+    }
+
     /**
      * Return the scheduling service for this operating system.
      * 
@@ -56,27 +106,19 @@ public abstract class Scheduler {
      * @param taskname
      * @return
      */
-    public abstract boolean exists() throws APIException;
-
-    /**
-     * Check if the task is running.
-     * 
-     * @return True if the task is running.
-     * @throws APIException
-     */
-    public abstract boolean isRunning() throws APIException;
+    public abstract TaskInfo info() throws APIException, TaskNotFoundException;
 
     /**
      * Run the task.
      * 
      * @throws APIException
      */
-    public abstract void run() throws APIException;
+    public abstract void run() throws APIException, TaskNotFoundException;
 
     /**
      * Terminate the task. Has no effect if the task is not running.
      * 
      * @throws APIException
      */
-    public abstract void terminate() throws APIException;
+    public abstract void terminate() throws APIException, TaskNotFoundException;
 }
