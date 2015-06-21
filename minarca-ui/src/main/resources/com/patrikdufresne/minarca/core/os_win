@@ -1,3 +1,5 @@
+${root}/Windows/
+${root}/Program Files/
 **/pagefile.sys
 **/NTUSER.DAT*
 **/ntuser.dat*
@@ -8,4 +10,3 @@
 ${root}Recovery/
 ${root}ProgramData/
 ${root}$Recycle.Bin/
-${root}/Windows/

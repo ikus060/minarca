@@ -16,7 +16,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -44,11 +43,94 @@ public class GlobPattern {
         return pattern.replace("\\", "/");
     }
 
-    private static String getPath(File file) {
+    /**
+     * Replace ${} by real value.
+     * 
+     * @param value
+     * 
+     * @return
+     */
+    private static String expand(String value) {
+        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.ROOT).replace("${temp}", Compat.TEMP);
+    }
+
+    /**
+     * Represent the default location where files are documents.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> getDocumentsPatterns() {
         try {
-            return file.getCanonicalPath();
+            return readResource("documents");
         } catch (IOException e) {
-            return file.getAbsolutePath();
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Represent the default location where files are downloaded.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> getDownloadsPatterns() {
+        try {
+            return readResource("downloads");
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Pattern to include musics.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> getMusicPatterns() {
+        try {
+            return readResource("music");
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Represent the operating system file to be ignored.
+     */
+    public static List<GlobPattern> getOsPatterns() {
+        try {
+            return readResource("os");
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    private static String getPath(File file) {
+        return file.getAbsolutePath();
+    }
+
+    /**
+     * Pattern to include pictures.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> getPicturesPatterns() {
+        try {
+            return readResource("pictures");
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Pattern to include pictures.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> getVideosPatterns() {
+        try {
+            return readResource("videos");
+        } catch (IOException e) {
+            return Collections.emptyList();
         }
     }
 
@@ -89,48 +171,6 @@ public class GlobPattern {
             }
         }
         return list;
-    }
-
-    /**
-     * Internal method used to write the patterns into a file.
-     * 
-     * @param file
-     * @param pattern
-     * @throws IOException
-     */
-    public static void writePatterns(File file, List<GlobPattern> pattern) throws IOException {
-        FileWriterWithEncoding writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
-        for (GlobPattern line : pattern) {
-            writer.append(line.value());
-            writer.append(SystemUtils.LINE_SEPARATOR);
-        }
-        writer.close();
-    }
-
-    /**
-     * Return a default include pattern.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> includesDefault() {
-        try {
-            return readResource("includes");
-        } catch (IOException e) {
-            return Arrays.asList(new GlobPattern(SystemUtils.getUserHome()));
-        }
-    }
-
-    /**
-     * Represent the default location where files are downloaded.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> excludesDownloads() {
-        try {
-            return readResource("excludes_downloads");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
     }
 
     /**
@@ -183,25 +223,19 @@ public class GlobPattern {
     }
 
     /**
-     * Replace ${} by real value.
+     * Internal method used to write the patterns into a file.
      * 
-     * @param value
-     * 
-     * @return
+     * @param file
+     * @param pattern
+     * @throws IOException
      */
-    private static String expand(String value) {
-        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.ROOT).replace("${temp}", Compat.TEMP);
-    }
-
-    /**
-     * Represent the operating system file to be ignored.
-     */
-    public static List<GlobPattern> excludesSystem() {
-        try {
-            return readResource("excludes_system");
-        } catch (IOException e) {
-            return Collections.emptyList();
+    public static void writePatterns(File file, List<GlobPattern> pattern) throws IOException {
+        FileWriterWithEncoding writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
+        for (GlobPattern line : pattern) {
+            writer.append(line.value());
+            writer.append(SystemUtils.LINE_SEPARATOR);
         }
+        writer.close();
     }
 
     private PathMatcher matcher;
@@ -228,11 +262,7 @@ public class GlobPattern {
             // Try to get the absolute location of the file.
             File f = new File(pattern);
             if (f.exists()) {
-                try {
-                    pattern = f.getCanonicalPath();
-                } catch (IOException e) {
-                    // Swallow exception. Keep original pattern.
-                }
+                pattern = f.getAbsolutePath();
             }
         }
         // rdiffweb for windows doesn't support \\ separator, replace them.
@@ -282,13 +312,7 @@ public class GlobPattern {
      * @return
      */
     public boolean matches(File file) {
-        // Try to get canonical name.
-        String path;
-        try {
-            path = file.getCanonicalPath();
-        } catch (IOException e) {
-            path = file.getAbsolutePath();
-        }
+        String path = file.getAbsolutePath();
         if (isGlobbing()) {
             return matcher().matches(Paths.get(path));
         }
@@ -298,7 +322,7 @@ public class GlobPattern {
 
     @Override
     public String toString() {
-        return this.pattern.replace("/", "\\");
+        return this.pattern.replace("/", SystemUtils.FILE_SEPARATOR);
     }
 
     public String value() {

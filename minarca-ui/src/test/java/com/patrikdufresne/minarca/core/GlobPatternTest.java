@@ -13,7 +13,7 @@ public class GlobPatternTest {
     public void testDownloadsExcludes() {
 
         GlobPattern pattern = new GlobPattern(SystemUtils.USER_HOME + "/Downloads");
-        List<GlobPattern> list = GlobPattern.excludesDownloads();
+        List<GlobPattern> list = GlobPattern.getDownloadsPatterns();
         assertTrue(list.contains(pattern));
 
     }

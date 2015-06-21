@@ -250,10 +250,15 @@ public class API {
     public void defaultConfig() throws APIException {
         LOGGER.debug("restore default config");
         // Sets the default includes / excludes.
-        setIncludes(GlobPattern.includesDefault());
+        List<GlobPattern> includes = new ArrayList<GlobPattern>();
+        includes.addAll(GlobPattern.getDocumentsPatterns());
+        includes.addAll(GlobPattern.getMusicPatterns());
+        includes.addAll(GlobPattern.getPicturesPatterns());
+        includes.addAll(GlobPattern.getVideosPatterns());
+        setIncludes(includes);
         List<GlobPattern> excludes = new ArrayList<GlobPattern>();
-        excludes.addAll(GlobPattern.excludesSystem());
-        excludes.addAll(GlobPattern.excludesDownloads());
+        excludes.addAll(GlobPattern.getOsPatterns());
+        excludes.addAll(GlobPattern.getDownloadsPatterns());
         setExcludes(excludes);
 
         // Delete & create schedule tasks.

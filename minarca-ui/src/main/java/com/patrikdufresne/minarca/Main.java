@@ -24,7 +24,7 @@ import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.ui.DetailMessageDialog;
 import com.patrikdufresne.minarca.ui.Images;
-import com.patrikdufresne.minarca.ui.PreferenceDialog;
+import com.patrikdufresne.minarca.ui.SettingsDialog;
 import com.patrikdufresne.minarca.ui.SetupDialog;
 
 /**
@@ -219,7 +219,7 @@ public class Main {
 
             winManager = new WindowManager();
             // Open Main Window
-            PreferenceDialog win = new PreferenceDialog();
+            SettingsDialog win = new SettingsDialog();
             win.setWindowManager(winManager);
             win.open();
             // Event loop

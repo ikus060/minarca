@@ -34,8 +34,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  */
 public class AppFormToolkit extends FormToolkit {
 
-    private static final String BG = "BG";
-    private static final String FG = "FG";
+    private static final String ALT_BG = "ALT_BG";
+    private static final String ALT_FG = "ALT_FG";
     private static final int FORM_TEXT_MARGNIN = 15;
     private static final String H = "H";
     private static final String H_HOVER = "H_HOVER";
@@ -78,11 +78,6 @@ public class AppFormToolkit extends FormToolkit {
     private IHyperlinkListener hyperlinkListener;
 
     /**
-     * True to use alt color (for setup dialog).
-     */
-    private final boolean useAltColor;
-
-    /**
      * Create a form tool kit using default color.
      * 
      * @param display
@@ -100,16 +95,23 @@ public class AppFormToolkit extends FormToolkit {
      */
     public AppFormToolkit(Display display, boolean useAltColor) {
         super(display);
-        this.useAltColor = useAltColor;
         refreshHyperlinkColors();
     }
 
     /**
      * This implementation adjust the colors according to the control type.
      */
+    @Override
     public void adapt(Composite composite) {
+        adapt(composite, false);
+    }
+
+    /**
+     * This implementation adjust the colors according to the control type.
+     */
+    public void adapt(Composite composite, boolean useAltColor) {
         super.adapt(composite);
-        if (this.useAltColor) {
+        if (useAltColor) {
             composite.setBackground(getAltBackground());
         }
     }
@@ -118,8 +120,15 @@ public class AppFormToolkit extends FormToolkit {
      * This implementation adjust the colors according to the control type.
      */
     public void adapt(Control control, boolean trackFocus, boolean trackKeyboard) {
+        adapt(control, trackFocus, trackKeyboard, false);
+    }
+
+    /**
+     * This implementation adjust the colors according to the control type.
+     */
+    public void adapt(Control control, boolean trackFocus, boolean trackKeyboard, boolean useAltColor) {
         super.adapt(control, trackFocus, trackKeyboard);
-        if (this.useAltColor) {
+        if (useAltColor) {
             if (control instanceof Label || control instanceof FormText) {
                 control.setBackground(getAltBackground());
                 control.setForeground(getAltForeground());
@@ -136,6 +145,20 @@ public class AppFormToolkit extends FormToolkit {
         return label;
     }
 
+    /**
+     * Create composite.
+     * 
+     * @param parent
+     * @param style
+     * @param useAltColor
+     * @return
+     */
+    public Composite createComposite(Composite parent, int style, boolean useAltColor) {
+        Composite comp = createComposite(parent, style);
+        adapt(comp, useAltColor);
+        return comp;
+    }
+
     public CTabFolder createCTabFolder(Composite parent) {
         CTabFolder t = new CTabFolder(parent, SWT.TOP | SWT.FLAT);
         Font f = getFontBold(JFaceResources.DIALOG_FONT);
@@ -149,7 +172,15 @@ public class AppFormToolkit extends FormToolkit {
 
     @Override
     public FormText createFormText(Composite parent, boolean trackFocus) {
-        return createFormText(parent, "", false);
+        return createFormText(parent, "", false, false);
+    }
+
+    public FormText createFormText(Composite parent, String text) {
+        return createFormText(parent, text, false, false);
+    }
+
+    public FormText createFormText(Composite parent, String text, boolean withPadding) {
+        return createFormText(parent, text, withPadding, false);
     }
 
     /**
@@ -162,7 +193,7 @@ public class AppFormToolkit extends FormToolkit {
      *            True to sets default padding value (current value: 15)
      * @return a FormText widget.
      */
-    public FormText createFormText(Composite parent, String text, boolean withPadding) {
+    public FormText createFormText(Composite parent, String text, boolean withPadding, boolean useAltColor) {
         FormText engine = new FormText(parent, SWT.NO_BACKGROUND | SWT.WRAP | SWT.NO_FOCUS) {
 
             private String replaceTag(String text, String tag, String replacement, String attributes) {
@@ -197,7 +228,7 @@ public class AppFormToolkit extends FormToolkit {
             engine.marginHeight = FORM_TEXT_MARGNIN;
         }
         // Add styles
-        Color fg = this.useAltColor ? getAltForeground() : getColors().getForeground();
+        Color fg = useAltColor ? getAltForeground() : getColors().getForeground();
         // H1,
         engine.setFont(H1, getFont(JFaceResources.DIALOG_FONT, 3.25f, false));
         engine.setColor(H1, fg);
@@ -215,7 +246,7 @@ public class AppFormToolkit extends FormToolkit {
 
         engine.setHyperlinkSettings(getHyperlinkGroup());
         engine.addHyperlinkListener(getHyperlinkListener());
-        adapt(engine, false, false);
+        adapt(engine, false, false, useAltColor);
         engine.setMenu(parent.getMenu());
         engine.setText(text, true, true);
         return engine;
@@ -232,11 +263,11 @@ public class AppFormToolkit extends FormToolkit {
     }
 
     private Color getAltBackground() {
-        return getColors().createColor(BG, rgb("#008cba"));
+        return getColors().createColor(ALT_BG, Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB());
     }
 
     private Color getAltForeground() {
-        return getColors().createColor(FG, rgb("#ffffff"));
+        return getColors().createColor(ALT_FG, rgb("#ffffff"));
     }
 
     /**
@@ -264,9 +295,9 @@ public class AppFormToolkit extends FormToolkit {
         return getColors().createColor(LIGHT, FormColors.blend(rgb("#ffffff"), getColors().getForeground().getRGB(), 25));
     }
 
-    public void refreshHyperlinkColors() {
+    public void refreshHyperlinkColors(boolean useAltColor) {
         super.refreshHyperlinkColors();
-        if (this.useAltColor) {
+        if (useAltColor) {
 
         } else {
             getHyperlinkGroup().setForeground(getColors().createColor(H, rgb("#008cba")));

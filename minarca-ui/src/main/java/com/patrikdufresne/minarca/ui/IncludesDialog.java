@@ -14,7 +14,10 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -64,6 +67,20 @@ import com.patrikdufresne.minarca.core.internal.Compat;
 public class IncludesDialog extends TrayDialog {
 
     private static final transient Logger LOGGER = LoggerFactory.getLogger(IncludesDialog.class);
+
+    /**
+     * Comparator used to show folders.
+     */
+    protected static final Comparator<? super File> FILE_COMPARATOR = new Comparator<File>() {
+        @Override
+        public int compare(File o1, File o2) {
+            // Folder first, file last.
+            if (o1.isDirectory() != o2.isDirectory()) {
+                return o1.isDirectory() ? -1 : 1;
+            }
+            return o1.getName().compareToIgnoreCase(o2.getName());
+        }
+    };
 
     private static ImageData convertToSWT(BufferedImage bufferedImage) {
         if (bufferedImage.getColorModel() instanceof DirectColorModel) {
@@ -137,10 +154,6 @@ public class IncludesDialog extends TrayDialog {
         return new Image(Display.getDefault(), convertToSWT(bufferedImage));
     }
 
-    private List<GlobPattern> defaultExcludes = Collections.emptyList();
-
-    private List<GlobPattern> defaultIncludes = Collections.emptyList();
-
     private List<GlobPattern> excludes = Collections.emptyList();
 
     private AppFormToolkit ft;
@@ -148,6 +161,10 @@ public class IncludesDialog extends TrayDialog {
     private ImageRegistry imageRegistry;
 
     private List<GlobPattern> includes = Collections.emptyList();
+
+    private List<GlobPattern> predefinedExcludes = Collections.emptyList();
+
+    private List<GlobPattern> predefinedIncludes = Collections.emptyList();
 
     private CheckboxTreeViewer viewer;
 
@@ -236,8 +253,12 @@ public class IncludesDialog extends TrayDialog {
 
             @Override
             public Object[] getChildren(Object parentElement) {
+                // From parent element get children.
                 File file = (File) parentElement;
-                return file.listFiles();
+                File[] children = file.listFiles();
+                // Then sort children.
+                Collections.sort(Arrays.asList(children), FILE_COMPARATOR);
+                return children;
             }
 
             @Override
@@ -373,13 +394,13 @@ public class IncludesDialog extends TrayDialog {
 
         // Need to remove the include pattern
         if (include.equals(new GlobPattern(file))) {
-            if (isDefaultInclude(include)) {
+            if (isPredefinedInclude(include)) {
                 DetailMessageDialog.openWarning(
                         this.getShell(),
                         _("Ignore"),
-                        _("Can''t ignore the {0} since it''s " + "included by default.", file.toString()),
+                        _("Can''t ignore the {0} since it''s " + "included by a predefined pattern.", file.toString()),
                         _("You are trying to ignore a folder or a file that "
-                                + "is included by default. If you really "
+                                + "is included by a predefined pattern. If you really "
                                 + "want to ignore this file, change your "
                                 + "configuration in 'Selective backup' "
                                 + "preferences."));
@@ -454,13 +475,13 @@ public class IncludesDialog extends TrayDialog {
         // Make sure to remove exclude if specific to this file.
         GlobPattern exclude = isExcluded(file);
         if (exclude != null && exclude.equals(new GlobPattern(file))) {
-            if (isDefaultExclude(exclude)) {
+            if (isPredefinedExclude(exclude)) {
                 DetailMessageDialog.openWarning(
                         this.getShell(),
                         _("Include"),
-                        _("Can''t include {0} since it''s " + "ignored by default.", file.toString()),
+                        _("Can''t include {0} since it''s ignored by predefined pattern.", file.toString()),
                         _("You are trying to include a folder or a file that "
-                                + "is ignored by default. If you really "
+                                + "is ignored by predefined pattern. If you really "
                                 + "want to include this file, change your "
                                 + "configuration in 'Selective backup' "
                                 + "preferences."));
@@ -479,26 +500,6 @@ public class IncludesDialog extends TrayDialog {
             LOGGER.debug("add include pattern [{}]", include);
             this.includes.add(include);
         }
-    }
-
-    /**
-     * Check if the given pattern is a "default" pattern. Those patterns should not be removed.
-     * 
-     * @param p
-     * @return
-     */
-    private boolean isDefaultExclude(GlobPattern p) {
-        return defaultExcludes.contains(p);
-    }
-
-    /**
-     * Check if the given pattern is a "default" pattern. Those patterns should not be removed.
-     * 
-     * @param p
-     * @return
-     */
-    private boolean isDefaultInclude(GlobPattern p) {
-        return defaultIncludes.contains(p);
     }
 
     /**
@@ -531,20 +532,32 @@ public class IncludesDialog extends TrayDialog {
         return null;
     }
 
+    /**
+     * Check if the given pattern is a "predefined" pattern. Those patterns should not be removed.
+     * 
+     * @param p
+     * @return
+     */
+    private boolean isPredefinedExclude(GlobPattern p) {
+        return predefinedExcludes.contains(p);
+    }
+
+    /**
+     * Check if the given pattern is a "Predefined" pattern. Those patterns should not be removed.
+     * 
+     * @param p
+     * @return
+     */
+    private boolean isPredefinedInclude(GlobPattern p) {
+        return predefinedIncludes.contains(p);
+    }
+
     @Override
     protected boolean isResizable() {
         return true;
     }
 
-    public void setDefaultExcludes(List<GlobPattern> list) {
-        this.defaultExcludes = new ArrayList<GlobPattern>(list);
-    }
-
-    public void setDefaultIncludes(List<GlobPattern> list) {
-        this.defaultIncludes = new ArrayList<GlobPattern>(list);
-    }
-
-    public void setExcludes(List<GlobPattern> excludes) {
+    public void setExcludes(Collection<GlobPattern> excludes) {
         this.excludes = new ArrayList<GlobPattern>(excludes);
     }
 
@@ -553,7 +566,25 @@ public class IncludesDialog extends TrayDialog {
      * 
      * @param patterns
      */
-    public void setIncludes(List<GlobPattern> includes) {
+    public void setIncludes(Collection<GlobPattern> includes) {
         this.includes = new ArrayList<GlobPattern>(includes);
+    }
+
+    /**
+     * Sets the predefine list of patterns (those are not editable by the dialog)
+     * 
+     * @param list
+     */
+    public void setPredefinedExcludes(Collection<GlobPattern> list) {
+        this.predefinedExcludes = new ArrayList<GlobPattern>(list);
+    }
+
+    /**
+     * Sets the predefine list of patterns (those are not editable by the dialog)
+     * 
+     * @param list
+     */
+    public void setPredefinedIncludes(Collection<GlobPattern> list) {
+        this.predefinedIncludes = new ArrayList<GlobPattern>(list);
     }
 }
