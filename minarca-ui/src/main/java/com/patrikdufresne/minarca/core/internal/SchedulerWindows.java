@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,13 +48,43 @@ public class SchedulerWindows extends Scheduler {
 
         private static final int LAST_RESULT = 7;
 
-        private static final int LAST_RUN_TIME = 2;
+        private static final int NEXT_RUN_TIME = 2;
+        
+        private static final int LAST_RUN_TIME = 4;
 
         private static final int STATUS = 3;
 
         private static final int TASK_TO_RUN = 8;
 
         private static final int TASKNAME = 1;
+
+        /**
+         * Heuristic to parse date string.
+         * 
+         * @param value
+         *            a date in string format.
+         * 
+         * @return a Date object or null
+         */
+        private static Date parseDate(String value) {
+            List<String> values = new ArrayList<String>();
+            values.add(value);
+            String parts[] = value.split(", ");
+            if (parts.length == 2) {
+                values.add(parts[1] + " " + parts[0]);
+            }
+            for (String v : values) {
+                for (DateFormat df : Arrays.asList(DateFormat.getDateTimeInstance())) {
+                    try {
+                        return df.parse(v);
+                    } catch (ParseException e) {
+                        // Swallow
+                    }
+                }
+            }
+            LOGGER.debug("fail to parse date [{}]", value);
+            return null;
+        }
 
         private final List<String> data;
 
@@ -103,11 +134,12 @@ public class SchedulerWindows extends Scheduler {
          */
         public Date getLastRunTime() {
             String value = get(LAST_RUN_TIME);
-            try {
-                return DateFormat.getDateTimeInstance().parse(value);
-            } catch (ParseException e) {
-                return null;
-            }
+            return parseDate(value);
+        }
+        
+        public Date getNextRunTime() {
+            String value = get(NEXT_RUN_TIME);
+            return parseDate(value);
         }
 
         /**
@@ -320,6 +352,26 @@ public class SchedulerWindows extends Scheduler {
         return Compat.searchFile(MINARCA, System.getProperty(PROPERTY_MINARCA_EXE_LOCATION), "./bin/", ".");
     }
 
+    /**
+     * Get information about the task.
+     */
+    @Override
+    public TaskInfo info() throws TaskNotFoundException, APIException {
+        LOGGER.info("check task info");
+        // Get reference to our task
+        SchTaskEntry task = query(TASK_NAME);
+        if (task == null) {
+            throw new TaskNotFoundException();
+        }
+        // Get the status and check if it run.
+        String status = task.getStatus();
+        LOGGER.debug("task status [{}]", status);
+        Matcher m = PATTERN_TASK_RUNNING.matcher(status);
+        Boolean running = m.find();
+
+        return new TaskInfo(running, task.getLastRunTime(), task.getLastResult());
+    }
+
     private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
         String data;
         if (taskname != null && !SystemUtils.IS_OS_WINDOWS_XP && !SystemUtils.IS_OS_WINDOWS_2003) {
@@ -353,26 +405,6 @@ public class SchedulerWindows extends Scheduler {
         }
         scanner.close();
         return list;
-    }
-
-    /**
-     * Get information about the task.
-     */
-    @Override
-    public TaskInfo info() throws TaskNotFoundException, APIException {
-        LOGGER.info("check task info");
-        // Get reference to our task
-        SchTaskEntry task = query(TASK_NAME);
-        if (task == null) {
-            throw new TaskNotFoundException();
-        }
-        // Get the status and check if it run.
-        String status = task.getStatus();
-        LOGGER.debug("task status [{}]", status);
-        Matcher m = PATTERN_TASK_RUNNING.matcher(status);
-        Boolean running = m.find();
-
-        return new TaskInfo(running, task.getLastRunTime(), task.getLastResult());
     }
 
     /**
