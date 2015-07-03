@@ -196,7 +196,7 @@ public class IncludesDialog extends TrayDialog {
     protected boolean containsInclude(File file) {
         GlobPattern p = new GlobPattern(file.getAbsolutePath());
         for (GlobPattern inc : includes) {
-            if (inc.toString().startsWith(p.toString())) {
+            if (p.matches(new File(inc.value()))) {
                 return true;
             }
         }

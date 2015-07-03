@@ -316,10 +316,17 @@ public class GlobPattern {
         if (isGlobbing()) {
             return matcher().matches(Paths.get(path));
         }
+        // For Windows OS, do case insensitive compare
+        if(SystemUtils.IS_OS_WINDOWS){
+            return encode(path).toLowerCase().startsWith(this.pattern.toLowerCase());
+        }
+        // Other platform do case sensitive compare
         return encode(path).startsWith(this.pattern);
-
     }
 
+    /**
+     * For printing, it's better to use the right file separator.
+     */
     @Override
     public String toString() {
         return this.pattern.replace("/", SystemUtils.FILE_SEPARATOR);
