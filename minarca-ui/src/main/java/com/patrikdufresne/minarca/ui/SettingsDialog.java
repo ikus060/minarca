@@ -162,7 +162,7 @@ public class SettingsDialog extends Dialog {
             public void run() {
                 if (!lastruntimeItem.isDisposed()) {
                     if (fInfo != null && fInfo.isRunning()) {
-                        lastruntimeItem.setValue(_("Running"));
+                        lastruntimeItem.setValue(_("Running..."));
                         stopStartButton.setEnabled(true);
                         stopStartButton.setText(_("Stop"));
                     } else if (fInfo != null && fInfo.getLastRun() != null) {
