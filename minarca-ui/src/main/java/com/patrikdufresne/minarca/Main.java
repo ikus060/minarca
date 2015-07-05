@@ -117,6 +117,7 @@ public class Main {
         try {
             API.checkEnv();
         } catch (APIException e) {
+            LOGGER.info("invalid env", e);
             System.err.println(e.getMessage());
             System.exit(1);
         }
@@ -126,6 +127,7 @@ public class Main {
             API.instance().checkConfig();
         } catch (APIException e) {
             // Show error message (usually localized).
+            LOGGER.info("invalid config", e);
             System.err.println(e.getMessage());
             System.exit(2);
         }
@@ -133,12 +135,10 @@ public class Main {
         // Run the backup.
         try {
             API.instance().backup();
+            LOGGER.info("backup SUCCESS");
         } catch (APIException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.info("backup FAILED", e);
             System.exit(3);
-        } finally {
-            LOGGER.info("backup completed");
         }
 
     }
