@@ -345,18 +345,18 @@ public class SettingsDialog extends Dialog {
         });
 
         // Separator.
-        new Label(backupItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
+        // new Label(backupItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
 
         // Create pause
-        CListItem pauseItem = new CListItem(backupItemlist, _("Pause backup"));
-        pauseItem.setTitleHelpText(_("Used to temporarily stop backup."));
-        SwitchButton pauseButton = pauseItem.createSwitchButton();
-        pauseButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                handlePauseBackup();
-            }
-        });
+        // CListItem pauseItem = new CListItem(backupItemlist, _("Pause backup"));
+        // pauseItem.setTitleHelpText(_("Used to temporarily stop backup."));
+        // SwitchButton pauseButton = pauseItem.createSwitchButton();
+        // pauseButton.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // handlePauseBackup();
+        // }
+        // });
 
         // Separator.
         new Label(backupItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
