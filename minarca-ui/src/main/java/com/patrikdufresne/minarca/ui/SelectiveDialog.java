@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.patrikdufresne.minarca.core.GlobPattern;
+import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.switchbutton.SwitchButton;
 
 /**
@@ -346,6 +347,8 @@ public class SelectiveDialog extends Dialog {
         DirectoryDialog dlg = new DirectoryDialog(getShell(), SWT.NONE);
         dlg.setText(getShell().getText());
         dlg.setMessage(_("Select a folder to be added to your selective backup."));
+        // Set default location to "Home".
+        dlg.setFilterPath(Compat.HOME);
         // Open dialog and check return code.
         if (dlg.open() == null) {
             // Cancel by user
