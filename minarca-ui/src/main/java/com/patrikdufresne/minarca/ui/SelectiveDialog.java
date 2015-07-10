@@ -132,7 +132,7 @@ public class SelectiveDialog extends Dialog {
         // Predefine label
         Label predefineLabel = new Label(comp, SWT.NONE);
         predefineLabel.setFont(AppFormToolkit.getFontBold(JFaceResources.DEFAULT_FONT));
-        predefineLabel.setText(_("Predefine"));
+        predefineLabel.setText(_("Predefined"));
 
         CList predefineList = new CList(comp, SWT.BORDER);
         predefineList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -477,7 +477,7 @@ public class SelectiveDialog extends Dialog {
             if (new File(p.value()).exists()) {
                 label = FilenameUtils.getBaseName(p.value());
             } else {
-                label = _("Custom include pattern");
+                label = _("Custom pattern");
             }
             createItem(this.customList, label, Arrays.asList(p), false);
         }
@@ -488,7 +488,7 @@ public class SelectiveDialog extends Dialog {
             if (new File(p.value()).exists()) {
                 label = FilenameUtils.getBaseName(p.value());
             } else {
-                label = _("Custom exclude pattern");
+                label = _("Custom pattern");
             }
             createItem(this.customList, label, Arrays.asList(p), false);
         }

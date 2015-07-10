@@ -339,7 +339,7 @@ public class SchedulerWindows extends Scheduler {
     private String getCommand() throws APIException {
         File file = getExeLocation();
         if (file == null) {
-            throw new APIException(_("{0} is missing ", MINARCA));
+            throw new APIException(_("{0} is missing", MINARCA));
         }
         StringBuilder buf = new StringBuilder();
         buf.append("\\\"");

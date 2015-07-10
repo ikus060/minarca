@@ -169,7 +169,7 @@ public class API {
             this.properties.load(in);
             in.close();
         } catch (IOException e) {
-            LoggerFactory.getLogger(API.class).warn(_("can't load properties {}"), confFile);
+            LoggerFactory.getLogger(API.class).warn("can't load properties {}", confFile);
         }
     }
 
@@ -228,7 +228,7 @@ public class API {
         try {
             Scheduler.getInstance().info();
         } catch (TaskNotFoundException e) {
-            throw new MissConfiguredException(_("scheduled tasks is missing"));
+            throw new MissConfiguredException(e.getMessage());
         }
     }
 

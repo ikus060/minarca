@@ -397,9 +397,9 @@ public class IncludesDialog extends TrayDialog {
             if (isPredefinedInclude(include)) {
                 DetailMessageDialog.openWarning(
                         this.getShell(),
-                        _("Ignore"),
-                        _("Can''t ignore the {0} since it''s " + "included by a predefined pattern.", file.toString()),
-                        _("You are trying to ignore a folder or a file that "
+                        _("Exclude"),
+                        _("Can''t exclude {0} since it''s " + "included by a predefined pattern.", file.toString()),
+                        _("You are trying to exclude a folder or a file that "
                                 + "is included by a predefined pattern. If you really "
                                 + "want to ignore this file, change your "
                                 + "configuration in 'Selective backup' "
@@ -479,9 +479,9 @@ public class IncludesDialog extends TrayDialog {
                 DetailMessageDialog.openWarning(
                         this.getShell(),
                         _("Include"),
-                        _("Can''t include {0} since it''s ignored by predefined pattern.", file.toString()),
+                        _("Can''t include {0} since it''s exclude by predefined pattern.", file.toString()),
                         _("You are trying to include a folder or a file that "
-                                + "is ignored by predefined pattern. If you really "
+                                + "is exclude by predefined pattern. If you really "
                                 + "want to include this file, change your "
                                 + "configuration in 'Selective backup' "
                                 + "preferences."));

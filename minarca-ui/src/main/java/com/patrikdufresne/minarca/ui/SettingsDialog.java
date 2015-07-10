@@ -322,7 +322,7 @@ public class SettingsDialog extends Dialog {
         // Create fingerprint
         CListItem fingerprintItem = new CListItem(accountItemlist, _("Fingerprint"));
         fingerprintItem.setValue(API.instance().getIdentityFingerPrint());
-        fingerprintItem.setValueHelpText(_("Use by your computer to identify it self."));
+        fingerprintItem.setValueHelpText(_("Use by your computer to identify itself."));
 
         // Create label.
         Label backupSettingsLabel = new Label(comp, SWT.NONE);
@@ -363,7 +363,7 @@ public class SettingsDialog extends Dialog {
 
         // Create Last run time
         lastruntimeItem = new CListItem(backupItemlist, _("Last run time"));
-        lastruntimeItem.setValue(_("..."));
+        lastruntimeItem.setValue(Dialog.ELLIPSIS);
         stopStartButton = lastruntimeItem.createButton(_("Start"));
         stopStartButton.setEnabled(false);
         stopStartButton.addSelectionListener(new SelectionAdapter() {

@@ -102,7 +102,7 @@ public class AboutDialog extends Dialog {
         appDescText.setBackground(this.getShell().getBackground());
 
         // App copyright
-        String appCopyright = _("Copyright © 2015 - Patrik Dufresne Service Logiciel inc");
+        String appCopyright = _("Copyright © 2015 - Patrik Dufresne Service Logiciel inc.");
         Label appCopyrightText = new Label(comp, SWT.CENTER);
         appCopyrightText.setText(appCopyright);
         appCopyrightText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));

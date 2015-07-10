@@ -60,7 +60,7 @@ public class APIException extends Exception {
     public static class PlinkMissingException extends APIException {
 
         public PlinkMissingException() {
-            super("plink is missing");
+            super(_("plink is missing"));
         }
 
     }
@@ -69,7 +69,7 @@ public class APIException extends Exception {
 
         // TODO Add mos arguments: fingerprint, hostname
         public UntrustedHostKey() {
-            super("remote SSH host is not trusted");
+            super(_("remote SSH host is not trusted"));
         }
 
     }
@@ -80,7 +80,7 @@ public class APIException extends Exception {
     public static class UnsupportedOS extends APIException {
 
         public UnsupportedOS() {
-            super(_("Minarca doesn't support you OS. This application will close."));
+            super(_("minarca doesn't support your operating system. This application will close."));
         }
 
     }
@@ -88,7 +88,7 @@ public class APIException extends Exception {
     public static class UnsufficientPermissons extends APIException {
 
         public UnsufficientPermissons() {
-            super(_("You don't have sufficient permissions to execute this application!"));
+            super(_("you don't have sufficient permissions to execute this application!"));
         }
 
     }
@@ -102,7 +102,7 @@ public class APIException extends Exception {
     public static class TaskNotFoundException extends APIException {
 
         public TaskNotFoundException() {
-            super(_("Scheduled task not found"));
+            super(_("scheduled task not found"));
         }
 
     }

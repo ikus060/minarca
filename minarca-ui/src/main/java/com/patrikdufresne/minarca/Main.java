@@ -268,7 +268,7 @@ public class Main {
                     null,
                     Display.getAppName(),
                     _("Do you want to restore default configuration ?"),
-                    _("Your minarca installation seams broken."
+                    _("Your minarca installation seams broken. "
                             + "If you answer Yes, all your personal configuration will be lost. "
                             + "If you answer no, this application may misbehave."),
                     null).getReturnCode() == IDialogConstants.YES_ID) {
@@ -280,7 +280,7 @@ public class Main {
                     DetailMessageDialog.openWarning(
                             null,
                             Display.getAppName(),
-                            _("Can't repair minarca configuration!"),
+                            _("Can't repair minarca's configuration!"),
                             _("This application may misbehave. If the problem persist, you may try to reinstall minarca."),
                             e1);
                 }

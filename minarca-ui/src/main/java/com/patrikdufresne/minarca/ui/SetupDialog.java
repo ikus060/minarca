@@ -155,7 +155,7 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Sign In") + "</h2><br/>";
-        introText += _("If you have an minarca account, " + "enter your username and password.");
+        introText += _("If you have a minarca account, enter your username and password.");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -389,10 +389,10 @@ public class SetupDialog extends Dialog {
             return e.getMessage();
         } catch (APIException e) {
             LOGGER.warn("fail to register computer", e);
-            return _("<strong>Unknown error occurred !</strong> If the problem persists, try to re-install mirarca.");
+            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install mirarca.");
         } catch (IllegalArgumentException e) {
             LOGGER.warn("invalid computername: " + name, e);
-            return _("Invalid computer name !");
+            return _("Invalid computer name!");
         }
 
         // Set other settings to default.
@@ -401,7 +401,7 @@ public class SetupDialog extends Dialog {
             API.instance().defaultConfig();
         } catch (APIException e) {
             LOGGER.warn("fail to schedule task", e);
-            return _("Can't schedule backup task ! If the problem persists, try to re-install mirarca.");
+            return _("Can't schedule backup task! If the problem persists, try to re-install mirarca.");
         }
 
         return null;
