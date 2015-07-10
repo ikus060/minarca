@@ -40,7 +40,6 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
 import com.patrikdufresne.minarca.ui.fontawesome.FontAwesome;
-import com.patrikdufresne.switchbutton.SwitchButton;
 
 /**
  * This is the main windows of the application used to configure the backup.
@@ -161,19 +160,23 @@ public class SettingsDialog extends Dialog {
             @Override
             public void run() {
                 if (!lastruntimeItem.isDisposed()) {
-                    if (fInfo != null && fInfo.isRunning()) {
+                    // Update value with last date.
+                    if (fInfo == null || fInfo.getLastRun() == null) {
+                        lastruntimeItem.setValue(_("Unknown"));
+                    } else if (fInfo.isRunning()) {
                         lastruntimeItem.setValue(_("Running..."));
-                        stopStartButton.setEnabled(true);
-                        stopStartButton.setText(_("Stop"));
                     } else if (fInfo != null && fInfo.getLastRun() != null) {
                         String text = DateFormat.getDateTimeInstance().format(fInfo.getLastRun());
                         lastruntimeItem.setValue(text);
-                        stopStartButton.setEnabled(true);
-                        stopStartButton.setText(_("Start"));
-                    } else {
-                        lastruntimeItem.setValue(_("Unknown"));
-                        stopStartButton.setEnabled(false);
                     }
+                    // Update label button according to task state.
+                    if (fInfo == null) {
+                        stopStartButton.setEnabled(false);
+                    } else {
+                        stopStartButton.setEnabled(true);
+                        stopStartButton.setText(fInfo.isRunning() ? _("Stop") : _("Start"));
+                    }
+                    // Update help text with Success or Failure
                     if (fInfo != null && fInfo.getLastResult() != null) {
                         if (fInfo.getLastResult().intValue() == 0) {
                             lastruntimeItem.setValueHelpText(_("Successful"));
