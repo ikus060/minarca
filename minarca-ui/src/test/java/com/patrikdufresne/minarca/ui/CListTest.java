@@ -113,7 +113,7 @@ public class CListTest {
         item11.setTitleHelpText("/home/ikus060/my files/autocad files");
         item11.createSwitchButton();
         item11.createButtonDelete();
-        
+
         shell.pack();
         shell.open();
 

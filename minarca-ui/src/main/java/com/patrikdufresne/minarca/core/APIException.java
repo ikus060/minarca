@@ -85,7 +85,7 @@ public class APIException extends Exception {
      * Raised when the task is not found.
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public static class TaskNotFoundException extends APIException {
 

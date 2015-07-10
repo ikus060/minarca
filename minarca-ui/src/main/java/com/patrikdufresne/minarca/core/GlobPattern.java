@@ -317,7 +317,7 @@ public class GlobPattern {
             return matcher().matches(Paths.get(path));
         }
         // For Windows OS, do case insensitive compare
-        if(SystemUtils.IS_OS_WINDOWS){
+        if (SystemUtils.IS_OS_WINDOWS) {
             return encode(path).toLowerCase().startsWith(this.pattern.toLowerCase());
         }
         // Other platform do case sensitive compare

@@ -49,7 +49,7 @@ public class SchedulerWindows extends Scheduler {
         private static final int LAST_RESULT = 7;
 
         private static final int NEXT_RUN_TIME = 2;
-        
+
         private static final int LAST_RUN_TIME = 4;
 
         private static final int STATUS = 3;
@@ -136,7 +136,7 @@ public class SchedulerWindows extends Scheduler {
             String value = get(LAST_RUN_TIME);
             return parseDate(value);
         }
-        
+
         public Date getNextRunTime() {
             String value = get(NEXT_RUN_TIME);
             return parseDate(value);
