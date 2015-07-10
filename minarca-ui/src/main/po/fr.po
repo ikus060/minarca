@@ -299,7 +299,7 @@ msgstr "À propos"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:165
 msgid "Running..."
-msgstr "Sauvegarde..."
+msgstr "En exécution..."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:167
 msgid "Stop"
