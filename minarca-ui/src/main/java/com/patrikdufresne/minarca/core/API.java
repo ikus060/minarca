@@ -38,6 +38,8 @@ import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
+import com.patrikdufresne.rdiffweb.core.Client;
+import com.patrikdufresne.rdiffweb.core.RdiffwebException;
 
 /**
  * This class is the main entry point to do everything related to minarca.
@@ -233,13 +235,29 @@ public class API {
     }
 
     /**
-     * Establish connection to minarca.
+     * Establish connection to minarca web service.
      * 
-     * @return a new client
+     * @return a new client instance
+     * 
      * @throws APIException
+     *             if the connection can't be established.
      */
-    public Client connect(String username, String password) throws APIException {
-        return new Client(username, password);
+    public Client connect(String username, String password) throws APIException, IOException {
+        // Create a new client instance.
+        Client client = new Client(API.BASE_URL, username, password);
+
+        // TODO Check version
+        // client.getCurrentVersion();
+
+        // Check connectivity
+        try {
+            client.check();
+        } catch (RdiffwebException e) {
+            LOGGER.error("connectivity check failed", e);
+            throw new APIException(e.getMessage(), e);
+        }
+
+        return client;
     }
 
     /**

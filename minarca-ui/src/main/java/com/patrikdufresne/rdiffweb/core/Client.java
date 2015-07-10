@@ -88,9 +88,9 @@ public class Client {
      * @param url
      */
     public Client(String url, String username, String password) {
-        Validate.notNull(this.url = url);
-        this.username = username;
-        this.password = password;
+        Validate.notEmpty(this.url = url);
+        Validate.notEmpty(this.username = username);
+        Validate.notEmpty(this.password = password);
     }
 
     /**
@@ -246,4 +246,17 @@ public class Client {
     protected WebTarget target(String target) {
         return new WebTarget(url).target(target).formCredentials(username, password);
     }
+
+    /**
+     * Check if authentication and connectivity is working.
+     * <p>
+     * Get proof of authentication. We query the user preferences because it's the less CPU intensive page.
+     * 
+     * @throws IOException
+     * @throws IllegalStateException
+     */
+    public void check() throws IllegalStateException, IOException {
+        target("/prefs/general/").getAsString();
+    }
+
 }

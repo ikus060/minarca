@@ -12,18 +12,6 @@ public class APIException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Exception used to represent an application error. Message return in alert-danger.
-     * 
-     * @author Patrik Dufresne
-     * 
-     */
-    public static class ApplicationException extends APIException {
-        public ApplicationException(String message) {
-            super(message);
-        }
-    }
-
-    /**
      * Thrown when the application is not configured.
      * 
      * @author Patrik Dufresne

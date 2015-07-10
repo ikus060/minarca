@@ -7,6 +7,8 @@ package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
 
+import java.io.IOException;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
@@ -31,9 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
-import com.patrikdufresne.minarca.core.APIException.ApplicationException;
-import com.patrikdufresne.minarca.core.Client;
 import com.patrikdufresne.minarca.core.internal.Compat;
+import com.patrikdufresne.rdiffweb.core.Client;
 
 /**
  * Dialog used to configure the application the first time the user open it. It's similar to a wizard.
@@ -352,16 +353,24 @@ public class SetupDialog extends Dialog {
      * @return an error message or null if OK.
      */
     protected String handleSignIn(String username, String password) {
+        // Check little validation of the username password.
+        if (username.trim().isEmpty()) {
+            return _("Username cannot be empty.");
+        }
+        if (password.trim().isEmpty()) {
+            return _("Password cannot be empty.");
+        }
         // Try to establish communication with HTTP first.
-        LOGGER.info("sign in as {}", username);
+        LOGGER.info("sign in as [{}]", username);
         try {
             this.client = API.instance().connect(username, password);
-            // If credentials are valid, safe the username
-            API.instance().setUsername(username);
-        } catch (ApplicationException e) {
+        } catch (APIException e) {
             LOGGER.warn("fail to sign in", e);
             return e.getMessage();
-        } catch (APIException e) {
+        } catch (IOException e) {
+            LOGGER.warn("fail to sign in", e);
+            return _("Can't validate your credentials. Please check your connectivity.");
+        } catch (Exception e) {
             LOGGER.warn("fail to sign in", e);
             return _("Unknown error occurred!");
         }
@@ -378,21 +387,23 @@ public class SetupDialog extends Dialog {
      * @return an error message or null if OK.
      */
     protected String handleLinkComputer(String name) {
+        // Little validation before
+        if (name.trim().isEmpty()) {
+            return _("Computer name cannot be empty.");
+        }
         // Link the computer
         LOGGER.info("link computer {}", name);
         try {
-
             API.instance().link(name, this.client);
-
-        } catch (ApplicationException e) {
-            LOGGER.warn("fail to register computer", e);
-            return e.getMessage();
         } catch (APIException e) {
             LOGGER.warn("fail to register computer", e);
-            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install mirarca.");
+            return e.getMessage();
         } catch (IllegalArgumentException e) {
             LOGGER.warn("invalid computername: " + name, e);
-            return _("Invalid computer name!");
+            return _("Should only contains letters, numbers, dash (-) and dot (.)");
+        } catch (Exception e) {
+            LOGGER.warn("fail to register computer", e);
+            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install mirarca.");
         }
 
         // Set other settings to default.
