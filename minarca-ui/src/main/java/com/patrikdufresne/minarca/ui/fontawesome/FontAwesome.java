@@ -56,6 +56,7 @@ public class FontAwesome {
             } finally {
                 out.close();
             }
+            tempfile.deleteOnExit();
         } catch (IOException e) {
             return false;
         }
