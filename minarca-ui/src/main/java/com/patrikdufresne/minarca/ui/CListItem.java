@@ -213,7 +213,7 @@ public class CListItem extends Composite {
      * @return the button widget
      */
     public Button createButton(String text) {
-        return createButton(text, SWT.PUSH);
+        return createButton(text, SWT.PUSH | SWT.FLAT);
     }
 
     /**
