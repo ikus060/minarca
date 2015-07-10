@@ -106,11 +106,11 @@ public class Compat {
         // Use a static block to declare constant value in the right order.
         LOGGER = LoggerFactory.getLogger(Compat.class);
         CHARSET_PROCESS = getProcessCharset();
-        IS_ADMIN = getIsAdmin();
         COMPUTER_NAME = getComputerName();
         ROOT = getRootPath();
         ROOT_FILE = new File(ROOT);
         WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
+        IS_ADMIN = getIsAdmin();
         CONFIG_PATH = getConfigPath(IS_ADMIN);
         TEMP = getTemp();
         TEMP_FILE = new File(TEMP);
@@ -207,6 +207,9 @@ public class Compat {
     private static String getHome(boolean isAdmin) {
         if (isAdmin) {
             if (SystemUtils.IS_OS_WINDOWS) {
+                if (Compat.WINDOWS_SYSTEMPROFILE_PATH == null) {
+                    throw new IllegalStateException("system profile path not defined");
+                }
                 return Compat.WINDOWS_SYSTEMPROFILE_PATH;
             } else {
                 return "/root";
