@@ -1,5 +1,6 @@
 package com.patrikdufresne.minarca.ui;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
@@ -36,7 +37,8 @@ public class CListItem extends Composite {
 
     private static final int HORIZONTAL_MARGIN = 8;
 
-    private static final int VERTICAL_MARGIN = 6;
+    // Change the top - bottom margin according to OS.
+    private static final int VERTICAL_MARGIN = SystemUtils.IS_OS_WINDOWS ? 6 : 2;
 
     /**
      * Blends two primary color components based on the provided ratio.
