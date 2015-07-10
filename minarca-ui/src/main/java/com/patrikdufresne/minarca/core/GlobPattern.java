@@ -316,11 +316,7 @@ public class GlobPattern {
         if (isGlobbing()) {
             return matcher().matches(Paths.get(path));
         }
-        // For Windows OS, do case insensitive compare
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return encode(path).toLowerCase().startsWith(this.pattern.toLowerCase());
-        }
-        // Other platform do case sensitive compare
+        // Do case-sensitive compare (rdiff-backup is case-sensitive on Windows).
         return encode(path).startsWith(this.pattern);
     }
 
