@@ -36,10 +36,10 @@ import org.eclipse.ui.forms.FormColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.fontawesome.FontAwesome;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
-import com.patrikdufresne.minarca.ui.fontawesome.FontAwesome;
 
 /**
  * This is the main windows of the application used to configure the backup.
@@ -258,7 +258,7 @@ public class SettingsDialog extends Dialog {
             // Change text for icon.
             helpButton.setToolTipText(helpButton.getText());
             helpButton.setFont(FontAwesome.getFont());
-            helpButton.setText(FontAwesome.QUESTION);
+            helpButton.setText(FontAwesome.question);
             // Update layout (to have a square button).
             Point minSize = helpButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
             data.widthHint = data.heightHint = Math.max(minSize.y, minSize.x);
@@ -271,7 +271,7 @@ public class SettingsDialog extends Dialog {
             // Change text for icon.
             aboutButton.setToolTipText(aboutButton.getText());
             aboutButton.setFont(FontAwesome.getFont());
-            aboutButton.setText(FontAwesome.INFO);
+            aboutButton.setText(FontAwesome.info);
             // Update layout (to have a square button).
             Point minSize = aboutButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
             data.widthHint = data.heightHint = Math.max(minSize.y, minSize.x);

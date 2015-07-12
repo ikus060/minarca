@@ -3,7 +3,6 @@ package com.patrikdufresne.minarca.ui;
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -24,7 +23,7 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import com.patrikdufresne.minarca.ui.fontawesome.FontAwesome;
+import com.patrikdufresne.fontawesome.FontAwesome;
 import com.patrikdufresne.switchbutton.SwitchButton;
 
 /**
@@ -69,10 +68,6 @@ public class CListItem extends Composite {
      * @return the font
      */
     private static Font getIconFont(Control control) {
-        String fontName = "ICON_FONT_" + control.getClass().getName(); //$NON-NLS-1$
-        if (JFaceResources.getFontRegistry().hasValueFor(fontName)) {
-            return JFaceResources.getFontRegistry().get(fontName);
-        }
         // Get default font
         Font cached = control.getFont();
         control.setFont(null);
@@ -82,13 +77,7 @@ public class CListItem extends Composite {
         FontData[] data = defaultFont.getFontData();
         int size = data[0].getHeight();
         // Use this default size with font awesome
-        data = FontAwesome.getFont().getFontData();
-        for (FontData d : data) {
-            d.setHeight((int) (size * 1.25f));
-        }
-        // Register the font.
-        JFaceResources.getFontRegistry().put(fontName, data);
-        return JFaceResources.getFontRegistry().get(fontName);
+        return FontAwesome.getFont((int) (size * 1.25f));
     }
 
     /**
@@ -258,7 +247,7 @@ public class CListItem extends Composite {
      */
     public Button createButtonDelete() {
         // Use TIME icon (X).
-        Button button = createButton(FontAwesome.TIMES, SWT.FLAT);
+        Button button = createButton(FontAwesome.times, SWT.FLAT);
         // Change the font (it's a bigger font).
         button.setFont(getIconFont(button));
         // Set the size of the button to be square
@@ -276,7 +265,7 @@ public class CListItem extends Composite {
      */
     public Button createButtonPlus() {
         // Use TIME icon (X).
-        Button button = createButton(FontAwesome.PLUS, SWT.FLAT);
+        Button button = createButton(FontAwesome.plus, SWT.FLAT);
         // Change the font (it's a bigger font).
         button.setFont(getIconFont(button));
         // Set the size of the button to be square
