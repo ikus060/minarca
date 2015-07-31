@@ -297,6 +297,28 @@ public class SettingsDialog extends Dialog {
         Composite comp = (Composite) super.createDialogArea(parent);
 
         // Create label.
+        Label browseLabel = new Label(comp, SWT.NONE);
+        browseLabel.setFont(AppFormToolkit.getFontBold(JFaceResources.DEFAULT_FONT));
+        browseLabel.setText(_("Your data"));
+
+        // Create list
+        CList browseItemlist = new CList(comp, SWT.BORDER);
+        browseItemlist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+
+        // Create selective backup
+        CListItem browseItem = new CListItem(browseItemlist, _("Go to Minarca website"));
+        browseItem.setTitleHelpText(_("Allows you to browse your backup and restore files."));
+        Button browseButton = browseItem.createButtonConfig();
+        browseButton.setText("");
+        browseButton.setImage(JFaceResources.getImageRegistry().get(Images.MINARCA_16_PNG));
+        browseButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleBrowse();
+            }
+        });
+
+        // Create label.
         Label accountSettingsLabel = new Label(comp, SWT.NONE);
         accountSettingsLabel.setFont(AppFormToolkit.getFontBold(JFaceResources.DEFAULT_FONT));
         accountSettingsLabel.setText(_("Account settings"));
@@ -416,6 +438,14 @@ public class SettingsDialog extends Dialog {
         RGB rgb = FormColors.blend(new RGB(255, 0, 0), Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION).getRGB(), 15);
         JFaceResources.getColorRegistry().put(WARN_BACKGROUNG, rgb);
         return JFaceResources.getColorRegistry().get(WARN_BACKGROUNG);
+    }
+
+    /**
+     * Called when the user click the button to browse his backup data.
+     */
+    protected void handleBrowse() {
+        // Simply open the URL into the default browser.
+        Program.launch(API.instance().getBrowseUrl());
     }
 
     /**
