@@ -1,6 +1,7 @@
 package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.core.GlobPattern.getDesktopPatterns;
 import static com.patrikdufresne.minarca.core.GlobPattern.getDocumentsPatterns;
 import static com.patrikdufresne.minarca.core.GlobPattern.getDownloadsPatterns;
 import static com.patrikdufresne.minarca.core.GlobPattern.getMusicPatterns;
@@ -62,7 +63,14 @@ public class SelectiveDialog extends Dialog {
      * @return
      */
     private static List<List<GlobPattern>> getPredefined() {
-        return Arrays.asList(getDocumentsPatterns(), getDownloadsPatterns(), getMusicPatterns(), getPicturesPatterns(), getVideosPatterns(), getOsPatterns());
+        return Arrays.asList(
+                getDesktopPatterns(),
+                getDocumentsPatterns(),
+                getDownloadsPatterns(),
+                getMusicPatterns(),
+                getPicturesPatterns(),
+                getVideosPatterns(),
+                getOsPatterns());
     }
 
     private CList customList;
@@ -139,12 +147,13 @@ public class SelectiveDialog extends Dialog {
         predefineList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
         // Create predefine include exclude
-        createItem(predefineList, _("Documents"), GlobPattern.getDocumentsPatterns(), true);
-        createItem(predefineList, _("Pictures"), GlobPattern.getPicturesPatterns(), true);
-        createItem(predefineList, _("Music"), GlobPattern.getMusicPatterns(), true);
-        createItem(predefineList, _("Videos"), GlobPattern.getVideosPatterns(), true);
-        createItem(predefineList, _("Downloads"), GlobPattern.getDownloadsPatterns(), true);
-        createItem(predefineList, _("System files"), GlobPattern.getOsPatterns(), true);
+        createItem(predefineList, _("Desktop"), getDesktopPatterns(), true);
+        createItem(predefineList, _("Documents"), getDocumentsPatterns(), true);
+        createItem(predefineList, _("Pictures"), getPicturesPatterns(), true);
+        createItem(predefineList, _("Music"), getMusicPatterns(), true);
+        createItem(predefineList, _("Videos"), getVideosPatterns(), true);
+        createItem(predefineList, _("Downloads"), getDownloadsPatterns(), true);
+        createItem(predefineList, _("System files"), getOsPatterns(), true);
 
         // Custom Label
         Label customLabel = new Label(comp, SWT.NONE);

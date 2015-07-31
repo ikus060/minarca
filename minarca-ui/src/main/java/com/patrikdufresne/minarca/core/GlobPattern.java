@@ -55,6 +55,19 @@ public class GlobPattern {
     }
 
     /**
+     * Represent the default location for desktop.
+     * 
+     * @return
+     */
+    public static List<GlobPattern> getDesktopPatterns() {
+        try {
+            return readResource("desktop");
+        } catch (IOException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
      * Represent the default location where files are documents.
      * 
      * @return

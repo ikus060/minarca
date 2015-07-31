@@ -269,6 +269,7 @@ public class API {
         LOGGER.debug("restore default config");
         // Sets the default includes / excludes.
         List<GlobPattern> includes = new ArrayList<GlobPattern>();
+        includes.addAll(GlobPattern.getDesktopPatterns());
         includes.addAll(GlobPattern.getDocumentsPatterns());
         includes.addAll(GlobPattern.getMusicPatterns());
         includes.addAll(GlobPattern.getPicturesPatterns());
