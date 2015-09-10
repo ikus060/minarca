@@ -46,17 +46,41 @@ public class SchedulerWindows extends Scheduler {
      */
     private static class SchTaskEntry {
 
-        private static final int LAST_RESULT = 7;
+        private static final String[] WINDOWS_XP_INDEXES = new String[] {
+                "HOSTNAME",
+                "TASKNAME",
+                "NEXT_RUN_TIME",
+                "STATUS",
+                "LAST_RUN_TIME",
+                "LAST_RESULT",
+                "AUTHOR",
+                "",
+                "TASK_TO_RUN" };
 
-        private static final int NEXT_RUN_TIME = 2;
+        private static final String[] WINDOWS_7_INDEXES = new String[] {
+                "HOSTNAME",
+                "TASKNAME",
+                "NEXT_RUN_TIME",
+                "STATUS",
+                "",
+                "LAST_RUN_TIME",
+                "LAST_RESULT",
+                "AUTHOR",
+                "TASK_TO_RUN" };
 
-        private static final int LAST_RUN_TIME = 4;
+        private final List<String> INDEXES = SystemUtils.IS_OS_WINDOWS_XP ? Arrays.asList(WINDOWS_XP_INDEXES) : Arrays.asList(WINDOWS_7_INDEXES);
 
-        private static final int STATUS = 3;
+        private final int LAST_RESULT = INDEXES.indexOf("LAST_RESULT");
 
-        private static final int TASK_TO_RUN = 8;
+        private final int NEXT_RUN_TIME = INDEXES.indexOf("NEXT_RUN_TIME");
 
-        private static final int TASKNAME = 1;
+        private final int LAST_RUN_TIME = INDEXES.indexOf("LAST_RUN_TIME");
+
+        private final int STATUS = INDEXES.indexOf("STATUS");
+
+        private final int TASK_TO_RUN = INDEXES.indexOf("TASK_TO_RUN");
+
+        private final int TASKNAME = INDEXES.indexOf("TASKNAME");
 
         /**
          * Heuristic to parse date string.
@@ -67,6 +91,20 @@ public class SchedulerWindows extends Scheduler {
          * @return a Date object or null
          */
         private static Date parseDate(String value) {
+            // Build list of DateFormat
+            List<DateFormat> dateformats = Arrays.asList(
+                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT),
+                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM),
+                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG),
+                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.FULL),
+                    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM),
+                    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG),
+                    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL),
+                    DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG),
+                    DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.FULL),
+                    DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL),
+                    DateFormat.getDateInstance());
+            // May need to reverse values.
             List<String> values = new ArrayList<String>();
             values.add(value);
             String parts[] = value.split(", ");
@@ -74,7 +112,7 @@ public class SchedulerWindows extends Scheduler {
                 values.add(parts[1] + " " + parts[0]);
             }
             for (String v : values) {
-                for (DateFormat df : Arrays.asList(DateFormat.getDateTimeInstance())) {
+                for (DateFormat df : dateformats) {
                     try {
                         return df.parse(v);
                     } catch (ParseException e) {
