@@ -161,13 +161,15 @@ Section "Start menu shortcuts" SecCreateShortcut
   SectionIn 1	; Can be unselected
   CreateDirectory "$SMPROGRAMS\${AppName}"
   ${If} ${RunningX64}
+    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarca64.exe" "" "$INSTDIR\minarca.ico" 0
     CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarca64.exe" "" "$INSTDIR\minarca.ico" 0
   ${Else}
+    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarca.exe" "" "$INSTDIR\minarca.ico" 0
     CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarca.exe" "" "$INSTDIR\minarca.ico" 0
   ${EndIf}
   
 SectionEnd
- 
+
 ;--------------------------------
 ;Descriptions
  
