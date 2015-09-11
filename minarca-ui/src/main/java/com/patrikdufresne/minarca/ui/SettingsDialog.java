@@ -566,8 +566,7 @@ public class SettingsDialog extends Dialog {
      * Called when user press to help button.
      */
     private void helpPressed() {
-        // TODO: Change this url to point to How-to
-        Program.launch("https://www.minarca.net/help/");
+        Program.launch(_("http://www.patrikdufresne.com/en/minarca/help/"));
     }
 
 }
