@@ -18,14 +18,20 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
@@ -198,6 +204,16 @@ public class SetupDialog extends Dialog {
                     createPage2(comp);
                 }
 
+            }
+        });
+
+        // Request account
+        Hyperlink createAccountLink = ft.createHyperlink(parent, _("Subscribe..."), SWT.NONE);
+        createAccountLink.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        createAccountLink.addHyperlinkListener(new HyperlinkAdapter() {
+            @Override
+            public void linkActivated(HyperlinkEvent e) {
+                Program.launch(_("www.patrikdufresne.com/en/minarca/subscribe"));
             }
         });
 
