@@ -522,6 +522,9 @@ public class SettingsDialog extends Dialog {
             return;
         }
 
+        // Remove last date.
+        lastruntimeItem.setValue(Dialog.ELLIPSIS);
+        
         // Unlink this computer.
         try {
             API.instance().runBackup();
