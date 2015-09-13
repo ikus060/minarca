@@ -23,12 +23,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.Hyperlink;
@@ -166,6 +164,10 @@ public class SetupDialog extends Dialog {
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
+        // Alert label.
+        final FormText alertLabel = ft.createFormText(parent, "", true);
+        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        
         // Username
         final Text usernameText = ft.createText(parent, "", SWT.BORDER);
         usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
@@ -181,10 +183,6 @@ public class SetupDialog extends Dialog {
         Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
         signInButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
         getShell().setDefaultButton(signInButton);
-
-        // Alert label.
-        final FormText alertLabel = ft.createFormText(parent, "", true);
-        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Add event binding.
         signInButton.addSelectionListener(new SelectionAdapter() {
@@ -207,16 +205,20 @@ public class SetupDialog extends Dialog {
             }
         });
 
+        // Spacer
+        Composite spacer = ft.createComposite(parent);
+        TableWrapData layoutdata = new TableWrapData(TableWrapData.FILL);
+        layoutdata.heightHint = 10;
+        spacer.setLayoutData(layoutdata);
+        
         // Request account
-        Hyperlink createAccountLink = ft.createHyperlink(parent, _("Subscribe..."), SWT.NONE);
-        createAccountLink.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        createAccountLink.addHyperlinkListener(new HyperlinkAdapter() {
-            @Override
-            public void linkActivated(HyperlinkEvent e) {
-                Program.launch(_("www.patrikdufresne.com/en/minarca/subscribe"));
-            }
-        });
-
+        String subscribeText = "<b>" + _("Create account") + "</b><br/>";
+        subscribeText += _("If you don't have a minarca account, you may subscribe by filling the online form.");
+        subscribeText += "<br/><a href='" + _("http://www.patrikdufresne.com/en/minarca/subscribe") + "'>";
+        subscribeText += _("Subscribe...") + "</a>";
+        FormText subscribeLabel = ft.createFormText(parent, subscribeText, false);
+        subscribeLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        
         // Relayout to update content.
         parent.layout();
 

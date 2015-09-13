@@ -36,7 +36,7 @@ public class AppFormToolkit extends FormToolkit {
 
     private static final String ALT_BG = "ALT_BG";
     private static final String ALT_FG = "ALT_FG";
-    private static final int FORM_TEXT_MARGNIN = 15;
+    private static final int FORM_TEXT_MARGNIN = 10;
     private static final String H = "H";
     private static final String H_HOVER = "H_HOVER";
     private static final String H1 = "h1";
