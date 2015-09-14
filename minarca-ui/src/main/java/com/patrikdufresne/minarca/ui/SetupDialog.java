@@ -18,18 +18,14 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
@@ -243,13 +239,22 @@ public class SetupDialog extends Dialog {
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
-        String introText = _("<h2>Link your computer</h2><br/>"
-                + "You need to link this computer to your account. Please, "
-                + "provide a friendly name to represent it. "
-                + "Once selected, you won't be able to change it.<br/>"
-                + "<br/><b>Provide a computer name</b>");
+        String introText = "<h2>" + _("Link your computer") + "</h2><br/>";
+        introText += _(
+                "You need to link this computer to your account. Please, "
+                        + "provide a friendly name to represent it. "
+                        + "Once selected, you won't be able to change it.");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+        // Alert label.
+        final FormText alertLabel = ft.createFormText(parent, "", true);
+        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+        // Label
+        String computerNameLabelText = "<b>" + _("Provide a computer name") + "</b>";
+        FormText computerNameLabel = ft.createFormText(parent, computerNameLabelText, false);
+        computerNameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Computer name
         final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
@@ -262,10 +267,6 @@ public class SetupDialog extends Dialog {
         Button linkButton = ft.createButton(parent, _("Link computer"), SWT.PUSH);
         linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
         getShell().setDefaultButton(linkButton);
-
-        // Alert label.
-        final FormText alertLabel = ft.createFormText(parent, "", true);
-        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Add event binding.
         linkButton.addSelectionListener(new SelectionAdapter() {
