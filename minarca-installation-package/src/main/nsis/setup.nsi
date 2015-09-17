@@ -215,6 +215,7 @@ Section "Uninstall"
   ; remove shortcuts, if any.
   Delete "$SMPROGRAMS\${AppName}\*.*"
   RMDir /r "$SMPROGRAMS\${AppName}"
+  Delete "$DESKTOP\${AppName}.lnk"
   ; remove files
   RMDir /r "$INSTDIR"
  
