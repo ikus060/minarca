@@ -226,7 +226,7 @@ msgstr "Associer l'ordinateur"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:316
 msgid "Success !"
-msgstr "Félicitation !"
+msgstr "Succès !"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:317
 msgid ""
