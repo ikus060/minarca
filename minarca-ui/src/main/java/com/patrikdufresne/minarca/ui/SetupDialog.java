@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
@@ -23,6 +24,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
+import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.rdiffweb.core.Client;
 
@@ -277,7 +280,7 @@ public class SetupDialog extends Dialog {
                 String computerName = computerNameText.getText();
 
                 // Check credentials.
-                String message = handleLinkComputer(computerName);
+                String message = handleLinkComputer(computerName, false);
                 if (message != null) {
                     alertLabel.setText(message, true, true);
                     alertLabel.getParent().layout();
@@ -413,7 +416,7 @@ public class SetupDialog extends Dialog {
      *            the computer name.
      * @return an error message or null if OK.
      */
-    protected String handleLinkComputer(String name) {
+    protected String handleLinkComputer(String name, boolean force) {
         // Little validation before
         if (name.trim().isEmpty()) {
             return _("Computer name cannot be empty.");
@@ -421,7 +424,22 @@ public class SetupDialog extends Dialog {
         // Link the computer
         LOGGER.info("link computer {}", name);
         try {
-            API.instance().link(name, this.client);
+            API.instance().link(name, this.client, force);
+        } catch (ComputerNameAlreadyInUseException e) {
+            DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
+                    getShell(),
+                    Display.getAppName(),
+                    _("Are you sure you want to keep the given computer name ?"),
+                    _("The given computer name is already in use in minarca. "
+                            + "You may keep this computer name if the name is "
+                            + "no longer used by another computer currently "
+                            + "link to minarca."),
+                    null);
+            if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
+                // Force usage of the computer name
+                return handleLinkComputer(name, true);
+            }
+            return _("Change the computer name");
         } catch (APIException e) {
             LOGGER.warn("fail to register computer", e);
             return e.getMessage();

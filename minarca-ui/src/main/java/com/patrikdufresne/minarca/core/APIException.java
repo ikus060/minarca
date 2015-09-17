@@ -12,6 +12,18 @@ public class APIException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Raised when trying to link a computer with a name already in use in minarca.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class ComputerNameAlreadyInUseException extends APIException {
+        public ComputerNameAlreadyInUseException(String computername) {
+            super(_("computer name {0} already in use", computername));
+        }
+    }
+
+    /**
      * Thrown when the application is not configured.
      * 
      * @author Patrik Dufresne

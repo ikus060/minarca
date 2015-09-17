@@ -1,8 +1,11 @@
 package com.patrikdufresne.rdiffweb.core;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,6 +68,26 @@ public class Client {
             return f.text();
         }
         return null;
+    }
+
+    /**
+     * Parse the given element value as date.
+     * 
+     * @param e
+     * @param query
+     * @return
+     */
+    protected static Date selectFirstAsDate(Element e, String query) {
+        String value = selectFirstAsString(e, query);
+        if (value == null) {
+            return null;
+        }
+        // Parse the date value.
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value);
+        } catch (ParseException exc) {
+            return null;
+        }
     }
 
     /**
@@ -178,6 +201,46 @@ public class Client {
             p.setVersion(version);
             p.setEnabled(enabled);
             list.add(p);
+        }
+        return list;
+    }
+
+    /**
+     * Get information related to specific repository.
+     * 
+     * @return repository info.
+     * 
+     * @throws IOException
+     */
+    public RepositoryInfo getRepositoryInfo(String name) throws IOException {
+        for (RepositoryInfo r : getRepositories()) {
+            if (name.equals(r.getName())) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return list of repositories.
+     * 
+     * @return
+     */
+    public Collection<RepositoryInfo> getRepositories() throws IOException {
+        // Query plugins page.
+        String data = target("/").getAsString();
+        // Select plugin items.
+        Document doc = Jsoup.parse(data);
+        Elements repos = doc.select("[itemtype=http://schema.org/ListItem]");
+        List<RepositoryInfo> list = new ArrayList<RepositoryInfo>(repos.size());
+        for (Element e : repos) {
+            String name = selectFirstAsString(e, "[itemprop=name]");
+            Date lastBackup = selectFirstAsDate(e, "[itemprop=lastBackupDate]");
+            // Create plugin object from properties found.
+            RepositoryInfo r = new RepositoryInfo();
+            r.setName(name);
+            r.setLastBackup(lastBackup);
+            list.add(r);
         }
         return list;
     }

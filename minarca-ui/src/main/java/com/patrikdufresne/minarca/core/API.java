@@ -33,6 +33,7 @@ import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
+import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
@@ -419,15 +420,30 @@ public class API {
      * 
      * @param computername
      *            friendly name to represent this computer.
+     * @param client
+     *            reference to web client
+     * @param force
+     *            True to force usage of existing computer name.
      * @throws APIException
      *             if the keys can't be created.
      * @throws IllegalAccessException
      *             if the computer name is not valid.
      */
-    public void link(String computername, Client client) throws APIException {
+    public void link(String computername, Client client, boolean force) throws APIException {
         Validate.notEmpty(computername);
         Validate.notNull(client);
         Validate.isTrue(computername.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
+
+        /*
+         * Check if computer name is already in uses.
+         */
+        try {
+            if (!force && client.getRepositoryInfo(computername) != null) {
+                throw new ComputerNameAlreadyInUseException(computername);
+            }
+        } catch (IOException e) {
+            throw new APIException("fail to link computer", e);
+        }
 
         /*
          * Generate the keys
