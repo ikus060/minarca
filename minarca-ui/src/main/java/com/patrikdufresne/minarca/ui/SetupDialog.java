@@ -9,7 +9,9 @@ import static com.patrikdufresne.minarca.Localized._;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -163,7 +165,7 @@ public class SetupDialog extends Dialog {
         // Alert label.
         final FormText alertLabel = ft.createFormText(parent, "", true);
         alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        
+
         // Username
         final Text usernameText = ft.createText(parent, "", SWT.BORDER);
         usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
@@ -206,7 +208,7 @@ public class SetupDialog extends Dialog {
         TableWrapData layoutdata = new TableWrapData(TableWrapData.FILL);
         layoutdata.heightHint = 10;
         spacer.setLayoutData(layoutdata);
-        
+
         // Request account
         String subscribeText = "<b>" + _("Create account") + "</b><br/>";
         subscribeText += _("If you don't have a minarca account, you may subscribe by filling the online form.");
@@ -214,7 +216,7 @@ public class SetupDialog extends Dialog {
         subscribeText += _("Subscribe...") + "</a>";
         FormText subscribeLabel = ft.createFormText(parent, subscribeText, false);
         subscribeLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        
+
         // Relayout to update content.
         parent.layout();
 
@@ -240,10 +242,9 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Link your computer") + "</h2><br/>";
-        introText += _(
-                "You need to link this computer to your account. Please, "
-                        + "provide a friendly name to represent it. "
-                        + "Once selected, you won't be able to change it.");
+        introText += _("You need to link this computer to your account. Please, "
+                + "provide a friendly name to represent it. "
+                + "Once selected, you won't be able to change it.");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -355,8 +356,15 @@ public class SetupDialog extends Dialog {
      */
     @Override
     protected Point getInitialSize() {
-        // Sets fixed window size.
-        return new Point(325, 575);
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new Point(325, 575);
+        } else {
+            // Sets fixed window size.
+            PixelConverter pc = new PixelConverter(this.getShell());
+            int height = pc.convertVerticalDLUsToPixels(235);
+            int width = pc.convertHorizontalDLUsToPixels(195);
+            return new Point(width, height);
+        }
     }
 
     /**
