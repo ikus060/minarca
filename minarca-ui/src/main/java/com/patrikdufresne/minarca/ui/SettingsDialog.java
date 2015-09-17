@@ -524,6 +524,7 @@ public class SettingsDialog extends Dialog {
 
         // Remove last date.
         lastruntimeItem.setValue(Dialog.ELLIPSIS);
+        lastruntimeItem.setValueHelpText(Dialog.ELLIPSIS);
 
         // Unlink this computer.
         try {
