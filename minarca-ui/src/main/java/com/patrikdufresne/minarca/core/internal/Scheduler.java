@@ -28,44 +28,28 @@ public abstract class Scheduler {
      * 
      * @author Patrik Dufresne
      */
-    public static class TaskInfo {
-
-        private Boolean running;
-        private Date lastRun;
-        private Integer lastResult;
-
-        public TaskInfo(Boolean running, Date lastRun, Integer lastResult) {
-            this.running = running;
-            this.lastRun = lastRun;
-            this.lastResult = lastResult;
-        }
+    public static interface TaskInfo {
 
         /**
          * True if the task is running.
          * 
          * @return
          */
-        public Boolean isRunning() {
-            return running;
-        }
+        public Boolean isRunning();
 
         /**
          * The last known running date.
          * 
          * @return
          */
-        public Date getLastRun() {
-            return lastRun;
-        }
+        public Date getLastRun();
 
         /**
          * The last result of the task.
          * 
          * @return
          */
-        public Integer getLastResult() {
-            return lastResult;
-        }
+        public Integer getLastResult();
 
     }
 

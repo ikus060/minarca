@@ -38,12 +38,12 @@ import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 public class SchedulerWindows extends Scheduler {
 
     /**
-     * Instance of this class represent a task in Windows scheduler.
+     * Instance of this class represent a task in Windows scheduler (used for CSV entry).
      * 
      * @author Patrik Dufresne
      * 
      */
-    private static class SchTaskEntry {
+    private static class TaskInfoWin implements TaskInfo {
 
         private static final String[] WINDOWS_XP_INDEXES = new String[] {
                 "HOSTNAME",
@@ -66,20 +66,6 @@ public class SchedulerWindows extends Scheduler {
                 "LAST_RESULT",
                 "AUTHOR",
                 "TASK_TO_RUN" };
-
-        private final List<String> INDEXES = SystemUtils.IS_OS_WINDOWS_XP ? Arrays.asList(WINDOWS_XP_INDEXES) : Arrays.asList(WINDOWS_7_INDEXES);
-
-        private final int LAST_RESULT = INDEXES.indexOf("LAST_RESULT");
-
-        private final int NEXT_RUN_TIME = INDEXES.indexOf("NEXT_RUN_TIME");
-
-        private final int LAST_RUN_TIME = INDEXES.indexOf("LAST_RUN_TIME");
-
-        private final int STATUS = INDEXES.indexOf("STATUS");
-
-        private final int TASK_TO_RUN = INDEXES.indexOf("TASK_TO_RUN");
-
-        private final int TASKNAME = INDEXES.indexOf("TASKNAME");
 
         /**
          * Heuristic to parse date string.
@@ -124,6 +110,12 @@ public class SchedulerWindows extends Scheduler {
         }
 
         private final List<String> data;
+        private final List<String> INDEXES;
+        private final int LAST_RESULT;
+        private final int LAST_RUN_TIME;
+        private final int STATUS;
+        private final int TASK_TO_RUN;
+        private final int TASKNAME;
 
         /**
          * Create a new task entry.
@@ -131,9 +123,20 @@ public class SchedulerWindows extends Scheduler {
          * @param data
          *            raw data.
          */
-        private SchTaskEntry(List<String> data) {
+        private TaskInfoWin(List<String> data) {
             Validate.notNull(data);
             this.data = Collections.unmodifiableList(new ArrayList<String>(data));
+            if (data.size() >= 28 /* || SystemUtils.IS_OS_WINDOWS_10 */) {
+                // Windows 10
+                INDEXES = Arrays.asList(WINDOWS_7_INDEXES);
+            } else {
+                INDEXES = Arrays.asList(WINDOWS_XP_INDEXES);
+            }
+            LAST_RESULT = INDEXES.indexOf("LAST_RESULT");
+            LAST_RUN_TIME = INDEXES.indexOf("LAST_RUN_TIME");
+            STATUS = INDEXES.indexOf("STATUS");
+            TASK_TO_RUN = INDEXES.indexOf("TASK_TO_RUN");
+            TASKNAME = INDEXES.indexOf("TASKNAME");
         }
 
         private String get(int index) {
@@ -146,7 +149,7 @@ public class SchedulerWindows extends Scheduler {
          * 
          * @return
          */
-        public String getCommand() {
+        String getCommand() {
             return get(TASK_TO_RUN);
         }
 
@@ -155,6 +158,7 @@ public class SchedulerWindows extends Scheduler {
          * 
          * @return the return code.
          */
+        @Override
         public Integer getLastResult() {
             String value = get(LAST_RESULT);
             try {
@@ -169,13 +173,9 @@ public class SchedulerWindows extends Scheduler {
          * 
          * @return the last run time date.
          */
-        public Date getLastRunTime() {
+        @Override
+        public Date getLastRun() {
             String value = get(LAST_RUN_TIME);
-            return parseDate(value);
-        }
-
-        public Date getNextRunTime() {
-            String value = get(NEXT_RUN_TIME);
             return parseDate(value);
         }
 
@@ -184,7 +184,7 @@ public class SchedulerWindows extends Scheduler {
          * 
          * @return
          */
-        public String getStatus() {
+        String getStatus() {
             return get(STATUS);
         }
 
@@ -193,8 +193,16 @@ public class SchedulerWindows extends Scheduler {
          * 
          * @return
          */
-        public String getTaskname() {
+        String getTaskname() {
             return get(TASKNAME);
+        }
+
+        @Override
+        public Boolean isRunning() {
+            // Get the status and check if it run.
+            LOGGER.debug("task status [{}]", getStatus());
+            Matcher m = PATTERN_TASK_RUNNING.matcher(getStatus());
+            return m.find();
         }
 
         @Override
@@ -338,30 +346,35 @@ public class SchedulerWindows extends Scheduler {
      */
     public boolean exists() {
         try {
-            SchTaskEntry task = query(TASK_NAME);
+            TaskInfo task = query(TASK_NAME);
             if (task == null) {
                 return false;
             }
             String curCommand;
             String expectedCommand;
-            if (SystemUtils.IS_OS_WINDOWS_XP) {
-                // For WinXP
-                // The current command won't contains any quote or single quote. It's a shame.
-                curCommand = task.getCommand().trim();
-                curCommand = curCommand.replace("  --backup", " --backup");
-                expectedCommand = getCommand().replace("\\\"", "");
+            if (task instanceof TaskInfoWin) {
+                if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
+                    // For WinXP
+                    // The current command won't contains any quote or single quote. It's a shame.
+                    curCommand = ((TaskInfoWin) task).getCommand().trim();
+                    curCommand = curCommand.replace("  --backup", " --backup");
+                    expectedCommand = getCommand().replace("\\\"", "");
+                } else {
+                    // For Win 7 & +
+                    // Replace the " by \" to match our command line
+                    curCommand = ((TaskInfoWin) task).getCommand().trim();
+                    expectedCommand = getCommand().replace("\\\"", "\"");
+                }
             } else {
-                // For Win 7
-                // Replace the " by \" to match our command line
-                curCommand = task.getCommand().trim();
-                expectedCommand = getCommand().replace("\\\"", "\"");
+                LOGGER.warn("unsupported TaskInfo [{}]", task);
+                return false;
             }
             if (!curCommand.equals(expectedCommand)) {
                 LOGGER.warn("command [{}] doesn't matched expected command [{}]", curCommand, expectedCommand);
                 return false;
             }
             return true;
-        } catch (APIException e) {
+        } catch (Exception e) {
             LOGGER.warn("can't detect the task", e);
             return false;
         }
@@ -396,34 +409,36 @@ public class SchedulerWindows extends Scheduler {
     public TaskInfo info() throws TaskNotFoundException, APIException {
         LOGGER.info("check task info");
         // Get reference to our task
-        SchTaskEntry task = query(TASK_NAME);
+        TaskInfo task = query(TASK_NAME);
         if (task == null) {
             throw new TaskNotFoundException();
         }
-        // Get the status and check if it run.
-        String status = task.getStatus();
-        LOGGER.debug("task status [{}]", status);
-        Matcher m = PATTERN_TASK_RUNNING.matcher(status);
-        Boolean running = m.find();
-
-        return new TaskInfo(running, task.getLastRunTime(), task.getLastResult());
+        return task;
     }
 
-    private List<SchTaskEntry> internalQuery(String taskname) throws APIException {
+    /**
+     * To support Windows XP and Windows 2003. Read data as CSV.
+     * 
+     * @param taskname
+     *            the task name.
+     * @return the task information.
+     * @throws APIException
+     */
+    private TaskInfoWin internalQueryCsv(String taskname) throws APIException {
+        // Execute the query command.
         String data;
-        if (taskname != null && !SystemUtils.IS_OS_WINDOWS_XP && !SystemUtils.IS_OS_WINDOWS_2003) {
-            // Query a specific taskname.
-            data = execute("/Query", "/FO", "CSV", "/V", "/TN", taskname);
-        } else {
+        if (SystemUtils.IS_OS_WINDOWS_2003 || SystemUtils.IS_OS_WINDOWS_XP) {
             data = execute("/Query", "/FO", "CSV", "/V");
+        } else {
+            data = execute("/Query", "/FO", "CSV", "/V", "/TN", taskname);
         }
         // Read the first line
         Scanner scanner = new Scanner(data);
         if (!scanner.hasNextLine()) {
             scanner.close();
-            return Collections.emptyList();
+            return null;
         }
-        List<SchTaskEntry> list = new ArrayList<SchedulerWindows.SchTaskEntry>();
+        List<TaskInfoWin> list = new ArrayList<TaskInfoWin>();
         String line = scanner.nextLine();
         String[] columns = line.split("\",\"");
         while (scanner.hasNextLine()) {
@@ -437,11 +452,15 @@ public class SchedulerWindows extends Scheduler {
             for (int i = 0; i < columns.length && i < values.length; i++) {
                 map.add((values[i]));
             }
-            SchTaskEntry task = new SchTaskEntry(map);
-            list.add(task);
+            list.add(new TaskInfoWin(map));
         }
         scanner.close();
-        return list;
+        for (TaskInfoWin t : list) {
+            if (t.getTaskname() != null && t.getTaskname().endsWith(taskname)) {
+                return t;
+            }
+        }
+        return null;
     }
 
     /**
@@ -450,14 +469,9 @@ public class SchedulerWindows extends Scheduler {
      * @param taskname
      * @throws APIException
      */
-    private SchTaskEntry query(String taskname) throws APIException {
-        // Find a matching taskname.
-        for (SchTaskEntry t : internalQuery(taskname)) {
-            if (t.getTaskname() != null && t.getTaskname().endsWith(taskname)) {
-                return t;
-            }
-        }
-        return null;
+    private TaskInfo query(String taskname) throws APIException {
+        Validate.notNull(taskname);
+        return internalQueryCsv(taskname);
     }
 
     /**
