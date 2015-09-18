@@ -38,7 +38,8 @@ import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
-import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
+import com.patrikdufresne.minarca.core.internal.SchedulerTask;
+import com.patrikdufresne.minarca.core.internal.SchedulerTask.Schedule;
 import com.patrikdufresne.rdiffweb.core.Client;
 import com.patrikdufresne.rdiffweb.core.RdiffwebException;
 
@@ -160,9 +161,9 @@ public class API {
         LoggerFactory.getLogger(API.class).info("using default charset [{}]", Compat.CHARSET_DEFAULT.name());
         LoggerFactory.getLogger(API.class).info("using process charset [{}]", Compat.CHARSET_PROCESS.name());
 
-        this.confFile = new File(Compat.CONFIG_PATH, FILENAME_CONF); //$NON-NLS-1$
-        this.includesFile = new File(Compat.CONFIG_PATH, FILENAME_INCLUDES); //$NON-NLS-1$
-        this.excludesFile = new File(Compat.CONFIG_PATH, FILENAME_EXCLUDES); //$NON-NLS-1$
+        this.confFile = new File(Compat.CONFIG_PATH, FILENAME_CONF); // $NON-NLS-1$
+        this.includesFile = new File(Compat.CONFIG_PATH, FILENAME_INCLUDES); // $NON-NLS-1$
+        this.excludesFile = new File(Compat.CONFIG_PATH, FILENAME_EXCLUDES); // $NON-NLS-1$
 
         // Load the configuration
         this.properties = new Properties();
@@ -283,7 +284,7 @@ public class API {
 
         // Delete & create schedule tasks.
         Scheduler scheduler = Scheduler.getInstance();
-        scheduler.create();
+        scheduler.create(SchedulerTask.Schedule.DAILY);
     }
 
     /**
@@ -380,33 +381,23 @@ public class API {
     }
 
     /**
-     * Get the username used for the backup (username used to authentication with SSH server).
-     * 
-     * @return
-     */
-    public String getUsername() {
-        return this.properties.getProperty(PROPERTY_USERNAME);
-    }
-
-    /**
      * Check if a backup task is running.
      * 
      * @return True if a backup task is running.
      * 
      * @throws APIException
      */
-    public TaskInfo getScheduleTaskInfo() throws APIException {
+    public SchedulerTask getSchedulerTask() throws APIException {
         return Scheduler.getInstance().info();
     }
 
     /**
-     * Used to asynchronously start the backup process. This operation usually used the system scheduler to run the
-     * backup task in background.
+     * Get the username used for the backup (username used to authentication with SSH server).
      * 
-     * @throws APIException
+     * @return
      */
-    public void runBackup() throws APIException {
-        Scheduler.getInstance().run();
+    public String getUsername() {
+        return this.properties.getProperty(PROPERTY_USERNAME);
     }
 
     /**
@@ -488,6 +479,16 @@ public class API {
     }
 
     /**
+     * Used to asynchronously start the backup process. This operation usually used the system scheduler to run the
+     * backup task in background.
+     * 
+     * @throws APIException
+     */
+    public void runBackup() throws APIException {
+        Scheduler.getInstance().run();
+    }
+
+    /**
      * Used to persist the configuration.
      * 
      * @throws IOException
@@ -499,6 +500,16 @@ public class API {
                 + "Minarca backup configuration.\r\n"
                 + "Please do not change this configuration file manually.");
         writer.close();
+    }
+
+    /**
+     * Reschedule task.
+     * 
+     * @param schedule
+     *            the new schedule.
+     */
+    public void scheduleTask(Schedule schedule) throws APIException {
+        Scheduler.getInstance().create(schedule);
     }
 
     /**

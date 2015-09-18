@@ -185,7 +185,7 @@ public class Compat {
         if (configPath != null) {
             return configPath;
         }
-        if (SystemUtils.IS_OS_WINDOWS) { //$NON-NLS-1$
+        if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
         } else if (SystemUtils.IS_OS_LINUX) {
             if (isAdmin) {
@@ -441,6 +441,7 @@ public class Compat {
      */
     public static File searchFile(String filename, String... paths) {
         Validate.notEmpty(filename);
+        Validate.notNull(paths);
         List<String> locations = new ArrayList<String>();
         locations.addAll(Arrays.asList(paths));
         locations.add(".");

@@ -4,7 +4,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -113,6 +113,14 @@ public class CListTest {
         item11.setTitleHelpText("/home/ikus060/my files/autocad files");
         item11.createSwitchButton();
         item11.createButtonDelete();
+
+        // Create item
+        CListItem item12 = new CListItem(itemlist, "Schedule");
+        item12.setTitleHelpText("Define backup frequency.");
+        Combo combo12 = item12.createCombo(SWT.NONE);
+        combo12.add("Hourly");
+        combo12.add("Daily");
+        item12.createButtonConfig();
 
         shell.pack();
         shell.open();

@@ -43,18 +43,20 @@ public class SchedulerWindows extends Scheduler {
      * @author Patrik Dufresne
      * 
      */
-    private static class TaskInfoWin implements TaskInfo {
+    private static class TaskInfoWin implements SchedulerTask {
 
-        private static final String[] WINDOWS_XP_INDEXES = new String[] {
-                "HOSTNAME",
-                "TASKNAME",
-                "NEXT_RUN_TIME",
-                "STATUS",
-                "LAST_RUN_TIME",
-                "LAST_RESULT",
-                "AUTHOR",
-                "",
-                "TASK_TO_RUN" };
+        private static final Pattern PATTERN_SCHEDULE_TYPE_DAILY = Pattern.compile("(Tous les jours|Journalier|Daily)");
+
+        private static final Pattern PATTERN_SCHEDULE_TYPE_HOURLY = Pattern.compile("(Toutes les heures|Hourly)");
+
+        private static final Pattern PATTERN_SCHEDULE_TYPE_MONTHLY = Pattern.compile("(Tous les mois|Mensuel|Monthly)");
+
+        private static final Pattern PATTERN_SCHEDULE_TYPE_WEEKLY = Pattern.compile("(Toutes les semaines|Weekly)");
+
+        /**
+         * Regex pattern used to check if the task is running.
+         */
+        private static final Pattern PATTERN_TASK_RUNNING = Pattern.compile("(En cours d'exécution|Running)");
 
         private static final String[] WINDOWS_7_INDEXES = new String[] {
                 "HOSTNAME",
@@ -65,7 +67,34 @@ public class SchedulerWindows extends Scheduler {
                 "LAST_RUN_TIME",
                 "LAST_RESULT",
                 "AUTHOR",
-                "TASK_TO_RUN" };
+                "TASK_TO_RUN",
+                "",
+                "COMMENT",
+                "STATE",
+                "",
+                "",
+                "RUN_AS",
+                "",
+                "",
+                "",
+                "SCHEDULE_TYPE",
+                "START_TIME" };
+
+        private static final String[] WINDOWS_XP_INDEXES = new String[] {
+                "HOSTNAME",
+                "TASKNAME",
+                "NEXT_RUN_TIME",
+                "STATUS",
+                "LAST_RUN_TIME",
+                "LAST_RESULT",
+                "AUTHOR",
+                "",
+                "TASK_TO_RUN",
+                "",
+                "COMMENT",
+                "STATE",
+                "SCHEDULE_TYPE",
+                "START_TIME" };
 
         /**
          * Heuristic to parse date string.
@@ -113,6 +142,7 @@ public class SchedulerWindows extends Scheduler {
         private final List<String> INDEXES;
         private final int LAST_RESULT;
         private final int LAST_RUN_TIME;
+        private final int SCHEDULE_TYPE;
         private final int STATUS;
         private final int TASK_TO_RUN;
         private final int TASKNAME;
@@ -137,6 +167,7 @@ public class SchedulerWindows extends Scheduler {
             STATUS = INDEXES.indexOf("STATUS");
             TASK_TO_RUN = INDEXES.indexOf("TASK_TO_RUN");
             TASKNAME = INDEXES.indexOf("TASKNAME");
+            SCHEDULE_TYPE = INDEXES.indexOf("SCHEDULE_TYPE");
         }
 
         private String get(int index) {
@@ -179,6 +210,21 @@ public class SchedulerWindows extends Scheduler {
             return parseDate(value);
         }
 
+        @Override
+        public Schedule getSchedule() {
+            String value = get(SCHEDULE_TYPE);
+            if (PATTERN_SCHEDULE_TYPE_HOURLY.matcher(value).find()) {
+                return Schedule.HOURLY;
+            } else if (PATTERN_SCHEDULE_TYPE_DAILY.matcher(value).find()) {
+                return Schedule.DAILY;
+            } else if (PATTERN_SCHEDULE_TYPE_WEEKLY.matcher(value).find()) {
+                return Schedule.WEEKLY;
+            } else if (PATTERN_SCHEDULE_TYPE_MONTHLY.matcher(value).find()) {
+                return Schedule.MONTHLY;
+            }
+            return Schedule.UNKNOWN;
+        }
+
         /**
          * Return the state of the task. If it's running or not. etc.
          * 
@@ -212,6 +258,11 @@ public class SchedulerWindows extends Scheduler {
 
     }
 
+    /**
+     * Pattern used to detect error.
+     */
+    private static final Pattern ERROR_PATTERN = Pattern.compile("(ERROR|ERREUR)");
+
     private static final transient Logger LOGGER = LoggerFactory.getLogger(SchedulerWindows.class);
 
     /**
@@ -220,30 +271,24 @@ public class SchedulerWindows extends Scheduler {
     private static final String MINARCA;
 
     /**
-     * Regex pattern used to check if the task is running.
-     */
-    private static final Pattern PATTERN_TASK_RUNNING = Pattern.compile("(En cours d'exécution|Running)");
-
-    /**
      * Property used to define the location of minarca.bat file.
      */
-    private static final String PROPERTY_MINARCA_EXE_LOCATION = "minarca.exe.location";
+    private static final String PROPERTY_MINARCA_EXE_LOCATION = "minarca.exe.location";;
+
     /**
      * Windows task name.
      */
     private static final String TASK_NAME = "minarca backup";
 
     static {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
-                MINARCA = "minarca64.exe";
-            } else {
-                MINARCA = "minarca.exe";
-            }
+        if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
+            MINARCA = "minarca64.exe";
         } else {
-            MINARCA = "minarca.sh";
+            MINARCA = "minarca.exe";
         }
     }
+
+    private Boolean isFr;
 
     /**
      * Create a new schedule tasks
@@ -260,26 +305,56 @@ public class SchedulerWindows extends Scheduler {
      * @see http ://www.windowsnetworking.com/kbase/WindowsTips/WindowsXP/AdminTips
      *      /Utilities/XPschtaskscommandlineutilityreplacesAT.exe.html
      */
-    public void create() throws APIException {
+    public synchronized void create(SchedulerTask.Schedule schedule) throws APIException {
         LOGGER.debug("creating schedule task [{}]", TASK_NAME);
-        String data;
+
+        // Delete the tasks (if exists). The /F option doesn't exists in WinXP.
         if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-            // Delete the tasks (if exists). The /F option doesn't exists in WinXP.
             delete();
-            // Create the task.
-            data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM");
-        } else {
-            // Otherwise
-            if (Compat.IS_ADMIN) {
-                // If running in admin mode, run minarca backup as SYSTEM user.
-                data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/RU", "SYSTEM", "/F");
-            } else {
-                // Otherwise, run minarca backup as current user.
-                data = execute("/Create", "/SC", "HOURLY", "/TN", TASK_NAME, "/TR", getCommand(), "/F");
-            }
         }
+        List<String> args = new ArrayList<String>();
+        args.add("/Create");
+
+        // Define task name
+        args.add("/TN");
+        args.add(TASK_NAME);
+
+        // Define command to execute
+        args.add("/TR");
+        args.add(getCommand());
+
+        if (!SystemUtils.IS_OS_WINDOWS_XP && !SystemUtils.IS_OS_WINDOWS_2003) {
+            // Add Force object to replace existing task.
+            args.add("/F");
+        }
+        if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
+            // Run task as Admin
+            args.add("/RU");
+            args.add("SYSTEM");
+        }
+
+        // Define schedule
+        args.add("/SC");
+        switch (schedule) {
+        case HOURLY:
+            args.add("HOURLY");
+            break;
+        case DAILY:
+            args.add("DAILY");
+            break;
+        case WEEKLY:
+            args.add(SystemUtils.IS_OS_WINDOWS_XP && isFr() ? "Toutes les semaines" : "WEEKLY");
+            break;
+        case MONTHLY:
+            args.add(SystemUtils.IS_OS_WINDOWS_XP && isFr() ? "MENSUEL" : "MONTHLY");
+            break;
+        default:
+            args.add("DAILY");
+        }
+
+        String data = execute(args);
         // FIXME looking at command output is not the best since it change according to user language.
-        if (data.matches("(ERROR|ERREUR)")) {
+        if (ERROR_PATTERN.matcher(data).find()) {
             throw new APIException("fail to schedule task");
         }
     }
@@ -291,7 +366,7 @@ public class SchedulerWindows extends Scheduler {
      *            the task to be deleted.
      * @throws APIException
      */
-    public boolean delete() throws APIException {
+    public synchronized boolean delete() throws APIException {
         LOGGER.debug("deleting schedule task [{}]", TASK_NAME);
         String data = execute("/Delete", "/F", "/TN", TASK_NAME);
         return data.contains("SUCCESS");
@@ -313,7 +388,6 @@ public class SchedulerWindows extends Scheduler {
             Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
             StreamHandler sh = new StreamHandler(p);
             sh.start();
-            // TODO Check return code.
             p.waitFor();
             return sh.getOutput();
         } catch (IOException e) {
@@ -344,9 +418,9 @@ public class SchedulerWindows extends Scheduler {
      *            the task name.
      * @return True if exists.
      */
-    public boolean exists() {
+    public synchronized boolean exists() {
         try {
-            TaskInfo task = query(TASK_NAME);
+            SchedulerTask task = query(TASK_NAME);
             if (task == null) {
                 return false;
             }
@@ -406,10 +480,10 @@ public class SchedulerWindows extends Scheduler {
      * Get information about the task.
      */
     @Override
-    public TaskInfo info() throws TaskNotFoundException, APIException {
+    public synchronized SchedulerTask info() throws TaskNotFoundException, APIException {
         LOGGER.info("check task info");
         // Get reference to our task
-        TaskInfo task = query(TASK_NAME);
+        SchedulerTask task = query(TASK_NAME);
         if (task == null) {
             throw new TaskNotFoundException();
         }
@@ -464,12 +538,28 @@ public class SchedulerWindows extends Scheduler {
     }
 
     /**
+     * True if french is detected.
+     */
+    private boolean isFr() {
+        if (isFr != null) {
+            return isFr;
+        }
+        try {
+            String data = execute("/?");
+            isFr = data.contains("paramètre");
+        } catch (APIException e) {
+            isFr = false;
+        }
+        return isFr;
+    }
+
+    /**
      * Query the given taskname.
      * 
      * @param taskname
      * @throws APIException
      */
-    private TaskInfo query(String taskname) throws APIException {
+    private SchedulerTask query(String taskname) throws APIException {
         Validate.notNull(taskname);
         return internalQueryCsv(taskname);
     }
@@ -478,7 +568,7 @@ public class SchedulerWindows extends Scheduler {
      * Start the task.
      */
     @Override
-    public void run() throws APIException {
+    public synchronized void run() throws APIException {
         LOGGER.info("starting the task");
         execute("/Run", "/TN", TASK_NAME);
     }
@@ -487,7 +577,7 @@ public class SchedulerWindows extends Scheduler {
      * End the task.
      */
     @Override
-    public void terminate() throws APIException {
+    public synchronized void terminate() throws APIException {
         LOGGER.info("terminating the task");
         execute("/End", "/TN", TASK_NAME);
     }

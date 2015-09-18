@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -277,7 +278,22 @@ public class CListItem extends Composite {
     }
 
     /**
-     * Create switch buton.
+     * Create a Combo widget
+     * 
+     * @return
+     */
+    public Combo createCombo(int style) {
+        addColumn();
+        Combo combo = new Combo(this, style);
+        combo.setBackground(getBackground());
+        combo.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+        combo.setEnabled(getEnabled());
+        registerlisteners(combo);
+        return combo;
+    }
+
+    /**
+     * Create switch button.
      * 
      * @return
      */

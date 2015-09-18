@@ -11,7 +11,7 @@ import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 public class SchedulerLinux extends Scheduler {
 
     @Override
-    public void create() {
+    public void create(SchedulerTask.Schedule schedule) {
         // TODO Auto-generated method stub
 
     }
@@ -23,7 +23,7 @@ public class SchedulerLinux extends Scheduler {
     }
 
     @Override
-    public TaskInfo info() throws APIException, TaskNotFoundException {
+    public SchedulerTask info() throws APIException, TaskNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }

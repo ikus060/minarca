@@ -16,7 +16,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
+import com.patrikdufresne.minarca.core.internal.SchedulerTask.Schedule;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SchedulerWindows.class, SystemUtils.class })
@@ -38,9 +38,10 @@ public class SchedulerWindowsTest {
 
         assertTrue(s.exists());
 
-        TaskInfo info = s.info();
+        SchedulerTask info = s.info();
         assertTrue(info.isRunning());
         assertEquals((Integer) 1, info.getLastResult());
+        assertEquals(Schedule.HOURLY, info.getSchedule());
         assertEquals(new Date(1433286360000l), info.getLastRun());
     }
 
@@ -60,21 +61,22 @@ public class SchedulerWindowsTest {
 
         assertTrue(s.exists());
 
-        TaskInfo info = s.info();
+        SchedulerTask info = s.info();
         assertFalse(info.isRunning());
         assertEquals((Integer) 1, info.getLastResult());
+        assertEquals(Schedule.HOURLY, info.getSchedule());
         assertEquals(new Date(1420595256000l), info.getLastRun());
     }
 
     @Test
-    public synchronized void testExists_ForWin7Fr() throws Exception {
+    public synchronized void testExists_ForWin7Fr_Hourly() throws Exception {
         // Enforce Win7
         Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
         Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) true);
         // Enforce French Local
         Locale.setDefault(Locale.CANADA_FRENCH);
 
-        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr.data"));
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-hourly.data"));
 
         SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
         PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
@@ -82,21 +84,90 @@ public class SchedulerWindowsTest {
 
         assertTrue(s.exists());
 
-        TaskInfo info = s.info();
+        SchedulerTask info = s.info();
         assertFalse(info.isRunning());
         assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.HOURLY, info.getSchedule());
         assertEquals(new Date(1441916280000l), info.getLastRun());
     }
 
     @Test
-    public synchronized void testExists_ForWin10En() throws Exception {
+    public synchronized void testExists_ForWin7Fr_Weekly() throws Exception {
         // Enforce Win7
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) true);
+        // Enforce French Local
+        Locale.setDefault(Locale.CANADA_FRENCH);
+
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-weekly.data"));
+
+        SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
+        PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
+
+        assertTrue(s.exists());
+
+        SchedulerTask info = s.info();
+        assertFalse(info.isRunning());
+        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.WEEKLY, info.getSchedule());
+        assertEquals(new Date(1442603940000l), info.getLastRun());
+    }
+
+    @Test
+    public synchronized void testExists_ForWin7Fr_Monthly() throws Exception {
+        // Enforce Win7
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) true);
+        // Enforce French Local
+        Locale.setDefault(Locale.CANADA_FRENCH);
+
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-monthly.data"));
+
+        SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
+        PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
+
+        assertTrue(s.exists());
+
+        SchedulerTask info = s.info();
+        assertFalse(info.isRunning());
+        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.MONTHLY, info.getSchedule());
+        assertEquals(new Date(1442603940000l), info.getLastRun());
+    }
+
+    @Test
+    public synchronized void testExists_ForWin7Fr_Daily() throws Exception {
+        // Enforce Win7
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) true);
+        // Enforce French Local
+        Locale.setDefault(Locale.CANADA_FRENCH);
+
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-daily.data"));
+
+        SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
+        PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
+
+        assertTrue(s.exists());
+
+        SchedulerTask info = s.info();
+        assertFalse(info.isRunning());
+        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.DAILY, info.getSchedule());
+        assertEquals(new Date(1442603940000l), info.getLastRun());
+    }
+
+    @Test
+    public synchronized void testExists_ForWin10En_Hourly() throws Exception {
         Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
         Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) false);
         // Enforce French Local
         Locale.setDefault(Locale.ENGLISH);
 
-        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en.data"));
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-hourly.data"));
 
         SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
         PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
@@ -104,9 +175,77 @@ public class SchedulerWindowsTest {
 
         assertTrue(s.exists());
 
-        TaskInfo info = s.info();
+        SchedulerTask info = s.info();
         assertFalse(info.isRunning());
         assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.HOURLY, info.getSchedule());
         assertEquals(new Date(1442588700000l), info.getLastRun());
     }
+
+    @Test
+    public synchronized void testExists_ForWin10En_Daily() throws Exception {
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) false);
+        // Enforce French Local
+        Locale.setDefault(Locale.ENGLISH);
+
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-daily.data"));
+
+        SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
+        PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
+
+        assertTrue(s.exists());
+
+        SchedulerTask info = s.info();
+        assertFalse(info.isRunning());
+        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.DAILY, info.getSchedule());
+        assertEquals(new Date(1442592300000l), info.getLastRun());
+    }
+
+    @Test
+    public synchronized void testExists_ForWin10En_Weekly() throws Exception {
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) false);
+        // Enforce French Local
+        Locale.setDefault(Locale.ENGLISH);
+
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-weekly.data"));
+
+        SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
+        PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
+
+        assertTrue(s.exists());
+
+        SchedulerTask info = s.info();
+        assertFalse(info.isRunning());
+        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.WEEKLY, info.getSchedule());
+        assertEquals(new Date(1442592300000l), info.getLastRun());
+    }
+
+    @Test
+    public synchronized void testExists_ForWin10En_Monthly() throws Exception {
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) false);
+        // Enforce French Local
+        Locale.setDefault(Locale.ENGLISH);
+
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-monthly.data"));
+
+        SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
+        PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
+
+        assertTrue(s.exists());
+
+        SchedulerTask info = s.info();
+        assertFalse(info.isRunning());
+        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(Schedule.MONTHLY, info.getSchedule());
+        assertEquals(new Date(1442592300000l), info.getLastRun());
+    }
+
 }

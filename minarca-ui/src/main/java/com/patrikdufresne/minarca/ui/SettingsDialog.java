@@ -7,6 +7,8 @@ package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,6 +17,11 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -39,7 +46,9 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.fontawesome.FontAwesome;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
-import com.patrikdufresne.minarca.core.internal.Scheduler.TaskInfo;
+import com.patrikdufresne.minarca.core.internal.Compat;
+import com.patrikdufresne.minarca.core.internal.SchedulerTask;
+import com.patrikdufresne.minarca.core.internal.SchedulerTask.Schedule;
 
 /**
  * This is the main windows of the application used to configure the backup.
@@ -78,6 +87,8 @@ public class SettingsDialog extends Dialog {
     private Button stopStartButton;
 
     private Button unlinkButton;
+
+    private ComboViewer scheduleCombo;
 
     /**
      * Create a new preference dialog.
@@ -148,45 +159,54 @@ public class SettingsDialog extends Dialog {
      */
     private void checkBackupInfo() {
         // Get backup info.
-        TaskInfo info = null;
+        SchedulerTask info = null;
         try {
-            info = API.instance().getScheduleTaskInfo();
+            info = API.instance().getSchedulerTask();
         } catch (APIException e) {
             LOGGER.warn("fail to get backup info", e);
         }
         // Update UI
-        final TaskInfo fInfo = info;
+        final SchedulerTask fInfo = info;
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (!lastruntimeItem.isDisposed()) {
-                    // Update value with last date.
-                    if (fInfo == null || fInfo.getLastRun() == null) {
-                        lastruntimeItem.setValue(_("Unknown"));
-                    } else if (fInfo.isRunning()) {
-                        lastruntimeItem.setValue(_("Running..."));
-                    } else if (fInfo != null && fInfo.getLastRun() != null) {
-                        String text = DateFormat.getDateTimeInstance().format(fInfo.getLastRun());
-                        lastruntimeItem.setValue(text);
-                    }
-                    // Update label button according to task state.
-                    if (fInfo == null) {
-                        stopStartButton.setEnabled(false);
-                    } else {
-                        stopStartButton.setEnabled(true);
-                        stopStartButton.setText(fInfo.isRunning() ? _("Stop") : _("Start"));
-                    }
-                    // Update help text with Success or Failure
-                    if (fInfo != null && fInfo.getLastResult() != null) {
-                        if (fInfo.getLastResult().intValue() == 0) {
-                            lastruntimeItem.setValueHelpText(_("Successful"));
-                        } else {
-                            lastruntimeItem.setValueHelpText(_("Failed"));
-                        }
-                    } else {
-                        lastruntimeItem.setValueHelpText(null);
-                    }
+                if (lastruntimeItem.isDisposed()) {
+                    return;
                 }
+                // Update value with last date.
+                if (fInfo == null || fInfo.getLastRun() == null) {
+                    lastruntimeItem.setValue(_("Unknown"));
+                } else if (fInfo.isRunning()) {
+                    lastruntimeItem.setValue(_("Running..."));
+                } else if (fInfo != null && fInfo.getLastRun() != null) {
+                    String text = DateFormat.getDateTimeInstance().format(fInfo.getLastRun());
+                    lastruntimeItem.setValue(text);
+                }
+                // Update label button according to task state.
+                if (fInfo == null) {
+                    stopStartButton.setEnabled(false);
+                } else {
+                    stopStartButton.setEnabled(true);
+                    stopStartButton.setText(fInfo.isRunning() ? _("Stop") : _("Start"));
+                }
+                // Update help text with Success or Failure
+                if (fInfo != null && fInfo.getLastResult() != null) {
+                    if (fInfo.getLastResult().intValue() == 0) {
+                        lastruntimeItem.setValueHelpText(_("Successful"));
+                    } else {
+                        lastruntimeItem.setValueHelpText(_("Failed"));
+                    }
+                } else {
+                    lastruntimeItem.setValueHelpText(null);
+                }
+                // Update schedule
+                if (fInfo != null && fInfo.getSchedule() != null) {
+                    scheduleCombo.setSelection(new StructuredSelection(fInfo.getSchedule()));
+                    scheduleCombo.getControl().setEnabled(true);
+                } else {
+                    scheduleCombo.getControl().setEnabled(false);
+                }
+
             }
         });
     }
@@ -305,7 +325,9 @@ public class SettingsDialog extends Dialog {
         CList browseItemlist = new CList(comp, SWT.BORDER);
         browseItemlist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-        // Create selective backup
+        /*
+         * Browse data
+         */
         CListItem browseItem = new CListItem(browseItemlist, _("Go to Minarca website"));
         browseItem.setTitleHelpText(_("Allows you to browse your backup and restore files."));
         Button browseButton = browseItem.createButtonConfig();
@@ -327,7 +349,9 @@ public class SettingsDialog extends Dialog {
         CList accountItemlist = new CList(comp, SWT.BORDER);
         accountItemlist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-        // Create status
+        /*
+         * Status
+         */
         statusItem = new CListItem(accountItemlist, _("Status"));
         statusItem.setValue(Dialog.ELLIPSIS);
         statusItem.setValueHelpText(_("As {0} @ {1}", API.instance().getUsername(), API.instance().getComputerName()));
@@ -344,7 +368,9 @@ public class SettingsDialog extends Dialog {
         // Separator.
         new Label(accountItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
 
-        // Create fingerprint
+        /*
+         * Fingerprint
+         */
         CListItem fingerprintItem = new CListItem(accountItemlist, _("Fingerprint"));
         fingerprintItem.setValue(API.instance().getIdentityFingerPrint());
         fingerprintItem.setValueHelpText(_("Use by your computer to identify itself."));
@@ -358,7 +384,9 @@ public class SettingsDialog extends Dialog {
         CList backupItemlist = new CList(comp, SWT.BORDER);
         backupItemlist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-        // Create selective backup
+        /*
+         * Selective backup
+         */
         CListItem selectiveBackupItem = new CListItem(backupItemlist, _("Selective backup"));
         selectiveBackupItem.setTitleHelpText(_("Allow you to select files and folders to backup."));
         Button selectiveButton = selectiveBackupItem.createButtonConfig();
@@ -386,7 +414,57 @@ public class SettingsDialog extends Dialog {
         // Separator.
         new Label(backupItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
 
-        // Create Last run time
+        /*
+         * Schedule
+         */
+        CListItem scheduleItem = new CListItem(backupItemlist, _("Schedule"));
+        scheduleItem.setTitleHelpText(_("Define the backup frequency."));
+        scheduleCombo = new ComboViewer(scheduleItem.createCombo(SWT.READ_ONLY));
+        scheduleCombo.getControl().setEnabled(false);
+        scheduleCombo.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                switch ((Schedule) element) {
+                case HOURLY:
+                    return _("Hourly");
+                case DAILY:
+                    return _("Daily");
+                case WEEKLY:
+                    return _("Weekly");
+                case MONTHLY:
+                    return _("Monthly");
+                case UNKNOWN:
+                    return _("Unknown");
+                }
+                return element.toString();
+            }
+
+        });
+        scheduleCombo.add(new Schedule[] { Schedule.HOURLY, Schedule.DAILY, Schedule.WEEKLY, Schedule.MONTHLY, Schedule.UNKNOWN });
+        Point size = scheduleCombo.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+        ((GridData) scheduleCombo.getControl().getLayoutData()).widthHint = size.x;
+        ((GridData) scheduleCombo.getControl().getLayoutData()).heightHint = size.y;
+        scheduleCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                handleSchedule(event);
+            }
+        });
+        Button scheduleButton = scheduleItem.createButtonConfig();
+        scheduleButton.setToolTipText(_("Advance scheduler configuration."));
+        scheduleButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleScheduleAdvance();
+            }
+        });
+
+        // Separator.
+        new Label(backupItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
+
+        /*
+         * Last run time & Start / Stop
+         */
         lastruntimeItem = new CListItem(backupItemlist, _("Last run time"));
         lastruntimeItem.setValue(Dialog.ELLIPSIS);
         stopStartButton = lastruntimeItem.createButton(_("Start"));
@@ -418,11 +496,6 @@ public class SettingsDialog extends Dialog {
      */
     @Override
     protected Point getInitialSize() {
-        // Sets fixed window size.
-        // if (SystemUtils.IS_OS_LINUX) {
-        // return new Point(450, 550);
-        // }
-        // return new Point(425, 500);
         return super.getInitialSize();
     }
 
@@ -495,7 +568,7 @@ public class SettingsDialog extends Dialog {
         // Check if backup is running
         Boolean running;
         try {
-            running = API.instance().getScheduleTaskInfo().isRunning();
+            running = API.instance().getSchedulerTask().isRunning();
         } catch (APIException e) {
             running = false;
         }
@@ -531,6 +604,83 @@ public class SettingsDialog extends Dialog {
             API.instance().runBackup();
         } catch (APIException e) {
             DetailMessageDialog.openError(this.getShell(), _("Error"), _("Can't backup this computer!"), _("An error occurred while backuping this computer."));
+        }
+
+    }
+
+    /**
+     * Called when user change the schedule.
+     * 
+     * @param event
+     *            the selection event
+     */
+    protected void handleSchedule(SelectionChangedEvent event) {
+        Schedule schedule = (Schedule) ((StructuredSelection) event.getSelection()).getFirstElement();
+        if (Schedule.UNKNOWN.equals(schedule)) {
+            // Do nothing.
+            return;
+        }
+        // Check if the schedule type is different.
+        try {
+            Schedule current = API.instance().getSchedulerTask().getSchedule();
+            if (schedule.equals(current)) {
+                // Nothing to do.
+                return;
+            }
+        } catch (APIException e) {
+            DetailMessageDialog.openError(
+                    this.getShell(),
+                    Display.getAppName(),
+                    _("Can't change backup schedule!"),
+                    _("Fail to retrieve current backup schedule."),
+                    e);
+        }
+
+        try {
+            API.instance().scheduleTask(schedule);
+        } catch (APIException e) {
+            DetailMessageDialog.openError(
+                    this.getShell(),
+                    Display.getAppName(),
+                    _("Can't change backup schedule!"),
+                    _("Fail to reschedule the backup task."),
+                    e);
+        }
+
+    }
+
+    /**
+     * Called when the user click on advance button config for scheduler. This action open the task scheduler.
+     */
+    protected void handleScheduleAdvance() {
+
+        // Prompt the user.
+        DetailMessageDialog dlg = DetailMessageDialog.openOkCancelConfirm(
+                getShell(),
+                Display.getAppName(),
+                _("This action will open Windows Task Scheduler."),
+                _("If you want more control over the backup schedule, you need to "
+                        + "manually edit the minarca backup task in Windows Task Scheduler. "
+                        + "If you don't know what you are doing, you should cancel the"
+                        + "operation to avoid breaking the schedule."),
+                null);
+        if (dlg.getReturnCode() != IDialogConstants.OK_ID) {
+            return;
+        }
+
+        // Open Task Scheduler (work in XP to 10)
+        File control = Compat.searchFile("control.exe", new String[0]);
+        if (control != null) {
+            try {
+                Runtime.getRuntime().exec(new String[] { control.toString(), "schedtasks" });
+            } catch (IOException e) {
+                DetailMessageDialog.openError(
+                        this.getShell(),
+                        Display.getAppName(),
+                        _("Can't open Windows Task Scheduler!"),
+                        _("An error occurred when trying to open Windows Task Scheduler."),
+                        e);
+            }
         }
 
     }

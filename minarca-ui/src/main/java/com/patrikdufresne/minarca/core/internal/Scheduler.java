@@ -5,8 +5,6 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
-import java.util.Date;
-
 import org.apache.commons.lang3.SystemUtils;
 
 import com.patrikdufresne.minarca.core.APIException;
@@ -23,35 +21,7 @@ import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
  */
 public abstract class Scheduler {
 
-    /**
-     * Create a task info.
-     * 
-     * @author Patrik Dufresne
-     */
-    public static interface TaskInfo {
-
-        /**
-         * True if the task is running.
-         * 
-         * @return
-         */
-        public Boolean isRunning();
-
-        /**
-         * The last known running date.
-         * 
-         * @return
-         */
-        public Date getLastRun();
-
-        /**
-         * The last result of the task.
-         * 
-         * @return
-         */
-        public Integer getLastResult();
-
-    }
+    public static Scheduler singleton;
 
     /**
      * Return the scheduling service for this operating system.
@@ -61,10 +31,13 @@ public abstract class Scheduler {
      *             if OS is not supported
      */
     public static Scheduler getInstance() {
+        if (singleton != null) {
+            return singleton;
+        }
         if (SystemUtils.IS_OS_WINDOWS) {
-            return new SchedulerWindows();
+            return singleton = new SchedulerWindows();
         } else if (SystemUtils.IS_OS_LINUX) {
-            return new SchedulerLinux();
+            return singleton = new SchedulerLinux();
         }
         throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
     }
@@ -75,7 +48,7 @@ public abstract class Scheduler {
      * @param taskname
      * @param command
      */
-    public abstract void create() throws APIException;
+    public abstract void create(SchedulerTask.Schedule schedule) throws APIException;
 
     /**
      * Delete the task
@@ -90,7 +63,7 @@ public abstract class Scheduler {
      * @param taskname
      * @return
      */
-    public abstract TaskInfo info() throws APIException, TaskNotFoundException;
+    public abstract SchedulerTask info() throws APIException, TaskNotFoundException;
 
     /**
      * Run the task.
