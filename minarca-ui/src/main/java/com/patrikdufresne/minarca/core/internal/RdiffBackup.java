@@ -184,7 +184,15 @@ public class RdiffBackup {
         List<String> args = new ArrayList<String>();
         args.add(rdiffbackup.toString());
         args.add("-v");
-        args.add("5");
+        if (LOGGER.isTraceEnabled()) {
+            args.add("9");
+        } else if (LOGGER.isDebugEnabled()) {
+            args.add("5");
+        } else if (LOGGER.isInfoEnabled()) {
+            args.add("3");
+        } else {
+            args.add("0");
+        }
         if (SystemUtils.IS_OS_WINDOWS) {
             args.add("--no-hard-links");
             args.add("--exclude-symbolic-links");
@@ -281,7 +289,15 @@ public class RdiffBackup {
         List<String> args = new ArrayList<String>();
         args.add(rdiffbackup.toString());
         args.add("-v");
-        args.add("5");
+        if (LOGGER.isTraceEnabled()) {
+            args.add("9");
+        } else if (LOGGER.isDebugEnabled()) {
+            args.add("5");
+        } else if (LOGGER.isInfoEnabled()) {
+            args.add("3");
+        } else {
+            args.add("0");
+        }
         args.add("--remote-schema");
         if (SystemUtils.IS_OS_WINDOWS) {
             File plink = getPlinkLocation();
