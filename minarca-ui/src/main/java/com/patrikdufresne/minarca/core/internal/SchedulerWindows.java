@@ -45,6 +45,11 @@ public class SchedulerWindows extends Scheduler {
      */
     private static class TaskInfoWin implements SchedulerTask {
 
+        /**
+         * Task has not yet run.
+         */
+        private static final Integer LAST_RESULT_NOT_YET_RUN = Integer.valueOf(267011);
+
         private static final Pattern PATTERN_SCHEDULE_TYPE_DAILY = Pattern.compile("(Tous les jours|Journalier|Daily)");
 
         private static final Pattern PATTERN_SCHEDULE_TYPE_HOURLY = Pattern.compile("(Toutes les heures|Hourly)");
@@ -193,7 +198,11 @@ public class SchedulerWindows extends Scheduler {
         public Integer getLastResult() {
             String value = get(LAST_RESULT);
             try {
-                return Integer.parseInt(value);
+                Integer lastresult = Integer.parseInt(value);
+                if(LAST_RESULT_NOT_YET_RUN.equals(lastresult)){
+                    return null;
+                }
+                return lastresult;
             } catch (NumberFormatException e) {
                 return null;
             }
@@ -206,6 +215,9 @@ public class SchedulerWindows extends Scheduler {
          */
         @Override
         public Date getLastRun() {
+            if (LAST_RESULT_NOT_YET_RUN.equals(getLastResult())) {
+                return null;
+            }
             String value = get(LAST_RUN_TIME);
             return parseDate(value);
         }
