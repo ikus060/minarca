@@ -16,6 +16,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import com.patrikdufresne.minarca.core.internal.SchedulerTask.LastResult;
 import com.patrikdufresne.minarca.core.internal.SchedulerTask.Schedule;
 
 @RunWith(PowerMockRunner.class)
@@ -40,7 +41,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertTrue(info.isRunning());
-        assertEquals((Integer) 1, info.getLastResult());
+        assertEquals(LastResult.FAILURE, info.getLastResult());
         assertEquals(Schedule.HOURLY, info.getSchedule());
         assertEquals(new Date(1433286360000l), info.getLastRun());
     }
@@ -63,7 +64,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 1, info.getLastResult());
+        assertEquals(LastResult.FAILURE, info.getLastResult());
         assertEquals(Schedule.HOURLY, info.getSchedule());
         assertEquals(new Date(1420595256000l), info.getLastRun());
     }
@@ -86,7 +87,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.SUCCESS, info.getLastResult());
         assertEquals(Schedule.HOURLY, info.getSchedule());
         assertEquals(new Date(1441916280000l), info.getLastRun());
     }
@@ -109,7 +110,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.SUCCESS, info.getLastResult());
         assertEquals(Schedule.WEEKLY, info.getSchedule());
         assertEquals(new Date(1442603940000l), info.getLastRun());
     }
@@ -132,7 +133,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.SUCCESS, info.getLastResult());
         assertEquals(Schedule.MONTHLY, info.getSchedule());
         assertEquals(new Date(1442603940000l), info.getLastRun());
     }
@@ -155,7 +156,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.SUCCESS, info.getLastResult());
         assertEquals(Schedule.DAILY, info.getSchedule());
         assertEquals(new Date(1442603940000l), info.getLastRun());
     }
@@ -177,9 +178,9 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.HAS_NOT_RUN, info.getLastResult());
         assertEquals(Schedule.HOURLY, info.getSchedule());
-        assertEquals(new Date(1442588700000l), info.getLastRun());
+        assertEquals(null, info.getLastRun());
     }
 
     @Test
@@ -199,7 +200,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.SUCCESS, info.getLastResult());
         assertEquals(Schedule.DAILY, info.getSchedule());
         assertEquals(new Date(1442592300000l), info.getLastRun());
     }
@@ -221,7 +222,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.SUCCESS, info.getLastResult());
         assertEquals(Schedule.WEEKLY, info.getSchedule());
         assertEquals(new Date(1442592300000l), info.getLastRun());
     }
@@ -243,7 +244,7 @@ public class SchedulerWindowsTest {
 
         SchedulerTask info = s.info();
         assertFalse(info.isRunning());
-        assertEquals((Integer) 0, info.getLastResult());
+        assertEquals(LastResult.SUCCESS, info.getLastResult());
         assertEquals(Schedule.MONTHLY, info.getSchedule());
         assertEquals(new Date(1442592300000l), info.getLastRun());
     }

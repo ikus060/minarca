@@ -191,10 +191,16 @@ public class SettingsDialog extends Dialog {
                 }
                 // Update help text with Success or Failure
                 if (fInfo != null && fInfo.getLastResult() != null) {
-                    if (fInfo.getLastResult().intValue() == 0) {
+                    switch(fInfo.getLastResult()){
+                    case SUCCESS:
                         lastruntimeItem.setValueHelpText(_("Successful"));
-                    } else {
+                        break;
+                    case FAILURE:
                         lastruntimeItem.setValueHelpText(_("Failed"));
+                        break;
+                    default:
+                        lastruntimeItem.setValueHelpText(_("Unknown"));
+                        break;
                     }
                 } else {
                     lastruntimeItem.setValueHelpText(null);

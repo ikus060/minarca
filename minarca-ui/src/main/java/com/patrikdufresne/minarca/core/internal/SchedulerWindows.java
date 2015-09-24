@@ -48,7 +48,9 @@ public class SchedulerWindows extends Scheduler {
         /**
          * Task has not yet run.
          */
-        private static final Integer LAST_RESULT_NOT_YET_RUN = Integer.valueOf(267011);
+        private static final Integer LAST_RESULT_HAS_NOT_RUN = Integer.valueOf(267011);
+
+        private static final Integer LAST_RESULT_SUCCESS = Integer.valueOf(0);
 
         private static final Pattern PATTERN_SCHEDULE_TYPE_DAILY = Pattern.compile("(Tous les jours|Journalier|Daily)");
 
@@ -195,16 +197,24 @@ public class SchedulerWindows extends Scheduler {
          * @return the return code.
          */
         @Override
-        public Integer getLastResult() {
+        public LastResult getLastResult() {
             String value = get(LAST_RESULT);
             try {
                 Integer lastresult = Integer.parseInt(value);
-                if(LAST_RESULT_NOT_YET_RUN.equals(lastresult)){
-                    return null;
+                // Ref http://systemcenter.no/?p=1142
+                // https://msdn.microsoft.com/en-us/library/aa383604(VS.85).aspx
+                if (lastresult.equals(LAST_RESULT_SUCCESS)) {
+                    return LastResult.SUCCESS;
                 }
-                return lastresult;
+                if (lastresult.equals(LAST_RESULT_HAS_NOT_RUN)) {
+                    return LastResult.HAS_NOT_RUN;
+                }
+                if (lastresult >= 267008) {
+                    return LastResult.UNKNOWN;
+                }
+                return LastResult.FAILURE;
             } catch (NumberFormatException e) {
-                return null;
+                return LastResult.UNKNOWN;
             }
         }
 
@@ -215,7 +225,7 @@ public class SchedulerWindows extends Scheduler {
          */
         @Override
         public Date getLastRun() {
-            if (LAST_RESULT_NOT_YET_RUN.equals(getLastResult())) {
+            if (LastResult.HAS_NOT_RUN.equals(getLastResult())) {
                 return null;
             }
             String value = get(LAST_RUN_TIME);

@@ -19,12 +19,16 @@ public interface SchedulerTask {
         DAILY, HOURLY, MONTHLY, UNKNOWN, WEEKLY
     }
 
+    public enum LastResult {
+        SUCCESS, FAILURE, HAS_NOT_RUN, UNKNOWN
+    }
+
     /**
      * The last result of the task.
      * 
      * @return
      */
-    public Integer getLastResult();
+    public LastResult getLastResult();
 
     /**
      * The last known running date.
