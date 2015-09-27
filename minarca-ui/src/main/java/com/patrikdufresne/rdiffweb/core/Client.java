@@ -212,8 +212,8 @@ public class Client {
      * 
      * @throws IOException
      */
-    public RepositoryInfo getRepositoryInfo(String name) throws IOException {
-        for (RepositoryInfo r : getRepositories()) {
+    public Repository getRepositoryInfo(String name) throws IOException {
+        for (Repository r : getRepositories()) {
             if (name.equals(r.getName())) {
                 return r;
             }
@@ -226,18 +226,18 @@ public class Client {
      * 
      * @return
      */
-    public Collection<RepositoryInfo> getRepositories() throws IOException {
+    public Collection<Repository> getRepositories() throws IOException {
         // Query plugins page.
         String data = target("/").getAsString();
         // Select plugin items.
         Document doc = Jsoup.parse(data);
         Elements repos = doc.select("[itemtype=http://schema.org/ListItem]");
-        List<RepositoryInfo> list = new ArrayList<RepositoryInfo>(repos.size());
+        List<Repository> list = new ArrayList<Repository>(repos.size());
         for (Element e : repos) {
             String name = selectFirstAsString(e, "[itemprop=name]");
             Date lastBackup = selectFirstAsDate(e, "[itemprop=lastBackupDate]");
             // Create plugin object from properties found.
-            RepositoryInfo r = new RepositoryInfo();
+            Repository r = new Repository(this);
             r.setName(name);
             r.setLastBackup(lastBackup);
             list.add(r);
