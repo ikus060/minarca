@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -14,21 +13,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolException;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.Validate;
@@ -43,8 +41,6 @@ public class WebTarget implements Cloneable {
     protected static final Logger LOGGER = LoggerFactory.getLogger(WebTarget.class);
 
     protected static final String LOGIN = "/login/";
-
-    private static final String USER_AGENT = "Mozilla/5.0";
 
     /**
      * Check if the page return any error.
@@ -98,13 +94,21 @@ public class WebTarget implements Cloneable {
      */
     private final String baseurl;
 
-    private String cookies;
+    /**
+     * True to close http client.
+     */
+    private boolean close;
 
     private HttpEntity entity;
     /**
      * Store the HTTP header.
      */
     private final Map<String, String> headers = new LinkedHashMap<String, String>();
+
+    /**
+     * Reference to http client.
+     */
+    private HttpClient httpclient;
 
     /**
      * Store the params.
@@ -126,16 +130,43 @@ public class WebTarget implements Cloneable {
      */
     private String username;
 
-    private String basicUsername;
+    public WebTarget(HttpClient httpclient, String baseurl) {
+        Validate.notEmpty(this.baseurl = baseurl);
+        // Initialize an http client.
+        if (httpclient != null) {
+            this.httpclient = httpclient;
+            this.close = false;
+            return;
+        } else {
+            this.close = true;
+            RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
+            this.httpclient = httpclient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();
+        }
 
-    private String basicPassword;
+    }
 
     public WebTarget(String baseurl) {
         Validate.notEmpty(this.baseurl = baseurl);
+        // Initialize an http client.
+        this.httpclient = HttpClients.createDefault();
     }
 
     public WebTarget clone() throws CloneNotSupportedException {
         return (WebTarget) super.clone();
+    }
+
+    /**
+     * Close HTTP client. Release resources.
+     */
+    public void close() {
+        if (close && this.httpclient instanceof CloseableHttpClient) {
+            try {
+                ((CloseableHttpClient) this.httpclient).close();
+            } catch (IOException e) {
+                // Swallow
+            }
+        }
+        this.httpclient = null;
     }
 
     /**
@@ -157,6 +188,29 @@ public class WebTarget implements Cloneable {
         return this;
     }
 
+    public WebTarget entityParam(String key, String value) throws IOException {
+        List<NameValuePair> list = new ArrayList<NameValuePair>();
+        // If already define, get current list from entity.
+        if (this.entity instanceof UrlEncodedFormEntity) {
+            list = URLEncodedUtils.parse(this.entity);
+        }
+        // Add item to list.
+        list.add(new BasicNameValuePair(key, value));
+        // Sets the entity again.
+        try {
+            this.entity = new UrlEncodedFormEntity(list, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException();
+        }
+        return this;
+    }
+
+    public WebTarget formCredentials(String username, String password) {
+        this.username = username;
+        this.password = password;
+        return this;
+    }
+
     /**
      * Execute the HTTP request.
      * 
@@ -168,37 +222,15 @@ public class WebTarget implements Cloneable {
         // FIXME use return code.
         String page;
         if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
-            WebTarget request = new WebTarget(this.baseurl)
+            WebTarget request = new WebTarget(this.httpclient, this.baseurl)
                     .target(LOGIN)
                     .entity(getLoginFormParams(page, username, password))
-                    .setCookies(getCookies())
                     .headers(getHeaders());
             response = request.httpPost();
-            setCookies(request.getCookies());
             page = toString(response);
         }
         checkPage(response);
         return response;
-    }
-
-    /**
-     * Add the given headers.
-     * 
-     * @param headers
-     * @return
-     */
-    public WebTarget headers(Map<String, String> headers) {
-        this.headers.putAll(headers);
-        return this;
-    }
-
-    /**
-     * Returh the headers.
-     * 
-     * @return
-     */
-    public Map<String, String> getHeaders() {
-        return Collections.unmodifiableMap(this.headers);
     }
 
     /**
@@ -210,10 +242,6 @@ public class WebTarget implements Cloneable {
      */
     public String getAsString() throws IllegalStateException, IOException {
         return toString(get());
-    }
-
-    public String getCookies() {
-        return cookies;
     }
 
     private List<NameValuePair> getFormParams(String html, String formid, Map<String, String> replacefields) throws UnsupportedEncodingException {
@@ -248,195 +276,20 @@ public class WebTarget implements Cloneable {
         return paramList;
     }
 
+    /**
+     * Returh the headers.
+     * 
+     * @return
+     */
+    public Map<String, String> getHeaders() {
+        return Collections.unmodifiableMap(this.headers);
+    }
+
     private List<NameValuePair> getLoginFormParams(String html, String username, String password) throws UnsupportedEncodingException {
         Map<String, String> table = new Hashtable<String, String>();
         table.put("login", username);
         table.put("password", password);
         return getFormParams(html, null, table);
-    }
-
-    /**
-     * Used to define form data (for HTTP POST).
-     * 
-     * @param key
-     *            the param key
-     * @param value
-     *            the param value
-     */
-    public WebTarget header(String key, String value) {
-        Validate.notEmpty(key);
-        Validate.notEmpty(value);
-        headers.put(key, value);
-        return this;
-    }
-
-    /**
-     * Execute the real HTTP GET.
-     * 
-     * @throws IOException
-     * @throws ClientProtocolException
-     */
-    private HttpResponse httpGet() throws ClientProtocolException, IOException {
-
-        // Build the HTTP request.
-        HttpGet request = new HttpGet(this.getUrl());
-        request.setHeader("User-Agent", USER_AGENT);
-        request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        if (!headers.containsKey("Accept-Language")) {
-            request.setHeader("Accept-Language", "en-US,en;q=0.5");
-        }
-        request.setHeader("Cookie", getCookies());
-        for (Entry<String, String> e : headers.entrySet()) {
-            request.setHeader(e.getKey(), e.getValue());
-        }
-
-        // Execute the request.
-        DefaultHttpClient client = new DefaultHttpClient();
-        if (this.basicUsername != null && this.basicPassword != null) {
-            client.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(this.basicUsername, this.basicPassword));
-        }
-        client.setRedirectStrategy(new DefaultRedirectStrategy() {
-            @Override
-            protected URI createLocationURI(String location) throws ProtocolException {
-                return super.createLocationURI(location);
-            }
-        });
-        HttpResponse response = client.execute(request);
-        int responseCode = response.getStatusLine().getStatusCode();
-
-        LOGGER.info("Sending 'GET' request to URL: {}", this.getUrl());
-        LOGGER.info("Response Code: {}", responseCode);
-
-        if (responseCode != 200) {
-            throw new ServerException(response.toString());
-        }
-
-        // Set cookies
-        Header cookie = response.getFirstHeader("Set-Cookie");
-        if (cookie != null) {
-            setCookies(cookie.getValue());
-        }
-
-        return response;
-    }
-
-    private HttpResponse httpPost() throws ClientProtocolException, IOException {
-
-        // Generate post request.
-        HttpPost request = new HttpPost(this.getUrl());
-        request.setHeader("User-Agent", USER_AGENT);
-        request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        if (!headers.containsKey("Accept-Language")) {
-            request.setHeader("Accept-Language", "en-US,en;q=0.5");
-        }
-        request.setHeader("Cookie", getCookies());
-        request.setHeader("Connection", "keep-alive");
-        request.setHeader("Referer", this.getUrl());
-        request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-        for (Entry<String, String> e : headers.entrySet()) {
-            request.setHeader(e.getKey(), e.getValue());
-        }
-
-        Validate.notNull(this.entity);
-        request.setEntity(this.entity);
-
-        // Execute the request.
-        DefaultHttpClient client = new DefaultHttpClient();
-        if (this.basicUsername != null && this.basicPassword != null) {
-            client.getCredentialsProvider().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(this.basicUsername, this.basicPassword));
-        }
-        client.setRedirectStrategy(new DefaultRedirectStrategy() {
-            @Override
-            protected URI createLocationURI(String location) throws ProtocolException {
-                return super.createLocationURI(location);
-            }
-        });
-        HttpResponse response = client.execute(request);
-        int responseCode = response.getStatusLine().getStatusCode();
-
-        LOGGER.info("Sending 'POST' request to URL: {}", this.getUrl());
-        LOGGER.info("Post parameters: {}", this.entity);
-        LOGGER.info("Response Code: {}", responseCode);
-
-        if (responseCode != 200) {
-            throw new ServerException(response.toString());
-        }
-
-        Header cookie = response.getFirstHeader("Set-Cookie");
-        if (cookie != null) {
-            setCookies(cookie.getValue());
-        }
-
-        return response;
-
-    }
-
-    /**
-     * Used to define <code>arg=key</code> in url.
-     * 
-     * @param key
-     *            the param key
-     * @param value
-     *            the param value
-     */
-    public WebTarget param(String key, String value) {
-        Validate.notEmpty(key);
-        Validate.notEmpty(value);
-        params.put(key, value);
-        return this;
-    }
-
-    /**
-     * Execute post statement.
-     * 
-     * @return
-     * @throws IOException
-     */
-    public HttpResponse post() throws IOException {
-        HttpResponse response = httpPost();
-        // Check if we need to login.
-        String page;
-        if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
-            WebTarget request = new WebTarget(this.baseurl).target(LOGIN).entity(getLoginFormParams(page, username, password)).setCookies(getCookies());
-            response = request.httpPost();
-            setCookies(request.getCookies());
-            checkPage(response);
-
-            // Re-execute the post.
-            response = httpPost();
-            page = toString(response);
-            if (page.contains("id=\"form-login\"")) {
-                throw new IllegalStateException("should be loggin.");
-            }
-        }
-        checkPage(response);
-        return response;
-    }
-
-    /**
-     * Execute the POST statement.
-     * 
-     * @return
-     * @throws IOException
-     */
-    public String postAsString() throws IOException {
-        return toString(post());
-    }
-
-    public WebTarget setCookies(String cookies) {
-        this.cookies = cookies;
-        return this;
-    }
-
-    /**
-     * Sets the target path.
-     * 
-     * @param target
-     * @return
-     */
-    public WebTarget target(String target) {
-        this.target = target;
-        return this;
     }
 
     /**
@@ -469,32 +322,159 @@ public class WebTarget implements Cloneable {
         return buf.toString();
     }
 
-    public WebTarget formCredentials(String username, String password) {
-        this.username = username;
-        this.password = password;
+    /**
+     * Used to define form data (for HTTP POST).
+     * 
+     * @param key
+     *            the param key
+     * @param value
+     *            the param value
+     */
+    public WebTarget header(String key, String value) {
+        Validate.notEmpty(key);
+        Validate.notEmpty(value);
+        headers.put(key, value);
         return this;
     }
 
-    public WebTarget basicAuth(String username, String password) {
-        this.basicUsername = username;
-        this.basicPassword = password;
+    /**
+     * Add the given headers.
+     * 
+     * @param headers
+     * @return
+     */
+    public WebTarget headers(Map<String, String> headers) {
+        this.headers.putAll(headers);
         return this;
     }
 
-    public WebTarget entityParam(String key, String value) throws IOException {
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
-        // If already define, get current list from entity.
-        if (this.entity instanceof UrlEncodedFormEntity) {
-            list = URLEncodedUtils.parse(this.entity);
+    /**
+     * Execute the real HTTP GET.
+     * 
+     * @throws IOException
+     * @throws ClientProtocolException
+     */
+    private HttpResponse httpGet() throws ClientProtocolException, IOException {
+
+        // Build the HTTP request.
+        HttpGet request = new HttpGet(this.getUrl());
+        // request.setHeader("User-Agent", USER_AGENT);
+        // request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        if (!headers.containsKey("Accept-Language")) {
+            request.setHeader("Accept-Language", "en-US,en;q=0.5");
         }
-        // Add item to list.
-        list.add(new BasicNameValuePair(key, value));
-        // Sets the entity again.
-        try {
-            this.entity = new UrlEncodedFormEntity(list, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException();
+        for (Entry<String, String> e : headers.entrySet()) {
+            request.setHeader(e.getKey(), e.getValue());
         }
+
+        // Execute the request.
+        HttpResponse response = httpclient.execute(request);
+        int responseCode = response.getStatusLine().getStatusCode();
+
+        LOGGER.info("Sending 'GET' request to URL: {}", this.getUrl());
+        LOGGER.info("Response Code: {}", responseCode);
+
+        if (responseCode != 200) {
+            throw new ServerException(response.toString());
+        }
+
+        return response;
+    }
+
+    private HttpResponse httpPost() throws ClientProtocolException, IOException {
+
+        // Generate post request.
+        HttpPost request = new HttpPost(this.getUrl());
+        // request.setHeader("User-Agent", USER_AGENT);
+        // request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        if (!headers.containsKey("Accept-Language")) {
+            request.setHeader("Accept-Language", "en-US,en;q=0.5");
+        }
+        // request.setHeader("Connection", "keep-alive");
+        // request.setHeader("Referer", this.getUrl());
+        // request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        for (Entry<String, String> e : headers.entrySet()) {
+            request.setHeader(e.getKey(), e.getValue());
+        }
+
+        Validate.notNull(this.entity);
+        request.setEntity(this.entity);
+
+        // Execute the request.
+        HttpResponse response = httpclient.execute(request);
+        int responseCode = response.getStatusLine().getStatusCode();
+
+        LOGGER.info("Sending 'POST' request to URL: {}", this.getUrl());
+        LOGGER.info("Post parameters: {}", this.entity);
+        LOGGER.info("Response Code: {}", responseCode);
+
+        if (responseCode != 200) {
+            throw new ServerException(response.toString());
+        }
+
+        return response;
+
+    }
+
+    /**
+     * Used to define <code>arg=key</code> in url.
+     * 
+     * @param key
+     *            the param key
+     * @param value
+     *            the param value
+     */
+    public WebTarget param(String key, String value) {
+        Validate.notEmpty(key);
+        Validate.notEmpty(value);
+        params.put(key, value);
+        return this;
+    }
+
+    /**
+     * Execute post statement.
+     * 
+     * @return
+     * @throws IOException
+     */
+    public HttpResponse post() throws IOException {
+        HttpResponse response = httpPost();
+        // Check if we need to login.
+        String page;
+        if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
+            WebTarget request = new WebTarget(this.httpclient, this.baseurl).target(LOGIN).entity(getLoginFormParams(page, username, password));
+            response = request.httpPost();
+            checkPage(response);
+
+            // Re-execute the post.
+            response = httpPost();
+            page = toString(response);
+            if (page.contains("id=\"form-login\"")) {
+                throw new IllegalStateException("should be loggin.");
+            }
+        }
+        checkPage(response);
+        return response;
+    }
+
+    /**
+     * Execute the POST statement.
+     * 
+     * @return
+     * @throws IOException
+     */
+    public String postAsString() throws IOException {
+        return toString(post());
+    }
+
+    /**
+     * Sets the target path.
+     * 
+     * @param target
+     * @return
+     */
+    public WebTarget target(String target) {
+        this.target = target;
         return this;
     }
 }
