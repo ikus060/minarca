@@ -127,7 +127,7 @@ public class StreamHandler extends Thread {
                     if (b == CR || b == LF) {
                         String line = buf.toString();
                         if (!line.isEmpty()) {
-                            LOGGER.debug(line);
+                            LOGGER.trace(line);
                             output.append(line);
                             output.append(SystemUtils.LINE_SEPARATOR);
                         }
@@ -139,7 +139,7 @@ public class StreamHandler extends Thread {
                         String prompt = buf.toString();
                         String answer = handler.handle(prompt);
                         if (answer != null) {
-                            LOGGER.debug(prompt);
+                            LOGGER.trace(prompt);
                             // LOGGER.debug(answer);
                             out.append(answer);
                             out.flush();

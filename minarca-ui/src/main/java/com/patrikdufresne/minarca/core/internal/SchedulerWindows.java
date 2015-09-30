@@ -268,7 +268,7 @@ public class SchedulerWindows extends Scheduler {
         @Override
         public Boolean isRunning() {
             // Get the status and check if it run.
-            LOGGER.debug("task status [{}]", getStatus());
+            LOGGER.trace("task status [{}]", getStatus());
             Matcher m = PATTERN_TASK_RUNNING.matcher(getStatus());
             return m.find();
         }
@@ -405,7 +405,7 @@ public class SchedulerWindows extends Scheduler {
         if (args != null) {
             command.addAll(args);
         }
-        LOGGER.debug("executing {}", StringUtils.join(command, " "));
+        LOGGER.trace("executing {}", StringUtils.join(command, " "));
         try {
             Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
             StreamHandler sh = new StreamHandler(p);
@@ -504,7 +504,6 @@ public class SchedulerWindows extends Scheduler {
      */
     @Override
     public synchronized SchedulerTask info() throws TaskNotFoundException, APIException {
-        LOGGER.info("check task info");
         // Get reference to our task
         SchedulerTask task = query(TASK_NAME);
         if (task == null) {
