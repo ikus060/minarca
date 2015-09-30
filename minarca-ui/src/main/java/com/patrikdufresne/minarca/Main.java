@@ -274,7 +274,7 @@ public class Main {
                     null).getReturnCode() == IDialogConstants.YES_ID) {
                 try {
                     LOGGER.debug("repair configuration");
-                    API.instance().defaultConfig();
+                    API.instance().defaultConfig(false);
                 } catch (APIException e1) {
                     LOGGER.warn("fail to repair configuration", e1);
                     DetailMessageDialog.openWarning(

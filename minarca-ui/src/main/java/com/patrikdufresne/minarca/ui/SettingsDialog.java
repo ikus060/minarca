@@ -191,7 +191,7 @@ public class SettingsDialog extends Dialog {
                 }
                 // Update help text with Success or Failure
                 if (fInfo != null && fInfo.getLastResult() != null) {
-                    switch(fInfo.getLastResult()){
+                    switch (fInfo.getLastResult()) {
                     case SUCCESS:
                         lastruntimeItem.setValueHelpText(_("Successful"));
                         break;

@@ -440,6 +440,7 @@ public class SchedulerWindows extends Scheduler {
      *            the task name.
      * @return True if exists.
      */
+    @Override
     public synchronized boolean exists() {
         try {
             SchedulerTask task = query(TASK_NAME);

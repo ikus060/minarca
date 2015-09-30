@@ -10,8 +10,10 @@ import static com.patrikdufresne.minarca.Localized._;
 import java.io.IOException;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
@@ -268,29 +270,45 @@ public class SetupDialog extends Dialog {
         computerNameText.setFocus();
 
         // Sign in button
-        Button linkButton = ft.createButton(parent, _("Link computer"), SWT.PUSH);
+        final Button linkButton = ft.createButton(parent, _("Link computer"), SWT.PUSH);
         linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
         getShell().setDefaultButton(linkButton);
+
+        // Progress bar
+        final ProgressIndicator progress = new ProgressIndicator(parent);
+        ft.adapt(progress);
+        progress.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Add event binding.
         linkButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                // What a mess. Blame Java.
+                final String computerName = computerNameText.getText();
+                linkButton.setEnabled(false);
+                progress.beginAnimatedTask();
 
-                String computerName = computerNameText.getText();
-
-                // Check credentials.
-                String message = handleLinkComputer(computerName, false);
-                if (message != null) {
-                    alertLabel.setText(message, true, true);
-                    alertLabel.getParent().layout();
-                    ft.decorateWarningLabel(alertLabel);
-                } else {
-                    createPage3(comp);
-                }
-
+                // Start the processing.
+                new Thread() {
+                    public void run() {
+                        final String message = handleLinkComputer(computerName, false);
+                        Display.getDefault().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                progress.done();
+                                if (message != null) {
+                                    linkButton.setEnabled(true);
+                                    alertLabel.setText(message, true, true);
+                                    alertLabel.getParent().layout();
+                                    ft.decorateWarningLabel(alertLabel);
+                                } else {
+                                    createPage3(comp);
+                                }
+                            }
+                        });
+                    }
+                }.start();
             }
-
         });
 
         // Relayout to update content.
@@ -371,6 +389,67 @@ public class SetupDialog extends Dialog {
     }
 
     /**
+     * Called to handle computer registration.
+     * <p>
+     * This step is used to exchange the SSH keys.
+     * 
+     * @param name
+     *            the computer name.
+     * @return an error message or null if OK.
+     */
+    protected String handleLinkComputer(String name, boolean force) {
+        // Little validation before
+        if (name.trim().isEmpty()) {
+            return _("Computer name cannot be empty.");
+        }
+        LOGGER.info("link computer {}", name);
+        try {
+            API.instance().link(name, this.client, force);
+        } catch (ComputerNameAlreadyInUseException e) {
+            final MutableInt returnCode = new MutableInt();
+            Display.getCurrent().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    int r = DetailMessageDialog.openYesNoQuestion(
+                            getShell(),
+                            Display.getAppName(),
+                            _("Are you sure you want to keep the given computer name ?"),
+                            _("The given computer name is already in use in minarca. "
+                                    + "You may keep this computer name if the name is "
+                                    + "no longer used by another computer currently "
+                                    + "link to minarca."),
+                            null).getReturnCode();
+                    returnCode.setValue(r);
+                }
+            });
+            if (returnCode.intValue() == IDialogConstants.YES_ID) {
+                // Force usage of the computer name
+                return handleLinkComputer(name, true);
+            }
+            return _("Change the computer name");
+        } catch (APIException e) {
+            LOGGER.warn("fail to register computer", e);
+            return e.getMessage();
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("invalid computername: " + name, e);
+            return _("Should only contains letters, numbers, dash (-) and dot (.)");
+        } catch (Exception e) {
+            LOGGER.warn("fail to register computer", e);
+            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install mirarca.");
+        }
+
+        // Set other settings to default.
+        LOGGER.info("set default config");
+        try {
+            API.instance().defaultConfig(true);
+        } catch (APIException e) {
+            LOGGER.warn("fail to schedule task", e);
+            return _("Can't schedule backup task! If the problem persists, try to re-install mirarca.");
+        }
+        return null;
+    }
+
+    /**
      * Called to handle user sign in.
      * <p>
      * This implementation will establish a connection via HTTP and or SSH to make sure the connection and credentials
@@ -405,63 +484,6 @@ public class SetupDialog extends Dialog {
             return _("Unknown error occurred!");
         }
         return null;
-    }
-
-    /**
-     * Called to handle computer registration.
-     * <p>
-     * This step is used to exchange the SSH keys.
-     * 
-     * @param name
-     *            the computer name.
-     * @return an error message or null if OK.
-     */
-    protected String handleLinkComputer(String name, boolean force) {
-        // Little validation before
-        if (name.trim().isEmpty()) {
-            return _("Computer name cannot be empty.");
-        }
-        // Link the computer
-        LOGGER.info("link computer {}", name);
-        try {
-            API.instance().link(name, this.client, force);
-        } catch (ComputerNameAlreadyInUseException e) {
-            DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
-                    getShell(),
-                    Display.getAppName(),
-                    _("Are you sure you want to keep the given computer name ?"),
-                    _("The given computer name is already in use in minarca. "
-                            + "You may keep this computer name if the name is "
-                            + "no longer used by another computer currently "
-                            + "link to minarca."),
-                    null);
-            if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
-                // Force usage of the computer name
-                return handleLinkComputer(name, true);
-            }
-            return _("Change the computer name");
-        } catch (APIException e) {
-            LOGGER.warn("fail to register computer", e);
-            return e.getMessage();
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("invalid computername: " + name, e);
-            return _("Should only contains letters, numbers, dash (-) and dot (.)");
-        } catch (Exception e) {
-            LOGGER.warn("fail to register computer", e);
-            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install mirarca.");
-        }
-
-        // Set other settings to default.
-        LOGGER.info("set default config");
-        try {
-            API.instance().defaultConfig();
-        } catch (APIException e) {
-            LOGGER.warn("fail to schedule task", e);
-            return _("Can't schedule backup task! If the problem persists, try to re-install mirarca.");
-        }
-
-        return null;
-
     }
 
 }

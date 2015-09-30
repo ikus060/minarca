@@ -18,6 +18,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -29,11 +30,11 @@ import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
-import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
@@ -265,26 +266,34 @@ public class API {
     /**
      * This method is called to sets the default configuration for includes, excludes and scheduled task.
      * 
+     * @param force
+     *            True to force setting the default. Otherwise, only set to default missing configuration.
      * @throws APIException
      */
-    public void defaultConfig() throws APIException {
+    public void defaultConfig(boolean force) throws APIException {
         LOGGER.debug("restore default config");
         // Sets the default includes / excludes.
-        List<GlobPattern> includes = new ArrayList<GlobPattern>();
-        includes.addAll(GlobPattern.getDesktopPatterns());
-        includes.addAll(GlobPattern.getDocumentsPatterns());
-        includes.addAll(GlobPattern.getMusicPatterns());
-        includes.addAll(GlobPattern.getPicturesPatterns());
-        includes.addAll(GlobPattern.getVideosPatterns());
-        setIncludes(includes);
-        List<GlobPattern> excludes = new ArrayList<GlobPattern>();
-        excludes.addAll(GlobPattern.getOsPatterns());
-        excludes.addAll(GlobPattern.getDownloadsPatterns());
-        setExcludes(excludes);
+        if (force || getIncludes().isEmpty()) {
+            List<GlobPattern> includes = new ArrayList<GlobPattern>();
+            includes.addAll(GlobPattern.getDesktopPatterns());
+            includes.addAll(GlobPattern.getDocumentsPatterns());
+            includes.addAll(GlobPattern.getMusicPatterns());
+            includes.addAll(GlobPattern.getPicturesPatterns());
+            includes.addAll(GlobPattern.getVideosPatterns());
+            setIncludes(includes);
+        }
+        if (force || getExcludes().isEmpty()) {
+            List<GlobPattern> excludes = new ArrayList<GlobPattern>();
+            excludes.addAll(GlobPattern.getOsPatterns());
+            excludes.addAll(GlobPattern.getDownloadsPatterns());
+            setExcludes(excludes);
+        }
 
         // Delete & create schedule tasks.
         Scheduler scheduler = Scheduler.getInstance();
-        scheduler.create(SchedulerTask.Schedule.DAILY);
+        if (force || !scheduler.exists()) {
+            scheduler.create(SchedulerTask.Schedule.DAILY);
+        }
     }
 
     /**
@@ -417,10 +426,11 @@ public class API {
      *            True to force usage of existing computer name.
      * @throws APIException
      *             if the keys can't be created.
+     * @throws InterruptedException
      * @throws IllegalAccessException
      *             if the computer name is not valid.
      */
-    public void link(String computername, Client client, boolean force) throws APIException {
+    public void link(String computername, Client client, boolean force) throws APIException, InterruptedException {
         Validate.notEmpty(computername);
         Validate.notNull(client);
         Validate.isTrue(computername.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
@@ -428,8 +438,10 @@ public class API {
         /*
          * Check if computer name is already in uses.
          */
+        boolean exists = false;
         try {
-            if (!force && client.getRepositoryInfo(computername) != null) {
+            exists = client.getRepositoryInfo(computername) != null;
+            if (!force && exists) {
                 throw new ComputerNameAlreadyInUseException(computername);
             }
         } catch (IOException e) {
@@ -476,6 +488,44 @@ public class API {
         setComputerName(computername);
         setRemotehost(getRemotehost());
 
+        // Create default schedule
+        scheduleTask(Schedule.DAILY);
+
+        // If the backup doesn't exists on the remote server, start an empty initial backup.
+        if (!exists) {
+
+            // Empty the include
+            setIncludes(Arrays.asList(new GlobPattern(Compat.ROOT)));
+            setExcludes(Arrays.asList(new GlobPattern(Compat.ROOT + "**")));
+
+            // Run backup
+            runBackup();
+
+            // Refresh list of repositories (30sec)
+            try {
+                int attempt = 30;
+                do {
+                    Thread.sleep(1000);
+                    attempt--;
+                    client.updateRepositories();
+                } while (attempt > 0 && !(exists = (client.getRepositoryInfo(computername) != null)));
+            } catch (IOException e) {
+                throw new APIException("repository not found", e);
+            }
+
+            // Check if repository exists.
+            if (!exists) {
+                throw new APIException("repository not found");
+            }
+
+            // Set encoding
+            try {
+                LOGGER.debug("updating repository [{}] encoding [{}]", computername, Compat.CHARSET_DEFAULT.toString());
+                client.getRepositoryInfo(computername).setEncoding(Compat.CHARSET_DEFAULT.toString());
+            } catch (Exception e) {
+                LOGGER.warn("fail to configure repository encoding", e);
+            }
+        }
     }
 
     /**

@@ -58,6 +58,14 @@ public abstract class Scheduler {
     public abstract boolean delete() throws APIException;
 
     /**
+     * Check if the schedule task exists.
+     * 
+     * @return True if the task exists.
+     * @throws APIException
+     */
+    public abstract boolean exists() throws APIException;
+
+    /**
      * Check if the task exists.
      * 
      * @param taskname

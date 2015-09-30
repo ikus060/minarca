@@ -42,6 +42,26 @@ public class Client {
         return Boolean.valueOf(value);
     }
 
+    /**
+     * Parse the given element value as date.
+     * 
+     * @param e
+     * @param query
+     * @return
+     */
+    protected static Date selectFirstAsDate(Element e, String query) {
+        String value = selectFirstAsString(e, query);
+        if (value == null) {
+            return null;
+        }
+        // Parse the date value.
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value);
+        } catch (ParseException exc) {
+            return null;
+        }
+    }
+
     protected static Integer selectFirstAsInt(Element e, String query) {
         String value = selectFirstAsString(e, query);
         if (value == null) {
@@ -71,34 +91,9 @@ public class Client {
     }
 
     /**
-     * Parse the given element value as date.
-     * 
-     * @param e
-     * @param query
-     * @return
-     */
-    protected static Date selectFirstAsDate(Element e, String query) {
-        String value = selectFirstAsString(e, query);
-        if (value == null) {
-            return null;
-        }
-        // Parse the date value.
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value);
-        } catch (ParseException exc) {
-            return null;
-        }
-    }
-
-    /**
      * The crendentials
      */
     private String password;
-
-    /**
-     * The HTTP Url to access rdiffweb.
-     */
-    private String url;
 
     /**
      * The credentials.
@@ -106,14 +101,20 @@ public class Client {
     private String username;
 
     /**
+     * Keep reference to web target to avoid re-login everytime.
+     */
+    private WebTarget target;
+
+    /**
      * Create a new rdiffweb client.
      * 
      * @param url
      */
     public Client(String url, String username, String password) {
-        Validate.notEmpty(this.url = url);
+        Validate.notEmpty(url);
         Validate.notEmpty(this.username = username);
         Validate.notEmpty(this.password = password);
+        this.target = new WebTarget(url);
     }
 
     /**
@@ -127,6 +128,18 @@ public class Client {
      */
     public void addSSHKey(String title, String key) throws IOException {
         target(PREFS_SSHKEYS).entityParam("action", "add").entityParam("title", title).entityParam("key", key).post();
+    }
+
+    /**
+     * Check if authentication and connectivity is working.
+     * <p>
+     * Get proof of authentication. We query the user preferences because it's the less CPU intensive page.
+     * 
+     * @throws IOException
+     * @throws IllegalStateException
+     */
+    public void check() throws IllegalStateException, IOException {
+        target("/prefs/general/").getAsString();
     }
 
     /**
@@ -206,22 +219,6 @@ public class Client {
     }
 
     /**
-     * Get information related to specific repository.
-     * 
-     * @return repository info.
-     * 
-     * @throws IOException
-     */
-    public Repository getRepositoryInfo(String name) throws IOException {
-        for (Repository r : getRepositories()) {
-            if (name.equals(r.getName())) {
-                return r;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Return list of repositories.
      * 
      * @return
@@ -243,6 +240,22 @@ public class Client {
             list.add(r);
         }
         return list;
+    }
+
+    /**
+     * Get information related to specific repository.
+     * 
+     * @return repository info.
+     * 
+     * @throws IOException
+     */
+    public Repository getRepositoryInfo(String name) throws IOException {
+        for (Repository r : getRepositories()) {
+            if (name.equals(r.getName())) {
+                return r;
+            }
+        }
+        return null;
     }
 
     /**
@@ -307,19 +320,20 @@ public class Client {
     }
 
     protected WebTarget target(String target) {
-        return new WebTarget(url).target(target).formCredentials(username, password);
+        try {
+            return this.target.clone().target(target).formCredentials(username, password);
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException();
+        }
     }
 
     /**
-     * Check if authentication and connectivity is working.
-     * <p>
-     * Get proof of authentication. We query the user preferences because it's the less CPU intensive page.
+     * Refresh the list of repositories for the given user.
      * 
      * @throws IOException
-     * @throws IllegalStateException
      */
-    public void check() throws IllegalStateException, IOException {
-        target("/prefs/general/").getAsString();
+    public void updateRepositories() throws IOException {
+        target("/prefs/general/").entityParam("action", "update_repos").postAsString();
     }
 
 }

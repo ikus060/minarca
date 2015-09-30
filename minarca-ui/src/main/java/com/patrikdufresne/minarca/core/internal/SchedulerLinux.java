@@ -23,6 +23,12 @@ public class SchedulerLinux extends Scheduler {
     }
 
     @Override
+    public boolean exists() throws APIException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
     public SchedulerTask info() throws APIException, TaskNotFoundException {
         // TODO Auto-generated method stub
         return null;

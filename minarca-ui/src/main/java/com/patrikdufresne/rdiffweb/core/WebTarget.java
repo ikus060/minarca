@@ -246,8 +246,6 @@ public class WebTarget implements Cloneable {
 
     private List<NameValuePair> getFormParams(String html, String formid, Map<String, String> replacefields) throws UnsupportedEncodingException {
 
-        System.out.println("Extracting form's data...");
-
         Document doc = Jsoup.parse(html);
 
         // Google form id
