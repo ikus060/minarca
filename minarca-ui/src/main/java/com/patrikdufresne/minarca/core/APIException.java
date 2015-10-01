@@ -111,7 +111,7 @@ public class APIException extends Exception {
      * Raised when link with minarca failed.
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public static class LinkComputerException extends APIException {
         public LinkComputerException() {

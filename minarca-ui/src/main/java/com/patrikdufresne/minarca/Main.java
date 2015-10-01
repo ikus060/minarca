@@ -221,15 +221,14 @@ public class Main {
     private void reconfigure() {
         // The configuration is broken. Ask use if we can fix it.
         LOGGER.debug("miss-configured -- ask to repair");
-        DetailMessageDialog dlg = DetailMessageDialog
-                .openYesNoQuestion(
-                        null,
-                        Display.getAppName(),
-                        _("Do you want to restore default configuration ?"),
-                        _("Your Minarca installation seams broken. "
-                                + "If you answer Yes, all your personal configuration will be lost. "
-                                + "If you answer no, this application may misbehave."),
-                        null);
+        DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
+                null,
+                Display.getAppName(),
+                _("Do you want to restore default configuration ?"),
+                _("Your Minarca installation seams broken. "
+                        + "If you answer Yes, all your personal configuration will be lost. "
+                        + "If you answer no, this application may misbehave."),
+                null);
         if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
             try {
                 LOGGER.debug("repair configuration");
