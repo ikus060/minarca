@@ -22,6 +22,7 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
+import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 import com.patrikdufresne.minarca.ui.DetailMessageDialog;
 import com.patrikdufresne.minarca.ui.Images;
 import com.patrikdufresne.minarca.ui.SettingsDialog;
@@ -107,43 +108,6 @@ public class Main {
     }
 
     /**
-     * This if the main function being called when minarca application is called with --backup or -b arguments.
-     */
-    private void backup() {
-
-        LOGGER.info("starting backup");
-
-        // Check if current OS and running environment is valid.
-        try {
-            API.checkEnv();
-        } catch (APIException e) {
-            LOGGER.info("invalid env", e);
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-
-        // Check if minarca is properly configure (from our point of view).
-        try {
-            API.instance().checkConfig();
-        } catch (APIException e) {
-            // Show error message (usually localized).
-            LOGGER.info("invalid config", e);
-            System.err.println(e.getMessage());
-            System.exit(2);
-        }
-
-        // Run the backup.
-        try {
-            API.instance().backup();
-            LOGGER.info("backup SUCCESS");
-        } catch (APIException e) {
-            LOGGER.info("backup FAILED", e);
-            System.exit(3);
-        }
-
-    }
-
-    /**
      * This function is updating the JFace Policy error handler.
      */
     protected static void updateJFacePolicy() {
@@ -181,6 +145,105 @@ public class Main {
                 }
             }
         });
+    }
+
+    /**
+     * This if the main function being called when minarca application is called with --backup or -b arguments.
+     */
+    private void backup() {
+
+        LOGGER.info("starting backup");
+
+        // Check if current OS and running environment is valid.
+        try {
+            API.checkEnv();
+        } catch (APIException e) {
+            LOGGER.info("invalid env", e);
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+
+        // Check if minarca is properly configure (from our point of view).
+        try {
+            API.instance().checkConfig();
+        } catch (APIException e) {
+            // Show error message (usually localized).
+            LOGGER.info("invalid config", e);
+            System.err.println(e.getMessage());
+            System.exit(2);
+        }
+
+        // Run the backup.
+        try {
+            API.instance().backup();
+            LOGGER.info("backup SUCCESS");
+        } catch (APIException e) {
+            LOGGER.info("backup FAILED", e);
+            System.exit(3);
+        }
+
+    }
+
+    /**
+     * Check if the application is configured. If not show a setup dialog. If miss configured try to repair.
+     * 
+     * @return True if configured or miss configured. False if not configured and user cancel configuration.
+     */
+    private boolean configure() {
+        // Check if configured.
+        try {
+            LOGGER.debug("checking minarca configuration");
+            API.instance().checkConfig();
+            API.instance().getSchedulerTask();
+            LOGGER.debug("configuration is OK");
+        } catch (NotConfiguredException e) {
+            // If not configured, show wizard.
+            LOGGER.debug("not configured -- show setup dialog");
+            if (!SetupDialog.open(null)) {
+                // If user cancel, lose application.
+                return false;
+            }
+        } catch (TaskNotFoundException e) {
+            reconfigure();
+            return true;
+        } catch (MissConfiguredException e) {
+            reconfigure();
+            return true;
+        } catch (APIException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Called to ask user to reconfigure.
+     */
+    private void reconfigure() {
+        // The configuration is broken. Ask use if we can fix it.
+        LOGGER.debug("miss-configured -- ask to repair");
+        DetailMessageDialog dlg = DetailMessageDialog
+                .openYesNoQuestion(
+                        null,
+                        Display.getAppName(),
+                        _("Do you want to restore default configuration ?"),
+                        _("Your Minarca installation seams broken. "
+                                + "If you answer Yes, all your personal configuration will be lost. "
+                                + "If you answer no, this application may misbehave."),
+                        null);
+        if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
+            try {
+                LOGGER.debug("repair configuration");
+                API.instance().defaultConfig(false);
+            } catch (APIException e1) {
+                LOGGER.warn("fail to repair configuration", e1);
+                DetailMessageDialog.openWarning(
+                        null,
+                        Display.getAppName(),
+                        _("Can't repair Minarca's configuration!"),
+                        _("This application may misbehave. If the problem persist, you may try to reinstall Minarca."),
+                        e1);
+            }
+        }
     }
 
     /**
@@ -241,56 +304,5 @@ public class Main {
             LOGGER.info("closing");
         }
 
-    }
-
-    /**
-     * Check if the application is configured. If not show a setup dialog. If miss configured try to repair.
-     * 
-     * @return True if configured or miss configured. False if not configured and user cancel configuration.
-     */
-    private boolean configure() {
-        // Check if configured.
-        try {
-            LOGGER.debug("checking minarca configuration");
-            API.instance().checkConfig();
-            API.instance().getSchedulerTask();
-            LOGGER.debug("configuration is OK");
-        } catch (NotConfiguredException e) {
-            // If not configured, show wizard.
-            LOGGER.debug("not configured -- show setup dialog");
-            if (!SetupDialog.open(null)) {
-                // If user cancel, lose application.
-                return false;
-            }
-        } catch (MissConfiguredException e) {
-            // The configuration is broken. Ask use if we can fix it.
-            LOGGER.debug("miss-configured -- ask to repair", e);
-            if (DetailMessageDialog.openYesNoQuestion(
-                    null,
-                    Display.getAppName(),
-                    _("Do you want to restore default configuration ?"),
-                    _("Your Minarca installation seams broken. "
-                            + "If you answer Yes, all your personal configuration will be lost. "
-                            + "If you answer no, this application may misbehave."),
-                    null).getReturnCode() == IDialogConstants.YES_ID) {
-                try {
-                    LOGGER.debug("repair configuration");
-                    API.instance().defaultConfig(false);
-                } catch (APIException e1) {
-                    LOGGER.warn("fail to repair configuration", e1);
-                    DetailMessageDialog.openWarning(
-                            null,
-                            Display.getAppName(),
-                            _("Can't repair Minarca's configuration!"),
-                            _("This application may misbehave. If the problem persist, you may try to reinstall Minarca."),
-                            e1);
-                }
-            } else {
-                return true;
-            }
-        } catch (APIException e) {
-            return false;
-        }
-        return true;
     }
 }
