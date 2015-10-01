@@ -192,7 +192,7 @@ public class Main {
 
         LOGGER.info("starting ui");
 
-        Display.setAppName(_("minarca"));
+        Display.setAppName(_("Minarca"));
         Display.setAppVersion(getCurrentVersion());
         final Display display = new Display();
 
@@ -268,7 +268,7 @@ public class Main {
                     null,
                     Display.getAppName(),
                     _("Do you want to restore default configuration ?"),
-                    _("Your minarca installation seams broken. "
+                    _("Your Minarca installation seams broken. "
                             + "If you answer Yes, all your personal configuration will be lost. "
                             + "If you answer no, this application may misbehave."),
                     null).getReturnCode() == IDialogConstants.YES_ID) {
@@ -280,8 +280,8 @@ public class Main {
                     DetailMessageDialog.openWarning(
                             null,
                             Display.getAppName(),
-                            _("Can't repair minarca's configuration!"),
-                            _("This application may misbehave. If the problem persist, you may try to reinstall minarca."),
+                            _("Can't repair Minarca's configuration!"),
+                            _("This application may misbehave. If the problem persist, you may try to reinstall Minarca."),
                             e1);
                 }
             } else {

@@ -300,7 +300,7 @@ public class SchedulerWindows extends Scheduler {
     /**
      * Windows task name.
      */
-    private static final String TASK_NAME = "minarca backup";
+    private static final String TASK_NAME = "Minarca backup";
 
     static {
         if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {

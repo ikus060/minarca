@@ -95,7 +95,7 @@ public class AboutDialog extends Dialog {
         appNameText.setBackground(this.getShell().getBackground());
 
         // App description
-        String appDescription = _("minarca is an all integrated online backup solution.");
+        String appDescription = _("Minarca is an all integrated online backup solution.");
         Label appDescText = new Label(comp, SWT.CENTER);
         appDescText.setText(appDescription);
         appDescText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));

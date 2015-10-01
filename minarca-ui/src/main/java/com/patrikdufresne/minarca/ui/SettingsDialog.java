@@ -362,7 +362,7 @@ public class SettingsDialog extends Dialog {
         statusItem.setValue(Dialog.ELLIPSIS);
         statusItem.setValueHelpText(_("As {0} @ {1}", API.instance().getUsername(), API.instance().getComputerName()));
         unlinkButton = statusItem.createButton(_("Unlink..."));
-        unlinkButton.setToolTipText(_("Unlink you computer from minarca."));
+        unlinkButton.setToolTipText(_("Unlink you computer from Minarca."));
         unlinkButton.setEnabled(false);
         unlinkButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -562,7 +562,7 @@ public class SettingsDialog extends Dialog {
                     this.getShell(),
                     _("Error"),
                     _("Error updating selective backup configuration"),
-                    _("Can't change the configuration for unknown reason. If the problem persists, try re-installing minarca."));
+                    _("Can't change the configuration for unknown reason. If the problem persists, try re-installing Minarca."));
         }
 
     }
@@ -594,7 +594,7 @@ public class SettingsDialog extends Dialog {
                         this.getShell(),
                         _("Backup now"),
                         _("Do you want to backup your system?"),
-                        _("You are about to backup your system to minarca. This operation may take some time. While this operation is running you may safely close the minarca application."),
+                        _("You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
                         null);
         if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
             LOGGER.info("backup cancel by user");
@@ -666,7 +666,7 @@ public class SettingsDialog extends Dialog {
                 Display.getAppName(),
                 _("This action will open Windows Task Scheduler."),
                 _("If you want more control over the backup schedule, you need to "
-                        + "manually edit the minarca backup task in Windows Task Scheduler. "
+                        + "manually edit the Minarca backup task in Windows Task Scheduler. "
                         + "If you don't know what you are doing, you should cancel the"
                         + "operation to avoid breaking the schedule."),
                 null);
@@ -700,8 +700,8 @@ public class SettingsDialog extends Dialog {
         DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
                 this.getShell(),
                 _("Confirm unlink"),
-                _("Are you sure you want to unlink this computer from minarca?"),
-                _("You are about to unlink this computer from minarca. This "
+                _("Are you sure you want to unlink this computer from Minarca?"),
+                _("You are about to unlink this computer from Minarca. This "
                         + "computer will no longer backup it self. Previous "
                         + "backup data will not be lost."),
                 null);

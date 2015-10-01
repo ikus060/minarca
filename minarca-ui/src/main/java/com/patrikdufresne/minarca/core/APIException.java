@@ -80,7 +80,7 @@ public class APIException extends Exception {
     public static class UnsupportedOS extends APIException {
 
         public UnsupportedOS() {
-            super(_("minarca doesn't support your operating system. This application will close."));
+            super(_("Minarca doesn't support your operating system. This application will close."));
         }
 
     }

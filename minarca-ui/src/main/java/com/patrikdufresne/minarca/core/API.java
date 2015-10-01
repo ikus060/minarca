@@ -219,7 +219,7 @@ public class API {
         // Basic sanity check to make sure it's configured. If not, display the
         // setup dialog.
         if (StringUtils.isEmpty(getComputerName()) || StringUtils.isEmpty(getUsername())) {
-            throw new NotConfiguredException(_("minarca is not configured"));
+            throw new NotConfiguredException(_("Minarca is not configured"));
         }
         // NOTICE: remotehosts is optional.
         // Check if SSH keys exists.
@@ -479,7 +479,7 @@ public class API {
         try {
             client.addSSHKey(computername, rsadata);
         } catch (IOException e) {
-            throw new APIException("fail to send SSH key to minarca", e);
+            throw new APIException(_("fail to send SSH key to Minarca"), e);
         }
 
         // Generate configuration file.

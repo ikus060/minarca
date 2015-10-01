@@ -294,7 +294,7 @@ public class IncludesDialog extends TrayDialog {
 
         // Intro label
         Label label = new Label(comp, SWT.NONE);
-        label.setText(_("Select or unselect folder to be backup by minarca."));
+        label.setText(_("Select or unselect folder to be backup by Minarca."));
 
         // Tree viewer
         this.viewer = new CheckboxTreeViewer(comp, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.CHECK);

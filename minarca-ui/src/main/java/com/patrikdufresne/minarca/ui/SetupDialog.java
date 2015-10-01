@@ -93,7 +93,7 @@ public class SetupDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText(_("Setup minarca"));
+        newShell.setText(_("Setup Minarca"));
     }
 
     /**
@@ -151,7 +151,7 @@ public class SetupDialog extends Dialog {
         disposeChildren(parent);
 
         // App name
-        Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
+        Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
         appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // App icon
@@ -163,7 +163,7 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Sign In") + "</h2><br/>";
-        introText += _("If you have a minarca account, enter your username and password.");
+        introText += _("If you have a Minarca account, enter your username and password.");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -216,7 +216,7 @@ public class SetupDialog extends Dialog {
 
         // Request account
         String subscribeText = "<b>" + _("Create account") + "</b><br/>";
-        subscribeText += _("If you don't have a minarca account, you may subscribe by filling the online form.");
+        subscribeText += _("If you don't have a Minarca account, you may subscribe by filling the online form.");
         subscribeText += "<br/><a href='" + _("http://www.patrikdufresne.com/en/minarca/subscribe") + "'>";
         subscribeText += _("Subscribe...") + "</a>";
         FormText subscribeLabel = ft.createFormText(parent, subscribeText, false);
@@ -237,7 +237,7 @@ public class SetupDialog extends Dialog {
         disposeChildren(parent);
 
         // App name
-        Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
+        Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
         appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // App icon
@@ -326,7 +326,7 @@ public class SetupDialog extends Dialog {
         disposeChildren(parent);
 
         // App name
-        Label appnameLabel = ft.createAppnameLabel(parent, _("minarca"), SWT.CENTER);
+        Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
         appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // App icon
@@ -336,7 +336,7 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Success !") + "</h2><br/>";
-        introText += _("Your computer is now configure to backup it self once a day with minarca!");
+        introText += _("Your computer is now configure to backup it self once a day with Minarca!");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -414,10 +414,10 @@ public class SetupDialog extends Dialog {
                             getShell(),
                             Display.getAppName(),
                             _("Are you sure you want to keep the given computer name ?"),
-                            _("The given computer name is already in use in minarca. "
+                            _("The given computer name is already in use in Minarca. "
                                     + "You may keep this computer name if the name is "
                                     + "no longer used by another computer currently "
-                                    + "link to minarca."),
+                                    + "link to Minarca."),
                             null).getReturnCode();
                     returnCode.setValue(r);
                 }
@@ -435,7 +435,7 @@ public class SetupDialog extends Dialog {
             return _("Should only contains letters, numbers, dash (-) and dot (.)");
         } catch (Exception e) {
             LOGGER.warn("fail to register computer", e);
-            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install mirarca.");
+            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install Minarca.");
         }
 
         // Set other settings to default.
@@ -444,7 +444,7 @@ public class SetupDialog extends Dialog {
             API.instance().defaultConfig(true);
         } catch (APIException e) {
             LOGGER.warn("fail to schedule task", e);
-            return _("Can't schedule backup task! If the problem persists, try to re-install mirarca.");
+            return _("Can't schedule backup task! If the problem persists, try to re-install Minarca.");
         }
         return null;
     }
