@@ -407,7 +407,7 @@ public class SetupDialog extends Dialog {
             API.instance().link(name, this.client, force);
         } catch (ComputerNameAlreadyInUseException e) {
             final MutableInt returnCode = new MutableInt();
-            Display.getCurrent().syncExec(new Runnable() {
+            Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
                     int r = DetailMessageDialog.openYesNoQuestion(
