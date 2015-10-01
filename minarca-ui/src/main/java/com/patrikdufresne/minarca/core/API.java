@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
+import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
-import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
@@ -231,7 +231,7 @@ public class API {
             throw new MissConfiguredException(_("includes or excludes pattern are missing"));
         }
     }
-    
+
     /**
      * Establish connection to minarca web service.
      * 
@@ -440,7 +440,7 @@ public class API {
                 throw new ComputerNameAlreadyInUseException(computername);
             }
         } catch (IOException e) {
-            throw new APIException("fail to link computer", e);
+            throw new LinkComputerException(e);
         }
 
         /*
@@ -463,18 +463,18 @@ public class API {
             // Read RSA pub key.
             rsadata = FileUtils.readFileToString(idrsaFile);
         } catch (NoSuchAlgorithmException e) {
-            throw new APIException("fail to generate the keys", e);
+            throw new LinkComputerException(_("fail to generate the keys"), e);
         } catch (IOException e) {
-            throw new APIException("fail to generate the keys", e);
+            throw new LinkComputerException(_("fail to generate the keys"), e);
         } catch (InvalidKeyException e) {
-            throw new APIException("fail to generate the keys", e);
+            throw new LinkComputerException(_("fail to generate the keys"), e);
         }
 
         // Send SSH key to minarca server using web service.
         try {
             client.addSSHKey(computername, rsadata);
         } catch (IOException e) {
-            throw new APIException(_("fail to send SSH key to Minarca"), e);
+            throw new LinkComputerException(_("fail to send SSH key to Minarca"), e);
         }
 
         // Generate configuration file.
@@ -505,12 +505,12 @@ public class API {
                     client.updateRepositories();
                 } while (attempt > 0 && !(exists = (client.getRepositoryInfo(computername) != null)));
             } catch (IOException e) {
-                throw new APIException("fail to link computer", e);
+                throw new LinkComputerException(e);
             }
 
             // Check if repository exists.
             if (!exists) {
-                throw new APIException("fail to link computer");
+                throw new LinkComputerException();
             }
 
             // Set encoding
@@ -541,9 +541,11 @@ public class API {
     private void save() throws IOException {
         LOGGER.debug("writing config to [{}]", confFile);
         Writer writer = Compat.openFileWriter(confFile, Compat.CHARSET_DEFAULT);
-        this.properties.store(writer, "Copyright (C) 2015 Patrik Dufresne Service Logiciel inc.\r\n"
-                + "Minarca backup configuration.\r\n"
-                + "Please do not change this configuration file manually.");
+        this.properties.store(
+                writer,
+                "Copyright (C) 2015 Patrik Dufresne Service Logiciel inc.\r\n"
+                        + "Minarca backup configuration.\r\n"
+                        + "Please do not change this configuration file manually.");
         writer.close();
     }
 

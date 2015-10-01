@@ -107,6 +107,31 @@ public class APIException extends Exception {
 
     }
 
+    /**
+     * Raised when link with minarca failed.
+     * 
+     * @author Patrik Dufresne
+     *
+     */
+    public static class LinkComputerException extends APIException {
+        public LinkComputerException() {
+            this(null, null);
+        }
+
+        public LinkComputerException(String message) {
+            this(message, null);
+        }
+
+        public LinkComputerException(Exception cause) {
+            this(null, cause);
+        }
+
+        public LinkComputerException(String message, Exception cause) {
+            super(message != null ? _("fail to link computer: {}", message) : _("fail to link computer"), cause);
+        }
+
+    }
+
     public APIException(String message) {
         super(message);
     }
