@@ -230,13 +230,8 @@ public class API {
         if (getIncludes().isEmpty() || getExcludes().isEmpty()) {
             throw new MissConfiguredException(_("includes or excludes pattern are missing"));
         }
-        try {
-            Scheduler.getInstance().info();
-        } catch (TaskNotFoundException e) {
-            throw new MissConfiguredException(e.getMessage());
-        }
     }
-
+    
     /**
      * Establish connection to minarca web service.
      * 
@@ -510,12 +505,12 @@ public class API {
                     client.updateRepositories();
                 } while (attempt > 0 && !(exists = (client.getRepositoryInfo(computername) != null)));
             } catch (IOException e) {
-                throw new APIException("repository not found", e);
+                throw new APIException("fail to link computer", e);
             }
 
             // Check if repository exists.
             if (!exists) {
-                throw new APIException("repository not found");
+                throw new APIException("fail to link computer");
             }
 
             // Set encoding

@@ -253,6 +253,7 @@ public class Main {
         try {
             LOGGER.debug("checking minarca configuration");
             API.instance().checkConfig();
+            API.instance().getSchedulerTask();
             LOGGER.debug("configuration is OK");
         } catch (NotConfiguredException e) {
             // If not configured, show wizard.
