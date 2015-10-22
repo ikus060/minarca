@@ -83,7 +83,7 @@ class MinarcaUserSetup(IUserChangeListener):
         try:
             uid = pwd.getpwnam(user).pw_uid
         except KeyError:
-            logger.info('user [%s] is not a real user. cannot set user [%s] quota', user)
+            logger.info('user [%s] is not a real user. cannot set user quota', user)
             return
 
         if uid < 1000:
