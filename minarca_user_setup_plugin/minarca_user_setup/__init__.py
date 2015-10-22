@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 
 import distutils.spawn
 import logging
-import mockldap
 import os
 import subprocess
 
