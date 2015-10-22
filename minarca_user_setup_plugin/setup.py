@@ -43,5 +43,10 @@ setup(
     data_files=data_files,
     install_requires=["rdiffweb>=0.8.0"],
     # required packages for build process
-    setup_requires=["babel>=0.9"]
+    setup_requires=["babel>=0.9"],
+    # requirement for testing
+    tests_require=[
+        "mockldap>=0.2.6",
+        "python-ldap>=2.4.21",
+    ]
     )
