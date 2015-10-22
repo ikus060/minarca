@@ -54,6 +54,7 @@ class MinarcaUserSetup(IUserChangeListener):
             if not distutils.spawn.find_executable('zfs'):
                 logger.warn('zfs executable not found to setup user quota')
             else:
+                logger.warn('update user [%s] quota')
                 subprocess.call(['zfs', 'set', 'userquota@%s=%s' % (user, '50G'), self._zfs_pool])
 
     def get_ldap_store(self):
