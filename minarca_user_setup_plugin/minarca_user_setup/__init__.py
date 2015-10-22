@@ -9,6 +9,7 @@
 
 from __future__ import unicode_literals
 
+import pwd
 import distutils.spawn
 import logging
 import os
@@ -37,10 +38,22 @@ class MinarcaUserSetup(IUserChangeListener):
 
     def _create_user_root(self, user, user_root):
         """Create and configure user home directory"""
+
+        # Get User / Group id
+        try:
+            pwd_user = pwd.getpwnam(user)
+            uid = pwd_user.pw_uid
+            gid = pwd_user.pw_gid
+        except KeyError:
+            uid = -1
+            gid = -1
+
         # Create folder if missing
         if not os.path.exists(user_root):
             logger.info('creating user [%s] root dir [%s]', user, user_root)
             os.makedirs(user_root, mode=self._mode)
+            os.chown(user_root, uid, gid)
+
         if not os.path.isdir(user_root):
             raise RdiffError(_('fail to create user [%s] root dir [%s]', user, user_root))
 
@@ -48,14 +61,10 @@ class MinarcaUserSetup(IUserChangeListener):
         ssh_dir = os.path.join(user_root, '.ssh')
         if not os.path.exists(ssh_dir):
             os.makedirs(ssh_dir, mode=0700)
+            os.chown(ssh_dir, uid, gid)
 
-        # Define default user quota
-        if self._zfs_pool:
-            if not distutils.spawn.find_executable('zfs'):
-                logger.warn('zfs executable not found to setup user quota')
-            else:
-                logger.warn('update user [%s] quota')
-                subprocess.call(['zfs', 'set', 'userquota@%s=%s' % (user, '50G'), self._zfs_pool])
+        # Set Quota
+        self._set_user_quota(user)
 
     def get_ldap_store(self):
         """get reference to ldap_store"""
@@ -63,6 +72,30 @@ class MinarcaUserSetup(IUserChangeListener):
         if plugin:
             return plugin.plugin_object
         return None
+
+    def _set_user_quota(self, user):
+        """Update the user quota"""
+        # Define default user quota
+        if not self._zfs_pool:
+            logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
+            return
+
+        try:
+            uid = pwd.getpwnam(user).pw_uid
+        except KeyError:
+            logger.info('user [%s] is not a real user. cannot set user [%s] quota', user)
+            return
+
+        if uid < 1000:
+            logger.info('user quota cannot be set for system user [%s]', user)
+            return
+
+        if not distutils.spawn.find_executable('zfs'):
+            logger.warn('zfs executable not found to setup user [%s] quota', user)
+            return
+
+        logger.warn('update user [%s] quota')
+        subprocess.call(['zfs', 'set', 'userquota@%s=%s' % (user, '50G'), self._zfs_pool])
 
     def user_added(self, user, password):
         """
