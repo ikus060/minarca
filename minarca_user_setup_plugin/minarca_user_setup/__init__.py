@@ -31,6 +31,10 @@ class MinarcaUserSetup(IUserChangeListener):
     def _basedir(self):
         return self.app.cfg.get_config('MinarcaUserSetupBaseDir', '/home')
 
+    @property
+    def _zfs_pool(self):
+        return self.app.cfg.get_config('MinarcaUserSetupZfsPool')
+
     def _create_user_root(self, user, user_root):
         """Create and configure user home directory"""
         # Create folder if missing
@@ -46,8 +50,11 @@ class MinarcaUserSetup(IUserChangeListener):
             os.makedirs(ssh_dir, mode=0700)
 
         # Define default user quota
-        if distutils.spawn.find_executable('zfs'):
-            subprocess.call(['zfs', 'set', 'userquota@%s=%s' % (user, '50G'), 'tank'])
+        if self._zfs_pool:
+            if not distutils.spawn.find_executable('zfs'):
+                logger.warn('zfs executable not found to setup user quota')
+            else:
+                subprocess.call(['zfs', 'set', 'userquota@%s=%s' % (user, '50G'), self._zfs_pool])
 
     def get_ldap_store(self):
         """get reference to ldap_store"""
