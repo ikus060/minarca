@@ -17,6 +17,7 @@ import subprocess
 
 from rdiffweb.rdw_plugin import IRdiffwebPlugin, IUserChangeListener
 from rdiffweb.core import RdiffError
+from rdiffweb.rdw_helpers import encode_s
 
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Get User / Group id
         try:
-            pwd_user = pwd.getpwnam(user)
+            pwd_user = pwd.getpwnam(encode_s(user))
             uid = pwd_user.pw_uid
             gid = pwd_user.pw_gid
         except KeyError:
@@ -81,7 +82,7 @@ class MinarcaUserSetup(IUserChangeListener):
             return
 
         try:
-            uid = pwd.getpwnam(user).pw_uid
+            uid = pwd.getpwnam(encode_s(user)).pw_uid
         except KeyError:
             logger.info('user [%s] is not a real user. cannot set user quota', user)
             return
@@ -101,6 +102,7 @@ class MinarcaUserSetup(IUserChangeListener):
         """
         When added (manually or not). Try to get data from LDAP.
         """
+        assert isinstance(user, unicode)
         # Check if LDAP is available.
         ldap_store = self.get_ldap_store()
         if not ldap_store:
