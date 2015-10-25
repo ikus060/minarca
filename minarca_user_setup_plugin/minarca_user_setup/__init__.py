@@ -81,22 +81,39 @@ class MinarcaUserSetup(IUserChangeListener):
             logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
             return
 
+        # Get user id (also check if local user).
         try:
             uid = pwd.getpwnam(encode_s(user)).pw_uid
         except KeyError:
             logger.info('user [%s] is not a real user. cannot set user quota', user)
             return
 
+        # Check if system user (for security)
         if uid < 1000:
             logger.info('user quota cannot be set for system user [%s]', user)
             return
 
+        # Get quota value from description field
+        ldap_store = self.get_ldap_store()
+        if not ldap_store:
+            return
+        descriptions = ldap_store.get_user_attr(user, 'description')
+        quota_gb = [int(x[1:])
+                    for x in descriptions
+                    if x.startswith("v") and x[1:].isdigit()]
+        # Default to 5GiB if quota if not defined
+        if not quota_gb:
+            quota_gb = 5
+        else:
+            quota_gb = max(quota_gb)
+
+        # Check if zfs is available
         if not distutils.spawn.find_executable('zfs'):
             logger.warn('zfs executable not found to setup user [%s] quota', user)
             return
 
-        logger.warn('update user [%s] quota')
-        subprocess.call(['zfs', 'set', 'userquota@%s=%s' % (user, '50G'), self._zfs_pool])
+        logger.info('update user [%s] quota [%sG]', user, quota_gb)
+        subprocess.call(['zfs', 'set', 'userquota@%s=%sG' % (user, quota_gb), self._zfs_pool])
 
     def user_added(self, user, password):
         """
