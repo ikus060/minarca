@@ -18,6 +18,7 @@ import subprocess
 from rdiffweb.rdw_plugin import IRdiffwebPlugin, IUserChangeListener
 from rdiffweb.core import RdiffError
 from rdiffweb.rdw_helpers import encode_s
+from subprocess import Popen
 
 
 logger = logging.getLogger(__name__)
@@ -65,7 +66,7 @@ class MinarcaUserSetup(IUserChangeListener):
             os.chown(ssh_dir, uid, gid)
 
         # Set Quota
-        self._set_user_quota(user)
+        self._set_zfs_userquota(user)
 
     def get_ldap_store(self):
         """get reference to ldap_store"""
@@ -74,9 +75,50 @@ class MinarcaUserSetup(IUserChangeListener):
             return plugin.plugin_object
         return None
 
-    def _set_user_quota(self, user):
+    def get_ldap_userquota(self, user):
+        """Get userquota from LDAP database."""
+
+        # Get quota value from description field.
+        ldap_store = self.get_ldap_store()
+        if not ldap_store:
+            return False
+        descriptions = ldap_store.get_user_attr(user, 'description')
+        quota_gb = [int(x[1:])
+                    for x in descriptions
+                    if x.startswith("v") and x[1:].isdigit()]
+        if not quota_gb:
+            return False
+        quota_gb = max(quota_gb)
+
+    def get_userquota(self, user):
+        """Get filesystem user quota."""
+        return self._get_zfs_userquota(user)
+
+    def _get_zfs_userquota(self, user):
+        """Get userquota from zfs."""
+
+        # Get ZFS pool name.
+        if not self._zfs_pool:
+            logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
+            return False
+
+        # Check if zfs is available
+        if not distutils.spawn.find_executable('zfs'):
+            logger.warn('zfs executable not found to setup user [%s] quota', user)
+            return False
+
+        # Get value using zfs (as exact value).
+        logger.debug('get user [%s] quota', user)
+        p = Popen(['zfs', 'get', '-p', '-H', '-o', 'value', 'userquota@%s' % (user,), self._zfs_pool], stdout=subprocess.PIPE)
+        value = p.communicate()[0]
+        if not value.isdigit():
+            return False
+        return value
+
+    def _set_zfs_userquota(self, user):
         """Update the user quota"""
-        # Define default user quota
+
+        # Get ZFS pool name.
         if not self._zfs_pool:
             logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
             return
@@ -93,19 +135,12 @@ class MinarcaUserSetup(IUserChangeListener):
             logger.info('user quota cannot be set for system user [%s]', user)
             return
 
-        # Get quota value from description field
-        ldap_store = self.get_ldap_store()
-        if not ldap_store:
-            return
-        descriptions = ldap_store.get_user_attr(user, 'description')
-        quota_gb = [int(x[1:])
-                    for x in descriptions
-                    if x.startswith("v") and x[1:].isdigit()]
-        # Default to 5GiB if quota if not defined
+        # Get user quota from LDAP server.
+        quota_gb = self.get_ldap_userquota(user)
         if not quota_gb:
-            quota_gb = 5
-        else:
-            quota_gb = max(quota_gb)
+            logger.info('user [%s] quota not defined', user)
+            return
+        quota_gb = min(quota_gb, 5)
 
         # Check if zfs is available
         if not distutils.spawn.find_executable('zfs'):
