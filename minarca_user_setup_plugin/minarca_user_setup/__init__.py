@@ -65,8 +65,14 @@ class MinarcaUserSetup(IUserChangeListener):
             os.makedirs(ssh_dir, mode=0700)
             os.chown(ssh_dir, uid, gid)
 
+        # Get user quota from LDAP server.
+        quota = self.get_ldap_userquota(user)
+        if not quota:
+            logger.info('user [%s] quota not defined', user)
+        quota = max(quota, 5 * 1024 * 1024 * 1024)
+
         # Set Quota
-        self._set_zfs_userquota(user)
+        self._set_zfs_userquota(user, quota)
 
     def get_ldap_store(self):
         """get reference to ldap_store"""
@@ -89,6 +95,7 @@ class MinarcaUserSetup(IUserChangeListener):
         if not quota_gb:
             return False
         quota_gb = max(quota_gb)
+        return quota_gb * 1024 * 1024 * 1024
 
     def get_userquota(self, user):
         """Get filesystem user quota."""
@@ -115,8 +122,10 @@ class MinarcaUserSetup(IUserChangeListener):
             return False
         return value
 
-    def _set_zfs_userquota(self, user):
+    def _set_zfs_userquota(self, user, quota):
         """Update the user quota"""
+        assert user
+        assert quota
 
         # Get ZFS pool name.
         if not self._zfs_pool:
@@ -135,20 +144,17 @@ class MinarcaUserSetup(IUserChangeListener):
             logger.info('user quota cannot be set for system user [%s]', user)
             return
 
-        # Get user quota from LDAP server.
-        quota_gb = self.get_ldap_userquota(user)
-        if not quota_gb:
-            logger.info('user [%s] quota not defined', user)
-            return
-        quota_gb = min(quota_gb, 5)
-
         # Check if zfs is available
         if not distutils.spawn.find_executable('zfs'):
             logger.warn('zfs executable not found to setup user [%s] quota', user)
             return
 
-        logger.info('update user [%s] quota [%sG]', user, quota_gb)
-        subprocess.call(['zfs', 'set', 'userquota@%s=%sG' % (user, quota_gb), self._zfs_pool])
+        logger.info('update user [%s] quota [%s]', user, quota)
+        p = subprocess.Popen(
+            ['zfs', 'set', 'userquota@%s=%s' % (user, quota), self._zfs_pool],
+            stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output = p.communicate()[0]
+        logger.debug(output)
 
     def user_added(self, user, password):
         """
