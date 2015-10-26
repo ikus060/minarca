@@ -23,7 +23,7 @@ import pkg_resources
 import unittest
 from mockldap import MockLdap
 
-from rdiffweb.tests.test import MockRdiffwebApp
+from rdiffweb.test import MockRdiffwebApp
 
 """
 Created on Oct 20, 2015
