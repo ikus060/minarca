@@ -24,25 +24,25 @@ class MinarcaDiskSpace(ILocationsPagePlugin):
     Since we define quota, this plugin display the user's quota.
     """
 
-    def _get_disk_space(self, user):
-        """Get disk space. Take quota in consideration."""
+    def _get_diskspace(self, user):
+        """
+        Get disk space from filesystem or from user quota.
 
-        # Get disk usages from filesystem
-        disk_space = self._get_fs_disk_space(user)
-        if not disk_space:
-            return False
+        return a dict with size, used, avail.
+        """
 
         # Take quota in consideration.
         user_setup_plugin = self.app.plugins.get_by_name('MinarcaUserSetup')
         if user_setup_plugin:
             user_setup = user_setup_plugin.plugin_object
-            quota = user_setup.get_userquota(user)
-            if quota:
-                disk_space['avail'] = min(disk_space['avail'], quota)
+            return user_setup.get_zfs_diskspace(user)
+        else:
+            # Get disk usages from filesystem
+            return self._get_fs_diskspace(user)
 
-        return disk_space
+        return False
 
-    def _get_fs_disk_space(self, user):
+    def _get_fs_diskspace(self, user):
         """
         Get current user disk space usage.
         """
@@ -72,7 +72,7 @@ class MinarcaDiskSpace(ILocationsPagePlugin):
             raise ValueError("user is not defined, can't get disk usages")
 
         # Append disk usage info
-        params["minarca_disk_space"] =  = self._get_disk_space(user)
+        params["minarca_disk_space"] = self._get_diskspace(user)
 
         # Append our template
         template = self.app.templates.get_template("minarca_disk_space.html")

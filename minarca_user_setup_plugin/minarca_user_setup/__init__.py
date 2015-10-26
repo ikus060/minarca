@@ -19,6 +19,7 @@ from rdiffweb.rdw_plugin import IRdiffwebPlugin, IUserChangeListener
 from rdiffweb.core import RdiffError
 from rdiffweb.rdw_helpers import encode_s
 from subprocess import Popen
+from cStringIO import StringIO
 
 
 logger = logging.getLogger(__name__)
@@ -101,26 +102,37 @@ class MinarcaUserSetup(IUserChangeListener):
         """Get filesystem user quota."""
         return self._get_zfs_userquota(user)
 
-    def _get_zfs_userquota(self, user):
-        """Get userquota from zfs."""
+    def get_zfs_diskspace(self, user):
+        """Get user disk quota and space."""
 
         # Get ZFS pool name.
         if not self._zfs_pool:
             logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
-            return False
+            return None
+
+        # Get user id (also check if local user).
+        try:
+            pwd.getpwnam(encode_s(user))
+        except KeyError:
+            logger.info('user [%s] is not a real user. cannot get user quota', user)
+            return None
 
         # Check if zfs is available
         if not distutils.spawn.find_executable('zfs'):
             logger.warn('zfs executable not found to setup user [%s] quota', user)
-            return False
+            return None
 
         # Get value using zfs (as exact value).
         logger.debug('get user [%s] quota', user)
-        p = Popen(['zfs', 'get', '-p', '-H', '-o', 'value', 'userquota@%s' % (user,), self._zfs_pool], stdout=subprocess.PIPE)
+        p = subprocess.Popen(
+            ['zfs', 'get', '-p', '-H', '-o', 'value', 'userused@%s,userquota@%s' % (user,), self._zfs_pool],
+            stdout=subprocess.PIPE)
         value = p.communicate()[0]
-        if not value.isdigit():
-            return False
-        return value
+        values = value.splitlines()
+        if len(values) != 2 or not values[0].isdigit() or not values[1].isdigit():
+            raise RdiffError('fail to get user disk space: %s' % (value))
+        used, size = values
+        return {"size": size, "used": used, "avail": size - used}
 
     def _set_zfs_userquota(self, user, quota):
         """Update the user quota"""
@@ -154,7 +166,10 @@ class MinarcaUserSetup(IUserChangeListener):
             ['zfs', 'set', 'userquota@%s=%s' % (user, quota), self._zfs_pool],
             stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
         output = p.communicate()[0]
-        logger.debug(output)
+        if p.returncode != 0:
+            logger.error(output)
+        else:
+            logger.debug(output)
 
     def user_added(self, user, password):
         """
