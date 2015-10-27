@@ -90,6 +90,8 @@ class MinarcaUserSetup(IUserChangeListener):
         if not ldap_store:
             return False
         descriptions = ldap_store.get_user_attr(user, 'description')
+        if not descriptions:
+            return False
         quota_gb = [int(x[1:])
                     for x in descriptions
                     if x.startswith("v") and x[1:].isdigit()]
