@@ -32,7 +32,7 @@ class MinarcaDiskSpace(ILocationsPagePlugin):
         """
 
         # Take quota in consideration.
-        user_setup_plugin = self.app.plugins.get_by_name('MinarcaUserSetup')
+        user_setup_plugin = self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
         if user_setup_plugin:
             user_setup = user_setup_plugin.plugin_object
             return user_setup.get_zfs_diskspace(user)
