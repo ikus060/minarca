@@ -32,15 +32,17 @@ class MinarcaDiskSpace(ILocationsPagePlugin):
         """
 
         # Take quota in consideration.
+        diskspace = None
         user_setup_plugin = self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
         if user_setup_plugin:
             user_setup = user_setup_plugin.plugin_object
-            return user_setup.get_zfs_diskspace(user)
-        else:
+            diskspace = user_setup.get_zfs_diskspace(user)
+
+        if not diskspace:
             # Get disk usages from filesystem
             return self._get_fs_diskspace(user)
 
-        return False
+        return diskspace
 
     def _get_fs_diskspace(self, user):
         """
