@@ -100,10 +100,6 @@ class MinarcaUserSetup(IUserChangeListener):
         quota_gb = max(quota_gb)
         return quota_gb * 1024 * 1024 * 1024
 
-    def get_userquota(self, user):
-        """Get filesystem user quota."""
-        return self._get_zfs_userquota(user)
-
     def get_zfs_diskspace(self, user):
         """Get user disk quota and space."""
 
@@ -119,22 +115,22 @@ class MinarcaUserSetup(IUserChangeListener):
             logger.info('user [%s] is not a real user. cannot get user quota', user)
             return None
 
-        # Check if zfs is available
-        if not distutils.spawn.find_executable('zfs'):
-            logger.warn('zfs executable not found to setup user [%s] quota', user)
-            return None
-
         # Get value using zfs (as exact value).
         logger.debug('get user [%s] quota', user)
         p = subprocess.Popen(
-            ['zfs', 'get', '-p', '-H', '-o', 'value', 'userused@%s,userquota@%s' % (user,), self._zfs_pool],
+            ['zfs', 'get', '-p', '-H', '-o', 'value', 'userused@%s,userquota@%s,used,available' % (user, user), self._zfs_pool],
             stdout=subprocess.PIPE)
         value = p.communicate()[0]
         values = value.splitlines()
-        if len(values) != 2 or not values[0].isdigit() or not values[1].isdigit():
+        if len(values) != 4:
             raise RdiffError('fail to get user disk space: %s' % (value))
-        used, size = values
-        return {"size": size, "used": used, "avail": size - used}
+        userused, userquota, used, available = [int(x) for x in values]
+
+        # If size is 0, the user doesn't have a quota. So use,
+        if userquota:
+            return {"size": userquota, "used": userused, "avail": userquota - userused}
+        else:
+            return {"size": used + available, "used": used, "avail": available}
 
     def _set_zfs_userquota(self, user, quota):
         """Update the user quota"""
