@@ -66,14 +66,8 @@ class MinarcaUserSetup(IUserChangeListener):
             os.makedirs(ssh_dir, mode=0700)
             os.chown(ssh_dir, uid, gid)
 
-        # Get user quota from LDAP server.
-        quota = self.get_ldap_userquota(user)
-        if not quota:
-            logger.info('user [%s] quota not defined', user)
-        quota = max(quota, 5 * 1024 * 1024 * 1024)
-
-        # Set Quota
-        self._set_zfs_userquota(user, quota)
+        # Update user quota
+        self._update_userquota(user)
 
     def get_ldap_store(self):
         """get reference to ldap_store"""
@@ -105,7 +99,7 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Get ZFS pool name.
         if not self._zfs_pool:
-            logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
+            logger.warn('zfs pool name not provided. cannot get user [%s] quota', user)
             return None
 
         # Get user id (also check if local user).
@@ -133,31 +127,26 @@ class MinarcaUserSetup(IUserChangeListener):
             return {"size": used + available, "used": used, "avail": available}
 
     def _set_zfs_userquota(self, user, quota):
-        """Update the user quota"""
+        """Update the user quota. Return True if quota update is successful."""
         assert user
         assert quota
 
         # Get ZFS pool name.
         if not self._zfs_pool:
             logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
-            return
+            return False
 
         # Get user id (also check if local user).
         try:
             uid = pwd.getpwnam(encode_s(user)).pw_uid
         except KeyError:
             logger.info('user [%s] is not a real user. cannot set user quota', user)
-            return
+            return False
 
         # Check if system user (for security)
         if uid < 1000:
             logger.info('user quota cannot be set for system user [%s]', user)
-            return
-
-        # Check if zfs is available
-        if not distutils.spawn.find_executable('zfs'):
-            logger.warn('zfs executable not found to setup user [%s] quota', user)
-            return
+            return False
 
         logger.info('update user [%s] quota [%s]', user, quota)
         p = subprocess.Popen(
@@ -166,8 +155,29 @@ class MinarcaUserSetup(IUserChangeListener):
         output = p.communicate()[0]
         if p.returncode != 0:
             logger.error(output)
-        else:
-            logger.debug(output)
+            return False
+        logger.debug(output)
+        return True
+
+    def _update_userquota(self, user, default_quota=5):
+        """
+        Get quota from LDAP and update the ZFS quota if required.
+        """
+        # Get user quota from LDAP server.
+        quota = self.get_ldap_userquota(user)
+        if not quota and not default_quota:
+            logger.info('user [%s] quota not defined', user)
+            return False
+        quota = max(quota, default_quota * 1024 * 1024 * 1024)
+
+        # Check if update required
+        diskspace = self.get_zfs_diskspace(user)
+        if not diskspace or quota == diskspace['size']:
+            logger.info('user [%s] quota [%s] does not required update', user, quota)
+            return True
+
+        # Set Quota
+        return self._set_zfs_userquota(user, quota)
 
     def user_added(self, user, password):
         """
@@ -206,3 +216,9 @@ class MinarcaUserSetup(IUserChangeListener):
         """
         When email is updated, try to update the LDAP.
         """
+
+    def user_logined(self, user, password):
+        """
+        Need to verify LDAP quota and update ZFS quota if required.
+        """
+        self._update_userquota(user, default_quota=0)
