@@ -66,9 +66,6 @@ class MinarcaUserSetup(IUserChangeListener):
             os.makedirs(ssh_dir, mode=0700)
             os.chown(ssh_dir, uid, gid)
 
-        # Update user quota
-        self._update_userquota(user)
-
     def get_ldap_store(self):
         """get reference to ldap_store"""
         plugin = self.app.plugins.get_plugin_by_name('Ldap')
