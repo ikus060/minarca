@@ -55,7 +55,7 @@ public class API {
     /**
      * Base URL.
      */
-    protected static final String BASE_URL = "https://www.minarca.net";
+    protected static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net") ;
 
     /**
      * Filename used for configuration file. Notice, this is also read by batch file.
@@ -100,7 +100,7 @@ public class API {
     /**
      * The remote host.
      */
-    private static final String REMOTEHOST_DEFAULT = "minarca.net";
+    private static final String REMOTEHOST_DEFAULT = System.getProperty("minarca.remotehost", "minarca.net");
 
     /**
      * Used to check if the current running environment is valid. Check supported OS, check permissions, etc. May also
