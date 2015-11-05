@@ -143,7 +143,7 @@ public class RdiffBackup {
         // Create a prompt handle to accept of refused the key according to it's fingerprint.
         PromptHandler handler = new PromptHandler() {
 
-            boolean accepthostkey = false;
+            boolean accepthostkey = Boolean.getBoolean("minarca.accepthostkey");
 
             @Override
             public String handle(String prompt) {
