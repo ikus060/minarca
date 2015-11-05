@@ -510,7 +510,7 @@ public class API {
 
             // Check if repository exists.
             if (!exists) {
-                throw new LinkComputerException();
+                throw new LinkComputerException(_("initial backup is not successful"));
             }
 
             // Set encoding
