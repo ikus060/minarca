@@ -85,7 +85,7 @@ public class RdiffBackup {
     private String path;
 
     /**
-     * The remove host (minarca.net)
+     * The remote host (minarca.net)
      */
     private String remotehost;
 
