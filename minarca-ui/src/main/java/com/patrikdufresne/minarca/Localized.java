@@ -22,10 +22,24 @@ public class Localized {
         i18n = I18nFactory.getI18n(Localized.class, BUNDLE_NAME, Locale.getDefault(), I18nFactory.FALLBACK);
     }
 
+    /**
+     * Localize the given text (a la gettext).
+     * 
+     * @param text
+     * @return
+     */
     public static String _(String text) {
         return i18n.tr(text);
     }
 
+    /**
+     * Localize the given text (a la gettext). The string may contains <code>{0}</code> as place holder for
+     * <code>args</code>.
+     * 
+     * @param text
+     * @param args
+     * @return
+     */
     public static String _(String text, Object... args) {
         return i18n.tr(text, args);
     }
