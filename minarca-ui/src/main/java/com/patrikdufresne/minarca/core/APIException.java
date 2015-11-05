@@ -127,7 +127,7 @@ public class APIException extends Exception {
         }
 
         public LinkComputerException(String message, Exception cause) {
-            super(message != null ? _("fail to link computer: {}", message) : _("fail to link computer"), cause);
+            super(message != null ? _("fail to link computer: {0}", message) : _("fail to link computer"), cause);
         }
 
     }
