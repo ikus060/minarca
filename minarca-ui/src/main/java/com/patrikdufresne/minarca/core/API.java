@@ -227,7 +227,9 @@ public class API {
         if (!identityFile.isFile() || !identityFile.canRead()) {
             throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
         }
-        if (getIncludes().isEmpty() || getExcludes().isEmpty()) {
+        // Don't verify includes/excludes patterns. See pdsl/minarca/#105
+        // Instead, check if the files exists.
+        if(!includesFile.isFile() || !excludesFile.isFile()) {
             throw new MissConfiguredException(_("includes or excludes pattern are missing"));
         }
     }
