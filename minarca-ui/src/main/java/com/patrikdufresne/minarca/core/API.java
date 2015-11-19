@@ -34,6 +34,7 @@ import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseExce
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
+import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
@@ -55,7 +56,7 @@ public class API {
     /**
      * Base URL.
      */
-    protected static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net") ;
+    protected static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net");
 
     /**
      * Filename used for configuration file. Notice, this is also read by batch file.
@@ -229,7 +230,7 @@ public class API {
         }
         // Don't verify includes/excludes patterns. See pdsl/minarca/#105
         // Instead, check if the files exists.
-        if(!includesFile.isFile() || !excludesFile.isFile()) {
+        if (!includesFile.isFile() || !excludesFile.isFile()) {
             throw new MissConfiguredException(_("includes or excludes pattern are missing"));
         }
     }
@@ -644,6 +645,16 @@ public class API {
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
+    }
+
+    /**
+     * Used to stop a running backup task.
+     * 
+     * @throws APIException
+     * @throws TaskNotFoundException
+     */
+    public void stopBackup() throws TaskNotFoundException, APIException {
+        Scheduler.getInstance().terminate();
     }
 
     /**

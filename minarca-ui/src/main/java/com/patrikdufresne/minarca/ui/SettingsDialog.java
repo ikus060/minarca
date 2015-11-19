@@ -572,44 +572,69 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleStopStartBackup() {
         // Check if backup is running
-        Boolean running;
+        boolean running;
         try {
             running = API.instance().getSchedulerTask().isRunning();
         } catch (APIException e) {
             running = false;
         }
-        if (Boolean.TRUE.equals(running)) {
-            DetailMessageDialog.openInformation(
-                    this.getShell(),
-                    _("Backup now"),
-                    _("Backup is already running!"),
-                    _("You can't start another backup process because there is one already running."),
-                    (String) null);
-            return;
-        }
 
-        // Show a confirmation message.
-        DetailMessageDialog dlg = DetailMessageDialog
-                .openYesNoQuestion(
+        if (running) {
+            DetailMessageDialog dlg = DetailMessageDialog
+                    .openYesNoQuestion(
+                            this.getShell(),
+                            Display.getAppName(),
+                            _("Are you sure you want to stop the current running backup?"),
+                            _("You are about to stop the running backup. Interupting the backup may temporarily disrupt data restore. Are you sure you want to continue?"),
+                            (String) null);
+            if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
+                LOGGER.info("stop backup cancel by user");
+                return;
+            }
+            
+            // Remove last date.
+            lastruntimeItem.setValue(Dialog.ELLIPSIS);
+            lastruntimeItem.setValueHelpText(Dialog.ELLIPSIS);
+            
+            // Stop backup
+            try {
+                API.instance().stopBackup();
+            } catch (APIException e) {
+                DetailMessageDialog.openError(
                         this.getShell(),
-                        _("Backup now"),
-                        _("Do you want to backup your system?"),
-                        _("You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
-                        null);
-        if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
-            LOGGER.info("backup cancel by user");
-            return;
-        }
+                        Display.getAppName(),
+                        _("Can't stop running backup!"),
+                        _("An error occurred while stopping the backup."));
+            }
 
-        // Remove last date.
-        lastruntimeItem.setValue(Dialog.ELLIPSIS);
-        lastruntimeItem.setValueHelpText(Dialog.ELLIPSIS);
+        } else {
+            // Show a confirmation message.
+            DetailMessageDialog dlg = DetailMessageDialog
+                    .openYesNoQuestion(
+                            this.getShell(),
+                            Display.getAppName(),
+                            _("Do you want to backup your system now?"),
+                            _("You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
+                            null);
+            if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
+                LOGGER.info("backup cancel by user");
+                return;
+            }
 
-        // Unlink this computer.
-        try {
-            API.instance().runBackup();
-        } catch (APIException e) {
-            DetailMessageDialog.openError(this.getShell(), _("Error"), _("Can't backup this computer!"), _("An error occurred while backuping this computer."));
+            // Remove last date.
+            lastruntimeItem.setValue(Dialog.ELLIPSIS);
+            lastruntimeItem.setValueHelpText(Dialog.ELLIPSIS);
+
+            // Start backup
+            try {
+                API.instance().runBackup();
+            } catch (APIException e) {
+                DetailMessageDialog.openError(
+                        this.getShell(),
+                        Display.getAppName(),
+                        _("Can't backup this computer!"),
+                        _("An error occurred while backuping this computer."));
+            }
         }
 
     }
