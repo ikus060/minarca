@@ -201,6 +201,7 @@ public class RdiffBackup {
             args.add("--remote-schema");
             args.add(plink + " -2 -batch -i \\\"" + identityFile + "\\\" %s rdiff-backup --server");
         } else {
+            args.add("--exclude-sockets");
             args.add("--remote-schema");
             args.add("ssh -i '" + identityFile + "' %s rdiff-backup --server");
         }
