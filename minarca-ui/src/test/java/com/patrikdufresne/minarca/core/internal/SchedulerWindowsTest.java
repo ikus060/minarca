@@ -160,6 +160,29 @@ public class SchedulerWindowsTest {
         assertEquals(Schedule.DAILY, info.getSchedule());
         assertEquals(new Date(1442603940000l), info.getLastRun());
     }
+    
+    @Test
+    public synchronized void testExists_ForWin7Fr_Daily_Running() throws Exception {
+        // Enforce Win7
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_XP", (Boolean) false);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_WINDOWS_7", (Boolean) true);
+        // Enforce French Local
+        Locale.setDefault(Locale.CANADA_FRENCH);
+    
+        String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-daily-running.data"));
+    
+        SchedulerWindows s = PowerMockito.spy(new SchedulerWindows());
+        PowerMockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
+    
+        assertTrue(s.exists());
+    
+        SchedulerTask info = s.info();
+        assertTrue(info.isRunning());
+        assertEquals(LastResult.UNKNOWN, info.getLastResult());
+        assertEquals(Schedule.DAILY, info.getSchedule());
+        assertEquals(new Date(1447947060000l), info.getLastRun());
+    }
 
     @Test
     public synchronized void testExists_ForWin10En_Hourly() throws Exception {
@@ -248,5 +271,6 @@ public class SchedulerWindowsTest {
         assertEquals(Schedule.MONTHLY, info.getSchedule());
         assertEquals(new Date(1442592300000l), info.getLastRun());
     }
+
 
 }

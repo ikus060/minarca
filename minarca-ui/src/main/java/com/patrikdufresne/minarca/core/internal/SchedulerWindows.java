@@ -50,6 +50,21 @@ public class SchedulerWindows extends Scheduler {
          */
         private static final Integer LAST_RESULT_HAS_NOT_RUN = Integer.valueOf(267011);
 
+        /*
+         * Already running. Hex value: 0x8004131f Int value: -2147216609
+         */
+        private static final Integer LAST_RESULT_ALREADY_RUNNING = (int) Long.parseLong("8004131f", 16);
+
+        /**
+         * The task is ready to run at its next scheduled time. Hex value: 0x00041300 Int value: 267008
+         */
+        private static final Integer LAST_RESULT_TASK_READY = (int) Long.parseLong("00041300", 16);
+
+        /**
+         * Task running. Hex value: 0x00041301, integer value: 267009
+         */
+        private static final Integer LAST_RESULT_TASK_RUNNING = (int) Long.parseLong("00041301", 16);
+
         private static final Integer LAST_RESULT_SUCCESS = Integer.valueOf(0);
 
         private static final Pattern PATTERN_SCHEDULE_TYPE_DAILY = Pattern.compile("(Tous les jours|Journalier|Daily)");
@@ -198,24 +213,25 @@ public class SchedulerWindows extends Scheduler {
          */
         @Override
         public LastResult getLastResult() {
-            String value = get(LAST_RESULT);
+            Integer lastresult;
             try {
-                Integer lastresult = Integer.parseInt(value);
-                // Ref http://systemcenter.no/?p=1142
-                // https://msdn.microsoft.com/en-us/library/aa383604(VS.85).aspx
-                if (lastresult.equals(LAST_RESULT_SUCCESS)) {
-                    return LastResult.SUCCESS;
-                }
-                if (lastresult.equals(LAST_RESULT_HAS_NOT_RUN)) {
-                    return LastResult.HAS_NOT_RUN;
-                }
-                if (lastresult >= 267008) {
-                    return LastResult.UNKNOWN;
-                }
-                return LastResult.FAILURE;
+                lastresult = Integer.parseInt(get(LAST_RESULT));
             } catch (NumberFormatException e) {
                 return LastResult.UNKNOWN;
             }
+            // Ref http://systemcenter.no/?p=1142
+            // https://msdn.microsoft.com/en-us/library/aa383604(VS.85).aspx
+            if (lastresult.equals(LAST_RESULT_SUCCESS) || lastresult.equals(LAST_RESULT_TASK_READY)) {
+                return LastResult.SUCCESS;
+            }
+            if (lastresult.equals(LAST_RESULT_HAS_NOT_RUN)) {
+                return LastResult.HAS_NOT_RUN;
+            }
+            // Other Windows return code are Unknown to Us.
+            if (lastresult.equals(LAST_RESULT_TASK_RUNNING) || lastresult.equals(LAST_RESULT_ALREADY_RUNNING)) {
+                return LastResult.UNKNOWN;
+            }
+            return LastResult.FAILURE;
         }
 
         /**
@@ -270,7 +286,20 @@ public class SchedulerWindows extends Scheduler {
             // Get the status and check if it run.
             LOGGER.trace("task status [{}]", getStatus());
             Matcher m = PATTERN_TASK_RUNNING.matcher(getStatus());
-            return m.find();
+            if (m.find()) {
+                return true;
+            }
+            // Check last return code
+            Integer lastresult;
+            try {
+                lastresult = Integer.parseInt(get(LAST_RESULT));
+            } catch (NumberFormatException e) {
+                return false;
+            }
+            if (lastresult.equals(LAST_RESULT_ALREADY_RUNNING) || lastresult.equals(LAST_RESULT_TASK_RUNNING)) {
+                return true;
+            }
+            return false;
         }
 
         @Override
@@ -552,7 +581,7 @@ public class SchedulerWindows extends Scheduler {
         }
         scanner.close();
         for (TaskInfoWin t : list) {
-            if (t.getTaskname() != null && t.getTaskname().endsWith(taskname)) {
+            if (t.getTaskname() != null && t.getTaskname().toLowerCase().endsWith(taskname.toLowerCase())) {
                 return t;
             }
         }
