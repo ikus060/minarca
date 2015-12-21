@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>minarca-root</artifactId>
         <groupId>com.patrikdufresne</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
     <artifactId>minarca-installation-package</artifactId>
     <packaging>pom</packaging>
@@ -156,30 +155,19 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <taskdef resource="net/sf/antcontrib/antlib.xml"
-                                    classpathref="maven.plugin.classpath" />
-                                <propertyregex property="AppVersion"
-                                    input="0.0.0.${project.version}"
-                                    regexp=".*([0-9]+.[0-9]+.[0-9]+.[0-9]+)"
-                                    select="\1" />
+                                <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="maven.plugin.classpath" />
+                                <propertyregex property="AppVersion" input="0.0.0.${project.version}" regexp=".*([0-9]+.[0-9]+.[0-9]+.[0-9]+)" select="\1" />
                                 <!-- Convert the license file into Window 
                                     encoding -->
-                                <exec osfamily="unix" executable="makensis"
-                                    dir="${project.build.directory}/package"
-                                    failonerror="true">
+                                <exec osfamily="unix" executable="makensis" dir="${project.build.directory}/package" failonerror="true">
                                     <!-- Avoid changing working directory -->
                                     <arg value="-NOCD" />
-                                    <arg
-                                        value="-Dincludedir=${basedir}/src/main/nsis/include" />
-                                    <arg
-                                        value="-Dplugindir=${basedir}/src/main/nsis/plugin" />
+                                    <arg value="-Dincludedir=${basedir}/src/main/nsis/include" />
+                                    <arg value="-Dplugindir=${basedir}/src/main/nsis/plugin" />
                                     <arg value="-DAppVersion=${AppVersion}" />
-                                    <arg
-                                        value="${basedir}/src/main/nsis/setup.nsi" />
+                                    <arg value="${basedir}/src/main/nsis/setup.nsi" />
                                 </exec>
-                                <move
-                                    file="${project.build.directory}/package/setup.exe"
-                                    tofile="${project.build.directory}/minarca-${project.version}-install.exe" />
+                                <move file="${project.build.directory}/package/setup.exe" tofile="${project.build.directory}/minarca-${project.version}-install.exe" />
                             </target>
                         </configuration>
                         <goals>
@@ -213,7 +201,7 @@
         <dependency>
             <groupId>com.patrikdufresne</groupId>
             <artifactId>minarca-ui</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 </project>

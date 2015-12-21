@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.patrikdufresne</groupId>
         <artifactId>minarca-root</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
     <artifactId>minarca-icons</artifactId>
     <properties>
@@ -28,46 +27,33 @@
                                     <attribute name="pngFile" />
                                     <attribute name="size" />
                                     <sequential>
-                                        <java fork="true"
-                                            classname="org.apache.batik.apps.rasterizer.Main"
-                                            failonerror="true">
+                                        <java fork="true" classname="org.apache.batik.apps.rasterizer.Main" failonerror="true">
                                             <arg value="-scriptSecurityOff" />
                                             <arg value="-d" />
-                                            <arg
-                                                value="${batikDestDir}/@{pngFile}" />
+                                            <arg value="${batikDestDir}/@{pngFile}" />
                                             <arg value="-m" />
                                             <arg value="image/png" />
                                             <arg value="-w" />
                                             <arg value="@{size}" />
                                             <arg value="-h" />
                                             <arg value="@{size}" />
-                                            <arg
-                                                value="${basedir}/src/main/svg/@{svgFile}" />
-                                            <classpath
-                                                refid="maven.plugin.classpath" />
+                                            <arg value="${basedir}/src/main/svg/@{svgFile}" />
+                                            <classpath refid="maven.plugin.classpath" />
                                         </java>
                                     </sequential>
                                 </macrodef>
                                 <!-- Generate PNG from SVG -->
-                                <batik svgFile="minarca_16.svg"
-                                    pngFile="minarca_16.png" size="16" />
-                                <batik svgFile="minarca_32.svg"
-                                    pngFile="minarca_32.png" size="32" />
-                                <batik svgFile="minarca_48.svg"
-                                    pngFile="minarca_48.png" size="48" />
-                                <batik svgFile="minarca_48.svg"
-                                    pngFile="minarca_128.png" size="128" />
-                                <batik svgFile="minarca_48_w.svg"
-                                    pngFile="minarca_16_w.png" size="16" />
-                                <batik svgFile="minarca_48_w.svg"
-                                    pngFile="minarca_22_w.png" size="22" />
-                                <batik svgFile="minarca_48_w.svg"
-                                    pngFile="minarca_128_w.png" size="128" />
+                                <batik svgFile="minarca_16.svg" pngFile="minarca_16.png" size="16" />
+                                <batik svgFile="minarca_32.svg" pngFile="minarca_32.png" size="32" />
+                                <batik svgFile="minarca_48.svg" pngFile="minarca_48.png" size="48" />
+                                <batik svgFile="minarca_48.svg" pngFile="minarca_128.png" size="128" />
+                                <batik svgFile="minarca_48_w.svg" pngFile="minarca_16_w.png" size="16" />
+                                <batik svgFile="minarca_48_w.svg" pngFile="minarca_22_w.png" size="22" />
+                                <batik svgFile="minarca_48_w.svg" pngFile="minarca_128_w.png" size="128" />
                                 <!-- Generate ICO from PNGs -->
                                 <!-- Require icotool -->
                                 <mkdir dir="${icotoolDestDir}" />
-                                <exec executable="icotool" dir="${batikDestDir}"
-                                    failonerror="true">
+                                <exec executable="icotool" dir="${batikDestDir}" failonerror="true">
                                     <arg value="-c" />
                                     <arg value="-o" />
                                     <arg value="${icotoolDestDir}/minarca.ico" />
