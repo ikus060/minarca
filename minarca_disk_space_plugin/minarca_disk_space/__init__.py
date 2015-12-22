@@ -12,13 +12,13 @@ from __future__ import unicode_literals
 import logging
 import os
 
-from rdiffweb.rdw_plugin import ILocationsPagePlugin  # @UnresolvedImport
+from rdiffweb.rdw_plugin import ITemplateFilterPlugin  # @UnresolvedImport
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
 
 
-class MinarcaDiskSpace(ILocationsPagePlugin):
+class MinarcaDiskSpace(ITemplateFilterPlugin):
     """
     This plugin provide feedback information to the users about the disk usage.
     Since we define quota, this plugin display the user's quota.
@@ -64,6 +64,10 @@ class MinarcaDiskSpace(ILocationsPagePlugin):
         used = size - avail
         # Return dictionary with values.
         return {"size": size, "used": used, "avail": avail}
+
+    def filter_data(self, template_name, data):
+        if template_name == 'locations.html':
+            self.locations_update_params(data)
 
     def locations_update_params(self, params):
         """

@@ -4,7 +4,7 @@ Module = minarca_disk_space
 
 [Documentation]
 Author = Patrik Dufresne
-Version = 0.8.0
+Version = 0.8.2
 Website = http://www.patrikdufresne.com/
 Description: Provide additional information about the disk space used and
     available for each repository.
