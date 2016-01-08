@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -56,6 +57,11 @@ public class SelectiveDialog extends Dialog {
     private static final String COMMA = ", ";
 
     private static final int PATH_MAX_LENGTH = 50;
+    
+    /**
+     * Number of pixel to free (to avoid filling all the screen).
+     */
+    private static final int WINDOW_HEIGHT_PADDING = 55;
 
     /**
      * Return collection of predefined patterns.
@@ -510,12 +516,23 @@ public class SelectiveDialog extends Dialog {
             new CListItem(this.customList);
         }
 
-        // Relayout scrollable.
+        /*
+         * Relayout scrollable.
+         */
+        // Compute the maximum size so the dialog is render in the screen.
+        int windowHeight = getShell().getBounds().height;
+        int widgetHeight = this.customList.getParent().getSize().y;
+        int monitorHeight =  Display.getDefault().getBounds().height;
+        int maxHeight = monitorHeight - windowHeight + widgetHeight - WINDOW_HEIGHT_PADDING;
+
+        // Compute the widget size
         Point size = customList.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+        // Fix the scrollable size
         ScrolledComposite scrollable = (ScrolledComposite) this.customList.getParent();
         scrollable.setMinHeight(size.y);
         ((GridData) scrollable.getLayoutData()).widthHint = size.x;
-        ((GridData) scrollable.getLayoutData()).heightHint = Math.min(size.y, 250);
+        ((GridData) scrollable.getLayoutData()).heightHint = Math.min(size.y, maxHeight);
 
         if (relayout) {
             // Recompute the dialog size.
