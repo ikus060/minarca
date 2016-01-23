@@ -9,27 +9,31 @@
 
 from __future__ import unicode_literals
 
-import pwd
 import distutils.spawn
+from builtins import str
+from future.utils.surrogateescape import decodefilename, encodefilename
 import logging
 import os
-import subprocess
-
-from rdiffweb.rdw_plugin import IRdiffwebPlugin, IUserChangeListener
-from rdiffweb.core import RdiffError
-from rdiffweb.rdw_helpers import encode_s
+import pwd
 from subprocess import Popen
-from cStringIO import StringIO
+import subprocess
+import sys
+
+from rdiffweb.core import RdiffError
+from rdiffweb.rdw_plugin import IRdiffwebPlugin, IUserChangeListener
 
 
 logger = logging.getLogger(__name__)
+
+
+PY3 = sys.version_info[0] == 3
 
 
 class MinarcaUserSetup(IUserChangeListener):
 
     @property
     def _mode(self):
-        return self.app.cfg.get_config_int('MinarcaUserSetupDirMode', 0700)
+        return self.app.cfg.get_config_int('MinarcaUserSetupDirMode', 0o0700)
 
     @property
     def _basedir(self):
@@ -44,7 +48,7 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Get User / Group id
         try:
-            pwd_user = pwd.getpwnam(encode_s(user))
+            pwd_user = self._getpwnam(user)
             uid = pwd_user.pw_uid
             gid = pwd_user.pw_gid
         except KeyError:
@@ -63,7 +67,7 @@ class MinarcaUserSetup(IUserChangeListener):
         # Create ssh subfolder
         ssh_dir = os.path.join(user_root, '.ssh')
         if not os.path.exists(ssh_dir):
-            os.makedirs(ssh_dir, mode=0700)
+            os.makedirs(ssh_dir, mode=0o0700)
             os.chown(ssh_dir, uid, gid)
 
     def get_ldap_store(self):
@@ -75,6 +79,7 @@ class MinarcaUserSetup(IUserChangeListener):
 
     def get_ldap_userquota(self, user):
         """Get userquota from LDAP database."""
+        assert isinstance(user, str)
 
         # Get quota value from description field.
         ldap_store = self.get_ldap_store()
@@ -91,17 +96,25 @@ class MinarcaUserSetup(IUserChangeListener):
         quota_gb = max(quota_gb)
         return quota_gb * 1024 * 1024 * 1024
 
+    def _getpwnam(self, user):
+        assert isinstance(user, str)
+        if PY3:
+            return pwd.getpwnam(user)
+        else:
+            return pwd.getpwnam(encodefilename(user))
+
     def get_zfs_diskspace(self, user):
         """Get user disk quota and space."""
+        assert isinstance(user, str)
 
         # Get ZFS pool name.
         if not self._zfs_pool:
-            logger.warn('zfs pool name not provided. cannot get user [%s] quota', user)
+            logger.warning('zfs pool name not provided. cannot get user [%s] quota', user)
             return None
 
         # Get user id (also check if local user).
         try:
-            pwd.getpwnam(encode_s(user))
+            self._getpwnam(user)
         except KeyError:
             logger.info('user [%s] is not a real user. cannot get user quota', user)
             return None
@@ -130,12 +143,12 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Get ZFS pool name.
         if not self._zfs_pool:
-            logger.warn('zfs pool name not provided. cannot set user [%s] quota', user)
+            logger.warning('zfs pool name not provided. cannot set user [%s] quota', user)
             return False
 
         # Get user id (also check if local user).
         try:
-            uid = pwd.getpwnam(encode_s(user)).pw_uid
+            uid = self._getpwnam(user).pw_uid
         except KeyError:
             logger.info('user [%s] is not a real user. cannot set user quota', user)
             return False
@@ -180,7 +193,8 @@ class MinarcaUserSetup(IUserChangeListener):
         """
         When added (manually or not). Try to get data from LDAP.
         """
-        assert isinstance(user, unicode)
+        assert isinstance(user, str)
+
         # Check if LDAP is available.
         ldap_store = self.get_ldap_store()
         if not ldap_store:
@@ -194,7 +208,7 @@ class MinarcaUserSetup(IUserChangeListener):
             logger.debug('update user [%s] root directory [%s]', user, home_dir)
             self.app.userdb.set_user_root(user, home_dir)
         except:
-            logger.warn('fail to update user root directory [%s]', user, exc_info=1)
+            logger.warning('fail to update user root directory [%s]', user, exc_info=1)
 
         # Get user email from LDAP
         try:
@@ -203,7 +217,7 @@ class MinarcaUserSetup(IUserChangeListener):
                 logger.debug('update user [%s] email [%s]', user, email)
                 self.app.userdb.set_email(user, email)
         except:
-            logger.warn('fail to update user email [%s]', user, exc_info=1)
+            logger.warning('fail to update user email [%s]', user, exc_info=1)
 
         # Setup Filesystem
         if home_dir:
@@ -213,9 +227,11 @@ class MinarcaUserSetup(IUserChangeListener):
         """
         When email is updated, try to update the LDAP.
         """
+        pass
 
     def user_logined(self, user, password):
         """
         Need to verify LDAP quota and update ZFS quota if required.
         """
+        assert isinstance(user, str)
         self._update_userquota(user, default_quota=0)

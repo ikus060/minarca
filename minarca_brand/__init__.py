@@ -9,10 +9,8 @@
 
 from __future__ import unicode_literals
 
-import logging
-import os
-
 from rdiffweb.rdw_plugin import IRdiffwebPlugin
+
 
 class MinarcaBrand(IRdiffwebPlugin):
     """
