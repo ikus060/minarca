@@ -4,7 +4,7 @@ Module = minarca_user_setup
 
 [Documentation]
 Author = Patrik Dufresne
-Version = 0.8.0
+Version = 0.9.1
 Website = http://www.patrikdufresne.com/
 Description: Configure the user from LDAP. Also configure the ZFS file system.
 Copyright: Copyright (C) 2015 Patrik Dufresne Service Logiciel inc. All rights reserved.
