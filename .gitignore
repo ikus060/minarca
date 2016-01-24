@@ -30,3 +30,5 @@ pip-log.txt
 .settings
 /ez_setup
 .pydevproject
+coverage.xml
+nosetests.xml
