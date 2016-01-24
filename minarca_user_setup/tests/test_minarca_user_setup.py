@@ -6,7 +6,6 @@
 # Copyright (C) 2015 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-
 """
 Created on Oct 20, 2015
 
@@ -15,10 +14,13 @@ Created on Oct 20, 2015
 
 from __future__ import unicode_literals
 
+from builtins import str
 import logging
 import mock
 from mockldap import MockLdap
 import pkg_resources
+import shutil
+import tempfile
 import unittest
 
 from rdiffweb.test import WebCase, AppTestCase
@@ -64,13 +66,19 @@ class TestMinarcaUserSetup(WebCase):
     @classmethod
     def setup_server(cls):
         path = pkg_resources.resource_filename('minarca_user_setup', '..')  # @UndefinedVariable
-        WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaUserSetup', 'Ldap'], default_config={'PluginSearchPath': path})
+        WebCase.setup_server(
+            enabled_plugins=['SQLite', 'MinarcaUserSetup', 'Ldap'],
+            default_config={'PluginSearchPath': path})
 
     def setUp(self):
+
         # Mock LDAP
         self.mockldap = MockLdap(self.directory)
         self.mockldap.start()
         self.ldapobj = self.mockldap['ldap://localhost/']
+        # Reconfigure
+        self.basedir = str(tempfile.mkdtemp(prefix='minarca_user_setup_tests_'))
+        self.app.cfg.set_config('MinarcaUserSetupBaseDir', self.basedir)
         # Call parent implementation
         WebCase.setUp(self)
 
@@ -79,6 +87,8 @@ class TestMinarcaUserSetup(WebCase):
         self.mockldap.stop()
         del self.ldapobj
         del self.mockldap
+        # Delete temp directory
+        shutil.rmtree(self.basedir)
         # Call parent implementation
         WebCase.tearDown(self)
 
