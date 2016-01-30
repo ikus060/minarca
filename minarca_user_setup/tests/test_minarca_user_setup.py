@@ -18,7 +18,6 @@ from builtins import str
 import logging
 import mock
 from mockldap import MockLdap
-import pkg_resources
 import shutil
 import tempfile
 import unittest
@@ -65,10 +64,7 @@ class TestMinarcaUserSetup(WebCase):
 
     @classmethod
     def setup_server(cls):
-        path = pkg_resources.resource_filename('minarca_user_setup', '..')  # @UndefinedVariable
-        WebCase.setup_server(
-            enabled_plugins=['SQLite', 'MinarcaUserSetup', 'Ldap'],
-            default_config={'PluginSearchPath': path})
+        WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaUserSetup', 'Ldap'])
 
     def setUp(self):
 
@@ -93,8 +89,7 @@ class TestMinarcaUserSetup(WebCase):
         WebCase.tearDown(self)
 
     def _get_plugin_obj(self):
-        plugin_info = self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
-        return plugin_info.plugin_object
+        return self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
 
     def test_check_plugin_enabled(self):
         """
@@ -129,7 +124,6 @@ class TesZfstMinarcaUserSetup(AppTestCase):
     enabled_plugins = ['SQLite', 'MinarcaUserSetup']
 
     default_config = {
-        'PluginSearchPath': pkg_resources.resource_filename('minarca_user_setup', '..'),  # @UndefinedVariable
         'MinarcaUserSetupBaseDir': '/tmp',
         'MinarcaUserSetupZfsPool': 'tank',
     }
@@ -153,8 +147,7 @@ class TesZfstMinarcaUserSetup(AppTestCase):
         AppTestCase.tearDown(self)
 
     def _get_plugin_obj(self):
-        plugin_info = self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
-        return plugin_info.plugin_object
+        return self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
 
     def test_get_zfs_diskspace_no_quota(self):
         """Check value for zfs disk space usage."""

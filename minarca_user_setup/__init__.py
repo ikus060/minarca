@@ -72,10 +72,9 @@ class MinarcaUserSetup(IUserChangeListener):
 
     def get_ldap_store(self):
         """get reference to ldap_store"""
-        plugin = self.app.plugins.get_plugin_by_name('Ldap')
-        if plugin:
-            return plugin.plugin_object
-        return None
+        plugin = self.app.plugins.get_plugin_by_name('LdapPasswordStore')
+        assert plugin
+        return plugin
 
     def get_ldap_userquota(self, user):
         """Get userquota from LDAP database."""
@@ -83,8 +82,7 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Get quota value from description field.
         ldap_store = self.get_ldap_store()
-        if not ldap_store:
-            return False
+        assert ldap_store
         descriptions = ldap_store.get_user_attr(user, 'description')
         if not descriptions:
             return False
@@ -197,8 +195,6 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Check if LDAP is available.
         ldap_store = self.get_ldap_store()
-        if not ldap_store:
-            return
 
         # Get user home directory from LDAP
         try:

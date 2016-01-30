@@ -15,7 +15,6 @@ Created on Jan 23, 2016
 from __future__ import unicode_literals
 
 import logging
-import pkg_resources
 import unittest
 
 from rdiffweb.test import WebCase
@@ -29,8 +28,7 @@ class MinarcaDiskSpaceTest(WebCase):
 
     @classmethod
     def setup_server(cls,):
-        path = pkg_resources.resource_filename('minarca_disk_space', '..')  # @UndefinedVariable
-        WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaDiskSpace'], default_config={'PluginSearchPath': path})
+        WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaDiskSpace'])
 
     def setUp(self):
         WebCase.setUp(self)

@@ -33,9 +33,8 @@ class MinarcaDiskSpace(ITemplateFilterPlugin):
 
         # Take quota in consideration.
         diskspace = None
-        user_setup_plugin = self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
-        if user_setup_plugin:
-            user_setup = user_setup_plugin.plugin_object
+        user_setup = self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
+        if user_setup:
             diskspace = user_setup.get_zfs_diskspace(user)
 
         if not diskspace:

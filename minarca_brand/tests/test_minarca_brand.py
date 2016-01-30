@@ -14,7 +14,6 @@ Created on Jan 23, 2016
 
 from __future__ import unicode_literals
 
-import logging
 import pkg_resources
 import unittest
 
@@ -29,11 +28,10 @@ class MinarcaBrandTest(WebCase):
 
     @classmethod
     def setup_server(cls,):
-        path = pkg_resources.resource_filename('minarca_brand', '..')  # @UndefinedVariable
         headerlogo = pkg_resources.resource_filename('minarca_brand', 'minarca_22_w.png')  # @UndefinedVariable
         WebCase.setup_server(
             enabled_plugins=['SQLite', 'MinarcaBrand'],
-            default_config={'PluginSearchPath': path, 'HeaderLogo': headerlogo})
+            default_config={'HeaderLogo': headerlogo})
 
     def test_check_plugin_enabled(self):
         """
