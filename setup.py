@@ -157,18 +157,6 @@ class build(build_):
     sub_commands.insert(0, ('compile_all_catalogs', None))
     sub_commands.insert(0, ('filltmpl', None))
 
-# Read package info from yapsy plugin file.
-# config = SafeConfigParser()
-# config.read(plugin_file)
-
-# Create recursive data_files
-# dest = "/etc/rdiffweb/plugins"
-# datadir = plugin_name
-# data_files = [
-#    (os.path.join(dest, root), [os.path.join(root, f) for f in files])
-#    for root, dirs, files in os.walk(datadir)]
-# data_files.append((dest, [plugin_file]))
-
 setup(
     name="minarca-plugins",
     version='0.9.1',
