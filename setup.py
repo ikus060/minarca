@@ -181,13 +181,19 @@ setup(
         'minarca_user_setup',
         'minarca_disk_space'
     ],
+    include_package_data=True,
+    data_files=[
+        ('/etc/rdiffweb/plugins/minarca_brand', [
+            'minarca_brand/minarca.ico',
+            'minarca_brand/minarca_22_w.png']),
+    ],
     cmdclass={
         'build': build,
         'compile_all_catalogs': compile_all_catalogs,
         'filltmpl': fill_template,
     },
     templates=['sonar-project.properties.in'],
-    install_requires=["rdiffweb>=0.9"],
+    # install_requires=["rdiffweb>=0.9"],
     # required packages for build process
     setup_requires=[
         "babel>=0.9",
@@ -195,5 +201,11 @@ setup(
     # requirement for testing
     tests_require=[
         "mockldap>=0.2.6",
-    ]
+    ],
+    # Declare entry point
+    entry_points={'rdiffweb.plugins': [
+        'MinarcaBrand = minarca_brand',
+        'MinarcaDiskSpace = minarca_disk_space',
+        'MinarcaUserSetup = minarca_user_setup',
+    ]},
 )
