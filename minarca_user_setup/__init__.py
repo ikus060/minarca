@@ -9,9 +9,9 @@
 
 from __future__ import unicode_literals
 
-import distutils.spawn
 from builtins import str
-from future.utils.surrogateescape import decodefilename, encodefilename
+import distutils.spawn
+from future.utils.surrogateescape import encodefilename
 import logging
 import os
 import pwd
