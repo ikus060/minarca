@@ -591,11 +591,11 @@ public class SettingsDialog extends Dialog {
                 LOGGER.info("stop backup cancel by user");
                 return;
             }
-            
+
             // Remove last date.
             lastruntimeItem.setValue(Dialog.ELLIPSIS);
             lastruntimeItem.setValueHelpText(Dialog.ELLIPSIS);
-            
+
             // Stop backup
             try {
                 API.instance().stopBackup();

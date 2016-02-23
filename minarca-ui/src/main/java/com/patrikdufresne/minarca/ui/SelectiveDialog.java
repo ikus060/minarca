@@ -57,7 +57,7 @@ public class SelectiveDialog extends Dialog {
     private static final String COMMA = ", ";
 
     private static final int PATH_MAX_LENGTH = 50;
-    
+
     /**
      * Number of pixel to free (to avoid filling all the screen).
      */
@@ -522,7 +522,7 @@ public class SelectiveDialog extends Dialog {
         // Compute the maximum size so the dialog is render in the screen.
         int windowHeight = getShell().getBounds().height;
         int widgetHeight = this.customList.getParent().getSize().y;
-        int monitorHeight =  Display.getDefault().getBounds().height;
+        int monitorHeight = Display.getDefault().getBounds().height;
         int maxHeight = monitorHeight - windowHeight + widgetHeight - WINDOW_HEIGHT_PADDING;
 
         // Compute the widget size
