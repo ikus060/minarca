@@ -50,7 +50,7 @@ class MinarcaDiskSpace(ITemplateFilterPlugin):
         logger.debug("get disk space usages for [%s]", user)
         # On linux use statvfs()
         # FIXME statvfs is not available on python3
-        rootdir = self.app.currentuser.root_dir
+        rootdir = self.app.currentuser.user_root
         if not rootdir:
             return False
         try:
