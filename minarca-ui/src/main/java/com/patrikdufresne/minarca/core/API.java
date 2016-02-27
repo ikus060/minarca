@@ -508,11 +508,16 @@ public class API {
                     client.updateRepositories();
                 } while (attempt > 0 && !(exists = (client.getRepositoryInfo(computername) != null)));
             } catch (IOException e) {
-                throw new LinkComputerException(e);
+                LOGGER.warn("io error", e);
             }
 
             // Check if repository exists.
             if (!exists) {
+                // Unset properties
+                setUsername(null);
+                setComputerName(null);
+                setRemotehost(null);
+                // Raise error.
                 throw new LinkComputerException(_("initial backup is not successful"));
             }
 
