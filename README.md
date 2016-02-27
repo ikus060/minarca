@@ -24,3 +24,22 @@ To update the translation file `.po`
     mvn gettext:merge
 
 
+# Code signing
+
+Minarca build script may sign the code. To enabled signing, call maven with the
+following options:
+    
+    mvn clean install -Dsign.certs.path=authenticode-certs.pem -Dsign.key.path=authenticode.pem -Dsign.passphrase=CHANGEME
+    
+To sign the code, you need to have `osslsigncode` installed locally.
+
+    sudo apt-get install libssl-dev libcurl4-gnutls-dev autoconf
+    wget http://nchc.dl.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz
+    tar zxvf osslsigncode-1.7.1.tar.gz
+    cd osslsigncode-1.7.1
+    ./configure
+    make
+    sudo make install
+    
+Reference: https://development.adaptris.net/users/lchan/blog/2013/06/07/signing-windows-installers-on-linux/ 
+   

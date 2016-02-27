@@ -112,7 +112,7 @@ public class API {
     public static void checkEnv() throws APIException {
         // Check OS and VM version.
         LOGGER.info("{} {} {}", SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH);
-        LOGGER.info("{} (build {}, {})", SystemUtils.JAVA_VM_INFO,  SystemUtils.JAVA_VM_VERSION, SystemUtils.JAVA_VM_INFO);
+        LOGGER.info("{} (build {}, {})", SystemUtils.JAVA_VM_INFO, SystemUtils.JAVA_VM_VERSION, SystemUtils.JAVA_VM_INFO);
         if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
             LOGGER.warn("unsupported OS");
             throw new UnsupportedOS();
