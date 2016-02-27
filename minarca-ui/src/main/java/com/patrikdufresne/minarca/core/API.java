@@ -208,8 +208,6 @@ public class API {
         // Run backup.
         rdiffbackup.backup(excludesFile, includesFile);
 
-        // TODO If it's our first backup for this computer, we need to refresh the repository list.
-
     }
 
     /**
