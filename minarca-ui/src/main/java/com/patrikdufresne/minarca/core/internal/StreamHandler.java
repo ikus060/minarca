@@ -67,6 +67,10 @@ public class StreamHandler extends Thread {
      * Use to prompt.
      */
     private PromptHandler handler;
+    /**
+     * LogLevel
+     */
+    private boolean forceLog;
 
     /**
      * Process stream handler.
@@ -75,15 +79,15 @@ public class StreamHandler extends Thread {
      *            the process.
      */
     public StreamHandler(Process p) {
-        this(p, Compat.CHARSET_PROCESS, null);
+        this(p, Compat.CHARSET_PROCESS, null, false);
     }
 
     public StreamHandler(Process p, PromptHandler handler) {
-        this(p, Compat.CHARSET_PROCESS, handler);
+        this(p, Compat.CHARSET_PROCESS, handler, false);
     }
 
     public StreamHandler(Process p, Charset charset) {
-        this(p, charset, null);
+        this(p, charset, null, false);
     }
 
     /**
@@ -91,10 +95,11 @@ public class StreamHandler extends Thread {
      * 
      * @param p
      */
-    public StreamHandler(Process p, Charset charset, PromptHandler handler) {
+    public StreamHandler(Process p, Charset charset, PromptHandler handler, boolean forceLog) {
         Validate.notNull(this.p = p);
         Validate.notNull(this.charset = charset);
         this.handler = handler;
+        this.forceLog = forceLog;
     }
 
     /**
@@ -105,6 +110,27 @@ public class StreamHandler extends Thread {
     public String getOutput() {
         synchronized (output) {
             return output.toString();
+        }
+    }
+
+    /**
+     * Log a line into log file.
+     * 
+     * @param line
+     */
+    private void log(String line) {
+        if (forceLog) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(line);
+            } else if (LOGGER.isInfoEnabled()) {
+                LOGGER.info(line);
+            } else if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn(line);
+            } else if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(line);
+            }
+        } else {
+            LOGGER.trace(line);
         }
     }
 
@@ -127,7 +153,7 @@ public class StreamHandler extends Thread {
                     if (b == CR || b == LF) {
                         String line = buf.toString();
                         if (!line.isEmpty()) {
-                            LOGGER.trace(line);
+                            log(line);
                             output.append(line);
                             output.append(SystemUtils.LINE_SEPARATOR);
                         }
@@ -139,7 +165,7 @@ public class StreamHandler extends Thread {
                         String prompt = buf.toString();
                         String answer = handler.handle(prompt);
                         if (answer != null) {
-                            LOGGER.trace(prompt);
+                            log(prompt);
                             // LOGGER.debug(answer);
                             out.append(answer);
                             out.flush();

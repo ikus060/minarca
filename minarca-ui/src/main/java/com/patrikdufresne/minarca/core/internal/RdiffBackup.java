@@ -252,7 +252,7 @@ public class RdiffBackup {
             }
             Process p = builder.command(command).redirectErrorStream(true).start();
             // Attach stream handle to answer a password when prompted
-            StreamHandler sh = new StreamHandler(p, handler);
+            StreamHandler sh = new StreamHandler(p, Compat.CHARSET_PROCESS, handler, true);
             sh.start();
             // Wait for process to complete
             int returnCode = p.waitFor();
