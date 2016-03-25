@@ -14,6 +14,36 @@
     </properties>
     <build>
         <plugins>
+            <!--Generate the shell script to start the application from command 
+                line -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.3.1</version>
+                <executions>
+                    <execution>
+                        <id>assemble-standalone</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                        <configuration>
+                            <assembleDirectory>${project.build.directory}/package</assembleDirectory>
+                            <programs>
+                                <program>
+                                    <mainClass>com.patrikdufresne.minarca.Main</mainClass>
+                                    <name>minarca</name>
+                                </program>
+                            </programs>
+                            <platforms>
+                                <platform>unix</platform>
+                            </platforms>
+                            <repositoryLayout>flat</repositoryLayout>
+                            <repositoryName>lib</repositoryName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Extract Icons -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
