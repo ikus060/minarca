@@ -163,7 +163,6 @@
                                   <attribute name="certs-file"/>
                                   <attribute name="key-file"/>
                                   <attribute name="passphrase"/>
-                                  <attribute name="hash"  default="sha1"/>
                                   <attribute name="name"  default="${project.name}"/>
                                   <attribute name="url"  default="${project.url}"/>
                                   <attribute name="file"/>
@@ -185,8 +184,6 @@
                                           <arg value="@{name}" />
                                           <arg value="-i" />
                                           <arg value="@{url}" />
-                                          <arg value="-h" />
-                                          <arg value="@{hash}" />
                                           <arg value="-t"/>
                                           <arg value="http://timestamp.verisign.com/scripts/timstamp.dll"/>
                                           <arg value="-in"/>
