@@ -18,6 +18,6 @@
 include *.plugin
 
 # Include translation file
-recursive-include minarca_brand *.po *.pot *.mo *.html *.ico *.png
+recursive-include minarca_brand *.po *.pot *.mo *.html *.ico *.png *.css *.less
 recursive-include minarca_disk_space *.po *.pot *.mo *.html
 recursive-include minarca_user_setup *.po *.pot *.mo *.html
