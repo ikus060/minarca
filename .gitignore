@@ -32,3 +32,4 @@ pip-log.txt
 .pydevproject
 coverage.xml
 nosetests.xml
+/sonar-project.properties
