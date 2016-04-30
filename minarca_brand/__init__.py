@@ -26,5 +26,10 @@ class MinarcaBrand(IRdiffwebPlugin):
         # Override location of main.css
         path = pkg_resources.resource_filename('minarca_brand', 'minarca.css')  # @UndefinedVariable
         self.app.root.static.main_css = static(path)
+        # In development, provide test.html as static page.
+        environment = self.app.cfg.get_config('Environment', 'production')
+        if environment != 'production':
+            path = pkg_resources.resource_filename('minarca_brand', 'test.html')  # @UndefinedVariable
+            self.app.root.static.test_html = static(path)
         # Activate plugin.
         IRdiffwebPlugin.activate(self)
