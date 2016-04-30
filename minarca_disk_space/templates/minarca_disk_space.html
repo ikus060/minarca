@@ -21,7 +21,7 @@ Use is subject to license terms.
   <b>{% trans %}Usage{% endtrans %}</b>
   {% trans used=used_str, avail=avail_str, size=size_str%}{{ used }} used | {{ size }} total | {{ avail }} free{% endtrans %}
   <div class="progress">
-    <div class="progress-bar {% if used_pct > 90 %}progress-bar-warning{% else %}progress-bar-info{% endif %}"
+    <div class="progress-bar {% if used_pct > 90 %}progress-bar-warning{% else %}progress-bar-success{% endif %}"
          role="progressbar"
          aria-valuenow="{{ used_pct }}"
          aria-valuemin="0"
