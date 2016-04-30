@@ -8,16 +8,16 @@
 //## Gray and brand colors for use across Bootstrap.
 
 @gray-base:              #000;
-@gray-darker:            lighten(@gray-base, 13.5%); // #222
-@gray-dark:              #333;   // #333
-@gray:                   #777; // #555
-@gray-light:             #AEA79F;   // #999
-@gray-lighter:           lighten(@gray-base, 93.5%); // #eee
+@gray-darker:            lighten(@gray-base, 13.5%);
+@gray-dark:              #333;
+@gray:                   #777;
+@gray-light:             #999; // united #AEA79F;
+@gray-lighter:           lighten(@gray-base, 93.5%);
 
 @brand-primary:         #DD4814;
 @brand-success:         #38B44A;
-@brand-info:            #772953;
-@brand-warning:         #EFB73E;
+@brand-info:            #336699;
+@brand-warning:         #f57900;
 @brand-danger:          #DF382C;
 
 
@@ -42,13 +42,13 @@
 //
 //## Font, line-height, and color for body text, headings, and more.
 
-@font-family-sans-serif:  "Ubuntu", Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-sans-serif:  "Quicksand", Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
 @font-family-serif:       Georgia, "Times New Roman", Times, serif;
 //** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
 @font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
 @font-family-base:        @font-family-sans-serif;
 
-@font-size-base:          14px;
+@font-size-base:          16px;
 @font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
 @font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
 
@@ -66,35 +66,23 @@
 
 //** By default, this inherits from the `<body>`.
 @headings-font-family:    @font-family-base;
-@headings-font-weight:    500;
+@headings-font-weight:    400;
 @headings-line-height:    1.1;
 @headings-color:          inherit;
-
-
-//== Iconography
-//
-//## Specify custom location and filename of the included Glyphicons icon font. Useful for those including Bootstrap via Bower.
-
-//** Load fonts from this directory.
-@icon-font-path:          "../fonts/";
-//** File name for all font files.
-@icon-font-name:          "glyphicons-halflings-regular";
-//** Element ID within SVG icon file.
-@icon-font-svg-id:        "glyphicons_halflingsregular";
 
 
 //== Components
 //
 //## Define common padding and border radius sizes and more. Values based on 14px text and 1.428 line-height (~20px to start).
 
-@padding-base-vertical:     8px;
-@padding-base-horizontal:   12px;
+@padding-base-vertical:     10px;
+@padding-base-horizontal:   15px;
 
-@padding-large-vertical:    14px;
-@padding-large-horizontal:  16px;
+@padding-large-vertical:    18px;
+@padding-large-horizontal:  27px;
 
-@padding-small-vertical:    5px;
-@padding-small-horizontal:  10px;
+@padding-small-vertical:    6px;
+@padding-small-horizontal:  9px;
 
 @padding-xs-vertical:       1px;
 @padding-xs-horizontal:     5px;
@@ -200,7 +188,7 @@
 @input-border-radius-small:      @border-radius-small;
 
 //** Border color for inputs on focus
-@input-border-focus:             #66afe9;
+@input-border-focus:             lighten(@brand-primary, 20%); // united #66afe9; //@gray; // united #66afe9;
 
 //** Placeholder text color
 @input-color-placeholder:        @gray-light;
@@ -241,7 +229,7 @@
 @dropdown-divider-bg:            #e5e5e5;
 
 //** Dropdown link text color.
-@dropdown-link-color:            @gray-dark;
+@dropdown-link-color:            @text-color; //united @gray-dark;
 //** Hover color for dropdown links.
 @dropdown-link-hover-color:      #fff;
 //** Hover background for dropdown links.
@@ -359,19 +347,19 @@
 // Basics of a navbar
 @navbar-height:                    50px;
 @navbar-margin-bottom:             @line-height-computed;
-@navbar-border-radius:             @border-radius-base;
+@navbar-border-radius:             0;
 @navbar-padding-horizontal:        floor((@grid-gutter-width / 2));
 @navbar-padding-vertical:          ((@navbar-height - @line-height-computed) / 2);
 @navbar-collapse-max-height:       340px;
 
 @navbar-default-color:             #fff;
 @navbar-default-bg:                @brand-primary;
-@navbar-default-border:            darken(@navbar-default-bg, 6.5%);
+@navbar-default-border:            transparent; // united darken(@navbar-default-bg, 6.5%);
 
 // Navbar links
 @navbar-default-link-color:                #fff;
 @navbar-default-link-hover-color:          #fff;
-@navbar-default-link-hover-bg:             darken(@navbar-default-bg, 15%);
+@navbar-default-link-hover-bg:             darken(@navbar-default-bg, 10%); // united darken(@navbar-default-bg, 15%);
 @navbar-default-link-active-color:         #fff;
 @navbar-default-link-active-bg:            darken(@navbar-default-bg, 10%);
 @navbar-default-link-disabled-color:       #ccc;
@@ -383,9 +371,9 @@
 @navbar-default-brand-hover-bg:            none;
 
 // Navbar toggle
-@navbar-default-toggle-hover-bg:           darken(@navbar-default-bg, 15%);
+@navbar-default-toggle-hover-bg:           darken(@navbar-default-bg, 10%); // united darken(@navbar-default-bg, 15%);
 @navbar-default-toggle-icon-bar-bg:        #fff;
-@navbar-default-toggle-border-color:       darken(@navbar-default-bg, 15%);
+@navbar-default-toggle-border-color:       darken(@navbar-default-bg, 10%); // united darken(@navbar-default-bg, 15%);
 
 
 //=== Inverted navbar
@@ -496,21 +484,21 @@
 //
 //## Define colors for form feedback states and, by default, alerts.
 
-@state-success-text:             #468847;
-@state-success-bg:               #dff0d8;
-@state-success-border:           darken(spin(@state-success-bg, -10), 5%);
+@state-success-text:             darken(spin(@brand-success, -10), 20%); // united #468847;
+@state-success-bg:               lighten(@brand-success, 25%); // united #dff0d8;
+@state-success-border:           @brand-success; // united darken(spin(@state-success-bg, -10), 5%);
 
-@state-info-text:                #3a87ad;
-@state-info-bg:                  #d9edf7;
-@state-info-border:              darken(spin(@state-info-bg, -10), 7%);
+@state-info-text:                darken(spin(@brand-info, -10), 20%); // united #3a87ad;
+@state-info-bg:                  lighten(@brand-info, 25%); // united #d9edf7;
+@state-info-border:              @brand-info; // united darken(spin(@state-info-bg, -10), 7%);
 
-@state-warning-text:             #c09853;
-@state-warning-bg:               #fcf8e3;
-@state-warning-border:           darken(spin(@state-warning-bg, -10), 3%);
+@state-warning-text:             darken(spin(@brand-warning, -10), 20%); // united #c09853;
+@state-warning-bg:               lighten(@brand-warning, 25%); // united #fcf8e3;
+@state-warning-border:           @brand-warning; // united darken(spin(@state-warning-bg, -10), 3%);
 
-@state-danger-text:              #b94a48;
-@state-danger-bg:                #f2dede;
-@state-danger-border:            darken(spin(@state-danger-bg, -10), 3%);
+@state-danger-text:              darken(spin(@brand-danger, -10), 20%); // united #b94a48;
+@state-danger-bg:                lighten(@brand-danger, 25%); // #f2dede;
+@state-danger-border:            @brand-danger; // united darken(spin(@state-danger-bg, -10), 3%);
 
 
 //== Tooltips

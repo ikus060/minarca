@@ -3,3 +3,31 @@
 
 // Overrides variables for Minarca branding.
 @import "variables.less";
+
+
+// Declare font
+@web-font-path: "//fonts.googleapis.com/css?family=Quicksand:400,700";
+
+.web-font(@path) {
+  @import url("@{path}");
+}
+.web-font(@web-font-path);
+
+// Override link colors in #browse, #restore
+#locations > .list-group,
+#files {
+  .btn-link {
+    color: @text-color;
+    &:hover,
+    &:focus {
+      color: @link-hover-color;
+    }
+  }
+  a {
+    color: @text-color;
+    &:hover,
+    &:focus {
+      color: @link-hover-color;
+    }
+  }
+}
