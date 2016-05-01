@@ -51,7 +51,7 @@ class MinarcaBrandTest(WebCase):
         """
         Check if header logo available.
         """
-        self.getPage("/minarca_22_w.png")
+        self.getPage("/static/header_logo")
         self.assertStatus('200 OK')
 
 
