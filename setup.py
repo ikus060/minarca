@@ -237,10 +237,13 @@ setup(
         'build_less': build_less,
     },
     templates=['sonar-project.properties.in'],
-    # install_requires=["rdiffweb>=0.9"],
+    install_requires=[
+        'rdiffweb>=0.9',
+    ],
     # required packages for build process
     setup_requires=[
         "babel>=0.9",
+        'rdiffweb>=0.9',
     ],
     # requirement for testing
     tests_require=[
