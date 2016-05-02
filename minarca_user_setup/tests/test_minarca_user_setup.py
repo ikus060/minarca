@@ -104,8 +104,8 @@ class TestMinarcaUserSetup(WebCase):
         """
         self.app.userdb.add_user('bob')
         self.assertTrue(self.app.userdb.exists('bob'))
-        self.assertEquals('bob@test.com', self.app.userdb.get_email('bob'))
-        self.assertEquals('/tmp/bob', self.app.userdb.get_user_root('bob'))
+        self.assertEquals('bob@test.com', self.app.userdb.get_user('bob').email)
+        self.assertEquals('/tmp/bob', self.app.userdb.get_user('bob').user_root)
 
     def test_get_ldap_userquota(self):
         """Check number of bytes return for v7."""

@@ -202,7 +202,7 @@ class MinarcaUserSetup(IUserChangeListener):
             if not home_dir:
                 home_dir = os.path.join(self._basedir, user)
             logger.debug('update user [%s] root directory [%s]', user, home_dir)
-            self.app.userdb.set_user_root(user, home_dir)
+            self.app.userdb.get_user(user).user_root = home_dir
         except:
             logger.warning('fail to update user root directory [%s]', user, exc_info=1)
 
@@ -211,7 +211,7 @@ class MinarcaUserSetup(IUserChangeListener):
             email = ldap_store.get_email(user)
             if email:
                 logger.debug('update user [%s] email [%s]', user, email)
-                self.app.userdb.set_email(user, email)
+                self.app.userdb.get_user(user).email = email
         except:
             logger.warning('fail to update user email [%s]', user, exc_info=1)
 

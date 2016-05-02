@@ -32,7 +32,7 @@ class MinarcaDiskSpaceTest(WebCase):
 
     def setUp(self):
         WebCase.setUp(self)
-        self.app.userdb.set_user_root('admin', '/tmp')
+        self.app.userdb.get_user('admin').user_root = '/tmp'
 
     def test_check_plugin_enabled(self):
         """
