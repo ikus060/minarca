@@ -484,19 +484,19 @@
 //
 //## Define colors for form feedback states and, by default, alerts.
 
-@state-success-text:             darken(spin(@brand-success, -10), 20%); // united #468847;
+@state-success-text:             @brand-success; // united #468847;
 @state-success-bg:               lighten(@brand-success, 25%); // united #dff0d8;
 @state-success-border:           @brand-success; // united darken(spin(@state-success-bg, -10), 5%);
 
-@state-info-text:                darken(spin(@brand-info, -10), 20%); // united #3a87ad;
+@state-info-text:                @brand-info; // united #3a87ad;
 @state-info-bg:                  lighten(@brand-info, 25%); // united #d9edf7;
 @state-info-border:              @brand-info; // united darken(spin(@state-info-bg, -10), 7%);
 
-@state-warning-text:             darken(spin(@brand-warning, -10), 20%); // united #c09853;
+@state-warning-text:             @brand-warning; // united #c09853;
 @state-warning-bg:               lighten(@brand-warning, 25%); // united #fcf8e3;
 @state-warning-border:           @brand-warning; // united darken(spin(@state-warning-bg, -10), 3%);
 
-@state-danger-text:              darken(spin(@brand-danger, -10), 20%); // united #b94a48;
+@state-danger-text:              @brand-danger; // united #b94a48;
 @state-danger-bg:                lighten(@brand-danger, 25%); // #f2dede;
 @state-danger-border:            @brand-danger; // united darken(spin(@state-danger-bg, -10), 3%);
 
@@ -613,19 +613,19 @@
 @alert-link-font-weight:      bold;
 
 @alert-success-bg:            @state-success-bg;
-@alert-success-text:          @state-success-text;
+@alert-success-text:          darken(spin(@brand-success, -10), 20%);
 @alert-success-border:        @state-success-border;
 
 @alert-info-bg:               @state-info-bg;
-@alert-info-text:             @state-info-text;
+@alert-info-text:             darken(spin(@brand-info, -10), 20%);
 @alert-info-border:           @state-info-border;
 
 @alert-warning-bg:            @state-warning-bg;
-@alert-warning-text:          @state-warning-text;
+@alert-warning-text:          darken(spin(@brand-warning, -10), 20%);
 @alert-warning-border:        @state-warning-border;
 
 @alert-danger-bg:             @state-danger-bg;
-@alert-danger-text:           @state-danger-text;
+@alert-danger-text:           darken(spin(@brand-danger, -10), 20%);
 @alert-danger-border:         @state-danger-border;
 
 
@@ -708,19 +708,19 @@
 @panel-primary-border:        @brand-primary;
 @panel-primary-heading-bg:    @brand-primary;
 
-@panel-success-text:          @state-success-text;
+@panel-success-text:          darken(spin(@brand-success, -10), 20%);
 @panel-success-border:        @state-success-border;
 @panel-success-heading-bg:    @state-success-bg;
 
-@panel-info-text:             @state-info-text;
+@panel-info-text:             darken(spin(@brand-info, -10), 20%);
 @panel-info-border:           @state-info-border;
 @panel-info-heading-bg:       @state-info-bg;
 
-@panel-warning-text:          @state-warning-text;
+@panel-warning-text:          darken(spin(@brand-warning, -10), 20%);
 @panel-warning-border:        @state-warning-border;
 @panel-warning-heading-bg:    @state-warning-bg;
 
-@panel-danger-text:           @state-danger-text;
+@panel-danger-text:           darken(spin(@brand-danger, -10), 20%);
 @panel-danger-border:         @state-danger-border;
 @panel-danger-heading-bg:     @state-danger-bg;
 
