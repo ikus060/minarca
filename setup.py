@@ -225,7 +225,6 @@ setup(
     include_package_data=True,
     data_files=[
         ('/etc/rdiffweb/plugins/minarca_brand', [
-            'minarca_brand/main.css',
             'minarca_brand/minarca.ico',
             'minarca_brand/minarca_22_w.png']),
     ],
