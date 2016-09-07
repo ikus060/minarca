@@ -26,6 +26,8 @@ class MinarcaDiskSpaceTest(WebCase):
 
     reset_app = True
 
+    reset_testcases = True
+
     @classmethod
     def setup_server(cls,):
         WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaDiskSpace'])
