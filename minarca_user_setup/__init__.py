@@ -167,6 +167,40 @@ class MinarcaUserSetup(IUserChangeListener):
         logger.debug(output)
         return True
 
+    def _update_email(self, user):
+        """
+        Called to update the user email from LDAP data.
+        """
+        # Get user email from LDAP
+        try:
+            ldap_store = self.get_ldap_store()
+            email = ldap_store.get_email(user)
+            if email:
+                logger.debug('update user [%s] email [%s]', user, email)
+                self.app.userdb.get_user(user).email = email
+        except:
+            logger.warning('fail to update user email [%s]', user, exc_info=1)
+
+    def _update_root(self, user):
+        """
+        Update the user root directory from LDAP data. Also create the directory
+        if it doesn't exists.
+        """
+        # Get user home directory from LDAP
+        try:
+            ldap_store = self.get_ldap_store()
+            home_dir = ldap_store.get_home_dir(user)
+            if not home_dir:
+                home_dir = os.path.join(self._basedir, user)
+            logger.debug('update user [%s] root directory [%s]', user, home_dir)
+            self.app.userdb.get_user(user).user_root = home_dir
+        except:
+            logger.warning('fail to update user root directory [%s]', user, exc_info=1)
+
+        # Setup Filesystem
+        if home_dir:
+            self._create_user_root(user, home_dir)
+
     def _update_userquota(self, user, default_quota=5):
         """
         Get quota from LDAP and update the ZFS quota if required.
@@ -193,31 +227,11 @@ class MinarcaUserSetup(IUserChangeListener):
         """
         assert isinstance(user, str)
 
-        # Check if LDAP is available.
-        ldap_store = self.get_ldap_store()
+        # Update user's email from LDAP
+        self._update_email(user)
 
-        # Get user home directory from LDAP
-        try:
-            home_dir = ldap_store.get_home_dir(user)
-            if not home_dir:
-                home_dir = os.path.join(self._basedir, user)
-            logger.debug('update user [%s] root directory [%s]', user, home_dir)
-            self.app.userdb.get_user(user).user_root = home_dir
-        except:
-            logger.warning('fail to update user root directory [%s]', user, exc_info=1)
-
-        # Get user email from LDAP
-        try:
-            email = ldap_store.get_email(user)
-            if email:
-                logger.debug('update user [%s] email [%s]', user, email)
-                self.app.userdb.get_user(user).email = email
-        except:
-            logger.warning('fail to update user email [%s]', user, exc_info=1)
-
-        # Setup Filesystem
-        if home_dir:
-            self._create_user_root(user, home_dir)
+        # Update user home directory from LDAP
+        self._update_root(user)
 
     def user_attr_changed(self, user, attrs={}):
         """
@@ -230,4 +244,6 @@ class MinarcaUserSetup(IUserChangeListener):
         Need to verify LDAP quota and update ZFS quota if required.
         """
         assert isinstance(user, str)
+        
+        # Update the user Quote from LDAP.
         self._update_userquota(user, default_quota=0)
