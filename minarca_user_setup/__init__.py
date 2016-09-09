@@ -177,7 +177,7 @@ class MinarcaUserSetup(IUserChangeListener):
             email = ldap_store.get_email(user)
             if email:
                 logger.debug('update user [%s] email [%s]', user, email)
-                self.app.userdb.get_user(user).email = email
+                self.app.userdb.get_user(user).set_attr('email', email, notify=False)
         except:
             logger.warning('fail to update user email [%s]', user, exc_info=1)
 
