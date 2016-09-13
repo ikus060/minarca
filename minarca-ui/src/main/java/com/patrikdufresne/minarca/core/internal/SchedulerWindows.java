@@ -434,7 +434,7 @@ public class SchedulerWindows extends Scheduler {
         if (args != null) {
             command.addAll(args);
         }
-        LOGGER.trace("executing {}", StringUtils.join(command, " "));
+        LOGGER.debug("executing {}", StringUtils.join(command, " "));
         try {
             Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
             StreamHandler sh = new StreamHandler(p);
