@@ -10,6 +10,7 @@ import static com.patrikdufresne.minarca.Localized._;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,9 +47,9 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.fontawesome.FontAwesome;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
+import com.patrikdufresne.minarca.core.LastResult;
+import com.patrikdufresne.minarca.core.Schedule;
 import com.patrikdufresne.minarca.core.internal.Compat;
-import com.patrikdufresne.minarca.core.internal.SchedulerTask;
-import com.patrikdufresne.minarca.core.internal.SchedulerTask.Schedule;
 
 /**
  * This is the main windows of the application used to configure the backup.
@@ -159,55 +160,65 @@ public class SettingsDialog extends Dialog {
      */
     private void checkBackupInfo() {
         // Get backup info.
-        SchedulerTask info = null;
+        final LastResult lastResult = API.instance().getLastResult();
+        final Date lastDate = API.instance().getLastResultDate();
+        Schedule temp = null;
         try {
-            info = API.instance().getSchedulerTask();
+            temp = API.instance().getSchedule();
         } catch (APIException e) {
-            LOGGER.warn("fail to get backup info", e);
+            // Do nothing.
         }
+        final Schedule schedule = temp;
+
         // Update UI
-        final SchedulerTask fInfo = info;
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 if (lastruntimeItem.isDisposed()) {
                     return;
                 }
+
                 // Update value with last date.
-                if (fInfo == null || fInfo.getLastRun() == null) {
-                    lastruntimeItem.setValue(_("Unknown"));
-                } else if (fInfo.isRunning()) {
-                    lastruntimeItem.setValue(_("Running..."));
-                } else if (fInfo != null && fInfo.getLastRun() != null) {
-                    String text = DateFormat.getDateTimeInstance().format(fInfo.getLastRun());
-                    lastruntimeItem.setValue(text);
+                if (lastDate == null || LastResult.RUNNING.equals(lastResult) || LastResult.HAS_NOT_RUN.equals(lastResult)) {
+                    lastruntimeItem.setValueHelpText(null);
+                } else {
+                    String text = DateFormat.getDateTimeInstance().format(lastDate);
+                    lastruntimeItem.setValueHelpText(text);
                 }
+
                 // Update label button according to task state.
-                if (fInfo == null) {
+                if (LastResult.UNKNOWN.equals(lastResult)) {
                     stopStartButton.setEnabled(false);
                 } else {
                     stopStartButton.setEnabled(true);
-                    stopStartButton.setText(fInfo.isRunning() ? _("Stop") : _("Start"));
+                    stopStartButton.setText(LastResult.RUNNING.equals(lastResult) ? _("Stop") : _("Start"));
                 }
+
                 // Update help text with Success or Failure
-                if (fInfo != null && fInfo.getLastResult() != null) {
-                    switch (fInfo.getLastResult()) {
-                    case SUCCESS:
-                        lastruntimeItem.setValueHelpText(_("Successful"));
-                        break;
-                    case FAILURE:
-                        lastruntimeItem.setValueHelpText(_("Failed"));
-                        break;
-                    default:
-                        lastruntimeItem.setValueHelpText(_("Unknown"));
-                        break;
-                    }
-                } else {
-                    lastruntimeItem.setValueHelpText(null);
+                switch (lastResult) {
+                case RUNNING:
+                    lastruntimeItem.setValue(_("Running..."));
+                    break;
+                case SUCCESS:
+                    lastruntimeItem.setValue(_("Successful"));
+                    break;
+                case FAILURE:
+                    lastruntimeItem.setValue(_("Failed"));
+                    break;
+                case HAS_NOT_RUN:
+                    lastruntimeItem.setValue(_("Never"));
+                    break;
+                case STALE:
+                    lastruntimeItem.setValue(_("Stale"));
+                    break;
+                default:
+                    lastruntimeItem.setValue(_("Unknown"));
+                    break;
                 }
+
                 // Update schedule
-                if (fInfo != null && fInfo.getSchedule() != null) {
-                    scheduleCombo.setSelection(new StructuredSelection(fInfo.getSchedule()));
+                if (schedule != null) {
+                    scheduleCombo.setSelection(new StructuredSelection(schedule));
                     scheduleCombo.getControl().setEnabled(true);
                 } else {
                     scheduleCombo.getControl().setEnabled(false);
@@ -234,7 +245,7 @@ public class SettingsDialog extends Dialog {
             // TODO: Complete this to provide the right status: can't connect, refused, etc.
             linked = false;
             text = _("Unknown");
-            
+
         }
         final String fText = text;
         final boolean fLinked = linked;
@@ -571,12 +582,7 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleStopStartBackup() {
         // Check if backup is running
-        boolean running;
-        try {
-            running = API.instance().getSchedulerTask().isRunning();
-        } catch (APIException e) {
-            running = false;
-        }
+        boolean running = API.instance().getLastResult().equals(LastResult.RUNNING);
 
         if (running) {
             DetailMessageDialog dlg = DetailMessageDialog
@@ -652,7 +658,7 @@ public class SettingsDialog extends Dialog {
         }
         // Check if the schedule type is different.
         try {
-            Schedule current = API.instance().getSchedulerTask().getSchedule();
+            Schedule current = API.instance().getSchedule();
             if (schedule.equals(current)) {
                 // Nothing to do.
                 return;
@@ -667,7 +673,7 @@ public class SettingsDialog extends Dialog {
         }
 
         try {
-            API.instance().scheduleTask(schedule);
+            API.instance().setSchedule(schedule);
         } catch (APIException e) {
             DetailMessageDialog.openError(
                     this.getShell(),

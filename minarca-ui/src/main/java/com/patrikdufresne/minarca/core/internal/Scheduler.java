@@ -8,7 +8,8 @@ package com.patrikdufresne.minarca.core.internal;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.patrikdufresne.minarca.core.APIException;
-import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
+import com.patrikdufresne.minarca.core.Schedule;
+import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 
 /**
  * Interface used to represent a scheduler.
@@ -48,7 +49,7 @@ public abstract class Scheduler {
      * @param taskname
      * @param command
      */
-    public abstract void create(SchedulerTask.Schedule schedule) throws APIException;
+    public abstract void create(Schedule schedule) throws APIException;
 
     /**
      * Delete the task
@@ -71,19 +72,19 @@ public abstract class Scheduler {
      * @param taskname
      * @return
      */
-    public abstract SchedulerTask info() throws APIException, TaskNotFoundException;
+    public abstract Schedule getSchedule() throws APIException, ScheduleNotFoundException;
 
     /**
      * Run the task.
      * 
      * @throws APIException
      */
-    public abstract void run() throws APIException, TaskNotFoundException;
+    public abstract void run() throws APIException, ScheduleNotFoundException;
 
     /**
      * Terminate the task. Has no effect if the task is not running.
      * 
      * @throws APIException
      */
-    public abstract void terminate() throws APIException, TaskNotFoundException;
+    public abstract void terminate() throws APIException, ScheduleNotFoundException;
 }

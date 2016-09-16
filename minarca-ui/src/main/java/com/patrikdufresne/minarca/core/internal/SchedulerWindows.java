@@ -9,15 +9,11 @@ import static com.patrikdufresne.minarca.Localized._;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
-import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
+import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
+import com.patrikdufresne.minarca.core.Schedule;
 
 /**
  * Wrapper around "schtasks" command line.
@@ -43,29 +40,7 @@ public class SchedulerWindows extends Scheduler {
      * @author Patrik Dufresne
      * 
      */
-    private static class TaskInfoWin implements SchedulerTask {
-
-        /**
-         * Task has not yet run.
-         */
-        private static final Integer LAST_RESULT_HAS_NOT_RUN = Integer.valueOf(267011);
-
-        /*
-         * Already running. Hex value: 0x8004131f Int value: -2147216609
-         */
-        private static final Integer LAST_RESULT_ALREADY_RUNNING = (int) Long.parseLong("8004131f", 16);
-
-        /**
-         * The task is ready to run at its next scheduled time. Hex value: 0x00041300 Int value: 267008
-         */
-        private static final Integer LAST_RESULT_TASK_READY = (int) Long.parseLong("00041300", 16);
-
-        /**
-         * Task running. Hex value: 0x00041301, integer value: 267009
-         */
-        private static final Integer LAST_RESULT_TASK_RUNNING = (int) Long.parseLong("00041301", 16);
-
-        private static final Integer LAST_RESULT_SUCCESS = Integer.valueOf(0);
+    private static class TaskInfoWin  {
 
         private static final Pattern PATTERN_SCHEDULE_TYPE_DAILY = Pattern.compile("(Tous les jours|Journalier|Daily)");
 
@@ -74,11 +49,6 @@ public class SchedulerWindows extends Scheduler {
         private static final Pattern PATTERN_SCHEDULE_TYPE_MONTHLY = Pattern.compile("(Tous les mois|Mensuel|Monthly)");
 
         private static final Pattern PATTERN_SCHEDULE_TYPE_WEEKLY = Pattern.compile("(Toutes les semaines|Weekly)");
-
-        /**
-         * Regex pattern used to check if the task is running.
-         */
-        private static final Pattern PATTERN_TASK_RUNNING = Pattern.compile("(En cours d'exécution|Running)");
 
         private static final String[] WINDOWS_7_INDEXES = new String[] {
                 "HOSTNAME",
@@ -118,54 +88,9 @@ public class SchedulerWindows extends Scheduler {
                 "SCHEDULE_TYPE",
                 "START_TIME" };
 
-        /**
-         * Heuristic to parse date string.
-         * 
-         * @param value
-         *            a date in string format.
-         * 
-         * @return a Date object or null
-         */
-        private static Date parseDate(String value) {
-            // Build list of DateFormat
-            List<DateFormat> dateformats = Arrays.asList(
-                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT),
-                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM),
-                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG),
-                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.FULL),
-                    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM),
-                    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG),
-                    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL),
-                    DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG),
-                    DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.FULL),
-                    DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL),
-                    DateFormat.getDateInstance());
-            // May need to reverse values.
-            List<String> values = new ArrayList<String>();
-            values.add(value);
-            String parts[] = value.split(", ");
-            if (parts.length == 2) {
-                values.add(parts[1] + " " + parts[0]);
-            }
-            for (String v : values) {
-                for (DateFormat df : dateformats) {
-                    try {
-                        return df.parse(v);
-                    } catch (ParseException e) {
-                        // Swallow
-                    }
-                }
-            }
-            LOGGER.debug("fail to parse date [{}]", value);
-            return null;
-        }
-
         private final List<String> data;
         private final List<String> INDEXES;
-        private final int LAST_RESULT;
-        private final int LAST_RUN_TIME;
         private final int SCHEDULE_TYPE;
-        private final int STATUS;
         private final int TASK_TO_RUN;
         private final int TASKNAME;
 
@@ -184,9 +109,6 @@ public class SchedulerWindows extends Scheduler {
             } else {
                 INDEXES = Arrays.asList(WINDOWS_XP_INDEXES);
             }
-            LAST_RESULT = INDEXES.indexOf("LAST_RESULT");
-            LAST_RUN_TIME = INDEXES.indexOf("LAST_RUN_TIME");
-            STATUS = INDEXES.indexOf("STATUS");
             TASK_TO_RUN = INDEXES.indexOf("TASK_TO_RUN");
             TASKNAME = INDEXES.indexOf("TASKNAME");
             SCHEDULE_TYPE = INDEXES.indexOf("SCHEDULE_TYPE");
@@ -206,49 +128,6 @@ public class SchedulerWindows extends Scheduler {
             return get(TASK_TO_RUN);
         }
 
-        /**
-         * Return the last known return code.
-         * 
-         * @return the return code.
-         */
-        @Override
-        public LastResult getLastResult() {
-            Integer lastresult;
-            try {
-                lastresult = Integer.parseInt(get(LAST_RESULT));
-            } catch (NumberFormatException e) {
-                return LastResult.UNKNOWN;
-            }
-            // Ref http://systemcenter.no/?p=1142
-            // https://msdn.microsoft.com/en-us/library/aa383604(VS.85).aspx
-            if (lastresult.equals(LAST_RESULT_SUCCESS) || lastresult.equals(LAST_RESULT_TASK_READY)) {
-                return LastResult.SUCCESS;
-            }
-            if (lastresult.equals(LAST_RESULT_HAS_NOT_RUN)) {
-                return LastResult.HAS_NOT_RUN;
-            }
-            // Other Windows return code are Unknown to Us.
-            if (lastresult.equals(LAST_RESULT_TASK_RUNNING) || lastresult.equals(LAST_RESULT_ALREADY_RUNNING)) {
-                return LastResult.UNKNOWN;
-            }
-            return LastResult.FAILURE;
-        }
-
-        /**
-         * Return the last run time.
-         * 
-         * @return the last run time date.
-         */
-        @Override
-        public Date getLastRun() {
-            if (LastResult.HAS_NOT_RUN.equals(getLastResult())) {
-                return null;
-            }
-            String value = get(LAST_RUN_TIME);
-            return parseDate(value);
-        }
-
-        @Override
         public Schedule getSchedule() {
             String value = get(SCHEDULE_TYPE);
             if (PATTERN_SCHEDULE_TYPE_HOURLY.matcher(value).find()) {
@@ -264,42 +143,12 @@ public class SchedulerWindows extends Scheduler {
         }
 
         /**
-         * Return the state of the task. If it's running or not. etc.
-         * 
-         * @return
-         */
-        String getStatus() {
-            return get(STATUS);
-        }
-
-        /**
          * Return the task name.
          * 
          * @return
          */
         String getTaskname() {
             return get(TASKNAME);
-        }
-
-        @Override
-        public Boolean isRunning() {
-            // Get the status and check if it run.
-            LOGGER.trace("task status [{}]", getStatus());
-            Matcher m = PATTERN_TASK_RUNNING.matcher(getStatus());
-            if (m.find()) {
-                return true;
-            }
-            // Check last return code
-            Integer lastresult;
-            try {
-                lastresult = Integer.parseInt(get(LAST_RESULT));
-            } catch (NumberFormatException e) {
-                return false;
-            }
-            if (lastresult.equals(LAST_RESULT_ALREADY_RUNNING) || lastresult.equals(LAST_RESULT_TASK_RUNNING)) {
-                return true;
-            }
-            return false;
         }
 
         @Override
@@ -356,7 +205,7 @@ public class SchedulerWindows extends Scheduler {
      * @see http ://www.windowsnetworking.com/kbase/WindowsTips/WindowsXP/AdminTips
      *      /Utilities/XPschtaskscommandlineutilityreplacesAT.exe.html
      */
-    public synchronized void create(SchedulerTask.Schedule schedule) throws APIException {
+    public synchronized void create(Schedule schedule) throws APIException {
         LOGGER.debug("creating schedule task [{}]", TASK_NAME);
 
         // Delete the tasks (if exists). The /F option doesn't exists in WinXP.
@@ -472,7 +321,7 @@ public class SchedulerWindows extends Scheduler {
     @Override
     public synchronized boolean exists() {
         try {
-            SchedulerTask task = query(TASK_NAME);
+            TaskInfoWin task = query(TASK_NAME);
             if (task == null) {
                 return false;
             }
@@ -532,13 +381,13 @@ public class SchedulerWindows extends Scheduler {
      * Get information about the task.
      */
     @Override
-    public synchronized SchedulerTask info() throws TaskNotFoundException, APIException {
+    public synchronized Schedule getSchedule() throws ScheduleNotFoundException, APIException {
         // Get reference to our task
-        SchedulerTask task = query(TASK_NAME);
+        TaskInfoWin task = query(TASK_NAME);
         if (task == null) {
-            throw new TaskNotFoundException();
+            throw new ScheduleNotFoundException();
         }
-        return task;
+        return task.getSchedule();
     }
 
     /**
@@ -610,7 +459,7 @@ public class SchedulerWindows extends Scheduler {
      * @param taskname
      * @throws APIException
      */
-    private SchedulerTask query(String taskname) throws APIException {
+    private TaskInfoWin query(String taskname) throws APIException {
         Validate.notNull(taskname);
         return internalQueryCsv(taskname);
     }

@@ -20,6 +20,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -34,14 +35,12 @@ import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseExce
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
-import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
+import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
-import com.patrikdufresne.minarca.core.internal.SchedulerTask;
-import com.patrikdufresne.minarca.core.internal.SchedulerTask.Schedule;
 import com.patrikdufresne.rdiffweb.core.Client;
 import com.patrikdufresne.rdiffweb.core.RdiffwebException;
 
@@ -69,6 +68,11 @@ public class API {
     private static final String FILENAME_GLOB_PATTERNS = "patterns";
 
     /**
+     * Filename used for configuration file. Notice, this is also read by batch file.
+     */
+    private static final String FILENAME_STATUS = "status.properties";
+
+    /**
      * Singleton instance of API
      */
     private static API instance;
@@ -86,6 +90,16 @@ public class API {
     /**
      * Property name.
      */
+    private static final String PROPERTY_LAST_DATE = "lastdate";
+
+    /**
+     * Property name.
+     */
+    private static final String PROPERTY_LAST_RESULT = "lastresult";
+
+    /**
+     * Property name.
+     */
     private static final String PROPERTY_REMOTEHOST = "remotehost";
 
     /**
@@ -97,6 +111,11 @@ public class API {
      * The remote host.
      */
     private static final String REMOTEHOST_DEFAULT = System.getProperty("minarca.remotehost", "minarca.net");
+
+    /**
+     * Delay 5 sec.
+     */
+    private static final int RUNNING_DELAY = 5000;
 
     /**
      * Used to check if the current running environment is valid. Check supported OS, check permissions, etc. May also
@@ -148,6 +167,11 @@ public class API {
     private Properties properties;
 
     /**
+     * Reference to status file.
+     */
+    private File statusFile;
+
+    /**
      * Default constructor.
      */
     private API() {
@@ -157,17 +181,10 @@ public class API {
 
         this.confFile = new File(Compat.CONFIG_PATH, FILENAME_CONF); // $NON-NLS-1$
         this.globPatternsFile = new File(Compat.CONFIG_PATH, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
+        this.statusFile = new File(Compat.CONFIG_PATH, FILENAME_STATUS); // $NON-NLS-1$
 
         // Load the configuration
-        this.properties = new Properties();
-        try {
-            LoggerFactory.getLogger(API.class).debug("reading config from [{}]", confFile);
-            FileInputStream in = new FileInputStream(confFile);
-            this.properties.load(in);
-            in.close();
-        } catch (IOException e) {
-            LoggerFactory.getLogger(API.class).warn("can't load properties {}", confFile);
-        }
+        this.properties = load(this.confFile);
     }
 
     /**
@@ -176,6 +193,26 @@ public class API {
      * @throws APIException
      */
     public void backup() throws APIException {
+
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        try {
+                            setLastStatus(LastResult.RUNNING);
+                        } catch (APIException e) {
+                            // Nothing to do.
+                        }
+                        sleep(RUNNING_DELAY);
+                    }
+                } catch (InterruptedException e) {
+                    // Nothing to do.
+                }
+            }
+        };
+        t.setDaemon(true);
+        t.start();
 
         // Get the config value.
         String username = this.getUsername();
@@ -194,14 +231,28 @@ public class API {
         // Check the remote server.
         rdiffbackup.testServer();
 
-        // Run backup.
+        // Read patterns
         List<GlobPattern> patterns;
         try {
             patterns = GlobPattern.readPatterns(globPatternsFile);
         } catch (IOException e) {
+            t.interrupt();
+            LOGGER.info("fail to read patterns");
+            setLastStatus(LastResult.FAILURE);
             throw new APIException(_("fail to read selective backup settings"), e);
         }
-        rdiffbackup.backup(patterns);
+        // Run backup.
+        try {
+            rdiffbackup.backup(patterns);
+            t.interrupt();
+            setLastStatus(LastResult.SUCCESS);
+            LOGGER.info("backup SUCCESS");
+        } catch (Exception e) {
+            t.interrupt();
+            setLastStatus(LastResult.FAILURE);
+            LOGGER.info("backup FAILED", e);
+            throw new APIException(_("Backup failed"), e);
+        }
 
     }
 
@@ -280,7 +331,7 @@ public class API {
         // Delete & create schedule tasks.
         Scheduler scheduler = Scheduler.getInstance();
         if (force || !scheduler.exists()) {
-            scheduler.create(SchedulerTask.Schedule.DAILY);
+            scheduler.create(Schedule.DAILY);
         }
     }
 
@@ -300,6 +351,21 @@ public class API {
      */
     public String getComputerName() {
         return this.properties.getProperty(PROPERTY_COMPUTERNAME);
+    }
+
+    /**
+     * Return the include patterns used for the backup.
+     * 
+     * @return the list of pattern.
+     */
+    public List<GlobPattern> getGlobPatterns() {
+        try {
+            LOGGER.debug("reading glob patterns from [{}]", globPatternsFile);
+            return GlobPattern.readPatterns(globPatternsFile);
+        } catch (IOException e) {
+            LOGGER.warn("error reading glob patterns", e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -336,17 +402,43 @@ public class API {
     }
 
     /**
-     * Return the include patterns used for the backup.
+     * Retrieve the last result.
      * 
-     * @return the list of pattern.
+     * @return the last result.
      */
-    public List<GlobPattern> getGlobPatterns() {
+    public LastResult getLastResult() {
+        Properties status = load(this.statusFile);
         try {
-            LOGGER.debug("reading glob patterns from [{}]", globPatternsFile);
-            return GlobPattern.readPatterns(globPatternsFile);
-        } catch (IOException e) {
-            LOGGER.warn("error reading glob patterns", e);
-            return Collections.emptyList();
+            String value = status.getProperty(PROPERTY_LAST_RESULT);
+            if (value == null) {
+                return LastResult.HAS_NOT_RUN;
+            }
+            LastResult result = LastResult.valueOf(value);
+            if (LastResult.RUNNING.equals(result)) {
+                Date now = new Date();
+                Date date = getLastResultDate();
+                if (date.getTime() < now.getTime() - (RUNNING_DELAY * 2)) {
+                    return LastResult.STALE;
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            return LastResult.UNKNOWN;
+        }
+    }
+
+    /**
+     * Return the last backup date. (success or failure)
+     * 
+     * @return
+     */
+    public Date getLastResultDate() {
+        Properties status = load(this.statusFile);
+        try {
+            String value = status.getProperty(PROPERTY_LAST_DATE);
+            return new Date(Long.valueOf(value).longValue());
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -366,11 +458,12 @@ public class API {
      * Check if a backup task is running.
      * 
      * @return True if a backup task is running.
+     * @throws ScheduleNotFoundException
      * 
      * @throws APIException
      */
-    public SchedulerTask getSchedulerTask() throws APIException {
-        return Scheduler.getInstance().info();
+    public Schedule getSchedule() throws ScheduleNotFoundException, APIException {
+        return Scheduler.getInstance().getSchedule();
     }
 
     /**
@@ -462,7 +555,7 @@ public class API {
         setRemotehost(getRemotehost());
 
         // Create default schedule
-        scheduleTask(Schedule.DAILY);
+        setSchedule(Schedule.DAILY);
 
         // If the backup doesn't exists on the remote server, start an empty initial backup.
         if (!exists) {
@@ -506,6 +599,22 @@ public class API {
     }
 
     /**
+     * Load properties.
+     */
+    private Properties load(File file) {
+        Properties properties = new Properties();
+        try {
+            LoggerFactory.getLogger(API.class).debug("reading properties from [{}]", file);
+            FileInputStream in = new FileInputStream(file);
+            properties.load(in);
+            in.close();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(API.class).warn("can't load properties {}", file);
+        }
+        return properties;
+    }
+
+    /**
      * Used to asynchronously start the backup process. This operation usually used the system scheduler to run the
      * backup task in background.
      * 
@@ -520,23 +629,13 @@ public class API {
      * 
      * @throws IOException
      */
-    private void save() throws IOException {
-        LOGGER.debug("writing config to [{}]", confFile);
-        Writer writer = Compat.openFileWriter(confFile, Compat.CHARSET_DEFAULT);
-        this.properties.store(writer, "Copyright (C) 2015 Patrik Dufresne Service Logiciel inc.\r\n"
+    private void save(File file, Properties properties) throws IOException {
+        LOGGER.debug("writing config to [{}]", file);
+        Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
+        properties.store(writer, "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
                 + "Minarca backup configuration.\r\n"
                 + "Please do not change this configuration file manually.");
         writer.close();
-    }
-
-    /**
-     * Reschedule task.
-     * 
-     * @param schedule
-     *            the new schedule.
-     */
-    public void scheduleTask(Schedule schedule) throws APIException {
-        Scheduler.getInstance().create(schedule);
     }
 
     /**
@@ -552,7 +651,7 @@ public class API {
             this.properties.setProperty(PROPERTY_COMPUTERNAME, value);
         }
         try {
-            save();
+            save(this.confFile, this.properties);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
@@ -574,6 +673,27 @@ public class API {
     }
 
     /**
+     * Set the last status.
+     * 
+     * @param state
+     *            the right state.
+     * @param date
+     *            the date
+     * @throws APIException
+     */
+    private void setLastStatus(LastResult state) throws APIException {
+        Validate.notNull(state);
+        Properties status = new Properties();
+        status.setProperty(PROPERTY_LAST_RESULT, state.toString());
+        status.setProperty(PROPERTY_LAST_DATE, Long.toString(new Date().getTime()));
+        try {
+            save(this.statusFile, status);
+        } catch (IOException e) {
+            throw new APIException(_("fail to save config"), e);
+        }
+    }
+
+    /**
      * Sets remote host.
      * 
      * @param value
@@ -586,10 +706,20 @@ public class API {
             this.properties.setProperty(PROPERTY_REMOTEHOST, value);
         }
         try {
-            save();
+            save(this.confFile, this.properties);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
+    }
+
+    /**
+     * Reschedule task.
+     * 
+     * @param schedule
+     *            the new schedule.
+     */
+    public void setSchedule(Schedule schedule) throws APIException {
+        Scheduler.getInstance().create(schedule);
     }
 
     /**
@@ -605,7 +735,7 @@ public class API {
             this.properties.setProperty(PROPERTY_USERNAME, value);
         }
         try {
-            save();
+            save(this.confFile, this.properties);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
@@ -615,9 +745,9 @@ public class API {
      * Used to stop a running backup task.
      * 
      * @throws APIException
-     * @throws TaskNotFoundException
+     * @throws ScheduleNotFoundException
      */
-    public void stopBackup() throws TaskNotFoundException, APIException {
+    public void stopBackup() throws ScheduleNotFoundException, APIException {
         Scheduler.getInstance().terminate();
     }
 

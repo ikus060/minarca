@@ -22,7 +22,7 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
-import com.patrikdufresne.minarca.core.APIException.TaskNotFoundException;
+import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 import com.patrikdufresne.minarca.ui.DetailMessageDialog;
 import com.patrikdufresne.minarca.ui.Images;
 import com.patrikdufresne.minarca.ui.SettingsDialog;
@@ -176,9 +176,7 @@ public class Main {
         // Run the backup.
         try {
             API.instance().backup();
-            LOGGER.info("backup SUCCESS");
         } catch (Exception e) {
-            LOGGER.info("backup FAILED", e);
             System.exit(3);
         }
 
@@ -194,7 +192,7 @@ public class Main {
         try {
             LOGGER.debug("checking minarca configuration");
             API.instance().checkConfig();
-            API.instance().getSchedulerTask();
+            API.instance().getSchedule();
             LOGGER.debug("configuration is OK");
         } catch (NotConfiguredException e) {
             // If not configured, show wizard.
@@ -203,7 +201,7 @@ public class Main {
                 // If user cancel, lose application.
                 return false;
             }
-        } catch (TaskNotFoundException e) {
+        } catch (ScheduleNotFoundException e) {
             reconfigure();
             return true;
         } catch (MissConfiguredException e) {

@@ -99,9 +99,9 @@ public class APIException extends Exception {
      * @author Patrik Dufresne
      * 
      */
-    public static class TaskNotFoundException extends APIException {
+    public static class ScheduleNotFoundException extends APIException {
 
-        public TaskNotFoundException() {
+        public ScheduleNotFoundException() {
             super(_("scheduled task not found"));
         }
 

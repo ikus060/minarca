@@ -16,8 +16,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.patrikdufresne.minarca.core.internal.SchedulerTask.LastResult;
-import com.patrikdufresne.minarca.core.internal.SchedulerTask.Schedule;
+import com.patrikdufresne.minarca.core.LastResult;
+import com.patrikdufresne.minarca.core.Schedule;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SchedulerWindows.class, SystemUtils.class })
@@ -38,12 +38,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertTrue(info.isRunning());
-        assertEquals(LastResult.FAILURE, info.getLastResult());
-        assertEquals(Schedule.HOURLY, info.getSchedule());
-        assertEquals(new Date(1433286360000l), info.getLastRun());
+        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -61,12 +56,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.FAILURE, info.getLastResult());
-        assertEquals(Schedule.HOURLY, info.getSchedule());
-        assertEquals(new Date(1420595256000l), info.getLastRun());
+        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -85,11 +75,7 @@ public class SchedulerWindowsTest {
 
         assertTrue(s.exists());
 
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.SUCCESS, info.getLastResult());
-        assertEquals(Schedule.HOURLY, info.getSchedule());
-        assertEquals(new Date(1441916280000l), info.getLastRun());
+        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -107,12 +93,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.SUCCESS, info.getLastResult());
-        assertEquals(Schedule.WEEKLY, info.getSchedule());
-        assertEquals(new Date(1442603940000l), info.getLastRun());
+        assertEquals(Schedule.WEEKLY, s.getSchedule());
     }
 
     @Test
@@ -130,12 +111,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.SUCCESS, info.getLastResult());
-        assertEquals(Schedule.MONTHLY, info.getSchedule());
-        assertEquals(new Date(1442603940000l), info.getLastRun());
+        assertEquals(Schedule.MONTHLY, s.getSchedule());
     }
 
     @Test
@@ -153,12 +129,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.SUCCESS, info.getLastResult());
-        assertEquals(Schedule.DAILY, info.getSchedule());
-        assertEquals(new Date(1442603940000l), info.getLastRun());
+        assertEquals(Schedule.DAILY, s.getSchedule());
     }
 
     @Test
@@ -176,12 +147,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertTrue(info.isRunning());
-        assertEquals(LastResult.UNKNOWN, info.getLastResult());
-        assertEquals(Schedule.DAILY, info.getSchedule());
-        assertEquals(new Date(1447947060000l), info.getLastRun());
+        assertEquals(Schedule.DAILY, s.getSchedule());
     }
 
     @Test
@@ -198,12 +164,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.HAS_NOT_RUN, info.getLastResult());
-        assertEquals(Schedule.HOURLY, info.getSchedule());
-        assertEquals(null, info.getLastRun());
+        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -220,12 +181,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.SUCCESS, info.getLastResult());
-        assertEquals(Schedule.DAILY, info.getSchedule());
-        assertEquals(new Date(1442592300000l), info.getLastRun());
+        assertEquals(Schedule.DAILY, s.getSchedule());
     }
 
     @Test
@@ -242,12 +198,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.SUCCESS, info.getLastResult());
-        assertEquals(Schedule.WEEKLY, info.getSchedule());
-        assertEquals(new Date(1442592300000l), info.getLastRun());
+        assertEquals(Schedule.WEEKLY, s.getSchedule());
     }
 
     @Test
@@ -264,12 +215,7 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-
-        SchedulerTask info = s.info();
-        assertFalse(info.isRunning());
-        assertEquals(LastResult.SUCCESS, info.getLastResult());
-        assertEquals(Schedule.MONTHLY, info.getSchedule());
-        assertEquals(new Date(1442592300000l), info.getLastRun());
+        assertEquals(Schedule.MONTHLY, s.getSchedule());
     }
 
 }
