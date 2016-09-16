@@ -544,6 +544,7 @@ public class CListItem extends Composite {
         } else {
             if (leftTitleHelpLabel != null) {
                 leftTitleHelpLabel.dispose();
+                leftTitleHelpLabel = null;
             }
         }
 
@@ -586,6 +587,7 @@ public class CListItem extends Composite {
         } else {
             if (rightValueText != null) {
                 rightValueText.dispose();
+                rightValueText = null;
             }
         }
     }
@@ -612,6 +614,7 @@ public class CListItem extends Composite {
         } else {
             if (rightValueHelpText != null) {
                 rightValueHelpText.dispose();
+                rightValueHelpText = null;
             }
         }
     }
