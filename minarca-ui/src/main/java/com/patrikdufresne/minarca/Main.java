@@ -210,6 +210,12 @@ public class Main {
             reconfigure();
             return true;
         } catch (APIException e) {
+            DetailMessageDialog.openWarning(
+                    null,
+                    Display.getAppName(),
+                    _("Fail to start Minarca."),
+                    _("If the problem persist, you may try to reinstall Minarca."),
+                    e);
             return false;
         }
         return true;
