@@ -234,6 +234,7 @@ public class SettingsDialog extends Dialog {
             // TODO: Complete this to provide the right status: can't connect, refused, etc.
             linked = false;
             text = _("Unknown");
+            
         }
         final String fText = text;
         final boolean fLinked = linked;
@@ -511,10 +512,10 @@ public class SettingsDialog extends Dialog {
      * @return
      */
     protected Color getWarnBackground() {
-        if (!JFaceResources.getColorRegistry().hasValueFor(WARN_BACKGROUNG)) {
+        if (JFaceResources.getColorRegistry().hasValueFor(WARN_BACKGROUNG)) {
             return JFaceResources.getColorRegistry().get(WARN_BACKGROUNG);
         }
-        RGB rgb = FormColors.blend(new RGB(255, 0, 0), Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION).getRGB(), 15);
+        RGB rgb = FormColors.blend(new RGB(255, 102, 0), Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(), 15);
         JFaceResources.getColorRegistry().put(WARN_BACKGROUNG, rgb);
         return JFaceResources.getColorRegistry().get(WARN_BACKGROUNG);
     }
