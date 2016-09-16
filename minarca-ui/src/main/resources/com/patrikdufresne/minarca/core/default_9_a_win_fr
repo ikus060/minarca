@@ -1,0 +1,3 @@
+# Exclude Win XP French
+-${home}/Voisinage d'impression/
+-${home}/Voisinage réseau/

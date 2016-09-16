@@ -1,31 +1,15 @@
 package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
-import static com.patrikdufresne.minarca.core.GlobPattern.getDesktopPatterns;
-import static com.patrikdufresne.minarca.core.GlobPattern.getDocumentsPatterns;
-import static com.patrikdufresne.minarca.core.GlobPattern.getDownloadsPatterns;
-import static com.patrikdufresne.minarca.core.GlobPattern.getMusicPatterns;
-import static com.patrikdufresne.minarca.core.GlobPattern.getOsPatterns;
-import static com.patrikdufresne.minarca.core.GlobPattern.getPicturesPatterns;
-import static com.patrikdufresne.minarca.core.GlobPattern.getVideosPatterns;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -47,14 +31,12 @@ import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.switchbutton.SwitchButton;
 
 /**
- * Selective backup dialog used to manage the include and exclude rules.
+ * Selective backup dialog used to manage the pattern rules.
  * 
  * @author Patrik Dufresne
  * 
  */
 public class SelectiveDialog extends Dialog {
-
-    private static final String COMMA = ", ";
 
     private static final int PATH_MAX_LENGTH = 50;
 
@@ -63,27 +45,14 @@ public class SelectiveDialog extends Dialog {
      */
     private static final int WINDOW_HEIGHT_PADDING = 55;
 
-    /**
-     * Return collection of predefined patterns.
-     * 
-     * @return
-     */
-    private static List<List<GlobPattern>> getPredefined() {
-        return Arrays.asList(
-                getDesktopPatterns(),
-                getDocumentsPatterns(),
-                getDownloadsPatterns(),
-                getMusicPatterns(),
-                getPicturesPatterns(),
-                getVideosPatterns(),
-                getOsPatterns());
-    }
-
     private CList customList;
 
-    private Set<GlobPattern> excludes = new LinkedHashSet<GlobPattern>();
+    private List<GlobPattern> patterns = new ArrayList<GlobPattern>();
 
-    private Set<GlobPattern> includes = new LinkedHashSet<GlobPattern>();
+    /**
+     * True to show all advance patterns.
+     */
+    private boolean showAdvance = false;
 
     protected SelectiveDialog(Shell parentShell) {
         super(parentShell);
@@ -112,20 +81,6 @@ public class SelectiveDialog extends Dialog {
         composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         composite.setFont(parent.getFont());
 
-        // Create advance button.
-        Button advanceButton = new Button(composite, SWT.PUSH);
-        advanceButton.setText(_("Advance..."));
-        ((GridLayout) composite.getLayout()).numColumns++;
-        setButtonLayoutData(advanceButton);
-        // advanceButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-        advanceButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                handleAdvancePatterns();
-            }
-        });
-        ((GridData) advanceButton.getLayoutData()).horizontalIndent = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
-
         // Continue with default creation of button.
         Control buttonSection = super.createButtonBar(composite);
         ((GridData) buttonSection.getLayoutData()).grabExcessHorizontalSpace = true;
@@ -144,28 +99,6 @@ public class SelectiveDialog extends Dialog {
         Point labelSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         ((GridData) label.getLayoutData()).widthHint = (int) (labelSize.x * 0.85f);
 
-        // Predefine label
-        Label predefineLabel = new Label(comp, SWT.NONE);
-        predefineLabel.setFont(AppFormToolkit.getFontBold(JFaceResources.DEFAULT_FONT));
-        predefineLabel.setText(_("Predefined"));
-
-        CList predefineList = new CList(comp, SWT.BORDER);
-        predefineList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-        // Create predefine include exclude
-        createItem(predefineList, _("Desktop"), getDesktopPatterns(), true);
-        createItem(predefineList, _("Documents"), getDocumentsPatterns(), true);
-        createItem(predefineList, _("Pictures"), getPicturesPatterns(), true);
-        createItem(predefineList, _("Music"), getMusicPatterns(), true);
-        createItem(predefineList, _("Videos"), getVideosPatterns(), true);
-        createItem(predefineList, _("Downloads"), getDownloadsPatterns(), true);
-        createItem(predefineList, _("System files"), getOsPatterns(), true);
-
-        // Custom Label
-        Label customLabel = new Label(comp, SWT.NONE);
-        customLabel.setFont(AppFormToolkit.getFontBold(JFaceResources.DEFAULT_FONT));
-        customLabel.setText(_("Custom"));
-
         // Create a scrolled composite for the list.
         ScrolledComposite scrollable = new ScrolledComposite(comp, SWT.BORDER | SWT.V_SCROLL);
         scrollable.setExpandHorizontal(true);
@@ -181,7 +114,7 @@ public class SelectiveDialog extends Dialog {
         scrollable.setContent(customList);
 
         Composite buttons = new Composite(comp, SWT.NONE);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(buttons);
+        GridLayoutFactory.fillDefaults().numColumns(3).applyTo(buttons);
 
         // Add folder button
         Button addFolderButton = new Button(buttons, SWT.PUSH);
@@ -202,6 +135,15 @@ public class SelectiveDialog extends Dialog {
             }
         });
 
+        final Button showAdvanceButton = new Button(buttons, SWT.CHECK);
+        showAdvanceButton.setText(_("Show advance patterns"));
+        showAdvanceButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleShowAdvancePatterns(showAdvanceButton.getSelection());
+            }
+        });
+
         return comp;
 
     }
@@ -213,111 +155,55 @@ public class SelectiveDialog extends Dialog {
      *            the parent
      * @param label
      *            the label (translated)
-     * @param patterns
-     *            the list of glob pattern
-     * @param predefined
-     *            True if creating a predefined item.
+     * @param pattern
+     *            the globing pattern
      */
-    private void createItem(CList parent, String label, final List<GlobPattern> patterns, final boolean predefined) {
+    private void createItem(CList parent, final GlobPattern pattern) {
         // Create separator (if required)
         if (parent.getChildren().length > 0) {
             new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
         }
+        // Define label
+        String label;
+        if (pattern.isGlobbing()) {
+            label = _("Custom pattern");
+        } else {
+            label = FilenameUtils.getBaseName(pattern.value());
+            if (!pattern.isFileExists()) {
+                label += " " + _("(not exists)");
+            }
+        }
         // Create an item.
         CListItem item = new CListItem(parent, label);
         SwitchButton button = item.createSwitchButton();
+        button.setToolTipText(_("Include / Exclude"));
+        button.setSelection(pattern.isInclude());
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handlePredefine(e, patterns);
+                handleToggleSwitch(e, pattern);
             }
         });
 
-        // Check if the patterns matches something.
-        List<GlobPattern> matches = new ArrayList<GlobPattern>();
-        for (GlobPattern p : patterns) {
-            // Don't expend globing (it's too expensive)
-            if (p.isGlobbing() || new File(p.value()).exists()) {
-                matches.add(p);
-            }
-        }
-
         // Update the item labels
-        String helptext;
-        if (matches.size() > 0) {
-            helptext = StringUtils.join(matches, COMMA);
-        } else if (!predefined) {
-            helptext = StringUtils.join(patterns, COMMA);
-        } else {
-            helptext = _("No file or folder matching predefined patterns");
-        }
+        String helptext = pattern.toString();
+        item.setToolTipText(helptext);
         if (helptext.length() > PATH_MAX_LENGTH) {
             item.setTitleHelpText(helptext.substring(0, PATH_MAX_LENGTH) + Dialog.ELLIPSIS);
-            item.setToolTipText(StringUtils.join(matches, "\n"));
         } else {
             item.setTitleHelpText(helptext.toString());
-            item.setToolTipText(helptext);
         }
-
-        // If the glob pattern doesn't match any thing, disable it.
-        item.setEnabled(matches.size() > 0 || !predefined);
-
-        // Check if pattern is selected.
-        boolean selected = includes.containsAll(patterns) && Collections.disjoint(excludes, patterns);
-        button.setSelection(selected);
 
         // Create Delete button if required.
-        if (!predefined) {
-
-            Button deleteButton = item.createButtonDelete();
-            deleteButton.setToolTipText(_("Delete"));
-            deleteButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    handleDelete(e, patterns);
-                }
-            });
-        }
-
-    }
-
-    /**
-     * Return filtered list of custom exclude patterns.
-     * 
-     * @return
-     */
-    private Collection<GlobPattern> getCustomExcludes() {
-        Set<GlobPattern> patterns = new HashSet<GlobPattern>(excludes);
-        for (Collection<GlobPattern> p : getPredefined()) {
-            if (excludes.containsAll(p)) {
-                patterns.removeAll(p);
+        Button deleteButton = item.createButtonDelete();
+        deleteButton.setToolTipText(_("Delete"));
+        deleteButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleDelete(pattern);
             }
-        }
-        return patterns;
-    }
+        });
 
-    /**
-     * Return filtered list of custom include patterns.
-     * 
-     * @return
-     */
-    private Collection<GlobPattern> getCustomIncludes() {
-        Set<GlobPattern> patterns = new HashSet<GlobPattern>(includes);
-        for (Collection<GlobPattern> p : getPredefined()) {
-            if (includes.containsAll(p)) {
-                patterns.removeAll(p);
-            }
-        }
-        return patterns;
-    }
-
-    /**
-     * Return the exclude pattern selected by the user.
-     * 
-     * @return
-     */
-    public List<GlobPattern> getExcludes() {
-        return new ArrayList<GlobPattern>(this.excludes);
     }
 
     /**
@@ -325,8 +211,8 @@ public class SelectiveDialog extends Dialog {
      * 
      * @return
      */
-    public List<GlobPattern> getIncludes() {
-        return new ArrayList<GlobPattern>(this.includes);
+    public List<GlobPattern> getPatterns() {
+        return new ArrayList<GlobPattern>(this.patterns);
     }
 
     /**
@@ -345,9 +231,7 @@ public class SelectiveDialog extends Dialog {
         String folder = dlg.getFilterPath();
         String[] files = dlg.getFileNames();
         for (String file : files) {
-            if (new File(folder, file).exists()) {
-                includes.add(new GlobPattern(new File(folder, file)));
-            }
+            handleAddFolderOrFile(new File(folder, file));
         }
         // Update the view.
         refreshCustomList(true);
@@ -371,84 +255,56 @@ public class SelectiveDialog extends Dialog {
         }
         // Get the selection from the dialog
         String file = dlg.getFilterPath();
-
-        // Check if file exists
-        if (!new File(file).exists()) {
-            DetailMessageDialog.openInformation(
-                    getShell(),
-                    getShell().getText(),
-                    _("Selected folder doesn't exists!"),
-                    _("The folder `{0}` cannot be include because it doesn't exists.", file));
-            return;
-        }
-
-        // Check if modification required.
-        GlobPattern p = new GlobPattern(file);
-        if (includes.contains(p)) {
-            DetailMessageDialog.openInformation(
-                    getShell(),
-                    getShell().getText(),
-                    _("Selected folder is already include!"),
-                    _("The folder `{0}` is already include in you selective backup.", file));
-            return;
-        }
-        // Check if predefined.
-        includes.add(p);
-        excludes.remove(p);
+        handleAddFolderOrFile(new File(file));
 
         // Update the view.
         refreshCustomList(true);
     }
 
     /**
-     * Called when user want to select advance filter.
+     * Called to add a new file or folder to the pattern list.
+     * 
+     * @param file
      */
-    protected void handleAdvancePatterns() {
-        // Open a dialog to edit filters.
-        IncludesDialog dlg = new IncludesDialog(this.getShell());
-        dlg.setIncludes(includes);
-        dlg.setExcludes(excludes);
-        dlg.setPredefinedIncludes(getPredefinedIncludes());
-        dlg.setPredefinedExcludes(getPredefinedExcludes());
-        if (dlg.open() != Window.OK) {
+    protected void handleAddFolderOrFile(File file) {
+        // Check if file exists
+        GlobPattern p = new GlobPattern(true, file);
+        if (!p.isFileExists()) {
+            DetailMessageDialog.openInformation(
+                    getShell(),
+                    getShell().getText(),
+                    _("Selected item doesn't exists!"),
+                    _("The path `{0}` cannot be include because it doesn't exists.", file));
             return;
         }
-        // Update our patterns according to the dialogs data.
-        includes = new LinkedHashSet<GlobPattern>(dlg.getIncludes());
-        excludes = new LinkedHashSet<GlobPattern>(dlg.getExcludes());
 
-        // Refresh custom section
-        refreshCustomList(true);
-    }
+        // Check if modification required.
+        if (patterns.contains(p)) {
+            DetailMessageDialog.openInformation(
+                    getShell(),
+                    getShell().getText(),
+                    _("Selected item is already include!"),
+                    _("The path `{0}` is already include in you selective backup.", file));
+            return;
+        }
 
-    /**
-     * Return collection of predefined excludes pattern.
-     * 
-     * @return
-     */
-    private Collection<GlobPattern> getPredefinedExcludes() {
-        Set<GlobPattern> patterns = new HashSet<GlobPattern>();
-        for (Collection<GlobPattern> p : getPredefined()) {
-            if (excludes.containsAll(p)) {
-                patterns.addAll(p);
+        // Check if selected item is already excluded
+        boolean excluded = false;
+        for (GlobPattern e : this.patterns) {
+            if (!e.isInclude() && e.matches(file)) {
+                excluded = true;
             }
         }
-        return patterns;
-    }
-
-    /**
-     * Return collection of predefined includes pattern.
-     * 
-     * @return
-     */
-    private Collection<GlobPattern> getPredefinedIncludes() {
-        Set<GlobPattern> patterns = new HashSet<GlobPattern>();
-        for (Collection<GlobPattern> p : getPredefined()) {
-            if (includes.containsAll(p)) {
-                patterns.addAll(p);
-            }
+        if (excluded) {
+            DetailMessageDialog.openWarning(
+                    getShell(),
+                    getShell().getText(),
+                    _("Selected item is excluded by another pattern."),
+                    _("The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.", file));
         }
-        return patterns;
+
+        // Check if predefined.
+        patterns.add(p);
     }
 
     /**
@@ -457,27 +313,31 @@ public class SelectiveDialog extends Dialog {
      * @param event
      * @param list
      */
-    protected void handleDelete(SelectionEvent event, List<GlobPattern> list) {
-        includes.removeAll(list);
-        excludes.removeAll(list);
+    protected void handleDelete(GlobPattern pattern) {
+        patterns.remove(pattern);
         refreshCustomList(true);
     }
 
     /**
-     * Cakked when the user click the toggle button.
+     * Called when user click on "show advance" check box.
+     * 
+     * @param selection
+     */
+    protected void handleShowAdvancePatterns(boolean selection) {
+        this.showAdvance = selection;
+        refreshCustomList(true);
+    }
+
+    /**
+     * Called when the user click the toggle button.
      * 
      * @param event
      * @param list
      */
-    protected void handlePredefine(SelectionEvent event, List<GlobPattern> list) {
+    protected void handleToggleSwitch(SelectionEvent event, GlobPattern pattern) {
+        patterns.remove(pattern);
         boolean selection = !((SwitchButton) event.widget).getSelection();
-        if (selection) {
-            includes.addAll(list);
-            excludes.removeAll(list);
-        } else {
-            includes.removeAll(list);
-            excludes.addAll(list);
-        }
+        patterns.add(new GlobPattern(selection, pattern.value()));
     }
 
     /**
@@ -490,25 +350,10 @@ public class SelectiveDialog extends Dialog {
         }
 
         // Compute the custom list of includes
-        for (GlobPattern p : getCustomIncludes()) {
-            String label;
-            if (new File(p.value()).exists()) {
-                label = FilenameUtils.getBaseName(p.value());
-            } else {
-                label = _("Custom pattern");
+        for (GlobPattern p : getPatterns()) {
+            if (!GlobPattern.isAdvance(p) || this.showAdvance) {
+                createItem(this.customList, p);
             }
-            createItem(this.customList, label, Arrays.asList(p), false);
-        }
-
-        // Compute the custom list of exclude
-        for (GlobPattern p : getCustomExcludes()) {
-            String label;
-            if (new File(p.value()).exists()) {
-                label = FilenameUtils.getBaseName(p.value());
-            } else {
-                label = _("Custom pattern");
-            }
-            createItem(this.customList, label, Arrays.asList(p), false);
         }
 
         // Create empty item is required
@@ -542,21 +387,12 @@ public class SelectiveDialog extends Dialog {
     }
 
     /**
-     * Initialise the exclude patterns.
+     * Initialise the patterns.
      * 
-     * @param excludes
+     * @param patterns
      */
-    public void setExcludes(Collection<GlobPattern> excludes) {
-        this.excludes = new LinkedHashSet<GlobPattern>(excludes);
-    }
-
-    /**
-     * Initialise the includes patterns.
-     * 
-     * @param includes
-     */
-    public void setIncludes(Collection<GlobPattern> includes) {
-        this.includes = new LinkedHashSet<GlobPattern>(includes);
+    public void setPatterns(Collection<GlobPattern> patterns) {
+        this.patterns = new ArrayList<GlobPattern>(patterns);
     }
 
 }

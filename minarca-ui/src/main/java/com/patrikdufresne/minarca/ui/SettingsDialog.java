@@ -548,16 +548,14 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleSelectiveBackup() {
         SelectiveDialog dlg = new SelectiveDialog(getShell());
-        dlg.setIncludes(API.instance().getIncludes());
-        dlg.setExcludes(API.instance().getExcludes());
+        dlg.setPatterns(API.instance().getGlobPatterns());
         // Open dialog and check return code.
         if (dlg.open() != Dialog.OK) {
             // Cancel by user.
             return;
         }
         try {
-            API.instance().setIncludes(dlg.getIncludes());
-            API.instance().setExcludes(dlg.getExcludes());
+            API.instance().setGlobPatterns(dlg.getPatterns());
         } catch (APIException e) {
             DetailMessageDialog.openError(
                     this.getShell(),

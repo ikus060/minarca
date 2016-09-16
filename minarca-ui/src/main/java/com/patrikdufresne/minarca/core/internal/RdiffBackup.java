@@ -17,9 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
-
-import static com.patrikdufresne.minarca.core.APIException.*;
-
+import com.patrikdufresne.minarca.core.APIException.UntrustedHostKey;
+import com.patrikdufresne.minarca.core.GlobPattern;
 import com.patrikdufresne.minarca.core.internal.StreamHandler.PromptHandler;
 
 /**
@@ -174,7 +173,7 @@ public class RdiffBackup {
      * 
      * @throws APIException
      */
-    public void backup(File excludes, File includes) throws APIException {
+    public void backup(List<GlobPattern> patterns) throws APIException {
         // Get location of rdiff-backup.
         File rdiffbackup = getRdiffbackupLocation();
         if (rdiffbackup == null) {
@@ -205,10 +204,14 @@ public class RdiffBackup {
             args.add("--remote-schema");
             args.add("ssh -i '" + identityFile + "' %s rdiff-backup --server");
         }
-        args.add("--exclude-globbing-filelist");
-        args.add(excludes.toString());
-        args.add("--include-globbing-filelist");
-        args.add(includes.toString());
+        for(GlobPattern p: patterns) {
+            if(p.isInclude()){
+                args.add("--include");
+            } else {
+                args.add("--exclude");
+            }
+            args.add(p.value());
+        }
         if (SystemUtils.IS_OS_WINDOWS) {
             args.add("--exclude");
             // C:/**

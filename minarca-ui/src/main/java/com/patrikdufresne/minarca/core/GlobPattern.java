@@ -16,7 +16,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -30,14 +29,43 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.internal.Compat;
 
 /**
- * Instance of this class represent a globbing pattern for include or exclude.
+ * Instance of this class represent a globing pattern for include or exclude.
  * 
  * @author Patrik Dufresne
  * @see http://www.nongnu.org/rdiff-backup/rdiff-backup.1.html
  */
 public class GlobPattern {
 
+    /**
+     * List of advance patterns
+     */
+    public static final List<GlobPattern> ADVANCE;
+
+    /**
+     * List of default patterns
+     */
+    public static final List<GlobPattern> DEFAULTS;
+
     private static final transient Logger LOGGER = LoggerFactory.getLogger(GlobPattern.class);
+
+    static {
+        List<GlobPattern> patterns = new ArrayList<GlobPattern>();
+        patterns.addAll(readResource("default_1"));
+        patterns.addAll(readResource("default_1_a"));
+        patterns.addAll(readResource("default_5"));
+        patterns.addAll(readResource("default_5_a"));
+        patterns.addAll(readResource("default_9"));
+        patterns.addAll(readResource("default_9_a"));
+        DEFAULTS = patterns;
+    }
+
+    static {
+        List<GlobPattern> patterns = new ArrayList<GlobPattern>();
+        patterns.addAll(readResource("default_1_a"));
+        patterns.addAll(readResource("default_5_a"));
+        patterns.addAll(readResource("default_9_a"));
+        ADVANCE = patterns;
+    }
 
     private static String encode(String pattern) {
         return pattern.replace("\\", "/");
@@ -54,100 +82,21 @@ public class GlobPattern {
         return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.ROOT).replace("${temp}", Compat.TEMP);
     }
 
-    /**
-     * Represent the default location for desktop.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> getDesktopPatterns() {
-        try {
-            return readResource("desktop");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Represent the default location where files are documents.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> getDocumentsPatterns() {
-        try {
-            return readResource("documents");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Represent the default location where files are downloaded.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> getDownloadsPatterns() {
-        try {
-            return readResource("downloads");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Pattern to include musics.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> getMusicPatterns() {
-        try {
-            return readResource("music");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Represent the operating system file to be ignored.
-     */
-    public static List<GlobPattern> getOsPatterns() {
-        try {
-            return readResource("os");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
     private static String getPath(File file) {
         return file.getAbsolutePath();
     }
 
     /**
-     * Pattern to include pictures.
+     * True if the pattern is advance.
      * 
+     * @param pattern
      * @return
      */
-    public static List<GlobPattern> getPicturesPatterns() {
-        try {
-            return readResource("pictures");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
+    public static boolean isAdvance(GlobPattern pattern) {
+        return ADVANCE.contains(pattern);
     }
 
-    /**
-     * Pattern to include pictures.
-     * 
-     * @return
-     */
-    public static List<GlobPattern> getVideosPatterns() {
-        try {
-            return readResource("videos");
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    public static boolean isGlobbing(String pattern) {
+    private static boolean isGlobbing(String pattern) {
         return pattern.contains("*") || pattern.contains("?");
     }
 
@@ -176,8 +125,13 @@ public class GlobPattern {
             if (line.startsWith("#")) {
                 continue;
             }
+            if (!line.startsWith("+") && !line.startsWith("-")) {
+                LOGGER.warn("invalid pattern [{}] discarded", line);
+                continue;
+            }
+            boolean include = line.startsWith("+");
             try {
-                list.add(new GlobPattern(line));
+                list.add(new GlobPattern(include, line.substring(1)));
             } catch (IllegalArgumentException e) {
                 // Swallow
                 LOGGER.warn("invalid pattern [{}] discarded", line);
@@ -193,7 +147,7 @@ public class GlobPattern {
      * @return
      * @throws IOException
      */
-    private static List<GlobPattern> readResource(String location) throws IOException {
+    private static List<GlobPattern> readResource(String location) {
         LOGGER.trace("read glob pattern from [{}]", location);
         List<String> locations = new ArrayList<String>();
         locations.add(location);
@@ -223,12 +177,16 @@ public class GlobPattern {
             }
             LOGGER.trace("reading glob pattern from [{}]", l);
             try {
-                for (GlobPattern p : readPatterns(new InputStreamReader(in))) {
-                    p = new GlobPattern(expand(p.value()));
-                    list.add(p);
+                try {
+                    for (GlobPattern p : readPatterns(new InputStreamReader(in))) {
+                        p = new GlobPattern(p.isInclude(), expand(p.value()));
+                        list.add(p);
+                    }
+                } finally {
+                    in.close();
                 }
-            } finally {
-                in.close();
+            } catch (IOException e) {
+                LOGGER.error("fail to read patterns", e);
             }
         }
 
@@ -245,11 +203,17 @@ public class GlobPattern {
     public static void writePatterns(File file, List<GlobPattern> pattern) throws IOException {
         FileWriterWithEncoding writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
         for (GlobPattern line : pattern) {
+            writer.append(line.isInclude() ? "+" : "-");
             writer.append(line.value());
             writer.append(SystemUtils.LINE_SEPARATOR);
         }
         writer.close();
     }
+
+    /**
+     * True if glob pattern should be included. False otherwise.
+     */
+    private boolean include;
 
     private PathMatcher matcher;
 
@@ -258,8 +222,8 @@ public class GlobPattern {
      */
     private final String pattern;
 
-    public GlobPattern(File file) {
-        this(getPath(file));
+    public GlobPattern(boolean include, File file) {
+        this(include, getPath(file));
     }
 
     /**
@@ -268,10 +232,10 @@ public class GlobPattern {
      * @param pattern
      *            the pattern
      */
-    public GlobPattern(String pattern) {
+    public GlobPattern(boolean include, String pattern) {
         Validate.notEmpty(pattern);
         if (!isGlobbing(pattern)) {
-            // If not a globbing pattern, it should be a real file or directory.
+            // If not a globing pattern, it should be a real file or directory.
             // Try to get the absolute location of the file.
             File f = new File(pattern);
             if (f.exists()) {
@@ -279,6 +243,7 @@ public class GlobPattern {
             }
         }
         // rdiffweb for windows doesn't support \\ separator, replace them.
+        this.include = include;
         this.pattern = encode(pattern);
     }
 
@@ -288,6 +253,7 @@ public class GlobPattern {
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         GlobPattern other = (GlobPattern) obj;
+        if (include != other.include) return false;
         if (pattern == null) {
             if (other.pattern != null) return false;
         } else if (!pattern.equals(other.pattern)) return false;
@@ -298,8 +264,19 @@ public class GlobPattern {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (include ? 1231 : 1237);
         result = prime * result + ((pattern == null) ? 0 : pattern.hashCode());
         return result;
+    }
+
+    /**
+     * True if the pattern matches an existing file.
+     * 
+     * @return
+     */
+    public boolean isFileExists() {
+        File f = new File(this.value());
+        return f.exists();
     }
 
     /**
@@ -334,6 +311,15 @@ public class GlobPattern {
     }
 
     /**
+     * True if the glob pattern include the given pattern.
+     * 
+     * @return
+     */
+    public boolean isInclude() {
+        return this.include;
+    }
+
+    /**
      * For printing, it's better to use the right file separator.
      */
     @Override
@@ -341,6 +327,11 @@ public class GlobPattern {
         return this.pattern.replace("/", SystemUtils.FILE_SEPARATOR);
     }
 
+    /**
+     * The pattern (as required for rdiff-backup).
+     * 
+     * @return the pattern.
+     */
     public String value() {
         return this.pattern;
     }

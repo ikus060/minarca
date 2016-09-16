@@ -177,7 +177,7 @@ public class Main {
         try {
             API.instance().backup();
             LOGGER.info("backup SUCCESS");
-        } catch (APIException e) {
+        } catch (Exception e) {
             LOGGER.info("backup FAILED", e);
             System.exit(3);
         }

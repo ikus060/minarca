@@ -1,0 +1,17 @@
+# Default Exclude folder for Windows XP, 7, 10
+-${root}/Windows/
+-${root}/Program Files/
+-${root}/ProgramData/
+-${home}/Recent/
+-${home}/SentTo/
+-${home}/PrintHood/
+-${home}/NetHood/
+-${home}/Cookies/
+-${home}/Local Settings/Application Data/
+-${home}/Local Settings/Temporary Internet Files/
+-${home}/Local Settings/Temp/
+
+# Exclude specific for Win 7
+-${home}/AppData/
+-${home}/Tracing/
+-${home}/Searches/

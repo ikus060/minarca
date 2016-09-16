@@ -64,14 +64,9 @@ public class API {
     private static final String FILENAME_CONF = "minarca.properties";
 
     /**
-     * Exclude filename.
-     */
-    private static final String FILENAME_EXCLUDES = "excludes";
-
-    /**
      * Includes filename.
      */
-    private static final String FILENAME_INCLUDES = "includes";
+    private static final String FILENAME_GLOB_PATTERNS = "patterns";
 
     /**
      * Singleton instance of API
@@ -143,14 +138,9 @@ public class API {
     private File confFile;
 
     /**
-     * Reference to exclude file list.
+     * Reference to file patterns.
      */
-    private File excludesFile;
-
-    /**
-     * Reference to include file list.
-     */
-    private File includesFile;
+    private File globPatternsFile;
 
     /**
      * Reference to the configuration.
@@ -166,8 +156,7 @@ public class API {
         LoggerFactory.getLogger(API.class).info("using process charset [{}]", Compat.CHARSET_PROCESS.name());
 
         this.confFile = new File(Compat.CONFIG_PATH, FILENAME_CONF); // $NON-NLS-1$
-        this.includesFile = new File(Compat.CONFIG_PATH, FILENAME_INCLUDES); // $NON-NLS-1$
-        this.excludesFile = new File(Compat.CONFIG_PATH, FILENAME_EXCLUDES); // $NON-NLS-1$
+        this.globPatternsFile = new File(Compat.CONFIG_PATH, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
 
         // Load the configuration
         this.properties = new Properties();
@@ -206,7 +195,13 @@ public class API {
         rdiffbackup.testServer();
 
         // Run backup.
-        rdiffbackup.backup(excludesFile, includesFile);
+        List<GlobPattern> patterns;
+        try {
+            patterns = GlobPattern.readPatterns(globPatternsFile);
+        } catch (IOException e) {
+            throw new APIException(_("fail to read selective backup settings"), e);
+        }
+        rdiffbackup.backup(patterns);
 
     }
 
@@ -228,10 +223,10 @@ public class API {
         if (!identityFile.isFile() || !identityFile.canRead()) {
             throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
         }
-        // Don't verify includes/excludes patterns. See pdsl/minarca/#105
+        // Don't verify patterns. See pdsl/minarca/#105
         // Instead, check if the files exists.
-        if (!includesFile.isFile() || !excludesFile.isFile()) {
-            throw new MissConfiguredException(_("includes or excludes pattern are missing"));
+        if (!globPatternsFile.isFile()) {
+            throw new MissConfiguredException(_("selective backup settings are missing"));
         }
     }
 
@@ -270,21 +265,16 @@ public class API {
      */
     public void defaultConfig(boolean force) throws APIException {
         LOGGER.debug("restore default config");
-        // Sets the default includes / excludes.
-        if (force || getIncludes().isEmpty()) {
-            List<GlobPattern> includes = new ArrayList<GlobPattern>();
-            includes.addAll(GlobPattern.getDesktopPatterns());
-            includes.addAll(GlobPattern.getDocumentsPatterns());
-            includes.addAll(GlobPattern.getMusicPatterns());
-            includes.addAll(GlobPattern.getPicturesPatterns());
-            includes.addAll(GlobPattern.getVideosPatterns());
-            setIncludes(includes);
-        }
-        if (force || getExcludes().isEmpty()) {
-            List<GlobPattern> excludes = new ArrayList<GlobPattern>();
-            excludes.addAll(GlobPattern.getOsPatterns());
-            excludes.addAll(GlobPattern.getDownloadsPatterns());
-            setExcludes(excludes);
+        // Sets the default patterns.
+        if (force || getGlobPatterns().isEmpty()) {
+            // Remove non-existing non-globing patterns.
+            List<GlobPattern> patterns = new ArrayList<GlobPattern>();
+            for (GlobPattern p : GlobPattern.DEFAULTS) {
+                if (p.isFileExists() || p.isGlobbing()) {
+                    patterns.add(p);
+                }
+            }
+            setGlobPatterns(patterns);
         }
 
         // Delete & create schedule tasks.
@@ -310,21 +300,6 @@ public class API {
      */
     public String getComputerName() {
         return this.properties.getProperty(PROPERTY_COMPUTERNAME);
-    }
-
-    /**
-     * Return the exclude patterns used for the backup.
-     * 
-     * @return the list of pattern.
-     */
-    public List<GlobPattern> getExcludes() {
-        try {
-            LOGGER.debug("reading excludes from [{}]", excludesFile);
-            return GlobPattern.readPatterns(excludesFile);
-        } catch (IOException e) {
-            LOGGER.warn("error reading excludes patterns", e);
-            return Collections.emptyList();
-        }
     }
 
     /**
@@ -365,12 +340,12 @@ public class API {
      * 
      * @return the list of pattern.
      */
-    public List<GlobPattern> getIncludes() {
+    public List<GlobPattern> getGlobPatterns() {
         try {
-            LOGGER.debug("reading includes from [{}]", includesFile);
-            return GlobPattern.readPatterns(includesFile);
+            LOGGER.debug("reading glob patterns from [{}]", globPatternsFile);
+            return GlobPattern.readPatterns(globPatternsFile);
         } catch (IOException e) {
-            LOGGER.warn("error reading includes patterns", e);
+            LOGGER.warn("error reading glob patterns", e);
             return Collections.emptyList();
         }
     }
@@ -493,8 +468,7 @@ public class API {
         if (!exists) {
 
             // Empty the include
-            setIncludes(Arrays.asList(new GlobPattern(Compat.ROOT)));
-            setExcludes(Arrays.asList(new GlobPattern(Compat.ROOT + "**")));
+            setGlobPatterns(Arrays.asList(new GlobPattern(true, Compat.ROOT), new GlobPattern(false, Compat.ROOT + "**")));
 
             // Run backup
             runBackup();
@@ -585,30 +559,15 @@ public class API {
     }
 
     /**
-     * Sets a new exclude patern list.
+     * Sets a new pattern list.
      * 
      * @param patterns
      * @throws APIException
      */
-    public void setExcludes(List<GlobPattern> patterns) throws APIException {
+    public void setGlobPatterns(List<GlobPattern> patterns) throws APIException {
         try {
-            LOGGER.debug("writing excludes to [{}]", excludesFile);
-            GlobPattern.writePatterns(excludesFile, patterns);
-        } catch (IOException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
-    }
-
-    /**
-     * Sets a new include pattern list.
-     * 
-     * @param patterns
-     * @throws APIException
-     */
-    public void setIncludes(List<GlobPattern> patterns) throws APIException {
-        try {
-            LOGGER.debug("writing includes to [{}]", includesFile);
-            GlobPattern.writePatterns(includesFile, patterns);
+            LOGGER.debug("writing patterns to [{}]", globPatternsFile);
+            GlobPattern.writePatterns(globPatternsFile, patterns);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
