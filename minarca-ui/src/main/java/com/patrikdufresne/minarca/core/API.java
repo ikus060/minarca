@@ -8,7 +8,6 @@ package com.patrikdufresne.minarca.core;
 import static com.patrikdufresne.minarca.Localized._;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.security.InvalidKeyException;
@@ -24,10 +23,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.logging.impl.NoOpLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,7 +167,12 @@ public class API {
     /**
      * Reference to the configuration.
      */
-    private Properties properties;
+    private PropertiesConfiguration properties;
+
+    /**
+     * Reference to the status.
+     */
+    private PropertiesConfiguration status;
 
     /**
      * Reference to status file.
@@ -185,6 +193,7 @@ public class API {
 
         // Load the configuration
         this.properties = load(this.confFile);
+        this.status = load(this.statusFile);
     }
 
     /**
@@ -350,7 +359,7 @@ public class API {
      * @return the computer name.
      */
     public String getComputerName() {
-        return this.properties.getProperty(PROPERTY_COMPUTERNAME);
+        return this.properties.getString(PROPERTY_COMPUTERNAME);
     }
 
     /**
@@ -407,9 +416,8 @@ public class API {
      * @return the last result.
      */
     public LastResult getLastResult() {
-        Properties status = load(this.statusFile);
         try {
-            String value = status.getProperty(PROPERTY_LAST_RESULT);
+            String value = this.status.getString(PROPERTY_LAST_RESULT);
             if (value == null) {
                 return LastResult.HAS_NOT_RUN;
             }
@@ -433,10 +441,9 @@ public class API {
      * @return
      */
     public Date getLastResultDate() {
-        Properties status = load(this.statusFile);
         try {
-            String value = status.getProperty(PROPERTY_LAST_DATE);
-            return new Date(Long.valueOf(value).longValue());
+            Long value = status.getLong(PROPERTY_LAST_DATE);
+            return new Date(value.longValue());
         } catch (Exception e) {
             return null;
         }
@@ -451,7 +458,7 @@ public class API {
      * @return
      */
     protected String getRemotehost() {
-        return this.properties.getProperty(PROPERTY_REMOTEHOST, REMOTEHOST_DEFAULT);
+        return this.properties.getString(PROPERTY_REMOTEHOST, REMOTEHOST_DEFAULT);
     }
 
     /**
@@ -472,7 +479,7 @@ public class API {
      * @return
      */
     public String getUsername() {
-        return this.properties.getProperty(PROPERTY_USERNAME);
+        return this.properties.getString(PROPERTY_USERNAME);
     }
 
     /**
@@ -600,16 +607,19 @@ public class API {
 
     /**
      * Load properties.
+     * 
+     * @throws APIException
      */
-    private Properties load(File file) {
-        Properties properties = new Properties();
+    private PropertiesConfiguration load(File file) {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
         try {
-            LoggerFactory.getLogger(API.class).debug("reading properties from [{}]", file);
-            FileInputStream in = new FileInputStream(file);
-            properties.load(in);
-            in.close();
-        } catch (IOException e) {
-            LoggerFactory.getLogger(API.class).warn("can't load properties {}", file);
+            LOGGER.debug("reading properties from [{}]", file);
+            properties = new PropertiesConfiguration(file);
+            properties.setLogger(new NoOpLog());
+            properties.setAutoSave(false);
+            properties.setReloadingStrategy(new FileChangedReloadingStrategy());
+        } catch (ConfigurationException e) {
+            LOGGER.warn("can't load properties {}", file);
         }
         return properties;
     }
@@ -645,14 +655,10 @@ public class API {
      * @throws APIException
      */
     public void setComputerName(String value) throws APIException {
-        if (value == null) {
-            this.properties.remove(PROPERTY_COMPUTERNAME);
-        } else {
-            this.properties.setProperty(PROPERTY_COMPUTERNAME, value);
-        }
+        this.properties.setProperty(PROPERTY_COMPUTERNAME, value);
         try {
-            save(this.confFile, this.properties);
-        } catch (IOException e) {
+            this.properties.save();
+        } catch (ConfigurationException e) {
             throw new APIException(_("fail to save config"), e);
         }
     }
@@ -700,14 +706,10 @@ public class API {
      * @throws APIException
      */
     public void setRemotehost(String value) throws APIException {
-        if (value == null || value.equals(REMOTEHOST_DEFAULT)) {
-            this.properties.remove(PROPERTY_REMOTEHOST);
-        } else {
-            this.properties.setProperty(PROPERTY_REMOTEHOST, value);
-        }
+        this.properties.setProperty(PROPERTY_REMOTEHOST, value);
         try {
-            save(this.confFile, this.properties);
-        } catch (IOException e) {
+            this.properties.save();
+        } catch (ConfigurationException e) {
             throw new APIException(_("fail to save config"), e);
         }
     }
@@ -729,14 +731,10 @@ public class API {
      * @throws APIException
      */
     public void setUsername(String value) throws APIException {
-        if (value == null) {
-            this.properties.remove(PROPERTY_USERNAME);
-        } else {
-            this.properties.setProperty(PROPERTY_USERNAME, value);
-        }
+        this.properties.setProperty(PROPERTY_USERNAME, value);
         try {
-            save(this.confFile, this.properties);
-        } catch (IOException e) {
+            this.properties.save();
+        } catch (ConfigurationException e) {
             throw new APIException(_("fail to save config"), e);
         }
     }
