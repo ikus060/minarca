@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang3.Validate;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

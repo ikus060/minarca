@@ -22,7 +22,7 @@ import java.util.Locale;
 
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.SystemUtils;
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
