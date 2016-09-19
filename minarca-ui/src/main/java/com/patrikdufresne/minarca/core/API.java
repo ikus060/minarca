@@ -568,7 +568,7 @@ public class API {
         if (!exists) {
 
             // Empty the include
-            setGlobPatterns(Arrays.asList(new GlobPattern(true, Compat.ROOT), new GlobPattern(false, Compat.ROOT + "**")));
+            setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.ROOT + "**")));
 
             // Run backup
             runBackup();
