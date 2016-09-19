@@ -15,6 +15,7 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -39,11 +40,6 @@ import com.patrikdufresne.switchbutton.SwitchButton;
 public class SelectiveDialog extends Dialog {
 
     private static final int PATH_MAX_LENGTH = 50;
-
-    /**
-     * Number of pixel to free (to avoid filling all the screen).
-     */
-    private static final int WINDOW_HEIGHT_PADDING = 55;
 
     private CList customList;
 
@@ -296,11 +292,14 @@ public class SelectiveDialog extends Dialog {
             }
         }
         if (excluded) {
-            DetailMessageDialog.openWarning(
-                    getShell(),
-                    getShell().getText(),
-                    _("Selected item is excluded by another pattern."),
-                    _("The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.", file));
+            DetailMessageDialog
+                    .openWarning(
+                            getShell(),
+                            getShell().getText(),
+                            _("Selected item is excluded by another pattern."),
+                            _(
+                                    "The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.",
+                                    file));
         }
 
         // Check if predefined.
@@ -368,7 +367,7 @@ public class SelectiveDialog extends Dialog {
         int windowHeight = getShell().getBounds().height;
         int widgetHeight = this.customList.getParent().getSize().y;
         int monitorHeight = Display.getDefault().getBounds().height;
-        int maxHeight = monitorHeight - windowHeight + widgetHeight - WINDOW_HEIGHT_PADDING;
+        int maxHeight = (int) (monitorHeight * 0.85f) - windowHeight + widgetHeight;
 
         // Compute the widget size
         Point size = customList.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -383,6 +382,12 @@ public class SelectiveDialog extends Dialog {
             // Recompute the dialog size.
             getShell().layout(true, true);
             getShell().setSize(getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            // Check if re-center is required
+            Rectangle bounds = getShell().getBounds();
+            if (monitorHeight < bounds.y + bounds.height) {
+                int x = getShell().getLocation().x;
+                getShell().setLocation(x, (monitorHeight - bounds.height) / 2);
+            }
         }
     }
 
