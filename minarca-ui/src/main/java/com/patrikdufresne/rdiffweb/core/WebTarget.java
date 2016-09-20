@@ -10,9 +10,11 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -29,7 +31,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Jsoup;
-import org.apache.commons.lang3.Validate;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -54,15 +55,13 @@ public class WebTarget implements Cloneable {
         }
         String page = toString(response);
         Document doc = Jsoup.parse(page);
-        Elements elements = doc.getElementsByAttributeValueContaining("class", "alert-danger");
+        Elements elements = doc.getElementsByAttributeValueContaining("role", "alert");
         if (elements.size() > 0) {
-            throw new RdiffwebException(elements.get(0).html(), response);
-        }
-        if (page.contains("<title>Error</title>")) {
-            throw new RdiffwebException("unknown!?", response);
-        }
-        if (page.contains("Invalid username or password.")) {
-            throw new RdiffwebException("Invalid username or password.", response);
+            String message = elements.get(0).text();
+            if (message.startsWith("\u00D7")) {
+                message = message.substring(1);
+            }
+            throw new RdiffwebException(message, response);
         }
     }
 
@@ -111,6 +110,11 @@ public class WebTarget implements Cloneable {
     private HttpClient httpclient;
 
     /**
+     * Locale.
+     */
+    private Locale locale;
+
+    /**
      * Store the params.
      */
     private final Map<String, String> params = new LinkedHashMap<String, String>();
@@ -130,8 +134,19 @@ public class WebTarget implements Cloneable {
      */
     private String username;
 
-    public WebTarget(HttpClient httpclient, String baseurl) {
+    /**
+     * Create a new web target.
+     * 
+     * @param httpclient
+     *            the HTTP client
+     * @param baseurl
+     *            the base URL
+     * @param locale
+     *            the locale
+     */
+    public WebTarget(HttpClient httpclient, String baseurl, Locale locale) {
         Validate.notEmpty(this.baseurl = baseurl);
+        Validate.notNull(this.locale = locale);
         // Initialize an http client.
         if (httpclient != null) {
             this.httpclient = httpclient;
@@ -142,13 +157,28 @@ public class WebTarget implements Cloneable {
             RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
             this.httpclient = httpclient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();
         }
-
     }
 
+    /**
+     * Create a new web target with default locale and default HTTP client.
+     * 
+     * @param baseurl
+     *            the base URL
+     */
     public WebTarget(String baseurl) {
-        Validate.notEmpty(this.baseurl = baseurl);
-        // Initialize an http client.
-        this.httpclient = HttpClients.createDefault();
+        this(baseurl, Locale.getDefault());
+    }
+
+    /**
+     * Create a new web target with default HTTP client.
+     * 
+     * @param baseurl
+     *            the base URL
+     * @param locale
+     *            the locale to be used.
+     */
+    public WebTarget(String baseurl, Locale locale) {
+        this(HttpClients.createDefault(), baseurl, locale);
     }
 
     public WebTarget clone() throws CloneNotSupportedException {
@@ -222,7 +252,7 @@ public class WebTarget implements Cloneable {
         // FIXME use return code.
         String page;
         if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
-            WebTarget request = new WebTarget(this.httpclient, this.baseurl)
+            WebTarget request = new WebTarget(this.httpclient, this.baseurl, this.locale)
                     .target(LOGIN)
                     .entity(getLoginFormParams(page, username, password))
                     .headers(getHeaders());
@@ -231,6 +261,14 @@ public class WebTarget implements Cloneable {
         }
         checkPage(response);
         return response;
+    }
+
+    /**
+     * Return accept language for HTTP header.
+     */
+    private String getAcceptLanguage() {
+        // en-US,en;q=0.5
+        return this.locale.getLanguage() + "," + this.locale.getLanguage() + "-" + this.locale.getCountry() + ";q=0.5";
     }
 
     /**
@@ -359,7 +397,7 @@ public class WebTarget implements Cloneable {
         // request.setHeader("User-Agent", USER_AGENT);
         // request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         if (!headers.containsKey("Accept-Language")) {
-            request.setHeader("Accept-Language", "en-US,en;q=0.5");
+            request.setHeader("Accept-Language", getAcceptLanguage());
         }
         for (Entry<String, String> e : headers.entrySet()) {
             request.setHeader(e.getKey(), e.getValue());
@@ -386,7 +424,7 @@ public class WebTarget implements Cloneable {
         // request.setHeader("User-Agent", USER_AGENT);
         // request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         if (!headers.containsKey("Accept-Language")) {
-            request.setHeader("Accept-Language", "en-US,en;q=0.5");
+            request.setHeader("Accept-Language", getAcceptLanguage());
         }
         // request.setHeader("Connection", "keep-alive");
         // request.setHeader("Referer", this.getUrl());
@@ -440,7 +478,7 @@ public class WebTarget implements Cloneable {
         // Check if we need to login.
         String page;
         if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
-            WebTarget request = new WebTarget(this.httpclient, this.baseurl).target(LOGIN).entity(getLoginFormParams(page, username, password));
+            WebTarget request = new WebTarget(this.httpclient, this.baseurl, this.locale).target(LOGIN).entity(getLoginFormParams(page, username, password));
             response = request.httpPost();
             checkPage(response);
 
