@@ -9,14 +9,17 @@
 
 from __future__ import unicode_literals
 
-from future.utils import native_str
-import pkg_resources
-from rdiffweb.rdw_plugin import ITemplateFilterPlugin
 import cherrypy
 from cherrypy.lib.static import serve_file
-from rdiffweb.dispatch import static
+from future.utils import native_str
+import os
+import pkg_resources
 
-FILES = ['minarca_16.png', 'minarca_22.png', 'minarca_32.png', 'minarca_48.png', 'minarca.ico', 'minarca_128.png']
+from rdiffweb.dispatch import static
+from rdiffweb.rdw_plugin import ITemplateFilterPlugin
+
+
+FILES = ['minarca_16.png', 'minarca_22.png', 'minarca_32.png', 'minarca_48.png', 'minarca.ico', 'minarca_128.png', 'manifest.json']
 
 
 class MinarcaBrand(ITemplateFilterPlugin):
@@ -32,7 +35,8 @@ class MinarcaBrand(ITemplateFilterPlugin):
         # Also add some static files
         for name in FILES:
             path = pkg_resources.resource_filename('minarca_brand', name)  # @UndefinedVariable
-            setattr(self.app.root.static, path.replace('.', '_'), static(path))
+            filename = os.path.basename(path.replace('.', '_'))
+            setattr(self.app.root.static, filename, static(path))
 
         # In development, provide test.html as static page.
         environment = self.app.cfg.get_config('Environment', 'production')
