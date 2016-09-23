@@ -39,6 +39,16 @@ public class Main {
     static final transient Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /**
+     * Port to be used to verify single instance of backup.
+     */
+    static final int SINGLE_INSTANCE_PORT_BACKUP = Integer.getInteger("minarca.singleinstance.backup.port", 52356);
+
+    /**
+     * Port to be used to verify single instance of UI.
+     */
+    static final int SINGLE_INSTANCE_PORT_UI = Integer.getInteger("minarca.singleinstance.backup.port", 60820);
+
+    /**
      * Return the current version.
      * 
      * @return
@@ -57,7 +67,7 @@ public class Main {
      * 
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // Process the arguments.
         boolean backup = false;
         for (String arg : args) {
@@ -75,13 +85,20 @@ public class Main {
             }
         }
 
-        // Start minarca.
-        Main main = new Main();
-        if (backup) {
-            main.backup();
-        } else {
-            main.startui(args);
-        }
+        // Check if single instance of application is running.
+        final boolean fBackup = backup;
+        SingleInstanceManager single = new SingleInstanceManager(fBackup ? SINGLE_INSTANCE_PORT_BACKUP : SINGLE_INSTANCE_PORT_UI);
+        single.run(new Runnable() {
+            @Override
+            public void run() {
+                Main main = new Main();
+                if (fBackup) {
+                    main.backup();
+                } else {
+                    main.startui(args);
+                }
+            }
+        });
 
     }
 
@@ -255,7 +272,6 @@ public class Main {
      * @param args
      */
     private void startui(String[] args) {
-
         LOGGER.info("starting ui");
 
         Display.setAppName(_("Minarca"));
