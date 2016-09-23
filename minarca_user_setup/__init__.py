@@ -62,7 +62,8 @@ class MinarcaUserSetup(IUserChangeListener):
             os.chown(user_root, uid, gid)
 
         if not os.path.isdir(user_root):
-            raise RdiffError(_('fail to create user [%s] root dir [%s]', user, user_root))
+            logger.exception('fail to create user [%s] root dir [%s]', user, user_root)
+            raise RdiffError(_("failed to setup user profile"))
 
         # Create ssh subfolder
         ssh_dir = os.path.join(user_root, '.ssh')
