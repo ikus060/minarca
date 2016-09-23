@@ -7,6 +7,8 @@ package com.patrikdufresne.minarca;
 
 import static com.patrikdufresne.minarca.Localized._;
 
+import java.lang.management.ManagementFactory;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -17,6 +19,7 @@ import org.eclipse.jface.window.WindowManager;
 import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
@@ -68,6 +71,9 @@ public class Main {
      * @param args
      */
     public static void main(final String[] args) {
+        // Define PID for logging
+        MDC.put("process_id", getPid());
+
         // Process the arguments.
         boolean backup = false;
         for (String arg : args) {
@@ -100,6 +106,20 @@ public class Main {
             }
         });
 
+    }
+
+    /**
+     * Return the process Id.
+     * 
+     * @return
+     */
+    private static String getPid() {
+        // Should return something like pid@hostname
+        String value = ManagementFactory.getRuntimeMXBean().getName();
+        if (value.contains("@")) {
+            return value.split("@")[0];
+        }
+        return value;
     }
 
     /**
