@@ -40,7 +40,7 @@ public class SchedulerWindows extends Scheduler {
      * @author Patrik Dufresne
      * 
      */
-    private static class TaskInfoWin  {
+    private static class TaskInfoWin {
 
         private static final Pattern PATTERN_SCHEDULE_TYPE_DAILY = Pattern.compile("(Tous les jours|Journalier|Daily)");
 

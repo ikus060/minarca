@@ -204,8 +204,8 @@ public class RdiffBackup {
             args.add("--remote-schema");
             args.add("ssh -i '" + identityFile + "' %s rdiff-backup --server");
         }
-        for(GlobPattern p: patterns) {
-            if(p.isInclude()){
+        for (GlobPattern p : patterns) {
+            if (p.isInclude()) {
                 args.add("--include");
             } else {
                 args.add("--exclude");
