@@ -58,7 +58,7 @@ public class API {
     /**
      * Base URL.
      */
-    protected static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net");
+    protected static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net");;
 
     /**
      * Filename used for configuration file. Notice, this is also read by batch file.
@@ -613,7 +613,7 @@ public class API {
     private PropertiesConfiguration load(File file) {
         PropertiesConfiguration properties = new PropertiesConfiguration();
         try {
-            LOGGER.debug("reading properties from [{}]", file);
+            LOGGER.trace("reading properties from [{}]", file);
             properties = new PropertiesConfiguration(file);
             properties.setLogger(new NoOpLog());
             properties.setAutoSave(false);
@@ -640,7 +640,7 @@ public class API {
      * @throws IOException
      */
     private void save(File file, Properties properties) throws IOException {
-        LOGGER.debug("writing config to [{}]", file);
+        LOGGER.trace("writing config to [{}]", file);
         Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
         properties.store(writer, "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
                 + "Minarca backup configuration.\r\n"

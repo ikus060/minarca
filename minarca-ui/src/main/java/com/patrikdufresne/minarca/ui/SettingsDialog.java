@@ -242,6 +242,7 @@ public class SettingsDialog extends Dialog {
             linked = true;
             text = _("Linked");
         } catch (APIException e) {
+            LOGGER.warn("check link failed", e);
             // TODO: Complete this to provide the right status: can't connect, refused, etc.
             linked = false;
             text = _("Unknown");
@@ -568,9 +569,10 @@ public class SettingsDialog extends Dialog {
         try {
             API.instance().setGlobPatterns(dlg.getPatterns());
         } catch (APIException e) {
+            LOGGER.error("error updating selective backup configuration", e);
             DetailMessageDialog.openError(
                     this.getShell(),
-                    _("Error"),
+                    Display.getAppName(),
                     _("Error updating selective backup configuration"),
                     _("Can't change the configuration for unknown reason. If the problem persists, try re-installing Minarca."));
         }
@@ -605,6 +607,7 @@ public class SettingsDialog extends Dialog {
             try {
                 API.instance().stopBackup();
             } catch (APIException e) {
+                LOGGER.error("an error occurred while stopping the backup", e);
                 DetailMessageDialog.openError(
                         this.getShell(),
                         Display.getAppName(),
@@ -634,6 +637,7 @@ public class SettingsDialog extends Dialog {
             try {
                 API.instance().runBackup();
             } catch (APIException e) {
+                LOGGER.error("an error occurred while backuping this computer", e);
                 DetailMessageDialog.openError(
                         this.getShell(),
                         Display.getAppName(),
@@ -664,6 +668,7 @@ public class SettingsDialog extends Dialog {
                 return;
             }
         } catch (APIException e) {
+            LOGGER.error("fail to retrieve current backup schedule", e);
             DetailMessageDialog.openError(
                     this.getShell(),
                     Display.getAppName(),
@@ -710,6 +715,7 @@ public class SettingsDialog extends Dialog {
             try {
                 Runtime.getRuntime().exec(new String[] { control.toString(), "schedtasks" });
             } catch (IOException e) {
+                LOGGER.error("an error occurred when trying to open Windows Task Scheduler", e);
                 DetailMessageDialog.openError(
                         this.getShell(),
                         Display.getAppName(),
@@ -744,6 +750,7 @@ public class SettingsDialog extends Dialog {
         try {
             API.instance().unlink();
         } catch (APIException e) {
+            LOGGER.error("an error occurred while unlinking this computer", e);
             DetailMessageDialog.openError(this.getShell(), _("Error"), _("Can't unlink this computer!"), _("An error occurred while unlinking this computer."));
         }
 

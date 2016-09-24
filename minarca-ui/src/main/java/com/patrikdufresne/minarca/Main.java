@@ -235,13 +235,15 @@ public class Main {
             // If not configured, show wizard.
             LOGGER.debug("not configured -- show setup dialog");
             if (!SetupDialog.open(null)) {
-                // If user cancel, lose application.
+                // If user cancel, close application.
                 return false;
             }
         } catch (ScheduleNotFoundException e) {
+            LOGGER.warn("schedule not found");
             reconfigure();
             return true;
         } catch (MissConfiguredException e) {
+            LOGGER.warn("miss configured");
             reconfigure();
             return true;
         } catch (APIException e) {
@@ -261,7 +263,7 @@ public class Main {
      */
     private void reconfigure() {
         // The configuration is broken. Ask use if we can fix it.
-        LOGGER.debug("miss-configured -- ask to repair");
+        LOGGER.debug("ask to repair configuration");
         DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
                 null,
                 Display.getAppName(),
