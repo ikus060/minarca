@@ -7,6 +7,8 @@ package com.patrikdufresne.minarca.core;
 
 import static com.patrikdufresne.minarca.Localized._;
 
+import java.io.File;
+
 public class APIException extends Exception {
 
     /**
@@ -50,6 +52,19 @@ public class APIException extends Exception {
     }
 
     /**
+     * Raised when the identify file is invalid or missing.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class IdentityMissingException extends APIException {
+
+        public IdentityMissingException(File file) {
+            super(_("identity file %s is missing", file.toString()));
+        }
+    }
+
+    /**
      * Raise when the first backup (during link) failed to run.
      * 
      * @author Patrik Dufresne
@@ -87,6 +102,20 @@ public class APIException extends Exception {
 
         public InitialBackupRunningException(Exception cause) {
             super(_("Initial backup is still running."), cause);
+        }
+
+    }
+
+    /**
+     * Raised when the known hosts file is invalid or missing.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class KnownHostsMissingException extends APIException {
+
+        public KnownHostsMissingException() {
+            super(_("known_hosts file is missing"));
         }
 
     }
@@ -157,6 +186,20 @@ public class APIException extends Exception {
 
         public ScheduleNotFoundException() {
             super(_("Scheduled task not found"));
+        }
+
+    }
+
+    /**
+     * Raised when ssh is missing.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class SshMissingException extends APIException {
+
+        public SshMissingException() {
+            super(_("ssh is missing"));
         }
 
     }

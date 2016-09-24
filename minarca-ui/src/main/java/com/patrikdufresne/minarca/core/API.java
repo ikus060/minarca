@@ -240,7 +240,7 @@ public class API {
         File identityFile = getIdentityFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, path, identityFile);
+        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, identityFile);
 
         // Check the remote server.
         rdiffbackup.testServer();
@@ -257,7 +257,7 @@ public class API {
         }
         // Run backup.
         try {
-            rdiffbackup.backup(patterns);
+            rdiffbackup.backup(patterns, path);
             t.interrupt();
             setLastStatus(LastResult.SUCCESS);
             LOGGER.info("backup SUCCESS");
@@ -786,16 +786,12 @@ public class API {
         // Get the config value.
         String username = this.getUsername();
         String remotehost = this.getRemotehost();
-        String repositoryName = this.getRepositoryName();
-
-        // Compute the path.
-        String path = "/home/" + username + "/" + repositoryName;
 
         // Get reference to the identity file to be used by ssh or plink.
         File identityFile = getIdentityFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, path, identityFile);
+        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, identityFile);
 
         // Check the remote server.
         rdiffbackup.testServer();
