@@ -161,7 +161,7 @@ public class Client {
      */
     public String getCurrentVersion() throws IOException {
         // Check current version.
-        String data = target("/login").formCredentials(null, null).getAsString();
+        String data = target("/").formCredentials(null, null).getAsString();
         Pattern p = Pattern.compile("<meta name=\"app-version\" content=\"([^\"]*)\">");
         Matcher m = p.matcher(data);
         if (m.find()) {

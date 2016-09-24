@@ -67,4 +67,54 @@ public class WebTargetTest {
         // Verify Local
         verifyThatRequest().havingHeaderEqualTo("Accept-Language", "fr,fr-CA;q=0.5").receivedOnce();
     }
+
+    /**
+     * Make sure alter info are not throwing exception.
+     * 
+     * @throws IOException
+     * @throws IllegalStateException
+     */
+    @Test
+    public void testGetWithAlertInfo() throws IllegalStateException, IOException {
+        // Mock response
+        onRequest()
+                .havingMethodEqualTo("GET")
+                .havingPathEqualTo("/")
+                .respond()
+                .withStatus(200)
+                .withBody(
+                        "<div class='alert alert-info alert-dismissible' role='alert'>"
+                                + "<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>×</span></button>"
+                                + "You don't have any repositories configured."
+                                + "</div>")
+                .withEncoding(Charset.forName("UTF-8"));
+
+        // Get page.
+        new WebTarget("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").getAsString();
+    }
+
+    /**
+     * Make sure alter info are not throwing exception.
+     * 
+     * @throws IOException
+     * @throws IllegalStateException
+     */
+    @Test(expected = RdiffwebException.class)
+    public void testGetWithAlertDanger() throws IllegalStateException, IOException {
+        // Mock response
+        onRequest()
+                .havingMethodEqualTo("GET")
+                .havingPathEqualTo("/")
+                .respond()
+                .withStatus(200)
+                .withBody(
+                        "<div class='alert alert-danger alert-dismissible' role='alert'>"
+                                + "<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>×</span></button>"
+                                + "This is an exception."
+                                + "</div>")
+                .withEncoding(Charset.forName("UTF-8"));
+
+        // Get page.
+        new WebTarget("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").getAsString();
+    }
 }

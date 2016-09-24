@@ -377,15 +377,12 @@ public class SetupDialog extends Dialog {
      */
     @Override
     protected Point getInitialSize() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return new Point(325, 575);
-        } else {
-            // Sets fixed window size.
-            PixelConverter pc = new PixelConverter(this.getShell());
-            int height = pc.convertVerticalDLUsToPixels(235);
-            int width = pc.convertHorizontalDLUsToPixels(195);
-            return new Point(width, height);
-        }
+        return getShell().computeSize(325, 575, true);
+        // if (SystemUtils.IS_OS_WINDOWS) {
+        // return new Point();
+        // } else {
+        // return new Point(325, 575);
+        // }
     }
 
     /**

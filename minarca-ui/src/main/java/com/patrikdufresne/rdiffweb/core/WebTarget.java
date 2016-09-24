@@ -44,28 +44,6 @@ public class WebTarget implements Cloneable {
     protected static final String LOGIN = "/login/";
 
     /**
-     * Check if the page return any error.
-     * 
-     * @throws IOException
-     */
-    private static void checkPage(HttpResponse response) throws IOException {
-        // Check error
-        if (response == null) {
-            return;
-        }
-        String page = toString(response);
-        Document doc = Jsoup.parse(page);
-        Elements elements = doc.getElementsByAttributeValueContaining("role", "alert");
-        if (elements.size() > 0) {
-            String message = elements.get(0).text();
-            if (message.startsWith("\u00D7")) {
-                message = message.substring(1);
-            }
-            throw new RdiffwebException(message, response);
-        }
-    }
-
-    /**
      * Convert the http content response to String.
      * 
      * @param response
@@ -94,11 +72,26 @@ public class WebTarget implements Cloneable {
     private final String baseurl;
 
     /**
+     * True to raise exception on alert-danger.
+     */
+    private boolean checkDangerException = true;
+
+    /**
+     * True to raise exception on alert-info.
+     */
+    private boolean checkInfoException = false;
+
+    /**
+     * True to raise exception on alert-warning.
+     */
+    private boolean checkWarningException = false;
+    /**
      * True to close http client.
      */
     private boolean close;
 
     private HttpEntity entity;
+
     /**
      * Store the HTTP header.
      */
@@ -128,7 +121,6 @@ public class WebTarget implements Cloneable {
      * The target url.
      */
     private String target;
-
     /**
      * The username.
      */
@@ -179,6 +171,67 @@ public class WebTarget implements Cloneable {
      */
     public WebTarget(String baseurl, Locale locale) {
         this(HttpClients.createDefault(), baseurl, locale);
+    }
+
+    /**
+     * Checks the page for any exception.
+     * 
+     * @return
+     */
+    public WebTarget checkException() {
+        return checkException(false, false, true);
+    }
+
+    /**
+     * Check the page for exception.
+     * 
+     * @param info
+     *            True to raise exception on alert-info
+     * @param warning
+     *            True to raise exception on alert-warning
+     * @param danger
+     *            True to raise exception on alert-danger
+     * @return Same instance for chainning.
+     */
+    public WebTarget checkException(boolean info, boolean warning, boolean danger) {
+        this.checkInfoException = info;
+        this.checkWarningException = warning;
+        this.checkDangerException = danger;
+        return this;
+    }
+
+    /**
+     * Check if an exception should be thrown.
+     * 
+     * @throws IOException
+     */
+    private void checkPage(HttpResponse response) throws IOException {
+        // If the response is empty, don't raise exception.
+        if (response == null) {
+            return;
+        }
+        // Parse page to find alert.
+        String page = toString(response);
+        Document doc = Jsoup.parse(page);
+        Elements elements = doc.getElementsByAttributeValueContaining("role", "alert");
+        for (Element e : elements) {
+            // Check if the alert should raise exception.
+            String cls = e.attr("class");
+            if (checkInfoException
+                    && cls.contains("alert-info")
+                    || checkWarningException
+                    && cls.contains("alert-warning")
+                    || checkDangerException
+                    && cls.contains("alert-danger")) {
+                String message = e.text();
+                // Remove the "X" sign from the message.
+                if (message.startsWith("\u00D7")) {
+                    message = message.substring(1);
+                }
+                throw new RdiffwebException(message, response);
+            }
+        }
+
     }
 
     public WebTarget clone() throws CloneNotSupportedException {
@@ -254,10 +307,15 @@ public class WebTarget implements Cloneable {
         if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
             WebTarget request = new WebTarget(this.httpclient, this.baseurl, this.locale)
                     .target(LOGIN)
+                    .checkException(false, true, true)
                     .entity(getLoginFormParams(page, username, password))
                     .headers(getHeaders());
             response = request.httpPost();
+            // Check if login.
             page = toString(response);
+            if (page.contains("id=\"form-login\"")) {
+                request.checkPage(response);
+            }
         }
         checkPage(response);
         return response;
@@ -478,15 +536,18 @@ public class WebTarget implements Cloneable {
         // Check if we need to login.
         String page;
         if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
-            WebTarget request = new WebTarget(this.httpclient, this.baseurl, this.locale).target(LOGIN).entity(getLoginFormParams(page, username, password));
+            WebTarget request = new WebTarget(this.httpclient, this.baseurl, this.locale)
+                    .target(LOGIN)
+                    .checkException(false, true, true)
+                    .entity(getLoginFormParams(page, username, password));
             response = request.httpPost();
-            checkPage(response);
+            request.checkPage(response);
 
             // Re-execute the post.
             response = httpPost();
             page = toString(response);
             if (page.contains("id=\"form-login\"")) {
-                throw new IllegalStateException("should be loggin.");
+                throw new IllegalStateException("should be logged-in");
             }
         }
         checkPage(response);
