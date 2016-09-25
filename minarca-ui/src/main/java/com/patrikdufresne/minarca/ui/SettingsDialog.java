@@ -241,7 +241,7 @@ public class SettingsDialog extends Dialog {
             API.instance().testServer();
             linked = true;
             text = _("Linked");
-        } catch (APIException e) {
+        } catch (Exception e) {
             LOGGER.warn("check link failed", e);
             // TODO: Complete this to provide the right status: can't connect, refused, etc.
             linked = false;

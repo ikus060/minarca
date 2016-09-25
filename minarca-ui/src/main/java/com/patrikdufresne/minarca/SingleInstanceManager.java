@@ -32,14 +32,23 @@ public class SingleInstanceManager {
          * Called when a difference instance of the same application is started.
          */
         public void newInstanceCreated();
+
+        /**
+         * Called when the running instance should be stopped.
+         */
+        public void stopInstance();
     }
 
     static final transient Logger LOGGER = LoggerFactory.getLogger(SingleInstanceManager.class);
 
     /**
-     * Must end with newline
+     * Key to identify new instance.
      */
-    public static final String SINGLE_INSTANCE_SHARED_KEY = "$$NewInstance$$\n";
+    public static final String SHARED_KEY_NEW_INSTANCE = "$$NewInstance$$";
+    /**
+     * Key to stop instance.
+     */
+    public static final String SHARED_KEY_STOP_INSTANCE = "$$StopInstance$$";
 
     /**
      * Listener to be notify when a new instance is started.
@@ -83,7 +92,7 @@ public class SingleInstanceManager {
      * 
      * @return true if first instance, false if not.
      */
-    private boolean begin() {
+    private boolean begin(String sharedkey) {
         // Try to open network socket.
         // If success, listen to socket for new instance message, return true
         try {
@@ -100,9 +109,12 @@ public class SingleInstanceManager {
                                 Socket client = socket.accept();
                                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                                 String message = in.readLine();
-                                if (SINGLE_INSTANCE_SHARED_KEY.trim().equals(message.trim())) {
-                                    LOGGER.debug("shared key matched - new application instance found");
+                                if (SHARED_KEY_NEW_INSTANCE.equals(message)) {
+                                    LOGGER.debug("new application instance found");
                                     fireNewInstance();
+                                } else if (SHARED_KEY_STOP_INSTANCE.equals(message)) {
+                                    LOGGER.debug("request to stop instance");
+                                    fireStopInstance();
                                 }
                                 in.close();
                                 client.close();
@@ -124,7 +136,8 @@ public class SingleInstanceManager {
             try {
                 Socket clientSocket = new Socket(InetAddress.getLoopbackAddress(), this.port);
                 OutputStream out = clientSocket.getOutputStream();
-                out.write(SINGLE_INSTANCE_SHARED_KEY.getBytes());
+                out.write(sharedkey.getBytes());
+                out.write('\n');
                 out.close();
                 clientSocket.close();
                 LOGGER.debug("successfully notified first instance");
@@ -170,6 +183,15 @@ public class SingleInstanceManager {
     }
 
     /**
+     * Used to notify instance to be stop.
+     */
+    private void fireStopInstance() {
+        if (listener != null) {
+            listener.stopInstance();
+        }
+    }
+
+    /**
      * Execute this runnable.
      * 
      * @param runnable
@@ -180,9 +202,10 @@ public class SingleInstanceManager {
         Validate.notNull(runnable);
 
         // Acquired socket lock.
-        if (!begin()) {
+        if (!begin(SHARED_KEY_NEW_INSTANCE)) {
             return false;
         }
+
         // Run the runnable.
         try {
             runnable.run();
@@ -200,6 +223,20 @@ public class SingleInstanceManager {
      */
     public void setApplicationInstanceListener(SingleInstanceListener listener) {
         this.listener = listener;
+    }
+
+    /**
+     * Send a stop signal to the previously running application.
+     * 
+     * @return True if the signal was sent.
+     */
+    public boolean stop() {
+        // Try to acquire socket. If not working, we need to send stop signal.
+        if (!begin(SHARED_KEY_STOP_INSTANCE)) {
+            return true;
+        }
+        end();
+        return false;
     }
 
 }

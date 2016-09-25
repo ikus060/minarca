@@ -177,7 +177,7 @@ public class RdiffBackup {
     /**
      * This method is called when the host ssh key must be accepted.
      */
-    private void acceptServerKey() throws APIException {
+    private void acceptServerKey() throws APIException, InterruptedException {
         if (SystemUtils.IS_OS_WINDOWS) {
             acceptServerKeyPlink();
         }
@@ -187,7 +187,7 @@ public class RdiffBackup {
     /**
      * Accept host key for Plink.
      */
-    private void acceptServerKeyPlink() throws APIException {
+    private void acceptServerKeyPlink() throws APIException, InterruptedException {
         // Construct the command line.
         List<String> args = new ArrayList<String>();
         File plink = getPlinkLocation();
@@ -235,7 +235,7 @@ public class RdiffBackup {
      * 
      * @throws APIException
      */
-    public void backup(List<GlobPattern> patterns, String path) throws APIException {
+    public void backup(List<GlobPattern> patterns, String path) throws APIException, InterruptedException {
         // Construct the command line.
         List<String> args = new ArrayList<String>();
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -276,17 +276,23 @@ public class RdiffBackup {
      *            the arguments list.
      * @throws APIException
      */
-    private void execute(List<String> command, File workingDir, PromptHandler handler) throws APIException {
+    private void execute(List<String> command, File workingDir, PromptHandler handler) throws APIException, InterruptedException {
         Validate.notNull(command);
         Validate.isTrue(command.size() > 0);
         LOGGER.debug("executing {}", StringUtils.join(command, " "));
+        Process p;
         try {
             // Execute the process.
             ProcessBuilder builder = new ProcessBuilder();
             if (workingDir != null) {
                 builder.directory(workingDir);
             }
-            Process p = builder.command(command).redirectErrorStream(true).start();
+            p = builder.command(command).redirectErrorStream(true).start();
+        } catch (IOException e) {
+            LOGGER.warn("fail to create subprocess");
+            throw new APIException("fail to create subprocess", e);
+        }
+        try {
             // Attach stream handle to answer a password when prompted
             StreamHandler sh = new StreamHandler(p, Compat.CHARSET_PROCESS, handler, true);
             sh.start();
@@ -307,11 +313,10 @@ public class RdiffBackup {
             if (returnCode != 0) {
                 throw new APIException(sh.getOutput());
             }
-        } catch (IOException e) {
-            throw new APIException("fail to create subprocess", e);
         } catch (InterruptedException e) {
-            // Swallow. Should not happen
-            LOGGER.warn("process interupted", e);
+            LOGGER.warn("rdiff-backup process interupted", e);
+            p.destroy();
+            throw new InterruptedException("rdiff-backup process interupted");
         }
     }
 
@@ -321,7 +326,7 @@ public class RdiffBackup {
      * @param extraArgs
      * @throws APIException
      */
-    private void rdiffbackup(List<String> extraArgs, String path) throws APIException {
+    private void rdiffbackup(List<String> extraArgs, String path) throws APIException, InterruptedException {
         // Get location of rdiff-backup.
         File rdiffbackup = getRdiffbackupLocation();
         if (rdiffbackup == null) {
@@ -369,7 +374,7 @@ public class RdiffBackup {
      * 
      * @throws APIException
      */
-    public void testServer() throws APIException {
+    public void testServer() throws APIException, InterruptedException {
         // Run the test.
         LOGGER.info("test server");
         try {

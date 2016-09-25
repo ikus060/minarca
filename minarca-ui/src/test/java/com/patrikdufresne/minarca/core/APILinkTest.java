@@ -21,7 +21,7 @@ public class APILinkTest {
     private Client client;
 
     @Before
-    public void setUp() throws APIException {
+    public void setUp() throws APIException, InterruptedException {
         this.client = Mockito.mock(Client.class);
         this.api = Mockito.spy(API.instance());
         System.setProperty("minarca.link.timeoutsec", "30");

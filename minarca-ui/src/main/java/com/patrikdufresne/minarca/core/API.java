@@ -242,9 +242,6 @@ public class API {
         // Create a new instance of rdiff backup to test and run the backup.
         RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, identityFile);
 
-        // Check the remote server.
-        rdiffbackup.testServer();
-
         // Read patterns
         List<GlobPattern> patterns;
         try {
@@ -255,12 +252,19 @@ public class API {
             setLastStatus(LastResult.FAILURE);
             throw new APIException(_("fail to read selective backup settings"), e);
         }
-        // Run backup.
         try {
+            // Check the remote server.
+            rdiffbackup.testServer();
+            // Run backup.
             rdiffbackup.backup(patterns, path);
             t.interrupt();
             setLastStatus(LastResult.SUCCESS);
             LOGGER.info("backup SUCCESS");
+        } catch (InterruptedException e) {
+            t.interrupt();
+            setLastStatus(LastResult.INTERUPT);
+            LOGGER.info("backup INTERUPT", e);
+            throw new APIException(_("Backup interupted"), e);
         } catch (Exception e) {
             t.interrupt();
             setLastStatus(LastResult.FAILURE);
@@ -780,8 +784,9 @@ public class API {
      * Check if this computer is properly link to minarca.net.
      * 
      * @throws APIException
+     * @throws InterruptedException 
      */
-    public void testServer() throws APIException {
+    public void testServer() throws APIException, InterruptedException {
 
         // Get the config value.
         String username = this.getUsername();
