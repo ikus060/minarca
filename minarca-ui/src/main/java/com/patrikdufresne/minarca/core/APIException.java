@@ -7,9 +7,9 @@ package com.patrikdufresne.minarca.core;
 
 import static com.patrikdufresne.minarca.Localized._;
 
-public class APIException extends Exception {
+import org.apache.commons.lang3.StringUtils;
 
-    private static final long serialVersionUID = 1L;
+public class APIException extends Exception {
 
     /**
      * Raised when trying to link a computer with a name already in use in minarca.
@@ -19,20 +19,78 @@ public class APIException extends Exception {
      */
     public static class ComputerNameAlreadyInUseException extends APIException {
         public ComputerNameAlreadyInUseException(String computername) {
-            super(_("computer name {0} already in use", computername));
+            super(_("Computer name {0} already in use", computername));
         }
     }
 
     /**
-     * Thrown when the application is not configured.
+     * Raised when the client failed to exchange the public key with remote server.
      * 
      * @author Patrik Dufresne
      * 
      */
-    public static class NotConfiguredException extends APIException {
-        public NotConfiguredException(String message) {
-            super(message);
+    public static class ExchangeSshKeyException extends APIException {
+
+        public ExchangeSshKeyException(Exception cause) {
+            super(_("Fail to send SSH key to Minarca."), cause);
         }
+
+    }
+
+    /**
+     * Raised when the creation of public private key failed.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class GenerateKeyException extends APIException {
+
+        public GenerateKeyException(Exception cause) {
+            super(_("Fail to generate the security keys."), cause);
+        }
+
+    }
+
+    /**
+     * Raise when the first backup (during link) failed to run.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class InitialBackupFailedException extends APIException {
+
+        public InitialBackupFailedException(Exception cause) {
+            super(_("Initial backup did not complete successfully."), cause);
+        }
+
+    }
+
+    /**
+     * Raised when the initial backup never ran.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class InitialBackupHasNotRunException extends APIException {
+
+        public InitialBackupHasNotRunException(Exception cause) {
+            super(_("Initial backup didn't run."), cause);
+        }
+
+    }
+
+    /**
+     * Raised when link with minarca failed.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class LinkComputerException extends APIException {
+
+        public LinkComputerException(Exception cause) {
+            super(_("Fail to link computer."), cause);
+        }
+
     }
 
     /**
@@ -52,6 +110,18 @@ public class APIException extends Exception {
     }
 
     /**
+     * Thrown when the application is not configured.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class NotConfiguredException extends APIException {
+        public NotConfiguredException(String message) {
+            super(message);
+        }
+    }
+
+    /**
      * Raised when plink.exe is missing.
      * 
      * @author Patrik Dufresne
@@ -60,16 +130,29 @@ public class APIException extends Exception {
     public static class PlinkMissingException extends APIException {
 
         public PlinkMissingException() {
-            super(_("plink is missing"));
+            super(_("Plink is missing"));
         }
 
     }
 
-    public static class UntrustedHostKey extends APIException {
+    /**
+     * Raised when the task is not found.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class ScheduleNotFoundException extends APIException {
 
-        // TODO Add mos arguments: fingerprint, hostname
-        public UntrustedHostKey() {
-            super(_("remote SSH host is not trusted"));
+        public ScheduleNotFoundException() {
+            super(_("Scheduled task not found"));
+        }
+
+    }
+
+    public static class UnsufficientPermissons extends APIException {
+
+        public UnsufficientPermissons() {
+            super(_("You don't have sufficient permissions to execute this application!"));
         }
 
     }
@@ -85,59 +168,23 @@ public class APIException extends Exception {
 
     }
 
-    public static class UnsufficientPermissons extends APIException {
+    public static class UntrustedHostKey extends APIException {
 
-        public UnsufficientPermissons() {
-            super(_("you don't have sufficient permissions to execute this application!"));
+        // TODO Add mos arguments: fingerprint, hostname
+        public UntrustedHostKey() {
+            super(_("Remote SSH host is not trusted"));
         }
 
     }
 
-    /**
-     * Raised when the task is not found.
-     * 
-     * @author Patrik Dufresne
-     * 
-     */
-    public static class ScheduleNotFoundException extends APIException {
+    private static final long serialVersionUID = 1L;
 
-        public ScheduleNotFoundException() {
-            super(_("scheduled task not found"));
-        }
-
-    }
-
-    /**
-     * Raised when link with minarca failed.
-     * 
-     * @author Patrik Dufresne
-     * 
-     */
-    public static class LinkComputerException extends APIException {
-        public LinkComputerException() {
-            this(null, null);
-        }
-
-        public LinkComputerException(String message) {
-            this(message, null);
-        }
-
-        public LinkComputerException(Exception cause) {
-            this(null, cause);
-        }
-
-        public LinkComputerException(String message, Exception cause) {
-            super(message != null ? _("fail to link computer: {0}", message) : _("fail to link computer"), cause);
-        }
-
+    public APIException(Exception cause) {
+        super(cause);
     }
 
     public APIException(String message) {
         super(message);
-    }
-
-    public APIException(Exception cause) {
-        super(cause);
     }
 
     public APIException(String message, Exception e) {

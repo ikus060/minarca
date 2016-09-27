@@ -10,7 +10,6 @@ import static com.patrikdufresne.minarca.Localized._;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
@@ -35,6 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
+import com.patrikdufresne.minarca.core.APIException.ExchangeSshKeyException;
+import com.patrikdufresne.minarca.core.APIException.GenerateKeyException;
+import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
+import com.patrikdufresne.minarca.core.APIException.InitialBackupHasNotRunException;
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
@@ -503,6 +506,7 @@ public class API {
      * @throws IllegalAccessException
      *             if the computer name is not valid.
      */
+    @SuppressWarnings("incomplete-switch")
     public void link(String computername, Client client, boolean force) throws APIException, InterruptedException {
         Validate.notEmpty(computername);
         Validate.notNull(client);
@@ -514,11 +518,11 @@ public class API {
         boolean exists = false;
         try {
             exists = client.getRepositoryInfo(computername) != null;
-            if (!force && exists) {
-                throw new ComputerNameAlreadyInUseException(computername);
-            }
         } catch (IOException e) {
             throw new LinkComputerException(e);
+        }
+        if (!force && exists) {
+            throw new ComputerNameAlreadyInUseException(computername);
         }
 
         /*
@@ -540,19 +544,15 @@ public class API {
             Keygen.toPrivatePuttyKey(pair, computername, puttyFile);
             // Read RSA pub key.
             rsadata = FileUtils.readFileToString(idrsaFile);
-        } catch (NoSuchAlgorithmException e) {
-            throw new LinkComputerException(_("fail to generate the keys"), e);
-        } catch (IOException e) {
-            throw new LinkComputerException(_("fail to generate the keys"), e);
-        } catch (InvalidKeyException e) {
-            throw new LinkComputerException(_("fail to generate the keys"), e);
+        } catch (Exception e) {
+            throw new GenerateKeyException(e);
         }
 
         // Send SSH key to minarca server using web service.
         try {
             client.addSSHKey(computername, rsadata);
         } catch (IOException e) {
-            throw new LinkComputerException(_("fail to send SSH key to Minarca"), e);
+            throw new ExchangeSshKeyException(e);
         }
 
         // Generate configuration file.
@@ -585,6 +585,15 @@ public class API {
                 LOGGER.warn("io error", e);
             }
 
+            // Check if the backup schedule ran.
+            switch (getLastResult()) {
+            case FAILURE:
+            case STALE:
+                throw new InitialBackupFailedException(null);
+            case HAS_NOT_RUN:
+                throw new InitialBackupHasNotRunException(null);
+            }
+
             // Check if repository exists.
             if (!exists) {
                 // Unset properties
@@ -592,7 +601,7 @@ public class API {
                 setComputerName(null);
                 setRemotehost(null);
                 // Raise error.
-                throw new LinkComputerException(_("initial backup is not successful"));
+                throw new LinkComputerException(null);
             }
 
             // Set encoding
