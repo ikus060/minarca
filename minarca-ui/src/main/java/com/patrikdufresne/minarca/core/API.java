@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -38,6 +39,7 @@ import com.patrikdufresne.minarca.core.APIException.ExchangeSshKeyException;
 import com.patrikdufresne.minarca.core.APIException.GenerateKeyException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupHasNotRunException;
+import com.patrikdufresne.minarca.core.APIException.InitialBackupRunningException;
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
@@ -503,11 +505,12 @@ public class API {
      * @throws APIException
      *             if the keys can't be created.
      * @throws InterruptedException
+     * @throws IOException
+     *             communication error with minarca website.
      * @throws IllegalAccessException
      *             if the computer name is not valid.
      */
-    @SuppressWarnings("incomplete-switch")
-    public void link(String computername, Client client, boolean force) throws APIException, InterruptedException {
+    public void link(String computername, Client client, boolean force) throws APIException, InterruptedException, IOException {
         Validate.notEmpty(computername);
         Validate.notNull(client);
         Validate.isTrue(computername.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
@@ -516,11 +519,7 @@ public class API {
          * Check if computer name is already in uses.
          */
         boolean exists = false;
-        try {
-            exists = client.getRepositoryInfo(computername) != null;
-        } catch (IOException e) {
-            throw new LinkComputerException(e);
-        }
+        exists = client.getRepositoryInfo(computername) != null;
         if (!force && exists) {
             throw new ComputerNameAlreadyInUseException(computername);
         }
@@ -565,52 +564,77 @@ public class API {
         setSchedule(Schedule.DAILY);
 
         // If the backup doesn't exists on the remote server, start an empty initial backup.
-        if (!exists) {
+        if (exists) {
+            LOGGER.debug("repository already exists");
+            return;
+        }
 
-            // Empty the include
-            setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.ROOT + "**")));
+        // Empty the include
+        List<GlobPattern> previousPatterns = getGlobPatterns();
+        setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.ROOT + "**")));
 
-            // Run backup
-            runBackup();
+        // Reset Last result
+        Date lastResultDate = getLastResultDate();
 
-            // Refresh list of repositories (30sec)
+        // Run backup
+        runBackup();
+
+        // Refresh list of repositories (10 min)
+        int attempt = Integer.getInteger("minarca.link.timeoutsec", 600 /* 5*60*100 */) * 1000 / RUNNING_DELAY;
+        do {
+            Thread.sleep(RUNNING_DELAY);
+            attempt--;
             try {
-                int attempt = 30;
-                do {
-                    Thread.sleep(1000);
-                    attempt--;
-                    client.updateRepositories();
-                } while (attempt > 0 && !(exists = (client.getRepositoryInfo(computername) != null)));
+                client.updateRepositories();
+                // Check if repo exists in minarca.
+                exists = client.getRepositoryInfo(computername) != null;
+                if (exists) {
+                    LOGGER.debug("repository {} found", computername);
+                    break;
+                }
             } catch (IOException e) {
                 LOGGER.warn("io error", e);
             }
+            // Check if backup task is completed.
+            if (!Objects.equals(lastResultDate, getLastResultDate()) && !LastResult.RUNNING.equals(getLastResult())) {
+                LOGGER.debug("schedule task not running");
+                attempt = Math.min(attempt, 1);
+            }
+        } while (attempt > 0);
+
+        // Restore glob patterns
+        setGlobPatterns(previousPatterns);
+
+        // Check if repository exists.
+        if (!exists) {
+
+            // Unset properties
+            setUsername(null);
+            setComputerName(null);
+            setRemotehost(null);
 
             // Check if the backup schedule ran.
             switch (getLastResult()) {
+            case RUNNING:
+                throw new InitialBackupRunningException(null);
             case FAILURE:
             case STALE:
                 throw new InitialBackupFailedException(null);
             case HAS_NOT_RUN:
                 throw new InitialBackupHasNotRunException(null);
-            }
-
-            // Check if repository exists.
-            if (!exists) {
-                // Unset properties
-                setUsername(null);
-                setComputerName(null);
-                setRemotehost(null);
-                // Raise error.
+            case SUCCESS:
+            case UNKNOWN:
+            default:
                 throw new LinkComputerException(null);
             }
+        }
 
-            // Set encoding
-            try {
-                LOGGER.debug("updating repository [{}] encoding [{}]", computername, Compat.CHARSET_DEFAULT.toString());
-                client.getRepositoryInfo(computername).setEncoding(Compat.CHARSET_DEFAULT.toString());
-            } catch (Exception e) {
-                LOGGER.warn("fail to configure repository encoding", e);
-            }
+        // Set encoding
+        try {
+            LOGGER.debug("updating repository [{}] encoding [{}]", computername, Compat.CHARSET_DEFAULT.toString());
+            client.getRepositoryInfo(computername).setEncoding(Compat.CHARSET_DEFAULT.toString());
+        } catch (Exception e) {
+            LOGGER.warn("fail to configure repository encoding", e);
         }
     }
 
@@ -651,9 +675,11 @@ public class API {
     private void save(File file, Properties properties) throws IOException {
         LOGGER.trace("writing config to [{}]", file);
         Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
-        properties.store(writer, "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
-                + "Minarca backup configuration.\r\n"
-                + "Please do not change this configuration file manually.");
+        properties.store(
+                writer,
+                "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
+                        + "Minarca backup configuration.\r\n"
+                        + "Please do not change this configuration file manually.");
         writer.close();
     }
 

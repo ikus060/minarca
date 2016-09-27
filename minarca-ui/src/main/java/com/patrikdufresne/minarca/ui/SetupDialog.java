@@ -247,9 +247,10 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Link your computer") + "</h2><br/>";
-        introText += _("You need to link this computer to your account. Please, "
-                + "provide a friendly name to represent it. "
-                + "Once selected, you won't be able to change it.");
+        introText += _(
+                "You need to link this computer to your account. Please, "
+                        + "provide a friendly name to represent it. "
+                        + "Once selected, you won't be able to change it.");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -407,15 +408,18 @@ public class SetupDialog extends Dialog {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    int r = DetailMessageDialog.openYesNoQuestion(
-                            getShell(),
-                            Display.getAppName(),
-                            _("Are you sure you want to keep the given computer name ?"),
-                            _("The given computer name is already in use in Minarca. "
-                                    + "You may keep this computer name if the name is "
-                                    + "no longer used by another computer currently "
-                                    + "link to Minarca."),
-                            null).getReturnCode();
+                    int r = DetailMessageDialog
+                            .openYesNoQuestion(
+                                    getShell(),
+                                    Display.getAppName(),
+                                    _("Are you sure you want to keep the given computer name ?"),
+                                    _(
+                                            "The given computer name is already in use in Minarca. "
+                                                    + "You may keep this computer name if the name is "
+                                                    + "no longer used by another computer currently "
+                                                    + "link to Minarca."),
+                                    null)
+                            .getReturnCode();
                     returnCode.setValue(r);
                 }
             });
@@ -430,6 +434,9 @@ public class SetupDialog extends Dialog {
         } catch (IllegalArgumentException e) {
             LOGGER.warn("invalid computername: " + name, e);
             return _("Should only contains letters, numbers, dash (-) and dot (.)");
+        } catch (IOException e) {
+            LOGGER.warn("fail to register computer", e);
+            return _("<strong>Communication error!</strong> Check if you can connected to Internet.");
         } catch (Exception e) {
             LOGGER.warn("fail to register computer", e);
             return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install Minarca.");

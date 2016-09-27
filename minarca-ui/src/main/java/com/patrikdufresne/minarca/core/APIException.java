@@ -7,8 +7,6 @@ package com.patrikdufresne.minarca.core;
 
 import static com.patrikdufresne.minarca.Localized._;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class APIException extends Exception {
 
     /**
@@ -75,6 +73,20 @@ public class APIException extends Exception {
 
         public InitialBackupHasNotRunException(Exception cause) {
             super(_("Initial backup didn't run."), cause);
+        }
+
+    }
+
+    /**
+     * Raise when the first backup is running for too long.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class InitialBackupRunningException extends APIException {
+
+        public InitialBackupRunningException(Exception cause) {
+            super(_("Initial backup is still running."), cause);
         }
 
     }
