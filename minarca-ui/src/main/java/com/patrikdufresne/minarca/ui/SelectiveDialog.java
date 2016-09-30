@@ -8,7 +8,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.Validate;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -154,7 +156,7 @@ public class SelectiveDialog extends Dialog {
      * @param pattern
      *            the globing pattern
      */
-    private void createItem(CList parent, final GlobPattern pattern) {
+    private void createItem(CList parent, final GlobPattern pattern, final int idx) {
         // Create separator (if required)
         if (parent.getChildren().length > 0) {
             new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -177,7 +179,7 @@ public class SelectiveDialog extends Dialog {
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handleToggleSwitch(e, pattern);
+                handleToggleSwitch(e, pattern, idx);
             }
         });
 
@@ -333,10 +335,14 @@ public class SelectiveDialog extends Dialog {
      * @param event
      * @param list
      */
-    protected void handleToggleSwitch(SelectionEvent event, GlobPattern pattern) {
-        patterns.remove(pattern);
+    protected void handleToggleSwitch(SelectionEvent event, GlobPattern pattern, int idx) {
+        // Make sure the index matches the given patterns
+        Validate.notNull(patterns);
+        Validate.validIndex(patterns, idx);
+        Validate.isTrue(this.patterns.get(idx).value().equals(pattern.value()));
+        patterns.remove(idx);
         boolean selection = !((SwitchButton) event.widget).getSelection();
-        patterns.add(new GlobPattern(selection, pattern.value()));
+        patterns.add(idx, new GlobPattern(selection, pattern.value()));
     }
 
     /**
@@ -349,9 +355,10 @@ public class SelectiveDialog extends Dialog {
         }
 
         // Compute the custom list of includes
-        for (GlobPattern p : getPatterns()) {
+        for (int i = 0; i < this.patterns.size(); i++) {
+            GlobPattern p = this.patterns.get(i);
             if (!GlobPattern.isAdvance(p) || this.showAdvance) {
-                createItem(this.customList, p);
+                createItem(this.customList, p, i);
             }
         }
 
