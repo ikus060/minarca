@@ -59,6 +59,16 @@ import com.patrikdufresne.minarca.core.internal.Compat;
  */
 public class SettingsDialog extends Dialog {
 
+    /**
+     * Button id for About button.
+     */
+    private static final int ABOUT_ID = IDialogConstants.CLIENT_ID;
+
+    /**
+     * Label for about button.
+     */
+    private static final String ABOUT_LABEL = _("About");
+
     private static final transient Logger LOGGER = LoggerFactory.getLogger(SettingsDialog.class);
 
     /**
@@ -67,29 +77,19 @@ public class SettingsDialog extends Dialog {
     private static final String WARN_BACKGROUNG = "WARN_BACKGROUNG";
 
     /**
-     * Button id for About button.
-     */
-    private int ABOUT_ID = IDialogConstants.CLIENT_ID;
-
-    /**
-     * Label for about button.
-     */
-    private String ABOUT_LABEL = _("About");
-
-    /**
      * Create an executor service to asynchronously update the UI.
      */
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private CListItem lastruntimeItem;
 
+    private ComboViewer scheduleCombo;
+
     private CListItem statusItem;
 
     private Button stopStartButton;
 
     private Button unlinkButton;
-
-    private ComboViewer scheduleCombo;
 
     /**
      * Create a new preference dialog.
@@ -556,6 +556,79 @@ public class SettingsDialog extends Dialog {
     }
 
     /**
+     * Called when user change the schedule.
+     * 
+     * @param event
+     *            the selection event
+     */
+    protected void handleSchedule(SelectionChangedEvent event) {
+        Schedule schedule = (Schedule) ((StructuredSelection) event.getSelection()).getFirstElement();
+        if (Schedule.UNKNOWN.equals(schedule)) {
+            // Do nothing.
+            return;
+        }
+        // Check if the schedule type is different.
+        try {
+            Schedule current = API.instance().getSchedule();
+            if (schedule.equals(current)) {
+                // Nothing to do.
+                return;
+            }
+        } catch (APIException e) {
+            LOGGER.error("fail to retrieve current backup schedule", e);
+            DetailMessageDialog
+                    .openError(this.getShell(), Display.getAppName(), _("Can't change backup schedule!"), _("Fail to retrieve current backup schedule."), e);
+        }
+
+        try {
+            API.instance().setSchedule(schedule);
+        } catch (APIException e) {
+            DetailMessageDialog
+                    .openError(this.getShell(), Display.getAppName(), _("Can't change backup schedule!"), _("Fail to reschedule the backup task."), e);
+        }
+
+    }
+
+    /**
+     * Called when the user click on advance button config for scheduler. This action open the task scheduler.
+     */
+    protected void handleScheduleAdvance() {
+
+        // Prompt the user.
+        DetailMessageDialog dlg = DetailMessageDialog
+                .openOkCancelConfirm(
+                        getShell(),
+                        Display.getAppName(),
+                        _("This action will open Windows Task Scheduler."),
+                        _(
+                                "If you want more control over the backup schedule, you need to "
+                                        + "manually edit the Minarca backup task in Windows Task Scheduler. "
+                                        + "If you don't know what you are doing, you should cancel the"
+                                        + "operation to avoid breaking the schedule."),
+                        null);
+        if (dlg.getReturnCode() != IDialogConstants.OK_ID) {
+            return;
+        }
+
+        // Open Task Scheduler (work in XP to 10)
+        File control = Compat.searchFile("control.exe", new String[0]);
+        if (control != null) {
+            try {
+                Runtime.getRuntime().exec(new String[] { control.toString(), "schedtasks" });
+            } catch (IOException e) {
+                LOGGER.error("an error occurred when trying to open Windows Task Scheduler", e);
+                DetailMessageDialog.openError(
+                        this.getShell(),
+                        Display.getAppName(),
+                        _("Can't open Windows Task Scheduler!"),
+                        _("An error occurred when trying to open Windows Task Scheduler."),
+                        e);
+            }
+        }
+
+    }
+
+    /**
      * Called when the user click on the Selective backup button.
      */
     protected void handleSelectiveBackup() {
@@ -587,13 +660,13 @@ public class SettingsDialog extends Dialog {
         boolean running = API.instance().getLastResult().equals(LastResult.RUNNING);
 
         if (running) {
-            DetailMessageDialog dlg = DetailMessageDialog
-                    .openYesNoQuestion(
-                            this.getShell(),
-                            Display.getAppName(),
-                            _("Are you sure you want to stop the current running backup?"),
-                            _("You are about to stop the running backup. Interupting the backup may temporarily disrupt data restore. Are you sure you want to continue?"),
-                            (String) null);
+            DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
+                    this.getShell(),
+                    Display.getAppName(),
+                    _("Are you sure you want to stop the current running backup?"),
+                    _(
+                            "You are about to stop the running backup. Interupting the backup may temporarily disrupt data restore. Are you sure you want to continue?"),
+                    (String) null);
             if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
                 LOGGER.info("stop backup cancel by user");
                 return;
@@ -608,22 +681,19 @@ public class SettingsDialog extends Dialog {
                 API.instance().stopBackup();
             } catch (APIException e) {
                 LOGGER.error("an error occurred while stopping the backup", e);
-                DetailMessageDialog.openError(
-                        this.getShell(),
-                        Display.getAppName(),
-                        _("Can't stop running backup!"),
-                        _("An error occurred while stopping the backup."));
+                DetailMessageDialog
+                        .openError(this.getShell(), Display.getAppName(), _("Can't stop running backup!"), _("An error occurred while stopping the backup."));
             }
 
         } else {
             // Show a confirmation message.
-            DetailMessageDialog dlg = DetailMessageDialog
-                    .openYesNoQuestion(
-                            this.getShell(),
-                            Display.getAppName(),
-                            _("Do you want to backup your system now?"),
-                            _("You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
-                            null);
+            DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
+                    this.getShell(),
+                    Display.getAppName(),
+                    _("Do you want to backup your system now?"),
+                    _(
+                            "You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
+                    null);
             if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
                 LOGGER.info("backup cancel by user");
                 return;
@@ -649,98 +719,21 @@ public class SettingsDialog extends Dialog {
     }
 
     /**
-     * Called when user change the schedule.
-     * 
-     * @param event
-     *            the selection event
-     */
-    protected void handleSchedule(SelectionChangedEvent event) {
-        Schedule schedule = (Schedule) ((StructuredSelection) event.getSelection()).getFirstElement();
-        if (Schedule.UNKNOWN.equals(schedule)) {
-            // Do nothing.
-            return;
-        }
-        // Check if the schedule type is different.
-        try {
-            Schedule current = API.instance().getSchedule();
-            if (schedule.equals(current)) {
-                // Nothing to do.
-                return;
-            }
-        } catch (APIException e) {
-            LOGGER.error("fail to retrieve current backup schedule", e);
-            DetailMessageDialog.openError(
-                    this.getShell(),
-                    Display.getAppName(),
-                    _("Can't change backup schedule!"),
-                    _("Fail to retrieve current backup schedule."),
-                    e);
-        }
-
-        try {
-            API.instance().setSchedule(schedule);
-        } catch (APIException e) {
-            DetailMessageDialog.openError(
-                    this.getShell(),
-                    Display.getAppName(),
-                    _("Can't change backup schedule!"),
-                    _("Fail to reschedule the backup task."),
-                    e);
-        }
-
-    }
-
-    /**
-     * Called when the user click on advance button config for scheduler. This action open the task scheduler.
-     */
-    protected void handleScheduleAdvance() {
-
-        // Prompt the user.
-        DetailMessageDialog dlg = DetailMessageDialog.openOkCancelConfirm(
-                getShell(),
-                Display.getAppName(),
-                _("This action will open Windows Task Scheduler."),
-                _("If you want more control over the backup schedule, you need to "
-                        + "manually edit the Minarca backup task in Windows Task Scheduler. "
-                        + "If you don't know what you are doing, you should cancel the"
-                        + "operation to avoid breaking the schedule."),
-                null);
-        if (dlg.getReturnCode() != IDialogConstants.OK_ID) {
-            return;
-        }
-
-        // Open Task Scheduler (work in XP to 10)
-        File control = Compat.searchFile("control.exe", new String[0]);
-        if (control != null) {
-            try {
-                Runtime.getRuntime().exec(new String[] { control.toString(), "schedtasks" });
-            } catch (IOException e) {
-                LOGGER.error("an error occurred when trying to open Windows Task Scheduler", e);
-                DetailMessageDialog.openError(
-                        this.getShell(),
-                        Display.getAppName(),
-                        _("Can't open Windows Task Scheduler!"),
-                        _("An error occurred when trying to open Windows Task Scheduler."),
-                        e);
-            }
-        }
-
-    }
-
-    /**
      * Called to unlink this computer.
      */
     protected void handleUnlinkComputer() {
 
         // Show a confirmation message.
-        DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
-                this.getShell(),
-                _("Confirm unlink"),
-                _("Are you sure you want to unlink this computer from Minarca?"),
-                _("You are about to unlink this computer from Minarca. This "
-                        + "computer will no longer backup it self. Previous "
-                        + "backup data will not be lost."),
-                null);
+        DetailMessageDialog dlg = DetailMessageDialog
+                .openYesNoQuestion(
+                        this.getShell(),
+                        _("Confirm unlink"),
+                        _("Are you sure you want to unlink this computer from Minarca?"),
+                        _(
+                                "You are about to unlink this computer from Minarca. This "
+                                        + "computer will no longer backup it self. Previous "
+                                        + "backup data will not be lost."),
+                        null);
         if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
             LOGGER.info("unlink opperation cancel by user");
             return;
