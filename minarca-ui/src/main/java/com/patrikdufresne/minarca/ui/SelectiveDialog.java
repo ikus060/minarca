@@ -43,6 +43,16 @@ public class SelectiveDialog extends Dialog {
 
     private static final int PATH_MAX_LENGTH = 50;
 
+    /**
+     * Button id for restore default button.
+     */
+    private static final int RESTORE_DEFAUL_ID = IDialogConstants.CLIENT_ID + 1;
+
+    /**
+     * Label for restore default button.
+     */
+    private static final String RESTORE_DEFAUL_LABEL = _("Restore defaults");
+
     private CList customList;
 
     private List<GlobPattern> patterns = new ArrayList<GlobPattern>();
@@ -54,6 +64,21 @@ public class SelectiveDialog extends Dialog {
 
     protected SelectiveDialog(Shell parentShell) {
         super(parentShell);
+    }
+
+    /**
+     * 
+     */
+    @Override
+    protected void buttonPressed(int buttonId) {
+        switch (buttonId) {
+        case RESTORE_DEFAUL_ID:
+            restoreDefaultPatterns();
+            break;
+        default:
+            super.buttonPressed(buttonId);
+
+        }
     }
 
     /**
@@ -78,6 +103,11 @@ public class SelectiveDialog extends Dialog {
         composite.setLayout(layout);
         composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         composite.setFont(parent.getFont());
+
+        // Restore default
+        Button restoreButton = createButton(composite, RESTORE_DEFAUL_ID, RESTORE_DEFAUL_LABEL, false);
+        GridData data = ((GridData) restoreButton.getLayoutData());
+        data.horizontalIndent = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
 
         // Continue with default creation of button.
         Control buttonSection = super.createButtonBar(composite);
@@ -294,14 +324,9 @@ public class SelectiveDialog extends Dialog {
             }
         }
         if (excluded) {
-            DetailMessageDialog
-                    .openWarning(
-                            getShell(),
-                            getShell().getText(),
-                            _("Selected item is excluded by another pattern."),
-                            _(
-                                    "The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.",
-                                    file));
+            DetailMessageDialog.openWarning(getShell(), getShell().getText(), _("Selected item is excluded by another pattern."), _(
+                    "The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.",
+                    file));
         }
 
         // Check if predefined.
@@ -396,6 +421,20 @@ public class SelectiveDialog extends Dialog {
                 getShell().setLocation(x, (monitorHeight - bounds.height) / 2);
             }
         }
+    }
+
+    /**
+     * Called to restore the default patterns.
+     */
+    private void restoreDefaultPatterns() {
+        // Remove non-existing non-globing patterns.
+        this.patterns.clear();
+        for (GlobPattern p : GlobPattern.DEFAULTS) {
+            if (p.isFileExists() || p.isGlobbing()) {
+                this.patterns.add(p);
+            }
+        }
+        refreshCustomList(true);
     }
 
     /**
