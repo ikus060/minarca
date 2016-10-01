@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-19 16:23-0400\n"
+"POT-Creation-Date: 2016-10-01 19:25-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Patrik Dufresne <info@patrikdufresne.com>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -16,19 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: com/patrikdufresne/minarca/Main.java:214
+#: com/patrikdufresne/minarca/Main.java:253
 msgid "Fail to start Minarca."
 msgstr "Impossible d'ouvrir Minarca."
 
-#: com/patrikdufresne/minarca/Main.java:215
+#: com/patrikdufresne/minarca/Main.java:254
 msgid "If the problem persist, you may try to reinstall Minarca."
 msgstr "Si le problème persiste, essayez de réinstaller Minarca."
 
-#: com/patrikdufresne/minarca/Main.java:231
+#: com/patrikdufresne/minarca/Main.java:270
 msgid "Do you want to restore default configuration ?"
 msgstr "Voulez-vous restaurer la configuration par défaut?"
 
-#: com/patrikdufresne/minarca/Main.java:232
+#: com/patrikdufresne/minarca/Main.java:271
 msgid ""
 "Your Minarca installation seams broken. If you answer Yes, all your personal "
 "configuration will be lost. If you answer no, this application may misbehave."
@@ -37,11 +37,11 @@ msgstr ""
 "vos paramètres personnels seront perdus. Si vous répondez non, cette "
 "application peut mal focntionner. "
 
-#: com/patrikdufresne/minarca/Main.java:245
+#: com/patrikdufresne/minarca/Main.java:284
 msgid "Can't repair Minarca's configuration!"
 msgstr "Impossibe de réparer la configuration de Minarca!"
 
-#: com/patrikdufresne/minarca/Main.java:246
+#: com/patrikdufresne/minarca/Main.java:285
 msgid ""
 "This application may misbehave. If the problem persist, you may try to "
 "reinstall Minarca."
@@ -49,85 +49,92 @@ msgstr ""
 "Impossible de réparer la configuration de Minarca. Si le problème persiste, "
 "essayez de réinstaller Minarca."
 
-#: com/patrikdufresne/minarca/Main.java:261
+#: com/patrikdufresne/minarca/Main.java:299
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:154
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:240
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:329
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:330
 msgid "Minarca"
 msgstr "Minarca"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:67
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:408
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:54
+msgid "Restore defaults"
+msgstr "Réinitialiser"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:90
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:409
 msgid "Selective backup"
 msgstr "Sauvegarde sélective"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:97
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:125
 msgid ""
 "Select files or folders you want to include or exclude from your backup."
 msgstr ""
 "Sélectionnez les fichiers ou les dossiers que vous souhaitez inclurent ou "
 "exclurent de votre sauvegarde."
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:121
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:149
 msgid "Add folder..."
 msgstr "Ajouter un dossier ..."
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:130
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:158
 msgid "Add file..."
 msgstr "Ajouter un fichier ..."
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:139
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:167
 msgid "Show advance patterns"
 msgstr "Afficher les paramètres avancés"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:169
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:197
 msgid "Custom pattern"
 msgstr "Modèle personalisé"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:173
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:201
 msgid "(not exists)"
 msgstr "(n'existe pas)"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:179
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:207
 msgid "Include / Exclude"
 msgstr "Inclure / Exclure"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:199
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:227
 msgid "Delete"
 msgstr "Supprimer"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:248
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:276
 msgid "Select a folder to be added to your selective backup."
 msgstr "Sélectionnez un dossier à ajouter à votre sauvegarde sélective."
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:276
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:304
 msgid "Selected item doesn't exists!"
 msgstr "L'item sélectionné n'existe pas!"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:277
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:305
 #, java-format
 msgid "The path `{0}` cannot be include because it doesn't exists."
 msgstr "L'emplacement `{0}` ne peut être inclus, car il n'existe pas."
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:286
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:314
 msgid "Selected item is already include!"
 msgstr "L'item sélectionné est déjà inclus!"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:287
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:315
 #, java-format
 msgid "The path `{0}` is already include in you selective backup."
 msgstr "L'emplacement `{0}` est déjà inclus dans votre sauvegarde sélective."
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:302
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:327
 msgid "Selected item is excluded by another pattern."
 msgstr "L'item sélectionné est exclu par un autre modèle."
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:303
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:328
 #, java-format
 msgid ""
 "The path `{0}` is currently excluded by another pattern. You may need to "
 "reorganize your patterns to properly include the selected item."
-msgstr "L'emplacement `{0}` est actuellement exclu par un autre modèle. Il vous sera nécessaire de réorganiser vos paramètres de sauvegarde sélective pour inclure l'item sélectionné."
+msgstr ""
+"L'emplacement `{0}` est actuellement exclu par un autre modèle. Il vous sera "
+"nécessaire de réorganiser vos paramètres de sauvegarde sélective pour "
+"inclure l'item sélectionné."
 
 #: com/patrikdufresne/minarca/ui/AboutDialog.java:55
 #, java-format
@@ -185,71 +192,74 @@ msgid "Subscribe..."
 msgstr "Souscrire"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:249
-msgid "Link your computer"
-msgstr "Associer votre ordinateur"
+msgid "Link your system"
+msgstr "Associer votre système"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:250
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:251
 msgid ""
-"You need to link this computer to your account. Please, provide a friendly "
+"You need to link this system to your account. Please, provide a friendly "
 "name to represent it. Once selected, you won't be able to change it."
 msgstr ""
-"Vous devez associer cet ordinateur à votre compte. S'il vous plaît donnez un "
-"nom convivial pour le représenter. Vous ne serez pas en mesure de le "
-"modifier. "
+"Vous devez associer ce système à votre compte. S'il vous plaît donnez un nom "
+"convivial pour le représenter. Vous ne serez pas en mesure de le modifier. "
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:261
-msgid "Provide a computer name"
-msgstr "Définir un nom d'ordinateur"
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:262
+msgid "Provide a repository name"
+msgstr "Définir un nom de dépôt"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:268
-msgid "Computer name"
-msgstr "Nom de l'ordinateur"
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:269
+msgid "Repository name"
+msgstr "Nom du dépôt"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:273
-msgid "Link computer"
-msgstr "Associer l'ordinateur"
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:274
+msgid "Link"
+msgstr "Associer"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:338
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:339
 msgid "Success !"
 msgstr "Succès !"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:339
-msgid ""
-"Your computer is now configure to backup it self once a day with Minarca!"
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:340
+msgid "Your system is now configure to backup it self once a day with Minarca!"
 msgstr ""
-"Votre ordinateur est maintenant configuré pour se sauvegarder "
-"automatiquement une fois par jour avec Minarca !"
+"Votre système est maintenant configuré pour se sauvegarder automatiquement "
+"une fois par jour avec Minarca !"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:344
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:345
 msgid "Close"
 msgstr "Fermer"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:403
-msgid "Computer name cannot be empty."
-msgstr "Vous devez avoir un nom pour votre ordinateur"
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:401
+msgid "Repository name cannot be empty."
+msgstr "Le nom du dépôt ne peut être vide."
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:416
-msgid "Are you sure you want to keep the given computer name ?"
-msgstr "Êtes-vous sûr de vouloir conserver ce nom d'ordinateur?"
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:415
+msgid "Are you sure you want to keep the given repository name ?"
+msgstr "Êtes-vous sûr de vouloir conserver ce nom de dépôt?"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:417
 msgid ""
-"The given computer name is already in use in Minarca. You may keep this "
-"computer name if the name is no longer used by another computer currently "
+"The given repository name is already in use in Minarca. You may keep this "
+"repository name if the name is no longer used by another system currently "
 "link to Minarca."
 msgstr ""
-"Le nom donné à votre ordinateur est déjà utilisé dans Minarca. Vous pouvez "
-"garder ce nom s'il n'est plus utilisé par un autre ordinateur lié à Minarca."
+"Le nom de dépôt est déjà utilisé dans Minarca. Vous pouvez garder ce nom "
+"s'il n'est plus utilisé par un autre système lié à Minarca."
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:429
-msgid "Change the computer name"
-msgstr "Modifiez le nom de l'ordinateur"
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:430
+msgid "Change the repository name"
+msgstr "Modifiez le nom du dépôt"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:435
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:436
 msgid "Should only contains letters, numbers, dash (-) and dot (.)"
 msgstr "Peut seulement contenir lettres, chiffres, tiret(-) et point(.)"
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:438
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:439
+msgid ""
+"<strong>Communication error!</strong> Check if you can connected to Internet."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:442
 msgid ""
 "<strong>Unknown error occurred!</strong> If the problem persists, try to re-"
 "install Minarca."
@@ -257,7 +267,7 @@ msgstr ""
 "<strong>Une erreur inconnue s'est produite!</strong> Si le problème "
 "persiste, essayez de réinstaller Minarca."
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:447
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:451
 msgid ""
 "Can't schedule backup task! If the problem persists, try to re-install "
 "Minarca."
@@ -265,21 +275,21 @@ msgstr ""
 "Impossible de créer une tâche de sauvegarde! Si le problème persiste essayez "
 "de réinstaller Minarca."
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:467
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:471
 msgid "Username cannot be empty."
 msgstr "Vous devez avoir un nom d'utilisateur."
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:470
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:474
 msgid "Password cannot be empty."
 msgstr "Vous devez avoir un mot de passe."
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:481
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:485
 msgid "Can't validate your credentials. Please check your connectivity."
 msgstr ""
 "Impossible de valider vos informations d'identification. S'il vous plaît "
 "vérifier votre connectivité."
 
-#: com/patrikdufresne/minarca/ui/SetupDialog.java:484
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:488
 msgid "Unknown error occurred!"
 msgstr "Une erreur inconnue s'est produite!"
 
@@ -287,7 +297,7 @@ msgstr "Une erreur inconnue s'est produite!"
 msgid "copy"
 msgstr "copier"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:77
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:70
 msgid "About"
 msgstr "À propos"
 
@@ -296,7 +306,7 @@ msgid "Stop"
 msgstr "Arrêter"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:194
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:488
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:489
 msgid "Start"
 msgstr "Démarrer"
 
@@ -321,8 +331,8 @@ msgid "Stale"
 msgstr "Bloqué"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:215
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:247
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:455
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:248
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:456
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -330,171 +340,109 @@ msgstr "Inconnu"
 msgid "Linked"
 msgstr "Associé"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:275
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:276
 msgid "Minarca Settings"
 msgstr "Paramètres de Minarca"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:340
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:341
 msgid "Your data"
 msgstr "Vos données"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:349
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:350
 msgid "Go to Minarca website"
 msgstr "Aller sur le site web de minarca"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:350
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:351
 msgid "Allows you to browse your backup and restore files."
 msgstr "Vous permet de parcourir vos sauvegardes et de restaurer des fichiers"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:364
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:365
 msgid "Account settings"
 msgstr "Paramètres du compte"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:373
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:374
 msgid "Status"
 msgstr "État"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:375
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:376
 #, java-format
 msgid "As {0} @ {1}"
 msgstr "En tant que {0} @ {1}"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:376
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:377
 msgid "Unlink..."
 msgstr "Dissocier ..."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:377
-msgid "Unlink you computer from Minarca."
-msgstr "Dissocier cet ordinateur de Minarca."
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:378
+msgid "Unlink you system from Minarca."
+msgstr "Dissocier ce système de Minarca."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:392
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:393
 msgid "Fingerprint"
 msgstr "Empreinte"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:394
-msgid "Use by your computer to identify itself."
-msgstr "Utilisé par votre ordinateur pour s'identifier."
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:395
+msgid "Use by your system to identify itself."
+msgstr "Utilisé par votre système pour s'identifier."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:399
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:400
 msgid "Backup settings"
 msgstr "Paramètres de sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:409
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:410
 msgid "Allow you to select files and folders to backup."
 msgstr "Vous permet de sélectionner les fichiers et dossiers à sauvegarder."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:438
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:439
 msgid "Schedule"
 msgstr "Planification"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:439
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:440
 msgid "Define the backup frequency."
 msgstr "Définit la fréquence de sauvegarde."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:447
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:448
 msgid "Hourly"
 msgstr "Heure"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:449
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:450
 msgid "Daily"
 msgstr "Quotidienne"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:451
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:452
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:453
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:454
 msgid "Monthly"
 msgstr "Mensuelle"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:472
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:473
 msgid "Advance scheduler configuration."
 msgstr "Configuration avancée de la fréquence."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:486
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:487
 msgid "Last run time"
 msgstr "Dernier moment d'exécution"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:573
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:747
-msgid "Error"
-msgstr "Erreur"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:574
-msgid "Error updating selective backup configuration"
-msgstr "Erreur lors de la mise à jour de la configuration"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:575
-msgid ""
-"Can't change the configuration for unknown reason. If the problem persists, "
-"try re-installing Minarca."
-msgstr ""
-"Impossible de modifier la configuration pour une raison inconnue. Si le "
-"problème persiste, essayez de réinstaller Minarca."
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:592
-msgid "Are you sure you want to stop the current running backup?"
-msgstr ""
-"Êtes-vous sûr de vouloir arrêter la sauvegarde qui est en cours d'exécution?"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:593
-msgid ""
-"You are about to stop the running backup. Interupting the backup may "
-"temporarily disrupt data restore. Are you sure you want to continue?"
-msgstr ""
-"Vous êtes sur le point d'arrêter une sauvegarde qui est en cours "
-"d'exécution. L'interruption de la sauvegarde en cours peut perturber "
-"temporairement la restauration  de vos données. Êtes vous certain de vouloir "
-"continuer?"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:611
-msgid "Can't stop running backup!"
-msgstr "Impossible d'interrompe la sauvegarde en cour d'exécution"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:612
-msgid "An error occurred while stopping the backup."
-msgstr "Une erreur s'est produite lors de l'arrêt de la sauvegarde en cours."
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:621
-msgid "Do you want to backup your system now?"
-msgstr "Voulez-vous lancer une sauvegarde de votre système?"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:622
-msgid ""
-"You are about to backup your system to Minarca. This operation may take some "
-"time. While this operation is running you may safely close the Minarca "
-"application."
-msgstr ""
-"Vous êtes sur le point de sauvegarder votre système vers Minarca. Ce "
-"processus peut prendre un certain temps. Durant ce processus, vous pouvez "
-"fermer l'application Minarca."
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:640
-msgid "Can't backup this computer!"
-msgstr "Impossible de sauvegarder cet ordinateur!"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:641
-msgid "An error occurred while backuping this computer."
-msgstr "Une erreur s'est produite lors de la sauvegarde de cet ordinateur."
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:670
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:681
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:580
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:587
 msgid "Can't change backup schedule!"
 msgstr "Vous ne pouvez pas changer la fréquence de sauvegarde!"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:671
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:580
 msgid "Fail to retrieve current backup schedule."
 msgstr "Impossible de récupérer la fréquence de sauvegarde actuelle."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:682
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:587
 msgid "Fail to reschedule the backup task."
 msgstr "Impossible de replanifier la tâche de sauvegarde."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:697
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:602
 msgid "This action will open Windows Task Scheduler."
 msgstr "Cette action ouvrira Planificateur de tâches de Windows."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:698
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:604
 msgid ""
 "If you want more control over the backup schedule, you need to manually edit "
 "the Minarca backup task in Windows Task Scheduler. If you don't know what "
@@ -506,128 +454,189 @@ msgstr ""
 "que vous faites, vous devez annuler l'opération afin d'éviter de casser la "
 "fréquence."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:716
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:623
 msgid "Can't open Windows Task Scheduler!"
 msgstr "Impossible d'ouvrir Planificateur de tâches Windows"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:717
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:624
 msgid "An error occurred when trying to open Windows Task Scheduler."
 msgstr ""
 "Une erreur s'est produite en essayant d'ouvrir Planificateur de tâches "
 "Windows."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:732
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:649
+msgid "Error updating selective backup configuration"
+msgstr "Erreur lors de la mise à jour de la configuration"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:650
+msgid ""
+"Can't change the configuration for unknown reason. If the problem persists, "
+"try re-installing Minarca."
+msgstr ""
+"Impossible de modifier la configuration pour une raison inconnue. Si le "
+"problème persiste, essayez de réinstaller Minarca."
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:666
+msgid "Are you sure you want to stop the current running backup?"
+msgstr ""
+"Êtes-vous sûr de vouloir arrêter la sauvegarde qui est en cours d'exécution?"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:668
+msgid ""
+"You are about to stop the running backup. Interupting the backup may "
+"temporarily disrupt data restore. Are you sure you want to continue?"
+msgstr ""
+"Vous êtes sur le point d'arrêter une sauvegarde qui est en cours "
+"d'exécution. L'interruption de la sauvegarde en cours peut perturber "
+"temporairement la restauration  de vos données. Êtes vous certain de vouloir "
+"continuer?"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:685
+msgid "Can't stop running backup!"
+msgstr "Impossible d'interrompe la sauvegarde en cour d'exécution"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:685
+msgid "An error occurred while stopping the backup."
+msgstr "Une erreur s'est produite lors de l'arrêt de la sauvegarde en cours."
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:693
+msgid "Do you want to backup your system now?"
+msgstr "Voulez-vous lancer une sauvegarde de votre système?"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:695
+msgid ""
+"You are about to backup your system to Minarca. This operation may take some "
+"time. While this operation is running you may safely close the Minarca "
+"application."
+msgstr ""
+"Vous êtes sur le point de sauvegarder votre système vers Minarca. Ce "
+"processus peut prendre un certain temps. Durant ce processus, vous pouvez "
+"fermer l'application Minarca."
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:714
+msgid "Can't backup this system!"
+msgstr "Impossible de sauvegarder ce système!"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:715
+msgid "An error occurred while backuping this system."
+msgstr "Une erreur s'est produite lors de la sauvegarde de ce système."
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:730
 msgid "Confirm unlink"
 msgstr "Confirmer dissociation"
 
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:731
+msgid "Are you sure you want to unlink this system from Minarca?"
+msgstr "Êtes-vous sûr de vouloir dissocier ce système de Minarca?"
+
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:733
-msgid "Are you sure you want to unlink this computer from Minarca?"
-msgstr "Êtes-vous sûr de vouloir dissocier cet ordinateur de Minarca?"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:734
 msgid ""
-"You are about to unlink this computer from Minarca. This computer will no "
-"longer backup it self. Previous backup data will not be lost."
+"You are about to unlink this system from Minarca. This system will no longer "
+"backup it self. Previous backup data will not be lost."
 msgstr ""
-"Vous êtes sur le point de dissocier cet ordinateur de Minarca. Cet "
-"ordinateur ne sera plus sauvegardé automatiquement. Les sauvegardes "
-"précédentes ne seront pas perdues."
+"Vous êtes sur le point de dissocier ce système de Minarca. Ce système ne "
+"sera plus sauvegardé automatiquement. Les sauvegardes précédentes ne seront "
+"pas perdues."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:747
-msgid "Can't unlink this computer!"
-msgstr "Impossible de dissocier cet ordinateur!"
+msgid "Error"
+msgstr "Erreur"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:747
-msgid "An error occurred while unlinking this computer."
-msgstr "Une erreur s'est produite lors de la dissociation de cet ordinateur."
+msgid "Can't unlink this system!"
+msgstr "Impossible de dissocier ce système!"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:747
+msgid "An error occurred while unlinking this system."
+msgstr "Une erreur s'est produite lors de la dissociation de ce système."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:759
 msgid "http://www.patrikdufresne.com/en/minarca/help/"
 msgstr "http://www.patrikdufresne.com/fr/minarca/help/"
 
-#: com/patrikdufresne/minarca/core/APIException.java:22
+#: com/patrikdufresne/minarca/core/APIException.java:20
 #, java-format
-msgid "computer name {0} already in use"
-msgstr "le nom d'ordinateur {0} est déjà utilisé"
+msgid "Repository name {0} already in use"
+msgstr "Le nom de dépôt {0} est déjà utilisé"
 
-#: com/patrikdufresne/minarca/core/APIException.java:63
-msgid "plink is missing"
-msgstr "plink est manquant "
+#: com/patrikdufresne/minarca/core/APIException.java:33
+msgid "Fail to send SSH key to Minarca."
+msgstr "Impossible d'envoyer la clé de sécurité à Minarca."
 
-#: com/patrikdufresne/minarca/core/APIException.java:72
-msgid "remote SSH host is not trusted"
-msgstr "l'hôte distant n'est pas digne de confiance"
+#: com/patrikdufresne/minarca/core/APIException.java:47
+msgid "Fail to generate the security keys."
+msgstr "Impossible de générer la clé de securité."
 
-#: com/patrikdufresne/minarca/core/APIException.java:83
+#: com/patrikdufresne/minarca/core/APIException.java:61
+msgid "Initial backup did not complete successfully."
+msgstr "La sauvegarde initiale a échoué."
+
+#: com/patrikdufresne/minarca/core/APIException.java:75
+msgid "Initial backup didn't run."
+msgstr "La sauvegarde initiale n'a pas fonctionné."
+
+#: com/patrikdufresne/minarca/core/APIException.java:89
+msgid "Initial backup is still running."
+msgstr "La sauvegarde initiale est toujours en cours d'exécution."
+
+#: com/patrikdufresne/minarca/core/APIException.java:103
+msgid "Fail to link computer."
+msgstr "Impossible d'associer votre ordinateur."
+
+#: com/patrikdufresne/minarca/core/APIException.java:145
+msgid "Plink is missing"
+msgstr "Plink est manquant "
+
+#: com/patrikdufresne/minarca/core/APIException.java:159
+msgid "Scheduled task not found"
+msgstr "La tâche planifiée est introuvable"
+
+#: com/patrikdufresne/minarca/core/APIException.java:167
+msgid "You don't have sufficient permissions to execute this application!"
+msgstr ""
+"Vous ne disposez pas des autorisations nécessaires pour exécuter cette "
+"application!"
+
+#: com/patrikdufresne/minarca/core/APIException.java:178
 msgid ""
 "Minarca doesn't support your operating system. This application will close."
 msgstr ""
 "Minarca ne supporte pas votre système d'exploitation. Cette application va "
 "fermer."
 
-#: com/patrikdufresne/minarca/core/APIException.java:91
-msgid "you don't have sufficient permissions to execute this application!"
-msgstr ""
-"vous ne disposez pas des autorisations nécessaires pour exécuter cette "
-"application!"
-
-#: com/patrikdufresne/minarca/core/APIException.java:105
-msgid "scheduled task not found"
-msgstr "la tâche planifiée est introuvable"
-
-#: com/patrikdufresne/minarca/core/APIException.java:130
-#, java-format
-msgid "fail to link computer: {0}"
-msgstr "impossible d'associer votre ordinateur : {0}"
-
-#: com/patrikdufresne/minarca/core/APIException.java:130
-msgid "fail to link computer"
-msgstr "impossible d'associer votre ordinateur"
+#: com/patrikdufresne/minarca/core/APIException.java:187
+msgid "Remote SSH host is not trusted"
+msgstr "L'hôte distant n'est pas digne de confiance"
 
 #: com/patrikdufresne/minarca/core/internal/SchedulerWindows.java:367
 #, java-format
 msgid "{0} is missing"
 msgstr "{0} est absent"
 
-#: com/patrikdufresne/minarca/core/API.java:251
+#: com/patrikdufresne/minarca/core/API.java:256
 msgid "fail to read selective backup settings"
 msgstr "impossible de lire les paramètres de sauvegarde selective"
 
-#: com/patrikdufresne/minarca/core/API.java:263
+#: com/patrikdufresne/minarca/core/API.java:268
 msgid "Backup failed"
 msgstr "Échec de la sauvegarde"
 
-#: com/patrikdufresne/minarca/core/API.java:278
+#: com/patrikdufresne/minarca/core/API.java:283
 msgid "Minarca is not configured"
 msgstr "Minarca n'est pas configuré"
 
-#: com/patrikdufresne/minarca/core/API.java:284
+#: com/patrikdufresne/minarca/core/API.java:289
 msgid "identity file doesn't exists or is not accessible"
 msgstr "le fichier d'identité n'existe pas ou n'est pas accessible"
 
-#: com/patrikdufresne/minarca/core/API.java:289
+#: com/patrikdufresne/minarca/core/API.java:294
 msgid "selective backup settings are missing"
 msgstr "paramètres de sauvegarde selective manquants"
 
-#: com/patrikdufresne/minarca/core/API.java:544
-#: com/patrikdufresne/minarca/core/API.java:546
-#: com/patrikdufresne/minarca/core/API.java:548
-msgid "fail to generate the keys"
-msgstr "impossible de générer la clé"
-
-#: com/patrikdufresne/minarca/core/API.java:555
-msgid "fail to send SSH key to Minarca"
-msgstr "échec d'envoi de la clé SSH à Minarca"
-
-#: com/patrikdufresne/minarca/core/API.java:595
-msgid "initial backup is not successful"
-msgstr "échec de la sauvegarde initilale"
-
-#: com/patrikdufresne/minarca/core/API.java:662
-#: com/patrikdufresne/minarca/core/API.java:677
-#: com/patrikdufresne/minarca/core/API.java:698
-#: com/patrikdufresne/minarca/core/API.java:713
-#: com/patrikdufresne/minarca/core/API.java:738
+#: com/patrikdufresne/minarca/core/API.java:697
+#: com/patrikdufresne/minarca/core/API.java:712
+#: com/patrikdufresne/minarca/core/API.java:733
+#: com/patrikdufresne/minarca/core/API.java:748
+#: com/patrikdufresne/minarca/core/API.java:773
 msgid "fail to save config"
 msgstr "échec de l'enregistrement des configurations"
-
