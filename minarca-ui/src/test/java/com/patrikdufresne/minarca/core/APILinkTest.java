@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
+import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupHasNotRunException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupRunningException;
@@ -112,7 +112,7 @@ public class APILinkTest {
      * @throws InterruptedException
      * @throws IOException
      */
-    @Test(expected = ComputerNameAlreadyInUseException.class)
+    @Test(expected = RepositoryNameAlreadyInUseException.class)
     public void testLink_WithRepoExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
         Repository r = Mockito.mock(Repository.class);
@@ -152,7 +152,7 @@ public class APILinkTest {
      * @throws InterruptedException
      * @throws IOException
      */
-    @Test(expected = ComputerNameAlreadyInUseException.class)
+    @Test(expected = RepositoryNameAlreadyInUseException.class)
     public void testLink_WithRepositoryExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
         Repository r = Mockito.mock(Repository.class);

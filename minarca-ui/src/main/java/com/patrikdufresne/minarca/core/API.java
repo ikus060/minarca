@@ -34,7 +34,7 @@ import org.apache.commons.logging.impl.NoOpLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
+import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.APIException.ExchangeSshKeyException;
 import com.patrikdufresne.minarca.core.APIException.GenerateKeyException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
@@ -93,7 +93,7 @@ public class API {
     /**
      * Property name.
      */
-    private static final String PROPERTY_COMPUTERNAME = "computername";
+    private static final String PROPERTY_REPOSITORY_NAME = "repositoryname";
 
     /**
      * Property name.
@@ -231,10 +231,10 @@ public class API {
         // Get the config value.
         String username = this.getUsername();
         String remotehost = this.getRemotehost();
-        String computerName = this.getComputerName();
+        String repositoryName = this.getRepositoryName();
 
         // Compute the path.
-        String path = "/home/" + username + "/" + computerName;
+        String path = "/home/" + username + "/" + repositoryName;
 
         // Get reference to the identity file to be used by ssh or plink.
         File identityFile = getIdentityFile();
@@ -279,7 +279,7 @@ public class API {
     public void checkConfig() throws APIException {
         // Basic sanity check to make sure it's configured. If not, display the
         // setup dialog.
-        if (StringUtils.isEmpty(getComputerName()) || StringUtils.isEmpty(getUsername())) {
+        if (StringUtils.isEmpty(getRepositoryName()) || StringUtils.isEmpty(getUsername())) {
             throw new NotConfiguredException(_("Minarca is not configured"));
         }
         // NOTICE: remotehosts is optional.
@@ -350,21 +350,21 @@ public class API {
     }
 
     /**
-     * Return default browse URL for the current computer.
+     * Return default browse URL for the current repository.
      * 
      * @return
      */
     public String getBrowseUrl() {
-        return BASE_URL + "/browse/" + getComputerName();
+        return BASE_URL + "/browse/" + getRepositoryName();
     }
 
     /**
-     * Friently named used to represent the computer being backuped.
+     * Friendly named used to represent the repository being backuped.
      * 
-     * @return the computer name.
+     * @return the repository name.
      */
-    public String getComputerName() {
-        return this.properties.getString(PROPERTY_COMPUTERNAME);
+    public String getRepositoryName() {
+        return this.properties.getString(PROPERTY_REPOSITORY_NAME);
     }
 
     /**
@@ -496,7 +496,7 @@ public class API {
      * computer name is added to the comments.
      * 
      * 
-     * @param computername
+     * @param repositoryName
      *            friendly name to represent this computer.
      * @param client
      *            reference to web client
@@ -508,26 +508,26 @@ public class API {
      * @throws IOException
      *             communication error with minarca website.
      * @throws IllegalAccessException
-     *             if the computer name is not valid.
+     *             if the repository name is not valid.
      */
-    public void link(String computername, Client client, boolean force) throws APIException, InterruptedException, IOException {
-        Validate.notEmpty(computername);
+    public void link(String repositoryName, Client client, boolean force) throws APIException, InterruptedException, IOException {
+        Validate.notEmpty(repositoryName);
         Validate.notNull(client);
-        Validate.isTrue(computername.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
+        Validate.isTrue(repositoryName.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
 
         /*
-         * Check if computer name is already in uses.
+         * Check if repository name is already in uses.
          */
         boolean exists = false;
-        exists = client.getRepositoryInfo(computername) != null;
+        exists = client.getRepositoryInfo(repositoryName) != null;
         if (!force && exists) {
-            throw new ComputerNameAlreadyInUseException(computername);
+            throw new RepositoryNameAlreadyInUseException(repositoryName);
         }
 
         /*
          * Generate the keys
          */
-        LOGGER.debug("generating public and private key for {}", computername);
+        LOGGER.debug("generating public and private key for {}", repositoryName);
         File idrsaFile = new File(Compat.CONFIG_PATH, "id_rsa.pub");
         File identityFile = new File(Compat.CONFIG_PATH, "id_rsa");
         File puttyFile = new File(Compat.CONFIG_PATH, "key.ppk");
@@ -536,11 +536,11 @@ public class API {
             // Generate a key pair.
             KeyPair pair = Keygen.generateRSA();
             // Generate a simple id_rsa.pub file.
-            Keygen.toPublicIdRsa((RSAPublicKey) pair.getPublic(), computername, idrsaFile);
+            Keygen.toPublicIdRsa((RSAPublicKey) pair.getPublic(), repositoryName, idrsaFile);
             // Generate a private key file.
             Keygen.toPrivatePEM((RSAPrivateKey) pair.getPrivate(), identityFile);
             // Generate a Putty private key file.
-            Keygen.toPrivatePuttyKey(pair, computername, puttyFile);
+            Keygen.toPrivatePuttyKey(pair, repositoryName, puttyFile);
             // Read RSA pub key.
             rsadata = FileUtils.readFileToString(idrsaFile);
         } catch (Exception e) {
@@ -549,15 +549,15 @@ public class API {
 
         // Send SSH key to minarca server using web service.
         try {
-            client.addSSHKey(computername, rsadata);
+            client.addSSHKey(repositoryName, rsadata);
         } catch (IOException e) {
             throw new ExchangeSshKeyException(e);
         }
 
         // Generate configuration file.
-        LOGGER.debug("saving configuration [{}][{}][{}]", computername, client.getUsername(), getRemotehost());
+        LOGGER.debug("saving configuration [{}][{}][{}]", repositoryName, client.getUsername(), getRemotehost());
         setUsername(client.getUsername());
-        setComputerName(computername);
+        setRepositoryName(repositoryName);
         setRemotehost(getRemotehost());
 
         // Create default schedule
@@ -587,9 +587,9 @@ public class API {
             try {
                 client.updateRepositories();
                 // Check if repo exists in minarca.
-                exists = client.getRepositoryInfo(computername) != null;
+                exists = client.getRepositoryInfo(repositoryName) != null;
                 if (exists) {
-                    LOGGER.debug("repository {} found", computername);
+                    LOGGER.debug("repository {} found", repositoryName);
                     break;
                 }
             } catch (IOException e) {
@@ -610,7 +610,7 @@ public class API {
 
             // Unset properties
             setUsername(null);
-            setComputerName(null);
+            setRepositoryName(null);
             setRemotehost(null);
 
             // Check if the backup schedule ran.
@@ -631,8 +631,8 @@ public class API {
 
         // Set encoding
         try {
-            LOGGER.debug("updating repository [{}] encoding [{}]", computername, Compat.CHARSET_DEFAULT.toString());
-            client.getRepositoryInfo(computername).setEncoding(Compat.CHARSET_DEFAULT.toString());
+            LOGGER.debug("updating repository [{}] encoding [{}]", repositoryName, Compat.CHARSET_DEFAULT.toString());
+            client.getRepositoryInfo(repositoryName).setEncoding(Compat.CHARSET_DEFAULT.toString());
         } catch (Exception e) {
             LOGGER.warn("fail to configure repository encoding", e);
         }
@@ -684,13 +684,13 @@ public class API {
     }
 
     /**
-     * Sets the computer name.
+     * Sets the repository name.
      * 
      * @param value
      * @throws APIException
      */
-    public void setComputerName(String value) throws APIException {
-        this.properties.setProperty(PROPERTY_COMPUTERNAME, value);
+    public void setRepositoryName(String value) throws APIException {
+        this.properties.setProperty(PROPERTY_REPOSITORY_NAME, value);
         try {
             this.properties.save();
         } catch (ConfigurationException e) {
@@ -794,10 +794,10 @@ public class API {
         // Get the config value.
         String username = this.getUsername();
         String remotehost = this.getRemotehost();
-        String computerName = this.getComputerName();
+        String repositoryName = this.getRepositoryName();
 
         // Compute the path.
-        String path = "/home/" + username + "/" + computerName;
+        String path = "/home/" + username + "/" + repositoryName;
 
         // Get reference to the identity file to be used by ssh or plink.
         File identityFile = getIdentityFile();
@@ -817,7 +817,7 @@ public class API {
      */
     public void unlink() throws APIException {
         // To unlink, delete the configuration and schedule task.
-        setComputerName(null);
+        setRepositoryName(null);
         setUsername(null);
         setRemotehost(null);
 

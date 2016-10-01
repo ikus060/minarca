@@ -15,9 +15,9 @@ public class APIException extends Exception {
      * @author Patrik Dufresne
      * 
      */
-    public static class ComputerNameAlreadyInUseException extends APIException {
-        public ComputerNameAlreadyInUseException(String computername) {
-            super(_("Computer name {0} already in use", computername));
+    public static class RepositoryNameAlreadyInUseException extends APIException {
+        public RepositoryNameAlreadyInUseException(String name) {
+            super(_("Repository name {0} already in use", name));
         }
     }
 

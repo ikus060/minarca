@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
-import com.patrikdufresne.minarca.core.APIException.ComputerNameAlreadyInUseException;
+import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.rdiffweb.core.Client;
 
@@ -246,9 +246,9 @@ public class SetupDialog extends Dialog {
         icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
 
         // Introduction message
-        String introText = "<h2>" + _("Link your computer") + "</h2><br/>";
+        String introText = "<h2>" + _("Link your system") + "</h2><br/>";
         introText += _(
-                "You need to link this computer to your account. Please, "
+                "You need to link this system to your account. Please, "
                         + "provide a friendly name to represent it. "
                         + "Once selected, you won't be able to change it.");
         FormText introLabel = ft.createFormText(parent, introText, false);
@@ -259,19 +259,19 @@ public class SetupDialog extends Dialog {
         alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Label
-        String computerNameLabelText = "<b>" + _("Provide a computer name") + "</b>";
+        String computerNameLabelText = "<b>" + _("Provide a repository name") + "</b>";
         FormText computerNameLabel = ft.createFormText(parent, computerNameLabelText, false);
         computerNameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Computer name
         final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
         computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        computerNameText.setMessage(_("Computer name"));
+        computerNameText.setMessage(_("Repository name"));
         computerNameText.setText(Compat.COMPUTER_NAME);
         computerNameText.setFocus();
 
         // Sign in button
-        final Button linkButton = ft.createButton(parent, _("Link computer"), SWT.PUSH);
+        final Button linkButton = ft.createButton(parent, _("Link"), SWT.PUSH);
         linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
         getShell().setDefaultButton(linkButton);
 
@@ -337,7 +337,7 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Success !") + "</h2><br/>";
-        introText += _("Your computer is now configure to backup it self once a day with Minarca!");
+        introText += _("Your system is now configure to backup it self once a day with Minarca!");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -398,12 +398,12 @@ public class SetupDialog extends Dialog {
     protected String handleLinkComputer(String name, boolean force) {
         // Little validation before
         if (name.trim().isEmpty()) {
-            return _("Computer name cannot be empty.");
+            return _("Repository name cannot be empty.");
         }
         LOGGER.info("link computer {}", name);
         try {
             API.instance().link(name, this.client, force);
-        } catch (ComputerNameAlreadyInUseException e) {
+        } catch (RepositoryNameAlreadyInUseException e) {
             final MutableInt returnCode = new MutableInt();
             Display.getDefault().syncExec(new Runnable() {
                 @Override
@@ -412,11 +412,11 @@ public class SetupDialog extends Dialog {
                             .openYesNoQuestion(
                                     getShell(),
                                     Display.getAppName(),
-                                    _("Are you sure you want to keep the given computer name ?"),
+                                    _("Are you sure you want to keep the given repository name ?"),
                                     _(
-                                            "The given computer name is already in use in Minarca. "
-                                                    + "You may keep this computer name if the name is "
-                                                    + "no longer used by another computer currently "
+                                            "The given repository name is already in use in Minarca. "
+                                                    + "You may keep this repository name if the name is "
+                                                    + "no longer used by another system currently "
                                                     + "link to Minarca."),
                                     null)
                             .getReturnCode();
@@ -427,7 +427,7 @@ public class SetupDialog extends Dialog {
                 // Force usage of the computer name
                 return handleLinkComputer(name, true);
             }
-            return _("Change the computer name");
+            return _("Change the repository name");
         } catch (APIException e) {
             LOGGER.warn("fail to register computer", e);
             return e.getMessage();

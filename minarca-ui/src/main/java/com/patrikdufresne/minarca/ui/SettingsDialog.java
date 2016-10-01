@@ -373,9 +373,9 @@ public class SettingsDialog extends Dialog {
          */
         statusItem = new CListItem(accountItemlist, _("Status"));
         statusItem.setValue(Dialog.ELLIPSIS);
-        statusItem.setValueHelpText(_("As {0} @ {1}", API.instance().getUsername(), API.instance().getComputerName()));
+        statusItem.setValueHelpText(_("As {0} @ {1}", API.instance().getUsername(), API.instance().getRepositoryName()));
         unlinkButton = statusItem.createButton(_("Unlink..."));
-        unlinkButton.setToolTipText(_("Unlink you computer from Minarca."));
+        unlinkButton.setToolTipText(_("Unlink you system from Minarca."));
         unlinkButton.setEnabled(false);
         unlinkButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -392,7 +392,7 @@ public class SettingsDialog extends Dialog {
          */
         CListItem fingerprintItem = new CListItem(accountItemlist, _("Fingerprint"));
         fingerprintItem.setValue(API.instance().getIdentityFingerPrint());
-        fingerprintItem.setValueHelpText(_("Use by your computer to identify itself."));
+        fingerprintItem.setValueHelpText(_("Use by your system to identify itself."));
 
         // Create label.
         Label backupSettingsLabel = new Label(comp, SWT.NONE);
@@ -711,8 +711,8 @@ public class SettingsDialog extends Dialog {
                 DetailMessageDialog.openError(
                         this.getShell(),
                         Display.getAppName(),
-                        _("Can't backup this computer!"),
-                        _("An error occurred while backuping this computer."));
+                        _("Can't backup this system!"),
+                        _("An error occurred while backuping this system."));
             }
         }
 
@@ -728,10 +728,10 @@ public class SettingsDialog extends Dialog {
                 .openYesNoQuestion(
                         this.getShell(),
                         _("Confirm unlink"),
-                        _("Are you sure you want to unlink this computer from Minarca?"),
+                        _("Are you sure you want to unlink this system from Minarca?"),
                         _(
-                                "You are about to unlink this computer from Minarca. This "
-                                        + "computer will no longer backup it self. Previous "
+                                "You are about to unlink this system from Minarca. This "
+                                        + "system will no longer backup it self. Previous "
                                         + "backup data will not be lost."),
                         null);
         if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
@@ -743,8 +743,8 @@ public class SettingsDialog extends Dialog {
         try {
             API.instance().unlink();
         } catch (APIException e) {
-            LOGGER.error("an error occurred while unlinking this computer", e);
-            DetailMessageDialog.openError(this.getShell(), _("Error"), _("Can't unlink this computer!"), _("An error occurred while unlinking this computer."));
+            LOGGER.error("an error occurred while unlinking this system", e);
+            DetailMessageDialog.openError(this.getShell(), _("Error"), _("Can't unlink this system!"), _("An error occurred while unlinking this system."));
         }
 
         // Then close this dialog to open the setup dialog.
