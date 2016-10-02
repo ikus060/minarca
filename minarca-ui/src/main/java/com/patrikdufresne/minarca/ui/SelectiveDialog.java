@@ -324,9 +324,14 @@ public class SelectiveDialog extends Dialog {
             }
         }
         if (excluded) {
-            DetailMessageDialog.openWarning(getShell(), getShell().getText(), _("Selected item is excluded by another pattern."), _(
-                    "The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.",
-                    file));
+            DetailMessageDialog
+                    .openWarning(
+                            getShell(),
+                            getShell().getText(),
+                            _("Selected item is excluded by another pattern."),
+                            _(
+                                    "The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.",
+                                    file));
         }
 
         // Check if predefined.

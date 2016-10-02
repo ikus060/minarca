@@ -675,11 +675,9 @@ public class API {
     private void save(File file, Properties properties) throws IOException {
         LOGGER.trace("writing config to [{}]", file);
         Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
-        properties.store(
-                writer,
-                "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
-                        + "Minarca backup configuration.\r\n"
-                        + "Please do not change this configuration file manually.");
+        properties.store(writer, "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
+                + "Minarca backup configuration.\r\n"
+                + "Please do not change this configuration file manually.");
         writer.close();
     }
 

@@ -245,10 +245,9 @@ public class SetupDialog extends Dialog {
 
         // Introduction message
         String introText = "<h2>" + _("Link your system") + "</h2><br/>";
-        introText += _(
-                "You need to link this system to your account. Please, "
-                        + "provide a friendly name to represent it. "
-                        + "Once selected, you won't be able to change it.");
+        introText += _("You need to link this system to your account. Please, "
+                + "provide a friendly name to represent it. "
+                + "Once selected, you won't be able to change it.");
         FormText introLabel = ft.createFormText(parent, introText, false);
         introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
@@ -406,18 +405,15 @@ public class SetupDialog extends Dialog {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    int r = DetailMessageDialog
-                            .openYesNoQuestion(
-                                    getShell(),
-                                    Display.getAppName(),
-                                    _("Are you sure you want to keep the given repository name ?"),
-                                    _(
-                                            "The given repository name is already in use in Minarca. "
-                                                    + "You may keep this repository name if the name is "
-                                                    + "no longer used by another system currently "
-                                                    + "link to Minarca."),
-                                    null)
-                            .getReturnCode();
+                    int r = DetailMessageDialog.openYesNoQuestion(
+                            getShell(),
+                            Display.getAppName(),
+                            _("Are you sure you want to keep the given repository name ?"),
+                            _("The given repository name is already in use in Minarca. "
+                                    + "You may keep this repository name if the name is "
+                                    + "no longer used by another system currently "
+                                    + "link to Minarca."),
+                            null).getReturnCode();
                     returnCode.setValue(r);
                 }
             });
