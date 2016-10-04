@@ -434,11 +434,7 @@ public class SelectiveDialog extends Dialog {
     private void restoreDefaultPatterns() {
         // Remove non-existing non-globing patterns.
         this.patterns.clear();
-        for (GlobPattern p : GlobPattern.DEFAULTS) {
-            if (p.isFileExists() || p.isGlobbing()) {
-                this.patterns.add(p);
-            }
-        }
+        this.patterns.addAll(GlobPattern.DEFAULTS);
         refreshCustomList(true);
     }
 

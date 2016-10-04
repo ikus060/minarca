@@ -13,12 +13,6 @@ import org.junit.Test;
 public class GlobPatternTest {
 
     @Test
-    public void testDownloadsExcludes() {
-        GlobPattern pattern = new GlobPattern(true, SystemUtils.USER_HOME + "/Downloads");
-        assertTrue(GlobPattern.DEFAULTS.contains(pattern));
-    }
-
-    @Test
     public void testReadWrite() throws IOException {
         GlobPattern pattern = new GlobPattern(true, SystemUtils.USER_HOME + "/Downloads");
         File temp = File.createTempFile("minaca", "globpattern");

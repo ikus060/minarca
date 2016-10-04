@@ -333,13 +333,7 @@ public class API {
         // Sets the default patterns.
         if (force || getGlobPatterns().isEmpty()) {
             // Remove non-existing non-globing patterns.
-            List<GlobPattern> patterns = new ArrayList<GlobPattern>();
-            for (GlobPattern p : GlobPattern.DEFAULTS) {
-                if (p.isFileExists() || p.isGlobbing()) {
-                    patterns.add(p);
-                }
-            }
-            setGlobPatterns(patterns);
+            setGlobPatterns(GlobPattern.DEFAULTS);
         }
 
         // Delete & create schedule tasks.

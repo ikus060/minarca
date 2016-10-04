@@ -56,7 +56,14 @@ public class GlobPattern {
         patterns.addAll(readResource("default_5_a"));
         patterns.addAll(readResource("default_9"));
         patterns.addAll(readResource("default_9_a"));
-        DEFAULTS = patterns;
+        // Filter out.
+        List<GlobPattern> list = new ArrayList<GlobPattern>();
+        for (GlobPattern p : patterns) {
+            if (p.isFileExists() || p.isGlobbing()) {
+                list.add(p);
+            }
+        }
+        DEFAULTS = list;
     }
 
     static {
