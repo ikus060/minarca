@@ -1,0 +1,9 @@
+# Copyright (C) 2016 Patrik Dufresne Service Logiciel inc. All rights reserved.
+# Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
+
+CherryPy==8.1.2
+Jinja2==2.8
+Babel==2.3.4
+future==0.15.2
+pycrypto==2.6
