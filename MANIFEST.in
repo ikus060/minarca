@@ -18,6 +18,7 @@
 include *.plugin
 include rdw.conf
 include babel.cfg
+include README.md
 
 # Include translation file
 recursive-include minarca_brand *.po *.pot *.mo *.html *.ico *.png *.css *.less
