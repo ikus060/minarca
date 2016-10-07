@@ -212,7 +212,7 @@ class build(build_):
 
 setup(
     name="minarca-plugins",
-    version='0.9.1',
+    version='0.9.0',
     description='Minarca Plugins',
     long_description='Sets of plugins for Minarca.',
     author='Patrik Dufresne Service Logiciel inc.',
