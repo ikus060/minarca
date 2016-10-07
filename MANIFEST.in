@@ -16,6 +16,8 @@
 
 # Include static Web files
 include *.plugin
+include rdw.conf
+include babel.cfg
 
 # Include translation file
 recursive-include minarca_brand *.po *.pot *.mo *.html *.ico *.png *.css *.less
