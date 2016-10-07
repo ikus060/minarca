@@ -208,7 +208,6 @@ class build(build_):
 
     sub_commands = build_.sub_commands[:]
     sub_commands.insert(0, ('compile_all_catalogs', None))
-    sub_commands.insert(0, ('filltmpl', None))
 
 setup(
     name="minarca-plugins",
