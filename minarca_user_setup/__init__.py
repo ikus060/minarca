@@ -119,14 +119,14 @@ class MinarcaUserSetup(IUserChangeListener):
             return None
 
         # Get value using zfs (as exact value).
-        logger.debug('get user [%s] quota', user)
-        p = subprocess.Popen(
-            ['zfs', 'get', '-p', '-H', '-o', 'value', 'userused@%s,userquota@%s,used,available' % (user, user), self._zfs_pool],
-            stdout=subprocess.PIPE)
+        logger.info('get user [%s] quota', user)
+        args = ['/sbin/zfs', 'get', '-p', '-H', '-o', 'value', 'userused@%s,userquota@%s,used,available' % (user, user), self._zfs_pool]
+        logger.info('execute command line: %s', ' '.join(args))
+        p = subprocess.Popen(args, stdout=subprocess.PIPE)
         value = p.communicate()[0]
         values = value.splitlines()
         if len(values) != 4:
-            raise RdiffError('fail to get user disk space: %s' % (value))
+            raise RdiffError('fail to get user disk space: %s' % (value,))
         userused, userquota, used, available = [int(x) for x in values]
 
         # If size is 0, the user doesn't have a quota. So use,
@@ -245,6 +245,6 @@ class MinarcaUserSetup(IUserChangeListener):
         Need to verify LDAP quota and update ZFS quota if required.
         """
         assert isinstance(user, str)
-        
+
         # Update the user Quote from LDAP.
         self._update_userquota(user, default_quota=0)
