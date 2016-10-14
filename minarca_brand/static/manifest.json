@@ -3,27 +3,27 @@
   "name": "Minarca",
   "icons": [
     {
-      "src": "/static/minarca_16.png",
+      "src": "/minarca_brand_static/minarca_16.png",
       "sizes": "16x16",
       "type": "image/png"
     },
     {
-      "src": "/static/minarca_22.png",
+      "src": "/minarca_brand_static/minarca_22.png",
       "sizes": "22x22",
       "type": "image/png"
     },
     {
-      "src": "/static/minarca_32.png",
+      "src": "/minarca_brand_static/minarca_32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/static/minarca_48.png",
+      "src": "/minarca_brand_static/minarca_48.png",
       "sizes": "48x48",
       "type": "image/png"
     },
     {
-      "src": "/static/minarca_128.png",
+      "src": "/static-plugins/minarca_brand/minarca_128.png",
       "sizes": "128x128",
       "type": "image/png"
     }

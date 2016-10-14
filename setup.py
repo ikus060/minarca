@@ -222,11 +222,6 @@ setup(
         'minarca_disk_space'
     ],
     include_package_data=True,
-    data_files=[
-        ('/etc/rdiffweb/plugins/minarca_brand', [
-            'minarca_brand/minarca.ico',
-            'minarca_brand/minarca_22_w.png']),
-    ],
     cmdclass={
         'build': build,
         'compile_all_catalogs': compile_all_catalogs,
