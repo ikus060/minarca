@@ -376,11 +376,6 @@ public class SetupDialog extends Dialog {
     @Override
     protected Point getInitialSize() {
         return getShell().computeSize(325, 575, true);
-        // if (SystemUtils.IS_OS_WINDOWS) {
-        // return new Point();
-        // } else {
-        // return new Point(325, 575);
-        // }
     }
 
     /**
