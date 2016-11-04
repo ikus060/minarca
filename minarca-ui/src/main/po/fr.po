@@ -35,7 +35,7 @@ msgid ""
 msgstr ""
 "Votre installation Minarca semble être brisée. Si vous répondez oui, tous "
 "vos paramètres personnels seront perdus. Si vous répondez non, cette "
-"application peut mal focntionner. "
+"application peut mal fonctionner. "
 
 #: com/patrikdufresne/minarca/Main.java:284
 msgid "Can't repair Minarca's configuration!"
