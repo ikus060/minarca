@@ -21,6 +21,7 @@ SetCompressor bzip2
   !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98426"
   !define JRE_URL_64 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98428"
   !include "JREDyna_Inetc.nsh"
+  !include "nsProcess.nsh"
 
 ;--------------------------------
 ;Configuration
@@ -102,6 +103,12 @@ SetCompressor bzip2
   LicenseLangString license ${LANG_FRENCH} "Licence_fr.rtf"
   
   !insertmacro JREINFO_LANGUAGE
+  
+;--------------------------------
+;Language Strings
+
+LangString APP_IS_RUNNING ${LANG_ENGLISH} "The installation process detected ${AppName} is running. Please close it and try again."
+LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté que ${AppName} est en cours d'exécution. S'il vous plaît, fermez l'application et essayez à nouveau."
   
 ;--------------------------------
 ;Reserve Files
@@ -195,6 +202,18 @@ Function .onInit
   
   !insertmacro MUI_LANGDLL_DISPLAY
   
+  ; Check if application is running.
+  ${nsProcess::FindProcess} "minarca.exe" $R0
+  StrCmp $R0 0 0 notRunning32
+    MessageBox MB_OK|MB_ICONEXCLAMATION $(APP_IS_RUNNING) /SD IDOK
+    Abort
+  notRunning32:
+  ${nsProcess::FindProcess} "minarca64.exe" $R0
+  StrCmp $R0 0 0 notRunning64
+    MessageBox MB_OK|MB_ICONEXCLAMATION $(APP_IS_RUNNING) /SD IDOK
+    Abort
+  notRunning64:
+    
 FunctionEnd
 
 ;--------------------------------
