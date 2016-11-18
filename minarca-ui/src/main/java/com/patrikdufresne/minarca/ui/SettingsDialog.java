@@ -44,6 +44,7 @@ import org.eclipse.ui.forms.FormColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.patrikdufresne.fontawesome.FontAwesome;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
@@ -79,7 +80,9 @@ public class SettingsDialog extends Dialog {
     /**
      * Create an executor service to asynchronously update the UI.
      */
-    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
+            .setNameFormat("scheduled-ui-update-%d")
+            .build());
 
     private CListItem lastruntimeItem;
 
