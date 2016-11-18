@@ -9,6 +9,8 @@
         <module>minarca-icons</module>
         <module>minarca-ui</module>
         <module>minarca-installation-package</module>
+        <module>minarca-installation-package-unix</module>
+        <module>minarca-installation-package-deb</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
