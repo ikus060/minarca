@@ -7,8 +7,6 @@ package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.concurrent.Executors;
@@ -50,7 +48,6 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.LastResult;
 import com.patrikdufresne.minarca.core.Schedule;
-import com.patrikdufresne.minarca.core.internal.Compat;
 
 /**
  * This is the main windows of the application used to configure the backup.
@@ -165,13 +162,6 @@ public class SettingsDialog extends Dialog {
         // Get backup info.
         final LastResult lastResult = API.instance().getLastResult();
         final Date lastDate = API.instance().getLastResultDate();
-        Schedule temp = null;
-        try {
-            temp = API.instance().getSchedule();
-        } catch (APIException e) {
-            // Do nothing.
-        }
-        final Schedule schedule = temp;
 
         // Update UI
         Display.getDefault().asyncExec(new Runnable() {
@@ -217,14 +207,6 @@ public class SettingsDialog extends Dialog {
                 default:
                     lastruntimeItem.setValue(_("Unknown"));
                     break;
-                }
-
-                // Update schedule
-                if (schedule != null) {
-                    scheduleCombo.setSelection(new StructuredSelection(schedule));
-                    scheduleCombo.getControl().setEnabled(true);
-                } else {
-                    scheduleCombo.getControl().setEnabled(false);
                 }
 
             }
@@ -442,7 +424,6 @@ public class SettingsDialog extends Dialog {
         CListItem scheduleItem = new CListItem(backupItemlist, _("Schedule"));
         scheduleItem.setTitleHelpText(_("Define the backup frequency."));
         scheduleCombo = new ComboViewer(scheduleItem.createCombo(SWT.READ_ONLY));
-        scheduleCombo.getControl().setEnabled(false);
         scheduleCombo.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -455,14 +436,12 @@ public class SettingsDialog extends Dialog {
                     return _("Weekly");
                 case MONTHLY:
                     return _("Monthly");
-                case UNKNOWN:
-                    return _("Unknown");
                 }
                 return element.toString();
             }
 
         });
-        scheduleCombo.add(new Schedule[] { Schedule.HOURLY, Schedule.DAILY, Schedule.WEEKLY, Schedule.MONTHLY, Schedule.UNKNOWN });
+        scheduleCombo.add(new Schedule[] { Schedule.HOURLY, Schedule.DAILY, Schedule.WEEKLY, Schedule.MONTHLY });
         Point size = scheduleCombo.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
         ((GridData) scheduleCombo.getControl().getLayoutData()).widthHint = size.x;
         ((GridData) scheduleCombo.getControl().getLayoutData()).heightHint = size.y;
@@ -472,14 +451,8 @@ public class SettingsDialog extends Dialog {
                 handleSchedule(event);
             }
         });
-        Button scheduleButton = scheduleItem.createButtonConfig();
-        scheduleButton.setToolTipText(_("Advance scheduler configuration."));
-        scheduleButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                handleScheduleAdvance();
-            }
-        });
+        // Update schedule
+        scheduleCombo.setSelection(new StructuredSelection(API.instance().getSchedule()));
 
         // Separator.
         new Label(backupItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -566,27 +539,6 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleSchedule(SelectionChangedEvent event) {
         Schedule schedule = (Schedule) ((StructuredSelection) event.getSelection()).getFirstElement();
-        if (Schedule.UNKNOWN.equals(schedule)) {
-            // Do nothing.
-            return;
-        }
-        // Check if the schedule type is different.
-        try {
-            Schedule current = API.instance().getSchedule();
-            if (schedule.equals(current)) {
-                // Nothing to do.
-                return;
-            }
-        } catch (APIException e) {
-            LOGGER.error("fail to retrieve current backup schedule", e);
-            DetailMessageDialog.openError(
-                    this.getShell(),
-                    Display.getAppName(),
-                    _("Can't change backup schedule!"),
-                    _("Fail to retrieve current backup schedule."),
-                    e);
-        }
-
         try {
             API.instance().setSchedule(schedule);
         } catch (APIException e) {
@@ -596,43 +548,6 @@ public class SettingsDialog extends Dialog {
                     _("Can't change backup schedule!"),
                     _("Fail to reschedule the backup task."),
                     e);
-        }
-
-    }
-
-    /**
-     * Called when the user click on advance button config for scheduler. This action open the task scheduler.
-     */
-    protected void handleScheduleAdvance() {
-
-        // Prompt the user.
-        DetailMessageDialog dlg = DetailMessageDialog.openOkCancelConfirm(
-                getShell(),
-                Display.getAppName(),
-                _("This action will open Windows Task Scheduler."),
-                _("If you want more control over the backup schedule, you need to "
-                        + "manually edit the Minarca backup task in Windows Task Scheduler. "
-                        + "If you don't know what you are doing, you should cancel the"
-                        + "operation to avoid breaking the schedule."),
-                null);
-        if (dlg.getReturnCode() != IDialogConstants.OK_ID) {
-            return;
-        }
-
-        // Open Task Scheduler (work in XP to 10)
-        File control = Compat.searchFile("control.exe", new String[0]);
-        if (control != null) {
-            try {
-                Runtime.getRuntime().exec(new String[] { control.toString(), "schedtasks" });
-            } catch (IOException e) {
-                LOGGER.error("an error occurred when trying to open Windows Task Scheduler", e);
-                DetailMessageDialog.openError(
-                        this.getShell(),
-                        Display.getAppName(),
-                        _("Can't open Windows Task Scheduler!"),
-                        _("An error occurred when trying to open Windows Task Scheduler."),
-                        e);
-            }
         }
 
     }
@@ -717,8 +632,8 @@ public class SettingsDialog extends Dialog {
 
             // Start backup
             try {
-                API.instance().runBackup();
-            } catch (APIException e) {
+                API.instance().backup(true, true);
+            } catch (Exception e) {
                 LOGGER.error("an error occurred while backuping this computer", e);
                 DetailMessageDialog.openError(
                         this.getShell(),

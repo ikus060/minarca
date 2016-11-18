@@ -7,5 +7,12 @@ package com.patrikdufresne.minarca.core;
  * 
  */
 public enum Schedule {
-    DAILY, HOURLY, MONTHLY, UNKNOWN, WEEKLY
+    DAILY(24), HOURLY(1), MONTHLY(720), WEEKLY(168);
+
+    public int delta;
+
+    private Schedule(int delta) {
+        this.delta = delta;
+    }
+
 }

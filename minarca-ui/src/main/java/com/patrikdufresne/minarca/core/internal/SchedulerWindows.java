@@ -23,8 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
-import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
-import com.patrikdufresne.minarca.core.Schedule;
 
 /**
  * Wrapper around "schtasks" command line.
@@ -41,14 +39,6 @@ public class SchedulerWindows extends Scheduler {
      * 
      */
     private static class TaskInfoWin {
-
-        private static final Pattern PATTERN_SCHEDULE_TYPE_DAILY = Pattern.compile("(Tous les jours|Journalier|Daily)");
-
-        private static final Pattern PATTERN_SCHEDULE_TYPE_HOURLY = Pattern.compile("(Toutes les heures|Hourly)");
-
-        private static final Pattern PATTERN_SCHEDULE_TYPE_MONTHLY = Pattern.compile("(Tous les mois|Mensuel|Monthly)");
-
-        private static final Pattern PATTERN_SCHEDULE_TYPE_WEEKLY = Pattern.compile("(Toutes les semaines|Weekly)");
 
         private static final String[] WINDOWS_7_INDEXES = new String[] {
                 "HOSTNAME",
@@ -90,7 +80,6 @@ public class SchedulerWindows extends Scheduler {
 
         private final List<String> data;
         private final List<String> INDEXES;
-        private final int SCHEDULE_TYPE;
         private final int TASK_TO_RUN;
         private final int TASKNAME;
 
@@ -111,7 +100,6 @@ public class SchedulerWindows extends Scheduler {
             }
             TASK_TO_RUN = INDEXES.indexOf("TASK_TO_RUN");
             TASKNAME = INDEXES.indexOf("TASKNAME");
-            SCHEDULE_TYPE = INDEXES.indexOf("SCHEDULE_TYPE");
         }
 
         private String get(int index) {
@@ -126,20 +114,6 @@ public class SchedulerWindows extends Scheduler {
          */
         String getCommand() {
             return get(TASK_TO_RUN);
-        }
-
-        public Schedule getSchedule() {
-            String value = get(SCHEDULE_TYPE);
-            if (PATTERN_SCHEDULE_TYPE_HOURLY.matcher(value).find()) {
-                return Schedule.HOURLY;
-            } else if (PATTERN_SCHEDULE_TYPE_DAILY.matcher(value).find()) {
-                return Schedule.DAILY;
-            } else if (PATTERN_SCHEDULE_TYPE_WEEKLY.matcher(value).find()) {
-                return Schedule.WEEKLY;
-            } else if (PATTERN_SCHEDULE_TYPE_MONTHLY.matcher(value).find()) {
-                return Schedule.MONTHLY;
-            }
-            return Schedule.UNKNOWN;
         }
 
         /**
@@ -166,29 +140,9 @@ public class SchedulerWindows extends Scheduler {
     private static final transient Logger LOGGER = LoggerFactory.getLogger(SchedulerWindows.class);
 
     /**
-     * Executable launch to start backup.
-     */
-    private static final String MINARCA;
-
-    /**
-     * Property used to define the location of minarca.bat file.
-     */
-    private static final String PROPERTY_MINARCA_EXE_LOCATION = "minarca.exe.location";;
-
-    /**
      * Windows task name.
      */
     private static final String TASK_NAME = "Minarca backup";
-
-    static {
-        if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
-            MINARCA = "minarca64.exe";
-        } else {
-            MINARCA = "minarca.exe";
-        }
-    }
-
-    private Boolean isFr;
 
     /**
      * Create a new schedule tasks
@@ -205,7 +159,7 @@ public class SchedulerWindows extends Scheduler {
      * @see http ://www.windowsnetworking.com/kbase/WindowsTips/WindowsXP/AdminTips
      *      /Utilities/XPschtaskscommandlineutilityreplacesAT.exe.html
      */
-    public synchronized void create(Schedule schedule) throws APIException {
+    public synchronized void create() throws APIException {
         LOGGER.debug("creating schedule task [{}]", TASK_NAME);
 
         // Delete the tasks (if exists). The /F option doesn't exists in WinXP.
@@ -235,24 +189,11 @@ public class SchedulerWindows extends Scheduler {
 
         // Define schedule
         args.add("/SC");
-        switch (schedule) {
-        case HOURLY:
-            args.add("HOURLY");
-            break;
-        case DAILY:
-            args.add("DAILY");
-            break;
-        case WEEKLY:
-            args.add(SystemUtils.IS_OS_WINDOWS_XP && isFr() ? "Toutes les semaines" : "WEEKLY");
-            break;
-        case MONTHLY:
-            args.add(SystemUtils.IS_OS_WINDOWS_XP && isFr() ? "MENSUEL" : "MONTHLY");
-            break;
-        default:
-            args.add("DAILY");
-        }
+        args.add("HOURLY");
 
+        // Execute the command.
         String data = execute(args);
+
         // FIXME looking at command output is not the best since it change according to user language.
         if (ERROR_PATTERN.matcher(data).find()) {
             throw new APIException("fail to schedule task");
@@ -363,7 +304,7 @@ public class SchedulerWindows extends Scheduler {
     private String getCommand() throws APIException {
         File file = getExeLocation();
         if (file == null) {
-            throw new APIException(_("{0} is missing", MINARCA));
+            throw new APIException(_("{0} is missing", MinarcaExecutable.MINARCA_EXE));
         }
         StringBuilder buf = new StringBuilder();
         buf.append("\\\"");
@@ -372,21 +313,13 @@ public class SchedulerWindows extends Scheduler {
         return buf.toString();
     }
 
-    protected File getExeLocation() {
-        return Compat.searchFile(MINARCA, System.getProperty(PROPERTY_MINARCA_EXE_LOCATION), "./bin/", ".");
-    }
-
     /**
-     * Get information about the task.
+     * Return the location of the executable.
+     * 
+     * @return
      */
-    @Override
-    public synchronized Schedule getSchedule() throws ScheduleNotFoundException, APIException {
-        // Get reference to our task
-        TaskInfoWin task = query(TASK_NAME);
-        if (task == null) {
-            throw new ScheduleNotFoundException();
-        }
-        return task.getSchedule();
+    protected File getExeLocation() {
+        return MinarcaExecutable.getMinarcaLocation();
     }
 
     /**
@@ -437,22 +370,6 @@ public class SchedulerWindows extends Scheduler {
     }
 
     /**
-     * True if french is detected.
-     */
-    private boolean isFr() {
-        if (isFr != null) {
-            return isFr;
-        }
-        try {
-            String data = execute("/?");
-            isFr = data.contains("paramètre");
-        } catch (APIException e) {
-            isFr = false;
-        }
-        return isFr;
-    }
-
-    /**
      * Query the given taskname.
      * 
      * @param taskname
@@ -461,24 +378,6 @@ public class SchedulerWindows extends Scheduler {
     private TaskInfoWin query(String taskname) throws APIException {
         Validate.notNull(taskname);
         return internalQueryCsv(taskname);
-    }
-
-    /**
-     * Start the task.
-     */
-    @Override
-    public synchronized void run() throws APIException {
-        LOGGER.info("starting the task");
-        execute("/Run", "/TN", TASK_NAME);
-    }
-
-    /**
-     * End the task.
-     */
-    @Override
-    public synchronized void terminate() throws APIException {
-        LOGGER.info("terminating the task");
-        execute("/End", "/TN", TASK_NAME);
     }
 
 }

@@ -1,9 +1,9 @@
 package com.patrikdufresne.minarca.core.internal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.sql.Date;
 import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
@@ -15,9 +15,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
-
-import com.patrikdufresne.minarca.core.LastResult;
-import com.patrikdufresne.minarca.core.Schedule;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SchedulerWindows.class, SystemUtils.class })
@@ -38,7 +35,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -56,7 +52,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -75,7 +70,6 @@ public class SchedulerWindowsTest {
 
         assertTrue(s.exists());
 
-        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -93,7 +87,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.WEEKLY, s.getSchedule());
     }
 
     @Test
@@ -111,7 +104,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.MONTHLY, s.getSchedule());
     }
 
     @Test
@@ -129,7 +121,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.DAILY, s.getSchedule());
     }
 
     @Test
@@ -147,7 +138,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.DAILY, s.getSchedule());
     }
 
     @Test
@@ -164,7 +154,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.HOURLY, s.getSchedule());
     }
 
     @Test
@@ -181,7 +170,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.DAILY, s.getSchedule());
     }
 
     @Test
@@ -198,7 +186,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.WEEKLY, s.getSchedule());
     }
 
     @Test
@@ -215,7 +202,6 @@ public class SchedulerWindowsTest {
         PowerMockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
-        assertEquals(Schedule.MONTHLY, s.getSchedule());
     }
 
 }

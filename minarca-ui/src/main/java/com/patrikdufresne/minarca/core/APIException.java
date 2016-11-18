@@ -135,6 +135,21 @@ public class APIException extends Exception {
     }
 
     /**
+     * Minarca executable cannot be found.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class MinarcaMissingException extends APIException {
+
+        // TODO Add mos arguments: fingerprint, hostname
+        public MinarcaMissingException() {
+            super(_("minarca is missing"));
+        }
+
+    }
+
+    /**
      * Thrown when the application is miss configured
      * 
      * @author Patrik Dufresne

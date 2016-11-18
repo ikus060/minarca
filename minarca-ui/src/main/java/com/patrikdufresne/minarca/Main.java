@@ -76,11 +76,14 @@ public class Main {
 
         // Process the arguments.
         boolean backup = false;
+        boolean force = false;
         boolean stop = false;
         for (String arg : args) {
             // TODO add arguments to link, unlink computer.
             if (arg.equals("--backup") || arg.equals("-b")) {
                 backup = true;
+            } else if (arg.equals("--force") || arg.equals("-f")) {
+                force = true;
             } else if (arg.equals("--stop") || arg.equals("-s")) {
                 stop = true;
             } else if (arg.equals("--version") || arg.equals("-v")) {
@@ -95,6 +98,7 @@ public class Main {
         }
         final Thread mainThread = Thread.currentThread();
         final boolean fBackup = backup;
+        final boolean fForce = force;
         SingleInstanceManager single = new SingleInstanceManager(
                 fBackup ? SINGLE_INSTANCE_PORT_BACKUP : SINGLE_INSTANCE_PORT_UI,
                 new SingleInstanceManager.SingleInstanceListener() {
@@ -122,7 +126,7 @@ public class Main {
             public void run() {
                 Main main = new Main();
                 if (fBackup) {
-                    main.backup();
+                    main.backup(fForce);
                 } else {
                     main.startui(args);
                 }
@@ -150,12 +154,13 @@ public class Main {
      */
     private static void printUsage() {
         System.out.println("Usage:");
-        System.out.println("    minarca --backup [--stop]");
+        System.out.println("    minarca --backup [--force] [--stop]");
         System.out.println("    minarca --help");
         System.out.println("    minarca --version");
         System.out.println("");
         System.out.println("    --backup  used to run the minarca backup.");
         System.out.println("    --stop    stop the backup (when used with --backup) or stop the UI.");
+        System.out.println("    --force   force execution of a backup.");
         System.out.println("    --help    display this help message.");
         System.out.println("    --version show minarca version.");
     }
@@ -211,7 +216,7 @@ public class Main {
     /**
      * This if the main function being called when minarca application is called with --backup or -b arguments.
      */
-    private void backup() {
+    private void backup(boolean force) {
 
         LOGGER.info("starting backup");
 
@@ -236,7 +241,7 @@ public class Main {
 
         // Run the backup.
         try {
-            API.instance().backup();
+            API.instance().backup(false, force);
         } catch (Exception e) {
             System.exit(3);
         }

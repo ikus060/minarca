@@ -15,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -34,7 +33,6 @@ import org.apache.commons.logging.impl.NoOpLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.APIException.ExchangeSshKeyException;
 import com.patrikdufresne.minarca.core.APIException.GenerateKeyException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
@@ -43,10 +41,12 @@ import com.patrikdufresne.minarca.core.APIException.InitialBackupRunningExceptio
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
+import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
+import com.patrikdufresne.minarca.core.internal.MinarcaExecutable;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 import com.patrikdufresne.rdiffweb.core.Client;
@@ -212,11 +212,30 @@ public class API {
     }
 
     /**
-     * Used to start a backup task.
+     * Used to start a backup.
+     * 
+     * @param background
+     *            True to asynchronously start the backup process. This operation usually used the system scheduler to
+     *            run the backup task in background.
+     * @param force
+     *            True to force the execution of
      * 
      * @throws APIException
+     * @throws InterruptedException
      */
-    public void backup() throws APIException {
+    public void backup(boolean background, boolean force) throws APIException, InterruptedException {
+        // To run in background, we start a new minarca process.
+        if (background) {
+            MinarcaExecutable minarca = new MinarcaExecutable();
+            minarca.backup(force);
+            return;
+        }
+
+        // If not forced, we need to check if it's time to run a backup.
+        if (!force && !isBackupTime()) {
+            LOGGER.info("not time to backup");
+            return;
+        }
 
         Thread t = new Thread() {
             @Override
@@ -353,7 +372,7 @@ public class API {
         // Delete & create schedule tasks.
         Scheduler scheduler = Scheduler.getInstance();
         if (force || !scheduler.exists()) {
-            scheduler.create(Schedule.DAILY);
+            scheduler.create();
         }
     }
 
@@ -364,15 +383,6 @@ public class API {
      */
     public String getBrowseUrl() {
         return BASE_URL + "/browse/" + getRepositoryName();
-    }
-
-    /**
-     * Friendly named used to represent the repository being backuped.
-     * 
-     * @return the repository name.
-     */
-    public String getRepositoryName() {
-        return this.properties.getString(PROPERTY_REPOSITORY_NAME);
     }
 
     /**
@@ -463,6 +473,20 @@ public class API {
     }
 
     /**
+     * Return the last successful backup date.
+     * 
+     * @return Date of last success or null.
+     */
+    public Date getLastSuccess() {
+        try {
+            Long value = status.getLong(PROPERTY_LAST_SUCCESS);
+            return new Date(value.longValue());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Return the remote host to be used for SSH communication.
      * <p>
      * Current implementation return the same SSH server. In future, this implementation might changed to request the
@@ -475,15 +499,26 @@ public class API {
     }
 
     /**
-     * Check if a backup task is running.
+     * Friendly named used to represent the repository being backuped.
      * 
-     * @return True if a backup task is running.
-     * @throws ScheduleNotFoundException
-     * 
-     * @throws APIException
+     * @return the repository name.
      */
-    public Schedule getSchedule() throws ScheduleNotFoundException, APIException {
-        return Scheduler.getInstance().getSchedule();
+    public String getRepositoryName() {
+        return this.properties.getString(PROPERTY_REPOSITORY_NAME);
+    }
+
+    /**
+     * Get the scheduling preferences.
+     * 
+     * @return The schedule
+     * 
+     */
+    public Schedule getSchedule() {
+        try {
+            return Schedule.valueOf(this.properties.getString(PROPERTY_SCHEDULE));
+        } catch (Exception e) {
+            return Schedule.DAILY;
+        }
     }
 
     /**
@@ -493,6 +528,22 @@ public class API {
      */
     public String getUsername() {
         return this.properties.getString(PROPERTY_USERNAME);
+    }
+
+    /**
+     * Check if it's time to backup according to user preferences.
+     * 
+     * @return True if we may backup.
+     */
+    private boolean isBackupTime() {
+        Date last = getLastSuccess();
+        if (last == null) {
+            return true;
+        }
+        Schedule schedule = getSchedule();
+        long delta = schedule.delta * 60l * 60l * 1000;
+        delta = delta * 98 / 100;
+        return delta < new Date().getTime() - last.getTime();
     }
 
     /**
@@ -585,7 +636,7 @@ public class API {
         Date lastResultDate = getLastResultDate();
 
         // Run backup
-        runBackup();
+        backup(true, true);
 
         // Refresh list of repositories (10 min)
         int attempt = Integer.getInteger("minarca.link.timeoutsec", 600 /* 5*60*100 */) * 1000 / RUNNING_DELAY;
@@ -666,16 +717,6 @@ public class API {
     }
 
     /**
-     * Used to asynchronously start the backup process. This operation usually used the system scheduler to run the
-     * backup task in background.
-     * 
-     * @throws APIException
-     */
-    public void runBackup() throws APIException {
-        Scheduler.getInstance().run();
-    }
-
-    /**
      * Used to persist the configuration.
      * 
      * @throws IOException
@@ -687,21 +728,6 @@ public class API {
                 + "Minarca backup configuration.\r\n"
                 + "Please do not change this configuration file manually.");
         writer.close();
-    }
-
-    /**
-     * Sets the repository name.
-     * 
-     * @param value
-     * @throws APIException
-     */
-    public void setRepositoryName(String value) throws APIException {
-        this.properties.setProperty(PROPERTY_REPOSITORY_NAME, value);
-        try {
-            this.properties.save();
-        } catch (ConfigurationException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
     }
 
     /**
@@ -731,8 +757,14 @@ public class API {
     private void setLastStatus(LastResult state) throws APIException {
         Validate.notNull(state);
         Properties status = new Properties();
+        String now = Long.toString(new Date().getTime());
         status.setProperty(PROPERTY_LAST_RESULT, state.toString());
-        status.setProperty(PROPERTY_LAST_DATE, Long.toString(new Date().getTime()));
+        status.setProperty(PROPERTY_LAST_DATE, now);
+        if (LastResult.SUCCESS.equals(state)) {
+            status.setProperty(PROPERTY_LAST_SUCCESS, now);
+        } else {
+            status.setProperty(PROPERTY_LAST_SUCCESS, Long.toString(getLastSuccess().getTime()));
+        }
         try {
             save(this.statusFile, status);
         } catch (IOException e) {
@@ -756,13 +788,34 @@ public class API {
     }
 
     /**
-     * Reschedule task.
+     * Sets the repository name.
+     * 
+     * @param value
+     * @throws APIException
+     */
+    public void setRepositoryName(String value) throws APIException {
+        this.properties.setProperty(PROPERTY_REPOSITORY_NAME, value);
+        try {
+            this.properties.save();
+        } catch (ConfigurationException e) {
+            throw new APIException(_("fail to save config"), e);
+        }
+    }
+
+    /**
+     * Define the scheduling preferences.
      * 
      * @param schedule
      *            the new schedule.
      */
     public void setSchedule(Schedule schedule) throws APIException {
-        Scheduler.getInstance().create(schedule);
+        Validate.notNull(schedule);
+        this.properties.setProperty(PROPERTY_SCHEDULE, schedule.toString());
+        try {
+            this.properties.save();
+        } catch (ConfigurationException e) {
+            throw new APIException(_("fail to save config"), e);
+        }
     }
 
     /**
@@ -787,7 +840,8 @@ public class API {
      * @throws ScheduleNotFoundException
      */
     public void stopBackup() throws ScheduleNotFoundException, APIException {
-        Scheduler.getInstance().terminate();
+        MinarcaExecutable minarca = new MinarcaExecutable();
+        minarca.stop();
     }
 
     /**

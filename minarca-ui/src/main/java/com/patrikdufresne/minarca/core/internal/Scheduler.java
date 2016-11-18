@@ -8,14 +8,13 @@ package com.patrikdufresne.minarca.core.internal;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.patrikdufresne.minarca.core.APIException;
-import com.patrikdufresne.minarca.core.Schedule;
-import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 
 /**
  * Interface used to represent a scheduler.
  * <p>
  * Class implementing this interface represent the scheduling service used by the current operating system. This
- * interface is indented to represent a subset of the feature provided by the scheduler.
+ * interface is indented to represent a subset of the feature provided by the scheduler. The main purpose is to register
+ * a task hourly and Minarca will decide to backup or not according to user preferences.
  * 
  * @author Patrik Dufresne
  * 
@@ -49,7 +48,7 @@ public abstract class Scheduler {
      * @param taskname
      * @param command
      */
-    public abstract void create(Schedule schedule) throws APIException;
+    public abstract void create() throws APIException;
 
     /**
      * Delete the task
@@ -64,27 +63,6 @@ public abstract class Scheduler {
      * @return True if the task exists.
      * @throws APIException
      */
-    public abstract boolean exists() throws APIException;
+    public abstract boolean exists();
 
-    /**
-     * Check if the task exists.
-     * 
-     * @param taskname
-     * @return
-     */
-    public abstract Schedule getSchedule() throws APIException, ScheduleNotFoundException;
-
-    /**
-     * Run the task.
-     * 
-     * @throws APIException
-     */
-    public abstract void run() throws APIException, ScheduleNotFoundException;
-
-    /**
-     * Terminate the task. Has no effect if the task is not running.
-     * 
-     * @throws APIException
-     */
-    public abstract void terminate() throws APIException, ScheduleNotFoundException;
 }
