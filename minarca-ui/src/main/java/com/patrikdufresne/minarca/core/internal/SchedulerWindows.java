@@ -287,7 +287,6 @@ public class SchedulerWindows extends Scheduler {
         try {
             Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
             StreamHandler sh = new StreamHandler(p);
-            sh.start();
             p.waitFor();
             return sh.getOutput();
         } catch (IOException e) {

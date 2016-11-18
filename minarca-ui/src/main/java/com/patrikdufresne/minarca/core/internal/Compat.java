@@ -128,7 +128,6 @@ public class Compat {
         try {
             Process p = new ProcessBuilder().command("cmd.exe", "/c", "chcp").redirectErrorStream(true).start();
             StreamHandler sh = new StreamHandler(p, Charset.defaultCharset());
-            sh.start();
             if (p.waitFor() != 0) {
                 return null;
             }
@@ -413,7 +412,6 @@ public class Compat {
         try {
             Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
             StreamHandler sh = new StreamHandler(p);
-            sh.start();
             if (p.waitFor() != 0) {
                 throw new APIException(sh.getOutput());
             }

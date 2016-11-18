@@ -93,11 +93,6 @@ public class API {
     /**
      * Property name.
      */
-    private static final String PROPERTY_REPOSITORY_NAME = "repositoryname";
-
-    /**
-     * Property name.
-     */
     private static final String PROPERTY_LAST_DATE = "lastdate";
 
     /**
@@ -108,7 +103,22 @@ public class API {
     /**
      * Property name.
      */
+    private static final String PROPERTY_LAST_SUCCESS = "lastsuccess";
+    
+    /**
+     * Property name.
+     */
     private static final String PROPERTY_REMOTEHOST = "remotehost";
+
+    /**
+     * Property name.
+     */
+    private static final String PROPERTY_REPOSITORY_NAME = "repositoryname";
+
+    /**
+     * Property name.
+     */
+    private static final String PROPERTY_SCHEDULE = "schedule";
 
     /**
      * Property name.
