@@ -116,12 +116,7 @@ public class MinarcaExecutable {
         } else {
             command = createMinarcaCommand("--backup");
         }
-        LOGGER.debug("executing command: {}", StringUtils.join(command, " "));
-        try {
-            Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            throw new APIException(e);
-        }
+        execute(command);
     }
 
     /**
@@ -131,10 +126,19 @@ public class MinarcaExecutable {
      */
     public void stop() throws APIException {
         // Need to stop the process.
-        String command[] = createMinarcaCommand("--backup", "--stop");
+        execute(createMinarcaCommand("--backup", "--stop"));
+    }
+
+    /**
+     * Execute minarca proess. Don't wait for it.
+     * 
+     * @param command
+     * @throws APIException
+     */
+    private void execute(String[] command) throws APIException {
         LOGGER.debug("executing command: {}", StringUtils.join(command, " "));
         try {
-            Runtime.getRuntime().exec(command);
+            new ProcessBuilder(command).inheritIO().start();
         } catch (IOException e) {
             throw new APIException(e);
         }
