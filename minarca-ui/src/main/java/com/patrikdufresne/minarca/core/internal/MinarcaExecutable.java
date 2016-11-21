@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,13 +110,13 @@ public class MinarcaExecutable {
      * @throws APIException
      */
     public void backup(boolean force) throws APIException {
-        String command;
+        String command[];
         if (force) {
-            command = createMinarcaCommandLine("--backup", "--force");
+            command = createMinarcaCommand("--backup", "--force");
         } else {
-            command = createMinarcaCommandLine("--backup");
+            command = createMinarcaCommand("--backup");
         }
-        LOGGER.debug("executing command: {}", command);
+        LOGGER.debug("executing command: {}", StringUtils.join(command, " "));
         try {
             Runtime.getRuntime().exec(command);
         } catch (IOException e) {
@@ -130,8 +131,8 @@ public class MinarcaExecutable {
      */
     public void stop() throws APIException {
         // Need to stop the process.
-        String command = createMinarcaCommandLine("--backup", "--stop");
-        LOGGER.debug("executing command: {}", command);
+        String command[] = createMinarcaCommand("--backup", "--stop");
+        LOGGER.debug("executing command: {}", StringUtils.join(command, " "));
         try {
             Runtime.getRuntime().exec(command);
         } catch (IOException e) {
