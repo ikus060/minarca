@@ -104,7 +104,7 @@ public class API {
      * Property name.
      */
     private static final String PROPERTY_LAST_SUCCESS = "lastsuccess";
-    
+
     /**
      * Property name.
      */
@@ -630,7 +630,7 @@ public class API {
 
         // Empty the include
         List<GlobPattern> previousPatterns = getGlobPatterns();
-        setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.ROOT + "**")));
+        setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.ROOTS[0] + "**")));
 
         // Reset Last result
         Date lastResultDate = getLastResultDate();
@@ -848,7 +848,7 @@ public class API {
      * Check if this computer is properly link to minarca.net.
      * 
      * @throws APIException
-     * @throws InterruptedException 
+     * @throws InterruptedException
      */
     public void testServer() throws APIException, InterruptedException {
 

@@ -86,7 +86,7 @@ public class GlobPattern {
      * @return
      */
     private static String expand(String value) {
-        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.ROOT).replace("${temp}", Compat.TEMP);
+        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.ROOTS[0].toString()).replace("${temp}", Compat.TEMP);
     }
 
     private static String getPath(File file) {
@@ -295,6 +295,25 @@ public class GlobPattern {
         return isGlobbing(this.pattern);
     }
 
+    /**
+     * True if the glob pattern include the given pattern.
+     * 
+     * @return
+     */
+    public boolean isInclude() {
+        return this.include;
+    }
+
+    /**
+     * Check if the current pattern matches the given root.
+     * 
+     * @param root
+     * @return Return True if the pattern may be applied to the given root.
+     */
+    public boolean isInRoot(File root) {
+        return this.toString().startsWith(root.toString());
+    }
+
     private PathMatcher matcher() {
         if (this.matcher != null) {
             return this.matcher;
@@ -315,15 +334,6 @@ public class GlobPattern {
         }
         // Do case-sensitive compare (rdiff-backup is case-sensitive on Windows).
         return encode(path).startsWith(this.pattern);
-    }
-
-    /**
-     * True if the glob pattern include the given pattern.
-     * 
-     * @return
-     */
-    public boolean isInclude() {
-        return this.include;
     }
 
     /**

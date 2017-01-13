@@ -91,6 +91,25 @@ public class RdiffBackup {
     }
 
     /**
+     * Identify the list of active root (C:, D:, etc.) in the given pattern list.
+     * 
+     * @param patternsa list of patterns
+     * @return the list of active Root device part of the patterns
+     */
+    private static List<File> getActiveRoots(List<GlobPattern> patterns) {
+        List<File> activeRoots = new ArrayList<File>();
+        for (File root : Compat.ROOTS) {
+            for (GlobPattern p : patterns) {
+                if (p.isInRoot(root)) {
+                    activeRoots.add(root);
+                    break;
+                }
+            }
+        }
+        return activeRoots;
+    }
+
+    /**
      * Return the location of the known_hosts file to be used for OpenSSH. Create it from ressources if it doesnt
      * exists.
      * 
@@ -236,37 +255,53 @@ public class RdiffBackup {
      * @throws APIException
      */
     public void backup(List<GlobPattern> patterns, String path) throws APIException, InterruptedException {
-        // Construct the command line.
-        List<String> args = new ArrayList<String>();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            args.add("--no-hard-links");
-            args.add("--exclude-symbolic-links");
-            args.add("--no-acls");
-        } else {
-            args.add("--exclude-sockets");
-        }
-        for (GlobPattern p : patterns) {
-            if (p.isInclude()) {
-                args.add("--include");
+        // On Windows operating system, the computer may have multiple Root
+        // (C:\, D:\, etc). To support this scenario, we need to run
+        // rdiff-backup multiple time on the same computer. Once for each Root
+        // to be backuped (if required).
+        for (File root : getActiveRoots(patterns)) {
+            // Construct the command line.
+            List<String> args = new ArrayList<String>();
+            if (SystemUtils.IS_OS_WINDOWS) {
+                args.add("--no-hard-links");
+                args.add("--exclude-symbolic-links");
+                args.add("--no-acls");
+                args.add("--create-full-path");
+            } else {
+                args.add("--exclude-sockets");
+            }
+            for (GlobPattern p : patterns) {
+                // Skip the patterns if not matching the given root.
+                if (p.isGlobbing() || p.isInRoot(root)) {
+                    if (p.isInclude()) {
+                        args.add("--include");
+                    } else {
+                        args.add("--exclude");
+                    }
+                    args.add(p.value());
+                }
+            }
+            if (SystemUtils.IS_OS_WINDOWS) {
+                args.add("--exclude");
+                // C:/**
+                args.add(root.toString().replace("\\", "/") + "**");
+                // Source C:/
+                args.add(root.toString().replace("\\", "/"));
             } else {
                 args.add("--exclude");
+                args.add("/*");
+                // Source
+                args.add("/");
             }
-            args.add(p.value());
+            // Define the destination
+            String dest = path;
+            if (SystemUtils.IS_OS_WINDOWS) {
+                dest = path + "/" + root.toString().replace("\\", "").replace(":", "");
+            }
+            // Run command.
+            LOGGER.info("start backup");
+            rdiffbackup(root, args, dest);
         }
-        if (SystemUtils.IS_OS_WINDOWS) {
-            args.add("--exclude");
-            // C:/**
-            args.add(Compat.ROOT.replace("\\", "/") + "**");
-            // C:/
-            args.add(Compat.ROOT.replace("\\", "/"));
-        } else {
-            args.add("--exclude");
-            args.add("/*");
-            args.add("/");
-        }
-        // Run command.
-        LOGGER.info("start backup");
-        rdiffbackup(args, path);
     }
 
     /**
@@ -325,7 +360,7 @@ public class RdiffBackup {
      * @param extraArgs
      * @throws APIException
      */
-    private void rdiffbackup(List<String> extraArgs, String path) throws APIException, InterruptedException {
+    private void rdiffbackup(File workingDir, List<String> extraArgs, String path) throws APIException, InterruptedException {
         // Get location of rdiff-backup.
         File rdiffbackup = getRdiffbackupLocation();
         if (rdiffbackup == null) {
@@ -365,7 +400,7 @@ public class RdiffBackup {
         // Add remote host.
         args.add(this.username + "@" + this.remotehost + "::" + path);
         // Execute the command line.
-        execute(args, Compat.ROOT_FILE, null);
+        execute(args, workingDir, null);
     }
 
     /**
@@ -377,12 +412,12 @@ public class RdiffBackup {
         // Run the test.
         LOGGER.info("test server");
         try {
-            rdiffbackup(Arrays.asList("--test-server"), "/");
+            rdiffbackup(Compat.ROOTS[0], Arrays.asList("--test-server"), "/");
         } catch (UntrustedHostKey e) {
             // Try to accept the key
             acceptServerKey();
             // Then try to test server again
-            rdiffbackup(Arrays.asList("--test-server"), "/");
+            rdiffbackup(Compat.ROOTS[0], Arrays.asList("--test-server"), "/");
         }
 
     }

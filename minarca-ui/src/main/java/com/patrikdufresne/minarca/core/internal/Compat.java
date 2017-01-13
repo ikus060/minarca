@@ -76,14 +76,9 @@ public class Compat {
     private static final transient Logger LOGGER;
 
     /**
-     * The root path. Under windows it should be "C:/" under linux it should be "/".
+     * List of roots. On Linux it's always "/". On Windows we may have multiple root "C:\", "D:\", etc.
      */
-    public static final String ROOT;
-
-    /**
-     * The root path. Under windows it should be "C:/" under linux it should be "/".
-     */
-    public static final File ROOT_FILE;
+    public static final File[] ROOTS;
 
     /**
      * Define temp directory.
@@ -107,8 +102,7 @@ public class Compat {
         LOGGER = LoggerFactory.getLogger(Compat.class);
         CHARSET_PROCESS = getProcessCharset();
         COMPUTER_NAME = getComputerName();
-        ROOT = getRootPath();
-        ROOT_FILE = new File(ROOT);
+        ROOTS = getRootsPath();
         WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
         IS_ADMIN = getIsAdmin();
         CONFIG_PATH = getConfigPath(IS_ADMIN);
@@ -300,19 +294,12 @@ public class Compat {
      * 
      * @return
      */
-    private static String getRootPath() {
+    private static File[] getRootsPath() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            String homedrive = System.getenv("HOMEDRIVE");
-            // Check if env variable contains something takt make senses
-            File file = new File(homedrive + SystemUtils.PATH_SEPARATOR);
-            if (file.exists() && file.isDirectory()) {
-                return file.getAbsolutePath();
-            }
-            // At last return hardcoded value.
-            return "C:\\";
+            return File.listRoots();
         } else if (SystemUtils.IS_OS_LINUX) {
-            // Under linux it's always /.
-            return "/";
+            // Under Linux it's always /.
+            return new File[] { new File("/") };
         }
         return null;
     }
