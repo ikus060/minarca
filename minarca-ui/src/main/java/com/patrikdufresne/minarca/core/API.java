@@ -51,6 +51,7 @@ import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 import com.patrikdufresne.rdiffweb.core.Client;
 import com.patrikdufresne.rdiffweb.core.RdiffwebException;
+import com.patrikdufresne.rdiffweb.core.Repository;
 
 /**
  * This class is the main entry point to do everything related to minarca.
@@ -640,16 +641,18 @@ public class API {
 
         // Refresh list of repositories (10 min)
         int attempt = Integer.getInteger("minarca.link.timeoutsec", 600 /* 5*60*100 */) * 1000 / RUNNING_DELAY;
-        do {
+        attempts: do {
             Thread.sleep(RUNNING_DELAY);
             attempt--;
             try {
                 client.updateRepositories();
                 // Check if repo exists in minarca.
-                exists = client.getRepositoryInfo(repositoryName) != null;
-                if (exists) {
-                    LOGGER.debug("repository {} found", repositoryName);
-                    break;
+                for (Repository r : client.getRepositories()) {
+                    if (r.getName().equals(repositoryName) || r.getName().startsWith(repositoryName + "/")) {
+                        LOGGER.debug("repository {} found", repositoryName);
+                        exists = true;
+                        break attempts;
+                    }
                 }
             } catch (IOException e) {
                 LOGGER.warn("io error", e);
@@ -724,9 +727,11 @@ public class API {
     private void save(File file, Properties properties) throws IOException {
         LOGGER.trace("writing config to [{}]", file);
         Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
-        properties.store(writer, "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
-                + "Minarca backup configuration.\r\n"
-                + "Please do not change this configuration file manually.");
+        properties.store(
+                writer,
+                "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
+                        + "Minarca backup configuration.\r\n"
+                        + "Please do not change this configuration file manually.");
         writer.close();
     }
 
