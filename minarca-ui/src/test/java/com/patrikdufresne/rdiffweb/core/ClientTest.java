@@ -5,6 +5,7 @@ import static net.jadler.Jadler.initJadler;
 import static net.jadler.Jadler.onRequest;
 import static net.jadler.Jadler.port;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -51,12 +52,8 @@ public class ClientTest {
     public void testLoginWithError() throws IOException {
         // Mock response
         onRequest().havingMethodEqualTo("GET").havingPathEqualTo("/").respond().withStatus(200).withBody(getClass().getResourceAsStream("login.html"));
-        onRequest()
-                .havingMethodEqualTo("POST")
-                .havingPathEqualTo("/login/")
-                .respond()
-                .withStatus(200)
-                .withBody(getClass().getResourceAsStream("login_invalid_credential.html"));
+        onRequest().havingMethodEqualTo("POST").havingPathEqualTo("/login/").respond().withStatus(200).withBody(
+                getClass().getResourceAsStream("login_invalid_credential.html"));
 
         // Test version
         Client client = new Client("http://localhost:" + port(), "user", "password");
@@ -112,8 +109,13 @@ public class ClientTest {
 
         // Test
         Client client = new Client("http://localhost:" + port(), "user", "password");
-        Repository repo = client.getRepositoryInfo("data");
-        assertEquals("data", repo.getName());
+        Collection<Repository> repos = client.getRepositoryInfo("data");
+        assertEquals(1, repos.size());
+        assertEquals("data", repos.iterator().next().getName());
+        
+        // Test with invalid repo
+        Collection<Repository> repos2 = client.getRepositoryInfo("invalid");
+        assertNull(repos2);
 
     }
 

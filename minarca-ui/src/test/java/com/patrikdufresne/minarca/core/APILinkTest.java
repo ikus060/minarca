@@ -1,6 +1,8 @@
 package com.patrikdufresne.minarca.core;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import org.junit.Before;
@@ -42,7 +44,7 @@ public class APILinkTest {
         Repository r = Mockito.mock(Repository.class);
         Mockito.when(this.api.getLastResultDate()).thenReturn(null).thenReturn(new Date());
         Mockito.when(this.api.getLastResult()).thenReturn(LastResult.SUCCESS);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null).thenReturn(r);
+        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null).thenReturn(Arrays.asList(r));
 
         // Try to link.
         this.api.link("computername", this.client, false);
@@ -117,7 +119,7 @@ public class APILinkTest {
     public void testLink_WithRepoExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
         Repository r = Mockito.mock(Repository.class);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(r);
+        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(Arrays.asList(r));
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -136,7 +138,7 @@ public class APILinkTest {
     public void testLink_WithRepoExistsForce() throws APIException, InterruptedException, IOException {
         // Mock the client.
         Repository r = Mockito.mock(Repository.class);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(r);
+        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(Arrays.asList(r));
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -157,7 +159,7 @@ public class APILinkTest {
     public void testLink_WithRepositoryExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
         Repository r = Mockito.mock(Repository.class);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(r);
+        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(Arrays.asList(r));
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -177,7 +179,7 @@ public class APILinkTest {
         Repository r = Mockito.mock(Repository.class);
         Mockito.when(this.api.getLastResultDate()).thenReturn(null).thenReturn(new Date());
         Mockito.when(this.api.getLastResult()).thenReturn(LastResult.RUNNING);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null).thenReturn(r);
+        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null).thenReturn(Arrays.asList(r));
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.

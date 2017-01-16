@@ -641,18 +641,16 @@ public class API {
 
         // Refresh list of repositories (10 min)
         int attempt = Integer.getInteger("minarca.link.timeoutsec", 600 /* 5*60*100 */) * 1000 / RUNNING_DELAY;
-        attempts: do {
+        do {
             Thread.sleep(RUNNING_DELAY);
             attempt--;
             try {
                 client.updateRepositories();
                 // Check if repo exists in minarca.
-                for (Repository r : client.getRepositories()) {
-                    if (r.getName().equals(repositoryName) || r.getName().startsWith(repositoryName + "/")) {
-                        LOGGER.debug("repository {} found", repositoryName);
-                        exists = true;
-                        break attempts;
-                    }
+                exists = client.getRepositoryInfo(repositoryName) != null;
+                if (exists) {
+                    LOGGER.debug("repository {} found", repositoryName);
+                    break;
                 }
             } catch (IOException e) {
                 LOGGER.warn("io error", e);
@@ -694,7 +692,9 @@ public class API {
         // Set encoding
         try {
             LOGGER.debug("updating repository [{}] encoding [{}]", repositoryName, Compat.CHARSET_DEFAULT.toString());
-            client.getRepositoryInfo(repositoryName).setEncoding(Compat.CHARSET_DEFAULT.toString());
+            for (Repository r : client.getRepositoryInfo(repositoryName)) {
+                r.setEncoding(Compat.CHARSET_DEFAULT.toString());
+            }
         } catch (Exception e) {
             LOGGER.warn("fail to configure repository encoding", e);
         }

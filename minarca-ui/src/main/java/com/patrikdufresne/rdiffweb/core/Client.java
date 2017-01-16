@@ -243,19 +243,21 @@ public class Client {
     }
 
     /**
-     * Get information related to specific repository.
+     * Get information related to specific repository or sub repository (e.g. for C and D drives).
      * 
-     * @return repository info.
+     * @return repositories info.
      * 
      * @throws IOException
      */
-    public Repository getRepositoryInfo(String name) throws IOException {
-        for (Repository r : getRepositories()) {
-            if (name.equals(r.getName())) {
-                return r;
+    public Collection<Repository> getRepositoryInfo(String name) throws IOException {
+        Collection<Repository> repos = getRepositories();
+        List<Repository> list = new ArrayList<Repository>(repos.size());
+        for (Repository r : repos) {
+            if (r.getName().equals(name) || r.getName().startsWith(name + "/")) {
+                list.add(r);
             }
         }
-        return null;
+        return list.isEmpty() ? null : list;
     }
 
     /**
