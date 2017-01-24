@@ -551,8 +551,8 @@ msgid "An error occurred while unlinking this system."
 msgstr "Une erreur s'est produite lors de la dissociation de ce système."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:759
-msgid "http://www.patrikdufresne.com/en/minarca/help/"
-msgstr "http://www.patrikdufresne.com/fr/minarca/help/"
+msgid "http://www.patrikdufresne.com/en/minarca/faq/"
+msgstr "http://www.patrikdufresne.com/fr/minarca/faq/"
 
 #: com/patrikdufresne/minarca/core/APIException.java:20
 #, java-format

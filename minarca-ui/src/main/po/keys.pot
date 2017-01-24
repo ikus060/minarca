@@ -507,7 +507,7 @@ msgid "An error occurred while unlinking this system."
 msgstr ""
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:759
-msgid "http://www.patrikdufresne.com/en/minarca/help/"
+msgid "http://www.patrikdufresne.com/en/minarca/faq/"
 msgstr ""
 
 #: com/patrikdufresne/minarca/core/APIException.java:20

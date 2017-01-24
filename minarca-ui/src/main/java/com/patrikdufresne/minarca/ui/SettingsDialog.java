@@ -681,7 +681,7 @@ public class SettingsDialog extends Dialog {
      * Called when user press to help button.
      */
     private void helpPressed() {
-        Program.launch(_("http://www.patrikdufresne.com/en/minarca/help/"));
+        Program.launch(_("http://www.patrikdufresne.com/en/minarca/faq/"));
     }
 
 }
