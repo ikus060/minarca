@@ -14,7 +14,6 @@ Created on Jan 23, 2016
 
 from __future__ import unicode_literals
 
-import pkg_resources
 import unittest
 
 from rdiffweb.test import WebCase
@@ -28,10 +27,7 @@ class MinarcaBrandTest(WebCase):
 
     @classmethod
     def setup_server(cls,):
-        headerlogo = pkg_resources.resource_filename('minarca_brand', 'minarca_22_w.png')  # @UndefinedVariable
-        WebCase.setup_server(
-            enabled_plugins=['SQLite', 'MinarcaBrand'],
-            default_config={'HeaderLogo': headerlogo})
+        WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaBrand'])
 
     def test_check_plugin_enabled(self):
         """
