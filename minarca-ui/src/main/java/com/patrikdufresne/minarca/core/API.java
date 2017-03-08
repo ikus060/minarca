@@ -378,15 +378,6 @@ public class API {
     }
 
     /**
-     * Return default browse URL for the current repository.
-     * 
-     * @return
-     */
-    public String getBrowseUrl() {
-        return BASE_URL + "/browse/" + getRepositoryName();
-    }
-
-    /**
      * Return the include patterns used for the backup.
      * 
      * @return the list of pattern.

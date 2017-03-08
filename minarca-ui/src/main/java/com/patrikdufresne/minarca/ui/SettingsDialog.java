@@ -513,7 +513,7 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleBrowse() {
         // Simply open the URL into the default browser.
-        Program.launch(API.instance().getBrowseUrl());
+        Program.launch("https://www.minarca.net/");
     }
 
     /**
