@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -20,14 +23,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Jsoup;
@@ -146,8 +151,20 @@ public class WebTarget implements Cloneable {
             return;
         } else {
             this.close = true;
-            RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
-            this.httpclient = httpclient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();
+            HttpClientBuilder builder = HttpClients.custom();
+            boolean ignoreSsl = Boolean.getBoolean("minarca.accepthostkey");
+            if (ignoreSsl) {
+                SSLContextBuilder sslBuilder = new SSLContextBuilder();
+                try {
+                    sslBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+                    SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslBuilder.build());
+                    builder.setSSLSocketFactory(sslsf);
+                } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+                    // Usually never happen.
+                    LOGGER.error("error while creating http client without ssl validation", e);
+                }
+            }
+            this.httpclient = builder.build();
         }
     }
 
@@ -170,7 +187,7 @@ public class WebTarget implements Cloneable {
      *            the locale to be used.
      */
     public WebTarget(String baseurl, Locale locale) {
-        this(HttpClients.createDefault(), baseurl, locale);
+        this(null, baseurl, locale);
     }
 
     /**
