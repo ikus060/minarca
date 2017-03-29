@@ -750,7 +750,7 @@ public class API {
      *            the date
      * @throws APIException
      */
-    private void setLastStatus(LastResult state) throws APIException {
+    protected void setLastStatus(LastResult state) throws APIException {
         Validate.notNull(state);
         Properties status = new Properties();
         String now = Long.toString(new Date().getTime());
@@ -759,7 +759,10 @@ public class API {
         if (LastResult.SUCCESS.equals(state)) {
             status.setProperty(PROPERTY_LAST_SUCCESS, now);
         } else {
-            status.setProperty(PROPERTY_LAST_SUCCESS, Long.toString(getLastSuccess().getTime()));
+            Date d = getLastSuccess();
+            if (d != null) {
+                status.setProperty(PROPERTY_LAST_SUCCESS, Long.toString(d.getTime()));
+            }
         }
         try {
             save(this.statusFile, status);
