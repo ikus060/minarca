@@ -93,7 +93,8 @@ public class RdiffBackup {
     /**
      * Identify the list of active root (C:, D:, etc.) in the given pattern list.
      * 
-     * @param patternsa list of patterns
+     * @param patternsa
+     *            list of patterns
      * @return the list of active Root device part of the patterns
      */
     private static List<File> getActiveRoots(List<GlobPattern> patterns) {
@@ -393,7 +394,15 @@ public class RdiffBackup {
             if (ssh == null) throw new SshMissingException();
             File knownhosts = getKnownHosts();
             if (knownhosts == null) throw new KnownHostsMissingException();
-            args.add(String.format("%s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server", ssh, knownhosts, identityFile));
+            String extraOptions = "";
+            if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
+            args.add(
+                    String.format(
+                            "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server",
+                            ssh,
+                            extraOptions,
+                            knownhosts,
+                            identityFile));
         }
         // Add extra args.
         args.addAll(extraArgs);
