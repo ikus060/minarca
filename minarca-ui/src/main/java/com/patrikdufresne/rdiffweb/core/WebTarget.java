@@ -7,6 +7,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -30,6 +32,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -157,7 +160,12 @@ public class WebTarget implements Cloneable {
                 LOGGER.info("ignore ssl validation");
                 SSLContextBuilder sslBuilder = new SSLContextBuilder();
                 try {
-                    sslBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+                    sslBuilder.loadTrustMaterial(null, new TrustStrategy() {
+                        @Override
+                        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                            return true;
+                        }
+                    });
                     SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslBuilder.build());
                     builder.setSSLSocketFactory(sslsf);
                 } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
