@@ -170,7 +170,7 @@ public class Main {
      */
     private static void printVersion() {
         System.out.println("Minarca version " + getCurrentVersion());
-        System.out.println("Copyright (C) 2015 Patrik Dufresne Service Logiciel Inc.");
+        System.out.println("Copyright (C) 2017 Patrik Dufresne Service Logiciel Inc.");
     }
 
     /**
@@ -323,7 +323,7 @@ public class Main {
      * @param args
      */
     private void startui(String[] args) {
-        LOGGER.info("starting ui");
+        LOGGER.info("starting minarca ui version " + getCurrentVersion());
 
         Display.setAppName(_("Minarca"));
         Display.setAppVersion(getCurrentVersion());
