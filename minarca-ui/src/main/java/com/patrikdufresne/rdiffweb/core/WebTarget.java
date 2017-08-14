@@ -154,6 +154,7 @@ public class WebTarget implements Cloneable {
             HttpClientBuilder builder = HttpClients.custom();
             boolean ignoreSsl = Boolean.getBoolean("minarca.accepthostkey");
             if (ignoreSsl) {
+                LOGGER.info("ignore ssl validation");
                 SSLContextBuilder sslBuilder = new SSLContextBuilder();
                 try {
                     sslBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
