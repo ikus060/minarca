@@ -8,6 +8,7 @@ package com.patrikdufresne.minarca;
 import static com.patrikdufresne.minarca.Localized._;
 
 import java.lang.management.ManagementFactory;
+import java.util.Calendar;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -63,6 +64,16 @@ public class Main {
             return "DEV";
         }
         return version;
+    }
+
+    /**
+     * Return the copyright text to be displayed.
+     * 
+     * @return
+     */
+    public static String getCopyrightText() {
+        int year = Calendar.getInstance().get(java.util.Calendar.YEAR);
+        return _("Copyright © {0,number,#} - Patrik Dufresne Service Logiciel inc.", year);
     }
 
     /**
@@ -170,7 +181,7 @@ public class Main {
      */
     private static void printVersion() {
         System.out.println("Minarca version " + getCurrentVersion());
-        System.out.println("Copyright (C) 2017 Patrik Dufresne Service Logiciel Inc.");
+        System.out.println(getCopyrightText());
     }
 
     /**
@@ -276,12 +287,8 @@ public class Main {
             reconfigure();
             return true;
         } catch (APIException e) {
-            DetailMessageDialog.openWarning(
-                    null,
-                    Display.getAppName(),
-                    _("Fail to start Minarca."),
-                    _("If the problem persist, you may try to reinstall Minarca."),
-                    e);
+            DetailMessageDialog
+                    .openWarning(null, Display.getAppName(), _("Fail to start Minarca."), _("If the problem persist, you may try to reinstall Minarca."), e);
             return false;
         }
         return true;
@@ -297,9 +304,10 @@ public class Main {
                 null,
                 Display.getAppName(),
                 _("Do you want to restore default configuration ?"),
-                _("Your Minarca installation seams broken. "
-                        + "If you answer Yes, all your personal configuration will be lost. "
-                        + "If you answer no, this application may misbehave."),
+                _(
+                        "Your Minarca installation seams broken. "
+                                + "If you answer Yes, all your personal configuration will be lost. "
+                                + "If you answer no, this application may misbehave."),
                 null);
         if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
             try {

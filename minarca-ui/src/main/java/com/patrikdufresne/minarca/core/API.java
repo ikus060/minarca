@@ -16,6 +16,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.apache.commons.logging.impl.NoOpLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.minarca.Main;
 import com.patrikdufresne.minarca.core.APIException.ExchangeSshKeyException;
 import com.patrikdufresne.minarca.core.APIException.GenerateKeyException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
@@ -718,9 +720,7 @@ public class API {
     private void save(File file, Properties properties) throws IOException {
         LOGGER.trace("writing config to [{}]", file);
         Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
-        properties.store(writer, "Copyright (C) 2016 Patrik Dufresne Service Logiciel inc.\r\n"
-                + "Minarca backup configuration.\r\n"
-                + "Please do not change this configuration file manually.");
+        properties.store(writer, Main.getCopyrightText() + "\r\nMinarca backup configuration.\r\n" + "Please do not change this configuration file manually.");
         writer.close();
     }
 
