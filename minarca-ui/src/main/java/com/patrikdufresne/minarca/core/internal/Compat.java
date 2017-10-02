@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.filechooser.FileSystemView;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -295,13 +297,16 @@ public class Compat {
      * @return
      */
     private static File[] getRootsPath() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return File.listRoots();
-        } else if (SystemUtils.IS_OS_LINUX) {
-            // Under Linux it's always /.
-            return new File[] { new File("/") };
+        FileSystemView fsv = FileSystemView.getFileSystemView();
+        List<File> roots = new ArrayList<File>();
+        for (File f : File.listRoots()) {
+            if (fsv.isFloppyDrive(f)) {
+                // Need to exclude floppy.
+                continue;
+            }
+            roots.add(f);
         }
-        return null;
+        return roots.toArray(new File[roots.size()]);
     }
 
     private static String getTemp() {
