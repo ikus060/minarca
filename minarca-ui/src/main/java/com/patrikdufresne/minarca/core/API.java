@@ -190,12 +190,12 @@ public class API {
     /**
      * Reference to the status.
      */
-    private PropertiesConfiguration status;
+    protected PropertiesConfiguration status;
 
     /**
      * Reference to status file.
      */
-    private File statusFile;
+    protected File statusFile;
 
     /**
      * Default constructor.
@@ -750,22 +750,28 @@ public class API {
      */
     protected void setLastStatus(LastResult state) throws APIException {
         Validate.notNull(state);
-        Properties status = new Properties();
+        Properties newStatus = new Properties();
         String now = Long.toString(new Date().getTime());
-        status.setProperty(PROPERTY_LAST_RESULT, state.toString());
-        status.setProperty(PROPERTY_LAST_DATE, now);
+        newStatus.setProperty(PROPERTY_LAST_RESULT, state.toString());
+        newStatus.setProperty(PROPERTY_LAST_DATE, now);
         if (LastResult.SUCCESS.equals(state)) {
-            status.setProperty(PROPERTY_LAST_SUCCESS, now);
+            newStatus.setProperty(PROPERTY_LAST_SUCCESS, now);
         } else {
             Date d = getLastSuccess();
             if (d != null) {
-                status.setProperty(PROPERTY_LAST_SUCCESS, Long.toString(d.getTime()));
+                newStatus.setProperty(PROPERTY_LAST_SUCCESS, Long.toString(d.getTime()));
             }
         }
         try {
-            save(this.statusFile, status);
+            save(this.statusFile, newStatus);
         } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
+        }
+        // Finally reload the status file.
+        try {
+            status.refresh();
+        } catch (ConfigurationException e) {
+            throw new APIException(_("fail to refresh config"), e);
         }
     }
 
