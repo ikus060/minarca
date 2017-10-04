@@ -624,7 +624,7 @@ public class API {
 
         // Empty the include
         List<GlobPattern> previousPatterns = getGlobPatterns();
-        setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.ROOTS[0] + "**")));
+        setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.getRootsPath()[0] + "**")));
 
         // Reset Last result
         Date lastResultDate = getLastResultDate();

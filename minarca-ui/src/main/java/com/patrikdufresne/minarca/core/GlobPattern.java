@@ -86,7 +86,7 @@ public class GlobPattern {
      * @return
      */
     private static String expand(String value) {
-        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.ROOTS[0].toString()).replace("${temp}", Compat.TEMP);
+        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.getRootsPath()[0].toString()).replace("${temp}", Compat.TEMP);
     }
 
     private static String getPath(File file) {

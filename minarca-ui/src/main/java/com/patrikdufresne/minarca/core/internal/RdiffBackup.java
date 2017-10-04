@@ -99,7 +99,7 @@ public class RdiffBackup {
      */
     private static List<File> getActiveRoots(List<GlobPattern> patterns) {
         List<File> activeRoots = new ArrayList<File>();
-        for (File root : Compat.ROOTS) {
+        for (File root : Compat.getRootsPath()) {
             for (GlobPattern p : patterns) {
                 if (p.isInRoot(root)) {
                     activeRoots.add(root);
@@ -396,12 +396,13 @@ public class RdiffBackup {
             if (knownhosts == null) throw new KnownHostsMissingException();
             String extraOptions = "";
             if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
-            args.add(String.format(
-                    "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server",
-                    ssh,
-                    extraOptions,
-                    knownhosts,
-                    identityFile));
+            args.add(
+                    String.format(
+                            "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server",
+                            ssh,
+                            extraOptions,
+                            knownhosts,
+                            identityFile));
         }
         // Add extra args.
         args.addAll(extraArgs);
@@ -420,12 +421,12 @@ public class RdiffBackup {
         // Run the test.
         LOGGER.info("test server");
         try {
-            rdiffbackup(Compat.ROOTS[0], Arrays.asList("--test-server"), "/");
+            rdiffbackup(Compat.getRootsPath()[0], Arrays.asList("--test-server"), "/");
         } catch (UntrustedHostKey e) {
             // Try to accept the key
             acceptServerKey();
             // Then try to test server again
-            rdiffbackup(Compat.ROOTS[0], Arrays.asList("--test-server"), "/");
+            rdiffbackup(Compat.getRootsPath()[0], Arrays.asList("--test-server"), "/");
         }
 
     }

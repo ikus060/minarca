@@ -78,11 +78,6 @@ public class Compat {
     private static final transient Logger LOGGER;
 
     /**
-     * List of roots. On Linux it's always "/". On Windows we may have multiple root "C:\", "D:\", etc.
-     */
-    public static final File[] ROOTS;
-
-    /**
      * Define temp directory.
      */
     public static final String TEMP;
@@ -104,7 +99,6 @@ public class Compat {
         LOGGER = LoggerFactory.getLogger(Compat.class);
         CHARSET_PROCESS = getProcessCharset();
         COMPUTER_NAME = getComputerName();
-        ROOTS = getRootsPath();
         WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
         IS_ADMIN = getIsAdmin();
         CONFIG_PATH = getConfigPath(IS_ADMIN);
@@ -294,9 +288,13 @@ public class Compat {
     /**
      * Return the home drive. On Windows usually return <code>C:\</code>. On linux always return <code>/</code>.
      * 
+     * List of roots. On Linux it's always "/". On Windows we may have multiple root "C:\", "D:\", etc.
+     * 
+     * Do not cache this since this value can changed during runtime on windows.
+     * 
      * @return
      */
-    private static File[] getRootsPath() {
+    public static File[] getRootsPath() {
         FileSystemView fsv = FileSystemView.getFileSystemView();
         List<File> roots = new ArrayList<File>();
         for (File f : File.listRoots()) {
