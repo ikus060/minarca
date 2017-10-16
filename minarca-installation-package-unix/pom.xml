@@ -4,7 +4,7 @@
     <parent>
         <artifactId>minarca-root</artifactId>
         <groupId>com.patrikdufresne</groupId>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>3.0.3</version>
     </parent>
     <artifactId>minarca-installation-package-unix</artifactId>
     <packaging>jar</packaging>
