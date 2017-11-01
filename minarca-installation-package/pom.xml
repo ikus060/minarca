@@ -4,7 +4,7 @@
     <parent>
         <artifactId>minarca-root</artifactId>
         <groupId>com.patrikdufresne</groupId>
-        <version>3.0.4-SNAPSHOT</version>
+        <version>3.0.4</version>
     </parent>
     <artifactId>minarca-installation-package</artifactId>
     <packaging>pom</packaging>
@@ -252,7 +252,7 @@
         <dependency>
             <groupId>com.patrikdufresne</groupId>
             <artifactId>minarca-ui</artifactId>
-            <version>3.0.4-SNAPSHOT</version>
+            <version>3.0.4</version>
         </dependency>
     </dependencies>
 </project>
