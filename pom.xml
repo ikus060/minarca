@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.patrikdufresne</groupId>
     <artifactId>minarca-root</artifactId>
-    <version>3.0.4</version>
+    <version>3.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>minarca-root</name>
     <modules>
@@ -21,7 +21,7 @@
     <scm>
         <!-- Set release SCM -->
         <developerConnection>scm:git:http://git.patrikdufresne.com/pdsl/minarca.git</developerConnection>
-        <tag>minarca-root-3.0.4</tag>
+        <tag>HEAD</tag>
     </scm>
     <!-- Define the repository. Used by deploy:deploy -->
     <distributionManagement>
