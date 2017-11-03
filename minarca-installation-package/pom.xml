@@ -201,8 +201,8 @@
                                 </macrodef>
                                 
                                 <!-- Sign winrun4j exe -->
-                                <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Installer" file="${project.build.directory}/package/bin/minarca.exe" if="sign.key.path" />
-                                <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Installer" file="${project.build.directory}/package/bin/minarca64.exe" if="sign.key.path" />
+                                <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Client" file="${project.build.directory}/package/bin/minarca.exe" if="sign.key.path" />
+                                <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Client" file="${project.build.directory}/package/bin/minarca64.exe" if="sign.key.path" />
                                 
                                 <propertyregex property="AppVersion" input="0.0.0.${project.version}" regexp=".*([0-9]+.[0-9]+.[0-9]+.[0-9]+)" select="\1" />
                                 <!-- Convert the license file into Window 
