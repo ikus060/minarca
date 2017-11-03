@@ -113,12 +113,12 @@ public class AboutDialog extends Dialog {
 
         // Application web site
         Link appWebSite = new Link(comp, SWT.NONE);
-        appWebSite.setText("<a>Minarca (https://www.minarca.net/)</a>"); //$NON-NLS-1$ //$NON-NLS-2$
+        appWebSite.setText("<a>Minarca (http://minarca.info/)</a>"); //$NON-NLS-1$ //$NON-NLS-2$
         appWebSite.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
         appWebSite.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                Program.launch("https://www.minarca.net/");
+                Program.launch("http://minarca.info/");
             }
         });
 
