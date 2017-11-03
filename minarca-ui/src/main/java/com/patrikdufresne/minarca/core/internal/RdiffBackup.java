@@ -162,17 +162,17 @@ public class RdiffBackup {
     /**
      * The identify file (private key).
      */
-    private File identityFile;
+    private final File identityFile;
 
     /**
      * The remote host (minarca.net)
      */
-    private String remotehost;
+    private final String remotehost;
 
     /**
      * The username for authentication.
      */
-    private String username;
+    private final String username;
 
     /**
      * Create a new instance of rdiffbackup.
