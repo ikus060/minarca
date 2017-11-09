@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
+import javax.swing.filechooser.FileSystemView;
+
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -52,6 +53,11 @@ public class SelectiveDialog extends Dialog {
      * Label for restore default button.
      */
     private static final String RESTORE_DEFAUL_LABEL = _("Restore defaults");
+
+    /**
+     * File system view instance to be reused.
+     */
+    private static final FileSystemView FSV = FileSystemView.getFileSystemView();
 
     private CList customList;
 
@@ -196,8 +202,13 @@ public class SelectiveDialog extends Dialog {
         if (pattern.isGlobbing()) {
             label = _("Custom pattern");
         } else {
-            label = FilenameUtils.getBaseName(pattern.value());
-            if (!pattern.isFileExists()) {
+            if (pattern.isFileExists()) {
+                label = FSV.getSystemDisplayName(new File(pattern.value()));
+                if (label==null) {
+                    label = pattern.value();
+                }
+            } else {
+                label = pattern.value();
                 label += " " + _("(not exists)");
             }
         }
@@ -324,14 +335,13 @@ public class SelectiveDialog extends Dialog {
             }
         }
         if (excluded) {
-            DetailMessageDialog
-                    .openWarning(
-                            getShell(),
-                            getShell().getText(),
-                            _("Selected item is excluded by another pattern."),
-                            _(
-                                    "The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.",
-                                    file));
+            DetailMessageDialog.openWarning(
+                    getShell(),
+                    getShell().getText(),
+                    _("Selected item is excluded by another pattern."),
+                    _(
+                            "The path `{0}` is currently excluded by another pattern. You may need to reorganize your patterns to properly include the selected item.",
+                            file));
         }
 
         // Check if predefined.

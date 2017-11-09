@@ -220,9 +220,9 @@ public class GlobPattern {
     /**
      * True if glob pattern should be included. False otherwise.
      */
-    private boolean include;
+    private final boolean include;
 
-    private PathMatcher matcher;
+    private transient PathMatcher matcher;
 
     /**
      * The pattern.
