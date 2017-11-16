@@ -27,6 +27,7 @@ import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
+import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.ui.DetailMessageDialog;
 import com.patrikdufresne.minarca.ui.Images;
 import com.patrikdufresne.minarca.ui.SettingsDialog;
@@ -228,7 +229,8 @@ public class Main {
      * This if the main function being called when minarca application is called with --backup or -b arguments.
      */
     private void backup(boolean force) {
-
+        LOGGER.info("using default charset [{}]", Compat.CHARSET_DEFAULT.name());
+        LOGGER.info("using process charset [{}]", Compat.CHARSET_PROCESS.name());
         LOGGER.info("starting backup");
 
         // Check if current OS and running environment is valid.
@@ -242,7 +244,7 @@ public class Main {
 
         // Check if minarca is properly configure (from our point of view).
         try {
-            API.instance().checkConfig();
+            API.instance().config().checkConfig();
         } catch (APIException e) {
             // Show error message (usually localized).
             LOGGER.info("invalid config", e);
@@ -268,8 +270,8 @@ public class Main {
         // Check if configured.
         try {
             LOGGER.debug("checking minarca configuration");
-            API.instance().checkConfig();
-            API.instance().getSchedule();
+            API.instance().config().checkConfig();
+            API.instance().config().getSchedule();
             LOGGER.debug("configuration is OK");
         } catch (NotConfiguredException e) {
             // If not configured, show wizard.
@@ -312,7 +314,7 @@ public class Main {
         if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
             try {
                 LOGGER.debug("repair configuration");
-                API.instance().defaultConfig(false);
+                API.instance().config().defaultConfig(false);
             } catch (APIException e1) {
                 LOGGER.warn("fail to repair configuration", e1);
                 DetailMessageDialog.openWarning(
@@ -331,7 +333,9 @@ public class Main {
      * @param args
      */
     private void startui(String[] args) {
-        LOGGER.info("starting minarca ui version " + getCurrentVersion());
+        LOGGER.info("using default charset [{}]", Compat.CHARSET_DEFAULT.name());
+        LOGGER.info("using process charset [{}]", Compat.CHARSET_PROCESS.name());
+        LOGGER.info("starting minarca ui version [{}]", getCurrentVersion());
 
         Display.setAppName(_("Minarca"));
         Display.setAppVersion(getCurrentVersion());

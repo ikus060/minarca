@@ -434,7 +434,7 @@ public class SetupDialog extends Dialog {
         // Set other settings to default.
         LOGGER.info("set default config");
         try {
-            API.instance().defaultConfig(true);
+            API.instance().config().defaultConfig(true);
         } catch (APIException e) {
             LOGGER.warn("fail to schedule task", e);
             return _("Can't schedule backup task! If the problem persists, try to re-install Minarca.");
