@@ -15,34 +15,27 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.List;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.Validate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 
 /**
- * Provide basics to generate public and private key file for OpenSSH and Putty.
+ * Provide basics to generate public and private key file for OpenSSH.
  * <p>
  * Current implementation doesn't support passphrase (since I don't need it).
  * 
@@ -51,39 +44,18 @@ import org.bouncycastle.openssl.PEMWriter;
  */
 public class Keygen {
     /**
-     * HMAC-SHA-1 algorithm
-     */
-    private static final String ALGORITHM_HMAC_SHA1 = "HmacSHA1";
-    /**
      * RSA algorithm.
      */
     private static final String ALGORITHM_RSA = "RSA";
     /**
-     * SHA-1 algorithm
-     */
-    private static final String ALGORITHM_SHA_1 = "SHA-1";
-    /**
      * Bouncy castle algorithm provider.
      */
     private static final BouncyCastleProvider BC;
-    /**
-     * Newline chars
-     */
-    private static final String CRLF = "\r\n";
-    /**
-     * Putty encryption
-     */
-    private static final String ENCRYPTION = "none";
 
     /**
      * Default RSA keysize (value: 2048).
      */
     private static final int KEYSIZE = 2048;
-
-    /**
-     * Putty Key type
-     */
-    private static final String TYPE = "ssh-rsa";
 
     /**
      * UTF-8 charset name.
@@ -92,19 +64,6 @@ public class Keygen {
     static {
         // Register the provider.
         Security.addProvider(BC = new BouncyCastleProvider());
-    }
-
-    /**
-     * Count the number of line
-     * 
-     * @param value
-     *            the string to be wrap
-     * @param col
-     *            number of char on a single line.
-     * @return
-     */
-    private static int countLines(String value, int col) {
-        return (value.length() + col - 1) / col;
     }
 
     /**
@@ -125,45 +84,6 @@ public class Keygen {
      */
     private static String encodeBase64(byte[] bytes) {
         return new String(Base64.encodeBase64(bytes));
-    }
-
-    /**
-     * From bytes to Hexadecimal string
-     * 
-     * @param bytes
-     * @return
-     */
-    private static String encodeHex(byte[] bytes) {
-        return new String(Hex.encodeHex(bytes));
-    }
-
-    /**
-     * Generate a valid private key compatible for putty.
-     * 
-     * @param rsaPrivateKey
-     *            the private key
-     * @return encoded version of the privated key
-     * @throws IOException
-     * @see https://github.com/Yasushi/putty/blob/master/sshpubk.c
-     */
-    private static byte[] encodePrivateKeyForPutty(RSAPrivateCrtKey rsaPrivateKey) throws IOException {
-        ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(byteOs);
-        // mpint private_exponent
-        dos.writeInt(rsaPrivateKey.getPrivateExponent().toByteArray().length);
-        dos.write(rsaPrivateKey.getPrivateExponent().toByteArray());
-        // mpint p (the larger of the two primes)
-        dos.writeInt(rsaPrivateKey.getPrimeP().toByteArray().length);
-        dos.write(rsaPrivateKey.getPrimeP().toByteArray());
-        // mpint q (the smaller prime)
-        dos.writeInt(rsaPrivateKey.getPrimeQ().toByteArray().length);
-        dos.write(rsaPrivateKey.getPrimeQ().toByteArray());
-        // mpint iqmp (the inverse of q modulo p)
-        dos.writeInt(rsaPrivateKey.getCrtCoefficient().toByteArray().length);
-        dos.write(rsaPrivateKey.getCrtCoefficient().toByteArray());
-        dos.close();
-        byteOs.close();
-        return byteOs.toByteArray();
     }
 
     /**
@@ -328,115 +248,6 @@ public class Keygen {
         PEMWriter pemFormatWriter = new PEMWriter(writer);
         pemFormatWriter.writeObject(privateKey);
         pemFormatWriter.close();
-    }
-
-    /**
-     * Generate a Putty private key file (ppk).
-     * <p>
-     * This implementation use default encoding.
-     * 
-     * @param pair
-     *            the key pair
-     * @param comment
-     *            the comment.
-     * @param file
-     *            the filename
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     */
-    public static void toPrivatePuttyKey(KeyPair pair, String comment, File file) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        FileWriterWithEncoding writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT.name());
-        toPrivatePuttyKey(pair, comment, writer);
-        writer.close();
-        // Set permissions (otherwise SSH complains about file permissions)
-        if (SystemUtils.IS_OS_LINUX) {
-            file.setExecutable(false, false);
-            file.setReadable(false, false);
-            file.setWritable(false, false);
-            file.setWritable(true, true);
-            file.setReadable(true, true);
-        }
-    }
-
-    /**
-     * Generate a Putty private key file (ppk).
-     * 
-     * @param pair
-     *            the key pair
-     * @param comment
-     *            the comments
-     * @param writer
-     *            the output the encoding should be
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     * @see https ://github.com/hierynomus/sshj/blob/master/src/main/java/net/schmizz
-     *      /sshj/userauth/keyprovider/PuTTYKeyFile.java
-     * @see https://github.com/Yasushi/putty/blob/master/sshpubk.c
-     */
-    public static void toPrivatePuttyKey(KeyPair pair, String comment, Writer writer) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        Validate.notNull(pair);
-        Validate.notNull(comment);
-        Validate.notNull(writer);
-        // Remove invalid char from the comment line.
-        comment = comment.replaceAll("[\\r\\n]", "");
-
-        // Encode public and private key for putty.
-        byte[] publicKeyEncoded = encodePublicKey((RSAPublicKey) pair.getPublic());
-        String publicKeyBase64 = encodeBase64(publicKeyEncoded);
-        byte[] privateKeyEncoded = encodePrivateKeyForPutty((RSAPrivateCrtKey) pair.getPrivate());
-        String privateKeyBase64 = encodeBase64(privateKeyEncoded);
-
-        /*
-         * Generate Mac
-         */
-        MessageDigest digest = MessageDigest.getInstance(ALGORITHM_SHA_1, BC);
-        digest.update("putty-private-key-file-mac-key".getBytes());
-        final byte[] mackey = digest.digest();
-
-        final Mac mac = Mac.getInstance(ALGORITHM_HMAC_SHA1, BC);
-        mac.init(new SecretKeySpec(mackey, 0, 20, mac.getAlgorithm()));
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        DataOutputStream macDataOs = new DataOutputStream(out);
-        // String "ssh-rsa"
-        macDataOs.writeInt(TYPE.getBytes().length);
-        macDataOs.write(TYPE.getBytes());
-        // String <encryption>
-        macDataOs.writeInt(ENCRYPTION.getBytes().length);
-        macDataOs.write(ENCRYPTION.getBytes());
-        // String <comment>
-        macDataOs.writeInt(comment.getBytes().length);
-        macDataOs.write(comment.getBytes());
-        // String <public-blob>
-        macDataOs.writeInt(publicKeyEncoded.length);
-        macDataOs.write(publicKeyEncoded);
-        // String <private-blob>
-        macDataOs.writeInt(privateKeyEncoded.length);
-        macDataOs.write(privateKeyEncoded);
-        byte[] macData = out.toByteArray();
-
-        /*
-         * Generate ppk file.
-         */
-        StringBuilder buf = new StringBuilder();
-        buf.append("PuTTY-User-Key-File-2: " + TYPE + CRLF);
-        buf.append("Encryption: " + ENCRYPTION + CRLF);
-        buf.append("Comment: " + comment + CRLF);
-        buf.append("Public-Lines: " + countLines(publicKeyBase64, 64) + CRLF);
-        for (int i = 0; i < publicKeyBase64.length(); i += 64) {
-            buf.append(publicKeyBase64.substring(i, Math.min(publicKeyBase64.length(), i + 64)));
-            buf.append(CRLF);
-        }
-        buf.append("Private-Lines: " + countLines(privateKeyBase64, 64) + CRLF);
-        for (int i = 0; i < privateKeyBase64.length(); i += 64) {
-            buf.append(privateKeyBase64.substring(i, Math.min(privateKeyBase64.length(), i + 64)));
-            buf.append(CRLF);
-        }
-        buf.append("Private-MAC: " + encodeHex(mac.doFinal(macData)) + CRLF);
-
-        writer.write(buf.toString());
     }
 
     /**

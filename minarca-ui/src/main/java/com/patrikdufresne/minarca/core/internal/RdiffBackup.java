@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.IdentityMissingException;
 import com.patrikdufresne.minarca.core.APIException.KnownHostsMissingException;
-import com.patrikdufresne.minarca.core.APIException.PlinkMissingException;
 import com.patrikdufresne.minarca.core.APIException.SshMissingException;
 import com.patrikdufresne.minarca.core.APIException.UntrustedHostKey;
 import com.patrikdufresne.minarca.core.GlobPattern;
@@ -41,17 +40,9 @@ public class RdiffBackup {
     private static final transient Logger LOGGER = LoggerFactory.getLogger(RdiffBackup.class);
 
     /**
-     * Executable name representing plink.
-     */
-    private static final String PLINK = "plink.exe";
-    /**
      * True to accept any host key.
      */
     private static final String PROPERTY_ACCEPT_HOST_KEY = "minarca.accepthostkey";
-    /**
-     * Property used to define the location of putty. Mainly used for development.
-     */
-    private static final String PROPERTY_PUTTY_LOCATION = "putty.location";
 
     /**
      * Property used to define the location of rdiff-backup.
@@ -70,14 +61,16 @@ public class RdiffBackup {
     /**
      * SSH executable name.
      */
-    private static final String SSH = "ssh";
+    private static final String SSH;
 
     static {
         if (SystemUtils.IS_OS_WINDOWS) {
             RDIFF_BACKUP = "rdiff-backup.exe";
+            SSH = "ssh.exe";
         } else {
             // Otherwise Linux
             RDIFF_BACKUP = "rdiff-backup";
+            SSH = "ssh";
         }
     }
 
@@ -133,15 +126,6 @@ public class RdiffBackup {
     }
 
     /**
-     * Determine the location of plink.exe.
-     * <p>
-     * This implementation look into into the follow directory: putty location, local directory,
-     */
-    private static File getPlinkLocation() {
-        return Compat.searchFile(PLINK, System.getProperty(PROPERTY_PUTTY_LOCATION), "./putty-0.63/", "./bin/");
-    }
-
-    /**
      * Determine the location of rdiff-backup executable.
      * 
      * @return
@@ -156,7 +140,12 @@ public class RdiffBackup {
      * @return ssh location
      */
     private static File getSshLocation() {
-        return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "/usr/bin/");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "./openssh-7.6p1-1/", "./bin/");
+        } else {
+            // Linux: use system ssh
+            return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "/usr/bin/");
+        }
     }
 
     /**
@@ -182,7 +171,7 @@ public class RdiffBackup {
      * @param remotehost
      *            the remote host (usually minarca.)
      * @param identityPath
-     *            location where the identify is stored (should contain id_rsa or key.ppk)
+     *            location where the identify is stored (should contain id_rsa)
      * @throws APIException
      */
     public RdiffBackup(String username, String remotehost, File identityFile) throws APIException {
@@ -191,62 +180,6 @@ public class RdiffBackup {
         Validate.notNull(this.identityFile = identityFile);
         if (!identityFile.isFile() || !identityFile.canRead()) {
             throw new IdentityMissingException(identityFile);
-        }
-    }
-
-    /**
-     * This method is called when the host ssh key must be accepted.
-     */
-    private void acceptServerKey() throws APIException, InterruptedException {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            acceptServerKeyPlink();
-        }
-        // Nothing to do. We use our how known_hosts.
-    }
-
-    /**
-     * Accept host key for Plink.
-     */
-    private void acceptServerKeyPlink() throws APIException, InterruptedException {
-        // Construct the command line.
-        List<String> args = new ArrayList<String>();
-        File plink = getPlinkLocation();
-        if (plink == null) throw new PlinkMissingException();
-        args.add(plink.toString());
-        args.add("-2");
-        args.add("-i");
-        args.add(identityFile.toString());
-        // Remote host
-        args.add(this.username + "@" + this.remotehost);
-        // Command line
-        args.add("exit");
-
-        // Create a prompt handle to accept of refused the key according to it's fingerprint.
-        PromptHandler handler = new PromptHandler() {
-
-            boolean acceptHostKey = getAcceptHostKey();
-
-            @Override
-            public String handle(String prompt) {
-                if (prompt.contains("7d:c7:dd:d4:72:22:10:f4:a3:a5:b5:5d:de:2f:83:39")) {
-                    acceptHostKey = true;
-                } else if (prompt.contains("Store key in cache? (y/n)")) {
-                    if (acceptHostKey) {
-                        LOGGER.info("accepting remote host key");
-                        return "y" + SystemUtils.LINE_SEPARATOR;
-                    } else {
-                        LOGGER.info("refusing remote host key");
-                        return "n" + SystemUtils.LINE_SEPARATOR;
-                    }
-                }
-                return null;
-            }
-        };
-        LOGGER.info("try to accept remote host key");
-        try {
-            execute(args, null, handler);
-        } catch (UntrustedHostKey e) {
-            // Swallow exception.
         }
     }
 
@@ -335,10 +268,7 @@ public class RdiffBackup {
             int returnCode = p.waitFor();
             String output = sh.getOutput();
             // Check for error message.
-            if (output.contains("The server's host key is not cached in the registry.")) {
-                // Plink Error.
-                throw new UntrustedHostKey();
-            } else if (output.contains("Host key verification failed.")) {
+            if (output.contains("Host key verification failed.")) {
                 // OpenSSH error.
                 throw new UntrustedHostKey();
             } else if (output.contains("Connection abandoned.")) {
@@ -382,28 +312,19 @@ public class RdiffBackup {
         }
         // Define the remote schema for each platform.
         args.add("--remote-schema");
-        if (SystemUtils.IS_OS_WINDOWS) {
-            File plink = getPlinkLocation();
-            if (plink == null) throw new PlinkMissingException();
-            args.add(String.format("%s -2 -batch -i \\\"%s\\\" %%s rdiff-backup --server", plink, identityFile));
-            // -2 : Force SSHv2
-            // batch : avoid user interaction
-            // -i : identity file, ssh private key
-        } else {
-            File ssh = getSshLocation();
-            if (ssh == null) throw new SshMissingException();
-            File knownhosts = getKnownHosts();
-            if (knownhosts == null) throw new KnownHostsMissingException();
-            String extraOptions = "";
-            if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
-            args.add(
-                    String.format(
-                            "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server",
-                            ssh,
-                            extraOptions,
-                            knownhosts,
-                            identityFile));
-        }
+        File ssh = getSshLocation();
+        if (ssh == null) throw new SshMissingException();
+        File knownhosts = getKnownHosts();
+        if (knownhosts == null) throw new KnownHostsMissingException();
+        String extraOptions = "";
+        if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
+        args.add(
+                String.format(
+                        "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server",
+                        ssh,
+                        extraOptions,
+                        knownhosts,
+                        identityFile));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.
@@ -420,14 +341,6 @@ public class RdiffBackup {
     public void testServer() throws APIException, InterruptedException {
         // Run the test.
         LOGGER.info("test server");
-        try {
-            rdiffbackup(Compat.getRootsPath()[0], Arrays.asList("--test-server"), "/");
-        } catch (UntrustedHostKey e) {
-            // Try to accept the key
-            acceptServerKey();
-            // Then try to test server again
-            rdiffbackup(Compat.getRootsPath()[0], Arrays.asList("--test-server"), "/");
-        }
-
+        rdiffbackup(Compat.getRootsPath()[0], Arrays.asList("--test-server"), "/");
     }
 }

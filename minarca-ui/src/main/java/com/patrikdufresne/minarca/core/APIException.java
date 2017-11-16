@@ -178,20 +178,6 @@ public class APIException extends Exception {
     }
 
     /**
-     * Raised when plink.exe is missing.
-     * 
-     * @author Patrik Dufresne
-     * 
-     */
-    public static class PlinkMissingException extends APIException {
-
-        public PlinkMissingException() {
-            super(_("Plink is missing"));
-        }
-
-    }
-
-    /**
      * Raised when the task is not found.
      * 
      * @author Patrik Dufresne

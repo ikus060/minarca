@@ -399,9 +399,6 @@ public class API {
      * @return the identity file.
      */
     private File getIdentityFile() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return new File(Compat.CONFIG_PATH, "key.ppk");
-        }
         return new File(Compat.CONFIG_PATH, "id_rsa");
     }
 
@@ -582,7 +579,6 @@ public class API {
         LOGGER.debug("generating public and private key for {}", repositoryName);
         File idrsaFile = new File(Compat.CONFIG_PATH, "id_rsa.pub");
         File identityFile = new File(Compat.CONFIG_PATH, "id_rsa");
-        File puttyFile = new File(Compat.CONFIG_PATH, "key.ppk");
         String rsadata = null;
         try {
             // Generate a key pair.
@@ -591,8 +587,6 @@ public class API {
             Keygen.toPublicIdRsa((RSAPublicKey) pair.getPublic(), repositoryName, idrsaFile);
             // Generate a private key file.
             Keygen.toPrivatePEM((RSAPrivateKey) pair.getPrivate(), identityFile);
-            // Generate a Putty private key file.
-            Keygen.toPrivatePuttyKey(pair, repositoryName, puttyFile);
             // Read RSA pub key.
             rsadata = FileUtils.readFileToString(idrsaFile);
         } catch (Exception e) {
@@ -858,7 +852,7 @@ public class API {
         String username = this.getUsername();
         String remotehost = this.getRemotehost();
 
-        // Get reference to the identity file to be used by ssh or plink.
+        // Get reference to the identity file to be used by ssh.
         File identityFile = getIdentityFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
