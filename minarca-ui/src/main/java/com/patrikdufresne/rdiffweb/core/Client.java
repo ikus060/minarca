@@ -171,54 +171,6 @@ public class Client {
     }
 
     /**
-     * Get the plugin info for the given plugin name.
-     * 
-     * @param name
-     * @return the plugin info or null.
-     * @throws IOException
-     */
-    public PluginInfo getPluginInfo(String name) throws IOException {
-        for (PluginInfo p : getPluginInfos()) {
-            if (name.equals(p.getName())) {
-                return p;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * List plugins information.
-     * 
-     * @return list of plugin information.
-     * 
-     * @throws IOException
-     */
-    public Collection<PluginInfo> getPluginInfos() throws IOException {
-        // Query plugins page.
-        String data = target("/admin/plugins/").getAsString();
-        // Select plugin items.
-        Document doc = Jsoup.parse(data);
-        Elements plugins = doc.select("[itemtype=https://schema.org/SoftwareApplication]");
-        List<PluginInfo> list = new ArrayList<PluginInfo>(plugins.size());
-        for (Element e : plugins) {
-            String name = selectFirstAsString(e, "[itemprop=name]");
-            String version = selectFirstAsString(e, "[itemprop=softwareVersion]");
-            Boolean enabled = selectFirstAsBoolean(e, "[itemprop=installed]");
-            String author = selectFirstAsString(e, "[itemprop=author]");
-            String description = selectFirstAsString(e, "[itemprop=description]");
-            // Create plugin object from properties found.
-            PluginInfo p = new PluginInfo();
-            p.setAuthor(author);
-            p.setDescription(description);
-            p.setName(name);
-            p.setVersion(version);
-            p.setEnabled(enabled);
-            list.add(p);
-        }
-        return list;
-    }
-
-    /**
      * Return list of repositories.
      * 
      * @return
@@ -285,31 +237,6 @@ public class Client {
             list.add(p);
         }
         return list;
-    }
-
-    /**
-     * Get usage information. Only available if minarca plugin is available.
-     * 
-     * @return return disk usage information.
-     * 
-     * @throws IOException
-     */
-    public UsageInfo getUsageInfo() throws IOException {
-
-        // Query page.
-        String data = target("/").getAsString();
-        // Select plugin items.
-        Document doc = Jsoup.parse(data);
-        Element e = selectFirst(doc, "[itemtype=https://schema.org/Filesystem]");
-        if (e == null) {
-            return null;
-        }
-        UsageInfo info = new UsageInfo();
-        info.setFree(selectFirstAsLong(e, "[itemprop=freeSpace]"));
-        info.setTotal(selectFirstAsLong(e, "[itemprop=totalSpace]"));
-        info.setUsed(selectFirstAsLong(e, "[itemprop=occupiedSpace]"));
-        return info;
-
     }
 
     /**
