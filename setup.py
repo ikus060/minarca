@@ -246,5 +246,6 @@ setup(
         'MinarcaBrand = minarca_brand',
         'MinarcaDiskSpace = minarca_disk_space',
         'MinarcaUserSetup = minarca_user_setup',
+        'MinarcaServerInfo = minarca_server_info',
     ]},
 )
