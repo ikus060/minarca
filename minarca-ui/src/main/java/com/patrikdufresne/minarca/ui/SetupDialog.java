@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
+import com.patrikdufresne.minarca.core.Config;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.rdiffweb.core.Client;
 
@@ -431,14 +432,6 @@ public class SetupDialog extends Dialog {
             return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install Minarca.");
         }
 
-        // Set other settings to default.
-        LOGGER.info("set default config");
-        try {
-            API.instance().config().defaultConfig(true);
-        } catch (APIException e) {
-            LOGGER.warn("fail to schedule task", e);
-            return _("Can't schedule backup task! If the problem persists, try to re-install Minarca.");
-        }
         return null;
     }
 
@@ -465,7 +458,7 @@ public class SetupDialog extends Dialog {
         // Try to establish communication with HTTP first.
         LOGGER.info("sign in as [{}]", username);
         try {
-            this.client = API.instance().connect(username, password);
+            this.client = API.instance().connect(Config.BASE_URL, username, password);
         } catch (APIException e) {
             LOGGER.warn("fail to sign in", e);
             return e.getMessage();

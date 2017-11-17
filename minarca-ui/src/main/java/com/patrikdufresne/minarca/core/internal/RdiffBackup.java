@@ -318,13 +318,8 @@ public class RdiffBackup {
         if (knownhosts == null) throw new KnownHostsMissingException();
         String extraOptions = "";
         if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
-        args.add(
-                String.format(
-                        "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server",
-                        ssh,
-                        extraOptions,
-                        knownhosts,
-                        identityFile));
+        args.add(String
+                .format("%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server", ssh, extraOptions, knownhosts, identityFile));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.

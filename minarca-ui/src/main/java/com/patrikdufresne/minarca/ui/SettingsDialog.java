@@ -160,8 +160,8 @@ public class SettingsDialog extends Dialog {
      */
     private void checkBackupInfo() {
         // Get backup info.
-        final LastResult lastResult = API.instance().config().getLastResult();
-        final Date lastDate = API.instance().config().getLastResultDate();
+        final LastResult lastResult = API.config().getLastResult();
+        final Date lastDate = API.config().getLastResultDate();
 
         // Update UI
         Display.getDefault().asyncExec(new Runnable() {
@@ -358,7 +358,7 @@ public class SettingsDialog extends Dialog {
          */
         statusItem = new CListItem(accountItemlist, _("Status"));
         statusItem.setValue(Dialog.ELLIPSIS);
-        statusItem.setValueHelpText(_("As {0} @ {1}", API.instance().config().getUsername(), API.instance().config().getRepositoryName()));
+        statusItem.setValueHelpText(_("As {0} @ {1}", API.config().getUsername(), API.config().getRepositoryName()));
         unlinkButton = statusItem.createButton(_("Unlink..."));
         unlinkButton.setToolTipText(_("Unlink you system from Minarca."));
         unlinkButton.setEnabled(false);
@@ -376,7 +376,7 @@ public class SettingsDialog extends Dialog {
          * Fingerprint
          */
         CListItem fingerprintItem = new CListItem(accountItemlist, _("Fingerprint"));
-        fingerprintItem.setValue(API.instance().config().getIdentityFingerPrint());
+        fingerprintItem.setValue(API.config().getIdentityFingerPrint());
         fingerprintItem.setValueHelpText(_("Use by your system to identify itself."));
 
         // Create label.
@@ -452,7 +452,7 @@ public class SettingsDialog extends Dialog {
             }
         });
         // Update schedule
-        scheduleCombo.setSelection(new StructuredSelection(API.instance().config().getSchedule()));
+        scheduleCombo.setSelection(new StructuredSelection(API.config().getSchedule()));
 
         // Separator.
         new Label(backupItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -540,7 +540,7 @@ public class SettingsDialog extends Dialog {
     protected void handleSchedule(SelectionChangedEvent event) {
         Schedule schedule = (Schedule) ((StructuredSelection) event.getSelection()).getFirstElement();
         try {
-            API.instance().config().setSchedule(schedule);
+            API.config().setSchedule(schedule, true);
         } catch (APIException e) {
             DetailMessageDialog.openError(
                     this.getShell(),
@@ -557,14 +557,14 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleSelectiveBackup() {
         SelectiveDialog dlg = new SelectiveDialog(getShell());
-        dlg.setPatterns(API.instance().config().getGlobPatterns());
+        dlg.setPatterns(API.config().getGlobPatterns());
         // Open dialog and check return code.
         if (dlg.open() != Dialog.OK) {
             // Cancel by user.
             return;
         }
         try {
-            API.instance().config().setGlobPatterns(dlg.getPatterns());
+            API.config().setGlobPatterns(dlg.getPatterns(), true);
         } catch (APIException e) {
             LOGGER.error("error updating selective backup configuration", e);
             DetailMessageDialog.openError(
@@ -581,7 +581,7 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleStopStartBackup() {
         // Check if backup is running
-        boolean running = API.instance().config().getLastResult().equals(LastResult.RUNNING);
+        boolean running = API.config().getLastResult().equals(LastResult.RUNNING);
 
         if (running) {
             DetailMessageDialog dlg = DetailMessageDialog

@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -33,14 +34,14 @@ import com.patrikdufresne.minarca.core.internal.Scheduler;
  * Class responsible to fetch and return configuration for the API.
  * 
  * @author Patrik Dufresne
- *
+ * 
  */
 public class Config {
 
     /**
      * Base URL.
      */
-    protected static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net");
+    public static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net");
 
     /**
      * Filename used for configuration file. Notice, this is also read by batch file.
@@ -124,14 +125,22 @@ public class Config {
      */
     protected File statusFile;
 
-    public Config() {
-        this.confFile = new File(Compat.CONFIG_PATH, FILENAME_CONF); // $NON-NLS-1$
-        this.globPatternsFile = new File(Compat.CONFIG_PATH, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
-        this.statusFile = new File(Compat.CONFIG_PATH, FILENAME_STATUS); // $NON-NLS-1$
+    private List<GlobPattern> patterns = Collections.emptyList();
+
+    private final String home;
+
+    public Config(String home) {
+        this.home = home;
+        this.confFile = new File(home, FILENAME_CONF); // $NON-NLS-1$
+        this.globPatternsFile = new File(home, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
+        this.statusFile = new File(home, FILENAME_STATUS); // $NON-NLS-1$
 
         // Load the configuration
-        this.properties = load(this.confFile);
-        this.status = load(this.statusFile);
+        load();
+    }
+
+    public Config() {
+        this(Compat.CONFIG_PATH);
     }
 
     /**
@@ -171,7 +180,7 @@ public class Config {
         // Sets the default patterns.
         if (force || getGlobPatterns().isEmpty()) {
             // Remove non-existing non-globing patterns.
-            setGlobPatterns(GlobPattern.DEFAULTS);
+            setGlobPatterns(GlobPattern.DEFAULTS, true);
         }
 
         // Delete & create schedule tasks.
@@ -187,13 +196,7 @@ public class Config {
      * @return the list of pattern.
      */
     public List<GlobPattern> getGlobPatterns() {
-        try {
-            LOGGER.debug("reading glob patterns from [{}]", globPatternsFile);
-            return GlobPattern.readPatterns(globPatternsFile);
-        } catch (IOException e) {
-            LOGGER.warn("error reading glob patterns", e);
-            return Collections.emptyList();
-        }
+        return this.patterns;
     }
 
     /**
@@ -202,7 +205,7 @@ public class Config {
      * @return the identity file.
      */
     protected File getIdentityFile() {
-        return new File(Compat.CONFIG_PATH, "id_rsa");
+        return new File(this.home, "id_rsa");
     }
 
     /**
@@ -212,7 +215,7 @@ public class Config {
      * @throws APIException
      */
     public String getIdentityFingerPrint() {
-        File file = new File(Compat.CONFIG_PATH, "id_rsa.pub");
+        File file = new File(this.home, "id_rsa.pub");
         if (!file.isFile() || !file.canRead()) {
             LOGGER.warn("public key [{}] is not accessible", file);
             return "";
@@ -326,20 +329,38 @@ public class Config {
     /**
      * Load properties.
      * 
+     * @throws ConfigurationException
+     * 
      * @throws APIException
      */
-    private PropertiesConfiguration load(File file) {
+    private static PropertiesConfiguration load(File file) throws ConfigurationException {
         PropertiesConfiguration properties = new PropertiesConfiguration();
-        try {
-            LOGGER.trace("reading properties from [{}]", file);
-            properties = new PropertiesConfiguration(file);
-            properties.setLogger(new NoOpLog());
-            properties.setAutoSave(false);
-            properties.setReloadingStrategy(new FileChangedReloadingStrategy());
-        } catch (ConfigurationException e) {
-            LOGGER.warn("can't load properties {}", file);
-        }
+        properties = new PropertiesConfiguration(file);
+        properties.setLogger(new NoOpLog());
+        properties.setAutoSave(false);
+        properties.setReloadingStrategy(new FileChangedReloadingStrategy());
         return properties;
+    }
+
+    public void load() {
+        LOGGER.debug("reading properties from [{}]", this.confFile);
+        try {
+            this.properties = load(this.confFile);
+        } catch (ConfigurationException e1) {
+            LOGGER.warn("can't load properties {}", this.confFile);
+        }
+        LOGGER.debug("reading properties from [{}]", this.statusFile);
+        try {
+            this.status = load(this.statusFile);
+        } catch (ConfigurationException e1) {
+            LOGGER.warn("can't load properties {}", this.confFile);
+        }
+        LOGGER.debug("reading glob patterns from [{}]", this.globPatternsFile);
+        try {
+            this.patterns = GlobPattern.readPatterns(this.globPatternsFile);
+        } catch (IOException e) {
+            LOGGER.warn("can't glob patterns from {}", this.confFile);
+        }
     }
 
     /**
@@ -360,13 +381,10 @@ public class Config {
      * @param patterns
      * @throws APIException
      */
-    public void setGlobPatterns(List<GlobPattern> patterns) throws APIException {
-        try {
-            LOGGER.debug("writing patterns to [{}]", globPatternsFile);
-            GlobPattern.writePatterns(globPatternsFile, patterns);
-        } catch (IOException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
+    public void setGlobPatterns(List<GlobPattern> patterns, boolean save) throws APIException {
+        Validate.notNull(patterns);
+        this.patterns = new ArrayList<>(patterns);
+        if (save) save();
     }
 
     /**
@@ -411,11 +429,26 @@ public class Config {
      * @param value
      * @throws APIException
      */
-    public void setRemotehost(String value) throws APIException {
+    public void setRemotehost(String value, boolean save) throws APIException {
         this.properties.setProperty(PROPERTY_REMOTEHOST, value);
+        if (save) save();
+    }
+
+    /**
+     * Save all the configuration.
+     * 
+     * @throws APIException
+     */
+    public void save() throws APIException {
         try {
             this.properties.save();
         } catch (ConfigurationException e) {
+            throw new APIException(_("fail to save config"), e);
+        }
+        try {
+            LOGGER.debug("writing patterns to [{}]", globPatternsFile);
+            GlobPattern.writePatterns(globPatternsFile, patterns);
+        } catch (IOException e) {
             throw new APIException(_("fail to save config"), e);
         }
     }
@@ -426,13 +459,9 @@ public class Config {
      * @param value
      * @throws APIException
      */
-    public void setRepositoryName(String value) throws APIException {
+    public void setRepositoryName(String value, boolean save) throws APIException {
         this.properties.setProperty(PROPERTY_REPOSITORY_NAME, value);
-        try {
-            this.properties.save();
-        } catch (ConfigurationException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
+        if (save) save();
     }
 
     /**
@@ -441,14 +470,10 @@ public class Config {
      * @param schedule
      *            the new schedule.
      */
-    public void setSchedule(Schedule schedule) throws APIException {
+    public void setSchedule(Schedule schedule, boolean save) throws APIException {
         Validate.notNull(schedule);
         this.properties.setProperty(PROPERTY_SCHEDULE, schedule.toString());
-        try {
-            this.properties.save();
-        } catch (ConfigurationException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
+        if (save) save();
     }
 
     /**
@@ -457,13 +482,9 @@ public class Config {
      * @param value
      * @throws APIException
      */
-    public void setUsername(String value) throws APIException {
+    public void setUsername(String value, boolean save) throws APIException {
         this.properties.setProperty(PROPERTY_USERNAME, value);
-        try {
-            this.properties.save();
-        } catch (ConfigurationException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
+        if (save) save();
     }
 
     public String getBaseUrl() {

@@ -80,6 +80,10 @@ public class API {
         }
     }
 
+    public static Config config() {
+        return instance().config;
+    }
+
     /**
      * Return the single instance of API.
      * 
@@ -92,17 +96,13 @@ public class API {
         return instance;
     }
 
-    /**
-     * Configuration instance to be used by this API class.
-     */
-    public final Config c;
+    protected Config config;
 
     /**
      * Default constructor.
      */
     private API() {
-        // Private constructor to avoid new instance to be created.
-        this.c = new Config();
+        this.config = new Config();
     }
 
     /**
@@ -126,7 +126,7 @@ public class API {
         }
 
         // If not forced, we need to check if it's time to run a backup.
-        if (!force && !isBackupTime()) {
+        if (!force && !isBackupTime(config)) {
             LOGGER.info("not time to backup");
             return;
         }
@@ -137,7 +137,7 @@ public class API {
                 try {
                     while (true) {
                         try {
-                            API.this.c.setLastStatus(LastResult.RUNNING);
+                            config.setLastStatus(LastResult.RUNNING);
                         } catch (APIException e) {
                             // Nothing to do.
                         }
@@ -152,25 +152,25 @@ public class API {
         t.start();
 
         // Get the config value.
-        String username = this.c.getUsername();
-        String remotehost = this.c.getRemotehost();
-        String repositoryName = this.c.getRepositoryName();
+        String username = config.getUsername();
+        String remotehost = config.getRemotehost();
+        String repositoryName = config.getRepositoryName();
 
         // Compute the path.
         String path = "/home/" + username + "/" + repositoryName;
 
         // Get reference to the identity file to be used by ssh or plink.
-        File identityFile = this.c.getIdentityFile();
+        File identityFile = config.getIdentityFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
         RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, identityFile);
 
         // Read patterns
-        List<GlobPattern> patterns = this.c.getGlobPatterns();
+        List<GlobPattern> patterns = config.getGlobPatterns();
         if (patterns.isEmpty()) {
             t.interrupt();
             LOGGER.info("fail to read patterns");
-            this.c.setLastStatus(LastResult.FAILURE);
+            config.setLastStatus(LastResult.FAILURE);
             throw new APIException(_("fail to read selective backup settings"));
         }
         try {
@@ -179,29 +179,20 @@ public class API {
             // Run backup.
             rdiffbackup.backup(patterns, path);
             t.interrupt();
-            this.c.setLastStatus(LastResult.SUCCESS);
+            config.setLastStatus(LastResult.SUCCESS);
             LOGGER.info("backup SUCCESS");
         } catch (InterruptedException e) {
             t.interrupt();
-            this.c.setLastStatus(LastResult.INTERUPT);
+            config.setLastStatus(LastResult.INTERUPT);
             LOGGER.info("backup INTERUPT", e);
             throw new APIException(_("Backup interupted"), e);
         } catch (Exception e) {
             t.interrupt();
-            this.c.setLastStatus(LastResult.FAILURE);
+            config.setLastStatus(LastResult.FAILURE);
             LOGGER.info("backup FAILED", e);
             throw new APIException(_("Backup failed"), e);
         }
 
-    }
-
-    /**
-     * Return the configuration used by the api.
-     * 
-     * @return
-     */
-    public Config config() {
-        return this.c;
     }
 
     /**
@@ -212,9 +203,9 @@ public class API {
      * @throws APIException
      *             if the connection can't be established.
      */
-    public Client connect(String username, String password) throws APIException, IOException {
+    public Client connect(String baseurl, String username, String password) throws APIException, IOException {
         // Create a new client instance.
-        Client client = new Client(this.c.getBaseUrl(), username, password);
+        Client client = new Client(baseurl, username, password);
 
         // TODO Check version
         // client.getCurrentVersion();
@@ -235,12 +226,12 @@ public class API {
      * 
      * @return True if we may backup.
      */
-    private boolean isBackupTime() {
-        Date last = this.c.getLastSuccess();
+    private boolean isBackupTime(Config config) {
+        Date last = config.getLastSuccess();
         if (last == null) {
             return true;
         }
-        Schedule schedule = this.c.getSchedule();
+        Schedule schedule = config.getSchedule();
         long delta = schedule.delta * 60l * 60l * 1000;
         delta = delta * 98 / 100;
         return delta < new Date().getTime() - last.getTime();
@@ -311,28 +302,30 @@ public class API {
         }
 
         // Generate configuration file.
-        LOGGER.debug("saving configuration [{}][{}][{}]", repositoryName, client.getUsername(), this.c.getRemotehost());
-        this.c.setUsername(client.getUsername());
-        this.c.setRepositoryName(repositoryName);
-        this.c.setRemotehost(this.c.getRemotehost());
+        LOGGER.debug("saving configuration [{}][{}][{}]", repositoryName, client.getUsername(), config.getRemotehost());
+        config.setUsername(client.getUsername(), false);
+        config.setRepositoryName(repositoryName, false);
+        config.setRemotehost(config.getRemotehost(), false);
 
         // Create default schedule
-        this.c.setSchedule(Schedule.DAILY);
+        config.setSchedule(Schedule.DAILY, false);
 
         // If the backup doesn't exists on the remote server, start an empty initial backup.
         if (exists) {
             LOGGER.debug("repository already exists");
+            config.save();
             return;
         }
 
         // Empty the include
-        List<GlobPattern> previousPatterns = this.c.getGlobPatterns();
-        this.c.setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.getRootsPath()[0] + "**")));
+        List<GlobPattern> previousPatterns = config.getGlobPatterns();
+        config.setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.getRootsPath()[0] + "**")), false);
 
         // Reset Last result
-        Date lastResultDate = this.c.getLastResultDate();
+        Date lastResultDate = config.getLastResultDate();
 
         // Run backup
+        config.save();
         backup(true, true);
 
         // Refresh list of repositories (10 min)
@@ -352,25 +345,26 @@ public class API {
                 LOGGER.warn("io error", e);
             }
             // Check if backup task is completed.
-            if (!Objects.equals(lastResultDate, this.c.getLastResultDate()) && !LastResult.RUNNING.equals(this.c.getLastResult())) {
+            if (!Objects.equals(lastResultDate, config.getLastResultDate()) && !LastResult.RUNNING.equals(config.getLastResult())) {
                 LOGGER.debug("schedule task not running");
                 attempt = Math.min(attempt, 1);
             }
         } while (attempt > 0);
 
         // Restore glob patterns
-        this.c.setGlobPatterns(previousPatterns);
+        config.setGlobPatterns(previousPatterns, false);
 
         // Check if repository exists.
         if (!exists) {
 
             // Unset properties
-            this.c.setUsername(null);
-            this.c.setRepositoryName(null);
-            this.c.setRemotehost(null);
+            config.setUsername(null, false);
+            config.setRepositoryName(null, false);
+            config.setRemotehost(null, false);
+            config.save();
 
             // Check if the backup schedule ran.
-            switch (this.c.getLastResult()) {
+            switch (config.getLastResult()) {
             case RUNNING:
                 throw new InitialBackupRunningException(null);
             case FAILURE:
@@ -394,6 +388,7 @@ public class API {
         } catch (Exception e) {
             LOGGER.warn("fail to configure repository encoding", e);
         }
+
     }
 
     /**
@@ -416,11 +411,11 @@ public class API {
     public void testServer() throws APIException, InterruptedException {
 
         // Get the config value.
-        String username = this.c.getUsername();
-        String remotehost = this.c.getRemotehost();
+        String username = config.getUsername();
+        String remotehost = config.getRemotehost();
 
         // Get reference to the identity file to be used by ssh.
-        File identityFile = this.c.getIdentityFile();
+        File identityFile = config.getIdentityFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
         RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, identityFile);
@@ -437,9 +432,10 @@ public class API {
      */
     public void unlink() throws APIException {
         // To unlink, delete the configuration and schedule task.
-        this.c.setRepositoryName(null);
-        this.c.setUsername(null);
-        this.c.setRemotehost(null);
+        config.setRepositoryName(null, false);
+        config.setUsername(null, false);
+        config.setRemotehost(null, false);
+        config.save();
 
         // TODO Remove RSA keys
 

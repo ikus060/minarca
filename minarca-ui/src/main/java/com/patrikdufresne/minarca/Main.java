@@ -244,7 +244,7 @@ public class Main {
 
         // Check if minarca is properly configure (from our point of view).
         try {
-            API.instance().config().checkConfig();
+            API.config().checkConfig();
         } catch (APIException e) {
             // Show error message (usually localized).
             LOGGER.info("invalid config", e);
@@ -270,8 +270,8 @@ public class Main {
         // Check if configured.
         try {
             LOGGER.debug("checking minarca configuration");
-            API.instance().config().checkConfig();
-            API.instance().config().getSchedule();
+            API.config().checkConfig();
+            API.config().getSchedule();
             LOGGER.debug("configuration is OK");
         } catch (NotConfiguredException e) {
             // If not configured, show wizard.
@@ -289,8 +289,12 @@ public class Main {
             reconfigure();
             return true;
         } catch (APIException e) {
-            DetailMessageDialog
-                    .openWarning(null, Display.getAppName(), _("Fail to start Minarca."), _("If the problem persist, you may try to reinstall Minarca."), e);
+            DetailMessageDialog.openWarning(
+                    null,
+                    Display.getAppName(),
+                    _("Fail to start Minarca."),
+                    _("If the problem persist, you may try to reinstall Minarca."),
+                    e);
             return false;
         }
         return true;
@@ -306,15 +310,14 @@ public class Main {
                 null,
                 Display.getAppName(),
                 _("Do you want to restore default configuration ?"),
-                _(
-                        "Your Minarca installation seams broken. "
-                                + "If you answer Yes, all your personal configuration will be lost. "
-                                + "If you answer no, this application may misbehave."),
+                _("Your Minarca installation seams broken. "
+                        + "If you answer Yes, all your personal configuration will be lost. "
+                        + "If you answer no, this application may misbehave."),
                 null);
         if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
             try {
                 LOGGER.debug("repair configuration");
-                API.instance().config().defaultConfig(false);
+                API.config().defaultConfig(false);
             } catch (APIException e1) {
                 LOGGER.warn("fail to repair configuration", e1);
                 DetailMessageDialog.openWarning(
