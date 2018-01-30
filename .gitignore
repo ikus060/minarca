@@ -33,3 +33,4 @@ pip-log.txt
 coverage.xml
 nosetests.xml
 /sonar-project.properties
+/.eggs/
