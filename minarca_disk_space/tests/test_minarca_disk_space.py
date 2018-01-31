@@ -26,7 +26,7 @@ class MinarcaDiskSpaceTest(WebCase):
 
     reset_app = True
 
-    reset_testcases = True
+    reset_testcases = False
 
     @classmethod
     def setup_server(cls,):
