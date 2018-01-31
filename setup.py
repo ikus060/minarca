@@ -264,6 +264,8 @@ setup(
     # requirement for testing
     tests_require=[
         "tox",
+        "pytest",
+        "nose",
         "mock>=1.3.0",
         "coverage>=4.0.1",
         "mockldap>=0.2.6",
