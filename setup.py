@@ -254,12 +254,12 @@ setup(
     },
     templates=['sonar-project.properties.in'],
     install_requires=[
-        'rdiffweb>=0.9',
+        'rdiffweb>=0.10.5',
     ],
     # required packages for build process
     setup_requires=[
         "babel>=0.9",
-        'rdiffweb>=0.9',
+        'rdiffweb>=0.10.5',
     ],
     # requirement for testing
     tests_require=[
