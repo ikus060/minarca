@@ -4,7 +4,7 @@
     <parent>
         <artifactId>minarca-root</artifactId>
         <groupId>com.patrikdufresne</groupId>
-        <version>3.0.7-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
     <artifactId>minarca-installation-package</artifactId>
     <packaging>pom</packaging>
@@ -204,7 +204,7 @@
                                 <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Client" file="${project.build.directory}/package/bin/minarca.exe" if="sign.key.path" />
                                 <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Client" file="${project.build.directory}/package/bin/minarca64.exe" if="sign.key.path" />
                                 
-                                <propertyregex property="AppVersion" input="0.0.0.${project.version}" regexp=".*([0-9]+.[0-9]+.[0-9]+.[0-9]+)" select="\1" />
+                                <propertyregex property="AppVersion" input="0.0.0.${project.version}" regexp=".*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" select="\1" />
                                 <!-- Convert the license file into Window 
                                     encoding -->
                                 <exec osfamily="unix" executable="makensis" dir="${project.build.directory}/package" failonerror="true">
@@ -252,7 +252,7 @@
         <dependency>
             <groupId>com.patrikdufresne</groupId>
             <artifactId>minarca-ui</artifactId>
-            <version>3.0.7-SNAPSHOT</version>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 </project>

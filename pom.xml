@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.patrikdufresne</groupId>
     <artifactId>minarca-root</artifactId>
-    <version>3.0.7-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>minarca-root</name>
     <modules>
@@ -14,28 +14,8 @@
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Fix SCM server id to allow username / password in settings.xml -->
-        <project.scm.id>git.patrikdufresne.com</project.scm.id>
         <swt.version>4.2.1</swt.version>
     </properties>
-    <scm>
-        <!-- Set release SCM -->
-        <developerConnection>scm:git:http://git.patrikdufresne.com/pdsl/minarca.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-    <!-- Define the repository. Used by deploy:deploy -->
-    <distributionManagement>
-        <repository>
-            <id>patrikdufresne</id>
-            <name>Internal Releases</name>
-            <url>http://nexus.patrikdufresne.com/content/repositories/minarca/</url>
-        </repository>
-        <snapshotRepository>
-            <id>patrikdufresne</id>
-            <name>Internal Snapshots</name>
-            <url>http://nexus.patrikdufresne.com/content/repositories/minarca-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
     <!-- Custom repository for JFace stuff. -->
     <repositories>
         <repository>
@@ -54,32 +34,6 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
-            </plugin>
-            <!-- generate source package -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Force release plugin version to work arround Git bug. -->
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.4.2</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-gitexe</artifactId>
-                        <version>1.8.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
