@@ -6,8 +6,6 @@ Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 Use is subject to license terms.
 #}
 {% if minarca_disk_space and not error %}
-{# Force usage of a different translation domain #}
-{% with _t = load_translation("minarca_disk_space_messages"), gettext = _t.ugettext, ngettext = _t.ungettext %}
 <div itemscope
     itemtype="https://schema.org/Filesystem"
     class="well well-sm">
@@ -30,5 +28,4 @@ Use is subject to license terms.
     </div>
   </div>
 </div>
-{% endwith %}
 {% endif %}
