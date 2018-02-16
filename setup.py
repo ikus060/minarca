@@ -158,28 +158,6 @@ class build(build_):
     sub_commands = build_.sub_commands[:]
     sub_commands.insert(0, ('compile_all_catalogs', None))
 
-class tox(TestCommand):
-    user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.tox_args = None
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import tox
-        import shlex
-        args = self.tox_args
-        if args:
-            args = shlex.split(self.tox_args)
-        errno = tox.cmdline(args=args)
-        sys.exit(errno)
-
 setup(
     name="minarca-plugins",
     version='0.9.3.dev1',
@@ -197,7 +175,6 @@ setup(
         'build': build,
         'compile_all_catalogs': compile_all_catalogs,
         'build_less': build_less,
-        'tox': tox,
     },
     templates=['sonar-project.properties.in'],
     install_requires=[
