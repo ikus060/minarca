@@ -47,58 +47,6 @@ except ImportError:
 DistributionMetadata.templates = None
 
 
-class fill_template(Command):
-    """
-    Custom distutils command to fill text templates with release meta data.
-    """
-
-    description = "Fill placeholders in documentation text file templates"
-
-    user_options = [
-        ('templates=', None, "Template text files to fill")
-    ]
-
-    def initialize_options(self):
-        self.templates = ''
-        self.template_ext = '.in'
-
-    def finalize_options(self):
-        if isinstance(self.templates, str):
-            self.templates = split_quoted(self.templates)
-
-        self.templates += getattr(self.distribution.metadata, 'templates', None) or []
-
-        for tmpl in self.templates:
-            if not tmpl.endswith(self.template_ext):
-                raise ValueError(
-                    "Template file '%s' does not have expected " +
-                    "extension '%s'." % (tmpl, self.template_ext))
-
-    def run(self):
-        metadata = self.get_metadata()
-
-        for infilename in self.templates:
-            try:
-                info("Reading template '%s'...", infilename)
-                with open(infilename) as infile:
-                    tmpl = Template(infile.read())
-                    outfilename = infilename.rstrip(self.template_ext)
-
-                    info("Writing filled template to '%s'.", outfilename)
-                    with open(outfilename, 'w') as outfile:
-                        outfile.write(tmpl.safe_substitute(metadata))
-            except:
-                error("Could not open template '%s'.", infilename)
-
-    def get_metadata(self):
-        data = dict()
-        for attr in self.distribution.metadata.__dict__:
-            if not callable(attr):
-                data[attr] = getattr(self.distribution.metadata, attr)
-
-        return data
-
-
 class compile_all_catalogs(Command):
     """
     This is implementation of command which complies all catalogs
@@ -248,7 +196,6 @@ setup(
     cmdclass={
         'build': build,
         'compile_all_catalogs': compile_all_catalogs,
-        'filltmpl': fill_template,
         'build_less': build_less,
         'tox': tox,
     },
