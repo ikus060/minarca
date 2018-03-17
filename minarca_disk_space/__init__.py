@@ -3,72 +3,44 @@
 #
 # Minarca disk space rdiffweb plugin
 #
-# Copyright (C) 2015 Patrik Dufresne Service Logiciel inc. All rights reserved.
+# Copyright (C) 2018 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
 from __future__ import unicode_literals
 
+from builtins import str
+import cherrypy
 import logging
 import os
+import requests
 
-from rdiffweb.rdw_plugin import ITemplateFilterPlugin  # @UnresolvedImport
+from rdiffweb import rdw_config
+from rdiffweb.rdw_plugin import ITemplateFilterPlugin, IUserChangeListener  # @UnresolvedImport
+
+
+try:
+    from urllib.parse import urljoin  # @UnresolvedImport @UnusedImport
+except:
+    from urlparse import urljoin  # @UnresolvedImport @UnusedImport @Reimport
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
 
 
-class MinarcaDiskSpace(ITemplateFilterPlugin):
+class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
     """
     This plugin provide feedback information to the users about the disk usage.
     Since we define quota, this plugin display the user's quota.
     """
 
-    def _get_diskspace(self, user):
-        """
-        Get disk space from filesystem or from user quota.
-
-        return a dict with size, used, avail.
-        """
-
-        # Take quota in consideration.
-        diskspace = None
-        user_setup = self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
-        if user_setup:
-            diskspace = user_setup.get_zfs_diskspace(user)
-
-        if not diskspace:
-            # Get disk usages from filesystem
-            return self._get_fs_diskspace(user)
-
-        return diskspace
-
-    def _get_fs_diskspace(self, user):
-        """
-        Get current user disk space usage.
-        """
-        logger.debug("get disk space usages for [%s]", user)
-        # On linux use statvfs()
-        # FIXME statvfs is not available on python3
-        rootdir = self.app.currentuser.user_root
-        if not rootdir:
-            return False
-        try:
-            data = os.statvfs(rootdir)
-        except:
-            return False
-        # Compute the space.
-        size = data.f_frsize * data.f_blocks
-        avail = data.f_frsize * data.f_bavail
-        used = size - avail
-        # Return dictionary with values.
-        return {"size": size, "used": used, "avail": avail}
+    _quota_api_url = rdw_config.Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
 
     def filter_data(self, template_name, data):
         if template_name == 'locations.html':
-            self.locations_update_params(data)
+            self._locations_update_params(data)
 
-    def locations_update_params(self, params):
+    def _locations_update_params(self, params):
         """
         This method is called to add extra param to the locations page.
         """
@@ -77,8 +49,64 @@ class MinarcaDiskSpace(ITemplateFilterPlugin):
             raise ValueError("user is not defined, can't get disk usages")
 
         # Append disk usage info
-        params["minarca_disk_space"] = self._get_diskspace(user)
+        params["minarca_disk_space"] = cherrypy.session.get('user_diskspace')  # @UndefinedVariable
 
         # Append our template
         template = self.app.templates.get_template("minarca_disk_space.html")
         params["templates_before_content"].append(template)
+
+    def user_logined(self, user, password):
+        """
+        Need to verify LDAP quota and update ZFS quota if required.
+        """
+        assert isinstance(user, str)
+        # Update the user Quote from LDAP.
+        try:
+            self._update_userquota(user)
+        except:
+            logger.warning('fail to update user quota [%s]', user, exc_info=1)
+
+    def _update_userquota(self, user):
+        """
+        Get quota from LDAP and update the ZFS quota if required.
+        """
+        # Get user quota from LDAP server.
+        quota = self._get_ldap_userquota(user) or 0
+        logger.info('user [%s] quota [%s]', user, quota)
+        cherrypy.session['user_quota'] = quota  # @UndefinedVariable
+
+        # Check if update required
+        url = os.path.join(self._quota_api_url, 'quota', user)
+        diskspace = requests.get(url, timeout=1).json()
+        assert diskspace and isinstance(diskspace, dict) and 'avail' in diskspace and 'used' in diskspace and 'size' in diskspace
+        cherrypy.session['user_diskspace'] = diskspace  # @UndefinedVariable
+
+        # Check if update required.
+        if not quota or quota == diskspace['size']:
+            logger.info('user [%s] quota [%s] does not required update', user, quota)
+        else:
+            self._set_zfs_userquota(user, quota)
+
+    def _get_ldap_store(self):
+        """get reference to ldap_store"""
+        plugin = self.app.plugins.get_plugin_by_name('LdapPasswordStore')
+        assert plugin
+        return plugin
+
+    def _get_ldap_userquota(self, user):
+        """Get userquota from LDAP database."""
+        assert isinstance(user, str)
+
+        # Get quota value from description field.
+        ldap_store = self._get_ldap_store()
+        assert ldap_store
+        descriptions = ldap_store.get_user_attr(user, 'description')
+        if not descriptions:
+            return False
+        quota_gb = [int(x[1:])
+                    for x in descriptions
+                    if x.startswith("v") and x[1:].isdigit()]
+        if not quota_gb:
+            return False
+        quota_gb = max(quota_gb)
+        return quota_gb * 1024 * 1024 * 1024

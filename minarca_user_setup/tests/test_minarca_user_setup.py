@@ -117,53 +117,6 @@ class TestMinarcaUserSetup(WebCase):
         self.assertFalse(self._get_plugin_obj().get_ldap_userquota('bob'))
 
 
-class TesZfstMinarcaUserSetup(AppTestCase):
-
-    reset_app = True
-
-    enabled_plugins = ['SQLite', 'MinarcaUserSetup']
-
-    default_config = {
-        'MinarcaUserSetupBaseDir': '/tmp',
-        'MinarcaUserSetupZfsPool': 'tank',
-    }
-
-    # run before each test - the mock_popen will be available and in the right state in every test<something> function
-    def setUp(self):
-        AppTestCase.setUp(self)
-
-        # The "where to patch" bit is important - http://www.voidspace.org.uk/python/mock/patch.html#where-to-patch
-        self.popen_patcher = mock.patch('minarca_user_setup.subprocess.Popen')
-        self.mock_popen = self.popen_patcher.start()
-
-        self.mock_rv = mock.Mock()
-        # communicate() returns [STDOUT, STDERR]
-        self.mock_rv.communicate.return_value = [None, None]
-        self.mock_popen.return_value = self.mock_rv
-
-    # run after each test
-    def tearDown(self):
-        self.popen_patcher.stop()
-        AppTestCase.tearDown(self)
-
-    def _get_plugin_obj(self):
-        return self.app.plugins.get_plugin_by_name('MinarcaUserSetup')
-
-    def test_get_zfs_diskspace_no_quota(self):
-        """Check value for zfs disk space usage."""
-        self.mock_rv.communicate.return_value[0] = """26112\n0\n284783104\n16228191744"""
-        self.assertEquals(
-            {'size': 16512974848, 'used': 284783104, 'avail': 16228191744},
-            self._get_plugin_obj().get_zfs_diskspace('root'))
-
-    def test_get_zfs_diskspace_with_quota(self):
-        """Check value for zfs disk space usage."""
-        self.mock_rv.communicate.return_value[0] = """0\n53687091200\n284761600\n16228213248"""
-        self.assertEquals(
-            {'size': 53687091200, 'used': 0, 'avail': 53687091200},
-            self._get_plugin_obj().get_zfs_diskspace('root'))
-
-
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     logging.basicConfig(level=logging.DEBUG)
