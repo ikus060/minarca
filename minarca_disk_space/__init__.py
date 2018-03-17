@@ -28,6 +28,14 @@ except:
 logger = logging.getLogger(__name__)
 
 
+class TimeoutHTTPAdapter(requests.adapters.HTTPAdapter):
+
+    def send(self, *args, **kwargs):
+        # Enforce a timeout value if not defined.
+        kwargs['timeout'] = kwargs.get('timeout', None)
+        return super(TimeoutHTTPAdapter, self).send(*args, **kwargs)
+
+
 class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
     """
     This plugin provide feedback information to the users about the disk usage.
@@ -35,6 +43,11 @@ class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
     """
 
     _quota_api_url = rdw_config.Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
+
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
+        self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
 
     def filter_data(self, template_name, data):
         if template_name == 'locations.html':
@@ -77,7 +90,7 @@ class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
 
         # Check if update required
         url = os.path.join(self._quota_api_url, 'quota', user)
-        diskspace = requests.get(url, timeout=1).json()
+        diskspace = self.session.get(url, timeout=1).json()
         assert diskspace and isinstance(diskspace, dict) and 'avail' in diskspace and 'used' in diskspace and 'size' in diskspace
         cherrypy.session['user_diskspace'] = diskspace  # @UndefinedVariable
 
