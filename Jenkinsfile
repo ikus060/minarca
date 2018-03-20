@@ -15,11 +15,15 @@ pipeline {
         }
     }
     stages {
-        stage ('Test') {
+        stage ('Setup') {
             steps {
                 // Upgrade python and install dependencies to avoid compiling from sources.
+                sh 'apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less'
                 sh 'pip install pip setuptools tox nose coverage --upgrade'
-            
+            }
+        }
+        stage ('Test') {
+            steps {
                 // Compile cataglog
                 sh 'python setup.py build'
                 sh "tox --recreate --workdir /tmp --sitepackages"
