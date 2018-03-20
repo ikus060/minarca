@@ -9,42 +9,12 @@
 
 from __future__ import print_function
 
-import sys
-import subprocess
-import pkg_resources
-PY2 = sys.version_info[0] == 2
-
-# Check running python version.
-if not PY2 and not sys.version_info >= (3, 4):
-    print('python version 3.4 is required.')
-    sys.exit(1)
-
-if PY2 and not sys.version_info >= (2, 7):
-    print('python version 2.7 is required.')
-    sys.exit(1)
-
-import os
 from distutils.cmd import Command
 from distutils.command.build import build as build_
-from distutils.dist import DistributionMetadata
-from distutils.log import error, info
-from distutils.util import split_quoted
-from setuptools.command.test import test as TestCommand
-from string import Template
-
-try:
-    from ConfigParser import SafeConfigParser
-except ImportError:
-    from configparser import SafeConfigParser
-
-try:
-    from setuptools import setup
-except ImportError:
-    import ez_setup
-    ez_setup.use_setuptools()
-    from setuptools import setup
-
-DistributionMetadata.templates = None
+import os
+import pkg_resources
+import setuptools
+import subprocess
 
 
 class compile_all_catalogs(Command):
@@ -160,9 +130,9 @@ class build(build_):
     sub_commands.insert(0, ('build_less', None))
 
 
-setup(
+setuptools.setup(
     name="minarca-plugins",
-    version='0.9.3.dev1',
+    use_scm_version=True,
     description='Minarca Plugins',
     long_description='Sets of plugins for Minarca.',
     author='Patrik Dufresne Service Logiciel inc.',
@@ -173,27 +143,23 @@ setup(
         'minarca_disk_space'
     ],
     include_package_data=True,
+    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
     cmdclass={
         'build': build,
         'compile_all_catalogs': compile_all_catalogs,
         'build_less': build_less,
     },
-    templates=['sonar-project.properties.in'],
     install_requires=[
-        'rdiffweb>=0.10.5',
+        "rdiffweb>=0.10.5",
     ],
     # required packages for build process
     setup_requires=[
         "babel>=0.9",
-        'rdiffweb>=0.10.5',
+        "setuptools_scm",
     ],
     # requirement for testing
     tests_require=[
-        "tox",
-        "pytest",
-        "nose",
         "mock>=1.3.0",
-        "coverage>=4.0.1",
         "mockldap>=0.2.6",
         "pycrypto>=2.6.1",
     ],
