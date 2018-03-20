@@ -164,6 +164,7 @@ setuptools.setup(
         "mock>=1.3.0",
         "mockldap>=0.2.6",
         "pycrypto>=2.6.1",
+        "httpretty",
     ],
     # Declare entry point
     entry_points={'rdiffweb.plugins': [
