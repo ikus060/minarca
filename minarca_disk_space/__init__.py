@@ -18,7 +18,6 @@ import requests
 from rdiffweb import rdw_config
 from rdiffweb.rdw_plugin import ITemplateFilterPlugin, IUserChangeListener  # @UnresolvedImport
 
-
 try:
     from urllib.parse import urljoin  # @UnresolvedImport @UnusedImport
 except:
@@ -75,7 +74,8 @@ class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
         assert isinstance(user, str)
         # Update the user Quote from LDAP.
         try:
-            self._update_userquota(user)
+            diskspace = self._update_userquota(user)
+            cherrypy.session['user_diskspace'] = diskspace  # @UndefinedVariable
         except:
             logger.warning('fail to update user quota [%s]', user, exc_info=1)
 
@@ -86,19 +86,14 @@ class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
         # Get user quota from LDAP server.
         quota = self._get_ldap_userquota(user) or 0
         logger.info('user [%s] quota [%s]', user, quota)
-        cherrypy.session['user_quota'] = quota  # @UndefinedVariable
 
         # Check if update required
         url = os.path.join(self._quota_api_url, 'quota', user)
-        diskspace = self.session.get(url, timeout=1).json()
+        diskspace = self.session.post(url, data={'size': quota}, timeout=1).json()
         assert diskspace and isinstance(diskspace, dict) and 'avail' in diskspace and 'used' in diskspace and 'size' in diskspace
-        cherrypy.session['user_diskspace'] = diskspace  # @UndefinedVariable
 
-        # Check if update required.
-        if not quota or quota == diskspace['size']:
-            logger.info('user [%s] quota [%s] does not required update', user, quota)
-        else:
-            self._set_zfs_userquota(user, quota)
+        # Keep values in session.
+        return diskspace  # @UndefinedVariable
 
     def _get_ldap_store(self):
         """get reference to ldap_store"""

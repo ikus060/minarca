@@ -67,7 +67,6 @@ class TestMinarcaUserSetup(WebCase):
         WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaUserSetup', 'Ldap'])
 
     def setUp(self):
-
         # Mock LDAP
         self.mockldap = MockLdap(self.directory)
         self.mockldap.start()
@@ -106,15 +105,6 @@ class TestMinarcaUserSetup(WebCase):
         self.assertTrue(self.app.userdb.exists('bob'))
         self.assertEquals('bob@test.com', self.app.userdb.get_user('bob').email)
         self.assertEquals('/tmp/bob', self.app.userdb.get_user('bob').user_root)
-
-    def test_get_ldap_userquota(self):
-        """Check number of bytes return for v7."""
-        # 7GiB
-        self.assertEquals(7516192768, self._get_plugin_obj().get_ldap_userquota('kim'))
-
-    def test_get_ldap_userquota_without_description(self):
-        """Check if return False when no matching description found."""
-        self.assertFalse(self._get_plugin_obj().get_ldap_userquota('bob'))
 
 
 if __name__ == "__main__":

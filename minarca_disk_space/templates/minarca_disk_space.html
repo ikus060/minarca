@@ -17,7 +17,7 @@ Use is subject to license terms.
   {% set size_str = minarca_disk_space.size | filesize %}
   {% set avail_str = minarca_disk_space.avail | filesize %}
   <b>{% trans %}Usage{% endtrans %}</b>
-  {% trans used=used_str, avail=avail_str, size=size_str%}{{ used }} used | {{ size }} total | {{ avail }} free{% endtrans %}
+  {{ used_str }} {% trans %}used{% endtrans %} | {{ size_str }} {% trans %}total{% endtrans %} | {{ avail_str }} {% trans %}free{% endtrans %}
   <div class="progress">
     <div class="progress-bar {% if used_pct > 90 %}progress-bar-warning{% else %}progress-bar-success{% endif %}"
          role="progressbar"
