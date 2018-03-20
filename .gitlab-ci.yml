@@ -1,0 +1,102 @@
+image: ikus060/docker-debian-py2-py3:stretch
+
+stages:
+- test
+- publish
+- deploy
+
+# TODO Split this by python version and OS.
+test_plugins_py27:
+  stage: test
+  script:
+  - cd minarca-plugins
+  - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
+  - pip install pip setuptools  tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
+  - tox --sitepackages
+  
+test_plugins_py3: 
+  stage: test
+  script:
+  - cd minarca-plugins
+  - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
+  - pip install pip setuptools tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
+  - tox --sitepackages
+  
+test_quota_py27: 
+  stage: test
+  script:
+  - cd minarca-quota-api
+  - pip install pip setuptools tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
+  - tox --sitepackages
+  
+test_quota_py3: 
+  stage: test
+  script:
+  - cd minarca-quota-api
+  - pip install pip setuptools tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
+  - tox --sitepackages
+  
+# TODO Publish coverage repport
+# TODO Publish testcases repport
+
+publish_plugins:
+  stage: publish
+  script:
+  - cd minarca-plugins
+  - pip install wheel twine --upgrade
+  - python setup.py sdist bdist_wheel
+  - twine upload dist/* -u $NEXUS_USR -p $NEXUS_PWD --repository-url $NEXUS_PYPI_URL
+
+publish_quota:
+  stage: publish
+  script:
+  - cd minarca-quota-api
+  - pip install wheel twine --upgrade
+  - python setup.py sdist bdist_wheel
+  - twine upload dist/* -u $NEXUS_USR -p $NEXUS_PWD --repository-url $NEXUS_PYPI_URL
+  
+rdiffweb_deploy_staging: 
+  stage: deploy
+  image: ikus060/ansible
+  environment:
+    name: staging
+    url: https://sestican.patrikdufresne.com
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  before_script:
+  - eval $(ssh-agent -s)
+  - echo "$SESTICAN_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+  - cd ansible-config
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root rdiffweb_version=develop minarca_version=$CI_COMMIT_SHA rdiffweb_default_repositories=true" --limit sestican
+
+rdiffweb_deploy_prod:
+  stage: deploy
+  when: manual
+  image: ikus060/ansible
+  environment:
+    name: prod
+    url: https://www.minarca.net
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  before_script:
+  - eval $(ssh-agent -s)
+  - echo "$SESTICAN_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+  - cd ansible-config
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$CI_COMMIT_SHA" --limit ranculos
+  

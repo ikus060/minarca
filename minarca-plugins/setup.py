@@ -132,7 +132,7 @@ class build(build_):
 
 setuptools.setup(
     name="minarca-plugins",
-    use_scm_version=True,
+    use_scm_version={"root": "..", "relative_to": __file__},
     description='Minarca Plugins',
     long_description='Sets of plugins for Minarca.',
     author='Patrik Dufresne Service Logiciel inc.',
@@ -156,7 +156,7 @@ setuptools.setup(
     # required packages for build process
     setup_requires=[
         "babel>=0.9",
-        "setuptools_scm",
+        "setuptools_scm==1.5.0",
         # This is required to compile with lessc.
         "rdiffweb>=0.10.5",
     ],
