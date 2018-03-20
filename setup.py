@@ -151,6 +151,7 @@ setuptools.setup(
     },
     install_requires=[
         "rdiffweb>=0.10.5",
+        "requests",
     ],
     # required packages for build process
     setup_requires=[
