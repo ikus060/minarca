@@ -87,9 +87,12 @@ class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
         quota = self._get_ldap_userquota(user) or 0
         logger.info('user [%s] quota [%s]', user, quota)
 
-        # Check if update required
+        # Always update unless quota not define
         url = os.path.join(self._quota_api_url, 'quota', user)
-        diskspace = self.session.post(url, data={'size': quota}, timeout=1).json()
+        if quota:
+            diskspace = self.session.post(url, data={'size': quota}, timeout=1).json()
+        else:
+            diskspace = self.session.get(url, timeout=1).json()
         assert diskspace and isinstance(diskspace, dict) and 'avail' in diskspace and 'used' in diskspace and 'size' in diskspace
 
         # Keep values in session.
