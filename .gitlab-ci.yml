@@ -99,7 +99,9 @@ rdiffweb_deploy_prod:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
+  - python ./minarca-quota-api/setup.py --version
+  - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$CI_COMMIT_SHA" --limit ranculos
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION rdiffweb_default_repositories=true" --limit ranculos,mercor
   
