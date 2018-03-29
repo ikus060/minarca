@@ -90,9 +90,11 @@ class MinarcaDiskSpace(ITemplateFilterPlugin, IUserChangeListener):
         # Always update unless quota not define
         url = os.path.join(self._quota_api_url, 'quota', user)
         if quota:
-            diskspace = self.session.post(url, data={'size': quota}, timeout=1).json()
+            r = self.session.post(url, data={'size': quota}, timeout=1)
         else:
-            diskspace = self.session.get(url, timeout=1).json()
+            r = self.session.get(url, timeout=1)
+        r.raise_for_status()
+        diskspace = r.json()
         assert diskspace and isinstance(diskspace, dict) and 'avail' in diskspace and 'used' in diskspace and 'size' in diskspace
 
         # Keep values in session.

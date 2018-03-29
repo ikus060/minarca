@@ -93,6 +93,15 @@ class MinarcaDiskSpaceTest(WebCase):
                                body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
         self.plugin._update_userquota('bob')
 
+    @httpretty.activate
+    def test__update_userquota_401(self):
+        # Checks if exception is raised when authentication is failing.
+        httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
+                               status=401)
+        # Make sure an exception is raised.
+        with self.assertRaises(Exception):
+            self.plugin._update_userquota('bob')
+
     def test_get_usage_info(self):
         """
         Check if value is available.
