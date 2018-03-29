@@ -58,6 +58,19 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
         self.assertStatus(200)
         pass
 
+    def test_set_quota_invalid_user(self):
+        # Mock the command line call
+        user = MagicMock()
+        user.pw_uid = 1001
+        minarca_quota_api._getpwnam = MagicMock(return_value=user)
+
+        # Make the query
+        headers = [("Authorization", "Basic " + b64encode(b"minarca:secret").decode('ascii'))]
+        body = urlencode([(b'size', b'2147483648')])
+        self.getPage('/quota/someuser', method='PUT', headers=headers, body=body)
+        self.assertStatus(500)
+        pass
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
