@@ -204,6 +204,8 @@ public class RdiffBackup {
             } else {
                 args.add("--exclude-sockets");
             }
+            // We are using ZFS compression. No need to compress data ourself.
+            args.add("--no-compression");
             for (GlobPattern p : patterns) {
                 // Skip the patterns if not matching the given root.
                 if (p.isGlobbing() || p.isInRoot(root)) {
