@@ -52,6 +52,7 @@ publish_plugins:
   script:
   - cd minarca-plugins
   - pip install wheel twine --upgrade
+  - apt-get update && apt-get -qq install node-less
   - python setup.py sdist bdist_wheel
   - twine upload dist/* -u $NEXUS_USR -p $NEXUS_PWD --repository-url $NEXUS_PYPI_URL
 
@@ -77,9 +78,11 @@ rdiffweb_deploy_staging:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
+  - python ./minarca-quota-api/setup.py --version
+  - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root rdiffweb_version=develop minarca_version=$CI_COMMIT_SHA rdiffweb_default_repositories=true" --limit sestican
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION rdiffweb_default_repositories=true" --limit sestican
 
 rdiffweb_deploy_prod:
   stage: deploy
