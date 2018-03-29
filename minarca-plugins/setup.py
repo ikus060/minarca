@@ -156,7 +156,7 @@ setuptools.setup(
     # required packages for build process
     setup_requires=[
         "babel>=0.9",
-        "setuptools_scm==1.5.0",
+        "setuptools_scm",
         # This is required to compile with lessc.
         "rdiffweb>=0.10.5",
     ],
