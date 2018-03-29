@@ -60,7 +60,7 @@ class Root(object):
         if size:
             size = int(size)
 
-        if cherrypy.request.method == 'PUT':
+        if cherrypy.request.method in ['PUT', 'POST']:
             return self.set_quota(user, size)
         else:
             return self.get_quota(user)
