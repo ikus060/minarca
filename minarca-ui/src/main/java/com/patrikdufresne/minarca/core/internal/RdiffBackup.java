@@ -281,9 +281,9 @@ public class RdiffBackup {
                 throw new APIException(sh.getOutput());
             }
         } catch (InterruptedException e) {
-            LOGGER.warn("rdiff-backup process interupted", e);
+            LOGGER.warn("rdiff-backup process interrupted", e);
             p.destroy();
-            throw new InterruptedException("rdiff-backup process interupted");
+            throw new InterruptedException("rdiff-backup process interrupted");
         }
     }
 

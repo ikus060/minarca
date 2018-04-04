@@ -183,9 +183,9 @@ public class API {
             LOGGER.info("backup SUCCESS");
         } catch (InterruptedException e) {
             t.interrupt();
-            config.setLastStatus(LastResult.INTERUPT);
+            config.setLastStatus(LastResult.INTERRUPT);
             LOGGER.info("backup INTERUPT", e);
-            throw new APIException(_("Backup interupted"), e);
+            throw new APIException(_("Backup interrupted"), e);
         } catch (Exception e) {
             t.interrupt();
             config.setLastStatus(LastResult.FAILURE);

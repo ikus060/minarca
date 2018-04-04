@@ -255,7 +255,7 @@ public class Crontab {
             return sh.getOutput();
         } catch (InterruptedException e) {
             // Swallow. Should no happen
-            LOGGER.warn("process interupted", e);
+            LOGGER.warn("process interrupted", e);
             Thread.currentThread().interrupt();
         }
         return null;

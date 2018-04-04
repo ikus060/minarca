@@ -172,7 +172,7 @@ public class StreamHandler {
         try {
             return this.future.get();
         } catch (InterruptedException e) {
-            LOGGER.warn("stream handler was interupted", e);
+            LOGGER.warn("stream handler was interrupted", e);
         } catch (ExecutionException e) {
             LOGGER.warn("fail to get stream value", e);
         }

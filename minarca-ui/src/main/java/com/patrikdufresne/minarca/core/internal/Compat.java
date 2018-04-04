@@ -410,7 +410,7 @@ public class Compat {
             throw new APIException("fail to create subprocess", e);
         } catch (InterruptedException e) {
             // Swallow. Should no happen
-            LOGGER.warn("process interupted", e);
+            LOGGER.warn("process interrupted", e);
             Thread.currentThread().interrupt();
             return null;
         }
