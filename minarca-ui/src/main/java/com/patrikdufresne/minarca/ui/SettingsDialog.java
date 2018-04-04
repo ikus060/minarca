@@ -203,6 +203,9 @@ public class SettingsDialog extends Dialog {
                 case STALE:
                     lastruntimeItem.setValue(_("Stale"));
                     break;
+                case INTERUPT:
+                    lastruntimeItem.setValue(_("Interupt"));
+                    break;
                 default:
                     lastruntimeItem.setValue(_("Unknown"));
                     break;
