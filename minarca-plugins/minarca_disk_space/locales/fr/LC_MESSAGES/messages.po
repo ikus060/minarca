@@ -1,5 +1,5 @@
 # French translations for minarca-disk-space.
-# Copyright (C) 2015 ORGANIZATION
+# Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the minarca-disk-space
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2015.

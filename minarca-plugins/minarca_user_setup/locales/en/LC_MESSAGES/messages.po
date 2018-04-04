@@ -1,5 +1,5 @@
 # English translations for minarca_user_setup.
-# Copyright (C) 2016 ORGANIZATION
+# Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the minarca_user_setup
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
