@@ -152,8 +152,11 @@ public class Config {
     public void checkConfig() throws APIException {
         // Basic sanity check to make sure it's configured. If not, display the
         // setup dialog.
-        if (StringUtils.isEmpty(getRepositoryName()) || StringUtils.isEmpty(getUsername())) {
-            throw new NotConfiguredException(_("Minarca is not configured"));
+        if (StringUtils.isEmpty(getRepositoryName())) {
+            throw new NotConfiguredException(_("Missing repository name"));
+        }
+        if (StringUtils.isEmpty(getUsername())) {
+            throw new NotConfiguredException(_("Missing username"));
         }
         // NOTICE: remotehosts is optional.
         // Check if SSH keys exists.
