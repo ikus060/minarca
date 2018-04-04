@@ -1,10 +1,15 @@
 package com.patrikdufresne.minarca.core;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,9 +26,22 @@ public class APILinkTest {
 
     private API api;
     private Client client;
+    private static Path tmpdir;
+
+    @BeforeClass
+    static public void setConfigPath() throws IOException {
+        // Enforce different config path for the test
+        tmpdir = Files.createTempDirectory("minarca-link-test");
+        System.setProperty("com.patrikdufresne.minarca.configPath", tmpdir.toString());
+    }
+
+    @AfterClass
+    static public void deleteConfigPath() throws IOException {
+        FileUtils.deleteDirectory(tmpdir.toFile());
+    }
 
     @Before
-    public void setUp() throws APIException, InterruptedException {
+    public void setUp() throws APIException, InterruptedException, IOException {
         this.client = Mockito.mock(Client.class);
         this.api = Mockito.spy(API.instance());
         this.api.config = Mockito.spy(new Config());
