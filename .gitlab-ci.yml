@@ -95,7 +95,8 @@ rdiffweb_deploy_prod:
     ANSIBLE_HOST_KEY_CHECKING: "False"
   before_script:
   - eval $(ssh-agent -s)
-  - echo "$SESTICAN_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$RANCULOS_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$MERCOR_ROOT_PRIVATEKEY"   | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
@@ -103,5 +104,5 @@ rdiffweb_deploy_prod:
   - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION rdiffweb_default_repositories=true" --limit ranculos,mercor
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION" --limit ranculos2,mercor
   
