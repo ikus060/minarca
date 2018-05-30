@@ -87,6 +87,8 @@ rdiffweb_deploy_staging:
 rdiffweb_deploy_prod:
   stage: deploy
   when: manual
+  only:
+  - master
   image: ikus060/ansible
   environment:
     name: prod
@@ -104,5 +106,5 @@ rdiffweb_deploy_prod:
   - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION" --limit ranculos2,mercor
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION" --limit ranculos,mercor
   

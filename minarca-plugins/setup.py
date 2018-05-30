@@ -140,7 +140,8 @@ setuptools.setup(
     packages=[
         'minarca_brand',
         'minarca_user_setup',
-        'minarca_disk_space'
+        'minarca_disk_space',
+        'minarca_server_info',
     ],
     include_package_data=True,
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',

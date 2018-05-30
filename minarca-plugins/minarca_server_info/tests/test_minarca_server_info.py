@@ -30,7 +30,7 @@ class MinarcaServerInfoTest(WebCase):
     def setUp(self):
         # Reconfigure
         filename = pkg_resources.resource_filename(__name__, 'test.pub')  # @UndefinedVariable
-        self.app.cfg.set_config('MinarcaSSHKPublicey', filename)
+        self.app.cfg.set_config('MinarcaSSHPublicKey', filename)
         # Call parent implementation
         WebCase.setUp(self)
 

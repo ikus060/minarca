@@ -26,7 +26,7 @@ class MinarcaServerInfo(ITemplateFilterPlugin):
     This plugin allow a user to fetch the server server info.
     """
 
-    ssh_public_key_files = Option("MinarcaSSHKPublicey", default='/etc/ssh/ssh_host_dsa_key.pub,/etc/ssh/ssh_host_ecdsa_key.pub,/etc/ssh/ssh_host_rsa_key.pub', doc="Location to the SSH Server key to be used by the client")
+    ssh_public_key_files = Option("MinarcaSSHPublicKey", default='/etc/ssh/ssh_host_dsa_key.pub,/etc/ssh/ssh_host_ecdsa_key.pub,/etc/ssh/ssh_host_rsa_key.pub', doc="Location to the SSH Server key to be used by the client")
 
     public_hostname = Option("MinarcaPublicHostname", default='minarca.net', doc="")
 
