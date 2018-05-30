@@ -87,6 +87,8 @@ rdiffweb_deploy_staging:
 rdiffweb_deploy_prod:
   stage: deploy
   when: manual
+  only:
+  - master
   image: ikus060/ansible
   environment:
     name: prod
