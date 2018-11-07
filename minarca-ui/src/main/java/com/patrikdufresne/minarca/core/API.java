@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -172,6 +173,11 @@ public class API {
             LOGGER.info("fail to read patterns");
             config.setLastStatus(LastResult.FAILURE);
             throw new APIException(_("fail to read selective backup settings"));
+        }
+        // By default ignore minarca log files
+        String logFolder = System.getProperty("log.folder");
+        if(StringUtils.isNotEmpty(logFolder)) {
+            patterns.add(new GlobPattern(false, logFolder + "/minarca-log*.txt"));
         }
         try {
             // Check the remote server.

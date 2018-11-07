@@ -42,4 +42,12 @@ To sign the code, you need to have `osslsigncode` installed locally.
     sudo make install
     
 Reference: https://development.adaptris.net/users/lchan/blog/2013/06/07/signing-windows-installers-on-linux/ 
+
+# Advance configuration
+
+* log.minarca.level = ERROR|WARN|INFO|DEBUG, default DEBUG
+* log.root.level = ERROR|WARN|INFO|DEBUG, default WARN
+* minarca.singleinstance.backup.port = <port>, default 52356
+* minarca.singleinstance.backup.port = <port>, default 52356
+
    
