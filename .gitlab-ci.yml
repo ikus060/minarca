@@ -1,4 +1,4 @@
-image: maven:3-jdk-7
+image: maven:3-jdk-8
 
 variables:
   MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
@@ -13,15 +13,16 @@ cache:
 
 stages:
   - test
+  - build
   - deploy
 
 # Install requirements to build.
 before_script:
-# Install requirements
-- apt-get update && apt-get -qq install icoutils nsis cron gettext
 # Get version
 - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
-- echo "REVISION=$VERSION"
+- echo "REVISION=$REVISION"
+# Install requirements
+- apt-get update && apt-get -qq install icoutils nsis cron gettext
 # Setup ssh
 - eval $(ssh-agent -s)
 - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
@@ -32,12 +33,30 @@ test:
   stage: test
   script:
   - mvn -B -Drevision=${REVISION} clean verify
-  
+
+sonar:
+  stage: test
+  allow_failure: true
+  script:
+  - mvn -B -Drevision=${REVISION} -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN clean verify sonar:sonar
+
+build:
+  stage: build
+  script:
+  # Setup authenticode
+  - apt-get update && apt-get -qq install libssl-dev libcurl4-gnutls-dev autoconf osslsigncode
+  - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
+  - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
+  - mvn -B -Drevision=${REVISION} -DskipTests -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
+  artifacts:
+    paths:
+    - minarca-installation-package/target/*.exe
+    - minarca-installation-package-unix/target/*.tar.gz
+    - minarca-installation-package-deb/target/*.deb
+
 deploy:
   stage: deploy
   script:
-  # Build
-  - mvn -B -Drevision=${REVISION} -DskipTests clean install 
   - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
   # Publish to kalo
   - scp -o StrictHostKeyChecking=no minarca-installation-package/target/minarca-${REVISION}-install.exe www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
@@ -47,7 +66,9 @@ promote:
   stage: deploy
   only:
   - tags
-  when: manual
+  environment:
+    name: latest
+    url: http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe  
   script:
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-$REVISION-install.exe /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_$REVISION_all.deb /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_latest_all.deb
