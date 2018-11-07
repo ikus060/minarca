@@ -320,8 +320,15 @@ public class RdiffBackup {
         if (knownhosts == null) throw new KnownHostsMissingException();
         String extraOptions = "";
         if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
-        args.add(String
-                .format("%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -i '%s' %%s rdiff-backup --server", ssh, extraOptions, knownhosts, identityFile));
+        // TASK-1028 make sure to use `-oIdentitiesOnly=yes` to enforce private key authentication.
+        // Otherwise if way use keychain or keberos authentication and prompt user for password.
+        args.add(
+                String.format(
+                        "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s rdiff-backup --server",
+                        ssh,
+                        extraOptions,
+                        knownhosts,
+                        identityFile));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.
