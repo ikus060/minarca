@@ -70,5 +70,5 @@ promote:
     name: latest
     url: http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe  
   script:
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-$REVISION-install.exe /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_$REVISION_all.deb /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_latest_all.deb
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-${REVISION}-install.exe /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_${REVISION}_all.deb /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_latest_all.deb
