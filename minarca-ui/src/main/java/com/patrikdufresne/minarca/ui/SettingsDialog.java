@@ -464,6 +464,7 @@ public class SettingsDialog extends Dialog {
          */
         lastruntimeItem = new CListItem(backupItemlist, _("Last run time"));
         lastruntimeItem.setValue(Dialog.ELLIPSIS);
+        lastruntimeItem.setValueHelpText("");
         stopStartButton = lastruntimeItem.createButton(_("Start"));
         stopStartButton.setEnabled(false);
         stopStartButton.addSelectionListener(new SelectionAdapter() {
