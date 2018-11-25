@@ -177,7 +177,7 @@ public class API {
         // By default ignore minarca log files
         String logFolder = System.getProperty("log.folder");
         if(StringUtils.isNotEmpty(logFolder)) {
-            patterns.add(new GlobPattern(false, logFolder + "/minarca-log*.txt"));
+            patterns.add(new GlobPattern(false, new File(logFolder, "minarca-log*.txt")));
         }
         try {
             // Check the remote server.
