@@ -284,8 +284,8 @@ public class API {
          * Generate the keys
          */
         LOGGER.debug("generating public and private key for {}", repositoryName);
-        File idrsaFile = new File(Compat.CONFIG_PATH, "id_rsa.pub");
-        File identityFile = new File(Compat.CONFIG_PATH, "id_rsa");
+        File idrsaFile = new File(Compat.CONFIG_HOME, "id_rsa.pub");
+        File identityFile = new File(Compat.CONFIG_HOME, "id_rsa");
         String rsadata = null;
         try {
             // Generate a key pair.

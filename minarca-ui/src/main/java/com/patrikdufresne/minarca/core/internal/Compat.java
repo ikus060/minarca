@@ -54,21 +54,39 @@ public class Compat {
 
     /**
      * Location where to store configuration for minarca.
+     * 
+     * <pre>
+     * $HOME/.config (on Linux)
+     * %USERPROFILE%/AppData/Local/ (on Windows)
+     * </pre>
      */
-    public static final String CONFIG_PATH;
+    public static final String CONFIG_HOME;
+
+    /**
+     * Location where to store data for minarca.
+     * 
+     * <pre>
+     * $HOME/.local/share (on Linux)
+     * %USERPROFILE%/AppData/Local/ (on Windows)
+     * C:/Documents and Settings/username/Local Settings/Application Data (on Windows XP)
+     * </pre>
+     */
+    public static final String DATA_HOME;
 
     /**
      * The user's home directory.
+     * 
+     * <pre>
+     *  /home/username (on Linux)
+     *  /root (on Linux for Root)
+     *  C:/Users/username (on Windows)
+     *  C:/Windows/System32/config/systemprofile (on Windows Administrator)
+     * </pre>
      */
     public static final String HOME;
 
     /**
-     * The user's home directory.
-     */
-    public static final File HOME_FILE;
-
-    /**
-     * True if the user is admin.
+     * True if the user is admin (on Windows) or root (on Linux).
      */
     public static final boolean IS_ADMIN;
 
@@ -82,30 +100,30 @@ public class Compat {
      */
     public static final String TEMP;
 
-    /**
-     * Define temp directory.
-     */
-    public static final File TEMP_FILE;
-
-    /**
-     * Path to system profile for Windows OS.
-     * <p>
-     * Under non-windows OS, this constant is null.
-     */
-    public static final String WINDOWS_SYSTEMPROFILE_PATH;
-
     static {
         // Use a static block to declare constant value in the right order.
         LOGGER = LoggerFactory.getLogger(Compat.class);
         CHARSET_PROCESS = getProcessCharset();
         COMPUTER_NAME = getComputerName();
-        WINDOWS_SYSTEMPROFILE_PATH = getWindowsSystemProfilePath();
         IS_ADMIN = getIsAdmin();
-        CONFIG_PATH = getConfigPath(IS_ADMIN);
+        CONFIG_HOME = getConfigPath(IS_ADMIN);
+        DATA_HOME = getDataPath(IS_ADMIN);
         TEMP = getTemp();
-        TEMP_FILE = new File(TEMP);
         HOME = getHome(IS_ADMIN);
-        HOME_FILE = new File(HOME);
+    }
+
+    /**
+     * Get environment variable or return the default value if the variable is not set or empty.
+     * 
+     * @param variable
+     *            the environment variable name
+     * @param defaultValue
+     *            the default value
+     * @return the variable value or default value
+     */
+    private static String getenv(String variable, String defaultValue) {
+        String value = System.getenv(variable);
+        return StringUtils.defaultString(value, defaultValue);
     }
 
     /**
@@ -136,7 +154,7 @@ public class Compat {
             // Swallow. Should no happen
             Thread.currentThread().interrupt();
         }
-        return null;
+        throw new IllegalStateException("can't get default encoding");
     }
 
     /**
@@ -147,20 +165,15 @@ public class Compat {
      * @return an empty string or a hostname
      */
     private static String getComputerName() {
-        // For Windows
-        String host = System.getenv("COMPUTERNAME");
-        if (host != null) return host.toLowerCase();
-        // For Linux
-        host = System.getenv("HOSTNAME");
-        if (host != null) return host.toLowerCase();
-        // Fallback and use Inet interface.
+        // on Windows: COMPUTERNAME
+        // on Linux: HOSTNAME
         try {
-            String result = InetAddress.getLocalHost().getHostName();
-            if (StringUtils.isNotEmpty(result)) return result.toLowerCase();
+            String defaultValue = InetAddress.getLocalHost().getHostName();
+            return getenv("COMPUTERNAME", getenv("HOSTNAME", defaultValue)).toLowerCase();
         } catch (UnknownHostException e) {
             // failed; try alternate means.
         }
-        return null;
+        throw new IllegalStateException("can't find hostname");
     }
 
     /**
@@ -176,14 +189,37 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else if (SystemUtils.IS_OS_LINUX) {
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
             if (isAdmin) {
                 return "/etc/minarca";
             } else {
-                return System.getenv("HOME") + "/.config/minarca/";
+                return getenv("XDG_CONFIG_HOME", getHome(isAdmin) + "/.config/") + "/minarca";
             }
         }
-        return null;
+    }
+
+    /**
+     * Return the location where to store data.
+     * 
+     * @param isAdmin
+     *            True if admin
+     * @return data folder
+     */
+    private static String getDataPath(boolean isAdmin) {
+        // Check if data path is forced (usually used for testing).
+        String path = System.getProperty("com.patrikdufresne.minarca.dataPath");
+        if (path != null) {
+            return path;
+        }
+        if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
+            return getLocalAppData(isAdmin) + "/minarca";
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
+            if (isAdmin) {
+                return "/var/lib/minarca";
+            } else {
+                return getenv("XDG_DATA_HOME", getHome(isAdmin) + "/.local/share/") + "/minarca";
+            }
+        }
     }
 
     /**
@@ -191,15 +227,12 @@ public class Compat {
      * 
      * @param isAdmin
      *            True if admin.
-     * @return
+     * @return return user's home folder.
      */
     private static String getHome(boolean isAdmin) {
         if (isAdmin) {
             if (SystemUtils.IS_OS_WINDOWS) {
-                if (Compat.WINDOWS_SYSTEMPROFILE_PATH == null) {
-                    throw new IllegalStateException("system profile path not defined");
-                }
-                return Compat.WINDOWS_SYSTEMPROFILE_PATH;
+                return getWindowsSystemProfilePath();
             } else {
                 return "/root";
             }
@@ -259,9 +292,9 @@ public class Compat {
     private static String getLocalAppData(boolean isAdmin) {
         if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
             // C:\Documents and Settings\ikus060\Local Settings\Application Data
-            return getHome(isAdmin) + "/Local Settings/Application Data/";
+            return getenv("LOCALAPPDATA", getHome(isAdmin) + "/Local Settings/Application Data/");
         }
-        return getHome(isAdmin) + "/AppData/Local/";
+        return getenv("LOCALAPPDATA", getHome(isAdmin) + "/AppData/Local/");
     }
 
     /**
@@ -320,7 +353,7 @@ public class Compat {
         if (SystemUtils.IS_OS_LINUX) {
             return "/tmp";
         }
-        return null;
+        throw new IllegalStateException("can't find temporary folder location");
     }
 
     /**
@@ -330,9 +363,9 @@ public class Compat {
      */
     private static String getWindowsSystemProfilePath() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            return System.getenv("WINDIR") + "/System32/config/systemprofile";
+            return getenv("WINDIR", "C:/Windows") + "/System32/config/systemprofile";
         }
-        return null;
+        throw new IllegalStateException("system profile path only availale on Windows OS");
     }
 
     /**
@@ -412,7 +445,7 @@ public class Compat {
             // Swallow. Should no happen
             LOGGER.warn("process interrupted", e);
             Thread.currentThread().interrupt();
-            return null;
+            throw new IllegalStateException("reg.exe process interrupted");
         }
     }
 

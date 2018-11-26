@@ -101,6 +101,22 @@ public class Config {
     private static final String REMOTEHOST_DEFAULT = System.getProperty("minarca.remotehost", "minarca.net");
 
     /**
+     * Load properties.
+     * 
+     * @throws ConfigurationException
+     * 
+     * @throws APIException
+     */
+    private static PropertiesConfiguration load(File file) throws ConfigurationException {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+        properties = new PropertiesConfiguration(file);
+        properties.setLogger(new NoOpLog());
+        properties.setAutoSave(false);
+        properties.setReloadingStrategy(new FileChangedReloadingStrategy());
+        return properties;
+    }
+
+    /**
      * Reference to the configuration file.
      */
     private File confFile;
@@ -109,6 +125,18 @@ public class Config {
      * Reference to file patterns.
      */
     private File globPatternsFile;
+
+    /**
+     * Identity file
+     */
+    private File identityPrivate;
+
+    /**
+     * Identity files
+     */
+    private File identityPublic;
+
+    private List<GlobPattern> patterns = Collections.emptyList();
 
     /**
      * Reference to the configuration.
@@ -125,22 +153,14 @@ public class Config {
      */
     protected File statusFile;
 
-    private List<GlobPattern> patterns = Collections.emptyList();
-
-    private final String home;
-
-    public Config(String home) {
-        this.home = home;
-        this.confFile = new File(home, FILENAME_CONF); // $NON-NLS-1$
-        this.globPatternsFile = new File(home, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
-        this.statusFile = new File(home, FILENAME_STATUS); // $NON-NLS-1$
-
+    public Config() {
+        this.confFile = new File(Compat.CONFIG_HOME, FILENAME_CONF); // $NON-NLS-1$
+        this.globPatternsFile = new File(Compat.CONFIG_HOME, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
+        this.statusFile = new File(Compat.DATA_HOME, FILENAME_STATUS); // $NON-NLS-1$
+        this.identityPrivate = new File(Compat.CONFIG_HOME, "id_rsa");
+        this.identityPublic = new File(Compat.CONFIG_HOME, "id_rsa.pub");
         // Load the configuration
         load();
-    }
-
-    public Config() {
-        this(Compat.CONFIG_PATH);
     }
 
     /**
@@ -193,6 +213,10 @@ public class Config {
         }
     }
 
+    public String getBaseUrl() {
+        return BASE_URL;
+    }
+
     /**
      * Return the include patterns used for the backup.
      * 
@@ -208,7 +232,7 @@ public class Config {
      * @return the identity file.
      */
     protected File getIdentityFile() {
-        return new File(this.home, "id_rsa");
+        return this.identityPrivate;
     }
 
     /**
@@ -218,16 +242,15 @@ public class Config {
      * @throws APIException
      */
     public String getIdentityFingerPrint() {
-        File file = new File(this.home, "id_rsa.pub");
-        if (!file.isFile() || !file.canRead()) {
-            LOGGER.warn("public key [{}] is not accessible", file);
+        if (!this.identityPublic.isFile() || !this.identityPublic.canRead()) {
+            LOGGER.warn("public key [{}] is not accessible", this.identityPublic);
             return "";
         }
         try {
-            RSAPublicKey publicKey = Keygen.fromPublicIdRsa(file);
+            RSAPublicKey publicKey = Keygen.fromPublicIdRsa(this.identityPublic);
             return Keygen.getFingerPrint(publicKey);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
-            LOGGER.warn("cannot read key [{}] ", file, e);
+            LOGGER.warn("cannot read key [{}] ", this.identityPublic, e);
         }
         return "";
     }
@@ -329,22 +352,6 @@ public class Config {
         return this.properties.getString(PROPERTY_USERNAME);
     }
 
-    /**
-     * Load properties.
-     * 
-     * @throws ConfigurationException
-     * 
-     * @throws APIException
-     */
-    private static PropertiesConfiguration load(File file) throws ConfigurationException {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
-        properties = new PropertiesConfiguration(file);
-        properties.setLogger(new NoOpLog());
-        properties.setAutoSave(false);
-        properties.setReloadingStrategy(new FileChangedReloadingStrategy());
-        return properties;
-    }
-
     public void load() {
         LOGGER.debug("reading properties from [{}]", this.confFile);
         try {
@@ -363,6 +370,25 @@ public class Config {
             this.patterns = GlobPattern.readPatterns(this.globPatternsFile);
         } catch (IOException e) {
             LOGGER.warn("can't glob patterns from {}", this.confFile);
+        }
+    }
+
+    /**
+     * Save all the configuration.
+     * 
+     * @throws APIException
+     */
+    public void save() throws APIException {
+        try {
+            this.properties.save();
+        } catch (ConfigurationException e) {
+            throw new APIException(_("fail to save config"), e);
+        }
+        try {
+            LOGGER.debug("writing patterns to [{}]", globPatternsFile);
+            GlobPattern.writePatterns(globPatternsFile, patterns);
+        } catch (IOException e) {
+            throw new APIException(_("fail to save config"), e);
         }
     }
 
@@ -438,25 +464,6 @@ public class Config {
     }
 
     /**
-     * Save all the configuration.
-     * 
-     * @throws APIException
-     */
-    public void save() throws APIException {
-        try {
-            this.properties.save();
-        } catch (ConfigurationException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
-        try {
-            LOGGER.debug("writing patterns to [{}]", globPatternsFile);
-            GlobPattern.writePatterns(globPatternsFile, patterns);
-        } catch (IOException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
-    }
-
-    /**
      * Sets the repository name.
      * 
      * @param value
@@ -488,10 +495,6 @@ public class Config {
     public void setUsername(String value, boolean save) throws APIException {
         this.properties.setProperty(PROPERTY_USERNAME, value);
         if (save) save();
-    }
-
-    public String getBaseUrl() {
-        return BASE_URL;
     }
 
 }

@@ -110,7 +110,7 @@ public class RdiffBackup {
      * @return
      */
     private static File getKnownHosts() {
-        File f = new File(Compat.CONFIG_PATH, "known_hosts");
+        File f = new File(Compat.CONFIG_HOME, "known_hosts");
         if (!f.exists()) {
             try {
                 InputStream in = RdiffBackup.class.getResourceAsStream("known_hosts");
