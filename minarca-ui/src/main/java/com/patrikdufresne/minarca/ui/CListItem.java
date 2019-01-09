@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 
 import com.patrikdufresne.fontawesome.FontAwesome;
 import com.patrikdufresne.switchbutton.SwitchButton;
@@ -117,9 +116,9 @@ public class CListItem extends Composite {
 
     private Composite right;
 
-    private Text rightValueHelpText;
+    private Label rightValueHelpText;
 
-    private Text rightValueText;
+    private Label rightValueText;
 
     /**
      * Create a new instance of list item.
@@ -575,7 +574,7 @@ public class CListItem extends Composite {
         checkWidget();
         if (text != null) {
             if (rightValueText == null) {
-                rightValueText = new Text(right, SWT.READ_ONLY);
+                rightValueText = new Label(right, SWT.READ_ONLY);
                 rightValueText.setBackground(getBackground());
                 rightValueText.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
                 rightValueText.setEnabled(getEnabled());
@@ -602,7 +601,7 @@ public class CListItem extends Composite {
         checkWidget();
         if (text != null) {
             if (rightValueHelpText == null) {
-                rightValueHelpText = new Text(right, SWT.READ_ONLY);
+                rightValueHelpText = new Label(right, SWT.READ_ONLY);
                 rightValueHelpText.setBackground(getBackground());
                 rightValueHelpText.setForeground(getHelpTextForeground());
                 rightValueHelpText.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));

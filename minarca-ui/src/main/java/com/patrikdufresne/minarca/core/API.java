@@ -177,7 +177,7 @@ public class API {
         // By default ignore minarca log files
         String logFolder = System.getProperty("log.folder");
         if(StringUtils.isNotEmpty(logFolder)) {
-            patterns.add(new GlobPattern(false, logFolder + "/minarca-log*.txt"));
+            patterns.add(new GlobPattern(false, new File(logFolder, "minarca-log*.txt")));
         }
         try {
             // Check the remote server.
@@ -284,8 +284,8 @@ public class API {
          * Generate the keys
          */
         LOGGER.debug("generating public and private key for {}", repositoryName);
-        File idrsaFile = new File(Compat.CONFIG_PATH, "id_rsa.pub");
-        File identityFile = new File(Compat.CONFIG_PATH, "id_rsa");
+        File idrsaFile = new File(Compat.CONFIG_HOME, "id_rsa.pub");
+        File identityFile = new File(Compat.CONFIG_HOME, "id_rsa");
         String rsadata = null;
         try {
             // Generate a key pair.
