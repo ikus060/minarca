@@ -51,16 +51,16 @@ build:
   artifacts:
     paths:
     - minarca-installation-package/target/*.exe
-    - minarca-installation-package-unix/target/*.tar.gz
     - minarca-installation-package-deb/target/*.deb
 
 deploy:
   stage: deploy
   script:
   - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
+  - mv minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb
   # Publish to kalo
   - scp -o StrictHostKeyChecking=no minarca-installation-package/target/minarca-${REVISION}-install.exe www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - scp -o StrictHostKeyChecking=no minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - scp -o StrictHostKeyChecking=no minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
 
 promote:
   stage: deploy
@@ -71,4 +71,4 @@ promote:
     url: http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe  
   script:
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-${REVISION}-install.exe /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_${REVISION}_all.deb /var/www/patrikdufresne/archive/minarca/minarca-installation-package-deb_latest_all.deb
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-client_${REVISION}_all.deb /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb

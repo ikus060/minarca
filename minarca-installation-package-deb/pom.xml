@@ -28,8 +28,6 @@
                 <groupId>org.vafer</groupId>
                 <version>1.5</version>
                 <configuration>
-                    <!-- Use timestamp for SNAPSHOT -->
-                    <snapshotExpand>true</snapshotExpand>
                     <dataSet>
                         <!-- Include archive from unix. -->
                         <data>
