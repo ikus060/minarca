@@ -1,0 +1,5 @@
+#!/bin/bash
+# minarca shell, invoked from ~/.ssh/authorized_keys
+# ----------------------------------------------------------------------
+
+$SSH_ORIGINAL_COMMAND

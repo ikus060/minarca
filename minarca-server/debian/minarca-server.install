@@ -1,0 +1,2 @@
+minarca-server.conf /etc/minarca/
+minarca-shell /opt/minarca/bin/

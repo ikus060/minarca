@@ -2,24 +2,28 @@ image: ikus060/docker-debian-py2-py3:stretch
 
 stages:
 - test
+- package
+- test-package
 - publish
-- deploy
+
+variables:
+  PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
 
 # TODO Split this by python version and OS.
-test_plugins_py27:
+test_server_py27: 
   stage: test
   script:
-  - cd minarca-plugins
+  - cd minarca-server
   - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
-  - pip install pip setuptools  tox nose coverage --upgrade
+  - pip install pip setuptools tox nose coverage --upgrade
   - python setup.py build
   - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
   - tox --sitepackages
   
-test_plugins_py3: 
+test_server_py3: 
   stage: test
   script:
-  - cd minarca-plugins
+  - cd minarca-server
   - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
   - pip install pip setuptools tox nose coverage --upgrade
   - python setup.py build
@@ -43,68 +47,91 @@ test_quota_py3:
   - python setup.py build
   - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
   - tox --sitepackages
-  
-# TODO Publish coverage repport
-# TODO Publish testcases repport
 
-publish_plugins:
+
+deb_server:
+  stage: package
+  script:
+  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
+  - pip2 install setuptools_scm
+  - cd minarca-server
+  - export VERSION=$(python setup.py --version)
+  - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
+  - export RELEASE_DATE="$(date '+%a, %d %b %Y %X') +0000"
+  - sed -i "s/%VERSION%/$VERSION/" debian/changelog
+  - sed -i "s/%DATE%/$RELEASE_DATE/" debian/changelog
+  - DH_VIRTUALENV_INSTALL_ROOT=/opt/ dpkg-buildpackage -us -uc
+  artifacts:
+    paths:
+    - minarca-server_*.deb
+
+test_deb_server:
+  stage: test-package
+  image: debian:stretch
+  script: 
+  - bash ./minarca-server/tests/install-deb.sh ./minarca-server_*.deb
+
+publish:
   stage: publish
   script:
-  - cd minarca-plugins
-  - pip install wheel twine --upgrade
-  - apt-get update && apt-get -qq install node-less
-  - python setup.py sdist bdist_wheel
-  - twine upload dist/* -u $NEXUS_USR -p $NEXUS_PWD --repository-url $NEXUS_PYPI_URL
-
-publish_quota:
-  stage: publish
-  script:
-  - cd minarca-quota-api
-  - pip install wheel twine --upgrade
-  - python setup.py sdist bdist_wheel
-  - twine upload dist/* -u $NEXUS_USR -p $NEXUS_PWD --repository-url $NEXUS_PYPI_URL
-  
-rdiffweb_deploy_staging: 
-  stage: deploy
-  image: ikus060/ansible
-  environment:
-    name: staging
-    url: https://sestican.patrikdufresne.com
-  variables:
-    ANSIBLE_HOST_KEY_CHECKING: "False"
-  before_script:
+  # Publish to kalo
   - eval $(ssh-agent -s)
-  - echo "$SESTICAN_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
-  script:
-  - python ./minarca-quota-api/setup.py --version
-  - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
-  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
-  - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION rdiffweb_default_repositories=true" --limit sestican
+  - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
 
-rdiffweb_deploy_prod:
-  stage: deploy
-  when: manual
-  only:
-  - master
-  image: ikus060/ansible
-  environment:
-    name: prod
-    url: https://www.minarca.net
-  variables:
-    ANSIBLE_HOST_KEY_CHECKING: "False"
-  before_script:
-  - eval $(ssh-agent -s)
-  - echo "$RANCULOS_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
-  - echo "$MERCOR_ROOT_PRIVATEKEY"   | tr -d '\r' | ssh-add - > /dev/null
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  script:
-  - python ./minarca-quota-api/setup.py --version
-  - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
-  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
-  - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION" --limit ranculos,mercor
+#test_nexus:
+#  image: debian:stretch
+#  stage: test-package
+#  script:
+#  - python-pip python-pysqlite2 rdiff-backup
+#  - sudo pip install -U pip
+#  - export REVISION=$(python setup.py --version)
+#  - echo $REVISION
+#  - pip install rdiffweb==$REVISION
+
+#rdiffweb_deploy_staging: 
+#  stage: deploy
+#  image: ikus060/ansible
+#  environment:
+#    name: staging
+#    url: https://sestican.patrikdufresne.com
+#  variables:
+#    ANSIBLE_HOST_KEY_CHECKING: "False"
+#  before_script:
+#  - eval $(ssh-agent -s)
+#  - echo "$SESTICAN_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+#  - mkdir -p ~/.ssh
+#  - chmod 700 ~/.ssh
+#  script:
+#  - python ./minarca-quota-api/setup.py --version
+#  - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
+#  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+#  - cd ansible-config
+#  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION rdiffweb_default_repositories=true" --limit sestican
+
+#rdiffweb_deploy_prod:
+#  stage: deploy
+#  when: manual
+#  only:
+#  - master
+#  image: ikus060/ansible
+#  environment:
+#    name: prod
+#    url: https://www.minarca.net
+#  variables:
+#    ANSIBLE_HOST_KEY_CHECKING: "False"
+#  before_script:
+#  - eval $(ssh-agent -s)
+#  - echo "$RANCULOS_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+#  - echo "$MERCOR_ROOT_PRIVATEKEY"   | tr -d '\r' | ssh-add - > /dev/null
+#  - mkdir -p ~/.ssh
+#  - chmod 700 ~/.ssh
+#  script:
+#  - python ./minarca-quota-api/setup.py --version
+#  - export MINARCA_VERSION=$(python ./minarca-quota-api/setup.py --version)
+#  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+#  - cd ansible-config
+#  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_version=$MINARCA_VERSION" --limit ranculos,mercor
   

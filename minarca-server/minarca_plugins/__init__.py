@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Minarca disk space rdiffweb plugin
+# Minarca plugins
 #
-# Copyright (C) 2018 Patrik Dufresne Service Logiciel inc. All rights reserved.
+# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
@@ -58,7 +58,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     
     _quota_api_url = Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
     _mode = IntOption('MinarcaUserSetupDirMode', 0o0700)
-    _basedir = Option('MinarcaUserSetupBaseDir', default='/home')
+    _basedir = Option('MinarcaUserSetupBaseDir', default='/var/opt/minarca')
 
     def __init__(self, app):
         self.app = app
