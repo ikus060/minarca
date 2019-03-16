@@ -14,13 +14,15 @@ Created on Jan 23, 2016
 
 from __future__ import unicode_literals
 
-import httpretty
 import logging
-from mock.mock import MagicMock
-from mockldap import MockLdap
+from rdiffweb.test import WebCase
 import unittest
 
-from rdiffweb.test import WebCase
+import httpretty
+from mock.mock import MagicMock  # @UnresolvedImport
+from mockldap import MockLdap
+
+from minarca_plugins import MinarcaUserSetup
 
 
 class MinarcaDiskSpaceTest(WebCase):
@@ -57,8 +59,12 @@ class MinarcaDiskSpaceTest(WebCase):
     ])
 
     @classmethod
-    def setup_server(cls,):
-        WebCase.setup_server(enabled_plugins=['SQLite', 'MinarcaDiskSpace', 'Ldap'], default_config={'AddMissingUser': 'true'})
+    def setup_server(cls):
+        WebCase.setup_server(default_config={
+            'AddMissingUser': 'true',
+            'LdapUri': '__default__',
+            'LdapBaseDn': 'dc=nodomain',
+            })
 
     def setUp(self):
         self.app.userdb.get_user('admin').user_root = '/tmp'
@@ -67,7 +73,7 @@ class MinarcaDiskSpaceTest(WebCase):
         self.mockldap.start()
         self.ldapobj = self.mockldap['ldap://localhost/']
         WebCase.setUp(self)
-        self.plugin = self.app.plugins.get_plugin_by_name('MinarcaDiskSpace')
+        self.plugin = MinarcaUserSetup(self.app)
 
     def tearDown(self):
         # Stop patching ldap.initialize and reset state.
@@ -75,26 +81,26 @@ class MinarcaDiskSpaceTest(WebCase):
         del self.ldapobj
         del self.mockldap
 
-    def test_check_plugin_enabled(self):
+    def test_login(self):
         """
-        Check if the plugin is shown in plugins page.
+        Check if new user is created with user_root and email.
         """
-        self._login(self.USERNAME, self.PASSWORD)
-        self.getPage("/admin/plugins/")
-        self.assertInBody('MinarcaDiskSpace')
-
-    def test_get_ldap_userquota(self):
-        quota = self.plugin._get_ldap_userquota('bob')
-        self.assertEquals(2147483648, quota)
+        userobj = self.app.userdb.login('bob', 'password')
+        self.assertIsNotNone(userobj)
+        self.assertTrue(self.app.userdb.exists('bob'))
+        # Check if profile get update from Ldap info.
+        self.assertEquals('bob@test.com', self.app.userdb.get_user('bob').email)
+        self.assertEquals('/tmp/bob', self.app.userdb.get_user('bob').user_root)
 
     @httpretty.activate
-    def test__update_userquota(self):
+    def test_set_disk_quota(self):
         httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
                                body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
-        self.plugin._update_userquota('bob')
+        userobj = self.app.userdb.add_user('bob')
+        self.plugin.set_disk_quota(userobj, quota=1234567)
 
     @httpretty.activate
-    def test__update_userquota_401(self):
+    def test_update_userquota_401(self):
         # Checks if exception is raised when authentication is failing.
         httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
                                status=401)

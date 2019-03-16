@@ -136,12 +136,10 @@ setuptools.setup(
     description='Minarca Plugins',
     long_description='Sets of plugins for Minarca.',
     author='Patrik Dufresne Service Logiciel inc.',
-    url='http://www.patrikdufresne.com/',
+    url='http://www.patrikdufresne.com/en/minarca/',
     packages=[
         'minarca_brand',
-        'minarca_user_setup',
-        'minarca_disk_space',
-        'minarca_server_info',
+        'minarca_plugins',
     ],
     include_package_data=True,
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
@@ -169,10 +167,9 @@ setuptools.setup(
         "httpretty",
     ],
     # Declare entry point
-    entry_points={'rdiffweb.plugins': [
-        'MinarcaBrand = minarca_brand',
-        'MinarcaDiskSpace = minarca_disk_space',
-        'MinarcaUserSetup = minarca_user_setup',
-        'MinarcaServerInfo = minarca_server_info',
-    ]},
+    entry_points={
+        'rdiffweb.IUserChangeListener': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],
+        'rdiffweb.IUserQuota': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],
+    },
 )
+
