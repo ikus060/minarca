@@ -14,13 +14,18 @@ Created on Jan 23, 2016
 
 from __future__ import unicode_literals
 
+from io import open
 import logging
-from rdiffweb.test import WebCase
+import os
+from rdiffweb.test import WebCase, AppTestCase
+import shutil
+import tempfile
 import unittest
 
 import httpretty
 from mock.mock import MagicMock  # @UnresolvedImport
 from mockldap import MockLdap
+import pkg_resources
 
 from minarca_plugins import MinarcaUserSetup
 
@@ -127,6 +132,53 @@ class MinarcaDiskSpaceTest(WebCase):
         self.assertInBody('occupiedSpace')
         self.assertInBody('totalSpace')
 
+
+class MinarcaSshKeysTest(AppTestCase):
+    """
+    Collections of tests related to ssh keys file update.
+    """
+    USERNAME = 'admin'
+
+    PASSWORD = 'test'
+    
+    base_dir = tempfile.mkdtemp(prefix='minarca_tests_')
+    
+    default_config = { 'MinarcaUserBaseDir': base_dir }
+    
+    def setUp(self):
+        AppTestCase.setUp(self)
+        if not os.path.isdir(self.base_dir):
+            os.mkdir(self.base_dir)
+    
+    def tearDown(self):
+        shutil.rmtree(self.base_dir)
+        AppTestCase.tearDown(self)
+    
+    def test_update_authorized_keys(self):
+        self.plugin = MinarcaUserSetup(self.app)
+        self.plugin._update_authorized_keys()
+    
+    def test_add_key(self):
+        """
+        Test creation of the ssh key.
+        """
+        # Read the key from a file
+        filename = pkg_resources.resource_filename(__name__, 'test_publickey_ssh_rsa.pub')  # @UndefinedVariable
+        with open(filename, 'r', encoding='utf8') as f: 
+            key = f.readline()
+        
+        # Add the key to the user.
+        userobj = self.app.userdb.get_user('admin')
+        userobj.add_authorizedkey(key)
+        
+        # Validate
+        filename = os.path.join(self.base_dir, '.ssh', 'authorized_keys')
+        with open(filename, 'r', encoding='utf-8') as f:
+            data = f.read()
+        self.assertEquals(
+            'command="/opt/minarca/bin/minarca-shell admin",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n',
+            data)
+    
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

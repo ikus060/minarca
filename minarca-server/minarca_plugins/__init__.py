@@ -9,19 +9,23 @@
 
 from __future__ import unicode_literals
 
+from builtins import str
+from io import StringIO
+from io import open
 import logging
 import os
 import pwd
-from rdiffweb.core import RdiffError
-from rdiffweb.core.config import Option, IntOption
-from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
+import stat
 import sys
 
-from builtins import str
 import cherrypy
 from future.utils.surrogateescape import encodefilename
-
+from rdiffweb.core import RdiffError, authorizedkeys
+from rdiffweb.core.authorizedkeys import AuthorizedKey
+from rdiffweb.core.config import Option, IntOption
+from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
 import requests
+
 
 PY3 = sys.version_info[0] == 3
 
@@ -58,7 +62,9 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     
     _quota_api_url = Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
     _mode = IntOption('MinarcaUserSetupDirMode', 0o0700)
-    _basedir = Option('MinarcaUserSetupBaseDir', default='/var/opt/minarca')
+    _basedir = Option('MinarcaUserBaseDir', default='/var/opt/minarca')
+    _minarca_shell = Option('MinarcaShell', default='/opt/minarca/bin/minarca-shell')
+    _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
 
     def __init__(self, app):
         self.app = app
@@ -135,6 +141,16 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         except:
             logger.warning('fail to update user profile [%s]', userobj.username, exc_info=1)
 
+    def user_attr_changed(self, username, attrs={}):
+        """
+        Listen to users attributes change to update the minarca authorized_keys.
+        """
+        if 'authorizedkeys' not in attrs:
+            return
+        
+        # TODO schedule a background task to update the authorized_keys.
+        self._update_authorized_keys()
+
     def _update_user_profile(self, userobj, attrs):
         """
         Called to update the user email and home directory from LDAP info.
@@ -144,7 +160,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         if email:
             logger.debug('update user [%s] email [%s]', userobj.username, email[0])
             userobj.email = email[0]
-
+            
         home_dir = attrs.get('homeDirectory', None)
         if not home_dir:
             home_dir = os.path.join(self._basedir, userobj.username)
@@ -175,3 +191,45 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         if not os.path.exists(ssh_dir):
             os.makedirs(ssh_dir, mode=0o0700)
             os.chown(ssh_dir, uid, gid)
+       
+    def _update_authorized_keys(self):
+        
+        # Create ssh subfolder
+        ssh_dir = os.path.join(self._basedir, '.ssh')
+        if not os.path.exists(ssh_dir):
+            logger.info("creating .ssh folder [%s]", ssh_dir)
+            os.mkdir(ssh_dir, 0o0700)
+        
+        # Create the authorized_keys file
+        filename = os.path.join(ssh_dir, 'authorized_keys')
+        if not os.path.exists(filename):
+            logger.info("creating authorized_keys [%s]", filename)
+            with open(filename, 'w+'):
+                os.utime(filename, None)
+                # change file permissions
+                os.chmod(filename, stat.S_IRUSR | stat.S_IWUSR)
+                val = os.stat(ssh_dir)
+                # Also try to change owner
+                os.chown(filename, val.st_uid, val.st_gid)
+        
+        # Get list of keys
+        seen = set()
+        new_data = StringIO()
+        for userobj in self.app.userdb.list():
+            for key in userobj.authorizedkeys:
+                
+                if key.fingerprint in seen:
+                    logger.warn("duplicates key %s, sshd will ignore it")
+                else:
+                    seen.add(key.fingerprint)
+                    
+                # Add option to the key
+                options = 'command="%s %s",%s' % (self._minarca_shell, userobj.username, self._auth_options)
+                key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
+                
+                # Write the new key
+                authorizedkeys.add(new_data, key)
+        
+        # Write the new file
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(new_data.getvalue())

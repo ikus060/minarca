@@ -28,7 +28,7 @@ setuptools.setup(
         "setuptools_scm",
     ],
     install_requires=[
-        "rdiffweb>=0.10.10.dev39",
+        "rdiffweb==0.10.10.dev43+ge329d6e",
         "cherrypy>=16.0.0",
         "requests",
     ],
@@ -36,8 +36,8 @@ setuptools.setup(
     tests_require=[
         "mock>=1.3.0",
         "mockldap>=0.2.6",
-        "pycrypto>=2.6.1",
         "httpretty",
+        "pytest",
     ],
     # Declare entry point
     entry_points={
