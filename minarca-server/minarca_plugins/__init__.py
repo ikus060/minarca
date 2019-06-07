@@ -224,7 +224,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
                     seen.add(key.fingerprint)
                     
                 # Add option to the key
-                options = 'command="%s %s",%s' % (self._minarca_shell, userobj.username, self._auth_options)
+                options = """command="%s '%s' '%s'",%s""" % (self._minarca_shell, userobj.username, userobj.user_root, self._auth_options)
                 key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
                 
                 # Write the new key

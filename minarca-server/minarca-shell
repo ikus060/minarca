@@ -1,5 +1,50 @@
 #!/bin/bash
+# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
+# Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
+#
 # minarca shell, invoked from ~/.ssh/authorized_keys
 # ----------------------------------------------------------------------
+set -e
+#set -x
+USERNAME=$1
+USERHOME=$2
 
-$SSH_ORIGINAL_COMMAND
+# TODO Evaluate execution in a sandbox/docker/lxc to provide better security then --restrict
+
+# Validate user home directory
+if [ ! -d "$USERHOME" ]; then
+    logger "$0: user [$USERNAME] in [$USERHOME] invalid user home: $USERHOME"
+    printf "ERROR user home directory is miss configured.\n"
+    exit 1
+fi
+
+# Quit if command line is not provided.
+if [ -z "$SSH_ORIGINAL_COMMAND" ]; then
+    printf "ERROR no command provided.\n"
+    exit 1
+fi
+
+# Either we get called by rdiff-backup directly
+# or we get called by minarca client which replace the command by the name of the repository.
+cd "$USERHOME"
+if [ "$SSH_ORIGINAL_COMMAND" == "rdiff-backup --server" ]; then
+    # When called by rdiff-backup, retrict path to user's home.
+    # But this will force rdiff-backup client to provide the full path.
+    logger "$0: user [$USERNAME] in [$USERHOME] invalid command: $SSH_ORIGINAL_COMMAND"
+    rdiff-backup --server --restrict="$USERHOME"
+    exit
+fi
+
+# When called by minarca client, the command should be the name of the repository.
+# Let make sure it's not trying to evade our user's home.
+REPO="$SSH_ORIGINAL_COMMAND"
+if [ "$REPO" == "/*" -o "$REPO" == "*/.." -o "$REPO" == "../*" -o "$REPO" == "*/../*" ]; then
+    logger "$0: user [$USERNAME] in [$USERHOME] invalid repo: $REPO"
+    printf "ERROR repository name $REPO is not valid\n."
+    exit 1
+fi
+
+logger "$0: user [$USERNAME] in [$USERHOME] repo: $REPO"
+cd "$USERHOME"
+rdiff-backup --server --restrict="$REPO"
