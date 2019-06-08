@@ -142,10 +142,9 @@ public class RdiffBackup {
     private static File getSshLocation() {
         if (SystemUtils.IS_OS_WINDOWS) {
             return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "./openssh-7.6p1-1/", "./bin/");
-        } else {
-            // Linux: use system ssh
-            return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "/usr/bin/");
         }
+        // Linux: use system ssh
+        return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "/usr/bin/");
     }
 
     /**
@@ -159,23 +158,15 @@ public class RdiffBackup {
     private final String remotehost;
 
     /**
-     * The username for authentication.
-     */
-    private final String username;
-
-    /**
      * Create a new instance of rdiffbackup.
      * 
-     * @param username
-     *            the username for authentication
      * @param remotehost
      *            the remote host (usually minarca.)
      * @param identityPath
      *            location where the identify is stored (should contain id_rsa)
      * @throws APIException
      */
-    public RdiffBackup(String username, String remotehost, File identityFile) throws APIException {
-        Validate.notEmpty(this.username = username);
+    public RdiffBackup(String remotehost, File identityFile) throws APIException {
         Validate.notEmpty(this.remotehost = remotehost);
         Validate.notNull(this.identityFile = identityFile);
         if (!identityFile.isFile() || !identityFile.canRead()) {
@@ -185,6 +176,11 @@ public class RdiffBackup {
 
     /**
      * Run the backup with rdiff-backup.
+     * 
+     * @param patterns
+     *            list of include exclude patterns,
+     * @param path
+     *            the repository name where to backup. aka the computer name.
      * 
      * @throws APIException
      */
@@ -322,17 +318,22 @@ public class RdiffBackup {
         if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
         // TASK-1028 make sure to use `-oIdentitiesOnly=yes` to enforce private key authentication.
         // Otherwise if way use keychain or keberos authentication and prompt user for password.
-        args.add(
-                String.format(
-                        "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s rdiff-backup --server",
-                        ssh,
-                        extraOptions,
-                        knownhosts,
-                        identityFile));
+        // Last argument is the command line to be executed. This should be the repository name.
+        // minarca-shell will make use if it.
+        args
+                .add(
+                        String
+                                .format(
+                                        "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
+                                        ssh,
+                                        extraOptions,
+                                        knownhosts,
+                                        identityFile,
+                                        path));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.
-        args.add(this.username + "@" + this.remotehost + "::" + path);
+        args.add("minarca@" + this.remotehost + "::" + path);
         // Execute the command line.
         execute(args, workingDir, null);
     }
@@ -340,11 +341,14 @@ public class RdiffBackup {
     /**
      * Run a self test.
      * 
+     * @param path
+     *            the repository name to be tested.
+     * 
      * @throws APIException
      */
-    public void testServer() throws APIException, InterruptedException {
+    public void testServer(String path) throws APIException, InterruptedException {
         // Run the test.
         LOGGER.info("test server");
-        rdiffbackup(Compat.getRootsPath()[0], Arrays.asList("--test-server"), "/");
+        rdiffbackup(Compat.getRootsPath()[0], Arrays.asList("--test-server"), path);
     }
 }

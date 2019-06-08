@@ -153,18 +153,14 @@ public class API {
         t.start();
 
         // Get the config value.
-        String username = config.getUsername();
         String remotehost = config.getRemotehost();
         String repositoryName = config.getRepositoryName();
-
-        // Compute the path.
-        String path = "/home/" + username + "/" + repositoryName;
 
         // Get reference to the identity file to be used by ssh or plink.
         File identityFile = config.getIdentityFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, identityFile);
+        RdiffBackup rdiffbackup = new RdiffBackup(remotehost, identityFile);
 
         // Read patterns
         List<GlobPattern> patterns = config.getGlobPatterns();
@@ -181,9 +177,9 @@ public class API {
         }
         try {
             // Check the remote server.
-            rdiffbackup.testServer();
+            rdiffbackup.testServer(repositoryName);
             // Run backup.
-            rdiffbackup.backup(patterns, path);
+            rdiffbackup.backup(patterns, repositoryName);
             t.interrupt();
             config.setLastStatus(LastResult.SUCCESS);
             LOGGER.info("backup SUCCESS");
@@ -417,17 +413,17 @@ public class API {
     public void testServer() throws APIException, InterruptedException {
 
         // Get the config value.
-        String username = config.getUsername();
         String remotehost = config.getRemotehost();
+        String repositoryName = config.getRepositoryName();
 
         // Get reference to the identity file to be used by ssh.
         File identityFile = config.getIdentityFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(username, remotehost, identityFile);
+        RdiffBackup rdiffbackup = new RdiffBackup(remotehost, identityFile);
 
         // Check the remote server.
-        rdiffbackup.testServer();
+        rdiffbackup.testServer(repositoryName);
 
     }
 
