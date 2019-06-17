@@ -13,7 +13,7 @@ cache:
 
 stages:
   - build
-  - deploy
+  - publish
 
 # Install requirements to build.
 before_script:
@@ -46,8 +46,11 @@ build:
     - minarca-installation-package/target/*.exe
     - minarca-installation-package-deb/target/*.deb
 
-deploy:
-  stage: deploy
+publish:
+  stage: publish
+  environment:
+    name: dev
+    url: http://www.patrikdufresne.com/archive/minarca/minarca-${REVISION}-install.exe
   script:
   - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
   - mv minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb
@@ -56,7 +59,7 @@ deploy:
   - scp -o StrictHostKeyChecking=no minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
 
 promote:
-  stage: deploy
+  stage: publish
   only:
   - tags
   environment:
