@@ -195,7 +195,6 @@ public class RdiffBackup {
             if (SystemUtils.IS_OS_WINDOWS) {
                 args.add("--no-hard-links");
                 args.add("--exclude-symbolic-links");
-                args.add("--no-acls");
                 args.add("--create-full-path");
             } else {
                 args.add("--exclude-sockets");
