@@ -19,10 +19,9 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * Used to answer the password for putty process.
@@ -113,7 +112,8 @@ public class StreamHandler {
     /**
      * Executor service used to read the stream.
      */
-    private ExecutorService executor = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("stream-handler-%d").build());
+    private ExecutorService executor = Executors.newFixedThreadPool(1, new BasicThreadFactory.Builder().namingPattern("stream-handler-%d").build());
+
     /**
      * LogLevel
      */

@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
@@ -42,7 +43,6 @@ import org.eclipse.ui.forms.FormColors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.patrikdufresne.fontawesome.FontAwesome;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
@@ -78,7 +78,7 @@ public class SettingsDialog extends Dialog {
      * Create an executor service to asynchronously update the UI.
      */
     private ScheduledExecutorService executor = Executors
-            .newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("scheduled-ui-update-%d").build());
+            .newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder().namingPattern("scheduled-ui-update-%d").build());
 
     private CListItem lastruntimeItem;
 
@@ -566,11 +566,12 @@ public class SettingsDialog extends Dialog {
             API.config().setGlobPatterns(dlg.getPatterns(), true);
         } catch (APIException e) {
             LOGGER.error("error updating selective backup configuration", e);
-            DetailMessageDialog.openError(
-                    this.getShell(),
-                    Display.getAppName(),
-                    _("Error updating selective backup configuration"),
-                    _("Can't change the configuration for unknown reason. If the problem persists, try re-installing Minarca."));
+            DetailMessageDialog
+                    .openError(
+                            this.getShell(),
+                            Display.getAppName(),
+                            _("Error updating selective backup configuration"),
+                            _("Can't change the configuration for unknown reason. If the problem persists, try re-installing Minarca."));
         }
 
     }
@@ -583,13 +584,14 @@ public class SettingsDialog extends Dialog {
         boolean running = API.config().getLastResult().equals(LastResult.RUNNING);
 
         if (running) {
-            DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
-                    this.getShell(),
-                    Display.getAppName(),
-                    _("Are you sure you want to stop the current running backup?"),
-                    _(
-                            "You are about to stop the running backup. Interupting the backup may temporarily disrupt data restore. Are you sure you want to continue?"),
-                    (String) null);
+            DetailMessageDialog dlg = DetailMessageDialog
+                    .openYesNoQuestion(
+                            this.getShell(),
+                            Display.getAppName(),
+                            _("Are you sure you want to stop the current running backup?"),
+                            _(
+                                    "You are about to stop the running backup. Interupting the backup may temporarily disrupt data restore. Are you sure you want to continue?"),
+                            (String) null);
             if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
                 LOGGER.info("stop backup cancel by user");
                 return;
@@ -610,13 +612,14 @@ public class SettingsDialog extends Dialog {
 
         } else {
             // Show a confirmation message.
-            DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
-                    this.getShell(),
-                    Display.getAppName(),
-                    _("Do you want to backup your system now?"),
-                    _(
-                            "You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
-                    null);
+            DetailMessageDialog dlg = DetailMessageDialog
+                    .openYesNoQuestion(
+                            this.getShell(),
+                            Display.getAppName(),
+                            _("Do you want to backup your system now?"),
+                            _(
+                                    "You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
+                            null);
             if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
                 LOGGER.info("backup cancel by user");
                 return;
@@ -644,15 +647,16 @@ public class SettingsDialog extends Dialog {
     protected void handleUnlinkComputer() {
 
         // Show a confirmation message.
-        DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
-                this.getShell(),
-                _("Confirm unlink"),
-                _("Are you sure you want to unlink this system from Minarca?"),
-                _(
-                        "You are about to unlink this system from Minarca. This "
-                                + "system will no longer backup it self. Previous "
-                                + "backup data will not be lost."),
-                null);
+        DetailMessageDialog dlg = DetailMessageDialog
+                .openYesNoQuestion(
+                        this.getShell(),
+                        _("Confirm unlink"),
+                        _("Are you sure you want to unlink this system from Minarca?"),
+                        _(
+                                "You are about to unlink this system from Minarca. This "
+                                        + "system will no longer backup it self. Previous "
+                                        + "backup data will not be lost."),
+                        null);
         if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
             LOGGER.info("unlink opperation cancel by user");
             return;
