@@ -73,6 +73,20 @@ test_deb_server:
 
 publish:
   stage: publish
+  except:
+  - tags
+  script:
+  # Publish to kalo
+  - eval $(ssh-agent -s)
+  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+
+promote:
+  stage: publish
+  only:
+  - tags
   script:
   # Publish to kalo
   - eval $(ssh-agent -s)
