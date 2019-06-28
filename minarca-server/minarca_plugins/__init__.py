@@ -17,6 +17,9 @@ import os
 import pwd
 import stat
 import sys
+import urllib
+
+import requests
 
 import cherrypy
 from future.utils.surrogateescape import encodefilename
@@ -24,15 +27,15 @@ from rdiffweb.core import RdiffError, authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
 from rdiffweb.core.config import Option, IntOption
 from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
-import requests
-
+import pkg_resources
 
 PY3 = sys.version_info[0] == 3
 
 try:
-    from urllib.parse import urljoin  # @UnresolvedImport @UnusedImport
+    from urllib.parse import urlparse, urljoin  # @UnresolvedImport @UnusedImport
 except:
     from urlparse import urljoin  # @UnresolvedImport @UnusedImport @Reimport
+    from urlparse import urlparse  # @UnresolvedImport @UnusedImport @Reimport
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
@@ -65,13 +68,39 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     _basedir = Option('MinarcaUserBaseDir', default='/var/opt/minarca')
     _minarca_shell = Option('MinarcaShell', default='/opt/minarca/bin/minarca-shell')
     _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
+    _minarca_remotehost = Option('MinarcaRemoteHost')
+    _minarca_identity = Option('MinarcaRemoteHostIdentity', default='/etc/ssh')
 
     def __init__(self, app):
         self.app = app
+        self.app.root.api.minarca = self.get_minarca
         self.session = requests.Session()
         self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
         self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
 
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_minarca(self):
+        
+        # RemoteHost
+        remotehost = self._minarca_remotehost
+        if not remotehost:
+            remotehost = urlparse(cherrypy.request.base).hostname
+        
+        # Identity known_hosts
+        identity = ""
+        files = [f for f in os.listdir(self._minarca_identity) if f.startswith('ssh_host') if f.endswith('.pub')]
+        for fn in files:
+            with open(os.path.join(self._minarca_identity, fn)) as fh:
+                identity += remotehost + " " + fh.read()
+        
+        # Get remote host value from config or from URL
+        return {
+            "version": pkg_resources.get_distribution("minarca-server").version,
+            "remotehost": remotehost,
+            "identity": identity,
+        }
+        
     def get_disk_usage(self, userobj):
         """
         Return the user disk space.

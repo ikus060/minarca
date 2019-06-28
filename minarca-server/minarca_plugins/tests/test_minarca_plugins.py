@@ -131,6 +131,17 @@ class MinarcaDiskSpaceTest(WebCase):
         self.assertInBody('freeSpace')
         self.assertInBody('occupiedSpace')
         self.assertInBody('totalSpace')
+        
+    def test_get_api_minarca(self):
+        self._login('bob', 'password')
+        self.getPage("/api/minarca")
+        # Check version
+        self.assertInBody('version')
+        # Check remoteHost
+        self.assertInBody('remotehost')
+        self.assertInBody('127.0.0.1')
+        # Check identity
+        self.assertInBody('identity')
 
 
 class MinarcaSshKeysTest(AppTestCase):
