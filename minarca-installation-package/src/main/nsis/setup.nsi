@@ -30,7 +30,7 @@ SetCompressor bzip2
   Name "${AppName}"
   VIProductVersion "${AppVersion}"
   VIAddVersionKey "ProductName" "${AppName}"
-  VIAddVersionKey "Comments" "An all integrated backup solution."
+  VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
   VIAddVersionKey "CompanyName" "${Vendor}"
   VIAddVersionKey "LegalCopyright" "© ${Vendor}"
   VIAddVersionKey "FileDescription" "${AppName} ${AppVersion} Installer"
