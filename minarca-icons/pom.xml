@@ -44,13 +44,10 @@
                                 </macrodef>
                                 <!-- Generate PNG from SVG -->
                                 <batik svgFile="minarca_16.svg" pngFile="minarca_16.png" size="16" />
-                                <batik svgFile="minarca_32.svg" pngFile="minarca_32.png" size="32" />
-                                <batik svgFile="minarca_48.svg" pngFile="minarca_48.png" size="48" />
-                                <batik svgFile="minarca_48.svg" pngFile="minarca_22.png" size="22" />
-                                <batik svgFile="minarca_48.svg" pngFile="minarca_128.png" size="128" />
-                                <batik svgFile="minarca_48_w.svg" pngFile="minarca_16_w.png" size="16" />
-                                <batik svgFile="minarca_48_w.svg" pngFile="minarca_22_w.png" size="22" />
-                                <batik svgFile="minarca_48_w.svg" pngFile="minarca_128_w.png" size="128" />
+                                <batik svgFile="minarca_16.svg" pngFile="minarca_32.png" size="32" />
+                                <batik svgFile="minarca_128.svg" pngFile="minarca_48.png" size="48" />
+                                <batik svgFile="minarca_16.svg" pngFile="minarca_22.png" size="22" />
+                                <batik svgFile="minarca_128.svg" pngFile="minarca_128.png" size="128" />
                                 <!-- Generate ICO from PNGs -->
                                 <!-- Require icotool -->
                                 <mkdir dir="${icotoolDestDir}" />
