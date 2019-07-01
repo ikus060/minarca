@@ -205,8 +205,15 @@
                                 <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Client" file="${project.build.directory}/package/bin/minarca64.exe" if="sign.key.path" />
                                 
                                 <propertyregex property="AppVersion" input="0.0.0.${project.version}" regexp=".*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)" select="\1" />
-                                <!-- Convert the license file into Window 
-                                    encoding -->
+
+                                <!-- Convert the license file into Window encoding -->
+                                <copy file="${basedir}/../LICENSE"
+                                    tofile="${project.build.directory}/package/LICENSE.txt"
+                                    encoding="UTF-8" outputencoding="ISO-8859-1" />
+                                <copy file="${basedir}/../LICENSE.fr"
+                                    tofile="${project.build.directory}/package/LICENSE.fr.txt"
+                                    encoding="UTF-8" outputencoding="ISO-8859-1" />
+                                    
                                 <exec osfamily="unix" executable="makensis" dir="${project.build.directory}/package" failonerror="true">
                                     <!-- Avoid changing working directory -->
                                     <arg value="-NOCD" />
