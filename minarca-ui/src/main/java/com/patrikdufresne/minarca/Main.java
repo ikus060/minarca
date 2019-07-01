@@ -244,7 +244,7 @@ public class Main {
 
         // Check if minarca is properly configure (from our point of view).
         try {
-            API.config().checkConfig();
+            API.instance().checkConfig();
         } catch (APIException e) {
             // Show error message (usually localized).
             LOGGER.info("invalid config", e);
@@ -270,8 +270,7 @@ public class Main {
         // Check if configured.
         try {
             LOGGER.debug("checking minarca configuration");
-            API.config().checkConfig();
-            API.config().getSchedule();
+            API.instance().checkConfig();
             LOGGER.debug("configuration is OK");
         } catch (NotConfiguredException e) {
             // If not configured, show wizard.
@@ -317,7 +316,7 @@ public class Main {
         if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
             try {
                 LOGGER.debug("repair configuration");
-                API.config().defaultConfig(false);
+                API.instance().defaultConfig(false);
             } catch (APIException e1) {
                 LOGGER.warn("fail to repair configuration", e1);
                 DetailMessageDialog.openWarning(

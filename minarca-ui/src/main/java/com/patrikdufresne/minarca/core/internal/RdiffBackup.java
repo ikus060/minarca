@@ -6,15 +6,11 @@
 package com.patrikdufresne.minarca.core.internal;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
@@ -23,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.IdentityMissingException;
-import com.patrikdufresne.minarca.core.APIException.KnownHostsMissingException;
 import com.patrikdufresne.minarca.core.APIException.SshMissingException;
 import com.patrikdufresne.minarca.core.APIException.UntrustedHostKey;
 import com.patrikdufresne.minarca.core.GlobPattern;
@@ -104,28 +99,6 @@ public class RdiffBackup {
     }
 
     /**
-     * Return the location of the known_hosts file to be used for OpenSSH. Create it from ressources if it doesnt
-     * exists.
-     * 
-     * @return
-     */
-    private static File getKnownHosts() {
-        File f = new File(Compat.CONFIG_HOME, "known_hosts");
-        if (!f.exists()) {
-            try {
-                InputStream in = RdiffBackup.class.getResourceAsStream("known_hosts");
-                OutputStream out = new FileOutputStream(f);
-                IOUtils.copy(in, out);
-            } catch (IOException e) {
-                // Swallow, nothing we can do here.
-                LOGGER.error("fail to create known_hosts file", e);
-                return null;
-            }
-        }
-        return f;
-    }
-
-    /**
      * Determine the location of rdiff-backup executable.
      * 
      * @return
@@ -153,6 +126,11 @@ public class RdiffBackup {
     private final File identityFile;
 
     /**
+     * The remote identity.
+     */
+    private File knownHostsFile;
+
+    /**
      * The remote host (minarca.net)
      */
     private final String remotehost;
@@ -162,12 +140,18 @@ public class RdiffBackup {
      * 
      * @param remotehost
      *            the remote host (usually minarca.)
+     * @param knownHostsFile
+     *            the remote identity file (known_hosts file).
      * @param identityPath
      *            location where the identify is stored (should contain id_rsa)
      * @throws APIException
      */
-    public RdiffBackup(String remotehost, File identityFile) throws APIException {
+    public RdiffBackup(String remotehost, File knownHostsFile, File identityFile) throws APIException {
         Validate.notEmpty(this.remotehost = remotehost);
+        Validate.notNull(this.knownHostsFile = knownHostsFile);
+        if (!knownHostsFile.isFile() || !knownHostsFile.canRead()) {
+            throw new IdentityMissingException(knownHostsFile);
+        }
         Validate.notNull(this.identityFile = identityFile);
         if (!identityFile.isFile() || !identityFile.canRead()) {
             throw new IdentityMissingException(identityFile);
@@ -311,24 +295,19 @@ public class RdiffBackup {
         args.add("--remote-schema");
         File ssh = getSshLocation();
         if (ssh == null) throw new SshMissingException();
-        File knownhosts = getKnownHosts();
-        if (knownhosts == null) throw new KnownHostsMissingException();
         String extraOptions = "";
         if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
         // TASK-1028 make sure to use `-oIdentitiesOnly=yes` to enforce private key authentication.
         // Otherwise if way use keychain or keberos authentication and prompt user for password.
         // Last argument is the command line to be executed. This should be the repository name.
         // minarca-shell will make use if it.
-        args
-                .add(
-                        String
-                                .format(
-                                        "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
-                                        ssh,
-                                        extraOptions,
-                                        knownhosts,
-                                        identityFile,
-                                        path));
+        args.add(String.format(
+                "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
+                ssh,
+                extraOptions,
+                knownHostsFile,
+                identityFile,
+                path));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.

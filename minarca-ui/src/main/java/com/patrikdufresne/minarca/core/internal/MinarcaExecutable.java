@@ -22,6 +22,8 @@ import com.patrikdufresne.minarca.core.APIException.MinarcaMissingException;
  */
 public class MinarcaExecutable {
 
+    private static final boolean DEV;
+
     /**
      * The logger.
      */
@@ -48,9 +50,38 @@ public class MinarcaExecutable {
             MINARCA_EXE = "minarca";
         }
     }
+    static {
+        String classpath = System.getProperty("java.class.path");
+        DEV = classpath.contains("javaagent");
+    }
 
-    public MinarcaExecutable() {
+    /**
+     * Return the command line to be executed to run a backup.
+     * 
+     * @return
+     * @throws APIException
+     */
+    private static String[] createMinarcaCommand(boolean development, String... extraArgs) throws MinarcaMissingException {
+        // Build the command line to be executed.
+        List<String> args = new ArrayList<String>();
+        if (development) {
+            // When running in development environment, we need to call minarca as a java process.
+            File javaExe = new File(new File(System.getProperty("java.home"), "bin"), "java");
+            args.add(javaExe.toString()); // usr/lib/jvm/java-8-openjdk-amd64/bin/java
+            args.add("-classpath");
+            args.add(System.getProperty("java.class.path"));
+            args.add(System.getProperty("sun.java.command")); // com.patrikdufresne.minarca.Main
+        } else {
+            // When running in production mode, execute the minarca binary directly.
+            File minarcaExe = getMinarcaLocation();
+            if (minarcaExe == null) {
+                throw new MinarcaMissingException();
+            }
+            args.add(minarcaExe.toString());
+        }
 
+        args.addAll(Arrays.asList(extraArgs));
+        return args.toArray(new String[0]);
     }
 
     /**
@@ -62,46 +93,8 @@ public class MinarcaExecutable {
         return Compat.searchFile(MINARCA_EXE, System.getProperty(PROPERTY_MINARCA_LOCATION), "./bin/", ".", "/opt/minarca/bin/");
     }
 
-    /**
-     * Return the command line to be executed to run a backup.
-     * 
-     * @return
-     * @throws APIException
-     */
-    public static String[] createMinarcaCommand(String... extraArgs) throws MinarcaMissingException {
-        File file = getMinarcaLocation();
-        if (file == null) {
-            throw new MinarcaMissingException();
-        }
-        List<String> args = new ArrayList<String>();
-        args.add(file.toString());
-        args.addAll(Arrays.asList(extraArgs));
-        return args.toArray(new String[0]);
-    }
-
-    /**
-     * Return the command line as a single line.
-     * 
-     * @return
-     * @throws APIException
-     */
-    public static String createMinarcaCommandLine(String... extraArgs) throws MinarcaMissingException {
-        StringBuffer buf = new StringBuffer();
-        for (String a : createMinarcaCommand(extraArgs)) {
-            // Check if space is needed
-            if (buf.length() > 0) {
-                buf.append(" ");
-            }
-            // Check if quote are require.
-            if (a.contains(" ")) {
-                buf.append("'");
-                buf.append(a);
-                buf.append("'");
-            } else {
-                buf.append(a);
-            }
-        }
-        return buf.toString();
+    public MinarcaExecutable() {
+        // Nothing to do.
     }
 
     /**
@@ -112,21 +105,11 @@ public class MinarcaExecutable {
     public void backup(boolean force) throws APIException {
         String command[];
         if (force) {
-            command = createMinarcaCommand("--backup", "--force");
+            command = createMinarcaCommand(DEV, "--backup", "--force");
         } else {
-            command = createMinarcaCommand("--backup");
+            command = createMinarcaCommand(DEV, "--backup");
         }
         execute(command);
-    }
-
-    /**
-     * Used to start minarca executable to stop current instance.
-     * 
-     * @throws APIException
-     */
-    public void stop() throws APIException {
-        // Need to stop the process.
-        execute(createMinarcaCommand("--backup", "--stop"));
     }
 
     /**
@@ -142,6 +125,16 @@ public class MinarcaExecutable {
         } catch (IOException e) {
             throw new APIException(e);
         }
+    }
+
+    /**
+     * Used to start minarca executable to stop current instance.
+     * 
+     * @throws APIException
+     */
+    public void stop() throws APIException {
+        // Need to stop the process.
+        execute(createMinarcaCommand(DEV, "--backup", "--stop"));
     }
 
 }

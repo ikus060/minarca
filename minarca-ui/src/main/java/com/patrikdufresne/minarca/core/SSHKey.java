@@ -3,7 +3,7 @@
  * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
  * Use is subject to license terms.
  */
-package com.patrikdufresne.rdiffweb.core;
+package com.patrikdufresne.minarca.core;
 
 /**
  * Represent an SSH key

@@ -39,11 +39,6 @@ import com.patrikdufresne.minarca.core.internal.Scheduler;
 public class Config {
 
     /**
-     * Base URL.
-     */
-    public static final String BASE_URL = System.getProperty("minarca.url", "https://www.minarca.net");
-
-    /**
      * Filename used for configuration file. Notice, this is also read by batch file.
      */
     private static final String FILENAME_CONF = "minarca.properties";
@@ -83,6 +78,11 @@ public class Config {
     /**
      * Property name.
      */
+    private static final String PROPERTY_REMOTEURL = "remoteurl";
+
+    /**
+     * Property name.
+     */
     private static final String PROPERTY_REPOSITORY_NAME = "repositoryname";
 
     /**
@@ -94,11 +94,6 @@ public class Config {
      * Property name.
      */
     private static final String PROPERTY_USERNAME = "username";
-
-    /**
-     * The remote host.
-     */
-    private static final String REMOTEHOST_DEFAULT = System.getProperty("minarca.remotehost", "minarca.net");
 
     /**
      * Load properties.
@@ -126,16 +121,6 @@ public class Config {
      */
     private File globPatternsFile;
 
-    /**
-     * Identity file
-     */
-    private File identityPrivate;
-
-    /**
-     * Identity files
-     */
-    private File identityPublic;
-
     private List<GlobPattern> patterns = Collections.emptyList();
 
     /**
@@ -157,64 +142,17 @@ public class Config {
         this.confFile = new File(Compat.CONFIG_HOME, FILENAME_CONF); // $NON-NLS-1$
         this.globPatternsFile = new File(Compat.CONFIG_HOME, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
         this.statusFile = new File(Compat.DATA_HOME, FILENAME_STATUS); // $NON-NLS-1$
-        this.identityPrivate = new File(Compat.CONFIG_HOME, "id_rsa");
-        this.identityPublic = new File(Compat.CONFIG_HOME, "id_rsa.pub");
         // Load the configuration
         load();
     }
 
     /**
-     * Used to check if the configuration is OK. Called as a sanity check to make sure "minarca" is properly configured.
-     * If not, it throw an exception.
+     * Return the remote URL to Minarca server.
      * 
      * @return
      */
-    public void checkConfig() throws APIException {
-        // Basic sanity check to make sure it's configured. If not, display the
-        // setup dialog.
-        if (StringUtils.isEmpty(getRepositoryName())) {
-            throw new NotConfiguredException(_("Missing repository name"));
-        }
-        if (StringUtils.isEmpty(getUsername())) {
-            throw new NotConfiguredException(_("Missing username"));
-        }
-        // NOTICE: remotehosts is optional.
-        // Check if SSH keys exists.
-        File identityFile = getIdentityFile();
-        if (!identityFile.isFile() || !identityFile.canRead()) {
-            throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
-        }
-        // Don't verify patterns. See pdsl/minarca/#105
-        // Instead, check if the files exists.
-        if (!globPatternsFile.isFile()) {
-            throw new MissConfiguredException(_("selective backup settings are missing"));
-        }
-    }
-
-    /**
-     * This method is called to sets the default configuration for includes, excludes and scheduled task.
-     * 
-     * @param force
-     *            True to force setting the default. Otherwise, only set to default missing configuration.
-     * @throws APIException
-     */
-    public void defaultConfig(boolean force) throws APIException {
-        LOGGER.debug("restore default config");
-        // Sets the default patterns.
-        if (force || getGlobPatterns().isEmpty()) {
-            // Remove non-existing non-globing patterns.
-            setGlobPatterns(GlobPattern.DEFAULTS, true);
-        }
-
-        // Delete & create schedule tasks.
-        Scheduler scheduler = Scheduler.getInstance();
-        if (force || !scheduler.exists()) {
-            scheduler.create();
-        }
-    }
-
     public String getBaseUrl() {
-        return BASE_URL;
+        return this.properties.getString(PROPERTY_REMOTEURL);
     }
 
     /**
@@ -226,13 +164,8 @@ public class Config {
         return this.patterns;
     }
 
-    /**
-     * Return the location of the identify file.
-     * 
-     * @return the identity file.
-     */
-    protected File getIdentityFile() {
-        return this.identityPrivate;
+    public File getGlobPatternsFile() {
+        return globPatternsFile;
     }
 
     /**
@@ -242,17 +175,27 @@ public class Config {
      * @throws APIException
      */
     public String getIdentityFingerPrint() {
-        if (!this.identityPublic.isFile() || !this.identityPublic.canRead()) {
-            LOGGER.warn("public key [{}] is not accessible", this.identityPublic);
+        File file = getPublicKeyFile();
+        if (!file.isFile() || !file.canRead()) {
+            LOGGER.warn("public key [{}] is not accessible", file);
             return "";
         }
         try {
-            RSAPublicKey publicKey = Keygen.fromPublicIdRsa(this.identityPublic);
+            RSAPublicKey publicKey = Keygen.fromPublicIdRsa(file);
             return Keygen.getFingerPrint(publicKey);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
-            LOGGER.warn("cannot read key [{}] ", this.identityPublic, e);
+            LOGGER.warn("cannot read key [{}] ", file, e);
         }
         return "";
+    }
+
+    /**
+     * Return the location of the known_hosts file to be used for OpenSSH.
+     * 
+     * @return
+     */
+    public File getKnownHosts() {
+        return new File(Compat.CONFIG_HOME, "known_hosts");
     }
 
     /**
@@ -309,6 +252,24 @@ public class Config {
     }
 
     /**
+     * Return the location of the identify file.
+     * 
+     * @return the identity file.
+     */
+    protected File getPrivateKeyFile() {
+        return new File(Compat.CONFIG_HOME, "id_rsa");
+    }
+
+    /**
+     * Return the location of the public key.
+     * 
+     * @return
+     */
+    protected File getPublicKeyFile() {
+        return new File(Compat.CONFIG_HOME, "id_rsa.pub");
+    }
+
+    /**
      * Return the remote host to be used for SSH communication.
      * <p>
      * Current implementation return the same SSH server. In future, this implementation might changed to request the
@@ -317,11 +278,11 @@ public class Config {
      * @return
      */
     protected String getRemotehost() {
-        return this.properties.getString(PROPERTY_REMOTEHOST, REMOTEHOST_DEFAULT);
+        return this.properties.getString(PROPERTY_REMOTEHOST);
     }
 
     /**
-     * Friendly named used to represent the repository being backuped.
+     * Friendly named used to represent the repository being backup.
      * 
      * @return the repository name.
      */

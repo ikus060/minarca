@@ -1,4 +1,4 @@
-package com.patrikdufresne.rdiffweb.core;
+package com.patrikdufresne.minarca.core;
 
 import static net.jadler.Jadler.closeJadler;
 import static net.jadler.Jadler.initJadler;
@@ -15,13 +15,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.patrikdufresne.minarca.core.RdiffwebException;
+import com.patrikdufresne.minarca.core.Requests;
+
 /**
  * Test the web target.
  * 
  * @author Patrik Dufresne
  * 
  */
-public class WebTargetTest {
+public class RequestsTest {
 
     @Before
     public void setUp() {
@@ -45,7 +48,7 @@ public class WebTargetTest {
         onRequest().havingMethodEqualTo("GET").havingPathEqualTo("/").respond().withStatus(200).withBody("TEST PAGE").withEncoding(Charset.forName("UTF-8"));
 
         // Get page.
-        String location = new WebTarget("http://localhost:" + port()).target("/").getAsString();
+        String location = new Requests("http://localhost:" + port()).target("/").text();
         assertEquals(location, "TEST PAGE");
     }
 
@@ -61,7 +64,7 @@ public class WebTargetTest {
         onRequest().havingMethodEqualTo("GET").havingPathEqualTo("/").respond().withStatus(200).withBody("TEST PAGE").withEncoding(Charset.forName("UTF-8"));
 
         // Get page.
-        String location = new WebTarget("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").getAsString();
+        String location = new Requests("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").text();
         assertEquals(location, "TEST PAGE");
 
         // Verify Local
@@ -90,7 +93,7 @@ public class WebTargetTest {
                 .withEncoding(Charset.forName("UTF-8"));
 
         // Get page.
-        new WebTarget("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").getAsString();
+        new Requests("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").text();
     }
 
     /**
@@ -115,6 +118,6 @@ public class WebTargetTest {
                 .withEncoding(Charset.forName("UTF-8"));
 
         // Get page.
-        new WebTarget("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").getAsString();
+        new Requests("http://localhost:" + port(), Locale.CANADA_FRENCH).target("/").text();
     }
 }

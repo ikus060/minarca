@@ -1,4 +1,4 @@
-package com.patrikdufresne.rdiffweb.core;
+package com.patrikdufresne.minarca.core;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,17 +23,21 @@ import org.apache.commons.lang3.Validate;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -45,11 +49,36 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebTarget implements Cloneable {
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(WebTarget.class);
+public class Requests implements Cloneable {
+
+    protected static final Gson GSON = new GsonBuilder().create();
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Requests.class);
 
     protected static final String LOGIN = "/login/";
+
+    /**
+     * Convert the HTTP content into Json document.
+     * 
+     * @param response
+     *            the reponse to be parsed.
+     * @return response parsed as Json.
+     * @throws IllegalStateException
+     *             if content stream cannot be created.
+     * @throws IOException
+     *             if the stream could not be created
+     */
+    public static <T> T toJson(HttpResponse response, Class<T> type) throws IllegalStateException, IOException {
+        // Replace the original entity by a buffered entity.
+        HttpEntity entity = response.getEntity();
+        response.setEntity(new BufferedHttpEntity(entity));
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        return GSON.fromJson(rd, type);
+    }
 
     /**
      * Convert the http content response to String.
@@ -98,6 +127,8 @@ public class WebTarget implements Cloneable {
      */
     private boolean close;
 
+    private CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
     private HttpEntity entity;
 
     /**
@@ -124,15 +155,42 @@ public class WebTarget implements Cloneable {
      * The password.
      */
     private String password;
-
     /**
      * The target url.
      */
     private String target;
+
     /**
      * The username.
      */
     private String username;
+
+    /**
+     * Create a new requests
+     * 
+     * @param httpclient
+     *            the http client to be used.
+     * @param baseurl
+     *            the base url.
+     * @param locale
+     *            the locale.
+     */
+    public Requests(HttpClient httpclient, String baseurl, Locale locale) {
+        Validate.notEmpty(this.baseurl = baseurl);
+        Validate.notNull(this.locale = locale);
+        Validate.notNull(this.httpclient = httpclient);
+        this.close = false;
+    }
+
+    /**
+     * Default constructor
+     * 
+     * @param baseurl
+     *            the base URL
+     */
+    public Requests(String baseurl) {
+        this(baseurl, false, Locale.getDefault());
+    }
 
     /**
      * Create a new web target.
@@ -144,59 +202,49 @@ public class WebTarget implements Cloneable {
      * @param locale
      *            the locale
      */
-    public WebTarget(HttpClient httpclient, String baseurl, Locale locale) {
+    public Requests(String baseurl, boolean ignoreSsl, Locale locale) {
         Validate.notEmpty(this.baseurl = baseurl);
         Validate.notNull(this.locale = locale);
-        // Initialize an http client.
-        if (httpclient != null) {
-            this.httpclient = httpclient;
-            this.close = false;
-            return;
-        } else {
-            this.close = true;
-            HttpClientBuilder builder = HttpClients.custom();
-            boolean ignoreSsl = Boolean.getBoolean("minarca.accepthostkey");
-            if (ignoreSsl) {
-                LOGGER.info("ignore ssl validation");
-                SSLContextBuilder sslBuilder = new SSLContextBuilder();
-                try {
-                    sslBuilder.loadTrustMaterial(null, new TrustStrategy() {
-                        @Override
-                        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                            return true;
-                        }
-                    });
-                    SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslBuilder.build());
-                    builder.setSSLSocketFactory(sslsf);
-                } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-                    // Usually never happen.
-                    LOGGER.error("error while creating http client without ssl validation", e);
-                }
+        this.close = true;
+        HttpClientBuilder builder = HttpClients.custom();
+        if (ignoreSsl) {
+            LOGGER.info("ignore ssl validation");
+            SSLContextBuilder sslBuilder = new SSLContextBuilder();
+            try {
+                sslBuilder.loadTrustMaterial(null, new TrustStrategy() {
+                    @Override
+                    public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                        return true;
+                    }
+                });
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslBuilder.build());
+                builder.setSSLSocketFactory(sslsf);
+            } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+                // Usually never happen.
+                LOGGER.error("error while creating http client without ssl validation", e);
             }
-            this.httpclient = builder.build();
         }
+        this.httpclient = builder.setDefaultCredentialsProvider(credentialsProvider).build();
     }
 
     /**
-     * Create a new web target with default locale and default HTTP client.
-     * 
-     * @param baseurl
-     *            the base URL
-     */
-    public WebTarget(String baseurl) {
-        this(baseurl, Locale.getDefault());
-    }
-
-    /**
-     * Create a new web target with default HTTP client.
+     * Default constructor
      * 
      * @param baseurl
      *            the base URL
      * @param locale
-     *            the locale to be used.
+     *            the locale
      */
-    public WebTarget(String baseurl, Locale locale) {
-        this(null, baseurl, locale);
+    public Requests(String baseurl, Locale locale) {
+        this(baseurl, false, locale);
+    }
+
+    public Requests auth(String username, String password) {
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
+        credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+        this.username = username;
+        this.password = password;
+        return this;
     }
 
     /**
@@ -204,7 +252,7 @@ public class WebTarget implements Cloneable {
      * 
      * @return
      */
-    public WebTarget checkException() {
+    public Requests checkException() {
         return checkException(false, false, true);
     }
 
@@ -219,7 +267,7 @@ public class WebTarget implements Cloneable {
      *            True to raise exception on alert-danger
      * @return Same instance for chainning.
      */
-    public WebTarget checkException(boolean info, boolean warning, boolean danger) {
+    public Requests checkException(boolean info, boolean warning, boolean danger) {
         this.checkInfoException = info;
         this.checkWarningException = warning;
         this.checkDangerException = danger;
@@ -235,6 +283,10 @@ public class WebTarget implements Cloneable {
         // If the response is empty, don't raise exception.
         if (response == null) {
             return;
+        }
+        int responseCode = response.getStatusLine().getStatusCode();
+        if (responseCode >= 300) {
+            throw new HttpResponseException(responseCode, response.getStatusLine().getReasonPhrase());
         }
         // Parse page to find alert.
         String page = toString(response);
@@ -260,8 +312,9 @@ public class WebTarget implements Cloneable {
 
     }
 
-    public WebTarget clone() throws CloneNotSupportedException {
-        return (WebTarget) super.clone();
+    @Override
+    public Requests clone() throws CloneNotSupportedException {
+        return (Requests) super.clone();
     }
 
     /**
@@ -283,12 +336,12 @@ public class WebTarget implements Cloneable {
      * 
      * @return
      */
-    public WebTarget entity(HttpEntity entity) {
+    public Requests entity(HttpEntity entity) {
         this.entity = entity;
         return this;
     }
 
-    public WebTarget entity(List<NameValuePair> namedValuePair) {
+    public Requests entity(List<NameValuePair> namedValuePair) {
         try {
             this.entity = new UrlEncodedFormEntity(namedValuePair, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -297,7 +350,7 @@ public class WebTarget implements Cloneable {
         return this;
     }
 
-    public WebTarget entityParam(String key, String value) throws IOException {
+    public Requests entityParam(String key, String value) throws IOException {
         List<NameValuePair> list = new ArrayList<NameValuePair>();
         // If already define, get current list from entity.
         if (this.entity instanceof UrlEncodedFormEntity) {
@@ -314,12 +367,6 @@ public class WebTarget implements Cloneable {
         return this;
     }
 
-    public WebTarget formCredentials(String username, String password) {
-        this.username = username;
-        this.password = password;
-        return this;
-    }
-
     /**
      * Execute the HTTP request.
      * 
@@ -328,10 +375,10 @@ public class WebTarget implements Cloneable {
      */
     public HttpResponse get() throws IOException {
         HttpResponse response = httpGet();
-        // FIXME use return code.
+
         String page;
         if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
-            WebTarget request = new WebTarget(this.httpclient, this.baseurl, this.locale)
+            Requests request = new Requests(this.httpclient, this.baseurl, this.locale)
                     .target(LOGIN)
                     .checkException(false, true, true)
                     .entity(getLoginFormParams(page, username, password))
@@ -353,17 +400,6 @@ public class WebTarget implements Cloneable {
     private String getAcceptLanguage() {
         // en-US,en;q=0.5
         return this.locale.getLanguage() + "," + this.locale.getLanguage() + "-" + this.locale.getCountry() + ";q=0.5";
-    }
-
-    /**
-     * Execute the HTTP GET request and convert the response as string.
-     * 
-     * @return the response as string.
-     * @throws IOException
-     * @throws IllegalStateException
-     */
-    public String getAsString() throws IllegalStateException, IOException {
-        return toString(get());
     }
 
     private List<NameValuePair> getFormParams(String html, String formid, Map<String, String> replacefields) throws UnsupportedEncodingException {
@@ -450,7 +486,7 @@ public class WebTarget implements Cloneable {
      * @param value
      *            the param value
      */
-    public WebTarget header(String key, String value) {
+    public Requests header(String key, String value) {
         Validate.notEmpty(key);
         Validate.notEmpty(value);
         headers.put(key, value);
@@ -463,7 +499,7 @@ public class WebTarget implements Cloneable {
      * @param headers
      * @return
      */
-    public WebTarget headers(Map<String, String> headers) {
+    public Requests headers(Map<String, String> headers) {
         this.headers.putAll(headers);
         return this;
     }
@@ -486,17 +522,12 @@ public class WebTarget implements Cloneable {
         for (Entry<String, String> e : headers.entrySet()) {
             request.setHeader(e.getKey(), e.getValue());
         }
-
         // Execute the request.
         HttpResponse response = httpclient.execute(request);
         int responseCode = response.getStatusLine().getStatusCode();
 
         LOGGER.info("Sending 'GET' request to URL: {}", this.getUrl());
         LOGGER.info("Response Code: {}", responseCode);
-
-        if (responseCode != 200) {
-            throw new ServerException(response.toString());
-        }
 
         return response;
     }
@@ -537,6 +568,35 @@ public class WebTarget implements Cloneable {
     }
 
     /**
+     * Execute the HTTP GET request and convert the response to Json.
+     * 
+     * @return response parsed as Json.
+     * @throws IllegalStateException
+     *             if content stream cannot be created.
+     * @throws IOException
+     *             if the stream could not be created
+     */
+    public JsonElement json() throws IllegalStateException, IOException {
+        return toJson(get(), JsonElement.class);
+    }
+
+    /**
+     * Execute the HTTP GET request and convert the response to Json.
+     * 
+     * @param type
+     *            type of data to convert into.
+     * 
+     * @return response parsed as Json.
+     * @throws IllegalStateException
+     *             if content stream cannot be created.
+     * @throws IOException
+     *             if the stream could not be created
+     */
+    public <T> T json(Class<T> type) throws IllegalStateException, IOException {
+        return toJson(get(), type);
+    }
+
+    /**
      * Used to define <code>arg=key</code> in url.
      * 
      * @param key
@@ -544,7 +604,7 @@ public class WebTarget implements Cloneable {
      * @param value
      *            the param value
      */
-    public WebTarget param(String key, String value) {
+    public Requests param(String key, String value) {
         Validate.notEmpty(key);
         Validate.notEmpty(value);
         params.put(key, value);
@@ -562,7 +622,7 @@ public class WebTarget implements Cloneable {
         // Check if we need to login.
         String page;
         if (this.username != null && this.password != null && (page = toString(response)).contains("id=\"form-login\"")) {
-            WebTarget request = new WebTarget(this.httpclient, this.baseurl, this.locale)
+            Requests request = new Requests(this.httpclient, this.baseurl, this.locale)
                     .target(LOGIN)
                     .checkException(false, true, true)
                     .entity(getLoginFormParams(page, username, password));
@@ -596,8 +656,25 @@ public class WebTarget implements Cloneable {
      * @param target
      * @return
      */
-    public WebTarget target(String target) {
-        this.target = target;
-        return this;
+    public Requests target(String target) {
+        Requests r;
+        try {
+            r = this.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException();
+        }
+        r.target = target;
+        return r;
+    }
+
+    /**
+     * Execute the HTTP GET request and convert the response as string.
+     * 
+     * @return the response as string.
+     * @throws IOException
+     * @throws IllegalStateException
+     */
+    public String text() throws IllegalStateException, IOException {
+        return toString(get());
     }
 }

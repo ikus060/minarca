@@ -189,7 +189,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */ {
+        } else /* if (SystemUtils.IS_OS_LINUX) */{
             if (isAdmin) {
                 return "/etc/minarca";
             } else {
@@ -213,7 +213,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */ {
+        } else /* if (SystemUtils.IS_OS_LINUX) */{
             if (isAdmin) {
                 return "/var/lib/minarca";
             } else {

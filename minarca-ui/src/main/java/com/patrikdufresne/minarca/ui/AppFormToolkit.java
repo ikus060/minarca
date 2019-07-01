@@ -41,11 +41,14 @@ public class AppFormToolkit extends FormToolkit {
     private static final String H_HOVER = "H_HOVER";
     private static final String H1 = "h1";
     private static final String H2 = "h2";
-    private static final String H3 = "h3";
+    public static final String H3 = "h3";
     private static final String H4 = "h4";
     private static final String LIGHT = "light";
+    public static final String SMALL = "small";
     private static final String WARN_BG = "WARN_BG";
     private static final String WARN_FG = "WARN_FG";
+
+    public static final String BOLD = "bold";
 
     protected static Font getFont(String symbolicname, float size, boolean bold) {
         String newSymbolicName = symbolicname + "." + size;
@@ -59,6 +62,11 @@ public class AppFormToolkit extends FormToolkit {
             registry.put(newSymbolicName, data);
         }
         return bold ? registry.getBold(newSymbolicName) : registry.get(newSymbolicName);
+    }
+
+    public static Font getFont(String symbolicname) {
+        FontRegistry registry = JFaceResources.getFontRegistry();
+        return registry.get(symbolicname);
     }
 
     public static Font getFontBold(String symbolicname) {
@@ -215,6 +223,7 @@ public class AppFormToolkit extends FormToolkit {
                 text = replaceTag(text, "h2", "span", "font='h2' color='h2'");
                 text = replaceTag(text, "h3", "span", "font='h3' color='h3'");
                 text = replaceTag(text, "h4", "span", "font='h4' color='h4'");
+                text = replaceTag(text, "small", "span", "font='small' color='small'");
                 try {
                     super.setText(text, parseTags, expandURLs);
                 } catch (IllegalArgumentException e) {
@@ -243,6 +252,9 @@ public class AppFormToolkit extends FormToolkit {
         engine.setColor(H4, fg);
         // LIGHT
         engine.setColor(LIGHT, getLightColor());
+        // SMALL
+        engine.setFont(SMALL, getFont(JFaceResources.DIALOG_FONT, .75f, false));
+        engine.setColor(SMALL, fg);
 
         engine.setHyperlinkSettings(getHyperlinkGroup());
         engine.addHyperlinkListener(getHyperlinkListener());
@@ -250,6 +262,31 @@ public class AppFormToolkit extends FormToolkit {
         engine.setMenu(parent.getMenu());
         engine.setText(text, true, true);
         return engine;
+    }
+
+    /**
+     * Create a Label with Bold font style.
+     * 
+     * @param parent
+     * @param text
+     * @return
+     */
+    public Label createLabel(Composite parent, String text, String style) {
+        Label l = createLabel(parent, text);
+        switch (style) {
+        case BOLD:
+            l.setFont(getFontBold(JFaceResources.DEFAULT_FONT));
+            break;
+        case SMALL:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+            break;
+        case H3:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
+            break;
+        default:
+            l.setFont(getFont(JFaceResources.DEFAULT_FONT));
+        }
+        return l;
     }
 
     public void decorateWarningLabel(FormText engine) {

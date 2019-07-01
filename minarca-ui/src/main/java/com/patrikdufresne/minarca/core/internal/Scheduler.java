@@ -21,27 +21,6 @@ import com.patrikdufresne.minarca.core.APIException;
  */
 public abstract class Scheduler {
 
-    public static Scheduler singleton;
-
-    /**
-     * Return the scheduling service for this operating system.
-     * 
-     * @return the scheduler service.
-     * @throws UnsupportedOperationException
-     *             if OS is not supported
-     */
-    public static Scheduler getInstance() {
-        if (singleton != null) {
-            return singleton;
-        }
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return singleton = new SchedulerWindows();
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return singleton = new SchedulerLinux();
-        }
-        throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
-    }
-
     /**
      * Create a new task in the scheduler
      * 

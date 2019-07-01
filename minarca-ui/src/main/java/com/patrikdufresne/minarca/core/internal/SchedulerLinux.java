@@ -5,6 +5,7 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
@@ -32,7 +33,7 @@ public class SchedulerLinux extends Scheduler {
             // Delete cronjob if exists.
             delete();
             // Create a new entry and add it.
-            Crontab.addEntry(new CrontabEntry(minute, "*", "*", "*", "*", MinarcaExecutable.createMinarcaCommandLine("--backup")));
+            Crontab.addEntry(new CrontabEntry(minute, "*", "*", "*", "*", getExeLocation() + " --backup"));
         } catch (IOException e) {
             throw new APIException(e);
         }
@@ -73,9 +74,9 @@ public class SchedulerLinux extends Scheduler {
      */
     protected CrontabEntry find() throws IOException, MinarcaMissingException {
         // Create the crontab.
-        Crontab crontab = Crontab.readAll();
+        Crontab crontab = getCrontab();
         // Identify the entry to be deleted;
-        String command = MinarcaExecutable.createMinarcaCommandLine("--backup");
+        String command = getExeLocation() + " --backup";
         for (CrontabEntry e : crontab.getEntries()) {
             if (command.equals(e.getCommand())) {
                 return e;
@@ -83,6 +84,25 @@ public class SchedulerLinux extends Scheduler {
         }
         LOGGER.trace("command line [{}] not found in crontab entries [{}]", command, crontab.getAllEntries().size());
         return null;
+    }
+
+    /**
+     * Return current user crontab.
+     * 
+     * @return
+     * @throws IOException
+     */
+    protected Crontab getCrontab() throws IOException {
+        return Crontab.readAll();
+    }
+
+    /**
+     * Return the location of the executable.
+     * 
+     * @return
+     */
+    protected File getExeLocation() {
+        return MinarcaExecutable.getMinarcaLocation();
     }
 
 }

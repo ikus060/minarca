@@ -1,0 +1,33 @@
+{
+	"username": "admin",
+	"repos": [
+		{
+			"last_backup_date": "2019-06-09T07:20:20-04:00",
+			"name": "PHOTO",
+			"maxage": 0,
+			"status": "ok",
+			"display_name": "PHOTO",
+			"encoding": "ascii",
+			"keepdays": -1
+		},
+		{
+			"last_backup_date": "2019-06-17T20:04:47-04:00",
+			"name": "vmtest-pc/C",
+			"maxage": 0,
+			"status": "ok",
+			"display_name": "vmtest-pc/C",
+			"encoding": "ascii",
+			"keepdays": -1
+		},
+		{
+			"last_backup_date": "2019-06-29T17:40:02-04:00",
+			"name": "ikus060-gb",
+			"maxage": 0,
+			"status": "ok",
+			"display_name": "ikus060-gb",
+			"encoding": "ascii",
+			"keepdays": -1
+		}
+	],
+	"email": ""
+}

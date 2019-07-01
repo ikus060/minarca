@@ -9,6 +9,8 @@ import static com.patrikdufresne.minarca.Localized._;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -16,6 +18,8 @@ import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -38,9 +42,8 @@ import org.slf4j.LoggerFactory;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
-import com.patrikdufresne.minarca.core.Config;
+import com.patrikdufresne.minarca.core.Client;
 import com.patrikdufresne.minarca.core.internal.Compat;
-import com.patrikdufresne.rdiffweb.core.Client;
 
 /**
  * Dialog used to configure the application the first time the user open it. It's similar to a wizard.
@@ -149,77 +152,60 @@ public class SetupDialog extends Dialog {
         // Dispose previous page.
         disposeChildren(parent);
 
-        // App name
-        Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
-        appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-        // App icon
-        Label icon = this.ft.createLabel(parent, null);
-        // JFaceResources.getImageRegistry().put(Main.MINARCA_128_PNG, ImageDescriptor.createFromFile(Main.class,
-        // Main.MINARCA_128_PNG));
-        icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
-        icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
-
         // Introduction message
-        String introText = "<h2>" + _("Sign In") + "</h2><br/>";
-        introText += _("If you have a Minarca account, enter your username and password.");
-        FormText introLabel = ft.createFormText(parent, introText, false);
-        introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        this.ft.createLabel(parent, _("Where's to backup your data ?"), AppFormToolkit.H3);
 
-        // Alert label.
-        final FormText alertLabel = ft.createFormText(parent, "", true);
-        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        // Remote server
+        this.ft.createLabel(parent, _("Address"), AppFormToolkit.BOLD);
+        final Text remoteserverText = ft.createText(parent, "", SWT.BORDER);
+        remoteserverText.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        remoteserverText.setMessage(_("Remote server address e.g.: backup.example.com:8080"));
+        remoteserverText.setToolTipText(_("Enter the remote server address. Either an ip address and port, or a URL."));
+        remoteserverText.setFocus();
+        this.ft.createLabel(parent, _("http[s]://hostname[:port]"), AppFormToolkit.SMALL);
 
-        // Username
+        // Username & Password
+        this.ft.createLabel(parent, _("Username"), AppFormToolkit.BOLD);
         final Text usernameText = ft.createText(parent, "", SWT.BORDER);
         usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        usernameText.setMessage(_("Username"));
-        usernameText.setFocus();
 
-        // Password
+        this.ft.createLabel(parent, _("Password"), AppFormToolkit.BOLD);
         final Text passwordText = ft.createText(parent, "", SWT.PASSWORD | SWT.BORDER);
         passwordText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        passwordText.setMessage(_("Password"));
 
         // Sign in button
-        Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
+        final Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
         signInButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        signInButton.setEnabled(false);
         getShell().setDefaultButton(signInButton);
+
+        // Enable Sing-In buttont when all field contains something.
+        ModifyListener modifyListener = new ModifyListener() {
+
+            @Override
+            public void modifyText(ModifyEvent e) {
+                String remoteserver = remoteserverText.getText();
+                String username = usernameText.getText();
+                String password = passwordText.getText();
+                signInButton.setEnabled(StringUtils.isNotBlank(remoteserver) && StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password));
+            }
+        };
+        remoteserverText.addModifyListener(modifyListener);
+        usernameText.addModifyListener(modifyListener);
+        passwordText.addModifyListener(modifyListener);
 
         // Add event binding.
         signInButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-
+                String remoteserver = remoteserverText.getText();
                 String username = usernameText.getText();
                 String password = passwordText.getText();
-
-                // Check credentials.
-                String message = handleSignIn(username, password);
-                if (message != null) {
-                    alertLabel.setText(message, true, true);
-                    alertLabel.getParent().layout();
-                    ft.decorateWarningLabel(alertLabel);
-                } else {
+                if (handleSignIn(remoteserver, username, password)) {
                     createPage2(comp);
                 }
-
             }
         });
-
-        // Spacer
-        Composite spacer = ft.createComposite(parent);
-        TableWrapData layoutdata = new TableWrapData(TableWrapData.FILL);
-        layoutdata.heightHint = 10;
-        spacer.setLayoutData(layoutdata);
-
-        // Request account
-        String subscribeText = "<b>" + _("Create account") + "</b><br/>";
-        subscribeText += _("If you don't have a Minarca account, you may subscribe by filling the online form.");
-        subscribeText += "<br/><a href='" + _("http://www.patrikdufresne.com/en/minarca/subscribe") + "'>";
-        subscribeText += _("Subscribe...") + "</a>";
-        FormText subscribeLabel = ft.createFormText(parent, subscribeText, false);
-        subscribeLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
         // Relayout to update content.
         parent.layout();
@@ -234,6 +220,8 @@ public class SetupDialog extends Dialog {
     private void createPage2(Composite parent) {
         // Dispose previous page.
         disposeChildren(parent);
+
+        ((TableWrapLayout) parent.getLayout()).numColumns = 1;
 
         // App name
         Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
@@ -324,6 +312,8 @@ public class SetupDialog extends Dialog {
         // Dispose previous page.
         disposeChildren(parent);
 
+        ((TableWrapLayout) parent.getLayout()).numColumns = 1;
+
         // App name
         Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
         appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
@@ -376,7 +366,7 @@ public class SetupDialog extends Dialog {
      */
     @Override
     protected Point getInitialSize() {
-        return getShell().computeSize(325, 575, true);
+        return getShell().computeSize(681, 519, true);
     }
 
     /**
@@ -441,35 +431,32 @@ public class SetupDialog extends Dialog {
      * This implementation will establish a connection via HTTP and or SSH to make sure the connection and credentials
      * are valid.
      * 
+     * @param remoteserver
+     *            the remote server address.
      * @param username
      *            the username for authentication
      * @param password
      *            the password for authentication.
      * @return an error message or null if OK.
      */
-    protected String handleSignIn(String username, String password) {
-        // Check little validation of the username password.
-        if (username.trim().isEmpty()) {
-            return _("Username cannot be empty.");
-        }
-        if (password.trim().isEmpty()) {
-            return _("Password cannot be empty.");
+    protected boolean handleSignIn(String remoteserver, String username, String password) {
+        Validate.notBlank(remoteserver);
+        Validate.notBlank(username);
+        Validate.notBlank(password);
+        // Add http if not provided.
+        if (!(remoteserver.startsWith("http://") || remoteserver.startsWith("https://"))) {
+            remoteserver = "http://" + remoteserver;
         }
         // Try to establish communication with HTTP first.
         LOGGER.info("sign in as [{}]", username);
         try {
-            this.client = API.instance().connect(Config.BASE_URL, username, password);
+            this.client = API.instance().connect(remoteserver, username, password);
         } catch (APIException e) {
-            LOGGER.warn("fail to sign in", e);
-            return e.getMessage();
-        } catch (IOException e) {
-            LOGGER.warn("fail to sign in", e);
-            return _("Can't validate your credentials. Please check your connectivity.");
-        } catch (Exception e) {
-            LOGGER.warn("fail to sign in", e);
-            return _("Unknown error occurred!");
+            LOGGER.warn("fail to authenticate", e);
+            DetailMessageDialog.openWarning(getShell(), Display.getAppName(), _("Fail to authenticate with the server"), e.getMessage(), e);
+            return false;
         }
-        return null;
+        return true;
     }
 
 }

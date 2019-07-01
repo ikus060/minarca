@@ -144,6 +144,8 @@ public class SchedulerWindows extends Scheduler {
      */
     private static final String TASK_NAME = "Minarca backup";
 
+    private static final String QUOTE = "\"";
+
     /**
      * Create a new schedule tasks
      * 
@@ -175,7 +177,7 @@ public class SchedulerWindows extends Scheduler {
 
         // Define command to execute
         args.add("/TR");
-        args.add(getCommand());
+        args.add(QUOTE + getExeLocation() + QUOTE + " --backup");
 
         if (!SystemUtils.IS_OS_WINDOWS_XP && !SystemUtils.IS_OS_WINDOWS_2003) {
             // Add Force object to replace existing task.
@@ -265,52 +267,28 @@ public class SchedulerWindows extends Scheduler {
             if (task == null) {
                 return false;
             }
-            String curCommand;
-            String expectedCommand;
-            if (task instanceof TaskInfoWin) {
-                if (SystemUtils.IS_OS_WINDOWS_XP || SystemUtils.IS_OS_WINDOWS_2003) {
-                    // For WinXP
-                    // The current command won't contains any quote or single quote. It's a shame.
-                    curCommand = ((TaskInfoWin) task).getCommand().trim();
-                    curCommand = curCommand.replace("  --backup", " --backup");
-                    expectedCommand = getCommand().replace("\\\"", "");
-                } else {
-                    // For Win 7 & +
-                    // Replace the " by \" to match our command line
-                    curCommand = ((TaskInfoWin) task).getCommand().trim();
-                    expectedCommand = getCommand().replace("\\\"", "\"");
-                }
-            } else {
-                LOGGER.warn("unsupported TaskInfo [{}]", task);
-                return false;
-            }
-            if (!curCommand.equals(expectedCommand)) {
-                LOGGER.warn("command [{}] doesn't matched expected command [{}]", curCommand, expectedCommand);
+            List<String> expectedCommands = new ArrayList<>();
+            // For WinXP
+            // The current command won't contains any quote or single quote. It's a shame.
+            expectedCommands.add(getExeLocation() + " --backup");
+            expectedCommands.add(getExeLocation() + "  --backup");
+
+            // For Win 7 & +
+            // Replace the " by \" to match our command line
+            expectedCommands.add(QUOTE + getExeLocation() + QUOTE + " --backup");
+            expectedCommands.add(QUOTE + getExeLocation() + QUOTE + "  --backup");
+
+            if (!expectedCommands.contains(task.getCommand())) {
+                LOGGER.warn("command [{}] doesn't matched expected command {}", task.getCommand(), expectedCommands);
                 return false;
             }
             return true;
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             LOGGER.warn("can't detect the task", e);
             return false;
         }
-    }
-
-    /**
-     * Return the command line to be executed to run a backup.
-     * 
-     * @return
-     * @throws APIException
-     */
-    private String getCommand() throws APIException {
-        File file = getExeLocation();
-        if (file == null) {
-            throw new APIException(_("{0} is missing", MinarcaExecutable.MINARCA_EXE));
-        }
-        StringBuilder buf = new StringBuilder();
-        buf.append("\\\"");
-        buf.append(file);
-        buf.append("\\\" --backup");
-        return buf.toString();
     }
 
     /**

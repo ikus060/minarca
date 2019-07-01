@@ -12,15 +12,31 @@ import java.io.File;
 public class APIException extends Exception {
 
     /**
-     * Raised when trying to link a computer with a name already in use in minarca.
+     * Raised when the client fail to authenticate with the server. (Map to HTTP status code 401)
      * 
      * @author Patrik Dufresne
      * 
      */
-    public static class RepositoryNameAlreadyInUseException extends APIException {
-        public RepositoryNameAlreadyInUseException(String name) {
-            super(_("Repository name {0} already in use", name));
+    public static class AuthenticationException extends APIException {
+
+        public AuthenticationException(Exception cause) {
+            super(_("Wrong username or password."), cause);
         }
+
+    }
+
+    /**
+     * Raised when we failed to establish connectivity with the remote url or remote host.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class ConnectivityException extends APIException {
+
+        public ConnectivityException(Exception cause) {
+            super(_("Failed to establish connectivity with the server. Verfy if the URL provided is valid and responding."), cause);
+        }
+
     }
 
     /**
@@ -107,20 +123,6 @@ public class APIException extends Exception {
     }
 
     /**
-     * Raised when the known hosts file is invalid or missing.
-     * 
-     * @author Patrik Dufresne
-     * 
-     */
-    public static class KnownHostsMissingException extends APIException {
-
-        public KnownHostsMissingException() {
-            super(_("known_hosts file is missing"));
-        }
-
-    }
-
-    /**
      * Raised when link with minarca failed.
      * 
      * @author Patrik Dufresne
@@ -174,6 +176,18 @@ public class APIException extends Exception {
     public static class NotConfiguredException extends APIException {
         public NotConfiguredException(String message) {
             super(message);
+        }
+    }
+
+    /**
+     * Raised when trying to link a computer with a name already in use in minarca.
+     * 
+     * @author Patrik Dufresne
+     * 
+     */
+    public static class RepositoryNameAlreadyInUseException extends APIException {
+        public RepositoryNameAlreadyInUseException(String name) {
+            super(_("Repository name {0} already in use", name));
         }
     }
 

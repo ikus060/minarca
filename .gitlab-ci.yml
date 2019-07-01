@@ -40,7 +40,7 @@ build:
   - apt-get update && apt-get -qq install libssl-dev libcurl4-gnutls-dev autoconf osslsigncode icoutils nsis cron gettext
   - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
   - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
-  - mvn -B -Drevision=${REVISION} -DskipTests -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
+  - mvn -B -Drevision=${REVISION} -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
   artifacts:
     paths:
     - minarca-installation-package/target/*.exe

@@ -3,7 +3,7 @@
  * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
  * Use is subject to license terms.
  */
-package com.patrikdufresne.rdiffweb.core;
+package com.patrikdufresne.minarca.core;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ public class RdiffwebException extends RuntimeException {
         if (this.response == null) {
             return null;
         }
-        return WebTarget.toString(this.response);
+        return Requests.toString(this.response);
     }
 
 }

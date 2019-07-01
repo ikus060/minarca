@@ -1,10 +1,14 @@
 package com.patrikdufresne.minarca.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
@@ -19,8 +23,10 @@ import com.patrikdufresne.minarca.core.APIException.InitialBackupHasNotRunExcept
 import com.patrikdufresne.minarca.core.APIException.InitialBackupRunningException;
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
-import com.patrikdufresne.rdiffweb.core.Client;
-import com.patrikdufresne.rdiffweb.core.Repository;
+import com.patrikdufresne.minarca.core.internal.SchedulerLinux;
+import com.patrikdufresne.minarca.core.model.CurrentUser;
+import com.patrikdufresne.minarca.core.model.MinarcaInfo;
+import com.patrikdufresne.minarca.core.model.Repo;
 
 public class APILinkTest {
 
@@ -40,6 +46,12 @@ public class APILinkTest {
         FileUtils.deleteDirectory(tmpdir.toFile());
     }
 
+    private static List<Repo> defaultRepos(String name) {
+        Repo r = new Repo();
+        r.name = name;
+        return Arrays.asList(r);
+    }
+
     @Before
     public void setUp() throws APIException, InterruptedException, IOException {
         this.client = Mockito.mock(Client.class);
@@ -47,6 +59,17 @@ public class APILinkTest {
         this.api.config = Mockito.spy(new Config());
         Mockito.doNothing().when(this.api).backup(true, true);
         Mockito.doNothing().when(this.api.config).setSchedule(Mockito.any(Schedule.class), Mockito.anyBoolean());
+        SchedulerLinux s = new SchedulerLinux() {
+            @Override
+            protected File getExeLocation() {
+                return new File("minarca");
+            }
+        };
+        Mockito.when(this.api.getScheduler()).thenReturn(s);
+        MinarcaInfo minarcaInfo = new MinarcaInfo();
+        minarcaInfo.identity = "some ssh key";
+        minarcaInfo.remotehost = "remotehost:22";
+        Mockito.when(this.client.getMinarcaInfo()).thenReturn(minarcaInfo);
         System.setProperty("minarca.link.timeoutsec", "30");
     }
 
@@ -60,10 +83,13 @@ public class APILinkTest {
     @Test
     public void testLink() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Repository r = Mockito.mock(Repository.class);
         Mockito.when(this.api.config.getLastResultDate()).thenReturn(null).thenReturn(new Date());
         Mockito.when(this.api.config.getLastResult()).thenReturn(LastResult.SUCCESS);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null).thenReturn(Arrays.asList(r));
+        CurrentUser first = new CurrentUser();
+        first.repos = Collections.emptyList();
+        CurrentUser second = new CurrentUser();
+        second.repos = defaultRepos("computername/C");
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first).thenReturn(second);
 
         // Try to link.
         this.api.link("computername", this.client, false);
@@ -84,7 +110,11 @@ public class APILinkTest {
     @Test(expected = InitialBackupHasNotRunException.class)
     public void testLink_WithHasNotRun() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null);
+        CurrentUser first = new CurrentUser();
+        first.repos = Collections.emptyList();
+        CurrentUser second = new CurrentUser();
+        second.repos = defaultRepos("computername");
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first);
         Mockito.when(this.api.config.getLastResultDate()).thenReturn(null);
         Mockito.when(this.api.config.getLastResult()).thenReturn(LastResult.HAS_NOT_RUN);
         Mockito.doNothing().when(this.api).backup(true, true);
@@ -103,7 +133,11 @@ public class APILinkTest {
     @Test(expected = LinkComputerException.class)
     public void testLink_WithSuccessNotExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null);
+        CurrentUser first = new CurrentUser();
+        first.repos = Collections.emptyList();
+        CurrentUser second = new CurrentUser();
+        second.repos = defaultRepos("computername");
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first);
         Mockito.when(this.api.config.getLastResultDate()).thenReturn(null);
         Mockito.when(this.api.config.getLastResult()).thenReturn(LastResult.SUCCESS);
         Mockito.doNothing().when(this.api).backup(true, true);
@@ -122,7 +156,7 @@ public class APILinkTest {
     @Test(expected = IOException.class)
     public void testLink_WithHttpError() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenThrow(new IOException());
+        Mockito.when(this.client.getCurrentUserInfo()).thenThrow(new IOException());
 
         // Try to link.
         this.api.link("computername", this.client, false);
@@ -138,8 +172,9 @@ public class APILinkTest {
     @Test(expected = RepositoryNameAlreadyInUseException.class)
     public void testLink_WithRepoExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Repository r = Mockito.mock(Repository.class);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(Arrays.asList(r));
+        CurrentUser first = new CurrentUser();
+        first.repos = defaultRepos("computername/C");
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first);
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -157,8 +192,9 @@ public class APILinkTest {
     @Test
     public void testLink_WithRepoExistsForce() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Repository r = Mockito.mock(Repository.class);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(Arrays.asList(r));
+        CurrentUser first = new CurrentUser();
+        first.repos = defaultRepos("computername/C");
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first);
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -178,8 +214,9 @@ public class APILinkTest {
     @Test(expected = RepositoryNameAlreadyInUseException.class)
     public void testLink_WithRepositoryExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Repository r = Mockito.mock(Repository.class);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(Arrays.asList(r));
+        CurrentUser first = new CurrentUser();
+        first.repos = defaultRepos("computername/C");
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first);
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -196,10 +233,13 @@ public class APILinkTest {
     @Test
     public void testLink_WithRunningExists() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Repository r = Mockito.mock(Repository.class);
         Mockito.when(this.api.config.getLastResultDate()).thenReturn(null).thenReturn(new Date());
         Mockito.when(this.api.config.getLastResult()).thenReturn(LastResult.RUNNING);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null).thenReturn(Arrays.asList(r));
+        CurrentUser first = new CurrentUser();
+        first.repos = Collections.EMPTY_LIST;
+        CurrentUser second = new CurrentUser();
+        second.repos = defaultRepos("computername/C");
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first).thenReturn(second);
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -219,7 +259,9 @@ public class APILinkTest {
         // Mock the client.
         Mockito.when(this.api.config.getLastResultDate()).thenReturn(null).thenReturn(new Date());
         Mockito.when(this.api.config.getLastResult()).thenReturn(LastResult.RUNNING);
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null);
+        CurrentUser first = new CurrentUser();
+        first.repos = Collections.EMPTY_LIST;
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first);
         Mockito.doNothing().when(this.api).backup(true, true);
 
         // Try to link.
@@ -237,7 +279,9 @@ public class APILinkTest {
     @Test(expected = InitialBackupFailedException.class)
     public void testLink_WithScheduleFailed() throws APIException, InterruptedException, IOException {
         // Mock the client.
-        Mockito.when(this.client.getRepositoryInfo("computername")).thenReturn(null);
+        CurrentUser first = new CurrentUser();
+        first.repos = Collections.EMPTY_LIST;
+        Mockito.when(this.client.getCurrentUserInfo()).thenReturn(first);
         Mockito.when(this.api.config.getLastResultDate()).thenReturn(null).thenReturn(new Date());
         Mockito.when(this.api.config.getLastResult()).thenReturn(null).thenReturn(LastResult.FAILURE);
         Mockito.doNothing().when(this.api).backup(true, true);

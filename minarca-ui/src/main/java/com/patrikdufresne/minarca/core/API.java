@@ -21,15 +21,21 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.conn.HttpHostConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.minarca.core.APIException.AuthenticationException;
+import com.patrikdufresne.minarca.core.APIException.ConnectivityException;
 import com.patrikdufresne.minarca.core.APIException.ExchangeSshKeyException;
 import com.patrikdufresne.minarca.core.APIException.GenerateKeyException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupHasNotRunException;
 import com.patrikdufresne.minarca.core.APIException.InitialBackupRunningException;
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
+import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
+import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
@@ -38,9 +44,11 @@ import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.MinarcaExecutable;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
-import com.patrikdufresne.rdiffweb.core.Client;
-import com.patrikdufresne.rdiffweb.core.RdiffwebException;
-import com.patrikdufresne.rdiffweb.core.Repository;
+import com.patrikdufresne.minarca.core.internal.SchedulerLinux;
+import com.patrikdufresne.minarca.core.internal.SchedulerWindows;
+import com.patrikdufresne.minarca.core.model.CurrentUser;
+import com.patrikdufresne.minarca.core.model.MinarcaInfo;
+import com.patrikdufresne.minarca.core.model.Repo;
 
 /**
  * This class is the main entry point to do everything related to minarca.
@@ -157,10 +165,11 @@ public class API {
         String repositoryName = config.getRepositoryName();
 
         // Get reference to the identity file to be used by ssh or plink.
-        File identityFile = config.getIdentityFile();
+        File knownHosts = config.getKnownHosts();
+        File identityFile = config.getPrivateKeyFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(remotehost, identityFile);
+        RdiffBackup rdiffbackup = new RdiffBackup(remotehost, knownHosts, identityFile);
 
         // Read patterns
         List<GlobPattern> patterns = config.getGlobPatterns();
@@ -172,7 +181,7 @@ public class API {
         }
         // By default ignore minarca log files
         String logFolder = System.getProperty("log.folder");
-        if(StringUtils.isNotEmpty(logFolder)) {
+        if (StringUtils.isNotEmpty(logFolder)) {
             patterns.add(new GlobPattern(false, new File(logFolder, "minarca-log*.txt")));
         }
         try {
@@ -198,6 +207,46 @@ public class API {
     }
 
     /**
+     * Used to check if the configuration is OK. Called as a sanity check to make sure "minarca" is properly configured.
+     * If not, it throw an exception.
+     * 
+     * @return
+     */
+    public void checkConfig() throws APIException {
+        // Basic sanity check to make sure it's configured. If not, display the
+        // setup dialog.
+        if (StringUtils.isEmpty(config.getRepositoryName())) {
+            throw new NotConfiguredException(_("Missing repository name"));
+        }
+        if (StringUtils.isEmpty(config.getUsername())) {
+            throw new NotConfiguredException(_("Missing username"));
+        }
+        // Check if SSH keys exists.
+        File identityFile = config.getPrivateKeyFile();
+        if (!identityFile.isFile() || !identityFile.canRead()) {
+            throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
+        }
+
+        // Check if known_hosts exists.
+        File knownHostsFile = config.getKnownHosts();
+        if (!knownHostsFile.isFile() || !knownHostsFile.canRead()) {
+            throw new NotConfiguredException(_("remote server identity (known_hosts) file doesn't exists or is not accessible"));
+        }
+
+        // Don't verify patterns. See pdsl/minarca/#105
+        // Instead, check if the files exists.
+        if (!config.getGlobPatternsFile().isFile()) {
+            throw new MissConfiguredException(_("selective backup settings are missing"));
+        }
+
+        // Check scheduler
+        if (!getScheduler().exists()) {
+            throw new ScheduleNotFoundException();
+        }
+
+    }
+
+    /**
      * Establish connection to minarca web service.
      * 
      * @return a new client instance
@@ -205,22 +254,60 @@ public class API {
      * @throws APIException
      *             if the connection can't be established.
      */
-    public Client connect(String baseurl, String username, String password) throws APIException, IOException {
+    public Client connect(String baseurl, String username, String password) throws APIException {
         // Create a new client instance.
         Client client = new Client(baseurl, username, password);
-
-        // TODO Check version
-        // client.getCurrentVersion();
 
         // Check connectivity
         try {
             client.check();
-        } catch (RdiffwebException e) {
+        } catch (HttpResponseException e) {
+            // Raised when status code >=300
+            if (e.getStatusCode() == 401) {
+                LOGGER.error("authentication failed", e);
+                throw new AuthenticationException(e);
+            }
+            throw new APIException(_("Unknown server error."), e);
+        } catch (HttpHostConnectException e) {
+            // Raised on connection failure
+            throw new ConnectivityException(e);
+        } catch (Exception e) {
             LOGGER.error("connectivity check failed", e);
-            throw new APIException(e.getMessage(), e);
+            throw new APIException(_("Authentication failed for unknown reason."), e);
         }
 
         return client;
+    }
+
+    /**
+     * This method is called to sets the default configuration for includes, excludes and scheduled task.
+     * 
+     * @param force
+     *            True to force setting the default. Otherwise, only set to default missing configuration.
+     * @throws APIException
+     */
+    public void defaultConfig(boolean force) throws APIException {
+        LOGGER.debug("restore default config");
+        // Sets the default patterns.
+        if (force || config.getGlobPatterns().isEmpty()) {
+            // Remove non-existing non-globing patterns.
+            config.setGlobPatterns(GlobPattern.DEFAULTS, true);
+        }
+
+        // Delete & create schedule tasks.
+        Scheduler scheduler = getScheduler();
+        if (force || !scheduler.exists()) {
+            scheduler.create();
+        }
+    }
+
+    protected Scheduler getScheduler() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new SchedulerWindows();
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return new SchedulerLinux();
+        }
+        throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
     }
 
     /**
@@ -254,24 +341,28 @@ public class API {
      *            reference to web client
      * @param force
      *            True to force usage of existing computer name.
-     * @throws APIException
+     * @throws GenerateKeyException
      *             if the keys can't be created.
+     * @throws ExchangeSshKeyException
+     *             if the SSH Keys can't be sent to the server.
      * @throws InterruptedException
      * @throws IOException
      *             communication error with minarca website.
      * @throws IllegalAccessException
      *             if the repository name is not valid.
+     * @throws RepositoryNameAlreadyInUseException
+     *             is the repository name already exists on the server and `force` is false.
      */
-    public void link(String repositoryName, Client client, boolean force) throws APIException, InterruptedException, IOException {
-        Validate.notEmpty(repositoryName);
+    public void link(final String repositoryName, Client client, boolean force) throws APIException, InterruptedException, IOException {
         Validate.notNull(client);
+        Validate.notEmpty(repositoryName);
         Validate.isTrue(repositoryName.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
 
         /*
          * Check if repository name is already in uses.
          */
-        boolean exists = false;
-        exists = client.getRepositoryInfo(repositoryName) != null;
+        CurrentUser userInfo = client.getCurrentUserInfo();
+        boolean exists = !userInfo.findRepos(repositoryName).isEmpty();
         if (!force && exists) {
             throw new RepositoryNameAlreadyInUseException(repositoryName);
         }
@@ -280,8 +371,8 @@ public class API {
          * Generate the keys
          */
         LOGGER.debug("generating public and private key for {}", repositoryName);
-        File idrsaFile = new File(Compat.CONFIG_HOME, "id_rsa.pub");
-        File identityFile = new File(Compat.CONFIG_HOME, "id_rsa");
+        File idrsaFile = config.getPublicKeyFile();
+        File identityFile = config.getPrivateKeyFile();
         String rsadata = null;
         try {
             // Generate a key pair.
@@ -303,11 +394,20 @@ public class API {
             throw new ExchangeSshKeyException(e);
         }
 
+        // Query info from WebServer
+        MinarcaInfo minarcaInfo = client.getMinarcaInfo();
+
+        // Replace known_hosts file
+        String knownHosts = minarcaInfo.identity;
+        FileUtils.write(config.getKnownHosts(), knownHosts);
+
         // Generate configuration file.
-        LOGGER.debug("saving configuration [{}][{}][{}]", repositoryName, client.getUsername(), config.getRemotehost());
-        config.setUsername(client.getUsername(), false);
+        String username = userInfo.username;
+        String remoteHost = minarcaInfo.remotehost;
+        LOGGER.debug("saving configuration [{}][{}][{}]", repositoryName, username, remoteHost);
+        config.setUsername(username, false);
         config.setRepositoryName(repositoryName, false);
-        config.setRemotehost(config.getRemotehost(), false);
+        config.setRemotehost(remoteHost, false);
 
         // Create default schedule
         config.setSchedule(Schedule.DAILY, false);
@@ -338,7 +438,7 @@ public class API {
             try {
                 client.updateRepositories();
                 // Check if repo exists in minarca.
-                exists = client.getRepositoryInfo(repositoryName) != null;
+                exists = !client.getCurrentUserInfo().findRepos(repositoryName).isEmpty();
                 if (exists) {
                     LOGGER.debug("repository {} found", repositoryName);
                     break;
@@ -381,12 +481,14 @@ public class API {
             }
         }
 
+        // Setup the scheduler
+        Scheduler scheduler = getScheduler();
+        scheduler.create();
+
         // Set encoding
         try {
             LOGGER.debug("updating repository [{}] encoding [{}]", repositoryName, Compat.CHARSET_DEFAULT.toString());
-            for (Repository r : client.getRepositoryInfo(repositoryName)) {
-                r.setEncoding(Compat.CHARSET_DEFAULT.toString());
-            }
+            client.setRepoEncoding(repositoryName, Compat.CHARSET_DEFAULT.toString());
         } catch (Exception e) {
             LOGGER.warn("fail to configure repository encoding", e);
         }
@@ -417,10 +519,11 @@ public class API {
         String repositoryName = config.getRepositoryName();
 
         // Get reference to the identity file to be used by ssh.
-        File identityFile = config.getIdentityFile();
+        File knownHosts = config.getKnownHosts();
+        File identityFile = config.getPrivateKeyFile();
 
         // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(remotehost, identityFile);
+        RdiffBackup rdiffbackup = new RdiffBackup(remotehost, knownHosts, identityFile);
 
         // Check the remote server.
         rdiffbackup.testServer(repositoryName);
@@ -444,7 +547,7 @@ public class API {
         // TODO Remove RSA key from client too.
 
         // Delete task
-        Scheduler scheduler = Scheduler.getInstance();
+        Scheduler scheduler = getScheduler();
         scheduler.delete();
     }
 }
