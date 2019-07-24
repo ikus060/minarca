@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -22,7 +23,7 @@ import com.patrikdufresne.minarca.core.APIException.MinarcaMissingException;
  */
 public class MinarcaExecutable {
 
-    private static final boolean DEV;
+    private static final boolean DEV = Boolean.getBoolean("com.patrikdufresne.minarca.development");
 
     /**
      * The logger.
@@ -50,10 +51,6 @@ public class MinarcaExecutable {
             MINARCA_EXE = "minarca";
         }
     }
-    static {
-        String classpath = System.getProperty("java.class.path");
-        DEV = classpath.contains("javaagent");
-    }
 
     /**
      * Return the command line to be executed to run a backup.
@@ -68,9 +65,15 @@ public class MinarcaExecutable {
             // When running in development environment, we need to call minarca as a java process.
             File javaExe = new File(new File(System.getProperty("java.home"), "bin"), "java");
             args.add(javaExe.toString()); // usr/lib/jvm/java-8-openjdk-amd64/bin/java
+            // Copy all minarca system properties.
+            for (Entry<Object, Object> e : System.getProperties().entrySet()) {
+                if (e.getKey().toString().startsWith("com.patrikdufresne.minarca")) {
+                    args.add("-D" + e.getKey() + "=" + e.getValue());
+                }
+            }
             args.add("-classpath");
             args.add(System.getProperty("java.class.path"));
-            args.add(System.getProperty("sun.java.command")); // com.patrikdufresne.minarca.Main
+            args.add(System.getProperty("sun.java.command", "com.patrikdufresne.minarca.Main"));
         } else {
             // When running in production mode, execute the minarca binary directly.
             File minarcaExe = getMinarcaLocation();
@@ -90,6 +93,8 @@ public class MinarcaExecutable {
      * @return
      */
     public static File getMinarcaLocation() {
+        // On Windows, user.dir will be defined as C:\Users\vmtest\AppData\Local\minarca, lookup to "./bin/" should find
+        // minarca.
         return Compat.searchFile(MINARCA_EXE, System.getProperty(PROPERTY_MINARCA_LOCATION), "./bin/", ".", "/opt/minarca/bin/");
     }
 

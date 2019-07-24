@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,20 +114,6 @@ public class Compat {
     }
 
     /**
-     * Get environment variable or return the default value if the variable is not set or empty.
-     * 
-     * @param variable
-     *            the environment variable name
-     * @param defaultValue
-     *            the default value
-     * @return the variable value or default value
-     */
-    private static String getenv(String variable, String defaultValue) {
-        String value = System.getenv(variable);
-        return StringUtils.defaultString(value, defaultValue);
-    }
-
-    /**
      * Execute chcp process. This command line is used to determine the process charset in Windows OS.
      * 
      * @return the code page or null
@@ -189,7 +176,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */{
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
             if (isAdmin) {
                 return "/etc/minarca";
             } else {
@@ -213,13 +200,27 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */{
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
             if (isAdmin) {
                 return "/var/lib/minarca";
             } else {
                 return getenv("XDG_DATA_HOME", getHome(isAdmin) + "/.local/share/") + "/minarca";
             }
         }
+    }
+
+    /**
+     * Get environment variable or return the default value if the variable is not set or empty.
+     * 
+     * @param variable
+     *            the environment variable name
+     * @param defaultValue
+     *            the default value
+     * @return the variable value or default value
+     */
+    private static String getenv(String variable, String defaultValue) {
+        String value = System.getenv(variable);
+        return StringUtils.defaultString(value, defaultValue);
     }
 
     /**
@@ -369,17 +370,20 @@ public class Compat {
     }
 
     /**
-     * Open a file as FileWriter with the given encoding.
-     * 
-     * @param file
-     *            the file
-     * @param encoding
-     *            the encoding to be used to read the file
-     * @return the file writer.
-     * @throws IOException
+     * Print all the compat value and system properties to the logs.
      */
-    public static FileWriterWithEncoding openFileWriter(File file, String encoding) throws IOException {
-        return openFileWriter(file, Charset.forName(encoding));
+    public static void logValues() {
+        for (Entry<Object, Object> e : System.getProperties().entrySet()) {
+            LOGGER.debug(e.getKey() + " = " + e.getValue());
+        }
+        LOGGER.debug("CHARSET_DEFAULT = " + CHARSET_DEFAULT.name());
+        LOGGER.debug("CHARSET_PROCESS = " + CHARSET_PROCESS.name());
+        LOGGER.debug("COMPUTER_NAME = " + COMPUTER_NAME);
+        LOGGER.debug("CONFIG_HOME = " + CONFIG_HOME);
+        LOGGER.debug("DATA_HOME = " + DATA_HOME);
+        LOGGER.debug("HOME = " + HOME);
+        LOGGER.debug("IS_ADMIN = " + IS_ADMIN);
+        LOGGER.debug("TEMP = " + TEMP);
     }
 
     /**
@@ -414,6 +418,20 @@ public class Compat {
             }
         }
         return new FileWriterWithEncoding(file, encoding);
+    }
+
+    /**
+     * Open a file as FileWriter with the given encoding.
+     * 
+     * @param file
+     *            the file
+     * @param encoding
+     *            the encoding to be used to read the file
+     * @return the file writer.
+     * @throws IOException
+     */
+    public static FileWriterWithEncoding openFileWriter(File file, String encoding) throws IOException {
+        return openFileWriter(file, Charset.forName(encoding));
     }
 
     /**

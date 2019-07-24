@@ -229,8 +229,7 @@ public class Main {
      * This if the main function being called when minarca application is called with --backup or -b arguments.
      */
     private void backup(boolean force) {
-        LOGGER.info("using default charset [{}]", Compat.CHARSET_DEFAULT.name());
-        LOGGER.info("using process charset [{}]", Compat.CHARSET_PROCESS.name());
+        Compat.logValues();
         LOGGER.info("starting backup");
 
         // Check if current OS and running environment is valid.
@@ -242,21 +241,11 @@ public class Main {
             System.exit(1);
         }
 
-        // Check if minarca is properly configure (from our point of view).
-        try {
-            API.instance().checkConfig();
-        } catch (APIException e) {
-            // Show error message (usually localized).
-            LOGGER.info("invalid config", e);
-            System.err.println(e.getMessage());
-            System.exit(2);
-        }
-
         // Run the backup.
         try {
             API.instance().backup(false, force);
         } catch (Exception e) {
-            System.exit(3);
+            System.exit(2);
         }
 
     }
@@ -335,8 +324,7 @@ public class Main {
      * @param args
      */
     private void startui(String[] args) {
-        LOGGER.info("using default charset [{}]", Compat.CHARSET_DEFAULT.name());
-        LOGGER.info("using process charset [{}]", Compat.CHARSET_PROCESS.name());
+        Compat.logValues();
         LOGGER.info("starting minarca ui version [{}]", getCurrentVersion());
 
         Display.setAppName(_("Minarca"));

@@ -48,7 +48,6 @@ import com.patrikdufresne.minarca.core.internal.SchedulerLinux;
 import com.patrikdufresne.minarca.core.internal.SchedulerWindows;
 import com.patrikdufresne.minarca.core.model.CurrentUser;
 import com.patrikdufresne.minarca.core.model.MinarcaInfo;
-import com.patrikdufresne.minarca.core.model.Repo;
 
 /**
  * This class is the main entry point to do everything related to minarca.
@@ -132,6 +131,16 @@ public class API {
             MinarcaExecutable minarca = new MinarcaExecutable();
             minarca.backup(force);
             return;
+        }
+
+        // Check if properly configure (from our point of view).
+        try {
+            checkConfig();
+        } catch (APIException e) {
+            // Show error message (usually localized).
+            LOGGER.info("invalid config", e);
+            config.setLastStatus(LastResult.FAILURE);
+            throw new APIException("invalid config", e);
         }
 
         // If not forced, we need to check if it's time to run a backup.
@@ -239,11 +248,6 @@ public class API {
             throw new MissConfiguredException(_("selective backup settings are missing"));
         }
 
-        // Check scheduler
-        if (!getScheduler().exists()) {
-            throw new ScheduleNotFoundException();
-        }
-
     }
 
     /**
@@ -256,6 +260,10 @@ public class API {
      */
     public Client connect(String baseurl, String username, String password) throws APIException {
         // Create a new client instance.
+        // Add http if not provided.
+        if (!(baseurl.startsWith("http://") || baseurl.startsWith("https://"))) {
+            baseurl = "http://" + baseurl;
+        }
         Client client = new Client(baseurl, username, password);
 
         // Check connectivity
@@ -264,7 +272,6 @@ public class API {
         } catch (HttpResponseException e) {
             // Raised when status code >=300
             if (e.getStatusCode() == 401) {
-                LOGGER.error("authentication failed", e);
                 throw new AuthenticationException(e);
             }
             throw new APIException(_("Unknown server error."), e);
@@ -272,10 +279,8 @@ public class API {
             // Raised on connection failure
             throw new ConnectivityException(e);
         } catch (Exception e) {
-            LOGGER.error("connectivity check failed", e);
             throw new APIException(_("Authentication failed for unknown reason."), e);
         }
-
         return client;
     }
 
@@ -352,11 +357,13 @@ public class API {
      *             if the repository name is not valid.
      * @throws RepositoryNameAlreadyInUseException
      *             is the repository name already exists on the server and `force` is false.
+     * @throws IllegalArgumentException
+     *             if the arguments are invalid.
      */
     public void link(final String repositoryName, Client client, boolean force) throws APIException, InterruptedException, IOException {
         Validate.notNull(client);
-        Validate.notEmpty(repositoryName);
-        Validate.isTrue(repositoryName.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"));
+        Validate.notEmpty(repositoryName, _("repository name cannot be empty"));
+        Validate.isTrue(repositoryName.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"), _("repository must only contains letters, numbers, dash (-) and dot (.)"));
 
         /*
          * Check if repository name is already in uses.

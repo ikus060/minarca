@@ -5,6 +5,7 @@
  */
 package com.patrikdufresne.minarca.ui;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -18,7 +19,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.FormColors;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
@@ -36,19 +39,25 @@ public class AppFormToolkit extends FormToolkit {
 
     private static final String ALT_BG = "ALT_BG";
     private static final String ALT_FG = "ALT_FG";
+    public static final String CLASS_BOLD = "bold";
+    public static final String CLASS_ERROR = "error";
+    public static final String CLASS_SUCESS = "sucess";
     private static final int FORM_TEXT_MARGNIN = 10;
     private static final String H = "H";
     private static final String H_HOVER = "H_HOVER";
     private static final String H1 = "h1";
     private static final String H2 = "h2";
-    public static final String H3 = "h3";
+    public static final String CLASS_H3 = "h3";
     private static final String H4 = "h4";
     private static final String LIGHT = "light";
-    public static final String SMALL = "small";
+    public static final String CLASS_SMALL = "small";
     private static final String WARN_BG = "WARN_BG";
     private static final String WARN_FG = "WARN_FG";
 
-    public static final String BOLD = "bold";
+    public static Font getFont(String symbolicname) {
+        FontRegistry registry = JFaceResources.getFontRegistry();
+        return registry.get(symbolicname);
+    }
 
     protected static Font getFont(String symbolicname, float size, boolean bold) {
         String newSymbolicName = symbolicname + "." + size;
@@ -62,11 +71,6 @@ public class AppFormToolkit extends FormToolkit {
             registry.put(newSymbolicName, data);
         }
         return bold ? registry.getBold(newSymbolicName) : registry.get(newSymbolicName);
-    }
-
-    public static Font getFont(String symbolicname) {
-        FontRegistry registry = JFaceResources.getFontRegistry();
-        return registry.get(symbolicname);
     }
 
     public static Font getFontBold(String symbolicname) {
@@ -104,6 +108,12 @@ public class AppFormToolkit extends FormToolkit {
     public AppFormToolkit(Display display, boolean useAltColor) {
         super(display);
         refreshHyperlinkColors();
+        display.addFilter(SWT.Skin, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                System.out.println("COUCOU");
+            }
+        });
     }
 
     /**
@@ -145,12 +155,63 @@ public class AppFormToolkit extends FormToolkit {
                 control.setBackground(getAltBackground());
             }
         }
+
+        control.addListener(SWT.Skin, skinListener);
     }
+
+    Listener skinListener = new Listener() {
+
+        @Override
+        public void handleEvent(Event event) {
+            if (event.widget instanceof Control) {
+                skinControl((Control) event.widget);
+            }
+        }
+    };
 
     public Label createAppnameLabel(Composite parent, String text, int style) {
         Label label = createLabel(parent, text, style);
         label.setFont(getFont(JFaceResources.DEFAULT_FONT, 3.25f, false));
         return label;
+    }
+
+    /**
+     * This function is called when a widget need to be reskin.
+     * 
+     * @param widget
+     */
+    protected void skinControl(Control control) {
+        String[] skinClasses = StringUtils.defaultString((String) control.getData(SWT.SKIN_CLASS)).split(",");
+        for (String skinClass : skinClasses) {
+            switch (skinClass) {
+            case CLASS_BOLD:
+                control.setFont(getFontBold(JFaceResources.DEFAULT_FONT));
+                break;
+            case CLASS_SMALL:
+                control.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+                break;
+            case CLASS_H3:
+                control.setFont(getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
+                break;
+            case CLASS_ERROR:
+                control.setForeground(getColors().createColor(CLASS_ERROR, rgb("#FF0000")));
+                break;
+            case CLASS_SUCESS:
+                control.setForeground(getColors().createColor(CLASS_SUCESS, rgb("#3b9444")));
+                break;
+            }
+        }
+    }
+
+    /**
+     * Change the class of a control. Utility function to update the class of a control.
+     * 
+     * @param control
+     * @param skinClass
+     */
+    public void setSkinClass(Control control, String... skinClass) {
+        control.setData(SWT.SKIN_CLASS, StringUtils.join(skinClass, ","));
+        skinControl(control);
     }
 
     /**
@@ -205,9 +266,9 @@ public class AppFormToolkit extends FormToolkit {
         FormText engine = new FormText(parent, SWT.NO_BACKGROUND | SWT.WRAP | SWT.NO_FOCUS) {
 
             private String replaceTag(String text, String tag, String replacement, String attributes) {
-                return text.replace("<" + tag + ">", "<" + replacement + (attributes != null ? " " + attributes : "") + ">").replace(
-                        "</" + tag + ">",
-                        "</" + replacement + ">");
+                return text
+                        .replace("<" + tag + ">", "<" + replacement + (attributes != null ? " " + attributes : "") + ">")
+                        .replace("</" + tag + ">", "</" + replacement + ">");
             }
 
             @Override
@@ -245,16 +306,16 @@ public class AppFormToolkit extends FormToolkit {
         engine.setFont(H2, getFont(JFaceResources.DIALOG_FONT, 2.6f, false));
         engine.setColor(H2, fg);
         // H3
-        engine.setFont(H3, getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
-        engine.setColor(H3, fg);
+        engine.setFont(CLASS_H3, getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
+        engine.setColor(CLASS_H3, fg);
         // H4
         engine.setFont(H4, getFont(JFaceResources.DIALOG_FONT, 1.25f, false));
         engine.setColor(H4, fg);
         // LIGHT
         engine.setColor(LIGHT, getLightColor());
         // SMALL
-        engine.setFont(SMALL, getFont(JFaceResources.DIALOG_FONT, .75f, false));
-        engine.setColor(SMALL, fg);
+        engine.setFont(CLASS_SMALL, getFont(JFaceResources.DIALOG_FONT, .75f, false));
+        engine.setColor(CLASS_SMALL, fg);
 
         engine.setHyperlinkSettings(getHyperlinkGroup());
         engine.addHyperlinkListener(getHyperlinkListener());
@@ -271,27 +332,14 @@ public class AppFormToolkit extends FormToolkit {
      * @param text
      * @return
      */
-    public Label createLabel(Composite parent, String text, String style) {
-        Label l = createLabel(parent, text);
-        switch (style) {
-        case BOLD:
-            l.setFont(getFontBold(JFaceResources.DEFAULT_FONT));
-            break;
-        case SMALL:
-            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
-            break;
-        case H3:
-            l.setFont(getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
-            break;
-        default:
-            l.setFont(getFont(JFaceResources.DEFAULT_FONT));
-        }
-        return l;
+    public Label createLabel(Composite parent, String text, String skinClass) {
+        return createLabel(parent, text, SWT.NONE, skinClass);
     }
 
-    public void decorateWarningLabel(FormText engine) {
-        engine.setBackground(getColors().createColor(WARN_BG, rgb("#e99002")));
-        engine.setForeground(getColors().createColor(WARN_FG, rgb("#ffffff")));
+    public Label createLabel(Composite parent, String text, int style, String skinClass) {
+        Label l = createLabel(parent, text, style);
+        setSkinClass(l, skinClass);
+        return l;
     }
 
     @Override
@@ -339,6 +387,36 @@ public class AppFormToolkit extends FormToolkit {
         } else {
             getHyperlinkGroup().setForeground(getColors().createColor(H, rgb("#008cba")));
             getHyperlinkGroup().setActiveForeground(getColors().createColor(H_HOVER, FormColors.blend(rgb("#008cba"), rgb("#000000"), 15)));
+        }
+    }
+
+    /**
+     * Update the style of a label.
+     * 
+     * @param l
+     * @param style
+     */
+    public void setStyle(Label l, String style) {
+        switch (style) {
+        case CLASS_BOLD:
+            l.setFont(getFontBold(JFaceResources.DEFAULT_FONT));
+            break;
+        case CLASS_SMALL:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+            break;
+        case CLASS_H3:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
+            break;
+        case CLASS_ERROR:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+            l.setForeground(getColors().createColor(CLASS_ERROR, rgb("#FF0000")));
+            break;
+        case CLASS_SUCESS:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+            l.setForeground(getColors().createColor(CLASS_SUCESS, rgb("#3b9444")));
+            break;
+        default:
+            l.setFont(getFont(JFaceResources.DEFAULT_FONT));
         }
     }
 

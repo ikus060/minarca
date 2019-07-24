@@ -7,10 +7,13 @@ package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.Localized._;
 
-import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -33,7 +36,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
-import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.slf4j.Logger;
@@ -75,10 +77,15 @@ public class SetupDialog extends Dialog {
      * The composite holding the page.
      */
     private Composite comp;
+
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
     /**
      * Form tool kit to provide a webpage style.
      */
     private AppFormToolkit ft;
+
+    private ScheduledFuture validateConnectivityTask;
 
     /**
      * Default constructor
@@ -87,6 +94,15 @@ public class SetupDialog extends Dialog {
      */
     protected SetupDialog(Shell parentShell) {
         super(parentShell);
+    }
+
+    @Override
+    public boolean close() {
+        boolean returnValue = super.close();
+        if (returnValue) {
+            executor.shutdown();
+        }
+        return returnValue;
     }
 
     /**
@@ -129,236 +145,142 @@ public class SetupDialog extends Dialog {
     @Override
     protected Control createDialogArea(Composite parent) {
 
-        this.comp = ft.createComposite(parent, SWT.NONE);
+        this.comp = ft.createComposite(parent, SWT.BORDER);
         this.comp.setLayoutData(new GridData(GridData.FILL_BOTH));
         TableWrapLayout layout = new TableWrapLayout();
         layout.topMargin = layout.bottomMargin = 5;
         layout.rightMargin = layout.leftMargin = 25;
         this.comp.setLayout(layout);
 
-        createPage1(this.comp);
-        // ft.paintBordersFor(this.comp);
-
-        return comp;
-
-    }
-
-    /**
-     * Page used to sign-in, check credentials.
-     * 
-     * @param parent
-     */
-    private void createPage1(Composite parent) {
-        // Dispose previous page.
-        disposeChildren(parent);
-
         // Introduction message
-        this.ft.createLabel(parent, _("Where's to backup your data ?"), AppFormToolkit.H3);
+        Label iconLabel = this.ft.createLabel(comp, StringUtils.EMPTY, SWT.NONE);
+        iconLabel.setImage(JFaceResources.getImageRegistry().get(Images.MINARCA_128_PNG));
+        iconLabel.setLayoutData(new TableWrapData(TableWrapData.CENTER));
+
+        Label title = this.ft.createLabel(comp, _("Tell Minarca where to backup your data"), AppFormToolkit.CLASS_H3);
+        title.setLayoutData(new TableWrapData(TableWrapData.CENTER));
+        this.ft
+                .createLabel(
+                        comp,
+                        _(
+                                "To configure Minarca to backup your data, "
+                                        + "you must provide the URL of a Minara server. "
+                                        + "This information should be provided to you by your system administrator."),
+                        SWT.WRAP | SWT.CENTER);
 
         // Remote server
-        this.ft.createLabel(parent, _("Address"), AppFormToolkit.BOLD);
-        final Text remoteserverText = ft.createText(parent, "", SWT.BORDER);
+        this.ft.createLabel(comp, _("Address"), AppFormToolkit.CLASS_BOLD);
+        final Text remoteserverText = ft.createText(comp, "", SWT.BORDER);
         remoteserverText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        remoteserverText.setMessage(_("Remote server address e.g.: backup.example.com:8080"));
-        remoteserverText.setToolTipText(_("Enter the remote server address. Either an ip address and port, or a URL."));
+        remoteserverText.setToolTipText(_("Enter the remote server address. Either an IP address and port or a URL. e.g.: http://example.com:8080"));
         remoteserverText.setFocus();
-        this.ft.createLabel(parent, _("http[s]://hostname[:port]"), AppFormToolkit.SMALL);
+        this.ft.createLabel(comp, _("http[s]://hostname[:port]"), AppFormToolkit.CLASS_SMALL);
 
         // Username & Password
-        this.ft.createLabel(parent, _("Username"), AppFormToolkit.BOLD);
-        final Text usernameText = ft.createText(parent, "", SWT.BORDER);
+        this.ft.createLabel(comp, _("Username"), AppFormToolkit.CLASS_BOLD);
+        final Text usernameText = ft.createText(comp, "", SWT.BORDER);
         usernameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
-        this.ft.createLabel(parent, _("Password"), AppFormToolkit.BOLD);
-        final Text passwordText = ft.createText(parent, "", SWT.PASSWORD | SWT.BORDER);
+        this.ft.createLabel(comp, _("Password"), AppFormToolkit.CLASS_BOLD);
+        final Text passwordText = ft.createText(comp, "", SWT.PASSWORD | SWT.BORDER);
         passwordText.setLayoutData(new TableWrapData(TableWrapData.FILL));
 
+        final Label connectError = this.ft.createLabel(comp, StringUtils.EMPTY);
+        connectError.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+        // Computer name
+        this.ft.createLabel(comp, _("Repository name"), AppFormToolkit.CLASS_BOLD);
+        final Text computerNameText = ft.createText(comp, "", SWT.BORDER);
+        computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        computerNameText.setText(Compat.COMPUTER_NAME);
+        this.ft
+                .createLabel(
+                        comp,
+                        _(
+                                "You must provide a unique name to identify this computer in Minarca. "
+                                        + "Please, provide a friendly name. By default, the computer's name is used. "
+                                        + "This value cannot be changed."),
+                        SWT.WRAP,
+                        AppFormToolkit.CLASS_SMALL);
+
+        Label alertLabel = this.ft.createLabel(comp, StringUtils.EMPTY);
+        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
         // Sign in button
-        final Button signInButton = ft.createButton(parent, _("Sign In"), SWT.PUSH);
-        signInButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        signInButton.setEnabled(false);
-        getShell().setDefaultButton(signInButton);
+        final Button linkButton = ft.createButton(comp, _("Link"), SWT.PUSH);
+        linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        linkButton.setEnabled(false);
+        getShell().setDefaultButton(linkButton);
 
-        // Enable Sing-In buttont when all field contains something.
+        // Progress bar
+        final ProgressIndicator progress = new ProgressIndicator(comp);
+        ft.adapt(progress);
+        progress.setLayoutData(new TableWrapData(TableWrapData.FILL));
+
+        // Enable Sing-In button when all field contains something.
+        // Also provide feedback to the user.
         ModifyListener modifyListener = new ModifyListener() {
-
             @Override
-            public void modifyText(ModifyEvent e) {
-                String remoteserver = remoteserverText.getText();
-                String username = usernameText.getText();
-                String password = passwordText.getText();
-                signInButton.setEnabled(StringUtils.isNotBlank(remoteserver) && StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password));
+            public void modifyText(ModifyEvent event) {
+                // Disable the link button immetiatly when one of the fields is blank.
+                final String computerName = computerNameText.getText();
+                final String remoteServer = remoteserverText.getText();
+                final String username = usernameText.getText();
+                final String password = passwordText.getText();
+                if (StringUtils.isBlank(computerName) || StringUtils.isBlank(remoteServer) || StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+                    linkButton.setEnabled(false);
+                }
+
+                // Enable the Link button if the url, user and password are valid AND if the repo is not empty.
+                validateConnectivity(remoteserverText.getText(), usernameText.getText(), passwordText.getText(), (APIException e) -> {
+                    connectError.setText(e != null ? e.getMessage() : _("Connected"));
+                    ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, e != null ? AppFormToolkit.CLASS_ERROR : AppFormToolkit.CLASS_SUCESS);
+                    linkButton.setEnabled(e == null && StringUtils.isNotBlank(computerName));
+                });
             }
         };
         remoteserverText.addModifyListener(modifyListener);
         usernameText.addModifyListener(modifyListener);
         passwordText.addModifyListener(modifyListener);
-
-        // Add event binding.
-        signInButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                String remoteserver = remoteserverText.getText();
-                String username = usernameText.getText();
-                String password = passwordText.getText();
-                if (handleSignIn(remoteserver, username, password)) {
-                    createPage2(comp);
-                }
-            }
-        });
-
-        // Relayout to update content.
-        parent.layout();
-
-    }
-
-    /**
-     * Page used to link the computer (SSH key exchange).
-     * 
-     * @param parent
-     */
-    private void createPage2(Composite parent) {
-        // Dispose previous page.
-        disposeChildren(parent);
-
-        ((TableWrapLayout) parent.getLayout()).numColumns = 1;
-
-        // App name
-        Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
-        appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-        // App icon
-        Label icon = this.ft.createLabel(parent, null);
-        icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
-        icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
-
-        // Introduction message
-        String introText = "<h2>" + _("Link your system") + "</h2><br/>";
-        introText += _("You need to link this system to your account. Please, "
-                + "provide a friendly name to represent it. "
-                + "Once selected, you won't be able to change it.");
-        FormText introLabel = ft.createFormText(parent, introText, false);
-        introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-        // Alert label.
-        final FormText alertLabel = ft.createFormText(parent, "", true);
-        alertLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-        // Label
-        String computerNameLabelText = "<b>" + _("Provide a repository name") + "</b>";
-        FormText computerNameLabel = ft.createFormText(parent, computerNameLabelText, false);
-        computerNameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-        // Computer name
-        final Text computerNameText = ft.createText(parent, "", SWT.BORDER);
-        computerNameText.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        computerNameText.setMessage(_("Repository name"));
-        computerNameText.setText(Compat.COMPUTER_NAME);
-        computerNameText.setFocus();
-
-        // Sign in button
-        final Button linkButton = ft.createButton(parent, _("Link"), SWT.PUSH);
-        linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        getShell().setDefaultButton(linkButton);
-
-        // Progress bar
-        final ProgressIndicator progress = new ProgressIndicator(parent);
-        ft.adapt(progress);
-        progress.setLayoutData(new TableWrapData(TableWrapData.FILL));
+        computerNameText.addModifyListener(modifyListener);
 
         // Add event binding.
         linkButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+
                 // What a mess. Blame Java.
+                final String remoteServer = remoteserverText.getText();
+                final String username = usernameText.getText();
+                final String password = passwordText.getText();
                 final String computerName = computerNameText.getText();
                 linkButton.setEnabled(false);
                 progress.beginAnimatedTask();
 
                 // Start the processing.
                 new Thread() {
+                    @Override
                     public void run() {
-                        final String message = handleLinkComputer(computerName, false);
+                        final boolean success = handleLinkComputer(remoteServer, username, password, computerName, false);
+                        // Stop progress bar.
                         Display.getDefault().asyncExec(new Runnable() {
                             @Override
                             public void run() {
+                                linkButton.setEnabled(true);
                                 progress.done();
-                                if (message != null) {
-                                    linkButton.setEnabled(true);
-                                    alertLabel.setText(message, true, true);
-                                    alertLabel.getParent().layout();
-                                    ft.decorateWarningLabel(alertLabel);
-                                } else {
-                                    createPage3(comp);
+                                if (success) {
+                                    SetupDialog.this.close();
                                 }
                             }
                         });
                     }
                 }.start();
+
             }
         });
 
-        // Relayout to update content.
-        parent.layout();
+        return comp;
 
-    }
-
-    /**
-     * Page used to show sucessful config.
-     * 
-     * @param parent
-     */
-    private void createPage3(Composite parent) {
-        // Dispose previous page.
-        disposeChildren(parent);
-
-        ((TableWrapLayout) parent.getLayout()).numColumns = 1;
-
-        // App name
-        Label appnameLabel = ft.createAppnameLabel(parent, _("Minarca"), SWT.CENTER);
-        appnameLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-        // App icon
-        Label icon = this.ft.createLabel(parent, null);
-        icon.setImage(JFaceResources.getImage(Images.MINARCA_128_PNG));
-        icon.setLayoutData(new TableWrapData(TableWrapData.CENTER));
-
-        // Introduction message
-        String introText = "<h2>" + _("Success !") + "</h2><br/>";
-        introText += _("Your system is now configure to backup it self once a day with Minarca!");
-        FormText introLabel = ft.createFormText(parent, introText, false);
-        introLabel.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
-        // Sign in button
-        Button linkButton = ft.createButton(parent, _("Close"), SWT.PUSH);
-        linkButton.setLayoutData(new TableWrapData(TableWrapData.FILL));
-        getShell().setDefaultButton(linkButton);
-
-        // Add event binding.
-        linkButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                // Close the setup dialog.
-                close();
-            }
-
-        });
-
-        // Relayout to update content.
-        parent.layout();
-
-    }
-
-    /**
-     * Used to dispose every children of the given composite
-     * 
-     * @param composite
-     */
-    private void disposeChildren(Composite composite) {
-        Control[] children = composite.getChildren();
-        for (Control c : children) {
-            c.dispose();
-        }
     }
 
     /**
@@ -366,7 +288,9 @@ public class SetupDialog extends Dialog {
      */
     @Override
     protected Point getInitialSize() {
-        return getShell().computeSize(681, 519, true);
+        Point size = getShell().computeSize(681, SWT.DEFAULT, true);
+        size.y += 50;
+        return size;
     }
 
     /**
@@ -374,89 +298,115 @@ public class SetupDialog extends Dialog {
      * <p>
      * This step is used to exchange the SSH keys.
      * 
-     * @param name
-     *            the computer name.
-     * @return an error message or null if OK.
-     */
-    protected String handleLinkComputer(String name, boolean force) {
-        // Little validation before
-        if (name.trim().isEmpty()) {
-            return _("Repository name cannot be empty.");
-        }
-        LOGGER.info("link computer {}", name);
-        try {
-            API.instance().link(name, this.client, force);
-        } catch (RepositoryNameAlreadyInUseException e) {
-            final MutableInt returnCode = new MutableInt();
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    int r = DetailMessageDialog.openYesNoQuestion(
-                            getShell(),
-                            Display.getAppName(),
-                            _("Are you sure you want to keep the given repository name ?"),
-                            _("The given repository name is already in use in Minarca. "
-                                    + "You may keep this repository name if the name is "
-                                    + "no longer used by another system currently "
-                                    + "link to Minarca."),
-                            null).getReturnCode();
-                    returnCode.setValue(r);
-                }
-            });
-            if (returnCode.intValue() == IDialogConstants.YES_ID) {
-                // Force usage of the computer name
-                return handleLinkComputer(name, true);
-            }
-            return _("Change the repository name");
-        } catch (APIException e) {
-            LOGGER.warn("fail to register computer", e);
-            return e.getMessage();
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("invalid computername: " + name, e);
-            return _("Should only contains letters, numbers, dash (-) and dot (.)");
-        } catch (IOException e) {
-            LOGGER.warn("fail to register computer", e);
-            return _("<strong>Communication error!</strong> Check if you can connected to Internet.");
-        } catch (Exception e) {
-            LOGGER.warn("fail to register computer", e);
-            return _("<strong>Unknown error occurred!</strong> If the problem persists, try to re-install Minarca.");
-        }
-
-        return null;
-    }
-
-    /**
-     * Called to handle user sign in.
-     * <p>
-     * This implementation will establish a connection via HTTP and or SSH to make sure the connection and credentials
-     * are valid.
-     * 
      * @param remoteserver
      *            the remote server address.
      * @param username
      *            the username for authentication
      * @param password
      *            the password for authentication.
+     * @param name
+     *            the computer name.
      * @return an error message or null if OK.
      */
-    protected boolean handleSignIn(String remoteserver, String username, String password) {
-        Validate.notBlank(remoteserver);
-        Validate.notBlank(username);
-        Validate.notBlank(password);
-        // Add http if not provided.
-        if (!(remoteserver.startsWith("http://") || remoteserver.startsWith("https://"))) {
-            remoteserver = "http://" + remoteserver;
-        }
-        // Try to establish communication with HTTP first.
-        LOGGER.info("sign in as [{}]", username);
+    protected boolean handleLinkComputer(String remoteserver, String username, String password, String name, boolean force) {
         try {
             this.client = API.instance().connect(remoteserver, username, password);
         } catch (APIException e) {
-            LOGGER.warn("fail to authenticate", e);
-            DetailMessageDialog.openWarning(getShell(), Display.getAppName(), _("Fail to authenticate with the server"), e.getMessage(), e);
+            DetailMessageDialog.openWarning(getShell(), Display.getAppName(), _("Communication with the server is not working !"), e.getMessage(), e);
             return false;
         }
-        return true;
+
+        // Little validation before
+        LOGGER.info("link computer {}", name);
+        try {
+            API.instance().link(name, this.client, force);
+            return true;
+        } catch (RepositoryNameAlreadyInUseException e) {
+            final MutableInt returnCode = new MutableInt();
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    int r = DetailMessageDialog
+                            .openYesNoQuestion(
+                                    getShell(),
+                                    Display.getAppName(),
+                                    _("Are you sure you want to keep the given repository name ?"),
+                                    _(
+                                            "The given repository name is already in use in Minarca. "
+                                                    + "You may keep this repository name if the name is "
+                                                    + "no longer used by another system currently "
+                                                    + "link to Minarca."),
+                                    null)
+                            .getReturnCode();
+                    returnCode.setValue(r);
+                }
+            });
+            if (returnCode.intValue() == IDialogConstants.YES_ID) {
+                // Force usage of the computer name
+                return handleLinkComputer(remoteserver, username, password, name, true);
+            }
+            return false;
+        } catch (InterruptedException e) {
+            // Nothing to do.
+            return false;
+        } catch (IllegalArgumentException e) {
+            DetailMessageDialog
+                    .openWarning(
+                            getShell(),
+                            Display.getAppName(),
+                            _("Invalid value provided to link this computer. Validate the value provided and try again."),
+                            e.getMessage(),
+                            e);
+            return false;
+        } catch (APIException e) {
+            LOGGER.warn("fail to register computer", e);
+            DetailMessageDialog.openWarning(getShell(), Display.getAppName(), _("Fail to link with the server"), e.getMessage(), e);
+            return false;
+        } catch (Exception e) {
+            LOGGER.warn("fail to register computer", e);
+            DetailMessageDialog
+                    .openWarning(
+                            getShell(),
+                            Display.getAppName(),
+                            _("Fail to link with the server"),
+                            _("Unexpected error happen during the linking process with the server. Verify connectivity with the server and try again later."),
+                            e);
+            return false;
+        }
+    }
+
+    /**
+     * Called to validate the connectivity with the given parameter.
+     * <p>
+     * This function will run the validation. in a background task in 500ms unless the function is called again.
+     */
+    public void validateConnectivity(final String remoteserver, final String username, final String password, Consumer<APIException> callback) {
+        if (validateConnectivityTask != null) {
+            validateConnectivityTask.cancel(false);
+        }
+        if (StringUtils.isBlank(remoteserver) || StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+            return;
+        }
+        validateConnectivityTask = executor.schedule(new Runnable() {
+            @Override
+            public void run() {
+                APIException e1 = null;
+                try {
+                    API.instance().connect(remoteserver, username, password);
+                } catch (APIException e2) {
+                    e1 = e2;
+                } catch (Exception e3) {
+                    e1 = new APIException(e3);
+                }
+                final APIException e = e1;
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.accept(e);
+                    }
+                });
+            }
+        }, 500, TimeUnit.MILLISECONDS);
     }
 
 }
