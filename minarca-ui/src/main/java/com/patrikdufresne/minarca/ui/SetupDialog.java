@@ -233,9 +233,14 @@ public class SetupDialog extends Dialog {
 
                 // Enable the Link button if the url, user and password are valid AND if the repo is not empty.
                 validateConnectivity(remoteserverText.getText(), usernameText.getText(), passwordText.getText(), (APIException e) -> {
-                    connectError.setText(e != null ? e.getMessage() : _("Connected"));
-                    ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, e != null ? AppFormToolkit.CLASS_ERROR : AppFormToolkit.CLASS_SUCESS);
-                    linkButton.setEnabled(e == null && StringUtils.isNotBlank(computerName));
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            connectError.setText(e != null ? e.getMessage() : _("Connected"));
+                            ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, e != null ? AppFormToolkit.CLASS_ERROR : AppFormToolkit.CLASS_SUCESS);
+                            linkButton.setEnabled(e == null && StringUtils.isNotBlank(computerName));
+                        }
+                    });
                 });
             }
         };
@@ -258,24 +263,27 @@ public class SetupDialog extends Dialog {
                 progress.beginAnimatedTask();
 
                 // Start the processing.
-                new Thread() {
-                    @Override
-                    public void run() {
-                        final boolean success = handleLinkComputer(remoteServer, username, password, computerName, false);
-                        // Stop progress bar.
-                        Display.getDefault().asyncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                linkButton.setEnabled(true);
-                                progress.done();
-                                if (success) {
-                                    SetupDialog.this.close();
-                                }
+                link(remoteServer, username, password, computerName, false, (APIException e1) -> {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            linkButton.setEnabled(true);
+                            progress.done();
+                            if (e1 == null) {
+                                SetupDialog.this.close();
+                            } else {
+                                progress.showError();
+                                DetailMessageDialog
+                                        .openWarning(
+                                                getShell(),
+                                                Display.getAppName(),
+                                                _("A problem happend during the linking process to Minarca server!"),
+                                                e1.getMessage(),
+                                                e1);
                             }
-                        });
-                    }
-                }.start();
-
+                        }
+                    });
+                });
             }
         });
 
@@ -308,77 +316,75 @@ public class SetupDialog extends Dialog {
      *            the computer name.
      * @return an error message or null if OK.
      */
-    protected boolean handleLinkComputer(String remoteserver, String username, String password, String name, boolean force) {
-        try {
-            this.client = API.instance().connect(remoteserver, username, password);
-        } catch (APIException e) {
-            DetailMessageDialog.openWarning(getShell(), Display.getAppName(), _("Communication with the server is not working !"), e.getMessage(), e);
-            return false;
-        }
+    protected void link(String remoteserver, String username, String password, String name, boolean force, Consumer<APIException> callback) {
+        this.executor.schedule(new Runnable() {
 
-        // Little validation before
-        LOGGER.info("link computer {}", name);
-        try {
-            API.instance().link(name, this.client, force);
-            return true;
-        } catch (RepositoryNameAlreadyInUseException e) {
-            final MutableInt returnCode = new MutableInt();
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    int r = DetailMessageDialog
-                            .openYesNoQuestion(
-                                    getShell(),
-                                    Display.getAppName(),
-                                    _("Are you sure you want to keep the given repository name ?"),
-                                    _(
-                                            "The given repository name is already in use in Minarca. "
-                                                    + "You may keep this repository name if the name is "
-                                                    + "no longer used by another system currently "
-                                                    + "link to Minarca."),
-                                    null)
-                            .getReturnCode();
-                    returnCode.setValue(r);
+            @Override
+            public void run() {
+                try {
+                    client = API.instance().connect(remoteserver, username, password);
+                } catch (APIException e) {
+                    callback.accept(e);
+                    return;
                 }
-            });
-            if (returnCode.intValue() == IDialogConstants.YES_ID) {
-                // Force usage of the computer name
-                return handleLinkComputer(remoteserver, username, password, name, true);
+
+                // Little validation before
+                LOGGER.info("link computer {}", name);
+                try {
+                    try {
+                        API.instance().link(name, client, force);
+                        callback.accept(null);
+                    } catch (RepositoryNameAlreadyInUseException e) {
+                        final MutableInt returnCode = new MutableInt();
+                        Display.getDefault().syncExec(() -> {
+                            int r = DetailMessageDialog
+                                    .openYesNoQuestion(
+                                            getShell(),
+                                            Display.getAppName(),
+                                            _("Repository name {0} already exists ! Do you want to keep the given repository name ?", name),
+                                            _(
+                                                    "The given repository name is already exists in Mianrca. "
+                                                            + "You may safely keep this repository name if the name is "
+                                                            + "not used by another computer linked to Minarca."),
+                                            null)
+                                    .getReturnCode();
+                            returnCode.setValue(r);
+                        });
+                        if (returnCode.intValue() == IDialogConstants.YES_ID) {
+                            // Force usage of the computer name
+                            API.instance().link(name, client, true);
+                            callback.accept(null);
+                        } else {
+                            callback.accept(e);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    // Nothing to do.
+                    LOGGER.error("fail to link", e);
+                    callback.accept(new APIException(_("Link process interrupted")));
+                } catch (IllegalArgumentException e) {
+                    LOGGER.error("fail to link", e);
+                    callback.accept(new APIException(e.getMessage()));
+                } catch (APIException e) {
+                    LOGGER.error("fail to link", e);
+                    callback.accept(e);
+                } catch (Exception e) {
+                    LOGGER.error("fail to link", e);
+                    callback
+                            .accept(
+                                    new APIException(
+                                            _(
+                                                    "Unexpected error happen during the linking process with the server. Verify connectivity with the server and try again later.")));
+                }
             }
-            return false;
-        } catch (InterruptedException e) {
-            // Nothing to do.
-            return false;
-        } catch (IllegalArgumentException e) {
-            DetailMessageDialog
-                    .openWarning(
-                            getShell(),
-                            Display.getAppName(),
-                            _("Invalid value provided to link this computer. Validate the value provided and try again."),
-                            e.getMessage(),
-                            e);
-            return false;
-        } catch (APIException e) {
-            LOGGER.warn("fail to register computer", e);
-            DetailMessageDialog.openWarning(getShell(), Display.getAppName(), _("Fail to link with the server"), e.getMessage(), e);
-            return false;
-        } catch (Exception e) {
-            LOGGER.warn("fail to register computer", e);
-            DetailMessageDialog
-                    .openWarning(
-                            getShell(),
-                            Display.getAppName(),
-                            _("Fail to link with the server"),
-                            _("Unexpected error happen during the linking process with the server. Verify connectivity with the server and try again later."),
-                            e);
-            return false;
-        }
+
+        }, 1, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Called to validate the connectivity with the given parameter.
      * <p>
-     * This function will run the validation. in a background task in 500ms unless the function is called again.
+     * This function will run the validation. in a background task in 250ms unless the function is called again.
      */
     public void validateConnectivity(final String remoteserver, final String username, final String password, Consumer<APIException> callback) {
         if (validateConnectivityTask != null) {
@@ -390,23 +396,16 @@ public class SetupDialog extends Dialog {
         validateConnectivityTask = executor.schedule(new Runnable() {
             @Override
             public void run() {
-                APIException e1 = null;
                 try {
                     API.instance().connect(remoteserver, username, password);
-                } catch (APIException e2) {
-                    e1 = e2;
+                    callback.accept(null);
+                } catch (APIException e) {
+                    callback.accept(e);
                 } catch (Exception e3) {
-                    e1 = new APIException(e3);
+                    callback.accept(new APIException(e3));
                 }
-                final APIException e = e1;
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.accept(e);
-                    }
-                });
             }
-        }, 500, TimeUnit.MILLISECONDS);
+        }, 250, TimeUnit.MILLISECONDS);
     }
 
 }

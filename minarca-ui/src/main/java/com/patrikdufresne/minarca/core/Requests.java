@@ -295,12 +295,9 @@ public class Requests implements Cloneable {
         for (Element e : elements) {
             // Check if the alert should raise exception.
             String cls = e.attr("class");
-            if (checkInfoException
-                    && cls.contains("alert-info")
-                    || checkWarningException
-                    && cls.contains("alert-warning")
-                    || checkDangerException
-                    && cls.contains("alert-danger")) {
+            if (checkInfoException && cls.contains("alert-info")
+                    || checkWarningException && cls.contains("alert-warning")
+                    || checkDangerException && cls.contains("alert-danger")) {
                 String message = e.text();
                 // Remove the "X" sign from the message.
                 if (message.startsWith("\u00D7")) {
@@ -458,7 +455,9 @@ public class Requests implements Cloneable {
         StringBuilder buf = new StringBuilder();
         buf.append(this.baseurl.endsWith("/") ? this.baseurl.substring(0, this.baseurl.length() - 1) : this.baseurl);
         buf.append("/");
-        buf.append(this.target.startsWith("/") ? this.target.substring(1, this.target.length()) : this.target);
+        if (this.target != null) {
+            buf.append(this.target.startsWith("/") ? this.target.substring(1, this.target.length()) : this.target);
+        }
 
         // Add params.
         if (this.params.size() > 0) {

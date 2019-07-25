@@ -17,18 +17,14 @@ import java.util.Properties;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.logging.impl.NoOpLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.Main;
-import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
-import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
-import com.patrikdufresne.minarca.core.internal.Scheduler;
 
 /**
  * Class responsible to fetch and return configuration for the API.
@@ -96,6 +92,11 @@ public class Config {
     private static final String PROPERTY_USERNAME = "username";
 
     /**
+     * Property name.
+     */
+    private static final String PROPERTY_CONFIGURED = "configured";
+
+    /**
      * Load properties.
      * 
      * @throws ConfigurationException
@@ -151,7 +152,7 @@ public class Config {
      * 
      * @return
      */
-    public String getBaseUrl() {
+    public String getRemoteUrl() {
         return this.properties.getString(PROPERTY_REMOTEURL);
     }
 
@@ -277,7 +278,7 @@ public class Config {
      * 
      * @return
      */
-    protected String getRemotehost() {
+    public String getRemotehost() {
         return this.properties.getString(PROPERTY_REMOTEHOST);
     }
 
@@ -311,6 +312,13 @@ public class Config {
      */
     public String getUsername() {
         return this.properties.getString(PROPERTY_USERNAME);
+    }
+
+    /**
+     * True if minarca was configured.
+     */
+    public boolean getConfigured() {
+        return Boolean.valueOf(this.properties.getString(PROPERTY_CONFIGURED));
     }
 
     public void load() {
@@ -421,6 +429,30 @@ public class Config {
      */
     public void setRemotehost(String value, boolean save) throws APIException {
         this.properties.setProperty(PROPERTY_REMOTEHOST, value);
+        if (save) save();
+    }
+
+    /**
+     * Sets if minarca is configured.
+     * 
+     * @param value
+     * @param save
+     * @throws APIException
+     */
+    public void setConfigured(boolean value, boolean save) throws APIException {
+        this.properties.setProperty(PROPERTY_CONFIGURED, value);
+        if (save) save();
+    }
+
+    /**
+     * Sets the remove url.
+     * 
+     * @param value
+     * @param save
+     * @throws APIException
+     */
+    public void setRemoteUrl(String value, boolean save) throws APIException {
+        this.properties.setProperty(PROPERTY_REMOTEURL, value);
         if (save) save();
     }
 

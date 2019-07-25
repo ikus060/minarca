@@ -168,18 +168,6 @@ public class APIException extends Exception {
     }
 
     /**
-     * Thrown when the application is not configured.
-     * 
-     * @author Patrik Dufresne
-     * 
-     */
-    public static class NotConfiguredException extends APIException {
-        public NotConfiguredException(String message) {
-            super(message);
-        }
-    }
-
-    /**
      * Raised when trying to link a computer with a name already in use in minarca.
      * 
      * @author Patrik Dufresne
@@ -187,7 +175,7 @@ public class APIException extends Exception {
      */
     public static class RepositoryNameAlreadyInUseException extends APIException {
         public RepositoryNameAlreadyInUseException(String name) {
-            super(_("Repository name {0} already in use", name));
+            super(_("Repository name {0} already exists.", name));
         }
     }
 

@@ -25,7 +25,6 @@ import org.slf4j.MDC;
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
-import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.ui.DetailMessageDialog;
@@ -251,74 +250,6 @@ public class Main {
     }
 
     /**
-     * Check if the application is configured. If not show a setup dialog. If miss configured try to repair.
-     * 
-     * @return True if configured or miss configured. False if not configured and user cancel configuration.
-     */
-    private boolean configure() {
-        // Check if configured.
-        try {
-            LOGGER.debug("checking minarca configuration");
-            API.instance().checkConfig();
-            LOGGER.debug("configuration is OK");
-        } catch (NotConfiguredException e) {
-            // If not configured, show wizard.
-            LOGGER.debug("not configured -- show setup dialog");
-            if (!SetupDialog.open(null)) {
-                // If user cancel, close application.
-                return false;
-            }
-        } catch (ScheduleNotFoundException e) {
-            LOGGER.warn("schedule not found");
-            reconfigure();
-            return true;
-        } catch (MissConfiguredException e) {
-            LOGGER.warn("miss configured");
-            reconfigure();
-            return true;
-        } catch (APIException e) {
-            DetailMessageDialog.openWarning(
-                    null,
-                    Display.getAppName(),
-                    _("Fail to start Minarca."),
-                    _("If the problem persist, you may try to reinstall Minarca."),
-                    e);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Called to ask user to reconfigure.
-     */
-    private void reconfigure() {
-        // The configuration is broken. Ask use if we can fix it.
-        LOGGER.debug("ask to repair configuration");
-        DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
-                null,
-                Display.getAppName(),
-                _("Do you want to restore default configuration ?"),
-                _("Your Minarca installation seams broken. "
-                        + "If you answer Yes, all your personal configuration will be lost. "
-                        + "If you answer no, this application may misbehave."),
-                null);
-        if (dlg.getReturnCode() == IDialogConstants.YES_ID) {
-            try {
-                LOGGER.debug("repair configuration");
-                API.instance().defaultConfig(false);
-            } catch (APIException e1) {
-                LOGGER.warn("fail to repair configuration", e1);
-                DetailMessageDialog.openWarning(
-                        null,
-                        Display.getAppName(),
-                        _("Can't repair Minarca's configuration!"),
-                        _("This application may misbehave. If the problem persist, you may try to reinstall Minarca."),
-                        e1);
-            }
-        }
-    }
-
-    /**
      * This function start the application.
      * 
      * @param args
@@ -347,9 +278,12 @@ public class Main {
 
         WindowManager winManager = null;
         try {
-            // Check configuration or re-configured
-            if (!configure()) {
-                return;
+            // If not configured open dialog to configure minarca.
+            if (!API.config().getConfigured()) {
+                if (!SetupDialog.open(null)) {
+                    // If user cancel, close application.
+                    return;
+                }
             }
 
             winManager = new WindowManager();

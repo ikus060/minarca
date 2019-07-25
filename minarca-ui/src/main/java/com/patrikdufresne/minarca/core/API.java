@@ -35,7 +35,6 @@ import com.patrikdufresne.minarca.core.APIException.InitialBackupHasNotRunExcept
 import com.patrikdufresne.minarca.core.APIException.InitialBackupRunningException;
 import com.patrikdufresne.minarca.core.APIException.LinkComputerException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
-import com.patrikdufresne.minarca.core.APIException.NotConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.APIException.ScheduleNotFoundException;
 import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
@@ -140,7 +139,7 @@ public class API {
             // Show error message (usually localized).
             LOGGER.info("invalid config", e);
             config.setLastStatus(LastResult.FAILURE);
-            throw new APIException("invalid config", e);
+            throw e;
         }
 
         // If not forced, we need to check if it's time to run a backup.
@@ -224,22 +223,28 @@ public class API {
     public void checkConfig() throws APIException {
         // Basic sanity check to make sure it's configured. If not, display the
         // setup dialog.
-        if (StringUtils.isEmpty(config.getRepositoryName())) {
-            throw new NotConfiguredException(_("Missing repository name"));
+        if (StringUtils.isBlank(config.getRepositoryName())) {
+            throw new MissConfiguredException(_("Missing repository name"));
         }
-        if (StringUtils.isEmpty(config.getUsername())) {
-            throw new NotConfiguredException(_("Missing username"));
+        if (StringUtils.isBlank(config.getUsername())) {
+            throw new MissConfiguredException(_("Missing username"));
+        }
+        if (StringUtils.isBlank(config.getRemotehost())) {
+            throw new MissConfiguredException(_("Missing remote host"));
+        }
+        if (StringUtils.isBlank(config.getRemoteUrl())) {
+            throw new MissConfiguredException(_("Missing remote server URL"));
         }
         // Check if SSH keys exists.
         File identityFile = config.getPrivateKeyFile();
         if (!identityFile.isFile() || !identityFile.canRead()) {
-            throw new NotConfiguredException(_("identity file doesn't exists or is not accessible"));
+            throw new MissConfiguredException(_("identity file doesn't exists or is not accessible"));
         }
 
         // Check if known_hosts exists.
         File knownHostsFile = config.getKnownHosts();
         if (!knownHostsFile.isFile() || !knownHostsFile.canRead()) {
-            throw new NotConfiguredException(_("remote server identity (known_hosts) file doesn't exists or is not accessible"));
+            throw new MissConfiguredException(_("remote server identity (known_hosts) file doesn't exists or is not accessible"));
         }
 
         // Don't verify patterns. See pdsl/minarca/#105
@@ -282,28 +287,6 @@ public class API {
             throw new APIException(_("Authentication failed for unknown reason."), e);
         }
         return client;
-    }
-
-    /**
-     * This method is called to sets the default configuration for includes, excludes and scheduled task.
-     * 
-     * @param force
-     *            True to force setting the default. Otherwise, only set to default missing configuration.
-     * @throws APIException
-     */
-    public void defaultConfig(boolean force) throws APIException {
-        LOGGER.debug("restore default config");
-        // Sets the default patterns.
-        if (force || config.getGlobPatterns().isEmpty()) {
-            // Remove non-existing non-globing patterns.
-            config.setGlobPatterns(GlobPattern.DEFAULTS, true);
-        }
-
-        // Delete & create schedule tasks.
-        Scheduler scheduler = getScheduler();
-        if (force || !scheduler.exists()) {
-            scheduler.create();
-        }
     }
 
     protected Scheduler getScheduler() {
@@ -415,6 +398,7 @@ public class API {
         config.setUsername(username, false);
         config.setRepositoryName(repositoryName, false);
         config.setRemotehost(remoteHost, false);
+        config.setRemoteUrl(client.getRemoteUrl(), false);
 
         // Create default schedule
         config.setSchedule(Schedule.DAILY, false);
@@ -422,6 +406,7 @@ public class API {
         // If the backup doesn't exists on the remote server, start an empty initial backup.
         if (exists) {
             LOGGER.debug("repository already exists");
+            config.setConfigured(true, true);
             config.save();
             return;
         }
@@ -487,6 +472,8 @@ public class API {
                 throw new LinkComputerException(null);
             }
         }
+        // Mark minarca as configured.
+        config.setConfigured(true, true);
 
         // Setup the scheduler
         Scheduler scheduler = getScheduler();

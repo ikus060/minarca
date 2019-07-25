@@ -321,7 +321,7 @@ public class CListItem extends Composite {
      */
     public Color getHelpTextForeground() {
         if (helpTextFg == null) {
-            return getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
+            return getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
         }
         return helpTextFg;
     }

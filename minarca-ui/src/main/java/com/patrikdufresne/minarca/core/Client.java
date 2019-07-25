@@ -131,6 +131,15 @@ public class Client {
     }
 
     /**
+     * Return the URL used by this client to establish connection.
+     * 
+     * @return
+     */
+    public String getRemoteUrl() {
+        return this.requests.getUrl();
+    }
+
+    /**
      * List SSH Keys.
      * 
      * @return list of keys.
