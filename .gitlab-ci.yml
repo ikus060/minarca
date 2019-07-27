@@ -31,7 +31,7 @@ sonar:
   allow_failure: true
   script:
   - apt-get update && apt-get -qq install icoutils nsis cron gettext
-  - mvn -B -Drevision=${REVISION} -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN clean verify sonar:sonar
+  - mvn -B -Drevision=${REVISION} -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN clean verify org.jacoco:jacoco-maven-plugin:prepare-agent clean verify sonar:sonar
 
 build:
   stage: build
