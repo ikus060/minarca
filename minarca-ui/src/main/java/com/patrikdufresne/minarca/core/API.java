@@ -132,16 +132,6 @@ public class API {
             return;
         }
 
-        // Check if properly configure (from our point of view).
-        try {
-            checkConfig();
-        } catch (APIException e) {
-            // Show error message (usually localized).
-            LOGGER.info("invalid config", e);
-            config.setLastStatus(LastResult.FAILURE);
-            throw e;
-        }
-
         // If not forced, we need to check if it's time to run a backup.
         if (!force && !isBackupTime(config)) {
             LOGGER.info("not time to backup");
@@ -168,31 +158,31 @@ public class API {
         t.setDaemon(true);
         t.start();
 
-        // Get the config value.
-        String remotehost = config.getRemotehost();
-        String repositoryName = config.getRepositoryName();
-
-        // Get reference to the identity file to be used by ssh or plink.
-        File knownHosts = config.getKnownHosts();
-        File identityFile = config.getPrivateKeyFile();
-
-        // Create a new instance of rdiff backup to test and run the backup.
-        RdiffBackup rdiffbackup = new RdiffBackup(remotehost, knownHosts, identityFile);
-
-        // Read patterns
-        List<GlobPattern> patterns = config.getGlobPatterns();
-        if (patterns.isEmpty()) {
-            t.interrupt();
-            LOGGER.info("fail to read patterns");
-            config.setLastStatus(LastResult.FAILURE);
-            throw new APIException(_("fail to read selective backup settings"));
-        }
-        // By default ignore minarca log files
-        String logFolder = System.getProperty("log.folder");
-        if (StringUtils.isNotEmpty(logFolder)) {
-            patterns.add(new GlobPattern(false, new File(logFolder, "minarca-log*.txt")));
-        }
         try {
+            checkConfig();
+
+            // Get the config value.
+            String remotehost = config.getRemotehost();
+            String repositoryName = config.getRepositoryName();
+            File knownHosts = config.getKnownHosts();
+            File identityFile = config.getPrivateKeyFile();
+
+            // Read patterns
+            List<GlobPattern> patterns = config.getGlobPatterns();
+            if (patterns.isEmpty()) {
+                t.interrupt();
+                LOGGER.info("fail to read patterns");
+                config.setLastStatus(LastResult.FAILURE);
+                throw new APIException(_("fail to read selective backup settings"));
+            }
+            // By default ignore minarca log files
+            String logFolder = System.getProperty("log.folder");
+            if (StringUtils.isNotEmpty(logFolder)) {
+                patterns.add(new GlobPattern(false, new File(logFolder, "minarca-log*.txt")));
+            }
+
+            // Create a new instance of rdiff backup to test and run the backup.
+            RdiffBackup rdiffbackup = new RdiffBackup(remotehost, knownHosts, identityFile);
             // Check the remote server.
             rdiffbackup.testServer(repositoryName);
             // Run backup.
@@ -507,6 +497,7 @@ public class API {
      * @throws InterruptedException
      */
     public void testServer() throws APIException, InterruptedException {
+        checkConfig();
 
         // Get the config value.
         String remotehost = config.getRemotehost();
@@ -534,6 +525,7 @@ public class API {
         config.setRepositoryName(null, false);
         config.setUsername(null, false);
         config.setRemotehost(null, false);
+        config.setConfigured(false, false);
         config.save();
 
         // TODO Remove RSA keys
