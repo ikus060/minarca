@@ -32,6 +32,8 @@ public class MinarcaExecutable {
 
     /**
      * Executable launch to start backup.
+     * 
+     * TODO Should be moved to Compat.
      */
     public static final String MINARCA_EXE;
 

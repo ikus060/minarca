@@ -3,7 +3,7 @@
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-MAIN=com.patrikdufresne.minarca.core.Main
+MAIN=com.patrikdufresne.minarca.ui.Main
 
 # resolve links - $0 may be a softlink
 PRG="$0"

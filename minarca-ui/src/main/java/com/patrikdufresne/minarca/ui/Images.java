@@ -14,8 +14,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 
-import com.patrikdufresne.minarca.Main;
-
 /**
  * Utility class to manage images.
  * 

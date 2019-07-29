@@ -11,7 +11,7 @@
     <fileSets>
         <!-- Include 128px icons -->
         <fileSet>
-            <directory>target/generated-resources/icons/com/patrikdufresne/minarca</directory>
+            <directory>target/generated-resources/icons/com/patrikdufresne/minarca/ui</directory>
             <includes>
                 <include>*128*</include>
             </includes>
@@ -22,12 +22,13 @@
             <directory>target/generate-resources</directory>
             <outputDirectory>.</outputDirectory>
         </fileSet>
-        <!-- Include executable script -->
+        <!-- Include README and LICENSE file -->
         <fileSet>
-            <directory>src/main/root</directory>
-            <excludes>
-                <exclude>bin/minarca</exclude>
-            </excludes>
+            <directory>../</directory>
+            <includes>
+                <include>README*</include>
+                <include>LICENSE*</include>
+            </includes>
             <outputDirectory>.</outputDirectory>
             <directoryMode>0755</directoryMode>
             <fileMode>0644</fileMode>

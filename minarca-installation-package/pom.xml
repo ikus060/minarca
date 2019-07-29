@@ -107,7 +107,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.7</version>
                 <executions>
-                    <!-- Copy icons into /target/package -->
+                    <!-- Copy minarca.ico into /target/package -->
                     <execution>
                         <id>copy-icons-resources</id>
                         <phase>generate-resources</phase>
@@ -118,7 +118,7 @@
                             <resources>
                                 <resource>
                                     <filtering>false</filtering>
-                                    <directory>${project.build.directory}/generated-resources/icons/com/patrikdufresne/minarca</directory>
+                                    <directory>${project.build.directory}/generated-resources/icons/com/patrikdufresne/minarca/ui</directory>
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.directory}/package</outputDirectory>

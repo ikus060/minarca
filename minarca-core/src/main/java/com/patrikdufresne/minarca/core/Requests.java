@@ -55,8 +55,6 @@ import com.google.gson.JsonElement;
 
 public class Requests implements Cloneable {
 
-    protected static final Gson GSON = new GsonBuilder().create();
-
     protected static final Logger LOGGER = LoggerFactory.getLogger(Requests.class);
 
     protected static final String LOGIN = "/login/";
@@ -77,7 +75,7 @@ public class Requests implements Cloneable {
         HttpEntity entity = response.getEntity();
         response.setEntity(new BufferedHttpEntity(entity));
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        return GSON.fromJson(rd, type);
+        return new GsonBuilder().create().fromJson(rd, type);
     }
 
     /**
@@ -295,9 +293,12 @@ public class Requests implements Cloneable {
         for (Element e : elements) {
             // Check if the alert should raise exception.
             String cls = e.attr("class");
-            if (checkInfoException && cls.contains("alert-info")
-                    || checkWarningException && cls.contains("alert-warning")
-                    || checkDangerException && cls.contains("alert-danger")) {
+            if (checkInfoException
+                    && cls.contains("alert-info")
+                    || checkWarningException
+                    && cls.contains("alert-warning")
+                    || checkDangerException
+                    && cls.contains("alert-danger")) {
                 String message = e.text();
                 // Remove the "X" sign from the message.
                 if (message.startsWith("\u00D7")) {

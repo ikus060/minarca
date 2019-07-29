@@ -60,9 +60,9 @@
 	</profiles>
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.5</version>
+			<groupId>com.patrikdufresne</groupId>
+			<artifactId>minarca-core</artifactId>
+			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jface</groupId>
@@ -81,62 +81,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.ibm.icu</groupId>
-			<artifactId>icu4j</artifactId>
-			<version>4.8.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.10</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk16</artifactId>
-			<version>1.46</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.3</version>
-		</dependency>
-
-		<dependency>
-			<!-- jsoup HTML parser library @ http://jsoup.org/ -->
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.8.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.googlecode.gettext-commons</groupId>
-			<artifactId>gettext-commons</artifactId>
-			<version>0.9.8</version>
-		</dependency>
-		<dependency>
 			<groupId>com.patrikdufresne</groupId>
 			<artifactId>minarca-icons</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.patrikdufresne</groupId>
@@ -147,22 +94,6 @@
 			<groupId>com.patrikdufresne</groupId>
 			<artifactId>com.patrikdufresne.fontawesome</artifactId>
 			<version>4.3.0-3</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.10</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.5</version>
-		</dependency>
-		<dependency>
-			<groupId>net.jadler</groupId>
-			<artifactId>jadler-all</artifactId>
-			<version>1.3.0</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -178,23 +109,6 @@
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 					</archive>
-				</configuration>
-			</plugin>
-			<!-- Formatting -->
-			<plugin>
-				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
-				<artifactId>maven-java-formatter-plugin</artifactId>
-				<version>0.4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>format</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<configFile>src/main/build-tools/formatter.xml</configFile>
-					<lineEnding>CRLF</lineEnding>
 				</configuration>
 			</plugin>
 			<!-- Localized -->
@@ -216,7 +130,7 @@
 					<!-- Generate translation for _() -->
 					<keywords>-k_</keywords>
 					<!-- Package and filename of the generated class or properties files -->
-					<targetBundle>com.patrikdufresne.minarca.messages</targetBundle>
+					<targetBundle>com.patrikdufresne.minarca.ui.messages</targetBundle>
 					<outputFormat>properties</outputFormat>
 				</configuration>
 			</plugin>

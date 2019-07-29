@@ -1,6 +1,6 @@
 package com.patrikdufresne.minarca.ui;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.ui.Localized._;
 
 import java.io.File;
 import java.util.ArrayList;

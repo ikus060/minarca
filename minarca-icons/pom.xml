@@ -96,11 +96,11 @@
                             <resources>
                                 <resource>
                                     <directory>${batikDestDir}</directory>
-                                    <targetPath>com/patrikdufresne/minarca</targetPath>
+                                    <targetPath>com/patrikdufresne/minarca/ui</targetPath>
                                 </resource>
                                 <resource>
                                     <directory>${icotoolDestDir}</directory>
-                                    <targetPath>com/patrikdufresne/minarca</targetPath>
+                                    <targetPath>com/patrikdufresne/minarca/ui</targetPath>
                                 </resource>
                             </resources>
                         </configuration>

@@ -5,7 +5,7 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.core.Localized._;
 
 import java.io.File;
 import java.io.IOException;

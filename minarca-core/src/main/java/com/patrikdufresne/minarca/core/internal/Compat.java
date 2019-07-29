@@ -101,6 +101,16 @@ public class Compat {
      */
     public static final String TEMP;
 
+    /**
+     * Return a reference to the pid file for backup.
+     */
+    public static final File PID_FILE_BACKUP;
+
+    /**
+     * Return a reference to the pid file used for the UI.
+     */
+    public static final File PID_FILE_GUI;
+
     static {
         // Use a static block to declare constant value in the right order.
         LOGGER = LoggerFactory.getLogger(Compat.class);
@@ -109,6 +119,8 @@ public class Compat {
         IS_ADMIN = getIsAdmin();
         CONFIG_HOME = getConfigPath(IS_ADMIN);
         DATA_HOME = getDataPath(IS_ADMIN);
+        PID_FILE_BACKUP = new File(DATA_HOME, "backup.pid");
+        PID_FILE_GUI = new File(DATA_HOME, "gui.pid");
         TEMP = getTemp();
         HOME = getHome(IS_ADMIN);
     }
@@ -176,7 +188,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */ {
+        } else /* if (SystemUtils.IS_OS_LINUX) */{
             if (isAdmin) {
                 return "/etc/minarca";
             } else {
@@ -200,7 +212,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */ {
+        } else /* if (SystemUtils.IS_OS_LINUX) */{
             if (isAdmin) {
                 return "/var/lib/minarca";
             } else {
@@ -384,6 +396,7 @@ public class Compat {
         LOGGER.debug("HOME = " + HOME);
         LOGGER.debug("IS_ADMIN = " + IS_ADMIN);
         LOGGER.debug("TEMP = " + TEMP);
+
     }
 
     /**

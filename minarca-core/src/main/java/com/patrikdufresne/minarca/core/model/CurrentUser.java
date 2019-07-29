@@ -45,5 +45,4 @@ public class CurrentUser {
     public List<Repo> findRepos(final String repositoryName) {
         return repos.stream().filter(r -> r.name.equals(repositoryName) || r.name.startsWith(repositoryName + "/")).collect(Collectors.toList());
     }
-
 }

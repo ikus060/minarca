@@ -5,7 +5,7 @@
  */
 package com.patrikdufresne.minarca.core;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.core.Localized._;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -89,6 +90,30 @@ public class API {
 
     public static Config config() {
         return instance().config;
+    }
+
+    /**
+     * Return the copyright text to be displayed.
+     * 
+     * @return
+     */
+    public static String getCopyrightText() {
+        int year = Calendar.getInstance().get(java.util.Calendar.YEAR);
+        return _("Copyright © {0,number,#} - Patrik Dufresne Service Logiciel inc.", year);
+    }
+
+    /**
+     * Return the current version.
+     * 
+     * @return
+     */
+    public static String getCurrentVersion() {
+        // Get the version from the package manifest
+        String version = Main.class.getPackage().getImplementationVersion();
+        if (version == null) {
+            return "DEV";
+        }
+        return version;
     }
 
     /**

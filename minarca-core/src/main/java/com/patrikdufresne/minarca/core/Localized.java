@@ -3,7 +3,7 @@
  * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
  * Use is subject to license terms.
  */
-package com.patrikdufresne.minarca;
+package com.patrikdufresne.minarca.core;
 
 import java.util.Locale;
 
@@ -13,7 +13,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 public class Localized {
 
-    private static final String BUNDLE_NAME = "com.patrikdufresne.minarca.messages";
+    private static final String BUNDLE_NAME = "com.patrikdufresne.minarca.core.messages";
 
     private static I18n i18n;
 

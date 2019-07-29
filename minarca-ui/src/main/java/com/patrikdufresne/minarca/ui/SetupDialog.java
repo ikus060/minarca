@@ -5,7 +5,7 @@
  */
 package com.patrikdufresne.minarca.ui;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.ui.Localized._;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

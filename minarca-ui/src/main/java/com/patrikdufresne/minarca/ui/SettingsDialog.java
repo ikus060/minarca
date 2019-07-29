@@ -5,7 +5,7 @@
  */
 package com.patrikdufresne.minarca.ui;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.ui.Localized._;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -78,8 +78,8 @@ public class SettingsDialog extends Dialog {
     /**
      * Create an executor service to asynchronously update the UI.
      */
-    private ScheduledExecutorService executor = Executors
-            .newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder().namingPattern("scheduled-ui-update-%d").build());
+    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder().namingPattern(
+            "scheduled-ui-update-%d").build());
 
     private AppFormToolkit ft;
 
@@ -494,8 +494,12 @@ public class SettingsDialog extends Dialog {
         try {
             API.config().setSchedule(schedule, true);
         } catch (APIException e) {
-            DetailMessageDialog
-                    .openError(this.getShell(), Display.getAppName(), _("Can't change backup schedule!"), _("Fail to reschedule the backup task."), e);
+            DetailMessageDialog.openError(
+                    this.getShell(),
+                    Display.getAppName(),
+                    _("Can't change backup schedule!"),
+                    _("Fail to reschedule the backup task."),
+                    e);
         }
 
     }
@@ -515,12 +519,11 @@ public class SettingsDialog extends Dialog {
             API.config().setGlobPatterns(dlg.getPatterns(), true);
         } catch (APIException e) {
             LOGGER.error("error updating selective backup configuration", e);
-            DetailMessageDialog
-                    .openError(
-                            this.getShell(),
-                            Display.getAppName(),
-                            _("Error updating selective backup configuration"),
-                            _("Can't change the configuration for unknown reason. If the problem persists, try re-installing Minarca."));
+            DetailMessageDialog.openError(
+                    this.getShell(),
+                    Display.getAppName(),
+                    _("Error updating selective backup configuration"),
+                    _("Can't change the configuration for unknown reason. If the problem persists, try re-installing Minarca."));
         }
 
     }
@@ -538,8 +541,7 @@ public class SettingsDialog extends Dialog {
                             this.getShell(),
                             Display.getAppName(),
                             _("Are you sure you want to stop the current running backup?"),
-                            _(
-                                    "You are about to stop the running backup. Interupting the backup may temporarily disrupt data restore. Are you sure you want to continue?"),
+                            _("You are about to stop the running backup. Interupting the backup may temporarily disrupt data restore. Are you sure you want to continue?"),
                             (String) null);
             if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
                 LOGGER.info("stop backup cancel by user");
@@ -554,8 +556,11 @@ public class SettingsDialog extends Dialog {
                 API.instance().stopBackup();
             } catch (APIException e) {
                 LOGGER.error("an error occurred while stopping the backup", e);
-                DetailMessageDialog
-                        .openError(this.getShell(), Display.getAppName(), _("Can't stop running backup!"), _("An error occurred while stopping the backup."));
+                DetailMessageDialog.openError(
+                        this.getShell(),
+                        Display.getAppName(),
+                        _("Can't stop running backup!"),
+                        _("An error occurred while stopping the backup."));
             }
 
         } else {
@@ -565,8 +570,7 @@ public class SettingsDialog extends Dialog {
                             this.getShell(),
                             Display.getAppName(),
                             _("Do you want to backup your system now?"),
-                            _(
-                                    "You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
+                            _("You are about to backup your system to Minarca. This operation may take some time. While this operation is running you may safely close the Minarca application."),
                             null);
             if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
                 LOGGER.info("backup cancel by user");
@@ -581,8 +585,11 @@ public class SettingsDialog extends Dialog {
                 API.instance().backup(true, true);
             } catch (Exception e) {
                 LOGGER.error("an error occurred while backuping this computer", e);
-                DetailMessageDialog
-                        .openError(this.getShell(), Display.getAppName(), _("Can't backup this system!"), _("An error occurred while backuping this system."));
+                DetailMessageDialog.openError(
+                        this.getShell(),
+                        Display.getAppName(),
+                        _("Can't backup this system!"),
+                        _("An error occurred while backuping this system."));
             }
         }
 
@@ -594,16 +601,14 @@ public class SettingsDialog extends Dialog {
     protected void handleUnlinkComputer() {
 
         // Show a confirmation message.
-        DetailMessageDialog dlg = DetailMessageDialog
-                .openYesNoQuestion(
-                        this.getShell(),
-                        _("Confirm unlink"),
-                        _("Are you sure you want to unlink this system from Minarca?"),
-                        _(
-                                "You are about to unlink this system from Minarca. This "
-                                        + "system will no longer backup it self. Previous "
-                                        + "backup data will not be lost."),
-                        null);
+        DetailMessageDialog dlg = DetailMessageDialog.openYesNoQuestion(
+                this.getShell(),
+                _("Confirm unlink"),
+                _("Are you sure you want to unlink this system from Minarca?"),
+                _("You are about to unlink this system from Minarca. This "
+                        + "system will no longer backup it self. Previous "
+                        + "backup data will not be lost."),
+                null);
         if (dlg.getReturnCode() != IDialogConstants.YES_ID) {
             LOGGER.info("unlink opperation cancel by user");
             return;

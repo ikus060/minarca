@@ -1,6 +1,6 @@
 package com.patrikdufresne.minarca.core;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.core.Localized._;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,6 @@ import org.apache.commons.logging.impl.NoOpLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.patrikdufresne.minarca.Main;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 
@@ -369,7 +368,7 @@ public class Config {
     private void save(File file, Properties properties) throws IOException {
         LOGGER.trace("writing config to [{}]", file);
         Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
-        properties.store(writer, Main.getCopyrightText() + "\r\nMinarca backup configuration.\r\n" + "Please do not change this configuration file manually.");
+        properties.store(writer, API.getCopyrightText() + "\r\nMinarca backup configuration.\r\n" + "Please do not change this configuration file manually.");
         writer.close();
     }
 
