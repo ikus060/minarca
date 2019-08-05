@@ -51,11 +51,8 @@ public class GlobPattern {
     static {
         List<GlobPattern> patterns = new ArrayList<GlobPattern>();
         patterns.addAll(readResource("default_1"));
-        patterns.addAll(readResource("default_1_a"));
         patterns.addAll(readResource("default_5"));
-        patterns.addAll(readResource("default_5_a"));
         patterns.addAll(readResource("default_9"));
-        patterns.addAll(readResource("default_9_a"));
         // Filter out.
         List<GlobPattern> list = new ArrayList<GlobPattern>();
         for (GlobPattern p : patterns) {
@@ -86,7 +83,12 @@ public class GlobPattern {
      * @return
      */
     private static String expand(String value) {
-        return value.replace("${home}", SystemUtils.USER_HOME).replace("${root}", Compat.getRootsPath()[0].toString()).replace("${temp}", Compat.TEMP);
+        return value
+                .replace("${home}", SystemUtils.USER_HOME)
+                .replace("${user.home}", SystemUtils.USER_HOME)
+                .replace("${log.folder}", System.getProperty("log.folder", Compat.TEMP))
+                .replace("${root}", Compat.getRootsPath()[0].toString())
+                .replace("${temp}", Compat.TEMP);
     }
 
     private static String getPath(File file) {

@@ -200,11 +200,8 @@ public class API {
                 config.setLastStatus(LastResult.FAILURE);
                 throw new APIException(_("fail to read selective backup settings"));
             }
-            // By default ignore minarca log files
-            String logFolder = System.getProperty("log.folder");
-            if (StringUtils.isNotEmpty(logFolder)) {
-                patterns.add(new GlobPattern(false, new File(logFolder, "minarca-log*.txt")));
-            }
+            // Add sets of patterns
+            patterns.addAll(GlobPattern.ADVANCE);
 
             // Create a new instance of rdiff backup to test and run the backup.
             RdiffBackup rdiffbackup = new RdiffBackup(remotehost, knownHosts, identityFile);
@@ -461,6 +458,9 @@ public class API {
         } while (attempt > 0);
 
         // Restore glob patterns
+        if (previousPatterns.isEmpty()) {
+            previousPatterns = GlobPattern.DEFAULTS;
+        }
         config.setGlobPatterns(previousPatterns, false);
 
         // Check if repository exists.
