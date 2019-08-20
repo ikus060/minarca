@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -193,7 +194,9 @@ public class API {
             File identityFile = config.getPrivateKeyFile();
 
             // Read patterns
-            List<GlobPattern> patterns = config.getGlobPatterns();
+            List<GlobPattern> patterns = new ArrayList<>();
+            patterns.addAll(GlobPattern.ADVANCE_BEFORE);
+            patterns.addAll(config.getGlobPatterns());
             if (patterns.isEmpty()) {
                 t.interrupt();
                 LOGGER.info("fail to read patterns");
@@ -201,7 +204,7 @@ public class API {
                 throw new APIException(_("fail to read selective backup settings"));
             }
             // Add sets of patterns
-            patterns.addAll(GlobPattern.ADVANCE);
+            patterns.addAll(GlobPattern.ADVANCE_AFTER);
 
             // Create a new instance of rdiff backup to test and run the backup.
             RdiffBackup rdiffbackup = new RdiffBackup(remotehost, knownHosts, identityFile);

@@ -39,7 +39,12 @@ public class GlobPattern {
     /**
      * List of advance patterns
      */
-    public static final List<GlobPattern> ADVANCE;
+    public static final List<GlobPattern> ADVANCE_BEFORE;
+
+    /**
+     * List of advance pattern
+     */
+    public static final List<GlobPattern> ADVANCE_AFTER;
 
     /**
      * List of default patterns
@@ -50,9 +55,7 @@ public class GlobPattern {
 
     static {
         List<GlobPattern> patterns = new ArrayList<GlobPattern>();
-        patterns.addAll(readResource("default_1"));
-        patterns.addAll(readResource("default_5"));
-        patterns.addAll(readResource("default_9"));
+        patterns.addAll(readResource("default"));
         // Filter out.
         List<GlobPattern> list = new ArrayList<GlobPattern>();
         for (GlobPattern p : patterns) {
@@ -64,11 +67,8 @@ public class GlobPattern {
     }
 
     static {
-        List<GlobPattern> patterns = new ArrayList<GlobPattern>();
-        patterns.addAll(readResource("default_1_a"));
-        patterns.addAll(readResource("default_5_a"));
-        patterns.addAll(readResource("default_9_a"));
-        ADVANCE = patterns;
+        ADVANCE_BEFORE = readResource("advance_before");
+        ADVANCE_AFTER = readResource("advance_before");
     }
 
     private static String encode(String pattern) {
@@ -102,7 +102,7 @@ public class GlobPattern {
      * @return
      */
     public static boolean isAdvance(GlobPattern pattern) {
-        return ADVANCE.contains(pattern);
+        return ADVANCE_AFTER.contains(pattern) || ADVANCE_BEFORE.contains(pattern);
     }
 
     private static boolean isGlobbing(String pattern) {

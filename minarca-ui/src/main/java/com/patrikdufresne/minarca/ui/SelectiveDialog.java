@@ -63,11 +63,6 @@ public class SelectiveDialog extends Dialog {
 
     private List<GlobPattern> patterns = new ArrayList<GlobPattern>();
 
-    /**
-     * True to show all advance patterns.
-     */
-    private boolean showAdvance = false;
-
     protected SelectiveDialog(Shell parentShell) {
         super(parentShell);
     }
@@ -166,15 +161,6 @@ public class SelectiveDialog extends Dialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 handleAddFileCustom();
-            }
-        });
-
-        final Button showAdvanceButton = new Button(buttons, SWT.CHECK);
-        showAdvanceButton.setText(_("Show advance patterns"));
-        showAdvanceButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                handleShowAdvancePatterns(showAdvanceButton.getSelection());
             }
         });
 
@@ -309,21 +295,23 @@ public class SelectiveDialog extends Dialog {
         // Check if file exists
         GlobPattern p = new GlobPattern(true, file);
         if (!p.isFileExists()) {
-            DetailMessageDialog.openInformation(
-                    getShell(),
-                    getShell().getText(),
-                    _("Selected item doesn't exists!"),
-                    _("The path `{0}` cannot be include because it doesn't exists.", file));
+            DetailMessageDialog
+                    .openInformation(
+                            getShell(),
+                            getShell().getText(),
+                            _("Selected item doesn't exists!"),
+                            _("The path `{0}` cannot be include because it doesn't exists.", file));
             return;
         }
 
         // Check if modification required.
         if (patterns.contains(p)) {
-            DetailMessageDialog.openInformation(
-                    getShell(),
-                    getShell().getText(),
-                    _("Selected item is already include!"),
-                    _("The path `{0}` is already include in you selective backup.", file));
+            DetailMessageDialog
+                    .openInformation(
+                            getShell(),
+                            getShell().getText(),
+                            _("Selected item is already include!"),
+                            _("The path `{0}` is already include in you selective backup.", file));
             return;
         }
 
@@ -361,16 +349,6 @@ public class SelectiveDialog extends Dialog {
     }
 
     /**
-     * Called when user click on "show advance" check box.
-     * 
-     * @param selection
-     */
-    protected void handleShowAdvancePatterns(boolean selection) {
-        this.showAdvance = selection;
-        refreshCustomList(true);
-    }
-
-    /**
      * Called when the user click the toggle button.
      * 
      * @param event
@@ -398,9 +376,7 @@ public class SelectiveDialog extends Dialog {
         // Compute the custom list of includes
         for (int i = 0; i < this.patterns.size(); i++) {
             GlobPattern p = this.patterns.get(i);
-            if (!GlobPattern.isAdvance(p) || this.showAdvance) {
-                createItem(this.customList, p, i);
-            }
+            createItem(this.customList, p, i);
         }
 
         // Create empty item is required
