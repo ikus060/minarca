@@ -413,7 +413,7 @@ public class SettingsDialog extends Dialog {
          */
         CListItem selectiveBackupItem = new CListItem(backupItemlist, _("Selective backup"));
         selectiveBackupItem.setTitleHelpText(_("Allow you to select files and folders to backup."));
-        Button selectiveButton = selectiveBackupItem.createButtonConfig();
+        Button selectiveButton = selectiveBackupItem.createButton(_("Select my files"));
         selectiveButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
