@@ -10,3 +10,6 @@
 # Exclude specific for Win 7
 -${home}/Tracing/
 -${home}/Searches/
+
+# Exclude TEMP
+- ${temp}

@@ -1,12 +1,50 @@
-# Exclupde pagefile
--**/pagefile.sys
+# Exclude operating system
+-*:/WINDOWS
+-*:/WINNT
+-*:/Program Files
+-*:/Program Files (x86)
+
+# Exclude Office install
+-*:/MSOCache
+
+# Exclude old Windows installation
+-*:/Windows.old
+
+# Exclude performance logs
+-*:/PerfLogs
+
+# Exclude cache files
+-*:/Users/All Users/Microsoft/Search
+-*:/Users/All Users/Microsoft Help
+-*:/Users/All Users/Microsoft/Windows Defender
+
+-*:/ProgramDataMicrosoft/Search
+-*:/ProgramData/Microsoft Help
+-*:/ProgramData/Microsoft/Windows Defender
+
 -**/NTUSER.DAT*
 -**/ntuser.dat*
 -**/desktop.ini
 -**/ntuser.ini
 -**/Thumbs.db
 -**/Default.rdp
+
+-*:/io.sys
+-*:/config.sys
+-*:/msdos.sys
+-*:/pagefile.sys
+-*:/hiberfil.sys
+-*:/swapfile.sys
+-*:/autoexec.bat
+-*:/boot.ini
+-*:/ntdetect.com
+-*:/bootmgr
+-*:/ntldr
+
 # Do not backup recovery
--${root}Recovery/
+-*:/Recovery/
 # Do not backup Trash.
 -**/$RECYCLE.BIN/
+
+# Exclude Outlook cache
+-*.ost
