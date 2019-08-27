@@ -7,6 +7,11 @@
 # ----------------------------------------------------------------------
 set -e
 #set -x
+
+if [ -e /etc/minarca/minarca-shell.conf ]; then
+    . /etc/minarca/minarca-shell.conf
+fi
+
 USERNAME=$1
 USERHOME=$2
 
@@ -32,7 +37,7 @@ if [ "$SSH_ORIGINAL_COMMAND" == "rdiff-backup --server" ]; then
     # When called by rdiff-backup, retrict path to user's home.
     # But this will force rdiff-backup client to provide the full path.
     logger "$0: user [$USERNAME] in [$USERHOME] invalid command: $SSH_ORIGINAL_COMMAND"
-    rdiff-backup --server --restrict="$USERHOME"
+    rdiff-backup --server --restrict="$USERHOME" $RDIFFBACKUP_ARGS
     exit
 fi
 
@@ -47,4 +52,4 @@ fi
 
 logger "$0: user [$USERNAME] in [$USERHOME] repo: $REPO"
 cd "$USERHOME"
-rdiff-backup --server --restrict="$REPO"
+rdiff-backup --server --restrict="$REPO" $RDIFFBACKUP_ARGS
