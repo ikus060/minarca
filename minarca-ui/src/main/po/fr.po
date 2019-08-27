@@ -1,20 +1,19 @@
-# French translations for minarca.
-# Copyright (C) 2018 ORGANIZATION
-# This file is distributed under the same license as the minarca project.
-# Patrik Dufresne <info@patrikdufresne.com>, 2014.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-08-20 08:15-0400\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2019-08-27 13:37+0000\n"
 "Last-Translator: Patrik Dufresne <info@patrikdufresne.com>\n"
-"Language-Team: fr <LL@li.org>\n"
-"Language: \n"
+"Language-Team: No linguistic content\n"
+"Language: zxx\n"
+"Plural-Forms: nplurals=2; plural=n!=1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Loco-Source-Locale: fr_CA\n"
+"X-Loco-Parser: loco_parse_po\n"
+"X-Generator: Loco https://localise.biz/"
 
 #: com/patrikdufresne/minarca/ui/DetailMessageDialog.java:530
 msgid "copy"
@@ -25,24 +24,21 @@ msgid "About"
 msgstr "À propos"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:153
-#, fuzzy
 msgid "Stop backup"
-msgstr "Sauvegarde sélective"
+msgstr "Arrêt de la sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:153
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:153 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:323
-#, fuzzy
 msgid "Start backup"
-msgstr "Sauvegarde sélective"
+msgstr "Début de la sauvegarde"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:161
-#, fuzzy
 msgid "Running"
-msgstr "En exécution..."
+msgstr "Exécution en cours"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:165
 msgid "Successful"
-msgstr "Félicitation"
+msgstr "Réussi"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:169
 msgid "Failed"
@@ -58,57 +54,53 @@ msgstr "Bloqué"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:180
 msgid "Interrupt"
-msgstr "Interrompu"
+msgstr "Interrompre"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:184
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:184 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:216
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:211
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:211 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:239
 msgid "Connected"
-msgstr ""
+msgstr "Connecté"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:316
-#, fuzzy
 msgid "Minarca status"
-msgstr "Paramètres de Minarca"
+msgstr "Statut de Minarca"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:321
 msgid "Last Backup"
-msgstr ""
+msgstr "Dernière sauvegarde"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:333
 msgid "Connectivity status"
-msgstr ""
+msgstr "Statut de la connectivité"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:337
-#, fuzzy
 msgid "Unlink"
-msgstr "Dissocier ..."
+msgstr "Dissocier"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:338
-#, fuzzy
 msgid "Unlink you system from Minarca"
-msgstr "Dissocier ce système de Minarca."
+msgstr "Dissocier votre système de Minarca."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:353
 msgid "Schedule"
 msgstr "Planification"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:357
-#, fuzzy
 msgid "Define the backup frequency"
-msgstr "Définit la fréquence de sauvegarde."
+msgstr "Définissez la fréquence de sauvegarde."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:364
 msgid "Hourly"
-msgstr "Heure"
+msgstr "À l'heure"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:366
 msgid "Daily"
-msgstr "Quotidienne"
+msgstr "Journalier"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:368
 msgid "Weekly"
@@ -116,22 +108,21 @@ msgstr "Hebdomadaire"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:370
 msgid "Monthly"
-msgstr "Mensuelle"
+msgstr "Mensuellement"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:397
-#, fuzzy
 msgid "Backup"
-msgstr "Échec de la sauvegarde"
+msgstr "Sauvegarde"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:402
 msgid "Go to Minarca website"
-msgstr "Aller sur le site web de minarca"
+msgstr "Aller sur le site web de Minarca"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:403
 msgid "Browse my backup"
-msgstr ""
+msgstr "Parcourir ma sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:414
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:414 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:91
 msgid "Selective backup"
 msgstr "Sauvegarde sélective"
@@ -140,9 +131,13 @@ msgstr "Sauvegarde sélective"
 msgid "Allow you to select files and folders to backup."
 msgstr "Vous permet de sélectionner les fichiers et dossiers à sauvegarder."
 
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:416
+msgid "Select my files"
+msgstr "Sélectionnez mes fichiers"
+
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:500
 msgid "Can't change backup schedule!"
-msgstr "Vous ne pouvez pas changer la fréquence de sauvegarde!"
+msgstr "Vous ne pouvez pas changer la programmation de la sauvegarde !"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:501
 msgid "Fail to reschedule the backup task."
@@ -150,7 +145,7 @@ msgstr "Impossible de replanifier la tâche de sauvegarde."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:525
 msgid "Error updating selective backup configuration"
-msgstr "Erreur lors de la mise à jour de la configuration"
+msgstr "Erreur lors de la configuration de la sauvegarde sélective"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:526
 msgid ""
@@ -162,30 +157,28 @@ msgstr ""
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:543
 msgid "Are you sure you want to stop the current running backup?"
-msgstr ""
-"Êtes-vous sûr de vouloir arrêter la sauvegarde qui est en cours d'exécution?"
+msgstr "Êtes-vous sûr de vouloir arrêter la sauvegarde en cours?"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:544
 msgid ""
 "You are about to stop the running backup. Interupting the backup may "
 "temporarily disrupt data restore. Are you sure you want to continue?"
 msgstr ""
-"Vous êtes sur le point d'arrêter une sauvegarde qui est en cours "
-"d'exécution. L'interruption de la sauvegarde en cours peut perturber "
-"temporairement la restauration  de vos données. Êtes vous certain de vouloir "
-"continuer?"
+"Vous êtes sur le point d'arrêter une sauvegarde qui est en cours d'exécution."
+" L'interruption de la sauvegarde peut perturber temporairement la "
+"restauration de vos données. Êtes-vous certain de vouloir continuer?"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:562
 msgid "Can't stop running backup!"
-msgstr "Impossible d'interrompe la sauvegarde en cour d'exécution"
+msgstr "Impossible d'interrompre la sauvegarde en cours!"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:563
 msgid "An error occurred while stopping the backup."
-msgstr "Une erreur s'est produite lors de l'arrêt de la sauvegarde en cours."
+msgstr "Une erreur s'est produite lors de l'arrêt de la sauvegarde."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:572
 msgid "Do you want to backup your system now?"
-msgstr "Voulez-vous lancer une sauvegarde de votre système?"
+msgstr "Voulez-vous lancer une sauvegarde de votre système maintenant ?"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:573
 msgid ""
@@ -199,7 +192,7 @@ msgstr ""
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:591
 msgid "Can't backup this system!"
-msgstr "Impossible de sauvegarder ce système!"
+msgstr "Impossible de sauvegarder ce système !"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:592
 msgid "An error occurred while backuping this system."
@@ -207,7 +200,7 @@ msgstr "Une erreur s'est produite lors de la sauvegarde de ce système."
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:606
 msgid "Confirm unlink"
-msgstr "Confirmer dissociation"
+msgstr "Confirmer la dissociation"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:607
 msgid "Are you sure you want to unlink this system from Minarca?"
@@ -228,7 +221,7 @@ msgstr "Erreur"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:622
 msgid "Can't unlink this system!"
-msgstr "Impossible de dissocier ce système!"
+msgstr "Impossible de dissocier ce système !"
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:622
 msgid "An error occurred while unlinking this system."
@@ -245,7 +238,7 @@ msgstr "À propos de {0}"
 
 #: com/patrikdufresne/minarca/ui/AboutDialog.java:102
 msgid "Minarca is an all integrated online backup solution."
-msgstr "Minarca est une solution de sauvegarde en ligne tout intégrée."
+msgstr "Minarca est une solution de sauvegarde en ligne complètement intégrée."
 
 #: com/patrikdufresne/minarca/ui/Main.java:136
 msgid "Minarca"
@@ -257,7 +250,7 @@ msgstr "Configuration de Minarca"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:160
 msgid "Tell Minarca where to backup your data"
-msgstr ""
+msgstr "Fournir a Minarca l'endroit où déposer la sauvegarde"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:166
 msgid ""
@@ -265,20 +258,25 @@ msgid ""
 "Minara server. This information should be provided to you by your system "
 "administrator."
 msgstr ""
+"Pour configurer la sauvegarde des données de Minarca vous devez fournir le "
+"lien URL d'un serveur Minarca. Cette information devrait vous être remise "
+"par votre administrateur système."
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:172
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:175
 msgid ""
-"Enter the remote server address. Either an IP address and port or a URL. e."
-"g.: http://example.com:8080"
+"Enter the remote server address. Either an IP address and port or a URL. e.g."
+": http://example.com:8080"
 msgstr ""
+"Entrer l'adresse IP et le numéro de port du serveur distant. Vous pouvez "
+"aussi inscrire le lien URL tel que http://example.com:8080"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:177
 msgid "http[s]://hostname[:port]"
-msgstr ""
+msgstr "http[s]://nom de l'hôte[:port]"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:180
 msgid "Username"
@@ -298,6 +296,9 @@ msgid ""
 "provide a friendly name. By default, the computer's name is used. This value "
 "cannot be changed."
 msgstr ""
+"Vous devez fournir un nom unique pour identifier votre ordinateur à Minarca. "
+"Veuillez fournir un nom simple, sinon le nom de l'ordinateur sera utilisé "
+"par défaut. Noter que vous ne pourrez plus changer cette valeur."
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:210
 msgid "Link"
@@ -305,35 +306,38 @@ msgstr "Associer"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:280
 msgid "A problem happend during the linking process to Minarca server!"
-msgstr ""
+msgstr "Un problème est survenu lors de la liaison au serveur Minarca!"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:344
-#, fuzzy, java-format
+#, java-format
 msgid ""
 "Repository name {0} already exists ! Do you want to keep the given "
 "repository name ?"
-msgstr "Êtes-vous sûr de vouloir conserver ce nom de dépôt?"
+msgstr ""
+"Un dépôt du nom {0} existe déjà. Êtes-vous certain de vouloir conserver ce "
+"nom de dépôt?"
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:346
-#, fuzzy
 msgid ""
 "The given repository name is already exists in Mianrca. You may safely keep "
 "this repository name if the name is not used by another computer linked to "
 "Minarca."
 msgstr ""
-"Le nom de dépôt est déjà utilisé dans Minarca. Vous pouvez garder ce nom "
-"s'il n'est plus utilisé par un autre système lié à Minarca."
+"Un dépôt du nom existe déjà dans Minarca. Vous pouvez sans risque garder "
+"ce nom de dépôt s'il n'est pas utilisé par un autre ordinateur lié à Minarca."
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:364
-#, fuzzy
 msgid "Link process interrupted"
-msgstr "Sauvegarde interrompue"
+msgstr "Liaison interrompue."
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:377
 msgid ""
 "Unexpected error happen during the linking process with the server. Verify "
 "connectivity with the server and try again later."
 msgstr ""
+"Une erreur inattendue est survenue durant la liaison au serveur. Veuillez "
+"vérifier la connectivité avec le serveur et essayer de nouveau un peu plus "
+"tard."
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:55
 msgid "Restore defaults"
@@ -343,8 +347,8 @@ msgstr "Réinitialiser"
 msgid ""
 "Select files or folders you want to include or exclude from your backup."
 msgstr ""
-"Sélectionnez les fichiers ou les dossiers que vous souhaitez inclurent ou "
-"exclurent de votre sauvegarde."
+"Sélectionnez les fichiers ou les dossiers que vous souhaitez inclure ou "
+"exclure de votre sauvegarde."
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:150
 msgid "Add folder..."
@@ -356,7 +360,7 @@ msgstr "Ajouter un fichier ..."
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:189
 msgid "Custom pattern"
-msgstr "Modèle personalisé"
+msgstr "Modèle personnalisé"
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:198
 msgid "(not exists)"
@@ -376,16 +380,16 @@ msgstr "Sélectionnez un dossier à ajouter à votre sauvegarde sélective."
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:302
 msgid "Selected item doesn't exists!"
-msgstr "L'item sélectionné n'existe pas!"
+msgstr "L'article sélectionné n'existe pas!"
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:303
 #, java-format
 msgid "The path `{0}` cannot be include because it doesn't exists."
-msgstr "L'emplacement `{0}` ne peut être inclus, car il n'existe pas."
+msgstr "L'emplacement `{0}` ne peut être inclus car il n'existe pas."
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:313
 msgid "Selected item is already include!"
-msgstr "L'item sélectionné est déjà inclus!"
+msgstr "L'article sélectionné est déjà inclus!"
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:314
 #, java-format
@@ -394,7 +398,7 @@ msgstr "L'emplacement `{0}` est déjà inclus dans votre sauvegarde sélective."
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:330
 msgid "Selected item is excluded by another pattern."
-msgstr "L'item sélectionné est exclu par un autre modèle."
+msgstr "L'article sélectionné est exclu par un autre modèle."
 
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:332
 #, java-format
@@ -402,6 +406,6 @@ msgid ""
 "The path `{0}` is currently excluded by another pattern. You may need to "
 "reorganize your patterns to properly include the selected item."
 msgstr ""
-"L'emplacement `{0}` est actuellement exclu par un autre modèle. Il vous sera "
-"nécessaire de réorganiser vos paramètres de sauvegarde sélective pour "
-"inclure l'item sélectionné."
+"L'emplacement `{0}` est actuellement exclu par un autre modèle. Vous devriez "
+"possiblement réorganiser vos paramètres de sauvegarde sélective pour inclure "
+"l'article sélectionné."

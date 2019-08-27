@@ -1,46 +1,47 @@
-# French translations for minarca.
-# Copyright (C) 2018 ORGANIZATION
-# This file is distributed under the same license as the minarca project.
-# Patrik Dufresne <info@patrikdufresne.com>, 2014.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-08-20 08:14-0400\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2019-08-27 13:26+0000\n"
 "Last-Translator: Patrik Dufresne <info@patrikdufresne.com>\n"
-"Language-Team: fr <LL@li.org>\n"
-"Language: \n"
+"Language-Team: No linguistic content\n"
+"Language: zxx\n"
+"Plural-Forms: nplurals=2; plural=n!=1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Loco-Source-Locale: fr_CA\n"
+"X-Loco-Parser: loco_parse_po\n"
+"X-Generator: Loco https://localise.biz/"
 
 #: com/patrikdufresne/minarca/core/APIException.java:23
 msgid "Wrong username or password."
-msgstr ""
+msgstr "Erreur d'usager ou de mot de passe."
 
 #: com/patrikdufresne/minarca/core/APIException.java:37
 msgid ""
 "Failed to establish connectivity with the server. Verfy if the URL provided "
 "is valid and responding."
 msgstr ""
+"Problème de connectivité avec le serveur. Veuillez vérifier que le lien URL "
+"est valide et répond."
 
 #: com/patrikdufresne/minarca/core/APIException.java:51
 msgid "Fail to send SSH key to Minarca."
-msgstr "Impossible d'envoyer la clé de sécurité à Minarca."
+msgstr "Impossible d'envoyer la clé de sécurité SSH à Minarca."
 
 #: com/patrikdufresne/minarca/core/APIException.java:65
 msgid "Fail to generate the security keys."
-msgstr "Impossible de générer la clé de securité."
+msgstr "Impossible de générer la clé de sécurité."
 
 #: com/patrikdufresne/minarca/core/APIException.java:79
 msgid "identity file %s is missing"
-msgstr "le fichier d'identité %s n'existe pas ou n'est pas accessible"
+msgstr "le fichier d'identité %s est manquant"
 
 #: com/patrikdufresne/minarca/core/APIException.java:92
 msgid "Initial backup did not complete successfully."
-msgstr "La sauvegarde initiale a échoué."
+msgstr "échec de la sauvegarde initiale."
 
 #: com/patrikdufresne/minarca/core/APIException.java:106
 msgid "Initial backup didn't run."
@@ -56,10 +57,10 @@ msgstr "Impossible d'associer votre ordinateur."
 
 #: com/patrikdufresne/minarca/core/APIException.java:149
 msgid "minarca is missing"
-msgstr "minarca est manquant "
+msgstr "Minarca est manquant "
 
 #: com/patrikdufresne/minarca/core/APIException.java:178
-#, fuzzy, java-format
+#, java-format
 msgid "Repository name {0} already exists."
 msgstr "Le nom de dépôt {0} est déjà utilisé"
 
@@ -69,33 +70,34 @@ msgstr "La tâche planifiée est introuvable"
 
 #: com/patrikdufresne/minarca/core/APIException.java:205
 msgid "ssh is missing"
-msgstr "ssh est absent"
+msgstr "la clé SSH est manquante"
 
 #: com/patrikdufresne/minarca/core/APIException.java:213
 msgid "You don't have sufficient permissions to execute this application!"
 msgstr ""
 "Vous ne disposez pas des autorisations nécessaires pour exécuter cette "
-"application!"
+"application !"
 
 #: com/patrikdufresne/minarca/core/APIException.java:224
 msgid ""
 "Minarca doesn't support your operating system. This application will close."
 msgstr ""
-"Minarca ne supporte pas votre système d'exploitation. Cette application va "
+"Minarca ne supporte pas votre système d'exploitation. L'application va "
 "fermer."
 
 #: com/patrikdufresne/minarca/core/APIException.java:233
 msgid "Remote SSH host is not trusted"
-msgstr "L'hôte distant n'est pas digne de confiance"
+msgstr ""
+"Le certificat de sécurité SSH de l'hôte distant n'est pas digne de confiance"
 
 #: com/patrikdufresne/minarca/core/API.java:103
 #, java-format
 msgid "Copyright © {0,number,#} - Patrik Dufresne Service Logiciel inc."
-msgstr "Droit d''auteur © {0,number,#} - Patrik Dufresne Service Logiciel inc."
+msgstr "Droit d'auteur © {0,number,#} - Patrik Dufresne Service Logiciel inc."
 
 #: com/patrikdufresne/minarca/core/API.java:204
 msgid "fail to read selective backup settings"
-msgstr "impossible de lire les paramètres de sauvegarde selective"
+msgstr "Impossible de lire les paramètres de sauvegarde sélective"
 
 #: com/patrikdufresne/minarca/core/API.java:222
 msgid "Backup interrupted"
@@ -103,7 +105,7 @@ msgstr "Sauvegarde interrompue"
 
 #: com/patrikdufresne/minarca/core/API.java:227
 msgid "Backup failed"
-msgstr "Échec de la sauvegarde"
+msgstr "Échec de sauvegarde"
 
 #: com/patrikdufresne/minarca/core/API.java:242
 msgid "Missing repository name"
@@ -114,53 +116,52 @@ msgid "Missing username"
 msgstr "Nom d'usager manquant"
 
 #: com/patrikdufresne/minarca/core/API.java:248
-#, fuzzy
 msgid "Missing remote host"
-msgstr "Nom d'usager manquant"
+msgstr "Nom de l'hôte manquant"
 
 #: com/patrikdufresne/minarca/core/API.java:251
 msgid "Missing remote server URL"
-msgstr ""
+msgstr "Lien URL du serveur distant manquant"
 
 #: com/patrikdufresne/minarca/core/API.java:256
 msgid "identity file doesn't exists or is not accessible"
 msgstr "le fichier d'identité n'existe pas ou n'est pas accessible"
 
 #: com/patrikdufresne/minarca/core/API.java:262
-#, fuzzy
 msgid ""
 "remote server identity (known_hosts) file doesn't exists or is not accessible"
-msgstr "le fichier d'identité n'existe pas ou n'est pas accessible"
+msgstr ""
+"le fichier d'identité du serveur distant (hôte connu) n'existe pas ou n'est "
+"pas accessible"
 
 #: com/patrikdufresne/minarca/core/API.java:268
 msgid "selective backup settings are missing"
-msgstr "paramètres de sauvegarde selective manquants"
+msgstr "paramètres de sauvegarde sélective manquants"
 
 #: com/patrikdufresne/minarca/core/API.java:297
-#, fuzzy
 msgid "Unknown server error."
-msgstr "Une erreur inconnue s'est produite!"
+msgstr "Une erreur inconnue s'est produite ."
 
 #: com/patrikdufresne/minarca/core/API.java:302
 msgid "Authentication failed for unknown reason."
-msgstr ""
+msgstr "Identification non réussie pour des raisons inconnues."
 
 #: com/patrikdufresne/minarca/core/API.java:363
-#, fuzzy
 msgid "repository name cannot be empty"
-msgstr "Le nom du dépôt ne peut être vide."
+msgstr "Le nom du dépôt ne peut être vide"
 
 #: com/patrikdufresne/minarca/core/API.java:364
-#, fuzzy
 msgid "repository must only contains letters, numbers, dash (-) and dot (.)"
-msgstr "Peut seulement contenir lettres, chiffres, tiret(-) et point(.)"
+msgstr ""
+"le dépôt doit contenir seulement des lettres, chiffres, tiret (-) et point (."
+")"
 
-#: com/patrikdufresne/minarca/core/Config.java:353
-#: com/patrikdufresne/minarca/core/Config.java:359
+#: com/patrikdufresne/minarca/core/Config.java:353 
+#: com/patrikdufresne/minarca/core/Config.java:359 
 #: com/patrikdufresne/minarca/core/Config.java:413
 msgid "fail to save config"
 msgstr "échec de l'enregistrement des configurations"
 
 #: com/patrikdufresne/minarca/core/Config.java:419
 msgid "fail to refresh config"
-msgstr "échec lors de l'actualisation des configurations"
+msgstr "échec de l'actualisation des configurations"

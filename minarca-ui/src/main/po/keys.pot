@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-20 08:15-0400\n"
+"POT-Creation-Date: 2019-08-27 09:52-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,6 +131,10 @@ msgstr ""
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:415
 msgid "Allow you to select files and folders to backup."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:416
+msgid "Select my files"
 msgstr ""
 
 #: com/patrikdufresne/minarca/ui/SettingsDialog.java:500
