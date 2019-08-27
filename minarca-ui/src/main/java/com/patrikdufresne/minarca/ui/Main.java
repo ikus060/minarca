@@ -9,6 +9,7 @@ import static com.patrikdufresne.minarca.ui.Localized._;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -147,6 +148,9 @@ public class Main {
         try {
             API.checkEnv();
         } catch (APIException e) {
+            LOGGER.info("{} {} {}", SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH);
+            LOGGER.info("{} (build {}, {})", SystemUtils.JAVA_VM_INFO, SystemUtils.JAVA_VM_VERSION, SystemUtils.JAVA_VM_INFO);
+            LOGGER.info("invalid environment", e);
             MessageDialog.openError(null, Display.getAppName(), e.getMessage());
             System.exit(1);
         }
@@ -154,7 +158,7 @@ public class Main {
         WindowManager winManager = null;
         try {
             // If not configured open dialog to configure minarca.
-            if (!API.config().getConfigured()) {
+            if (!API.instance().config().getConfigured()) {
                 if (!SetupDialog.open(null)) {
                     // If user cancel, close application.
                     return;

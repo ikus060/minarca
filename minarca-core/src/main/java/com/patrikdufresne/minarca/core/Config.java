@@ -10,7 +10,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,27 +42,7 @@ public class Config {
      */
     private static final String FILENAME_GLOB_PATTERNS = "patterns";;
 
-    /**
-     * Filename used for configuration file. Notice, this is also read by batch file.
-     */
-    private static final String FILENAME_STATUS = "status.properties";
-
     private static final transient Logger LOGGER = LoggerFactory.getLogger(Config.class);
-
-    /**
-     * Property name.
-     */
-    private static final String PROPERTY_LAST_DATE = "lastdate";
-
-    /**
-     * Property name.
-     */
-    private static final String PROPERTY_LAST_RESULT = "lastresult";
-
-    /**
-     * Property name.
-     */
-    private static final String PROPERTY_LAST_SUCCESS = "lastsuccess";
 
     /**
      * Property name.
@@ -128,20 +107,9 @@ public class Config {
      */
     private PropertiesConfiguration properties;
 
-    /**
-     * Reference to the status.
-     */
-    protected PropertiesConfiguration status;
-
-    /**
-     * Reference to status file.
-     */
-    protected File statusFile;
-
     public Config() {
         this.confFile = new File(Compat.CONFIG_HOME, FILENAME_CONF); // $NON-NLS-1$
         this.globPatternsFile = new File(Compat.CONFIG_HOME, FILENAME_GLOB_PATTERNS); // $NON-NLS-1$
-        this.statusFile = new File(Compat.DATA_HOME, FILENAME_STATUS); // $NON-NLS-1$
         // Load the configuration
         load();
     }
@@ -196,59 +164,6 @@ public class Config {
      */
     public File getKnownHosts() {
         return new File(Compat.CONFIG_HOME, "known_hosts");
-    }
-
-    /**
-     * Retrieve the last result.
-     * 
-     * @return the last result.
-     */
-    public LastResult getLastResult() {
-        try {
-            String value = this.status.getString(PROPERTY_LAST_RESULT);
-            if (value == null) {
-                return LastResult.HAS_NOT_RUN;
-            }
-            LastResult result = LastResult.valueOf(value);
-            if (LastResult.RUNNING.equals(result)) {
-                Date now = new Date();
-                Date date = getLastResultDate();
-                if (date.getTime() < now.getTime() - (API.RUNNING_DELAY * 2)) {
-                    return LastResult.STALE;
-                }
-            }
-            return result;
-        } catch (Exception e) {
-            return LastResult.UNKNOWN;
-        }
-    }
-
-    /**
-     * Return the last backup date. (success or failure)
-     * 
-     * @return
-     */
-    public Date getLastResultDate() {
-        try {
-            Long value = status.getLong(PROPERTY_LAST_DATE);
-            return new Date(value.longValue());
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Return the last successful backup date.
-     * 
-     * @return Date of last success or null.
-     */
-    public Date getLastSuccess() {
-        try {
-            Long value = status.getLong(PROPERTY_LAST_SUCCESS);
-            return new Date(value.longValue());
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     /**
@@ -327,12 +242,6 @@ public class Config {
         } catch (ConfigurationException e1) {
             LOGGER.warn("can't load properties {}", this.confFile);
         }
-        LOGGER.debug("reading properties from [{}]", this.statusFile);
-        try {
-            this.status = load(this.statusFile);
-        } catch (ConfigurationException e1) {
-            LOGGER.warn("can't load properties {}", this.confFile);
-        }
         LOGGER.debug("reading glob patterns from [{}]", this.globPatternsFile);
         try {
             this.patterns = GlobPattern.readPatterns(this.globPatternsFile);
@@ -382,42 +291,6 @@ public class Config {
         Validate.notNull(patterns);
         this.patterns = new ArrayList<>(patterns);
         if (save) save();
-    }
-
-    /**
-     * Set the last status.
-     * 
-     * @param state
-     *            the right state.
-     * @param date
-     *            the date
-     * @throws APIException
-     */
-    protected void setLastStatus(LastResult state) throws APIException {
-        Validate.notNull(state);
-        Properties newStatus = new Properties();
-        String now = Long.toString(new Date().getTime());
-        newStatus.setProperty(PROPERTY_LAST_RESULT, state.toString());
-        newStatus.setProperty(PROPERTY_LAST_DATE, now);
-        if (LastResult.SUCCESS.equals(state)) {
-            newStatus.setProperty(PROPERTY_LAST_SUCCESS, now);
-        } else {
-            Date d = getLastSuccess();
-            if (d != null) {
-                newStatus.setProperty(PROPERTY_LAST_SUCCESS, Long.toString(d.getTime()));
-            }
-        }
-        try {
-            save(this.statusFile, newStatus);
-        } catch (IOException e) {
-            throw new APIException(_("fail to save config"), e);
-        }
-        // Finally reload the status file.
-        try {
-            status.refresh();
-        } catch (ConfigurationException e) {
-            throw new APIException(_("fail to refresh config"), e);
-        }
     }
 
     /**

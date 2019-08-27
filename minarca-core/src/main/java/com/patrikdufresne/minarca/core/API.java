@@ -81,16 +81,18 @@ public class API {
      */
     public static void checkEnv() throws APIException {
         // Check OS and VM version.
-        LOGGER.info("{} {} {}", SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH);
-        LOGGER.info("{} (build {}, {})", SystemUtils.JAVA_VM_INFO, SystemUtils.JAVA_VM_VERSION, SystemUtils.JAVA_VM_INFO);
         if (!(SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_LINUX)) {
-            LOGGER.warn("unsupported OS");
             throw new UnsupportedOS();
         }
     }
 
-    public static Config config() {
-        return instance().config;
+    /**
+     * Return the config of this client.
+     * 
+     * @return
+     */
+    public Config config() {
+        return config;
     }
 
     /**
@@ -127,6 +129,15 @@ public class API {
             instance = new API();
         }
         return instance;
+    }
+
+    /**
+     * Return the current minarca state.
+     * 
+     * @return
+     */
+    public Status status() {
+        return Status.fromFile();
     }
 
     protected Config config;
@@ -170,7 +181,7 @@ public class API {
                 try {
                     while (true) {
                         try {
-                            config.setLastStatus(LastResult.RUNNING);
+                            Status.setLastStatus(LastResult.RUNNING);
                         } catch (APIException e) {
                             // Nothing to do.
                         }
@@ -200,7 +211,7 @@ public class API {
             if (patterns.isEmpty()) {
                 t.interrupt();
                 LOGGER.info("fail to read patterns");
-                config.setLastStatus(LastResult.FAILURE);
+                Status.setLastStatus(LastResult.FAILURE);
                 throw new APIException(_("fail to read selective backup settings"));
             }
             // Add sets of patterns
@@ -213,16 +224,16 @@ public class API {
             // Run backup.
             rdiffbackup.backup(patterns, repositoryName);
             t.interrupt();
-            config.setLastStatus(LastResult.SUCCESS);
+            Status.setLastStatus(LastResult.SUCCESS);
             LOGGER.info("backup SUCCESS");
         } catch (InterruptedException e) {
             t.interrupt();
-            config.setLastStatus(LastResult.INTERRUPT);
+            Status.setLastStatus(LastResult.INTERRUPT);
             LOGGER.info("backup INTERUPT", e);
             throw new APIException(_("Backup interrupted"), e);
         } catch (Exception e) {
             t.interrupt();
-            config.setLastStatus(LastResult.FAILURE);
+            Status.setLastStatus(LastResult.FAILURE);
             LOGGER.info("backup FAILED", e);
             throw new APIException(_("Backup failed"), e);
         }
@@ -319,7 +330,7 @@ public class API {
      * @return True if we may backup.
      */
     private boolean isBackupTime(Config config) {
-        Date last = config.getLastSuccess();
+        Date last = status().getLastSuccess();
         if (last == null) {
             return true;
         }
@@ -431,7 +442,7 @@ public class API {
         config.setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.getRootsPath()[0] + "**")), false);
 
         // Reset Last result
-        Date lastResultDate = config.getLastResultDate();
+        Date lastResultDate = status().getLastResultDate();
 
         // Run backup
         config.save();
@@ -454,7 +465,8 @@ public class API {
                 LOGGER.warn("io error", e);
             }
             // Check if backup task is completed.
-            if (!Objects.equals(lastResultDate, config.getLastResultDate()) && !LastResult.RUNNING.equals(config.getLastResult())) {
+            Status status = status();
+            if (!Objects.equals(lastResultDate, status.getLastResultDate()) && !LastResult.RUNNING.equals(status.getLastResult())) {
                 LOGGER.debug("schedule task not running");
                 attempt = Math.min(attempt, 1);
             }
@@ -476,7 +488,7 @@ public class API {
             config.save();
 
             // Check if the backup schedule ran.
-            switch (config.getLastResult()) {
+            switch (status().getLastResult()) {
             case RUNNING:
                 throw new InitialBackupRunningException(null);
             case FAILURE:
@@ -564,4 +576,5 @@ public class API {
         Scheduler scheduler = getScheduler();
         scheduler.delete();
     }
+
 }

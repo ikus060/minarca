@@ -112,9 +112,9 @@ public class MinarcaExecutable {
     public void backup(boolean force) throws APIException {
         String command[];
         if (force) {
-            command = createMinarcaCommand(DEV, "--backup", "--force");
+            command = createMinarcaCommand(DEV, "backup", "--force");
         } else {
-            command = createMinarcaCommand(DEV, "--backup");
+            command = createMinarcaCommand(DEV, "backup");
         }
         execute(command);
     }
@@ -141,7 +141,7 @@ public class MinarcaExecutable {
      */
     public void stop() throws APIException {
         // Need to stop the process.
-        execute(createMinarcaCommand(DEV, "--backup", "--stop"));
+        execute(createMinarcaCommand(DEV, "stop"));
     }
 
 }

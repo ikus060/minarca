@@ -34,7 +34,7 @@ public class ProcessUtils {
      * Data structure to hold basic process information retrieved using the pid.
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public static class ProcessInfo {
         public int pid;
@@ -45,7 +45,7 @@ public class ProcessUtils {
      * Raised by {@link ProcessUtils} when a given pid is not found.
      * 
      * @author Patrik Dufresne
-     *
+     * 
      */
     public static class NoSuchProcess extends Exception {
         public NoSuchProcess() {
@@ -169,7 +169,7 @@ public class ProcessUtils {
      * 
      * @param pid
      */
-    public void kill(int pid) throws NoSuchProcess {
+    public static void kill(int pid) throws NoSuchProcess {
         if (SystemUtils.IS_OS_WINDOWS) {
             try {
                 java.lang.Process p = new ProcessBuilder("taskkill.exe", "/pid", Integer.toString(pid)).redirectErrorStream(true).start();

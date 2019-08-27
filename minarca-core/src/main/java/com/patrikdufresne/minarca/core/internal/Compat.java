@@ -57,8 +57,8 @@ public class Compat {
      * Location where to store configuration for minarca.
      * 
      * <pre>
-     * $HOME/.config (on Linux)
-     * %USERPROFILE%/AppData/Local/ (on Windows)
+     * $HOME/.config/minarca (on Linux)
+     * %USERPROFILE%/AppData/Local/minarca (on Windows)
      * </pre>
      */
     public static final String CONFIG_HOME;
@@ -67,9 +67,9 @@ public class Compat {
      * Location where to store data for minarca.
      * 
      * <pre>
-     * $HOME/.local/share (on Linux)
-     * %USERPROFILE%/AppData/Local/ (on Windows)
-     * C:/Documents and Settings/username/Local Settings/Application Data (on Windows XP)
+     * $HOME/.local/share/minarca (on Linux)
+     * %USERPROFILE%/AppData/Local/minarca (on Windows)
+     * C:/Documents and Settings/username/Local Settings/Application Data/minarca (on Windows XP)
      * </pre>
      */
     public static final String DATA_HOME;
@@ -111,6 +111,11 @@ public class Compat {
      */
     public static final File PID_FILE_GUI;
 
+    /**
+     * Location of the status.properties file.
+     */
+    public static File STATUS_FILE;
+
     static {
         // Use a static block to declare constant value in the right order.
         LOGGER = LoggerFactory.getLogger(Compat.class);
@@ -123,6 +128,9 @@ public class Compat {
         PID_FILE_GUI = new File(DATA_HOME, "gui.pid");
         TEMP = getTemp();
         HOME = getHome(IS_ADMIN);
+
+        STATUS_FILE = new File(Compat.DATA_HOME, "status.properties");
+
     }
 
     /**

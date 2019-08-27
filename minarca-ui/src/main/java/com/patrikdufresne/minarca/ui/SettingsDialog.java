@@ -7,8 +7,6 @@ package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.ui.Localized._;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +47,7 @@ import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.LastResult;
 import com.patrikdufresne.minarca.core.Schedule;
+import com.patrikdufresne.minarca.core.Status;
 
 /**
  * This is the main windows of the application used to configure the backup.
@@ -134,8 +133,7 @@ public class SettingsDialog extends Dialog {
             public void run() {
 
                 // Get backup info.
-                final LastResult lastResult = API.config().getLastResult();
-                final Date lastDate = API.config().getLastResultDate();
+                final Status state = API.instance().status();
 
                 // Update UI
                 Display.getDefault().asyncExec(new Runnable() {
@@ -146,44 +144,27 @@ public class SettingsDialog extends Dialog {
                         }
 
                         // Update label button according to task state.
-                        if (LastResult.UNKNOWN.equals(lastResult)) {
+                        if (LastResult.UNKNOWN.equals(state.getLastResult())) {
                             stopStartButton.setEnabled(false);
                         } else {
                             stopStartButton.setEnabled(true);
-                            stopStartButton.setText(LastResult.RUNNING.equals(lastResult) ? _("Stop backup") : _("Start backup"));
+                            stopStartButton.setText(LastResult.RUNNING.equals(state.getLastResult()) ? _("Stop backup") : _("Start backup"));
                         }
 
                         // Update help text with Success or Failure
                         // Update value with last date.
-                        String date = lastDate != null ? DateFormat.getDateTimeInstance().format(lastDate) : StringUtils.EMPTY;
-                        switch (lastResult) {
+                        lastruntimeItem.setValue(state.getLocalized());
+                        switch (state.getLastResult()) {
                         case RUNNING:
-                            lastruntimeItem.setValue(_("Running"));
-                            ft.setSkinClass(lastruntimeItem, AppFormToolkit.CLASS_SUCESS);
-                            break;
                         case SUCCESS:
-                            lastruntimeItem.setValue(date + " " + _("Successful"));
                             ft.setSkinClass(lastruntimeItem, AppFormToolkit.CLASS_SUCESS);
                             break;
                         case FAILURE:
-                            lastruntimeItem.setValue(date + " " + _("Failed"));
-                            ft.setSkinClass(lastruntimeItem, AppFormToolkit.CLASS_ERROR);
-                            break;
                         case HAS_NOT_RUN:
-                            lastruntimeItem.setValue(_("Never"));
-                            break;
                         case STALE:
-                            lastruntimeItem.setValue(date + " " + _("Stale"));
-                            ft.setSkinClass(lastruntimeItem, AppFormToolkit.CLASS_ERROR);
-                            break;
                         case INTERRUPT:
-                            lastruntimeItem.setValue(date + " " + _("Interrupt"));
-                            ft.setSkinClass(lastruntimeItem, AppFormToolkit.CLASS_ERROR);
-                            break;
                         default:
-                            lastruntimeItem.setValue(date + " " + _("Unknown"));
                             ft.setSkinClass(lastruntimeItem, AppFormToolkit.CLASS_ERROR);
-                            break;
                         }
 
                     }
@@ -214,7 +195,6 @@ public class SettingsDialog extends Dialog {
                     // TODO: Complete this to provide the right status: can't connect, refused, etc.
                     linked = false;
                     text = _("Unknown");
-
                 }
                 final String fText = text;
                 final boolean fLinked = linked;
@@ -332,8 +312,9 @@ public class SettingsDialog extends Dialog {
         // Connectivity status.
         statusItem = new CListItem(statusItemlist, _("Connectivity status"));
         statusItem.setValue(StringUtils.EMPTY);
-        // statusItem.setTitleHelpText(_("{0} @ {1} / {2}", API.config().getUsername(), API.config().getRemotehost(),
-        // API.config().getRepositoryName()));
+        // statusItem.setTitleHelpText(_("{0} @ {1} / {2}", API.instance().config().getUsername(),
+        // API.instance().config().getRemotehost(),
+        // API.instance().config().getRepositoryName()));
         unlinkButton = statusItem.createButton(_("Unlink"));
         unlinkButton.setToolTipText(_("Unlink you system from Minarca"));
         unlinkButton.setEnabled(false);
@@ -384,7 +365,7 @@ public class SettingsDialog extends Dialog {
             }
         });
         // Update schedule
-        scheduleCombo.setSelection(new StructuredSelection(API.config().getSchedule()));
+        scheduleCombo.setSelection(new StructuredSelection(API.instance().config().getSchedule()));
 
         // TODO Pause
 
@@ -465,7 +446,7 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleBrowse() {
         // Simply open the URL into the default browser.
-        Program.launch(API.config().getRemoteUrl());
+        Program.launch(API.instance().config().getRemoteUrl());
     }
 
     /**
@@ -492,7 +473,7 @@ public class SettingsDialog extends Dialog {
     protected void handleSchedule(SelectionChangedEvent event) {
         Schedule schedule = (Schedule) ((StructuredSelection) event.getSelection()).getFirstElement();
         try {
-            API.config().setSchedule(schedule, true);
+            API.instance().config().setSchedule(schedule, true);
         } catch (APIException e) {
             DetailMessageDialog.openError(
                     this.getShell(),
@@ -509,14 +490,14 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleSelectiveBackup() {
         SelectiveDialog dlg = new SelectiveDialog(getShell());
-        dlg.setPatterns(API.config().getGlobPatterns());
+        dlg.setPatterns(API.instance().config().getGlobPatterns());
         // Open dialog and check return code.
         if (dlg.open() != Dialog.OK) {
             // Cancel by user.
             return;
         }
         try {
-            API.config().setGlobPatterns(dlg.getPatterns(), true);
+            API.instance().config().setGlobPatterns(dlg.getPatterns(), true);
         } catch (APIException e) {
             LOGGER.error("error updating selective backup configuration", e);
             DetailMessageDialog.openError(
@@ -533,7 +514,7 @@ public class SettingsDialog extends Dialog {
      */
     protected void handleStopStartBackup() {
         // Check if backup is running
-        boolean running = API.config().getLastResult().equals(LastResult.RUNNING);
+        boolean running = API.instance().status().getLastResult().equals(LastResult.RUNNING);
 
         if (running) {
             DetailMessageDialog dlg = DetailMessageDialog
