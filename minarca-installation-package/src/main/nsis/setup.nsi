@@ -100,7 +100,7 @@ SetCompressor bzip2
   !insertmacro MUI_LANGUAGE "French"
 
   LicenseLangString license ${LANG_ENGLISH} "LICENSE.txt"
-  LicenseLangString license ${LANG_FRENCH} "LICENSE.fr.txt"
+  LicenseLangString license ${LANG_FRENCH} "LICENSE.txt"
   
   !insertmacro JREINFO_LANGUAGE
   
