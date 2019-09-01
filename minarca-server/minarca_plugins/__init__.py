@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Minarca plugins
+# Minarca server
 #
 # Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
