@@ -30,6 +30,68 @@ import pkg_resources
 from minarca_plugins import MinarcaUserSetup
 
 
+class MinarcaUserSetupTest(WebCase):
+    
+    # Reset app and testcases on every test
+    reset_app = True
+    # Login as admin before each test
+    login = True
+    
+    @classmethod
+    def setup_server(cls):
+        WebCase.setup_server(default_config={
+            'MinarcaUserBaseDir': '/tmp/minarca-test',
+            })
+        
+    def setUp(self):
+        if not os.path.isdir('/tmp/minarca-test'):
+            os.mkdir('/tmp/minarca-test')
+        WebCase.setUp(self)
+
+    def tearDown(self):
+        WebCase.tearDown(self)
+        shutil.rmtree('/tmp/minarca-test')
+    
+    def _add_user(self, username=None, email=None, password=None, user_root=None, is_admin=None):
+        b = {}
+        b['action'] = 'add'
+        if username is not None:
+            b['username'] = username
+        if email is not None:
+            b['email'] = email
+        if password is not None:
+            b['password'] = password
+        if user_root is not None:
+            b['user_root'] = user_root
+        if is_admin is not None:
+            b['is_admin'] = str(bool(is_admin)).lower()
+        self.getPage("/admin/users/", method='POST', body=b)
+    
+    def test_add_user_without_user_root(self):
+        """
+        Add user without user_root
+        
+        Make sure the user_root getg populated with default value from basedir.
+        """
+        #  Add user to be listed
+        self._add_user("mtest1", None, "mtest1", None, False)
+        self.assertInBody("User added successfully.")
+        user = self.app.userdb.get_user('mtest1')
+        self.assertEquals('/tmp/minarca-test/mtest1', user.user_root)
+    
+    def test_add_user_with_user_root(self):
+        """
+        Add user with user_root
+        
+        Make sure the user_root get redefined inside basedir.
+        """
+        #  Add user to be listed
+        self._add_user("mtest2", None, "mtest2", "/home/mtest2", False)
+        self.assertInBody("User added successfully.")
+        user = self.app.userdb.get_user('mtest2')
+        self.assertEquals('/tmp/minarca-test/mtest2', user.user_root)
+    
+
 class MinarcaDiskSpaceTest(WebCase):
 
     # Reset app and testcases on every test
@@ -69,6 +131,7 @@ class MinarcaDiskSpaceTest(WebCase):
             'AddMissingUser': 'true',
             'LdapUri': '__default__',
             'LdapBaseDn': 'dc=nodomain',
+            'MinarcaUserBaseDir': '/tmp/minarca-test',
             })
 
     def setUp(self):
@@ -79,12 +142,16 @@ class MinarcaDiskSpaceTest(WebCase):
         self.ldapobj = self.mockldap['ldap://localhost/']
         WebCase.setUp(self)
         self.plugin = MinarcaUserSetup(self.app)
+        if not os.path.isdir('/tmp/minarca-test'):
+            os.mkdir('/tmp/minarca-test')
 
     def tearDown(self):
+        WebCase.tearDown(self)
         # Stop patching ldap.initialize and reset state.
         self.mockldap.stop()
         del self.ldapobj
         del self.mockldap
+        shutil.rmtree('/tmp/minarca-test')
 
     def test_login(self):
         """
@@ -95,7 +162,7 @@ class MinarcaDiskSpaceTest(WebCase):
         self.assertTrue(self.app.userdb.exists('bob'))
         # Check if profile get update from Ldap info.
         self.assertEquals('bob@test.com', self.app.userdb.get_user('bob').email)
-        self.assertEquals('/tmp/bob', self.app.userdb.get_user('bob').user_root)
+        self.assertEquals('/tmp/minarca-test/bob', self.app.userdb.get_user('bob').user_root)
 
     @httpretty.activate
     def test_set_disk_quota(self):

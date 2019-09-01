@@ -22,10 +22,9 @@ import urllib
 import requests
 
 import cherrypy
-from future.utils.surrogateescape import encodefilename
 from rdiffweb.core import RdiffError, authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
-from rdiffweb.core.config import Option, IntOption
+from rdiffweb.core.config import Option, IntOption, BoolOption
 from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
 import pkg_resources
 
@@ -39,14 +38,6 @@ except:
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
-
-
-def _getpwnam(user):
-    assert isinstance(user, str)
-    if PY3:
-        return pwd.getpwnam(user)
-    else:
-        return pwd.getpwnam(encodefilename(user))
 
 
 class TimeoutHTTPAdapter(requests.adapters.HTTPAdapter):
@@ -70,6 +61,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
     _minarca_remotehost = Option('MinarcaRemoteHost')
     _minarca_identity = Option('MinarcaRemoteHostIdentity', default='/etc/ssh')
+    _restrited_basedir = BoolOption('MinarcaRestrictedToBasedDir', default=True)
 
     def __init__(self, app):
         self.app = app
@@ -142,8 +134,8 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         Need to verify LDAP quota and update ZFS quota if required.
         """
         assert isinstance(userobj, UserObject)
-     
-        # Get quota value from description field.
+        # TODO This is specific to Minarca Saas. We need to change this.
+        # Get quota value from LDAP field.
         quota = False
         descriptions = attrs and attrs.get('description')
         if descriptions:
@@ -165,63 +157,62 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         """
         assert isinstance(userobj, UserObject)
         try:
-            if attrs:
-                self._update_user_profile(userobj, attrs)
+            self._update_user_email(userobj, attrs)
+            self._update_user_root(userobj, attrs)
         except:
             logger.warning('fail to update user profile [%s]', userobj.username, exc_info=1)
 
-    def user_attr_changed(self, username, attrs={}):
+    def user_attr_changed(self, userobj, attrs={}):
         """
         Listen to users attributes change to update the minarca authorized_keys.
         """
-        if 'authorizedkeys' not in attrs:
-            return
-        
-        # TODO schedule a background task to update the authorized_keys.
-        self._update_authorized_keys()
+        # Update minarca's authorized_keys when users update their ssh keys.
+        if 'authorizedkeys' in attrs:
+            # TODO schedule a background task to update the authorized_keys.
+            self._update_authorized_keys()
+            
+        if 'user_root' in attrs:
+            self._update_user_root(userobj, attrs)
 
-    def _update_user_profile(self, userobj, attrs):
+    def _update_user_email(self, userobj, attrs):
         """
         Called to update the user email and home directory from LDAP info.
         """
         # Get user email from LDAP
-        email = attrs.get('mail', None)
+        email = attrs and attrs.get('mail', None)
         if email:
-            logger.debug('update user [%s] email [%s]', userobj.username, email[0])
+            logger.debug('update user [%s] email from LDAP [%s]', userobj.username, email[0])
             userobj.email = email[0]
+
+    def _update_user_root(self, userobj, attrs):
+        """
+        Called to update the user's home directory. Either to define it with
+        default value or restrict it to base dir.
+        """
+        # Define default user_home if not provided
+        user_root = userobj.user_root or os.path.join(self._basedir, userobj.username)
+        # Normalise path to avoid relative path.
+        user_root = os.path.abspath(user_root)
+        # Verify if the user_root is inside base dir.
+        if self._restrited_basedir and not user_root.startswith(self._basedir):
+            logger.warn('restrict user [%s] root [%s] to base dir [%s]', userobj.username, user_root, self._basedir)
+            user_root = os.path.join(self._basedir, userobj.username)
+        # Persist the value if different then original
+        if userobj.user_root != user_root:
+            userobj.user_root = user_root
             
-        home_dir = attrs.get('homeDirectory', None)
-        if not home_dir:
-            home_dir = os.path.join(self._basedir, userobj.username)
-        logger.debug('update user [%s] root directory [%s]', userobj.username, home_dir)
-        userobj.user_root = home_dir
-        
-        # Get User / Group id
-        try:
-            pwd_user = _getpwnam(userobj.username)
-            uid = pwd_user.pw_uid
-            gid = pwd_user.pw_gid
-        except KeyError:
-            uid = -1
-            gid = -1
+        # Create folder if inside our base dir and missing.
+        if user_root.startswith(self._basedir) and not os.path.exists(user_root):
+            logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
+            os.makedirs(user_root, mode=self._mode)
 
-        # Create folder if missing
-        if not os.path.exists(userobj.user_root):
-            logger.info('creating user [%s] root dir [%s]', userobj.username, userobj.user_root)
-            os.makedirs(userobj.user_root, mode=self._mode)
-            os.chown(userobj.user_root, uid, gid)
+        if not os.path.isdir(user_root):
+            logger.exception('fail to create user [%s] root dir [%s]', userobj.username, user_root)
 
-        if not os.path.isdir(userobj.user_root):
-            logger.exception('fail to create user [%s] root dir [%s]', userobj.username, userobj.user_root)
-            raise RdiffError(_("failed to setup user profile"))
-
-        # Create ssh subfolder
-        ssh_dir = os.path.join(userobj.user_root, '.ssh')
-        if not os.path.exists(ssh_dir):
-            os.makedirs(ssh_dir, mode=0o0700)
-            os.chown(ssh_dir, uid, gid)
-       
     def _update_authorized_keys(self):
+        """
+        Used to update the authorized_keys of minarca user.
+        """
         
         # Create ssh subfolder
         ssh_dir = os.path.join(self._basedir, '.ssh')
