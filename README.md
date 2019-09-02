@@ -18,22 +18,26 @@ and mirrored to [Github](https://github.com/ikus060/minarca-server).
 
 The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
+## Current Build Status
+
+[![Build Status](https://git.patrikdufresne.com/pdsl/minarca-server/badges/master/pipeline.svg)](https://git.patrikdufresne.com/pdsl/minarca-server/pipelines)
+
 ## Download
 
 Minarca Server may be installed on Linux Debian.
 
-* [Latest Linux Ubuntu/Debian version](http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb)
+* [Latest Ubuntu/Debian Linux version](http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb)
 
-While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution will be officially supported.
+While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
 
 # Installation
 
-On a Linux debian server:
+On a Debian Linux server:
 
     wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb
     apt install minarca-server_latest_all.deb
 
-This should install minarca server and all requried dependencies. The server should be running on http://127.0.0.1:8080 listening on all interfaces.
+This should install Minarca server and all required dependencies. The server should be running on http://127.0.0.1:8080 listening on all interfaces.
 
 You may stop start the service using systemd:
 
@@ -45,11 +49,18 @@ You may stop start the service using systemd:
 
 Since Minarca Server is built on top of rdiffweb, you may take a look at [rdiffweb configiuration](https://github.com/ikus060/rdiffweb/).
 
-In addition to rdiffweb cconfiguration, you may also change the following configuration that is specific to Minarca.
+You may also change Minarca's configuration in `/etc/minarca/minarca-server.conf`:
 
-## Current Build Status
-
-[![Build Status](https://git.patrikdufresne.com/pdsl/minarca-server/badges/master/pipeline.svg)](https://git.patrikdufresne.com/pdsl/minarca-server/pipelines)
+| Parameter | Description | Required | Example |
+| --- | --- | --- | --- |
+| MinarcaQuotaApiUrl | URL to a minarca-quota-api service to be used to get/set user's quota. | No | http://minarca:secret@localhost:8081/ | 
+| MinarcaUserSetupDirMode | Permission to be set on the user's folder created by Minarca. (Default: 0700) | No | 0o0700 |
+| MinarcaUserBaseDir | Folder where users repositories should be created. You may need to change this value if you already have your repositories created in a different location or if you are migrating from rdiffweb. Otherwise it's recommended to keep the default value. (Default: /var/opt/minarca) | No | /var/opt/minarca |
+| MinarcaRestrictedToBasedDir | Used to enforce security by limiting the user's home directories to inside `UserBaseDir`. It's highly recommended to keep this feature enabled. (Default: True) | No | True |
+| MinarcaShell | Location of `minarca-shell` used to limit SSH server access. (Default: /opt/minarca/bin/minarca-shell) | No | /opt/minarca/bin/minarca-shell | 
+| MinarcaAuthOptions | Default SSH auth options. This is used to limit the user's permission on the SSH Server, effectively disabling X11 forwarding, port forwarding and PTY. | No | default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' |
+| MinarcaRemoteHost | URL defining the remote SSH identity. This value is queried by Minarca Client to link and back up to the server. If not provided, the HTTP URL is used as a base. You may need to change this value if the SSH server is accessible using a different IP address or if not running on port 22. | No | ssh.example.com:2222 |
+| MinarcaRemoteHostIdentity | Location of SSH server identity. This value is queried by Minarca Client to authenticate the server. You may need to change this value if SSH service and the Web service are not running on the same server. (Default: /etc/ssh) | No | /etc/ssh | 
 
 # Support
 
@@ -72,5 +83,3 @@ Professional support for Minarca is available by contacting [Patrik Dufresne Ser
  * Improve SSH server security
  * Add /api/ to be used by minarca-client
  * Update Minarca icon
-
-
