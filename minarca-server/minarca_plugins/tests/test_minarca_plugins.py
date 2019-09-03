@@ -177,27 +177,21 @@ class MinarcaDiskSpaceTest(WebCase):
         httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
                                status=401)
         # Make sure an exception is raised.
+        userobj = self.app.userdb.add_user('bob')
         with self.assertRaises(Exception):
-            self.plugin._update_userquota('bob')
+            self.plugin.set_disk_quota(userobj, quota=1234567)
 
-    def test_get_usage_info(self):
+    @httpretty.activate
+    def test_get_disk_usage(self):
         """
         Check if value is available.
         """
-        self.plugin._update_userquota = MagicMock(return_value={"avail": 2147483648, "used": 0, "size": 2147483648})
-
-        self._login('bob', 'password')
-
-        self.getPage("/")
-        # Check if template is loaded
-        self.assertInBody('Usage')
-        self.assertInBody('used')
-        self.assertInBody('total')
-        self.assertInBody('free')
-        # Check if meta value is available
-        self.assertInBody('freeSpace')
-        self.assertInBody('occupiedSpace')
-        self.assertInBody('totalSpace')
+        # Checks if exception is raised when authentication is failing.
+        httpretty.register_uri(httpretty.GET, "http://localhost:8081/quota/bob",
+                               body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
+        # Make sure an exception is raised.
+        userobj = self.app.userdb.add_user('bob')
+        self.assertEquals({"avail": 2147483648, "used": 0, "size": 2147483648}, self.plugin.get_disk_usage(userobj))
         
     def test_get_api_minarca(self):
         self._login('bob', 'password')
