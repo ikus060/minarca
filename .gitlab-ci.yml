@@ -96,15 +96,14 @@ promote:
   - chmod 700 ~/.ssh
   - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
 
-deploy:staging:
+deploy:dev:sylve:
   stage: deploy
-  when: manual
   environment:
-    name: staging
+    name: dev
     url: http://sylve.patrikdufresne.com:8080
   before_script:
   - eval $(ssh-agent -s)
-  - echo "$SESTICAN_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
@@ -113,4 +112,48 @@ deploy:staging:
   - echo $VERSION
   - scp -o StrictHostKeyChecking=no "$DEB_FILE" root@sylve.patrikdufresne.com:/tmp/
   - ssh -o StrictHostKeyChecking=no root@sylve.patrikdufresne.com "dpkg -i /tmp/$DEB_FILE;service minarca-server restart" 
+  
+deploy:staging:sestican:
+  stage: deploy
+  image: ikus060/ansible
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  environment:
+    name: staging
+    url: https://sestican.patrikdufresne.com
+  before_script:
+  - eval $(ssh-agent -s)
+  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
+  - echo MINARCA_VERSION=$MINARCA_VERSION
+  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+  - cd ansible-config
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit sestican
+  
+deploy:prod:ranculos:
+  stage: deploy
+  image: ikus060/ansible
+  when: manual
+  only: 
+  - tags
+  - master
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  environment:
+    name: prod
+    url: https://www.minarca.net
+  before_script:
+  - eval $(ssh-agent -s)
+  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
+  - echo MINARCA_VERSION=$MINARCA_VERSION
+  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+  - cd ansible-config
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit ranculos
   
