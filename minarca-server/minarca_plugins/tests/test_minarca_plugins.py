@@ -204,6 +204,19 @@ class MinarcaDiskSpaceTest(WebCase):
         # Check identity
         self.assertInBody('identity')
 
+    def test_get_api_minarca_with_reverse_proxy(self):
+        # When behind an apache reverse proxy, minarca server should make use
+        # of the Header to determine the public hostname provided.
+        self._login('bob', 'password')
+        headers = [
+            ('X-Forwarded-For', '10.255.1.106'),
+            ('X-Forwarded-Host', 'sestican.patrikdufresne.com'),
+            ('X-Forwarded-Server', '10.255.1.106')]
+
+        self.getPage("/api/minarca", headers=headers)
+        self.assertInBody('remotehost')
+        self.assertInBody('sestican.patrikdufresne.com')
+
 
 class MinarcaSshKeysTest(AppTestCase):
     """
