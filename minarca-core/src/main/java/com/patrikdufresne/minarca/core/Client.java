@@ -6,11 +6,9 @@
 package com.patrikdufresne.minarca.core;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,7 +61,7 @@ public class Client {
      * 
      * @param url
      */
-    public Client(String url, String username, String password) {
+    public Client(String url, String username, String password) throws MalformedURLException {
         Validate.notEmpty(url);
         Validate.notEmpty(username);
         Validate.notEmpty(password);
@@ -95,7 +93,7 @@ public class Client {
      *             if the stream could not be created
      */
     public void check() throws IllegalStateException, IOException {
-        this.requests.target("/api/currentuser/").get();
+        this.requests.target("/api/currentuser/").post();
     }
 
     /**
