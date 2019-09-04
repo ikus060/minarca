@@ -182,10 +182,18 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         Called to update the user email and home directory from LDAP info.
         """
         # Get user email from LDAP
-        email = attrs and attrs.get('mail', None)
-        if email:
-            logger.debug('update user [%s] email from LDAP [%s]', userobj.username, email[0])
-            userobj.email = email[0]
+        mail = attrs and attrs.get('mail', None)
+        if not mail:
+            return
+        # mail might be a list.
+        if hasattr(mail, '__getitem__') and len(mail):
+            mail = mail[0]
+            
+        if isinstance(mail, bytes):
+            mail = mail.decode('utf-8')
+            
+        logger.info('update user [%s] email from LDAP [%s]', userobj.username, mail)
+        userobj.email = mail
 
     def _update_user_root(self, userobj, attrs):
         """
