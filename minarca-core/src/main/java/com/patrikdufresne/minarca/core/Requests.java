@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -19,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,6 +45,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -49,7 +54,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
@@ -104,7 +108,7 @@ public class Requests implements Cloneable {
     /**
      * The base URL. e.g.: http:///my.domain.com/
      */
-    private final String baseurl;
+    private final URL baseurl;
 
     /**
      * True to raise exception on alert-danger.
@@ -173,8 +177,8 @@ public class Requests implements Cloneable {
      * @param locale
      *            the locale.
      */
-    public Requests(HttpClient httpclient, String baseurl, Locale locale) {
-        Validate.notEmpty(this.baseurl = baseurl);
+    protected Requests(HttpClient httpclient, URL baseurl, Locale locale) {
+        Validate.notNull(this.baseurl = baseurl);
         Validate.notNull(this.locale = locale);
         Validate.notNull(this.httpclient = httpclient);
         this.close = false;
@@ -185,8 +189,9 @@ public class Requests implements Cloneable {
      * 
      * @param baseurl
      *            the base URL
+     * @throws MalformedURLException
      */
-    public Requests(String baseurl) {
+    public Requests(String baseurl) throws MalformedURLException {
         this(baseurl, false, Locale.getDefault());
     }
 
@@ -199,9 +204,18 @@ public class Requests implements Cloneable {
      *            the base URL
      * @param locale
      *            the locale
+     * @throws MalformedURLException 
      */
-    public Requests(String baseurl, boolean ignoreSsl, Locale locale) {
-        Validate.notEmpty(this.baseurl = baseurl);
+    public Requests(String baseurl, boolean ignoreSsl, Locale locale) throws MalformedURLException {
+        Validate.notNull(baseurl);
+        this.baseurl = new URL(baseurl);
+        // Do further URL validation specific for HTTP Client
+        if(!"http".equals(this.baseurl.getProtocol()) && !"https".equals(this.baseurl.getProtocol())) {
+            throw new MalformedURLException("protocol must be http or https");
+        }
+        if(StringUtils.isBlank(this.baseurl.getHost())) {
+            throw new MalformedURLException("URL does not specify a valid host name");
+        }
         Validate.notNull(this.locale = locale);
         this.close = true;
         HttpClientBuilder builder = HttpClients.custom();
@@ -222,6 +236,8 @@ public class Requests implements Cloneable {
                 LOGGER.error("error while creating http client without ssl validation", e);
             }
         }
+        // Follow redirect for GET and POST
+        builder.setRedirectStrategy(new LaxRedirectStrategy());
         this.httpclient = builder.setDefaultCredentialsProvider(credentialsProvider).build();
     }
 
@@ -232,8 +248,9 @@ public class Requests implements Cloneable {
      *            the base URL
      * @param locale
      *            the locale
+     * @throws MalformedURLException
      */
-    public Requests(String baseurl, Locale locale) {
+    public Requests(String baseurl, Locale locale) throws MalformedURLException {
         this(baseurl, false, locale);
     }
 
@@ -454,7 +471,7 @@ public class Requests implements Cloneable {
     public String getUrl() {
 
         StringBuilder buf = new StringBuilder();
-        buf.append(this.baseurl.endsWith("/") ? this.baseurl.substring(0, this.baseurl.length() - 1) : this.baseurl);
+        buf.append(this.baseurl.toString().endsWith("/") ? this.baseurl.toString().substring(0, this.baseurl.toString().length() - 1) : this.baseurl);
         buf.append("/");
         if (this.target != null) {
             buf.append(this.target.startsWith("/") ? this.target.substring(1, this.target.length()) : this.target);
@@ -548,7 +565,6 @@ public class Requests implements Cloneable {
             request.setHeader(e.getKey(), e.getValue());
         }
 
-        Validate.notNull(this.entity);
         request.setEntity(this.entity);
 
         // Execute the request.
@@ -559,8 +575,8 @@ public class Requests implements Cloneable {
         LOGGER.info("Post parameters: {}", this.entity);
         LOGGER.info("Response Code: {}", responseCode);
 
-        if (responseCode != 200) {
-            throw new ServerException(response.toString());
+        if (responseCode >= 300) {
+            throw new HttpResponseException(responseCode, response.toString());
         }
 
         return response;
