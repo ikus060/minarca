@@ -44,7 +44,7 @@ public class Main {
 
         try {
             try {
-                ProcessInfo p = ProcessUtils.getPid(Compat.PID_FILE_BACKUP, MinarcaExecutable.MINARCA_EXE);
+                ProcessInfo p = ProcessUtils.getPid(Compat.PID_FILE_BACKUP, Compat.MINARCA_EXE);
                 LOGGER.info("minarca backup is already running as pid " + p.pid);
                 System.err.println("minarca backup is already running as pid " + p.pid);
                 System.exit(1);
@@ -371,7 +371,7 @@ public class Main {
 
         try {
             try {
-                ProcessInfo p = ProcessUtils.getPid(Compat.PID_FILE_BACKUP, MinarcaExecutable.MINARCA_EXE);
+                ProcessInfo p = ProcessUtils.getPid(Compat.PID_FILE_BACKUP, Compat.MINARCA_EXE);
                 ProcessUtils.kill(p.pid);
                 return;
             } catch (NoSuchProcess e) {

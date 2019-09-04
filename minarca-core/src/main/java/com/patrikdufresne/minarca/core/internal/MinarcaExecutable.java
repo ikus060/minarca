@@ -31,28 +31,9 @@ public class MinarcaExecutable {
     private static final transient Logger LOGGER = LoggerFactory.getLogger(MinarcaExecutable.class);
 
     /**
-     * Executable launch to start backup.
-     * 
-     * TODO Should be moved to Compat.
-     */
-    public static final String MINARCA_EXE;
-
-    /**
      * Property used to define the location of minarca.bat file.
      */
     private static final String PROPERTY_MINARCA_LOCATION = "minarca.exe.location";
-
-    static {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
-                MINARCA_EXE = "minarca64.exe";
-            } else {
-                MINARCA_EXE = "minarca.exe";
-            }
-        } else {
-            MINARCA_EXE = "minarca";
-        }
-    }
 
     /**
      * Return the command line to be executed to run a backup.
@@ -97,7 +78,7 @@ public class MinarcaExecutable {
     public static File getMinarcaLocation() {
         // On Windows, user.dir will be defined as C:\Users\vmtest\AppData\Local\minarca, lookup to "./bin/" should find
         // minarca.
-        return Compat.searchFile(MINARCA_EXE, System.getProperty(PROPERTY_MINARCA_LOCATION), "./bin/", ".", "/opt/minarca/bin/");
+        return Compat.searchFile(Compat.MINARCA_EXE, System.getProperty(PROPERTY_MINARCA_LOCATION), "./bin/", ".", "/opt/minarca/bin/");
     }
 
     public MinarcaExecutable() {
