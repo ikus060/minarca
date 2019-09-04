@@ -93,7 +93,7 @@ public class ProcessUtils {
             try {
                 // tasklist.exe /FI "PID eq 1500" /FO CSV /NH
                 // "dwm.exe","1500","RDP-Tcp#0","2","2 748 Ko"
-                java.lang.Process p = new ProcessBuilder("tasklist.exe", "/FO", "CSV", "/NH/", "/FI", "PID eq " + pid).redirectErrorStream(true).start();
+                java.lang.Process p = new ProcessBuilder("tasklist.exe", "/FO", "CSV", "/NH", "/FI", "PID eq " + pid).redirectErrorStream(true).start();
                 StreamHandler sh = new StreamHandler(p);
                 int returnCode = p.waitFor();
                 output = sh.getOutput();

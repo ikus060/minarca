@@ -97,6 +97,16 @@ public class Compat {
     private static final transient Logger LOGGER;
 
     /**
+     * Executable launch to start backup.
+     */
+    public static final String MINARCA_EXE;
+
+    /**
+     * Executable launch to start backup.
+     */
+    public static final String MINARCAUI_EXE;
+    
+    /**
      * Define temp directory.
      */
     public static final String TEMP;
@@ -130,6 +140,19 @@ public class Compat {
         HOME = getHome(IS_ADMIN);
 
         STATUS_FILE = new File(Compat.DATA_HOME, "status.properties");
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if (SystemUtils.JAVA_VM_NAME.contains("64-Bit")) {
+                MINARCA_EXE = "minarca64.exe";
+                MINARCAUI_EXE = "minarcaui64.exe";
+            } else {
+                MINARCA_EXE = "minarca.exe";
+                MINARCAUI_EXE = "minarcaui.exe";
+            }
+        } else {
+            MINARCA_EXE = "minarca";
+            MINARCAUI_EXE = "minarcaui";
+        }
 
     }
 
@@ -196,7 +219,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */{
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
             if (isAdmin) {
                 return "/etc/minarca";
             } else {
@@ -220,7 +243,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */{
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
             if (isAdmin) {
                 return "/var/lib/minarca";
             } else {
