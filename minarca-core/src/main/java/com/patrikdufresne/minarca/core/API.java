@@ -9,6 +9,7 @@ import static com.patrikdufresne.minarca.core.Localized._;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -18,6 +19,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -309,6 +313,10 @@ public class API {
         } catch (HttpHostConnectException e) {
             // Raised on connection failure
             throw new ConnectivityException(e);
+        } catch (SSLException e) {
+        	throw new APIException(_("Fail to validate SSL certificate."), e);
+        } catch (UnknownHostException e) {
+        	throw new APIException(_("{0}''s server IP address could not be found.", e.getMessage()), e);
         } catch (Exception e) {
             throw new APIException(_("Authentication failed for unknown reason."), e);
         }
