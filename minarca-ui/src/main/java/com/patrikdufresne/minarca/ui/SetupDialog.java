@@ -7,6 +7,8 @@ package com.patrikdufresne.minarca.ui;
 
 import static com.patrikdufresne.minarca.ui.Localized._;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -19,6 +21,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.window.DefaultToolTip;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -187,7 +191,8 @@ public class SetupDialog extends Dialog {
 
         final Label connectError = this.ft.createLabel(comp, StringUtils.EMPTY);
         connectError.setLayoutData(new TableWrapData(TableWrapData.FILL));
-
+        final DefaultToolTip connectErrorToolTip = new DefaultToolTip(connectError, ToolTip.NO_RECREATE, false);
+        
         // Computer name
         this.ft.createLabel(comp, _("Repository name"), AppFormToolkit.CLASS_BOLD);
         final Text computerNameText = ft.createText(comp, "", SWT.BORDER);
@@ -236,9 +241,21 @@ public class SetupDialog extends Dialog {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            connectError.setText(e != null ? e.getMessage() : _("Connected"));
-                            ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, e != null ? AppFormToolkit.CLASS_ERROR : AppFormToolkit.CLASS_SUCESS);
-                            linkButton.setEnabled(e == null && StringUtils.isNotBlank(computerName));
+                        	if(e != null) {
+                        		connectError.setText(e.getMessage());
+                        		StringWriter buf =new StringWriter();
+                        		e.printStackTrace(new PrintWriter(buf));
+                        		connectErrorToolTip.setText(buf.toString());
+                        		connectErrorToolTip.activate();
+                        		ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, AppFormToolkit.CLASS_ERROR);
+                        		linkButton.setEnabled(false);
+                        	} else {
+                        		connectError.setText(_("Connected"));
+                        		connectErrorToolTip.setText(null);
+                        		connectErrorToolTip.deactivate();
+                        		ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, AppFormToolkit.CLASS_SUCESS);
+                        		linkButton.setEnabled(StringUtils.isNotBlank(computerName));
+                        	}
                         }
                     });
                 });
@@ -397,12 +414,15 @@ public class SetupDialog extends Dialog {
             @Override
             public void run() {
                 try {
+                	LOGGER.error("validating connectivity to {} at {}", username, remoteserver);
                     API.instance().connect(remoteserver, username, password);
                     callback.accept(null);
                 } catch (APIException e) {
+                	LOGGER.error("fail to validate connectivity", e);
                     callback.accept(e);
                 } catch (Exception e3) {
-                    callback.accept(new APIException(e3));
+                	LOGGER.error("fail to validate connectivity", e3);
+                    callback.accept(new APIException(_("Unexpected error occured"), e3));
                 }
             }
         }, 250, TimeUnit.MILLISECONDS);
