@@ -158,9 +158,12 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         assert isinstance(userobj, UserObject)
         try:
             self._update_user_email(userobj, attrs)
+        except:
+            logger.warning('fail to update user [%s] email from LDAP', userobj.username, exc_info=1)
+        try:
             self._update_user_root(userobj, attrs)
         except:
-            logger.warning('fail to update user profile [%s]', userobj.username, exc_info=1)
+            logger.warning('fail to update user [%s] root', userobj.username, exc_info=1)
 
     def user_attr_changed(self, userobj, attrs={}):
         """
