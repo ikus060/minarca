@@ -50,7 +50,7 @@ public class Status {
      * @return
      */
     public static Status fromFile() {
-        LOGGER.debug("reading properties from [{}]", Compat.STATUS_FILE);
+        LOGGER.trace("reading properties from [{}]", Compat.STATUS_FILE);
         PropertiesConfiguration status;
         try {
             status = load(Compat.STATUS_FILE);
