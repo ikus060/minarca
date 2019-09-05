@@ -177,6 +177,12 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         if 'user_root' in attrs:
             self._update_user_root(userobj, attrs)
 
+    def user_deleted(self, username):
+        """
+        When user get dleted, update the authorized_key.
+        """
+        self._update_authorized_keys()
+
     def _update_user_email(self, userobj, attrs):
         """
         Called to update the user email and home directory from LDAP info.
