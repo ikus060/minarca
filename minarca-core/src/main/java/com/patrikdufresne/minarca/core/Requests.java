@@ -236,8 +236,6 @@ public class Requests implements Cloneable {
                 LOGGER.error("error while creating http client without ssl validation", e);
             }
         }
-        // Follow redirect for GET and POST
-        builder.setRedirectStrategy(new LaxRedirectStrategy());
         this.httpclient = builder.setDefaultCredentialsProvider(credentialsProvider).build();
     }
 
