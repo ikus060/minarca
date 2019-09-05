@@ -53,6 +53,7 @@ import com.patrikdufresne.minarca.core.internal.SchedulerLinux;
 import com.patrikdufresne.minarca.core.internal.SchedulerWindows;
 import com.patrikdufresne.minarca.core.model.CurrentUser;
 import com.patrikdufresne.minarca.core.model.MinarcaInfo;
+import com.patrikdufresne.minarca.core.model.Repo;
 
 /**
  * This class is the main entry point to do everything related to minarca.
@@ -300,7 +301,7 @@ public class API {
 
         // Check connectivity
         try {
-        	client = new Client(baseurl, username, password);
+            client = new Client(baseurl, username, password);
             client.check();
         } catch (HttpResponseException e) {
             // Raised when status code >=300
@@ -312,11 +313,11 @@ public class API {
             // Raised on connection failure
             throw new ConnectivityException(e);
         } catch (SSLException e) {
-        	throw new APIException(_("Fail to validate SSL certificate."), e);
+            throw new APIException(_("Fail to validate SSL certificate."), e);
         } catch (UnknownHostException e) {
-        	throw new APIException(_("{0}''s server IP address could not be found.", e.getMessage()), e);
+            throw new APIException(_("{0}''s server IP address could not be found.", e.getMessage()), e);
         } catch (MalformedURLException e) {
-        	throw new APIException(_("{0} is not a valid URL.", baseurl), e);
+            throw new APIException(_("{0} is not a valid URL.", baseurl), e);
         } catch (Exception e) {
             throw new APIException(_("Authentication failed for unknown reason."), e);
         }
@@ -386,8 +387,8 @@ public class API {
          * Check if repository name is already in uses.
          */
         CurrentUser userInfo = client.getCurrentUserInfo();
-        boolean exists = !userInfo.findRepos(repositoryName).isEmpty();
-        if (!force && exists) {
+        List<Repo> repos = userInfo.findRepos(repositoryName);
+        if (!force && !repos.isEmpty()) {
             throw new RepositoryNameAlreadyInUseException(repositoryName);
         }
 
@@ -438,7 +439,7 @@ public class API {
         config.setSchedule(Schedule.DAILY, false);
 
         // If the backup doesn't exists on the remote server, start an empty initial backup.
-        if (exists) {
+        if (!repos.isEmpty()) {
             LOGGER.debug("repository already exists");
             config.setConfigured(true, true);
             config.save();
@@ -464,8 +465,8 @@ public class API {
             try {
                 client.updateRepositories();
                 // Check if repo exists in minarca.
-                exists = !client.getCurrentUserInfo().findRepos(repositoryName).isEmpty();
-                if (exists) {
+                repos = client.getCurrentUserInfo().findRepos(repositoryName);
+                if (!repos.isEmpty()) {
                     LOGGER.debug("repository {} found", repositoryName);
                     break;
                 }
@@ -487,7 +488,7 @@ public class API {
         config.setGlobPatterns(previousPatterns, false);
 
         // Check if repository exists.
-        if (!exists) {
+        if (repos.isEmpty()) {
 
             // Unset properties
             config.setUsername(null, false);
@@ -518,11 +519,13 @@ public class API {
         scheduler.create();
 
         // Set encoding
-        try {
-            LOGGER.debug("updating repository [{}] encoding [{}]", repositoryName, Compat.CHARSET_DEFAULT.toString());
-            client.setRepoEncoding(repositoryName, Compat.CHARSET_DEFAULT.toString());
-        } catch (Exception e) {
-            LOGGER.warn("fail to configure repository encoding", e);
+        for (Repo repo : repos) {
+            try {
+                LOGGER.debug("updating repository [{}] encoding [{}]", repo.name, Compat.CHARSET_DEFAULT.toString());
+                client.setRepoEncoding(repo.name, Compat.CHARSET_DEFAULT.toString());
+            } catch (Exception e) {
+                LOGGER.warn("fail to configure repository [" + repo.name + "] encoding", e);
+            }
         }
 
     }

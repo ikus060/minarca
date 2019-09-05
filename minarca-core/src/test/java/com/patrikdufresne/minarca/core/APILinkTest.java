@@ -113,6 +113,7 @@ public class APILinkTest {
 
         // check if SSH key was sent
         Mockito.verify(this.client).addSSHKey(Mockito.eq("computername"), Mockito.anyString());
+        Mockito.verify(this.client).setRepoEncoding(Mockito.eq("computername/C"), Mockito.anyString());
         Mockito.verify(this.api).backup(true, true);
     }
 
