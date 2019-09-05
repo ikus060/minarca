@@ -305,10 +305,19 @@ public class API {
             client.check();
         } catch (HttpResponseException e) {
             // Raised when status code >=300
-            if (e.getStatusCode() == 401) {
+            switch (e.getStatusCode()) {
+            case 301:
+            case 302:
+                // Try to provide usefule guidance for http vs https URL
+                if(e.getMessage().contains("Location: https://") && baseurl.startsWith("http://")) {
+                    throw new APIException(_("{0} is redirected to another location. Double check if the URL should start with https:// instead of http://", baseurl), e);                    
+                } 
+                throw new APIException(_("{0} is redirected to another location. Please provide the canonical URL.", baseurl), e);
+            case 401:
                 throw new AuthenticationException(e);
+            default:
+                throw new APIException(_("Unknown server error."), e);
             }
-            throw new APIException(_("Unknown server error."), e);
         } catch (HttpHostConnectException e) {
             // Raised on connection failure
             throw new ConnectivityException(e);
