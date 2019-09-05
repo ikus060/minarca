@@ -268,5 +268,6 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
                 authorizedkeys.add(new_data, key)
         
         # Write the new file
+        logger.info("updating authorized_keys file [%s]", filename)
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(new_data.getvalue())
