@@ -31,6 +31,8 @@ setuptools.setup(
     # requirement for testing
     tests_require=[
         "mock>=1.3.0",
+        "pytest",
+        "coverage",
     ],
     entry_points={"console_scripts": ["minarca-quota-api = minarca_quota_api:run"], },
 )

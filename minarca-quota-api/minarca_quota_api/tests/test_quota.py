@@ -36,7 +36,7 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
 
     def test_get_quota(self):
         # Mock the command line call
-        minarca_quota_api.subprocess.check_output = MagicMock(return_value='1121784464\n2147483648\n1122091872\n718078912672\n')
+        minarca_quota_api.subprocess.check_output = MagicMock(return_value='1122091872\n718078912672\n2147483648\n')
 
         # Make the query
         headers = [("Authorization", "Basic " + b64encode(b"minarca:secret").decode('ascii'))]
@@ -46,10 +46,7 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
 
     def test_set_quota(self):
         # Mock the command line call
-        minarca_quota_api.subprocess.check_output = MagicMock(side_effect=['', '1121784464\n2147483648\n1122091872\n718078912672\n'])
-        user = MagicMock()
-        user.pw_uid = 1001
-        minarca_quota_api._getpwnam = MagicMock(return_value=user)
+        minarca_quota_api.subprocess.check_output = MagicMock(side_effect=["cannot create 'tank/someuser': dataset already exists", '', '1122091872\n718078912672\n2147483648\n'])
 
         # Make the query
         headers = [("Authorization", "Basic " + b64encode(b"minarca:secret").decode('ascii'))]
@@ -59,10 +56,6 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
         pass
 
     def test_set_quota_invalid_user(self):
-        # Mock the command line call
-        user = MagicMock()
-        user.pw_uid = 1001
-        minarca_quota_api._getpwnam = MagicMock(return_value=user)
 
         # Make the query
         headers = [("Authorization", "Basic " + b64encode(b"minarca:secret").decode('ascii'))]
