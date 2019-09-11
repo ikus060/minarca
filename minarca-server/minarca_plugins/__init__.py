@@ -141,7 +141,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         if descriptions:
             quota_gb = [
                 int(x[1:]) for x in descriptions
-                if x.startswith("v") and x[1:].isdigit()]
+                if x.startswith(b"v") and x[1:].isdigit()]
             if quota_gb:
                 quota_gb = max(quota_gb)
                 quota = quota_gb * 1024 * 1024 * 1024
