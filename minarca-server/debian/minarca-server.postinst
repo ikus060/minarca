@@ -1,5 +1,5 @@
 MINARCA_USER=minarca
-MINARCA_HOME=/var/opt/minarca
+MINARCA_HOME=/backups/
 MINARCA_ETC=/etc/minarca
 MINARCA_LOG=/var/log/minarca
 

@@ -55,7 +55,7 @@ You may also change Minarca's configuration in `/etc/minarca/minarca-server.conf
 | --- | --- | --- | --- |
 | MinarcaQuotaApiUrl | URL to a minarca-quota-api service to be used to get/set user's quota. | No | http://minarca:secret@localhost:8081/ | 
 | MinarcaUserSetupDirMode | Permission to be set on the user's folder created by Minarca. (Default: 0700) | No | 0o0700 |
-| MinarcaUserBaseDir | Folder where users repositories should be created. You may need to change this value if you already have your repositories created in a different location or if you are migrating from rdiffweb. Otherwise it's recommended to keep the default value. (Default: /var/opt/minarca) | No | /var/opt/minarca |
+| MinarcaUserBaseDir | Folder where users repositories should be created. You may need to change this value if you already have your repositories created in a different location or if you are migrating from rdiffweb. Otherwise it's recommended to keep the default value. (Default: /backups/) | No | /backups/ |
 | MinarcaRestrictedToBasedDir | Used to enforce security by limiting the user's home directories to inside `UserBaseDir`. It's highly recommended to keep this feature enabled. (Default: True) | No | True |
 | MinarcaShell | Location of `minarca-shell` used to limit SSH server access. (Default: /opt/minarca/bin/minarca-shell) | No | /opt/minarca/bin/minarca-shell | 
 | MinarcaAuthOptions | Default SSH auth options. This is used to limit the user's permission on the SSH Server, effectively disabling X11 forwarding, port forwarding and PTY. | No | default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' |

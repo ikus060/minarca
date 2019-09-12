@@ -56,7 +56,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     
     _quota_api_url = Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
     _mode = IntOption('MinarcaUserSetupDirMode', 0o0700)
-    _basedir = Option('MinarcaUserBaseDir', default='/var/opt/minarca')
+    _basedir = Option('MinarcaUserBaseDir', default='/backups/')
     _minarca_shell = Option('MinarcaShell', default='/opt/minarca/bin/minarca-shell')
     _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
     _minarca_remotehost = Option('MinarcaRemoteHost')
