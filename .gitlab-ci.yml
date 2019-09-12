@@ -95,6 +95,7 @@ promote:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-server_${REVISION}_amd64.deb /var/www/patrikdufresne/archive/minarca/minarca-server_latest_amd64.deb
 
 deploy:dev:sylve:
   stage: deploy
