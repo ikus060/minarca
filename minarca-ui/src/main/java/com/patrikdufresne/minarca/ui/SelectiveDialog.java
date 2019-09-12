@@ -1,6 +1,6 @@
 package com.patrikdufresne.minarca.ui;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.ui.Localized._;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,11 +62,6 @@ public class SelectiveDialog extends Dialog {
     private CList customList;
 
     private List<GlobPattern> patterns = new ArrayList<GlobPattern>();
-
-    /**
-     * True to show all advance patterns.
-     */
-    private boolean showAdvance = false;
 
     protected SelectiveDialog(Shell parentShell) {
         super(parentShell);
@@ -166,15 +161,6 @@ public class SelectiveDialog extends Dialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 handleAddFileCustom();
-            }
-        });
-
-        final Button showAdvanceButton = new Button(buttons, SWT.CHECK);
-        showAdvanceButton.setText(_("Show advance patterns"));
-        showAdvanceButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                handleShowAdvancePatterns(showAdvanceButton.getSelection());
             }
         });
 
@@ -361,16 +347,6 @@ public class SelectiveDialog extends Dialog {
     }
 
     /**
-     * Called when user click on "show advance" check box.
-     * 
-     * @param selection
-     */
-    protected void handleShowAdvancePatterns(boolean selection) {
-        this.showAdvance = selection;
-        refreshCustomList(true);
-    }
-
-    /**
      * Called when the user click the toggle button.
      * 
      * @param event
@@ -398,9 +374,7 @@ public class SelectiveDialog extends Dialog {
         // Compute the custom list of includes
         for (int i = 0; i < this.patterns.size(); i++) {
             GlobPattern p = this.patterns.get(i);
-            if (!GlobPattern.isAdvance(p) || this.showAdvance) {
-                createItem(this.customList, p, i);
-            }
+            createItem(this.customList, p, i);
         }
 
         // Create empty item is required

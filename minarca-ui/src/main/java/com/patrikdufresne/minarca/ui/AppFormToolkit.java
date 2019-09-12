@@ -5,6 +5,7 @@
  */
 package com.patrikdufresne.minarca.ui;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -14,7 +15,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -36,16 +36,25 @@ public class AppFormToolkit extends FormToolkit {
 
     private static final String ALT_BG = "ALT_BG";
     private static final String ALT_FG = "ALT_FG";
+    public static final String CLASS_BOLD = "bold";
+    public static final String CLASS_ERROR = "error";
+    public static final String CLASS_SUCESS = "sucess";
     private static final int FORM_TEXT_MARGNIN = 10;
     private static final String H = "H";
     private static final String H_HOVER = "H_HOVER";
     private static final String H1 = "h1";
     private static final String H2 = "h2";
-    private static final String H3 = "h3";
+    public static final String CLASS_H3 = "h3";
     private static final String H4 = "h4";
     private static final String LIGHT = "light";
+    public static final String CLASS_SMALL = "small";
     private static final String WARN_BG = "WARN_BG";
     private static final String WARN_FG = "WARN_FG";
+
+    public static Font getFont(String symbolicname) {
+        FontRegistry registry = JFaceResources.getFontRegistry();
+        return registry.get(symbolicname);
+    }
 
     protected static Font getFont(String symbolicname, float size, boolean bold) {
         String newSymbolicName = symbolicname + "." + size;
@@ -78,65 +87,13 @@ public class AppFormToolkit extends FormToolkit {
     private IHyperlinkListener hyperlinkListener;
 
     /**
-     * Create a form tool kit using default color.
-     * 
-     * @param display
-     */
-    public AppFormToolkit(Display display) {
-        this(display, false);
-    }
-
-    /**
      * Create a form tool kit for minarca.
      * 
      * @param display
-     * @param useAltColor
-     *            True to use alternative colors.
      */
-    public AppFormToolkit(Display display, boolean useAltColor) {
-        super(display);
+    public AppFormToolkit(Display display, boolean widgetColors) {
+        super(new MinarcaFormColors(display, widgetColors));
         refreshHyperlinkColors();
-    }
-
-    /**
-     * This implementation adjust the colors according to the control type.
-     */
-    @Override
-    public void adapt(Composite composite) {
-        adapt(composite, false);
-    }
-
-    /**
-     * This implementation adjust the colors according to the control type.
-     */
-    public void adapt(Composite composite, boolean useAltColor) {
-        super.adapt(composite);
-        if (useAltColor) {
-            composite.setBackground(getAltBackground());
-        }
-    }
-
-    /**
-     * This implementation adjust the colors according to the control type.
-     */
-    public void adapt(Control control, boolean trackFocus, boolean trackKeyboard) {
-        adapt(control, trackFocus, trackKeyboard, false);
-    }
-
-    /**
-     * This implementation adjust the colors according to the control type.
-     */
-    public void adapt(Control control, boolean trackFocus, boolean trackKeyboard, boolean useAltColor) {
-        super.adapt(control, trackFocus, trackKeyboard);
-        if (useAltColor) {
-            if (control instanceof Label || control instanceof FormText) {
-                control.setBackground(getAltBackground());
-                control.setForeground(getAltForeground());
-            }
-            if (control instanceof Button) {
-                control.setBackground(getAltBackground());
-            }
-        }
     }
 
     public Label createAppnameLabel(Composite parent, String text, int style) {
@@ -146,17 +103,42 @@ public class AppFormToolkit extends FormToolkit {
     }
 
     /**
-     * Create composite.
+     * This function is called when a widget need to be reskin.
      * 
-     * @param parent
-     * @param style
-     * @param useAltColor
-     * @return
+     * @param widget
      */
-    public Composite createComposite(Composite parent, int style, boolean useAltColor) {
-        Composite comp = createComposite(parent, style);
-        adapt(comp, useAltColor);
-        return comp;
+    protected void skinControl(Control control) {
+        String[] skinClasses = StringUtils.defaultString((String) control.getData(SWT.SKIN_CLASS)).split(",");
+        for (String skinClass : skinClasses) {
+            switch (skinClass) {
+            case CLASS_BOLD:
+                control.setFont(getFontBold(JFaceResources.DEFAULT_FONT));
+                break;
+            case CLASS_SMALL:
+                control.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+                break;
+            case CLASS_H3:
+                control.setFont(getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
+                break;
+            case CLASS_ERROR:
+                control.setForeground(getColors().createColor(CLASS_ERROR, rgb("#FF0000")));
+                break;
+            case CLASS_SUCESS:
+                control.setForeground(getColors().createColor(CLASS_SUCESS, rgb("#3b9444")));
+                break;
+            }
+        }
+    }
+
+    /**
+     * Change the class of a control. Utility function to update the class of a control.
+     * 
+     * @param control
+     * @param skinClass
+     */
+    public void setSkinClass(Control control, String... skinClass) {
+        control.setData(SWT.SKIN_CLASS, StringUtils.join(skinClass, ","));
+        skinControl(control);
     }
 
     public CTabFolder createCTabFolder(Composite parent) {
@@ -215,6 +197,7 @@ public class AppFormToolkit extends FormToolkit {
                 text = replaceTag(text, "h2", "span", "font='h2' color='h2'");
                 text = replaceTag(text, "h3", "span", "font='h3' color='h3'");
                 text = replaceTag(text, "h4", "span", "font='h4' color='h4'");
+                text = replaceTag(text, "small", "span", "font='small' color='small'");
                 try {
                     super.setText(text, parseTags, expandURLs);
                 } catch (IllegalArgumentException e) {
@@ -228,7 +211,7 @@ public class AppFormToolkit extends FormToolkit {
             engine.marginHeight = FORM_TEXT_MARGNIN;
         }
         // Add styles
-        Color fg = useAltColor ? getAltForeground() : getColors().getForeground();
+        Color fg = getColors().getForeground();
         // H1,
         engine.setFont(H1, getFont(JFaceResources.DIALOG_FONT, 3.25f, false));
         engine.setColor(H1, fg);
@@ -236,38 +219,45 @@ public class AppFormToolkit extends FormToolkit {
         engine.setFont(H2, getFont(JFaceResources.DIALOG_FONT, 2.6f, false));
         engine.setColor(H2, fg);
         // H3
-        engine.setFont(H3, getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
-        engine.setColor(H3, fg);
+        engine.setFont(CLASS_H3, getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
+        engine.setColor(CLASS_H3, fg);
         // H4
         engine.setFont(H4, getFont(JFaceResources.DIALOG_FONT, 1.25f, false));
         engine.setColor(H4, fg);
         // LIGHT
         engine.setColor(LIGHT, getLightColor());
+        // SMALL
+        engine.setFont(CLASS_SMALL, getFont(JFaceResources.DIALOG_FONT, .75f, false));
+        engine.setColor(CLASS_SMALL, fg);
 
         engine.setHyperlinkSettings(getHyperlinkGroup());
         engine.addHyperlinkListener(getHyperlinkListener());
-        adapt(engine, false, false, useAltColor);
+        adapt(engine, false, false);
         engine.setMenu(parent.getMenu());
         engine.setText(text, true, true);
         return engine;
     }
 
-    public void decorateWarningLabel(FormText engine) {
-        engine.setBackground(getColors().createColor(WARN_BG, rgb("#e99002")));
-        engine.setForeground(getColors().createColor(WARN_FG, rgb("#ffffff")));
+    /**
+     * Create a Label with Bold font style.
+     * 
+     * @param parent
+     * @param text
+     * @return
+     */
+    public Label createLabel(Composite parent, String text, String skinClass) {
+        return createLabel(parent, text, SWT.NONE, skinClass);
+    }
+
+    public Label createLabel(Composite parent, String text, int style, String skinClass) {
+        Label l = createLabel(parent, text, style);
+        setSkinClass(l, skinClass);
+        return l;
     }
 
     @Override
     public void dispose() {
         super.dispose();
-    }
-
-    private Color getAltBackground() {
-        return getColors().createColor(ALT_BG, Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB());
-    }
-
-    private Color getAltForeground() {
-        return getColors().createColor(ALT_FG, rgb("#ffffff"));
     }
 
     /**
@@ -302,6 +292,36 @@ public class AppFormToolkit extends FormToolkit {
         } else {
             getHyperlinkGroup().setForeground(getColors().createColor(H, rgb("#008cba")));
             getHyperlinkGroup().setActiveForeground(getColors().createColor(H_HOVER, FormColors.blend(rgb("#008cba"), rgb("#000000"), 15)));
+        }
+    }
+
+    /**
+     * Update the style of a label.
+     * 
+     * @param l
+     * @param style
+     */
+    public void setStyle(Label l, String style) {
+        switch (style) {
+        case CLASS_BOLD:
+            l.setFont(getFontBold(JFaceResources.DEFAULT_FONT));
+            break;
+        case CLASS_SMALL:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+            break;
+        case CLASS_H3:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, 1.7f, false));
+            break;
+        case CLASS_ERROR:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+            l.setForeground(getColors().createColor(CLASS_ERROR, rgb("#FF0000")));
+            break;
+        case CLASS_SUCESS:
+            l.setFont(getFont(JFaceResources.DIALOG_FONT, .75f, false));
+            l.setForeground(getColors().createColor(CLASS_SUCESS, rgb("#3b9444")));
+            break;
+        default:
+            l.setFont(getFont(JFaceResources.DEFAULT_FONT));
         }
     }
 

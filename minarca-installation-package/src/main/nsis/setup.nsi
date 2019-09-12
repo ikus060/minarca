@@ -30,7 +30,7 @@ SetCompressor bzip2
   Name "${AppName}"
   VIProductVersion "${AppVersion}"
   VIAddVersionKey "ProductName" "${AppName}"
-  VIAddVersionKey "Comments" "An all integrated backup solution."
+  VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
   VIAddVersionKey "CompanyName" "${Vendor}"
   VIAddVersionKey "LegalCopyright" "© ${Vendor}"
   VIAddVersionKey "FileDescription" "${AppName} ${AppVersion} Installer"
@@ -98,9 +98,9 @@ SetCompressor bzip2
  
   !insertmacro MUI_LANGUAGE "English"
   !insertmacro MUI_LANGUAGE "French"
- 
-  LicenseLangString license ${LANG_ENGLISH} "Licence_en.rtf"
-  LicenseLangString license ${LANG_FRENCH} "Licence_fr.rtf"
+
+  LicenseLangString license ${LANG_ENGLISH} "LICENSE.txt"
+  LicenseLangString license ${LANG_FRENCH} "LICENSE.txt"
   
   !insertmacro JREINFO_LANGUAGE
   
@@ -168,11 +168,11 @@ Section "Start menu shortcuts" SecCreateShortcut
   SectionIn 1	; Can be unselected
   CreateDirectory "$SMPROGRAMS\${AppName}"
   ${If} ${RunningX64}
-    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarca64.exe" "" "$INSTDIR\minarca.ico" 0
-    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarca64.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarcaui64.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarcaui64.exe" "" "$INSTDIR\minarca.ico" 0
   ${Else}
-    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarca.exe" "" "$INSTDIR\minarca.ico" 0
-    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarca.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarcaui.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarcaui.exe" "" "$INSTDIR\minarca.ico" 0
   ${EndIf}
   
 SectionEnd
@@ -213,6 +213,16 @@ Function .onInit
     MessageBox MB_OK|MB_ICONEXCLAMATION $(APP_IS_RUNNING) /SD IDOK
     Abort
   notRunning64:
+  ${nsProcess::FindProcess} "minarcaui.exe" $R0
+  StrCmp $R0 0 0 notRunningUi32
+    MessageBox MB_OK|MB_ICONEXCLAMATION $(APP_IS_RUNNING) /SD IDOK
+    Abort
+  notRunningUi32:
+  ${nsProcess::FindProcess} "minarcaui64.exe" $R0
+  StrCmp $R0 0 0 notRunningUi64
+    MessageBox MB_OK|MB_ICONEXCLAMATION $(APP_IS_RUNNING) /SD IDOK
+    Abort
+  notRunningUi64:
     
 FunctionEnd
 

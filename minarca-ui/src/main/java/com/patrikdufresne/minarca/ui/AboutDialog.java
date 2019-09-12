@@ -1,6 +1,6 @@
 package com.patrikdufresne.minarca.ui;
 
-import static com.patrikdufresne.minarca.Localized._;
+import static com.patrikdufresne.minarca.ui.Localized._;
 
 import java.util.Calendar;
 
@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 
-import com.patrikdufresne.minarca.Main;
+import com.patrikdufresne.minarca.core.API;
 
 /**
  * Reusable composite to show About information.
@@ -107,7 +107,7 @@ public class AboutDialog extends Dialog {
 
         // App copyright
         Label appCopyrightText = new Label(comp, SWT.CENTER);
-        appCopyrightText.setText(Main.getCopyrightText());
+        appCopyrightText.setText(API.getCopyrightText());
         appCopyrightText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         appCopyrightText.setBackground(this.getShell().getBackground());
 

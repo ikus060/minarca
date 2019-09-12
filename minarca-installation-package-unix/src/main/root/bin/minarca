@@ -1,8 +1,9 @@
 #!/bin/sh
-# Copyright (C) 2018, Patrik Dufresne Service Logiciel inc. All rights reserved.
+# Copyright (C) 2019, Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
+MAIN=com.patrikdufresne.minarca.core.Main
 
 # resolve links - $0 may be a softlink
 PRG="$0"
@@ -118,5 +119,5 @@ cd "$BASEDIR"
 exec "$JAVACMD" $JAVA_OPTS  \
   -classpath "$CLASSPATH" \
   -Dlog.folder=$HOME/.local/share/minarca/ \
-  com.patrikdufresne.minarca.Main \
+  $MAIN \
   "$@"

@@ -1,53 +1,56 @@
-# Build Minarca
+# Minarca Client
 
-To build minarca client you need to install maven and icotool (used to create
-.ico file from pngs). The following command should install them and there
-dependencies.
+Minarca is a backup software for Windows and Linux to put you in control of your backups. Minarca eases management of your backup, provides easy recovery with a rich and powerful web interface.
 
-    sudo apt-get install maven icoutils
+Minarca Client is a software agent to be installed on computers to get backuped into a Minara server. Minarca 
 
-Once the dependencies are installed, should may compile minarca as follow:
+Minarca Client is written in Java and is released as open source project under the  GNU GENERAL PUBLIC LICENSE (GPLv3). All source code and documentation are
+Copyright Patrik Dufresne Service Logiciel inc.
 
-    mvn clean install
+Minarca Client is actively developed by [Patrik Dufresne](http://patrikdufresne.com) since November 2014.
 
-# Translation
+The Minarca Client source code is hosted on [self-hosted Gitlab](https://git.patrikdufresne.com/pdsl/minarca-client) and mirrored to [Github](https://github.com/ikus060/minarca-client).
 
-minarca project uses gettext plugin to support translation using `.pot` and
-`.po` files. You may update the translation or add a new translation as follow.
+The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
-To extract translatable string and update the `.pot` file
+## Download
 
-    mvn gettext:gettext
+Minarca Client may be installed on Linux Debian or Windows.
 
-To update the translation file `.po`
+* [Latest Linux Ubuntu/Debian version](http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb)
+* [Latest Windows version](http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe)
 
-    mvn gettext:merge
+While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
+
+## Current Build Status
+
+[![Build Status](https://git.patrikdufresne.com/pdsl/minarca-client/badges/master/pipeline.svg)](https://git.patrikdufresne.com/pdsl/minarca-client/pipelines)
+
+# Support
+
+## Bug Reports
+
+Bug reports should be reported on the Minarca development web site at https://github.com/ikus060/minarca-client/issues
+
+## Professional support
+
+Professional support for Minarca is available by contacting [Patrik Dufresne Service Logiciel](http://www.patrikdufresne.com/en/support/#form).
+
+# Changelog
+
+## v3.1.5 - First public release
+
+* Provide debian packages
+* Replace Form request by API calls
+* Make it work with minarca-shell
+* Use patches version of rdiff-backup 1.2.8
+* Replace proprietary licence by GPLv3
+* Replace Minarca icon
+* Improve configuration UI
+* Improve linking UI
+* Update default ignored patterns
+* Update french translation
+* Add command line interface 
+* Verify if process is running using pid file on all platform
 
 
-# Code signing
-
-Minarca build script may sign the code. To enabled signing, call maven with the
-following options:
-    
-    mvn clean install -Dsign.certs.path=authenticode-certs.pem -Dsign.key.path=authenticode.pem -Dsign.passphrase=CHANGEME
-    
-To sign the code, you need to have `osslsigncode` installed locally.
-
-    sudo apt-get install libssl-dev libcurl4-gnutls-dev autoconf
-    wget http://nchc.dl.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz
-    tar zxvf osslsigncode-1.7.1.tar.gz
-    cd osslsigncode-1.7.1
-    ./configure
-    make
-    sudo make install
-    
-Reference: https://development.adaptris.net/users/lchan/blog/2013/06/07/signing-windows-installers-on-linux/ 
-
-# Advance configuration
-
-* log.minarca.level = ERROR|WARN|INFO|DEBUG, default DEBUG
-* log.root.level = ERROR|WARN|INFO|DEBUG, default WARN
-* minarca.singleinstance.backup.port = <port>, default 52356
-* minarca.singleinstance.backup.port = <port>, default 52356
-
-   

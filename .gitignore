@@ -7,3 +7,6 @@
 *.h2.db
 *.pdf
 *.h2.lock
+/.~lock.Procedures.odt#
+/.~lock.Testcases.odt#
+.pydev*
