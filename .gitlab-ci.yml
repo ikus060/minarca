@@ -147,7 +147,8 @@ deploy:prod:ranculos:
     url: https://www.minarca.net
   before_script:
   - eval $(ssh-agent -s)
-  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$RANCULOS_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$MERCOR_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
@@ -155,5 +156,5 @@ deploy:prod:ranculos:
   - echo MINARCA_VERSION=$MINARCA_VERSION
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit ranculos
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit ranculos,mercor
   
