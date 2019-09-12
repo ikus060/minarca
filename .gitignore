@@ -31,3 +31,4 @@ coverage.xml
 nosetests.xml
 /sonar-project.properties
 /.eggs/
+deb_dist

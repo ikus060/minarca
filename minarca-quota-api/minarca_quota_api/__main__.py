@@ -3,13 +3,13 @@
 #
 # Minarca Quota API
 #
-# Copyright (C) 2018 Patrik Dufresne Service Logiciel inc. All rights reserved.
+# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 """
 Created on Mar 7, 2018
 
-@author: ikus060
+@author: Patrik Dufresne
 """
 from __future__ import unicode_literals
 

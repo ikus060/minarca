@@ -1,0 +1,17 @@
+MINARCA_USER=minarca
+MINARCA_HOME=/backups/
+MINARCA_ETC=/etc/minarca
+MINARCA_LOG=/var/log/minarca
+
+case "$1" in
+  configure)
+        if ! getent passwd "$MINARCA_USER" >/dev/null; then
+            adduser --quiet --system --home "$MINARCA_HOME" --shell /bin/bash \
+                --no-create-home --gecos 'minarca repository hosting' \
+                --group "$MINARCA_USER"
+        fi
+        # Create folder for logs.
+        mkdir -p "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
+        chown minarca:minarca "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
+    ;;
+esac

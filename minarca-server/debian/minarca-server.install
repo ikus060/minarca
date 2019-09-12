@@ -1,0 +1,5 @@
+minarca-server.conf /etc/minarca/
+minarca-shell.conf /etc/minarca/
+minarca-shell /opt/minarca/bin/
+minarca.ico /opt/minarca/share/
+minarca_22.png /opt/minarca/share/

@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Minarca Quota API
+# Minarca Server
 #
 # Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.

@@ -3,7 +3,7 @@
 #
 # Minarca Quota API
 #
-# Copyright (C) 2018 Patrik Dufresne Service Logiciel inc. All rights reserved.
+# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
@@ -31,6 +31,8 @@ setuptools.setup(
     # requirement for testing
     tests_require=[
         "mock>=1.3.0",
+        "pytest",
+        "coverage",
     ],
     entry_points={"console_scripts": ["minarca-quota-api = minarca_quota_api:run"], },
 )
