@@ -30,37 +30,6 @@ Minarca Server may be installed on Linux Debian.
 
 While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
 
-# Installation
-
-On a Debian Linux server:
-
-    wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb
-    apt install minarca-server_latest_all.deb
-
-This should install Minarca server and all required dependencies. The server should be running on http://127.0.0.1:8080 listening on all interfaces.
-
-You may stop start the service using systemd:
-
-    sudo service minarca-server stop
-    sudo service minarca-server start
-
-
-# Configuration
-
-Since Minarca Server is built on top of rdiffweb, you may take a look at [rdiffweb configiuration](https://github.com/ikus060/rdiffweb/).
-
-You may also change Minarca's configuration in `/etc/minarca/minarca-server.conf`:
-
-| Parameter | Description | Required | Example |
-| --- | --- | --- | --- |
-| MinarcaQuotaApiUrl | URL to a minarca-quota-api service to be used to get/set user's quota. | No | http://minarca:secret@localhost:8081/ | 
-| MinarcaUserSetupDirMode | Permission to be set on the user's folder created by Minarca. (Default: 0700) | No | 0o0700 |
-| MinarcaUserBaseDir | Folder where users repositories should be created. You may need to change this value if you already have your repositories created in a different location or if you are migrating from rdiffweb. Otherwise it's recommended to keep the default value. (Default: /backups/) | No | /backups/ |
-| MinarcaRestrictedToBasedDir | Used to enforce security by limiting the user's home directories to inside `UserBaseDir`. It's highly recommended to keep this feature enabled. (Default: True) | No | True |
-| MinarcaShell | Location of `minarca-shell` used to limit SSH server access. (Default: /opt/minarca/bin/minarca-shell) | No | /opt/minarca/bin/minarca-shell | 
-| MinarcaAuthOptions | Default SSH auth options. This is used to limit the user's permission on the SSH Server, effectively disabling X11 forwarding, port forwarding and PTY. | No | default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' |
-| MinarcaRemoteHost | URL defining the remote SSH identity. This value is queried by Minarca Client to link and back up to the server. If not provided, the HTTP URL is used as a base. You may need to change this value if the SSH server is accessible using a different IP address or if not running on port 22. | No | ssh.example.com:2222 |
-| MinarcaRemoteHostIdentity | Location of SSH server identity. This value is queried by Minarca Client to authenticate the server. You may need to change this value if SSH service and the Web service are not running on the same server. (Default: /etc/ssh) | No | /etc/ssh | 
 
 # Support
 
