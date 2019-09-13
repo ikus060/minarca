@@ -41,6 +41,9 @@ build:
   - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
   - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
   - mvn -B -Drevision=${REVISION} -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
+  # Rename deb
+  - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
+  - mv minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb
   artifacts:
     paths:
     - minarca-installation-package/target/*.exe
@@ -52,8 +55,6 @@ publish:
     name: dev
     url: http://www.patrikdufresne.com/archive/minarca/nightly/minarca-client-${REVISION}.exe
   script:
-  - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
-  - mv minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb
   # Publish to kalo
   - scp -o StrictHostKeyChecking=no minarca-installation-package/target/minarca-client-${REVISION}.exe www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
   - scp -o StrictHostKeyChecking=no minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
