@@ -34,7 +34,7 @@ fi
 # or we get called by minarca client which replace the command by the name of the repository.
 cd "$USERHOME"
 if [ "$SSH_ORIGINAL_COMMAND" == "rdiff-backup --server" ]; then
-    # When called by rdiff-backup, retrict path to user's home.
+    # When called by rdiff-backup, restrict path to user's home.
     # But this will force rdiff-backup client to provide the full path.
     logger "$0: user [$USERNAME] in [$USERHOME] invalid command: $SSH_ORIGINAL_COMMAND"
     rdiff-backup --server --restrict="$USERHOME" $RDIFFBACKUP_ARGS

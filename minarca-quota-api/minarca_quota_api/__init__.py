@@ -44,11 +44,6 @@ def validate_password(realm, username, password):
     return False
 
 
-def _call(*args):
-    cherrypy.log('execute command line: %s' % ' '.join(args))
-    return subprocess.check_output(args)
-
-
 @cherrypy.tools.auth_basic(realm='minarca-api', checkpassword=validate_password)
 class Root(object):
 
@@ -69,46 +64,51 @@ class Root(object):
             return self.set_quota(user, size)
         else:
             return self.get_quota(user)
-        
+
     def get_quota(self, user):
         """Get user disk quota and space."""
 
         # Get value using zfs (as exact value).
+        args = ['/sbin/zfs', 'get', '-p', '-H', '-o', 'value', 'userused@%s,userquota@%s,used,available' % (user, user), POOL]
         cherrypy.log('get user [%s] quota' % user)
-        user_pool = os.path.join(POOL, user)
+        cherrypy.log('execute command line: %s' % ' '.join(args))
         try:
-            output = _call('/sbin/zfs', 'get', '-p', '-H', '-o', 'value', 'used,available,quota', user_pool)
+            output = subprocess.check_output(args)
         except subprocess.CalledProcessError as e:
             cherrypy.log(e.output)
             raise cherrypy.HTTPError(500, 'fail to get user quota')
 
         values = output.splitlines()
-        if len(values) != 3:
+        if len(values) != 4:
             cherrypy.log('fail to get user disk space: %s' % (output,), severity=logging.ERROR)
             raise cherrypy.HTTPError(500, 'fail to get user quota')
-        used, available, quota = [0 if x == '-' else int(x) for x in values]
+        userused, userquota, used, available = [0 if x == '-' else int(x) for x in values]
 
-        # If quota is 0, the user doesn't have a quota.
-        if quota:
-            return {"size": quota, "used": used, "avail": max(0, quota - used)}
+        # If size is 0, the user doesn't have a quota.
+        if userquota:
+            return {"size": userquota, "used": userused, "avail": max(0, userquota - userused)}
         else:
             return {"size": used + available, "used": used, "avail": available}
 
     def set_quota(self, user, quota):
         """Update the user quota. Return True if quota update is successful."""
 
+        # Get user id (also check if local user).
+        try:
+            uid = _getpwnam(user).pw_uid
+        except KeyError:
+            raise cherrypy.HTTPError(500, 'invalid user')
+
+        # Check if system user (for security)
+        if uid < 1000:
+            cherrypy.log('user quota cannot be set for system user [%s]' % user)
+            raise cherrypy.HTTPError(500, 'invalid user')
+
         cherrypy.log('update user [%s] quota [%s]' % (user, quota))
-        quota = int(quota)
-        user_pool = os.path.join(POOL, user)
+        args = ['/sbin/zfs', 'set', 'userquota@%s=%s' % (user, quota), POOL]
+        cherrypy.log('execute command line: %s' % ' '.join(args))
         try:
-            _call('/sbin/zfs', 'create', user_pool)
-        except subprocess.CalledProcessError as e:
-            if 'dataset already exists' in e.output:
-                pass    
-            else:
-                raise cherrypy.HTTPError(500, 'fail to get user quota')
-        try:
-            _call('/sbin/zfs', 'set', 'quota=%s' % quota, user_pool)
+            subprocess.check_output(args)
         except subprocess.CalledProcessError as e:
             cherrypy.log(e.output)
             raise cherrypy.HTTPError(500, 'fail to set user quota')
