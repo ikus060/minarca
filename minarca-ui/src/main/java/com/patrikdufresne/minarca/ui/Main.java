@@ -70,15 +70,17 @@ public class Main {
 
             try {
                 ProcessInfo p = ProcessUtils.getPid(Compat.PID_FILE_GUI, Compat.MINARCAUI_EXE);
-                LOGGER.info("minarca ui is already running as pid " + p.pid);
-                System.err.println("minarca ui is already running as pid " + p.pid);
-                System.exit(0);
-                return;
+                if (p.pid != ProcessUtils.pid()) {
+                    LOGGER.info("minarca ui is already running as pid " + p.pid);
+                    System.err.println("minarca ui is already running as pid " + p.pid);
+                    System.exit(0);
+                    return;
+                }
             } catch (NoSuchProcess e) {
                 // Pass
-                ProcessUtils.writePidFile(Compat.PID_FILE_GUI);
-                new Main().startui();
             }
+            ProcessUtils.writePidFile(Compat.PID_FILE_GUI);
+            new Main().startui();
         } catch (IOException e) {
             e.printStackTrace();
         }
