@@ -55,7 +55,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     """
     
     _quota_api_url = Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
-    _mode = IntOption('MinarcaUserSetupDirMode', 0o0700)
+    _mode = IntOption('MinarcaUserSetupDirMode', 0o0770)
     _basedir = Option('MinarcaUserBaseDir', default='/backups/')
     _minarca_shell = Option('MinarcaShell', default='/opt/minarca/bin/minarca-shell')
     _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
@@ -221,7 +221,8 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         # Create folder if inside our base dir and missing.
         if user_root.startswith(self._basedir) and not os.path.exists(user_root):
             logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
-            os.makedirs(user_root, mode=self._mode)
+            os.mkdir(user_root)
+            os.chmod(user_root, self._mode)
 
         if not os.path.isdir(user_root):
             logger.exception('fail to create user [%s] root dir [%s]', userobj.username, user_root)
@@ -235,7 +236,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         ssh_dir = os.path.join(self._basedir, '.ssh')
         if not os.path.exists(ssh_dir):
             logger.info("creating .ssh folder [%s]", ssh_dir)
-            os.mkdir(ssh_dir, 0o0700)
+            os.mkdir(ssh_dir, 0o700)
         
         # Create the authorized_keys file
         filename = os.path.join(ssh_dir, 'authorized_keys')
