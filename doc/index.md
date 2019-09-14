@@ -13,6 +13,8 @@ You may stop start the service using systemd:
 
     sudo service minarca-server stop
     sudo service minarca-server start
+    
+Once insatalled, read how to configure minarca-server.
 
 ## Migrating from rdiffweb to minarca-server
 
@@ -61,6 +63,18 @@ as it was recommended by rdiffweb documentation. You may run the following
 command to update the permissions.
 
     sudo chown -R minarca:minarca /backups/
+
+## Setup Storage
+
+Compared to rdiffweb, Minarca intend to take over the management of your storage and for that reason,
+need to enforce some rules regarding how your storage should be layout.
+
+You need to define a folder where all your backups will reside. Everything under this folder will then be managed by Minarca. By default, this folder is `/backups`. If you want a different folder update the parameter `MinarcaUserBaseDir` in minarca configuration.
+
+When installing, this folder will be created with the right ownership and permissions. If you have created this folder your self, make sure the ownership is set to `minarca:minarca` and permissions to `-rwxr-x---`.
+
+    chown minarca:minarca /backups/
+    chmod 7500 /backups/
 
 
 ## Configuration
