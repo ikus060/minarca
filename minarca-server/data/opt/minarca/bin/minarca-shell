@@ -30,14 +30,22 @@ if [ -z "$SSH_ORIGINAL_COMMAND" ]; then
     exit 1
 fi
 
+# For quota management, we need to sudo as the user to sets the file permissions properly.
+# Check if the user really exists. If it does exists, let sudo as this user.
+SUDO=""
+if [ ! -x "$(id -u $USERNAME 2>/dev/null)" -a $SUDO_OWNERSHIP ]; then
+    SUDO="sudo --non-interactive -u $USERNAME -g minarca"
+fi
+
 # Either we get called by rdiff-backup directly
 # or we get called by minarca client which replace the command by the name of the repository.
 cd "$USERHOME"
-if [ "$SSH_ORIGINAL_COMMAND" == "rdiff-backup --server" ]; then
+if [ ${RDIFFBACKUP_COMPATIBILITY:-0} -a "$SSH_ORIGINAL_COMMAND" == "rdiff-backup --server" ]; then
     # When called by rdiff-backup, restrict path to user's home.
     # But this will force rdiff-backup client to provide the full path.
-    logger "$0: user [$USERNAME] in [$USERHOME] invalid command: $SSH_ORIGINAL_COMMAND"
-    rdiff-backup --server --restrict="$USERHOME" $RDIFFBACKUP_ARGS
+    logger "$0: user [$USERNAME] in [$USERHOME] obsolete command: $SSH_ORIGINAL_COMMAND"
+    $SUDO  rdiff-backup --server $RDIFFBACKUP_ARGS
+    $SUDO chmod 770 *
     exit
 fi
 
@@ -52,4 +60,5 @@ fi
 
 logger "$0: user [$USERNAME] in [$USERHOME] repo: $REPO"
 cd "$USERHOME"
-rdiff-backup --server --restrict="$REPO" $RDIFFBACKUP_ARGS
+$SUDO rdiff-backup --server --restrict="$REPO" $RDIFFBACKUP_ARGS
+$SUDO chmod 770 *
