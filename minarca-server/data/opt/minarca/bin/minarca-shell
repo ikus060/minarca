@@ -40,13 +40,20 @@ fi
 # Either we get called by rdiff-backup directly
 # or we get called by minarca client which replace the command by the name of the repository.
 cd "$USERHOME"
-if [ ${RDIFFBACKUP_COMPATIBILITY:-0} -a "$SSH_ORIGINAL_COMMAND" == "rdiff-backup --server" ]; then
-    # When called by rdiff-backup, restrict path to user's home.
-    # But this will force rdiff-backup client to provide the full path.
-    logger "$0: user [$USERNAME] in [$USERHOME] obsolete command: $SSH_ORIGINAL_COMMAND"
-    $SUDO  rdiff-backup --server $RDIFFBACKUP_ARGS
-    $SUDO chmod 770 *
-    exit
+if [ ${RDIFFBACKUP_COMPATIBILITY:-0} ]; then
+    case "$SSH_ORIGINAL_COMMAND" in
+    "rdiff-backup --server")
+        # When called by rdiff-backup, restrict path to user's home.
+        # But this will force rdiff-backup client to provide the full path.
+        logger "$0: user [$USERNAME] in [$USERHOME] obsolete command: $SSH_ORIGINAL_COMMAND"
+        $SUDO  rdiff-backup --server $RDIFFBACKUP_ARGS
+        $SUDO chmod 770 *
+        exit;;
+    "echo -n 1"|"echo -n host is alive"|"/usr/bin/rdiff-backup -V")
+        # Used by backup-ninja to verify connectivity
+        $SSH_ORIGINAL_COMMAND
+        exit;;
+    esac
 fi
 
 # When called by minarca client, the command should be the name of the repository.
