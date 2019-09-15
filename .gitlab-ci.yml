@@ -94,8 +94,9 @@ promote:
   - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
-  - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-server_${REVISION}_amd64.deb /var/www/patrikdufresne/archive/minarca/minarca-server_latest_amd64.deb
+  - export MINARCA_DEB_FILE=$(ls -1 minarca-server_*.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest_amd64.deb
 
 deploy:dev:sylve:
   stage: deploy
