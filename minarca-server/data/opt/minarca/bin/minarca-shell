@@ -59,11 +59,12 @@ fi
 # When called by minarca client, the command should be the name of the repository.
 # Let make sure it's not trying to evade our user's home.
 REPO="$SSH_ORIGINAL_COMMAND"
-if [ "$REPO" == "/*" -o "$REPO" == "*/.." -o "$REPO" == "../*" -o "$REPO" == "*/../*" ]; then
+case "$REPO" in
+/*|*/..|../*|*/../*)
     logger "$0: user [$USERNAME] in [$USERHOME] invalid repo: $REPO"
     printf "ERROR repository name $REPO is not valid\n."
     exit 1
-fi
+esac
 
 logger "$0: user [$USERNAME] in [$USERHOME] repo: $REPO"
 cd "$USERHOME"
