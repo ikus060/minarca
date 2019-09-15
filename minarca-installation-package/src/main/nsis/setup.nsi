@@ -17,7 +17,7 @@ SetCompressor bzip2
   ; Include Java Install
   !addincludedir ${includedir}
   !addplugindir ${plugindir}
-  !define JRE_VERSION "1.7"
+  !define JRE_VERSION "1.8"
   !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98426"
   !define JRE_URL_64 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98428"
   !include "JREDyna_Inetc.nsh"
