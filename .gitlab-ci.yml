@@ -73,11 +73,19 @@ promote:
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-client-${REVISION}.exe /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-client_${REVISION}_all.deb /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
 
-test:deb:
+test:install-deb:
   stage: test-integration
   image: debian:stretch
   before_script: []
   script:
-  - apt update
-  - apt install -y ./minarca-installation-package-deb/target/*.deb
-  - /opt/minarca/bin/minarca --version
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-installation-package-deb/target/*.deb)
+  - bash ./tests/test_install_deb.sh
+  
+test:install-exe:
+  stage: test-integration
+  image: debian:stretch
+  before_script: []
+  script:
+  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-installation-package/target/*.exe)
+  - bash ./tests/test_install_exe.sh
+  
