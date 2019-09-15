@@ -6,6 +6,7 @@ stages:
 - test-package
 - publish
 - deploy
+- test-integration
 
 variables:
   PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
@@ -129,6 +130,10 @@ deploy:staging:sestican:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
+  # Delete previous installation
+  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "apt remove minarca-server --purge || true"
+  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "rm -Rf /etc/minarca/; rm -Rf /backups/"
+  # Install minarca
   - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
   - echo MINARCA_VERSION=$MINARCA_VERSION
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
@@ -159,4 +164,10 @@ deploy:prod:ranculos:
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
   - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit ranculos,mercor
+  
+test:staging:sestican:
+  image: debian:stretch
+  stage: test-integration
+  script: 
+  - bash ./minarca-server/tests/test-link.sh
   
