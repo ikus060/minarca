@@ -14,6 +14,7 @@ cache:
 stages:
   - build
   - publish
+  - test-integration
 
 # Install requirements to build.
 before_script:
@@ -71,3 +72,12 @@ promote:
   - scp -o StrictHostKeyChecking=no minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-client-${REVISION}.exe /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/minarca-client_${REVISION}_all.deb /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
+
+test:deb:
+  stage: test-integration
+  image: debian:stretch
+  before_script: []
+  script:
+  - apt update
+  - apt install -y ./minarca-installation-package-deb/target/*.deb
+  - /opt/minarca/bin/minarca --version

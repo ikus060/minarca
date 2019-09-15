@@ -17,8 +17,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.filechooser.FileSystemView;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -105,7 +103,7 @@ public class Compat {
      * Executable launch to start backup.
      */
     public static final String MINARCAUI_EXE;
-    
+
     /**
      * Define temp directory.
      */
@@ -372,10 +370,9 @@ public class Compat {
      * @return
      */
     public static File[] getRootsPath() {
-        FileSystemView fsv = FileSystemView.getFileSystemView();
         List<File> roots = new ArrayList<File>();
         for (File f : File.listRoots()) {
-            if (fsv.isFloppyDrive(f)) {
+            if (f.getAbsolutePath().equals("A:\\") || f.getAbsolutePath().equals("B:\\")) {
                 // Need to exclude floppy.
                 continue;
             }
