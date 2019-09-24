@@ -169,14 +169,14 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         """
         Listen to users attributes change to update the minarca authorized_keys.
         """
-        # Update minarca's authorized_keys when users update their ssh keys.
-        if 'authorizedkeys' in attrs:
-            # TODO schedule a background task to update the authorized_keys.
-            self._update_authorized_keys()
-            
         if 'user_root' in attrs:
             self._update_user_root(userobj, attrs)
 
+        # Update minarca's authorized_keys when users update their ssh keys.
+        if 'authorizedkeys' in attrs or 'user_root' in attrs:
+            # TODO schedule a background task to update the authorized_keys.
+            self._update_authorized_keys()
+            
     def user_deleted(self, username):
         """
         When user get dleted, update the authorized_key.
