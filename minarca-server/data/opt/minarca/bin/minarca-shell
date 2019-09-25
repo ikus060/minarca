@@ -33,8 +33,10 @@ fi
 # For quota management, we need to sudo as the user to sets the file permissions properly.
 # Check if the user really exists. If it does exists, let sudo as this user.
 SUDO=""
-if [ ! -x "$(id -u $USERNAME 2>/dev/null)" -a $SUDO_OWNERSHIP ]; then
+if id -u $USERNAME 2>/dev/null; then
+if $SUDO_OWNERSHIP; then
     SUDO="sudo --non-interactive -u $USERNAME -g minarca"
+fi
 fi
 
 # Either we get called by rdiff-backup directly
@@ -69,4 +71,6 @@ esac
 logger "$0: user [$USERNAME] in [$USERHOME] repo: $REPO"
 cd "$USERHOME"
 $SUDO rdiff-backup --server --restrict="$REPO" $RDIFFBACKUP_ARGS
-$SUDO chmod 770 *
+if [ -e "$REPO" ]; then
+    $SUDO chmod 770 "$REPO"
+fi
