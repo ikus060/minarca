@@ -38,7 +38,25 @@ Professional support for Minarca is available by contacting [Patrik Dufresne Ser
 
 # Changelog
 
-## v3.1.5 - First public release
+## v3.2.4 (2019-10-01)
+
+* Update french translation
+
+## v3.2.3 (2019-09-25)
+
+* Add "cron" as dependencies in debian package
+
+## v3.2.2 (2019-09-15)
+
+* Add "java-headless" and ssh-client as dependencies in debian package
+* Remove dependencies to AWT (to work in headless mode)
+* Bump JRE version to 1.8 in Windows installer
+
+## v3.2.1 (2019-09-14)
+
+* Fix pid verification to avoid multiple instance to be running
+
+## v3.2.0 - First public release (2019-09-12)
 
 * Provide debian packages
 * Replace Form request by API calls
