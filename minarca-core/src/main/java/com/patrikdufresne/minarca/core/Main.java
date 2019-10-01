@@ -113,7 +113,7 @@ public class Main {
             return;
         } catch (Exception e) {
             System.err
-                    .println(_("Unexpected error happen during the linking process with the server. Verify connectivity with the server and try again later."));
+                    .println(_("Unexpected error happened during the linking process with the server. Verify connectivity with the server and try again later."));
             System.exit(1);
             return;
         }

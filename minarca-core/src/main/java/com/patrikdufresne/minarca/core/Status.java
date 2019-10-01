@@ -214,7 +214,7 @@ public class Status {
         case STALE:
             return date + " " + _("Stale");
         case INTERRUPT:
-            return date + " " + _("Interrupt");
+            return date + " " + _("Interrupted");
         default:
             return date + " " + _("Unknown");
         }
