@@ -33,10 +33,11 @@ fi
 # For quota management, we need to sudo as the user to sets the file permissions properly.
 # Check if the user really exists. If it does exists, let sudo as this user.
 SUDO=""
-if id -u $USERNAME 2>/dev/null; then
-if $SUDO_OWNERSHIP; then
-    SUDO="sudo --non-interactive -u $USERNAME -g minarca"
-fi
+if id -u $USERNAME &>/dev/null ; then
+case "$SUDO_OWNERSHIP" in
+  true|1)
+    SUDO="sudo --non-interactive -u $USERNAME -g minarca";;
+esac
 fi
 
 # Either we get called by rdiff-backup directly
@@ -49,7 +50,7 @@ if [ ${RDIFFBACKUP_COMPATIBILITY:-0} ]; then
         # But this will force rdiff-backup client to provide the full path.
         logger "$0: user [$USERNAME] in [$USERHOME] obsolete command: $SSH_ORIGINAL_COMMAND"
         $SUDO  rdiff-backup --server $RDIFFBACKUP_ARGS
-        $SUDO chmod 770 *
+        $SUDO chmod 770 "$REPO"
         exit;;
     "echo -n 1"|"echo -n host is alive"|"/usr/bin/rdiff-backup -V")
         # Used by backup-ninja to verify connectivity
