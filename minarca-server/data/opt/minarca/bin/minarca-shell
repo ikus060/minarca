@@ -33,8 +33,10 @@ fi
 # For quota management, we need to sudo as the user to sets the file permissions properly.
 # Check if the user really exists. If it does exists, let sudo as this user.
 SUDO=""
-if [ ! -x "$(id -u $USERNAME 2>/dev/null)" -a $SUDO_OWNERSHIP ]; then
+if id -u $USERNAME 2>/dev/null; then
+if $SUDO_OWNERSHIP; then
     SUDO="sudo --non-interactive -u $USERNAME -g minarca"
+fi
 fi
 
 # Either we get called by rdiff-backup directly
@@ -59,13 +61,16 @@ fi
 # When called by minarca client, the command should be the name of the repository.
 # Let make sure it's not trying to evade our user's home.
 REPO="$SSH_ORIGINAL_COMMAND"
-if [ "$REPO" == "/*" -o "$REPO" == "*/.." -o "$REPO" == "../*" -o "$REPO" == "*/../*" ]; then
+case "$REPO" in
+/*|*/..|../*|*/../*)
     logger "$0: user [$USERNAME] in [$USERHOME] invalid repo: $REPO"
     printf "ERROR repository name $REPO is not valid\n."
     exit 1
-fi
+esac
 
 logger "$0: user [$USERNAME] in [$USERHOME] repo: $REPO"
 cd "$USERHOME"
 $SUDO rdiff-backup --server --restrict="$REPO" $RDIFFBACKUP_ARGS
-$SUDO chmod 770 *
+if [ -e "$REPO" ]; then
+    $SUDO chmod 770 "$REPO"
+fi

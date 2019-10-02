@@ -10,6 +10,7 @@
 from __future__ import unicode_literals
 
 from builtins import str
+import grp
 from io import StringIO
 from io import open
 import logging
@@ -19,6 +20,7 @@ import stat
 import sys
 import urllib
 
+import pkg_resources
 import requests
 
 import cherrypy
@@ -26,7 +28,6 @@ from rdiffweb.core import RdiffError, authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
 from rdiffweb.core.config import Option, IntOption, BoolOption
 from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
-import pkg_resources
 
 PY3 = sys.version_info[0] == 3
 
@@ -55,7 +56,9 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     """
     
     _quota_api_url = Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
-    _mode = IntOption('MinarcaUserSetupDirMode', 0o0770)
+    _mode = IntOption('MinarcaUserDirMode', 0o0770)
+    _owner = Option('MinarcaUserDirOwner', 'minarca')
+    _group = Option('MinarcaUserDirGroup', 'minarca')
     _basedir = Option('MinarcaUserBaseDir', default='/backups/')
     _minarca_shell = Option('MinarcaShell', default='/opt/minarca/bin/minarca-shell')
     _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
@@ -169,14 +172,14 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         """
         Listen to users attributes change to update the minarca authorized_keys.
         """
-        # Update minarca's authorized_keys when users update their ssh keys.
-        if 'authorizedkeys' in attrs:
-            # TODO schedule a background task to update the authorized_keys.
-            self._update_authorized_keys()
-            
         if 'user_root' in attrs:
             self._update_user_root(userobj, attrs)
 
+        # Update minarca's authorized_keys when users update their ssh keys.
+        if 'authorizedkeys' in attrs or 'user_root' in attrs:
+            # TODO schedule a background task to update the authorized_keys.
+            self._update_authorized_keys()
+            
     def user_deleted(self, username):
         """
         When user get dleted, update the authorized_key.
@@ -221,11 +224,14 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         # Create folder if inside our base dir and missing.
         if user_root.startswith(self._basedir) and not os.path.exists(user_root):
             logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
-            os.mkdir(user_root)
-            os.chmod(user_root, self._mode)
-
-        if not os.path.isdir(user_root):
-            logger.exception('fail to create user [%s] root dir [%s]', userobj.username, user_root)
+            try:
+                os.mkdir(user_root)
+                # Change mode
+                os.chmod(user_root, self._mode)
+                # Change owner
+                os.chown(user_root, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
+            except:
+                logger.exception('fail to create user [%s] root dir [%s]', userobj.username, user_root)
 
     def _update_authorized_keys(self):
         """
@@ -237,6 +243,10 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         if not os.path.exists(ssh_dir):
             logger.info("creating .ssh folder [%s]", ssh_dir)
             os.mkdir(ssh_dir, 0o700)
+            try:
+                os.chown(ssh_dir, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
+            except:
+                logger.warn("fail to set permissions on [%s] folder", ssh_dir)
         
         # Create the authorized_keys file
         filename = os.path.join(ssh_dir, 'authorized_keys')

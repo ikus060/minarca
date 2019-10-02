@@ -228,7 +228,7 @@ class MinarcaSshKeysTest(AppTestCase):
     
     base_dir = tempfile.mkdtemp(prefix='minarca_tests_')
     
-    default_config = { 'MinarcaUserBaseDir': base_dir }
+    default_config = { 'MinarcaUserBaseDir': base_dir, }
     
     reset_testcases = True
     
@@ -241,39 +241,44 @@ class MinarcaSshKeysTest(AppTestCase):
         shutil.rmtree(self.base_dir)
         AppTestCase.tearDown(self)
     
+    def assertAuthorizedKeys(self, expected):
+        filename = os.path.join(self.base_dir, '.ssh', 'authorized_keys')
+        with open(filename, 'r', encoding='utf-8') as f:
+            data = f.read()
+        self.assertEqual(data, expected)
+    
     def test_update_authorized_keys(self):
         self.plugin = MinarcaUserSetup(self.app)
         self.plugin._update_authorized_keys()
     
     def test_add_key(self):
-        """
-        Test creation of the ssh key.
-        """
         # Read the key from a file
         filename = pkg_resources.resource_filename(__name__, 'test_publickey_ssh_rsa.pub')  # @UndefinedVariable
         with open(filename, 'r', encoding='utf8') as f: 
             key = f.readline()
         
         # Add the key to the user.
-        userobj = self.app.userdb.get_user(self.USERNAME)
+        userobj = self.app.userdb.add_user('testuser')
         userobj.add_authorizedkey(key)
+        user_root = userobj.user_root
         
         # Validate
-        filename = os.path.join(self.base_dir, '.ssh', 'authorized_keys')
-        with open(filename, 'r', encoding='utf-8') as f:
-            data = f.read()
-        self.assertEquals(
-            '''command="/opt/minarca/bin/minarca-shell 'admin' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % userobj.user_root,
-            data)
+        self.assertAuthorizedKeys(
+            '''command="/opt/minarca/bin/minarca-shell 'testuser' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
+        
+        # Update user's home
+        user_root = os.path.join(self.base_dir, 'testing')
+        userobj.user_root = user_root
+
+        # Validate
+        self.assertAuthorizedKeys(
+            '''command="/opt/minarca/bin/minarca-shell 'testuser' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
         
         # Deleting the user should delete it's keys
-        self.app.userdb.delete_user(self.USERNAME)
+        self.app.userdb.delete_user('testuser')
         
         # Validate
-        filename = os.path.join(self.base_dir, '.ssh', 'authorized_keys')
-        with open(filename, 'r', encoding='utf-8') as f:
-            data = f.read()
-        self.assertEquals('', data)
+        self.assertAuthorizedKeys('')
     
 
 if __name__ == "__main__":
