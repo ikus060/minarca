@@ -24,9 +24,8 @@
         </fileSet>
         <!-- Include README and LICENSE file -->
         <fileSet>
-            <directory>../</directory>
+            <directory>../../</directory>
             <includes>
-                <include>README*</include>
                 <include>LICENSE*</include>
             </includes>
             <outputDirectory>.</outputDirectory>
