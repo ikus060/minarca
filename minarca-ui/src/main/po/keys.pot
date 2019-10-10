@@ -1,0 +1,361 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-10-01 11:49-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: com/patrikdufresne/minarca/ui/DetailMessageDialog.java:530
+msgid "copy"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:68
+msgid "About"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:151
+msgid "Stop backup"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:151
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:303
+msgid "Start backup"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:192
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:253
+msgid "Connected"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:197
+msgid "Unknown"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:296
+msgid "Minarca status"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:301
+msgid "Last Backup"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:313
+msgid "Connectivity status"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:318
+msgid "Unlink"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:319
+msgid "Unlink you system from Minarca"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:334
+msgid "Schedule"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:338
+msgid "Define the backup frequency"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:345
+msgid "Hourly"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:347
+msgid "Daily"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:349
+msgid "Weekly"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:351
+msgid "Monthly"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:378
+msgid "Backup"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:383
+msgid "Go to Minarca website"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:384
+msgid "Browse my backup"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:395
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:91
+msgid "Selective backup"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:396
+msgid "Allow you to select files and folders to backup."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:397
+msgid "Select my files"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:481
+msgid "Can't change backup schedule!"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:482
+msgid "Fail to reschedule the backup task."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:506
+msgid "Error updating selective backup configuration"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:507
+msgid ""
+"Can't change the configuration for unknown reason. If the problem persists, "
+"try re-installing Minarca."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:524
+msgid "Are you sure you want to stop the current running backup?"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:525
+msgid ""
+"You are about to stop the running backup. Interupting the backup may "
+"temporarily disrupt data restore. Are you sure you want to continue?"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:543
+msgid "Can't stop running backup!"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:544
+msgid "An error occurred while stopping the backup."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:553
+msgid "Do you want to backup your system now?"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:554
+msgid ""
+"You are about to backup your system to Minarca. This operation may take some "
+"time. While this operation is running you may safely close the Minarca "
+"application."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:572
+msgid "Can't backup this system!"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:573
+msgid "An error occurred while backuping this system."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:587
+msgid "Confirm unlink"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:588
+msgid "Are you sure you want to unlink this system from Minarca?"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:589
+msgid ""
+"You are about to unlink this system from Minarca. This system will no longer "
+"backup it self. Previous backup data will not be lost."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:603
+msgid "Error"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:603
+msgid "Can't unlink this system!"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:603
+msgid "An error occurred while unlinking this system."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:615
+msgid "http://www.patrikdufresne.com/en/minarca/faq/"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/AboutDialog.java:59
+#, java-format
+msgid "About {0}"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/AboutDialog.java:102
+msgid "Minarca is an all integrated online backup solution."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/Main.java:138
+msgid "Minarca"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:118
+msgid "Setup Minarca"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:164
+msgid "Tell Minarca where to backup your data"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:170
+msgid ""
+"To configure Minarca to backup your data, you must provide the URL of a "
+"Minara server. This information should be provided to you by your system "
+"administrator."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:176
+msgid "Address"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:179
+msgid ""
+"Enter the remote server address. Either an IP address and port or a URL. e."
+"g.: http://example.com:8080"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:181
+msgid "http[s]://hostname[:port]"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:184
+msgid "Username"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:188
+msgid "Password"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:197
+msgid "Repository name"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:205
+msgid ""
+"You must provide a unique name to identify this computer in Minarca. Please, "
+"provide a friendly name. By default, the computer's name is used. This value "
+"cannot be changed."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:215
+msgid "Link"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:297
+msgid "A problem happend during the linking process to Minarca server!"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:361
+#, java-format
+msgid ""
+"Repository name {0} already exists ! Do you want to keep the given "
+"repository name ?"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:363
+msgid ""
+"The given repository name is already exists in Mianrca. You may safely keep "
+"this repository name if the name is not used by another computer linked to "
+"Minarca."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:381
+msgid "Link process interrupted"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:394
+msgid ""
+"Unexpected error happen during the linking process with the server. Verify "
+"connectivity with the server and try again later."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SetupDialog.java:425
+msgid "Unexpected error occured"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:55
+msgid "Restore defaults"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:126
+msgid ""
+"Select files or folders you want to include or exclude from your backup."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:150
+msgid "Add folder..."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:159
+msgid "Add file..."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:189
+msgid "Custom pattern"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:198
+msgid "(not exists)"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:204
+msgid "Include / Exclude"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:224
+msgid "Delete"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:273
+msgid "Select a folder to be added to your selective backup."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:301
+msgid "Selected item doesn't exists!"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:302
+#, java-format
+msgid "The path `{0}` cannot be include because it doesn't exists."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:311
+msgid "Selected item is already include!"
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:312
+#, java-format
+msgid "The path `{0}` is already include in you selective backup."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:328
+msgid "Selected item is excluded by another pattern."
+msgstr ""
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:330
+#, java-format
+msgid ""
+"The path `{0}` is currently excluded by another pattern. You may need to "
+"reorganize your patterns to properly include the selected item."
+msgstr ""
