@@ -1,0 +1,173 @@
+image: ikus060/docker-debian-py2-py3:stretch
+
+stages:
+- test
+- package
+- test-package
+- publish
+- deploy
+- test-integration
+
+variables:
+  PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
+
+# TODO Split this by python version and OS.
+test_server_py27: 
+  stage: test
+  script:
+  - cd minarca-server
+  - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
+  - pip install pip setuptools tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
+  - tox --sitepackages
+  
+test_server_py3: 
+  stage: test
+  script:
+  - cd minarca-server
+  - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
+  - pip install pip setuptools tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
+  - tox --sitepackages
+  
+test_quota_py27: 
+  stage: test
+  script:
+  - cd minarca-quota-api
+  - pip install pip setuptools tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
+  - tox --sitepackages
+  
+test_quota_py3: 
+  stage: test
+  script:
+  - cd minarca-quota-api
+  - pip install pip setuptools tox nose coverage --upgrade
+  - python setup.py build
+  - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
+  - tox --sitepackages
+
+
+deb_server:
+  stage: package
+  script:
+  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
+  - pip2 install setuptools_scm
+  - cd minarca-server
+  - export VERSION=$(python setup.py --version)
+  - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
+  - export RELEASE_DATE="$(date '+%a, %d %b %Y %X') +0000"
+  - sed -i "s/%VERSION%/$VERSION/" debian/changelog
+  - sed -i "s/%DATE%/$RELEASE_DATE/" debian/changelog
+  - DH_VIRTUALENV_INSTALL_ROOT=/opt/ dpkg-buildpackage -us -uc
+  artifacts:
+    paths:
+    - minarca-server_*.deb
+
+test_deb_server:
+  stage: test-package
+  image: debian:stretch
+  script: 
+  - bash ./minarca-server/tests/install-deb.sh ./minarca-server_*.deb
+
+publish:
+  stage: publish
+  except:
+  - tags
+  script:
+  # Publish to kalo
+  - eval $(ssh-agent -s)
+  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+
+promote:
+  stage: publish
+  only:
+  - tags
+  script:
+  # Publish to kalo
+  - eval $(ssh-agent -s)
+  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - export MINARCA_DEB_FILE=$(ls -1 minarca-server_*.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest_amd64.deb
+
+deploy:dev:sylve:
+  stage: deploy
+  environment:
+    name: dev
+    url: http://sylve.patrikdufresne.com:8080
+  before_script:
+  - eval $(ssh-agent -s)
+  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  - export VERSION=$(cd minarca-server; python setup.py --version)
+  - export DEB_FILE="minarca-server_${VERSION}_amd64.deb"
+  - echo $VERSION
+  - scp -o StrictHostKeyChecking=no "$DEB_FILE" root@sylve.patrikdufresne.com:/tmp/
+  - ssh -o StrictHostKeyChecking=no root@sylve.patrikdufresne.com "dpkg -i /tmp/$DEB_FILE;service minarca-server restart" 
+  
+deploy:staging:sestican:
+  stage: deploy
+  image: ikus060/ansible
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  environment:
+    name: staging
+    url: https://sestican.patrikdufresne.com
+  before_script:
+  - eval $(ssh-agent -s)
+  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  # Delete previous installation
+  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "apt remove minarca-server --purge || true"
+  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "rm -Rf /etc/minarca/; rm -Rf /backups/"
+  # Install minarca
+  - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
+  - echo MINARCA_VERSION=$MINARCA_VERSION
+  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+  - cd ansible-config
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit sestican
+  
+deploy:prod:ranculos:
+  stage: deploy
+  image: ikus060/ansible
+  when: manual
+  only: 
+  - tags
+  - master
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  environment:
+    name: prod
+    url: https://www.minarca.net
+  before_script:
+  - eval $(ssh-agent -s)
+  - echo "$RANCULOS_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$MERCOR_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  script:
+  - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
+  - echo MINARCA_VERSION=$MINARCA_VERSION
+  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
+  - cd ansible-config
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit ranculos,mercor
+  
+test:staging:sestican:
+  image: debian:stretch
+  stage: test-integration
+  script: 
+  - bash ./minarca-server/tests/test-link.sh
+  

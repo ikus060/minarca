@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with python-virtualenv --with systemd
+
+override_dh_virtualenv:
+	dh_virtualenv --install-suffix minarca
+
+override_dh_systemd_start:
+	dh_systemd_start --restart-after-upgrade

@@ -1,0 +1,6 @@
+minarca-server (%VERSION%) unstable; urgency=low
+
+  * Debian package generated using dh_virtualenv.
+
+
+ -- Patrik Dufresne Service Logiciel inc. <support@patrikdufresne.com>  %DATE%
