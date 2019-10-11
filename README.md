@@ -28,11 +28,18 @@ Minarca is a **free and open-source** backup software providing end-to-end integ
 
 ## Getting started
 
-Minarca Server may be installed on Linux Debian.
+**Minarca Server** may be installed on Linux Debian.
 
 * [Latest Ubuntu/Debian Linux version](http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb)
 
-While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
+Note: While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
+
+**Minarca Client** may be installed on Linux Debian or Windows.
+
+* [Latest Linux Ubuntu/Debian version](http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb)
+* [Latest Windows version](http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe)
+
+Note: While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
 
 # Support
 
@@ -60,7 +67,7 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
-## v3.0.1 - Bug fixes (2019-10-04)
+## Server v3.0.1 - Bug fixes (2019-10-04)
 
  * Upgrade to rdiffweb v1.0.3.
  * Update the authorized_keys when user's home directory get updated.
@@ -69,7 +76,21 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
  * Minarca-shell: Add SUDO_OWNERSHIP to sets the owner and group. Allow better quota management.
  * Pipeline: Add integration testing with server and client linking.
 
-## v3.0.0 - First public version (2019-09-14)
+## Client v3.2.4 (2019-10-01)
+
+* Client: Update french translation
+
+## Client v3.2.3 (2019-09-25)
+
+* Client: Add "cron" as dependencies in debian package
+
+## Client v3.2.2 (2019-09-15)
+
+* Client: Add "java-headless" and ssh-client as dependencies in debian package
+* Client: Remove dependencies to AWT (to work in headless mode)
+* Client: Bump JRE version to 1.8 in Windows installer
+
+## Server v3.0.0 / Client v3.2.1 - First public version (2019-09-14)
 
  * Support cherrypy v16
  * Provide debian packages
@@ -78,3 +99,19 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
  * Improve SSH server security
  * Add /api/ to be used by minarca-client
  * Update Minarca icon
+ * Client: Fix pid verification to avoid multiple instance to be running
+ 
+## Client v3.2.0 - First public release (2019-09-12)
+
+* Client: Provide debian packages
+* Client: Replace Form request by API calls
+* Client: Make it work with minarca-shell
+* Client: Use patches version of rdiff-backup 1.2.8
+* Client: Replace proprietary licence by GPLv3
+* Client: Replace Minarca icon
+* Client: Improve configuration UI
+* Client: Improve linking UI
+* Client: Update default ignored patterns
+* Client: Update french translation
+* Client: Add command line interface 
+* Client: Verify if process is running using pid file on all platform

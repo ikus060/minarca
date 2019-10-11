@@ -1,0 +1,10 @@
+Package: [[deb.name]]
+Version: [[version]]
+Section: misc
+Priority: optional
+Architecture: all
+Depends: jdk (>= 1.7)
+Maintainer: Patrik Dufresne Service Logiciel inc. <support@patrikdufresne.com>
+Description: Minarca is a online backup software for SMB and freelancer. Minarca make sure your data is safe.
+Distribution: development
+Depends: default-jre-headless, rdiff-backup, ssh-client, cron

@@ -1,8 +1,7 @@
 image: ikus060/docker-debian-py2-py3:stretch
 
 stages:
-- test
-- package
+- build
 - test-package
 - publish
 - deploy
@@ -10,10 +9,14 @@ stages:
 
 variables:
   PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
+  MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+               -Dorg.slf4j.simpleLogger.showDateTime=true
+               -Djava.awt.headless=true
+               -Dmaven.repo.local=.m2/repository"
 
 # TODO Split this by python version and OS.
-test_server_py27: 
-  stage: test
+server_test_py27: 
+  stage: build
   script:
   - cd minarca-server
   - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
@@ -22,8 +25,8 @@ test_server_py27:
   - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
   - tox --sitepackages
   
-test_server_py3: 
-  stage: test
+server_test_py3: 
+  stage: build
   script:
   - cd minarca-server
   - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
@@ -32,8 +35,8 @@ test_server_py3:
   - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
   - tox --sitepackages
   
-test_quota_py27: 
-  stage: test
+quota_test_py27: 
+  stage: build
   script:
   - cd minarca-quota-api
   - pip install pip setuptools tox nose coverage --upgrade
@@ -41,8 +44,8 @@ test_quota_py27:
   - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
   - tox --sitepackages
   
-test_quota_py3: 
-  stage: test
+quota_test_py3: 
+  stage: build
   script:
   - cd minarca-quota-api
   - pip install pip setuptools tox nose coverage --upgrade
@@ -50,9 +53,39 @@ test_quota_py3:
   - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
   - tox --sitepackages
 
+client_sonar:
+  stage: build
+  allow_failure: true
+  image: maven:3-jdk-8
+  script:
+  - cd minarca-client
+  - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
+  - echo "REVISION=$REVISION"
+  - apt-get update && apt-get -qq install icoutils nsis cron gettext
+  - mvn -B -Drevision=${REVISION} -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN clean verify org.jacoco:jacoco-maven-plugin:prepare-agent clean verify sonar:sonar
 
-deb_server:
-  stage: package
+client_build:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+  - cd minarca-client
+  - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
+  - echo "REVISION=$REVISION"
+  # Setup authenticode
+  - apt-get update && apt-get -qq install libssl-dev libcurl4-gnutls-dev autoconf osslsigncode icoutils nsis cron gettext
+  - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
+  - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
+  - mvn -B -Drevision=${REVISION} -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
+  # Rename deb
+  - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
+  - mv minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb
+  artifacts:
+    paths:
+    - minarca-client/minarca-installation-package/target/*.exe
+    - minarca-client/minarca-installation-package-deb/target/*.deb
+
+server_package_deb:
+  stage: build
   script:
   - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
   - pip2 install setuptools_scm
@@ -67,13 +100,29 @@ deb_server:
     paths:
     - minarca-server_*.deb
 
-test_deb_server:
+server_test_deb:
   stage: test-package
   image: debian:stretch
   script: 
   - bash ./minarca-server/tests/install-deb.sh ./minarca-server_*.deb
 
-publish:
+client_test_deb:
+  stage: test-package
+  image: debian:stretch
+  before_script: []
+  script:
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
+  - bash ./minarca-client/tests/test_install_deb.sh
+  
+client_test_exe:
+  stage: test-package
+  image: debian:stretch
+  before_script: []
+  script:
+  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client/minarca-installation-package/target/*.exe)
+  - bash ./minarca-client/tests/test_install_exe.sh
+
+server_publish:
   stage: publish
   except:
   - tags
@@ -85,19 +134,58 @@ publish:
   - chmod 700 ~/.ssh
   - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
 
-promote:
+server_promote:
   stage: publish
   only:
   - tags
   script:
-  # Publish to kalo
+  # Setup authentication
   - eval $(ssh-agent -s)
   - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
+  # Publish to kalo
   - export MINARCA_DEB_FILE=$(ls -1 minarca-server_*.deb)
   - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest_amd64.deb
+
+client_publish:
+  stage: publish
+  environment:
+    name: dev
+    url: http://www.patrikdufresne.com/archive/minarca/nightly/minarca-client-${REVISION}.exe
+  script:
+  # Setup authentication
+  - eval $(ssh-agent -s)
+  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  # Publish to kalo
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
+  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client/minarca-installation-package/target/*.exe)
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+
+client_promote:
+  stage: publish
+  only:
+  - tags
+  environment:
+    name: latest
+    url: http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe
+  script:
+  # Setup authentication
+  - eval $(ssh-agent -s)
+  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  # Publish to kalo
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
+  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client/minarca-installation-package/target/*.exe)
+  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_DEB_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
 
 deploy:dev:sylve:
   stage: deploy
