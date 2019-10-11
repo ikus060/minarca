@@ -8,7 +8,7 @@ set -e
 set -x
 
 # Default variables
-MINARCA_DEB_FILE=${MINARCA_DEB_FILE:-minarca-client_latest_all.deb}
+MINARCA_DEB_FILE=${MINARCA_DEB_FILE:-./minarca-client_latest_all.deb}
 MINARCA_REMOTE_URL=${MINARCA_REMOTE_URL:-https://sestican.patrikdufresne.com}
 MINARCA_USERNAME=${MINARCA_USERNAME:-admin}
 MINARCA_PASSWORD=${MINARCA_PASSWORD:-admin123}
@@ -16,9 +16,11 @@ MINARCA_REPOSITORYNAME=${MINARCA_REPOSITORYNAME:-test}
 
 
 # Install minarca-client
-apt update && apt install -y wget
-wget -O $MINARCA_DEB_FILE http://www.patrikdufresne.com/archive/minarca/$MINARCA_DEB_FILE
-apt install -y ./$MINARCA_DEB_FILE
+if [ ! -e "$MINARCA_DEB_FILE" ]; then
+    apt update && apt install -y wget
+    wget -O $MINARCA_DEB_FILE http://www.patrikdufresne.com/archive/minarca/${MINARCA_DEB_FILE##*/}
+fi
+apt update && apt install -y $MINARCA_DEB_FILE
 
 # Add PDSL inc certificate
 cat <<EOD > /usr/local/share/ca-certificates/root-ca.patrikdufresne.com.crt
