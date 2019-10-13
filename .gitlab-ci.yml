@@ -256,6 +256,8 @@ deploy:prod:ranculos:
 test:staging:sestican:
   image: debian:stretch
   stage: test-integration
+  variables:
+    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
   script: 
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
   - bash ./minarca-server/tests/test-link.sh
