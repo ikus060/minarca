@@ -219,7 +219,7 @@ deploy:staging:sestican:
   - chmod 700 ~/.ssh
   script:
   # Delete previous installation
-  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "apt remove -y minarca-server --purge || true"
+  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "! dpkg -s minarca-server || apt remove -y minarca-server --purge"
   - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "rm -Rf /etc/minarca/; rm -Rf /backups/"
   # Install minarca
   - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
