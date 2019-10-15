@@ -263,7 +263,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         # Get list of keys
         seen = set()
         new_data = StringIO()
-        for userobj in self.app.userdb.list():
+        for userobj in self.app.userdb.users():
             for key in userobj.authorizedkeys:
                 
                 if key.fingerprint in seen:
