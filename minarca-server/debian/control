@@ -10,5 +10,5 @@ Standards-Version: 3.9.5
 Package: minarca-server
 Architecture: any
 Pre-Depends: dpkg (>= 1.16.1), python3 (>= 3.5), ${misc:Pre-Depends}
-Depends: adduser, rdiff-backup, openssh-client, openssh-server | ssh-server, libldap-2.4-2, ${python:Depends}, ${misc:Depends}, sudo
+Depends: adduser, rdiff-backup, openssh-client, openssh-server | ssh-server, libldap-2.4-2, ${python:Depends}, ${misc:Depends}, sudo, coreutils
 Description: Minarca Web Server
