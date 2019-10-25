@@ -177,8 +177,13 @@ public class Client {
      * @throws IOException
      */
     public void setRepoEncoding(String name, String encoding) throws IOException {
-        // Create query to update encding.
-        this.requests.target("/api/set-encoding/" + name + "/").entityParam("new_encoding", encoding).postAsString();
+        // Create query to update encoding.
+        String username = getCurrentUserInfo().username;
+
+        this.requests
+                .target("/settings/" + username + "/" + name + "/")
+                .entityParam("new_encoding", encoding)
+                .postAsString();
     }
 
     /**
