@@ -67,6 +67,23 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
+## Server / Client v3.3.0 (2019-10-xx)
+
+ * Server: Upgrade to rdiffweb v1.1.0
+	 * Change repository URL to username/repo-name - in preparation to add ACL in future release
+	 * Add repository view to allow administrator to browse, restore, edit other user repositories
+	 * Add system information (version, configuration, operating system info, etc.) to the admin area
+	 * Add server logs to admin area (rdiff-backup.log & rdiff-backup-access.log)
+	 * Improve the user's view layout
+	 * Check local database credentials before LDAP credentials
+	 * Reduce footprint of confirmation dialog box
+	 * Reduce code smells reported by Sonarqube
+	 * Improve main menu structure
+	 * Change default login page headline
+	 * Support Jinja2 version >= 2.10 (add integration test to CICD pipeline)
+	 * Update documentation
+ * Server: Add `tail` as a dependency for server logs
+
 ## Server v3.0.1 - Bug fixes (2019-10-04)
 
  * Upgrade to rdiffweb v1.0.3.
