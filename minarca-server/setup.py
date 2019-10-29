@@ -28,7 +28,7 @@ setuptools.setup(
         "setuptools_scm",
     ],
     install_requires=[
-        "rdiffweb==1.0.4.dev47+g0770b7f",
+        "rdiffweb==1.0.4.dev48+g774d120",
         "cherrypy>=16.0.0",
         "requests",
     ],
