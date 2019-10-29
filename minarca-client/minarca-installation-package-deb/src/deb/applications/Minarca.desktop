@@ -4,6 +4,6 @@ Encoding=UTF-8
 Name=Minarca
 Comment=Minarca is a online backup software for SMB and freelancer. Make sure your data is safe.
 Comment[fr]=Minarca est un logiciel de sauvegarde de données en ligne pour les PME et les travailleur autonome. S'assure que vos données sont sauvegardé.
-Exec=/opt/minarca/bin/minarca
+Exec=/opt/minarca/bin/minarcaui
 Icon=/opt/minarca/minarca_128.png
 Terminal=false
