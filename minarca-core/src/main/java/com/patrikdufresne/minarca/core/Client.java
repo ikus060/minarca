@@ -180,10 +180,7 @@ public class Client {
         // Create query to update encoding.
         String username = getCurrentUserInfo().username;
 
-        this.requests
-                .target("/settings/" + username + "/" + name + "/")
-                .entityParam("new_encoding", encoding)
-                .postAsString();
+        this.requests.target("/settings/" + username + "/" + name + "/").entityParam("new_encoding", encoding).postAsString();
     }
 
     /**
