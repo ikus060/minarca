@@ -28,6 +28,7 @@ import com.patrikdufresne.minarca.core.internal.MinarcaExecutable;
 import com.patrikdufresne.minarca.core.internal.ProcessUtils;
 import com.patrikdufresne.minarca.core.internal.ProcessUtils.NoSuchProcess;
 import com.patrikdufresne.minarca.core.internal.ProcessUtils.ProcessInfo;
+import com.patrikdufresne.minarca.core.internal.Scheduler;
 
 /**
  * This class is the main entry point to the software.
@@ -164,6 +165,11 @@ public class Main {
                     // If user cancel, close application.
                     return;
                 }
+            }
+
+            // Make sure a scheduled task exists.
+            if (!Scheduler.instance().exists()) {
+                Scheduler.instance().create();
             }
 
             winManager = new WindowManager();
