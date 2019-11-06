@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import com.patrikdufresne.minarca.core.internal.Compat;
-import com.patrikdufresne.minarca.core.internal.MinarcaExecutable;
 import com.patrikdufresne.minarca.core.internal.ProcessUtils;
 import com.patrikdufresne.minarca.core.internal.ProcessUtils.NoSuchProcess;
 import com.patrikdufresne.minarca.core.internal.ProcessUtils.ProcessInfo;
+import com.patrikdufresne.minarca.core.internal.Scheduler;
 
 /**
  * This class is the main entry point to the software.
@@ -113,7 +113,9 @@ public class Main {
             return;
         } catch (Exception e) {
             System.err
-                    .println(_("Unexpected error happened during the linking process with the server. Verify connectivity with the server and try again later."));
+                    .println(
+                            _(
+                                    "Unexpected error happened during the linking process with the server. Verify connectivity with the server and try again later."));
             System.exit(1);
             return;
         }
@@ -137,6 +139,11 @@ public class Main {
             boolean force = parseBoolArgument(args, "--force", "-f");
             checkEnv();
             backup(force);
+            break;
+        case "crontab":
+        case "scheduler":
+            checkEnv();
+            createScheduledTask();
             break;
         case "link":
             force = parseBoolArgument(args, "--force", "-f");
@@ -215,6 +222,19 @@ public class Main {
             break;
         }
 
+    }
+
+    /**
+     * Create a scheduled task.
+     */
+    private static void createScheduledTask() {
+        try {
+            Scheduler.instance().create();
+        } catch (APIException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+            return;
+        }
     }
 
     /**
