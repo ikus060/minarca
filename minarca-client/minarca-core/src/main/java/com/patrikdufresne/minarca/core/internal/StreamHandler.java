@@ -39,9 +39,7 @@ public class StreamHandler {
             // Read stream line by line without buffer (otherwise it block).
             try {
                 Writer out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
-                if (handler == null) {
-                    out.close();
-                }
+                out.close();
 
                 InputStreamReader in = new InputStreamReader(p.getInputStream(), charset);
 
@@ -60,42 +58,12 @@ public class StreamHandler {
                     } else {
                         buf.append((char) b);
                     }
-                    if (handler != null) {
-                        String prompt = buf.toString();
-                        String answer = handler.handle(prompt);
-                        if (answer != null) {
-                            log(prompt);
-                            // LOGGER.debug(answer);
-                            out.append(answer);
-                            out.flush();
-                            buf.setLength(0);
-                        }
-                    }
                 }
             } catch (IOException e) {
                 LOGGER.warn("unknown IO error", e);
             }
             return output.toString();
         }
-    }
-
-    /**
-     * Interface used to allow client to send data to the stream.
-     * 
-     * @author Patrik Dufresne
-     * 
-     */
-    public interface PromptHandler {
-
-        /**
-         * Called everytime the prompt is updated (may be called for each new char added to the stream.)
-         * 
-         * @param prompt
-         *            the current prompt line.
-         * @return The value to be send (or null if nothing to sent).
-         */
-        public String handle(String prompt);
-
     }
 
     private static final int CR = 10;
@@ -120,10 +88,6 @@ public class StreamHandler {
     private boolean forceLog;
 
     private Future<String> future;
-    /**
-     * Use to prompt.
-     */
-    private PromptHandler handler;
 
     /**
      * Process to monitor.
@@ -137,11 +101,11 @@ public class StreamHandler {
      *            the process.
      */
     public StreamHandler(Process p) {
-        this(p, Compat.CHARSET_PROCESS, null, false);
+        this(p, Compat.CHARSET_PROCESS, false);
     }
 
     public StreamHandler(Process p, Charset charset) {
-        this(p, charset, null, false);
+        this(p, charset, false);
     }
 
     /**
@@ -149,18 +113,13 @@ public class StreamHandler {
      * 
      * @param p
      */
-    public StreamHandler(Process p, Charset charset, PromptHandler handler, boolean forceLog) {
+    public StreamHandler(Process p, Charset charset, boolean forceLog) {
         Validate.notNull(this.p = p);
         Validate.notNull(this.charset = charset);
-        this.handler = handler;
         this.forceLog = forceLog;
         this.future = this.executor.submit(new PrivateCallable());
         // Once the task is submit, we may shutdown the executor.
         this.executor.shutdown();
-    }
-
-    public StreamHandler(Process p, PromptHandler handler) {
-        this(p, Compat.CHARSET_PROCESS, handler, false);
     }
 
     /**

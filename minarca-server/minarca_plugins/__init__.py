@@ -87,7 +87,11 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         files = [f for f in os.listdir(self._minarca_identity) if f.startswith('ssh_host') if f.endswith('.pub')]
         for fn in files:
             with open(os.path.join(self._minarca_identity, fn)) as fh:
-                identity += remotehost + " " + fh.read()
+                if ':' in remotehost:
+                    hostname, port = remotehost.split(':', 1)
+                    identity += "[" + hostname + "]:" + port + " " + fh.read()
+                else:
+                    identity += remotehost + " " + fh.read()
         
         # Get remote host value from config or from URL
         return {

@@ -22,7 +22,6 @@ import com.patrikdufresne.minarca.core.APIException.IdentityMissingException;
 import com.patrikdufresne.minarca.core.APIException.SshMissingException;
 import com.patrikdufresne.minarca.core.APIException.UntrustedHostKey;
 import com.patrikdufresne.minarca.core.GlobPattern;
-import com.patrikdufresne.minarca.core.internal.StreamHandler.PromptHandler;
 
 /**
  * Utility class to run rdiffbackup command line.
@@ -99,28 +98,6 @@ public class RdiffBackup {
     }
 
     /**
-     * Determine the location of rdiff-backup executable.
-     * 
-     * @return
-     */
-    private static File getRdiffbackupLocation() {
-        return Compat.searchFile(RDIFF_BACKUP, System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
-    }
-
-    /**
-     * Determine the location of ssh executable.
-     * 
-     * @return ssh location
-     */
-    private static File getSshLocation() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "./openssh-7.6p1-1/", "./bin/");
-        }
-        // Linux: use system ssh
-        return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "/usr/bin/");
-    }
-
-    /**
      * The identify file (private key).
      */
     private final File identityFile;
@@ -136,6 +113,11 @@ public class RdiffBackup {
     private final String remotehost;
 
     /**
+     * The remote port (default to 22)
+     */
+    private final String remoteport;
+
+    /**
      * Create a new instance of rdiffbackup.
      * 
      * @param remotehost
@@ -147,7 +129,10 @@ public class RdiffBackup {
      * @throws APIException
      */
     public RdiffBackup(String remotehost, File knownHostsFile, File identityFile) throws APIException {
-        Validate.notEmpty(this.remotehost = remotehost);
+        Validate.notEmpty(remotehost);
+        String parts[] = remotehost.split(":", 2);
+        this.remotehost = parts[0];
+        this.remoteport = parts.length == 2 ? parts[1] : null;
         Validate.notNull(this.knownHostsFile = knownHostsFile);
         if (!knownHostsFile.isFile() || !knownHostsFile.canRead()) {
             throw new IdentityMissingException(knownHostsFile);
@@ -226,7 +211,7 @@ public class RdiffBackup {
      *            the arguments list.
      * @throws APIException
      */
-    private void execute(List<String> command, File workingDir, PromptHandler handler) throws APIException, InterruptedException {
+    protected void execute(List<String> command, File workingDir) throws APIException, InterruptedException {
         Validate.notNull(command);
         Validate.isTrue(command.size() > 0);
         LOGGER.debug("executing {}", StringUtils.join(command, " "));
@@ -244,7 +229,7 @@ public class RdiffBackup {
         }
         try {
             // Attach stream handle to answer a password when prompted
-            StreamHandler sh = new StreamHandler(p, Compat.CHARSET_PROCESS, handler, true);
+            StreamHandler sh = new StreamHandler(p, Compat.CHARSET_PROCESS, true);
             // Wait for process to complete
             int returnCode = p.waitFor();
             String output = sh.getOutput();
@@ -267,12 +252,34 @@ public class RdiffBackup {
     }
 
     /**
+     * Determine the location of rdiff-backup executable.
+     * 
+     * @return
+     */
+    protected File getRdiffbackupLocation() {
+        return Compat.searchFile(RDIFF_BACKUP, System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
+    }
+
+    /**
+     * Determine the location of ssh executable.
+     * 
+     * @return ssh location
+     */
+    protected File getSshLocation() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "./openssh-7.6p1-1/", "./bin/");
+        }
+        // Linux: use system ssh
+        return Compat.searchFile(SSH, System.getProperty(PROPERTY_SSH_LOCATION), "/usr/bin/");
+    }
+
+    /**
      * Utility method to start a rdiff-backup process.
      * 
      * @param extraArgs
      * @throws APIException
      */
-    private void rdiffbackup(File workingDir, List<String> extraArgs, String path) throws APIException, InterruptedException {
+    protected void rdiffbackup(File workingDir, List<String> extraArgs, String path) throws APIException, InterruptedException {
         // Get location of rdiff-backup.
         File rdiffbackup = getRdiffbackupLocation();
         if (rdiffbackup == null) {
@@ -296,24 +303,28 @@ public class RdiffBackup {
         File ssh = getSshLocation();
         if (ssh == null) throw new SshMissingException();
         String extraOptions = "";
-        if (getAcceptHostKey()) extraOptions = "-oStrictHostKeyChecking=no";
+        if (getAcceptHostKey()) extraOptions += "-oStrictHostKeyChecking=no ";
+        if (StringUtils.isNotBlank(remoteport)) extraOptions += "-p " + this.remoteport + " ";
         // TASK-1028 make sure to use `-oIdentitiesOnly=yes` to enforce private key authentication.
         // Otherwise if way use keychain or keberos authentication and prompt user for password.
         // Last argument is the command line to be executed. This should be the repository name.
         // minarca-shell will make use if it.
-        args.add(String.format(
-                "%s %s -oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
-                ssh,
-                extraOptions,
-                knownHostsFile,
-                identityFile,
-                path));
+        args
+                .add(
+                        String
+                                .format(
+                                        "%s %s-oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
+                                        ssh,
+                                        extraOptions,
+                                        knownHostsFile,
+                                        identityFile,
+                                        path));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.
         args.add("minarca@" + this.remotehost + "::" + path);
         // Execute the command line.
-        execute(args, workingDir, null);
+        execute(args, workingDir);
     }
 
     /**

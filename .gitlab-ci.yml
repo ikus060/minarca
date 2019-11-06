@@ -211,7 +211,7 @@ deploy:staging:sestican:
     ANSIBLE_HOST_KEY_CHECKING: "False"
   environment:
     name: staging
-    url: https://sestican.patrikdufresne.com
+    url: https://test.minarca.net
   before_script:
   - eval $(ssh-agent -s)
   - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null

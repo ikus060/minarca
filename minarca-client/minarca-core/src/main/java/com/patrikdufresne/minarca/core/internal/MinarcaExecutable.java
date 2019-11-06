@@ -50,13 +50,13 @@ public class MinarcaExecutable {
             args.add(javaExe.toString()); // usr/lib/jvm/java-8-openjdk-amd64/bin/java
             // Copy all minarca system properties.
             for (Entry<Object, Object> e : System.getProperties().entrySet()) {
-                if (e.getKey().toString().startsWith("com.patrikdufresne.minarca")) {
+                if (e.getKey().toString().startsWith("com.patrikdufresne.minarca") || e.getKey().equals("log.folder")) {
                     args.add("-D" + e.getKey() + "=" + e.getValue());
                 }
             }
             args.add("-classpath");
             args.add(System.getProperty("java.class.path"));
-            args.add(System.getProperty("sun.java.command", "com.patrikdufresne.minarca.Main"));
+            args.add("com.patrikdufresne.minarca.core.Main");
         } else {
             // When running in production mode, execute the minarca binary directly.
             File minarcaExe = getMinarcaLocation();

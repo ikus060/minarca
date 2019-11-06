@@ -87,6 +87,7 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
  * Client: Re-create scheduled task on startup if it was removed by the user
  * Client: Upgrade apache client version to v4.3.6 mitigate security risk repported by Github vulnerability scan
  * Client: Fix default minarca launcher to call `minarcaui` instead or `minarca`
+ * Client & Server: Allow backup over non-default SSH port (22)
  
 ## Server v3.0.1 - Bug fixes (2019-10-04)
 
