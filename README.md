@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/ikus060/minarca-server"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/ikus060/minarca"></a>
   <a href="https://github.com/ikus060/minarca/blob/master/doc/index.md"><img alt="Documentation" src="https://img.shields.io/badge/code-documented-brightgreen.svg?style=flat-square"></a>
   <a href="https://git.patrikdufresne.com/pdsl/minarca/pipelines"><img alt="Build" src="https://git.patrikdufresne.com/pdsl/minarca/badges/master/pipeline.svg"></a>
 </p>
