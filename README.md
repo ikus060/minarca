@@ -30,14 +30,17 @@ Minarca is a **free and open-source** backup software providing end-to-end integ
 
 **Minarca Server** may be installed on Linux Debian.
 
-* [Latest Ubuntu/Debian Linux version](http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb)
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb"><img alt="Minarca Server for Ubuntu/Debian Linux version" src="https://img.shields.io/badge/download-Minaca--server--for--Debian-green?&logo=debian&style=for-the-badge"></a>
 
 Note: While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
 
 **Minarca Client** may be installed on Linux Debian or Windows.
 
-* [Latest Linux Ubuntu/Debian version](http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb)
-* [Latest Windows version](http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe)
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minaca--client--for--Debian-green?&logo=debian&style=for-the-badge"></a>
+<br/>
+<br/>
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minaca--client--for--Windows-green?&logo=windows&style=for-the-badge"></a>
+
 
 Note: While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
 
@@ -67,7 +70,7 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
-## Server / Client v3.3.0 (2019-11-xx)
+## Server / Client v3.3.0 (2019-11-06)
 
  * Server: Upgrade to rdiffweb v1.1.0
 	 * Change repository URL to username/repo-name - in preparation to add ACL in future release
