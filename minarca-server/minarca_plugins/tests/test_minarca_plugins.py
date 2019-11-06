@@ -194,6 +194,9 @@ class MinarcaDiskSpaceTest(WebCase):
         self.assertEquals({"avail": 2147483648, "used": 0, "size": 2147483648}, self.plugin.get_disk_usage(userobj))
         
     def test_get_api_minarca(self):
+        self.app.cfg['minarcaremotehost'] = None
+        self.app.cfg['minarcaremotehostidentity'] = None
+        
         self._login('bob', 'password')
         self.getPage("/api/minarca")
         # Check version
@@ -203,8 +206,18 @@ class MinarcaDiskSpaceTest(WebCase):
         self.assertInBody('127.0.0.1')
         # Check identity
         self.assertInBody('identity')
+        
+    def test_get_api_minarca_identity(self):
+        self.app.cfg['minarcaremotehost'] = "test.examples:2222"
+        self.app.cfg['minarcaremotehostidentity'] = pkg_resources.resource_filename(__name__, '')  # @UndefinedVariable
+        self._login(self.USERNAME, self.PASSWORD)
+        data = self.getJson("/api/minarca/")
+        self.assertIn("[test.examples]:2222", data['identity'])
 
     def test_get_api_minarca_with_reverse_proxy(self):
+        self.app.cfg['minarcaremotehost'] = None
+        self.app.cfg['minarcaremotehostidentity'] = None
+        
         # When behind an apache reverse proxy, minarca server should make use
         # of the Header to determine the public hostname provided.
         self._login('bob', 'password')
@@ -279,7 +292,7 @@ class MinarcaSshKeysTest(AppTestCase):
         
         # Validate
         self.assertAuthorizedKeys('')
-    
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

@@ -251,7 +251,7 @@ public class API {
      * 
      * @return
      */
-    public void checkConfig() throws APIException {
+    private void checkConfig() throws APIException {
         // Basic sanity check to make sure it's configured. If not, display the
         // setup dialog.
         if (StringUtils.isBlank(config.getRepositoryName())) {
@@ -309,9 +309,11 @@ public class API {
             case 301:
             case 302:
                 // Try to provide usefule guidance for http vs https URL
-                if(e.getMessage().contains("Location: https://") && baseurl.startsWith("http://")) {
-                    throw new APIException(_("{0} is redirected to another location. Double check if the URL should start with https:// instead of http://", baseurl), e);                    
-                } 
+                if (e.getMessage().contains("Location: https://") && baseurl.startsWith("http://")) {
+                    throw new APIException(
+                            _("{0} is redirected to another location. Double check if the URL should start with https:// instead of http://", baseurl),
+                            e);
+                }
                 throw new APIException(_("{0} is redirected to another location. Please provide the canonical URL.", baseurl), e);
             case 401:
                 throw new AuthenticationException(e);
@@ -331,15 +333,6 @@ public class API {
             throw new APIException(_("Authentication failed for unknown reason."), e);
         }
         return client;
-    }
-
-    protected Scheduler getScheduler() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return new SchedulerWindows();
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return new SchedulerLinux();
-        }
-        throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
     }
 
     /**
@@ -524,8 +517,7 @@ public class API {
         config.setConfigured(true, true);
 
         // Setup the scheduler
-        Scheduler scheduler = getScheduler();
-        scheduler.create();
+        Scheduler.instance().create();
 
         // Set encoding
         for (Repo repo : repos) {
@@ -593,8 +585,7 @@ public class API {
         // TODO Remove RSA key from client too.
 
         // Delete task
-        Scheduler scheduler = getScheduler();
-        scheduler.delete();
+        Scheduler.instance().delete();
     }
 
 }

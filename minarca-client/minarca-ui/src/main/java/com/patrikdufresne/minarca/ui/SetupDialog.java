@@ -414,14 +414,14 @@ public class SetupDialog extends Dialog {
             @Override
             public void run() {
                 try {
-                	LOGGER.error("validating connectivity to {} at {}", username, remoteserver);
+                    LOGGER.error("validating connectivity to {} at {}", username, remoteserver);
                     API.instance().connect(remoteserver, username, password);
                     callback.accept(null);
                 } catch (APIException e) {
-                	LOGGER.error("fail to validate connectivity", e);
+                    LOGGER.error("fail to validate connectivity", e);
                     callback.accept(e);
                 } catch (Exception e3) {
-                	LOGGER.error("fail to validate connectivity", e3);
+                    LOGGER.error("fail to validate connectivity", e3);
                     callback.accept(new APIException(_("Unexpected error occured"), e3));
                 }
             }

@@ -4,7 +4,7 @@
   <strong>
     <a href="http://www.patrikdufresne.com/en/minarca/">website</a>
     •
-    <a href="https://github.com/ikus060/minarca-server/blob/master/doc/index.md">docs</a>
+    <a href="https://github.com/ikus060/minarca/blob/master/doc/index.md">docs</a>
     •
     <a href="https://groups.google.com/forum/#!forum/rdiffweb">community</a>
   </strong>
@@ -12,8 +12,8 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/ikus060/minarca-server"></a>
-  <a href="https://github.com/ikus060/minarca-server/blob/master/doc/index.md"><img alt="Documentation" src="https://img.shields.io/badge/code-documented-brightgreen.svg?style=flat-square"></a>
-  <a href="https://git.patrikdufresne.com/pdsl/minarca-server/pipelines"><img alt="Build" src="https://git.patrikdufresne.com/pdsl/minarca-server/badges/master/pipeline.svg"></a>
+  <a href="https://github.com/ikus060/minarca/blob/master/doc/index.md"><img alt="Documentation" src="https://img.shields.io/badge/code-documented-brightgreen.svg?style=flat-square"></a>
+  <a href="https://git.patrikdufresne.com/pdsl/minarca/pipelines"><img alt="Build" src="https://git.patrikdufresne.com/pdsl/minarca/badges/master/pipeline.svg"></a>
 </p>
 
 <h1 align="center">
@@ -45,7 +45,7 @@ Note: While it's possible to get Minarca Client working on other Linux distribut
 
 ## Bug Reports
 
-Bug reports should be reported on the Minarca development web site at https://github.com/ikus060/minarca-server/issues
+Bug reports should be reported on the Minarca development web site at https://github.com/ikus060/minarca/issues
 
 ## Professional support
 
@@ -60,14 +60,14 @@ Copyright Patrik Dufresne Service Logiciel inc. <info@patrikdufresne.com>
 Minarca Server is actively developed by [Patrik Dufresne](http://patrikdufresne.com)
 since April 2015.
 
-The Minarca Server source code is hosted on [private Gitlab](https://git.patrikdufresne.com/pdsl/minarca-server)
-and mirrored to [Github](https://github.com/ikus060/minarca-server).
+The Minarca Server source code is hosted on [private Gitlab](https://git.patrikdufresne.com/pdsl/minarca)
+and mirrored to [Github](https://github.com/ikus060/minarca).
 
 The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
-## Server / Client v3.3.0 (2019-10-xx)
+## Server / Client v3.3.0 (2019-11-xx)
 
  * Server: Upgrade to rdiffweb v1.1.0
 	 * Change repository URL to username/repo-name - in preparation to add ACL in future release
@@ -80,10 +80,15 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 	 * Reduce code smells reported by Sonarqube
 	 * Improve main menu structure
 	 * Change default login page headline
-	 * Support Jinja2 version >= 2.10 (add integration test to CICD pipeline)
+	 * Support Jinja2 version >= 2.10 (add integration test for 2.6 to 2.10)
 	 * Update documentation
- * Server: Add `tail` as a dependency for server logs
-
+ * Server: Add `tail` packages as a dependency
+ * Server: Replace headline on the login page, adding link to website, documentation and community
+ * Client: Re-create scheduled task on startup if it was removed by the user
+ * Client: Upgrade apache client version to v4.3.6 mitigate security risk repported by Github vulnerability scan
+ * Client: Fix default minarca launcher to call `minarcaui` instead or `minarca`
+ * Client & Server: Allow backup over non-default SSH port (22)
+ 
 ## Server v3.0.1 - Bug fixes (2019-10-04)
 
  * Upgrade to rdiffweb v1.0.3.

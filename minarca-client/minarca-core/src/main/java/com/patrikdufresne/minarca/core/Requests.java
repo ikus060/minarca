@@ -204,16 +204,16 @@ public class Requests implements Cloneable {
      *            the base URL
      * @param locale
      *            the locale
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public Requests(String baseurl, boolean ignoreSsl, Locale locale) throws MalformedURLException {
         Validate.notNull(baseurl);
         this.baseurl = new URL(baseurl);
         // Do further URL validation specific for HTTP Client
-        if(!"http".equals(this.baseurl.getProtocol()) && !"https".equals(this.baseurl.getProtocol())) {
+        if (!"http".equals(this.baseurl.getProtocol()) && !"https".equals(this.baseurl.getProtocol())) {
             throw new MalformedURLException("protocol must be http or https");
         }
-        if(StringUtils.isBlank(this.baseurl.getHost())) {
+        if (StringUtils.isBlank(this.baseurl.getHost())) {
             throw new MalformedURLException("URL does not specify a valid host name");
         }
         Validate.notNull(this.locale = locale);

@@ -22,6 +22,20 @@ import com.patrikdufresne.minarca.core.APIException;
 public abstract class Scheduler {
 
     /**
+     * Return an instance of Schedule for the given platform.
+     * 
+     * @return
+     */
+    public static Scheduler instance() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return new SchedulerWindows();
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return new SchedulerLinux();
+        }
+        throw new UnsupportedOperationException(SystemUtils.OS_NAME + " not supported");
+    }
+
+    /**
      * Create a new task in the scheduler
      * 
      * @param taskname

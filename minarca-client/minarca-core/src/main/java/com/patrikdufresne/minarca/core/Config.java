@@ -275,18 +275,6 @@ public class Config {
     }
 
     /**
-     * Used to persist the configuration.
-     * 
-     * @throws IOException
-     */
-    private void save(File file, Properties properties) throws IOException {
-        LOGGER.trace("writing config to [{}]", file);
-        Writer writer = Compat.openFileWriter(file, Compat.CHARSET_DEFAULT);
-        properties.store(writer, API.getCopyrightText() + "\r\nMinarca backup configuration.\r\n" + "Please do not change this configuration file manually.");
-        writer.close();
-    }
-
-    /**
      * Sets a new pattern list.
      * 
      * @param patterns

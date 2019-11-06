@@ -77,13 +77,6 @@ public class APILinkTest {
         this.api.config = Mockito.spy(new Config());
         Mockito.doNothing().when(this.api).backup(true, true);
         Mockito.doNothing().when(this.api.config).setSchedule(Mockito.any(Schedule.class), Mockito.anyBoolean());
-        SchedulerLinux s = new SchedulerLinux() {
-            @Override
-            protected File getExeLocation() {
-                return new File("minarca");
-            }
-        };
-        Mockito.when(this.api.getScheduler()).thenReturn(s);
         MinarcaInfo minarcaInfo = new MinarcaInfo();
         minarcaInfo.identity = "some ssh key";
         minarcaInfo.remotehost = "remotehost:22";
