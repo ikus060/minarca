@@ -28,19 +28,24 @@ Minarca is a **free and open-source** backup software providing end-to-end integ
 
 ## Getting started
 
-**Minarca Server** may be installed on Linux Debian.
+Check how Minarca is working without installing the server. We have setup a testing environment for you. You may login to https://test.minarca.net/ using the default username / password: admin / admin123
+
+Then start a backup in few minutes by installing minarca client for [Windows](http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe) or [Linux/Debian](http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb). 
+
+## Download & Install
+
+**Minarca Server**
 
 <a href="http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb"><img alt="Minarca Server for Ubuntu/Debian Linux version" src="https://img.shields.io/badge/download-Minaca--server--for--Debian-green?&logo=debian&style=for-the-badge"></a>
 
 Note: While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
 
-**Minarca Client** may be installed on Linux Debian or Windows.
+**Minarca Client**
 
 <a href="http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minaca--client--for--Debian-green?&logo=debian&style=for-the-badge"></a>
 <br/>
 <br/>
 <a href="http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minaca--client--for--Windows-green?&logo=windows&style=for-the-badge"></a>
-
 
 Note: While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
 
