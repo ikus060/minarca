@@ -187,23 +187,6 @@ client_promote:
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_DEB_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
 
-deploy:dev:sylve:
-  stage: deploy
-  environment:
-    name: dev
-    url: http://sylve.patrikdufresne.com:8080
-  before_script:
-  - eval $(ssh-agent -s)
-  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  script:
-  - export VERSION=$(cd minarca-server; python setup.py --version)
-  - export DEB_FILE="minarca-server_${VERSION}_amd64.deb"
-  - echo $VERSION
-  - scp -o StrictHostKeyChecking=no "$DEB_FILE" root@sylve.patrikdufresne.com:/tmp/
-  - ssh -o StrictHostKeyChecking=no root@sylve.patrikdufresne.com "dpkg -i /tmp/$DEB_FILE;service minarca-server restart" 
-  
 deploy:staging:sestican:
   stage: deploy
   image: ikus060/ansible
