@@ -4,8 +4,8 @@
 
 On a Debian Linux server:
 
-    wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb
-    apt install minarca-server_latest_all.deb
+    wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb
+    apt install minarca-server_latest_amd64.deb
 
 This should install Minarca server and all required dependencies. The server should be running on http://127.0.0.1:8080 listening on all interfaces.
 

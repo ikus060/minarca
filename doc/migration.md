@@ -21,8 +21,8 @@ preferences, you must copy the database to minarca folder.
 
 Proceed with the installation of minarca-server.
 
-    wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_all.deb
-    apt install minarca-server_latest_all.deb
+    wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb
+    apt install minarca-server_latest_amd64.deb
     
 ## 5. Review minarca-server configuration
 
