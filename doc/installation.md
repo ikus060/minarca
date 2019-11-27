@@ -1,11 +1,11 @@
-# Minarca-Server Installation
+# Installation
 
-# Install on new server
+# Install Minarca-Server
 
 On a Debian Linux server:
 
     wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb
-    apt install minarca-server_latest_amd64.deb
+    sudo apt install ./minarca-server_latest_amd64.deb
 
 This should install Minarca server and all required dependencies. The server should be running on http://127.0.0.1:8080 listening on all interfaces.
 
@@ -27,3 +27,31 @@ When installing, this folder will be created with the right ownership and permis
 
     chown minarca:minarca /backups/
     chmod 0750 /backups/
+    
+## Setup SSH
+
+On a fresh Debian installation, Minarca is working fine with the default SSH server
+configuration (etc/ssh/sshd_config), but if you have enforce some configuration in your SSH
+server, you may need to update it's configuration to allow "minarca" user to authenticate.
+
+Something similar to the following should make it work in most environment:
+	
+	Match User minarca
+	        PubkeyAuthentication yes
+	        PasswordAuthentication no
+	        AllowGroups minarca
+	        X11Forwarding no
+	        AllowTcpForwarding no
+	        PermitTTY no
+
+
+# Install Minarca-Client
+
+On a Windows or Debian workstation, download the appropriate installer.
+
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minaca--client--for--Debian-green?&logo=debian&style=for-the-badge"></a>
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minaca--client--for--Windows-green?&logo=windows&style=for-the-badge"></a>
+
+Then launch the execution of the installer and follow the instructions. On Debian workstation, it's preferable to install the packages using Gdebi.
+
+Once installed, a shortcut to Minarca should be available on your desktop or start menu. Use it to start Minarca.
