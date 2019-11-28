@@ -66,7 +66,9 @@ public class Main {
         try {
             API.instance().backup(false, force);
         } catch (Exception e) {
+            System.err.println("error during backup: " + e.getMessage());
             System.exit(2);
+            return;
         }
 
     }
