@@ -327,9 +327,9 @@ public class API {
             case 302:
                 // Try to provide usefule guidance for http vs https URL
                 if (e.getMessage().contains("Location: https://") && baseurl.startsWith("http://")) {
-                    throw new APIException(
-                            _("{0} is redirected to another location. Double check if the URL should start with https:// instead of http://", baseurl),
-                            e);
+                    throw new APIException(_(
+                            "{0} is redirected to another location. Double check if the URL should start with https:// instead of http://",
+                            baseurl), e);
                 }
                 throw new APIException(_("{0} is redirected to another location. Please provide the canonical URL.", baseurl), e);
             case 401:

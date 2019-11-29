@@ -46,19 +46,18 @@ public class RdiffBackupTest {
         rdiffbackup.testServer("reponame");
 
         // Check results
-        List<String> expectedArgs = Arrays
-                .asList(
-                        "/usr/bin/rdiff-backup",
-                        "-v",
-                        "5",
-                        "--remote-schema",
-                        "/usr/bin/ssh -p 2222 -oBatchMode=yes -oUserKnownHostsFile='"
-                                + hostFile.toString()
-                                + "' -oIdentitiesOnly=yes -i '"
-                                + identity.toString()
-                                + "' %s reponame",
-                        "--test-server",
-                        "minarca@example.com::reponame");
+        List<String> expectedArgs = Arrays.asList(
+                "/usr/bin/rdiff-backup",
+                "-v",
+                "5",
+                "--remote-schema",
+                "/usr/bin/ssh -p 2222 -oBatchMode=yes -oUserKnownHostsFile='"
+                        + hostFile.toString()
+                        + "' -oIdentitiesOnly=yes -i '"
+                        + identity.toString()
+                        + "' %s reponame",
+                "--test-server",
+                "minarca@example.com::reponame");
         Mockito.verify(rdiffbackup).execute(Mockito.eq(expectedArgs), Mockito.any(File.class));
 
     }

@@ -42,11 +42,12 @@ public class ProcessUtils {
         }
     }
 
-    /**
-     * TODO Let implementat a fast process open.
-     */
-    public void popen() {
+    public static class CalledProcessError extends Exception {
+        int exitCode;
 
+        public CalledProcessError(int exitCode) {
+            this.exitCode = exitCode;
+        }
     }
 
     /**
