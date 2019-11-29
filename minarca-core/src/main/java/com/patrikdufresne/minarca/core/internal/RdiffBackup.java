@@ -309,16 +309,13 @@ public class RdiffBackup {
         // Otherwise if way use keychain or keberos authentication and prompt user for password.
         // Last argument is the command line to be executed. This should be the repository name.
         // minarca-shell will make use if it.
-        args
-                .add(
-                        String
-                                .format(
-                                        "%s %s-oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
-                                        ssh,
-                                        extraOptions,
-                                        knownHostsFile,
-                                        identityFile,
-                                        path));
+        args.add(String.format(
+                "%s %s-oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
+                ssh,
+                extraOptions,
+                knownHostsFile,
+                identityFile,
+                path));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.

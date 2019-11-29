@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -92,6 +91,12 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna-platform</artifactId>
 			<version>5.5.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.github.hypfvieh/dbus-java -->
+		<dependency>
+			<groupId>com.github.hypfvieh</groupId>
+			<artifactId>dbus-java</artifactId>
+			<version>3.2.0</version>
 		</dependency>
 	</dependencies>
 	<build>
