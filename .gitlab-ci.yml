@@ -84,6 +84,20 @@ client_build:
     - minarca-client/minarca-installation-package/target/*.exe
     - minarca-client/minarca-installation-package-deb/target/*.deb
 
+client_windows:
+  stage: build
+  image: ikus060/docker-wine-maven:3-jdk-8
+  script:
+  - cd minarca-client
+  - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
+  - echo "REVISION=$REVISION"
+  # Start a virtual frame buffer
+  - (Xvfb :99 &)
+  - export DISPLAY=:99
+  # Run unit test only, since the build is not working on windows
+  - mvn -B -Drevision=${REVISION} clean verify
+  
+
 server_package_deb:
   stage: build
   script:

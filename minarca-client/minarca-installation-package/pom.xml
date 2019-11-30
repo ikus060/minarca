@@ -217,7 +217,7 @@
                                     <arg value="-Dincludedir=${basedir}/src/main/nsis/include" />
                                     <arg value="-Dplugindir=${basedir}/src/main/nsis/plugin" />
                                     <arg value="-DAppVersion=${AppVersion}" />
-                                    <arg value="-DOutFile=minarca-client-${project.version}.exe" />
+                                    <arg value="-DOutFile=${project.build.directory}/minarca-client-${project.version}.exe" />
                                     <arg value="${basedir}/src/main/nsis/setup.nsi" />
                                 </exec>
 
