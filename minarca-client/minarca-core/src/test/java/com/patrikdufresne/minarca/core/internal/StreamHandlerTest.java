@@ -9,13 +9,19 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 
 public class StreamHandlerTest {
 
     @Test
     public void test() throws IOException {
-        Process p = new ProcessBuilder().command("echo", "coucou").redirectErrorStream(true).start();
+        Process p;
+        if (SystemUtils.IS_OS_LINUX) {
+            p = new ProcessBuilder().command("echo", "coucou").redirectErrorStream(true).start();
+        } else {
+            p = new ProcessBuilder().command("cmd", "/c", "echo", "coucou").redirectErrorStream(true).start();
+        }
         StreamHandler sh = new StreamHandler(p);
         assertEquals("coucou\n", sh.getOutput());
     }
