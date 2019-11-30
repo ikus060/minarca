@@ -120,6 +120,11 @@ public class Compat {
     public static final File PID_FILE_GUI;
 
     /**
+     * Either \n or \r\n
+     */
+    public static final String LINEENDING;
+
+    /**
      * Location of the status.properties file.
      */
     public static File STATUS_FILE;
@@ -147,9 +152,11 @@ public class Compat {
                 MINARCA_EXE = "minarca.exe";
                 MINARCAUI_EXE = "minarcaui.exe";
             }
+            LINEENDING = "\r\n";
         } else {
             MINARCA_EXE = "minarca";
             MINARCAUI_EXE = "minarcaui";
+            LINEENDING = "\n";
         }
 
     }
