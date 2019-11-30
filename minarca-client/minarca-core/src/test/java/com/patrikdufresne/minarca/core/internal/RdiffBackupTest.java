@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -39,25 +40,41 @@ public class RdiffBackupTest {
         // Mock some part of rdiff backup
         RdiffBackup rdiffbackup = Mockito.spy(new RdiffBackup("example.com:2222", hostFile, identity));
         Mockito.doNothing().when(rdiffbackup).execute(Mockito.anyList(), Mockito.any(File.class));
-        Mockito.doReturn(new File("/usr/bin/rdiff-backup")).when(rdiffbackup).getRdiffbackupLocation();
-        Mockito.doReturn(new File("/usr/bin/ssh")).when(rdiffbackup).getSshLocation();
+        Mockito.doReturn(new File("./rdiff-backup")).when(rdiffbackup).getRdiffbackupLocation();
+        Mockito.doReturn(new File("./ssh")).when(rdiffbackup).getSshLocation();
 
         // Make a call
         rdiffbackup.testServer("reponame");
 
         // Check results
-        List<String> expectedArgs = Arrays.asList(
-                "/usr/bin/rdiff-backup",
-                "-v",
-                "5",
-                "--remote-schema",
-                "/usr/bin/ssh -p 2222 -oBatchMode=yes -oUserKnownHostsFile='"
-                        + hostFile.toString()
-                        + "' -oIdentitiesOnly=yes -i '"
-                        + identity.toString()
-                        + "' %s reponame",
-                "--test-server",
-                "minarca@example.com::reponame");
+        List<String> expectedArgs;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            expectedArgs = Arrays.asList(
+                    ".\\rdiff-backup",
+                    "-v",
+                    "5",
+                    "--remote-schema",
+                    ".\\ssh -p 2222 -oBatchMode=yes -oUserKnownHostsFile='"
+                            + hostFile.toString()
+                            + "' -oIdentitiesOnly=yes -i '"
+                            + identity.toString()
+                            + "' %s reponame",
+                    "--test-server",
+                    "minarca@example.com::reponame");
+        } else {
+            expectedArgs = Arrays.asList(
+                    "./rdiff-backup",
+                    "-v",
+                    "5",
+                    "--remote-schema",
+                    "./ssh -p 2222 -oBatchMode=yes -oUserKnownHostsFile='"
+                            + hostFile.toString()
+                            + "' -oIdentitiesOnly=yes -i '"
+                            + identity.toString()
+                            + "' %s reponame",
+                    "--test-server",
+                    "minarca@example.com::reponame");
+        }
         Mockito.verify(rdiffbackup).execute(Mockito.eq(expectedArgs), Mockito.any(File.class));
 
     }
