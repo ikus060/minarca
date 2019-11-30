@@ -12,6 +12,13 @@ import java.lang.management.ManagementFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.Kernel32Util;
+import com.sun.jna.platform.win32.Psapi;
+import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
+
 /**
  * Utility class to manage processes.
  * 
@@ -27,7 +34,13 @@ public class ProcessUtils {
      * 
      */
     public static class ProcessInfo {
+        /**
+         * The pid.
+         */
         public int pid;
+        /**
+         * The file name. e.g.: minarca.exe
+         */
         public String name;
     }
 
@@ -90,26 +103,28 @@ public class ProcessUtils {
      */
     public static ProcessInfo getPid(int pid) throws NoSuchProcess {
         if (SystemUtils.IS_OS_WINDOWS) {
-            String output;
-            try {
-                // tasklist.exe /FI "PID eq 1500" /FO CSV /NH
-                // "dwm.exe","1500","RDP-Tcp#0","2","2 748 Ko"
-                java.lang.Process p = new ProcessBuilder("tasklist.exe", "/FO", "CSV", "/NH", "/FI", "PID eq " + pid).redirectErrorStream(true).start();
-                StreamHandler sh = new StreamHandler(p);
-                int returnCode = p.waitFor();
-                output = sh.getOutput();
-            } catch (IOException | InterruptedException e) {
-                throw new IllegalStateException(e);
+
+            HANDLE p = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_ALL_ACCESS, false, pid);
+            if (p != null) {
+                try {
+
+                    final char[] filePathUnicode = new char[1025];
+                    int length = Psapi.INSTANCE.GetModuleFileNameExW(p, null, filePathUnicode, filePathUnicode.length - 1);
+                    if (length == 0) {
+                        throw new Win32Exception(Kernel32.INSTANCE.GetLastError());
+                    }
+
+                    ProcessInfo data = new ProcessInfo();
+                    data.pid = pid;
+                    data.name = new File(new String(filePathUnicode)).getName();
+                    return data;
+
+                } finally {
+                    Kernel32Util.closeHandle(p);
+                }
             }
-            String[] fields = output.replaceFirst("^\"", "").replaceFirst("\"$", "").split("\",\"");
-            if (fields.length >= 5) {
-                ProcessInfo data = new ProcessInfo();
-                data.pid = pid;
-                data.name = fields[0];
-                return data;
-            }
-            throw new NoSuchProcess();
         }
+
         /* Linux */
         File cmdline = new File("/proc/" + pid + "/exe");
         if (cmdline.exists()) {
