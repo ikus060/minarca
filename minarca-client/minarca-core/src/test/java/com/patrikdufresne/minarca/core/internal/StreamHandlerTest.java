@@ -23,7 +23,7 @@ public class StreamHandlerTest {
             p = new ProcessBuilder().command("cmd", "/c", "echo", "coucou").redirectErrorStream(true).start();
         }
         StreamHandler sh = new StreamHandler(p);
-        assertEquals("coucou\n", sh.getOutput());
+        assertEquals("coucou" + Compat.LINEENDING, sh.getOutput());
     }
 
 }
