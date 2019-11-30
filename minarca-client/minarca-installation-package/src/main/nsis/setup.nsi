@@ -32,10 +32,10 @@ SetCompressor bzip2
   VIAddVersionKey "ProductName" "${AppName}"
   VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
   VIAddVersionKey "CompanyName" "${Vendor}"
-  VIAddVersionKey "LegalCopyright" "© ${Vendor}"
+  VIAddVersionKey "LegalCopyright" "ï¿½ ${Vendor}"
   VIAddVersionKey "FileDescription" "${AppName} ${AppVersion} Installer"
   VIAddVersionKey "FileVersion" "${AppVersion}"
-  OutFile "setup.exe"
+  OutFile "${OutFile}"
   
   ; Define icon
   !define MUI_ICON "minarca.ico"
@@ -108,7 +108,7 @@ SetCompressor bzip2
 ;Language Strings
 
 LangString APP_IS_RUNNING ${LANG_ENGLISH} "The installation process detected ${AppName} is running. Please close it and try again."
-LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté que ${AppName} est en cours d'exécution. S'il vous plaît, fermez l'application et essayez à nouveau."
+LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a dï¿½tectï¿½ que ${AppName} est en cours d'exï¿½cution. S'il vous plaï¿½t, fermez l'application et essayez ï¿½ nouveau."
   
 ;--------------------------------
 ;Reserve Files
@@ -127,7 +127,7 @@ LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté 
   LangString DESC_SecAppFiles ${LANG_FRENCH} "Copie des fichiers"
   
   LangString RunMinarca ${LANG_ENGLISH} "Start ${AppName}"
-  LangString RunMinarca ${LANG_FRENCH} "Démarrer ${AppName}"
+  LangString RunMinarca ${LANG_FRENCH} "Dï¿½marrer ${AppName}"
  
 ;--------------------------------
 ;Installer Sections
