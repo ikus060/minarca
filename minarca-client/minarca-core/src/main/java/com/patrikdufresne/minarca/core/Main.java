@@ -74,15 +74,6 @@ public class Main {
     }
 
     /**
-     * Include a new patterns
-     * 
-     * @param string
-     */
-    private static void include(String string) {
-
-    }
-
-    /**
      * Called for action "link".
      * 
      * @param remoteurl
