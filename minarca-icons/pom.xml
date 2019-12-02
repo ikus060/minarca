@@ -51,7 +51,7 @@
                                 <!-- Generate ICO from PNGs -->
                                 <!-- Require icotool -->
                                 <mkdir dir="${icotoolDestDir}" />
-                                <exec executable="icotool" dir="${batikDestDir}" failonerror="true">
+                                <exec osfamily="unix" executable="icotool" dir="${batikDestDir}" failonerror="true">
                                     <arg value="-c" />
                                     <arg value="-o" />
                                     <arg value="${icotoolDestDir}/minarca.ico" />

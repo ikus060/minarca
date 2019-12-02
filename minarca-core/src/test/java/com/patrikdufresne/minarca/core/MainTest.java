@@ -8,10 +8,12 @@ package com.patrikdufresne.minarca.core;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.security.Permission;
 import java.util.Locale;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -121,10 +123,18 @@ public class MainTest {
         Main.main(new String[] { "exclude", "**/toberemove" });
 
         Main.main(new String[] { "patterns" });
-        assertTrue(outContent.toString().contains("include **/test"));
-        assertTrue(outContent.toString().contains("exclude **/me"));
-        assertTrue(!outContent.toString().contains("include **/toberemove"));
-        assertTrue(outContent.toString().contains("exclude **/toberemove"));
+        if (SystemUtils.IS_OS_WINDOWS) {
+            assertTrue(outContent.toString().contains("include **\\test"));
+            assertTrue(outContent.toString().contains("exclude **\\me"));
+            assertTrue(!outContent.toString().contains("include **\\toberemove"));
+            assertTrue(outContent.toString().contains("exclude **\\toberemove"));
+        } else {
+            assertTrue(outContent.toString().contains("include **/test"));
+            assertTrue(outContent.toString().contains("exclude **/me"));
+            assertTrue(!outContent.toString().contains("include **/toberemove"));
+            assertTrue(outContent.toString().contains("exclude **/toberemove"));
+        }
+
     }
 
 }

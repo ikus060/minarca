@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -23,21 +24,25 @@ public class SchedulerLinuxTest {
     @Test
     public void testExists() throws ScheduleNotFoundException, APIException, IOException {
         // Mock crontab
-        SchedulerLinux sh = Mockito.spy(new SchedulerLinux());
-        Mockito.doReturn(new CrontabEntry("@daily minarca --backup")).when(sh).find();
-        // Get value
-        assertTrue(sh.exists());
+        if (SystemUtils.IS_OS_LINUX) {
+            SchedulerLinux sh = Mockito.spy(new SchedulerLinux());
+            Mockito.doReturn(new CrontabEntry("@daily minarca --backup")).when(sh).find();
+            // Get value
+            assertTrue(sh.exists());
+        }
     }
 
     @Test
     public void testFind() throws ScheduleNotFoundException, APIException, IOException {
-        SchedulerLinux sh = Mockito.spy(new SchedulerLinux());
-        Mockito.when(sh.getExeLocation()).thenReturn(new File("minarca"));
-        Crontab crontab = new Crontab(Arrays.asList(new CrontabEntry("@daily minarca --backup")));
-        Mockito.when(sh.getCrontab()).thenReturn(crontab);
+        if (SystemUtils.IS_OS_LINUX) {
+            SchedulerLinux sh = Mockito.spy(new SchedulerLinux());
+            Mockito.when(sh.getExeLocation()).thenReturn(new File("minarca"));
+            Crontab crontab = new Crontab(Arrays.asList(new CrontabEntry("@daily minarca --backup")));
+            Mockito.when(sh.getCrontab()).thenReturn(crontab);
 
-        // Get value
-        assertTrue(sh.exists());
+            // Get value
+            assertTrue(sh.exists());
+        }
     }
 
 }
