@@ -66,17 +66,10 @@ public class Main {
         try {
             API.instance().backup(false, force);
         } catch (Exception e) {
+            System.err.println("error during backup: " + e.getMessage());
             System.exit(2);
+            return;
         }
-
-    }
-
-    /**
-     * Include a new patterns
-     * 
-     * @param string
-     */
-    private static void include(String string) {
 
     }
 
@@ -113,9 +106,7 @@ public class Main {
             return;
         } catch (Exception e) {
             System.err
-                    .println(
-                            _(
-                                    "Unexpected error happened during the linking process with the server. Verify connectivity with the server and try again later."));
+                    .println(_("Unexpected error happened during the linking process with the server. Verify connectivity with the server and try again later."));
             System.exit(1);
             return;
         }

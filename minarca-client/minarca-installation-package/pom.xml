@@ -217,9 +217,9 @@
                                     <arg value="-Dincludedir=${basedir}/src/main/nsis/include" />
                                     <arg value="-Dplugindir=${basedir}/src/main/nsis/plugin" />
                                     <arg value="-DAppVersion=${AppVersion}" />
+                                    <arg value="-DOutFile=${project.build.directory}/minarca-client-${project.version}.exe" />
                                     <arg value="${basedir}/src/main/nsis/setup.nsi" />
                                 </exec>
-                                <move file="${project.build.directory}/package/setup.exe" tofile="${project.build.directory}/minarca-client-${project.version}.exe" />
 
                                 <!-- Sign exe installer -->
                                 <signexe certs-file="${sign.certs.path}" key-file="${sign.key.path}" passphrase="${sign.passphrase}" name="Minarca Installer" file="${project.build.directory}/minarca-client-${project.version}.exe" if="sign.key.path" />

@@ -47,6 +47,7 @@ import com.patrikdufresne.minarca.core.APIException.UnsupportedOS;
 import com.patrikdufresne.minarca.core.internal.Compat;
 import com.patrikdufresne.minarca.core.internal.Keygen;
 import com.patrikdufresne.minarca.core.internal.MinarcaExecutable;
+import com.patrikdufresne.minarca.core.internal.PowerManagement;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
 import com.patrikdufresne.minarca.core.internal.SchedulerLinux;
@@ -195,6 +196,8 @@ public class API {
                 } catch (InterruptedException e) {
                     // Nothing to do.
                 }
+                // Restore sleep mode.
+                PowerManagement.uninhibit();
             }
         };
         t.setDaemon(true);
@@ -222,6 +225,13 @@ public class API {
             // Add sets of patterns
             patterns.addAll(GlobPattern.ADVANCE_AFTER);
 
+            // Prevent Computer from sleeping. during backup.
+            try {
+                PowerManagement.inhibit();
+            } catch (Exception e) {
+                LOGGER.warn("error to inhibit computer");
+            }
+
             // Create a new instance of rdiff backup to test and run the backup.
             RdiffBackup rdiffbackup = new RdiffBackup(remotehost, knownHosts, identityFile);
             // Check the remote server.
@@ -240,7 +250,14 @@ public class API {
             t.interrupt();
             Status.setLastStatus(LastResult.FAILURE);
             LOGGER.info("backup FAILED", e);
-            throw new APIException(_("Backup failed"), e);
+            throw (e instanceof APIException ? (APIException) e : new APIException(e));
+        } finally {
+            // Prevent Computer from sleeping.
+            try {
+                PowerManagement.uninhibit();
+            } catch (Exception e) {
+                LOGGER.warn("error to uninhibit computer");
+            }
         }
 
     }
@@ -310,9 +327,9 @@ public class API {
             case 302:
                 // Try to provide usefule guidance for http vs https URL
                 if (e.getMessage().contains("Location: https://") && baseurl.startsWith("http://")) {
-                    throw new APIException(
-                            _("{0} is redirected to another location. Double check if the URL should start with https:// instead of http://", baseurl),
-                            e);
+                    throw new APIException(_(
+                            "{0} is redirected to another location. Double check if the URL should start with https:// instead of http://",
+                            baseurl), e);
                 }
                 throw new APIException(_("{0} is redirected to another location. Please provide the canonical URL.", baseurl), e);
             case 401:
