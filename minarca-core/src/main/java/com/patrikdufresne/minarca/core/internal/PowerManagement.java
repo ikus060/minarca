@@ -74,7 +74,7 @@ public class PowerManagement {
                 }
             }
             inhibitCookie = (UInt32) reply.getReply();
-        } catch (DBusException e) {
+        } catch (RuntimeException | DBusException e) {
             LOGGER.warn("inhibit gnome session manager failed", e);
         }
     }
@@ -161,7 +161,7 @@ public class PowerManagement {
                     Thread.currentThread().interrupt();
                 }
             }
-        } catch (DBusException e) {
+        } catch (RuntimeException | DBusException e) {
             LOGGER.warn("inhibit gnome session return an error", e);
         }
     }
