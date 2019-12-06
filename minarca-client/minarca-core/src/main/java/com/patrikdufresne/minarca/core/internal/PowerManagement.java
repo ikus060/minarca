@@ -101,6 +101,13 @@ public class PowerManagement {
     private static final UInt32 INHIBIT_FLAG_4 = new UInt32(4);
 
     private static boolean isInhibitedLinux() {
+        // Check if inhibited
+        // dbus-send --session --dest=org.gnome.SessionManager --type=method_call --print-reply
+        // --reply-timeout=20000 /org/gnome/SessionManager org.gnome.SessionManager.IsInhibited uint32:2
+
+        // Get list of inhibitors
+        // dbus-send --session --dest=org.gnome.SessionManager --type=method_call --print-reply
+        // --reply-timeout=20000 /org/gnome/SessionManager org.gnome.SessionManager.GetInhibitors
         try {
             DBusConnection session = DBusConnection.getConnection(DBusBusType.SESSION);
             DBusInterface proxy = session.getRemoteObject("org.gnome.SessionManager", "/org/gnome/SessionManager", SessionManager.class);
