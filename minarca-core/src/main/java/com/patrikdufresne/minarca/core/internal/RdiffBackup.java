@@ -310,7 +310,7 @@ public class RdiffBackup {
         // Last argument is the command line to be executed. This should be the repository name.
         // minarca-shell will make use if it.
         args.add(String.format(
-                "%s %s-oBatchMode=yes -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
+                "%s %s-oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
                 ssh,
                 extraOptions,
                 knownHostsFile,
