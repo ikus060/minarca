@@ -54,7 +54,7 @@ public class RdiffBackupTest {
                     "-v",
                     "5",
                     "--remote-schema",
-                    ".\\ssh -p 2222 -oBatchMode=yes -oUserKnownHostsFile='"
+                    ".\\ssh -p 2222 -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='"
                             + hostFile.toString()
                             + "' -oIdentitiesOnly=yes -i '"
                             + identity.toString()
@@ -67,7 +67,7 @@ public class RdiffBackupTest {
                     "-v",
                     "5",
                     "--remote-schema",
-                    "./ssh -p 2222 -oBatchMode=yes -oUserKnownHostsFile='"
+                    "./ssh -p 2222 -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='"
                             + hostFile.toString()
                             + "' -oIdentitiesOnly=yes -i '"
                             + identity.toString()
