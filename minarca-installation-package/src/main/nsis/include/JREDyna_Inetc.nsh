@@ -119,13 +119,13 @@ downloadJRE:
   DetailPrint "Download result = $0"
 
   strcmp $0 "OK" downloadsuccessful
-  MessageBox MB_OK "There was a problem downloading required component - Error: $0"
+  MessageBox MB_OK "There was a problem downloading required component - Error: $0" /SD IDOK
   abort
   
 downloadsuccessful:
 
   DetailPrint $(JRE_LAUNCH_SETUP)
-  ExecWait '"$TEMP\jre_setup.exe" /s REBOOT=Disable AUTO_UPDATE=0 /L \"$TEMP\jre_setup.log\"' $0
+  ExecWait '"$TEMP\jre_setup.exe" /s REBOOT=Disable AUTO_UPDATE=0 WEB_JAVA=0 WEB_ANALYTICS=0 /L \"$TEMP\jre_setup.log\"' $0
   goto jreSetupfinished
   
 jreSetupFinished:
@@ -161,7 +161,7 @@ JREPathStorage:
 ExitInstallJRE:
 
   Pop $1
-  MessageBox MB_OK "Unable to install Java - Setup will be aborted$\n$\n$1"
+  MessageBox MB_OK "Unable to install Java - Setup will be aborted$\n$\n$1" /SD IDOK
   Pop $1    ; Restore $1
   Pop $0    ; Restore $0
   Abort
