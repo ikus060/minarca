@@ -27,7 +27,11 @@ import cherrypy
 from rdiffweb.core import RdiffError, authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
 from rdiffweb.core.config import Option, IntOption, BoolOption
-from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
+try:
+    from rdiffweb.core.store import IUserChangeListener, IUserQuota, UserObject
+except:
+    # rdiffweb <= 1.1.0
+    from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
 
 PY3 = sys.version_info[0] == 3
 
@@ -267,7 +271,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         # Get list of keys
         seen = set()
         new_data = StringIO()
-        for userobj in self.app.userdb.users():
+        for userobj in self.app.store.users():
             for key in userobj.authorizedkeys:
                 
                 if key.fingerprint in seen:
