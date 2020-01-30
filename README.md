@@ -75,6 +75,26 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
+## Server / Client v3.4.0 (2020-12-30)
+
+ * Server: Upgrade to rdiffweb v1.2.0
+     * Add explicit testing for Debian Stretch & Buster
+     * Change the persistence layers
+       * Minimize number of SQL queries
+       * Add object lazy loading
+       * Add object data caching
+     * Fix bugs with SQLite <= 3.16 (Debian Stretch)
+ * Server: Add port to EmailHost` by default
+ * Client: Windows - To avoid unexpected interruption inhibits computers from sleep during backup.
+ * Client: Windows - Replace usage of `tasklist.exe` by JNA calls to improve portability and responsiveness
+ * Client: Windows - Allow the installer to be silent using `minarca-client-install.exe /S`
+ * Client: Windows - For portability downgrade OpenSSH client to 32-bit version
+ * Client: Windows - To reduce package footprints, remove unused text files from Windows installation.
+ * Client: Linux- To avoid unexpected interruption inhibits computers from sleep during backup on Gnome Desktop using D-Bus calls.
+ * Client: to improve SSH handshake, enforce client to use public key authentication 
+ * Automate testing of Windows 
+ * Update documentation
+
 ## Server / Client v3.3.0 (2019-11-06)
 
  * Server: Upgrade to rdiffweb v1.1.0
