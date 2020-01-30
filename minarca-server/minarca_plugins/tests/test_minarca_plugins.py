@@ -76,7 +76,7 @@ class MinarcaUserSetupTest(WebCase):
         #  Add user to be listed
         self._add_user("mtest1", None, "mtest1", None, False)
         self.assertInBody("User added successfully.")
-        user = self.app.userdb.get_user('mtest1')
+        user = self.app.store.get_user('mtest1')
         self.assertEquals('/tmp/minarca-test/mtest1', user.user_root)
     
     def test_add_user_with_user_root(self):
@@ -88,7 +88,7 @@ class MinarcaUserSetupTest(WebCase):
         #  Add user to be listed
         self._add_user("mtest2", None, "mtest2", "/home/mtest2", False)
         self.assertInBody("User added successfully.")
-        user = self.app.userdb.get_user('mtest2')
+        user = self.app.store.get_user('mtest2')
         self.assertEquals('/tmp/minarca-test/mtest2', user.user_root)
     
 
@@ -135,7 +135,7 @@ class MinarcaDiskSpaceTest(WebCase):
             })
 
     def setUp(self):
-        self.app.userdb.get_user('admin').user_root = '/tmp'
+        self.app.store.get_user('admin').user_root = '/tmp'
         # Mock LDAP
         self.mockldap = MockLdap(self.directory)
         self.mockldap.start()
@@ -157,18 +157,18 @@ class MinarcaDiskSpaceTest(WebCase):
         """
         Check if new user is created with user_root and email.
         """
-        userobj = self.app.userdb.login('bob', 'password')
+        userobj = self.app.store.login('bob', 'password')
         self.assertIsNotNone(userobj)
-        self.assertTrue(self.app.userdb.exists('bob'))
+        self.assertIsNotNone(self.app.store.get_user('bob'))
         # Check if profile get update from Ldap info.
-        self.assertEquals('bob@test.com', self.app.userdb.get_user('bob').email)
-        self.assertEquals('/tmp/minarca-test/bob', self.app.userdb.get_user('bob').user_root)
+        self.assertEquals('bob@test.com', self.app.store.get_user('bob').email)
+        self.assertEquals('/tmp/minarca-test/bob', self.app.store.get_user('bob').user_root)
 
     @httpretty.activate
     def test_set_disk_quota(self):
         httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
                                body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
-        userobj = self.app.userdb.add_user('bob')
+        userobj = self.app.store.add_user('bob')
         self.plugin.set_disk_quota(userobj, quota=1234567)
 
     @httpretty.activate
@@ -177,7 +177,7 @@ class MinarcaDiskSpaceTest(WebCase):
         httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
                                status=401)
         # Make sure an exception is raised.
-        userobj = self.app.userdb.add_user('bob')
+        userobj = self.app.store.add_user('bob')
         with self.assertRaises(Exception):
             self.plugin.set_disk_quota(userobj, quota=1234567)
 
@@ -190,7 +190,7 @@ class MinarcaDiskSpaceTest(WebCase):
         httpretty.register_uri(httpretty.GET, "http://localhost:8081/quota/bob",
                                body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
         # Make sure an exception is raised.
-        userobj = self.app.userdb.add_user('bob')
+        userobj = self.app.store.add_user('bob')
         self.assertEquals({"avail": 2147483648, "used": 0, "size": 2147483648}, self.plugin.get_disk_usage(userobj))
         
     def test_get_api_minarca(self):
@@ -271,7 +271,7 @@ class MinarcaSshKeysTest(AppTestCase):
             key = f.readline()
         
         # Add the key to the user.
-        userobj = self.app.userdb.add_user('testuser')
+        userobj = self.app.store.add_user('testuser')
         userobj.add_authorizedkey(key)
         user_root = userobj.user_root
         
@@ -288,7 +288,7 @@ class MinarcaSshKeysTest(AppTestCase):
             '''command="/opt/minarca/bin/minarca-shell 'testuser' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
         
         # Deleting the user should delete it's keys
-        self.app.userdb.delete_user('testuser')
+        userobj.delete()
         
         # Validate
         self.assertAuthorizedKeys('')
