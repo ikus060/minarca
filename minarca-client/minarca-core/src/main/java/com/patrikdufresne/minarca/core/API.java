@@ -107,8 +107,7 @@ public class API {
      * @return
      */
     public static String getCopyrightText() {
-        int year = Calendar.getInstance().get(java.util.Calendar.YEAR);
-        return _("Copyright © {0,number,#} - Patrik Dufresne Service Logiciel inc.", year);
+        return _("Copyright (c) 2019 - Patrik Dufresne Service Logiciel inc.");
     }
 
     /**
