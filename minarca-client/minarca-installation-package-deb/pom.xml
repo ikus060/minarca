@@ -56,6 +56,13 @@
                                 <filemode>644</filemode>
                             </mapper>
                         </data>
+                        <!-- Symbolic link example -->
+						<data>
+							<type>link</type>
+							<linkName>/usr/sbin/minarca</linkName>
+							<linkTarget>/opt/minarca/bin/minarca</linkTarget>
+							<symlink>true</symlink>
+						</data>
                     </dataSet>
                 </configuration>
             </plugin>
