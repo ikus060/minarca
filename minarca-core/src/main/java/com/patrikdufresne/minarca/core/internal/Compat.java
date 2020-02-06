@@ -134,7 +134,7 @@ public class Compat {
         LOGGER = LoggerFactory.getLogger(Compat.class);
         CHARSET_PROCESS = getProcessCharset();
         COMPUTER_NAME = getComputerName();
-        IS_ADMIN = getIsAdmin();
+        IS_ADMIN = getIsRoot();
         CONFIG_HOME = getConfigPath(IS_ADMIN);
         DATA_HOME = getDataPath(IS_ADMIN);
         PID_FILE_BACKUP = new File(DATA_HOME, "backup.pid");
@@ -297,12 +297,7 @@ public class Compat {
      * 
      * @return
      */
-    private static boolean getIsAdmin() {
-        // Check if the verification is forced (usually used for testing).
-        boolean forceIsAdmin = Boolean.getBoolean("com.patrikdufresne.minarca.isAdmin");
-        if (forceIsAdmin) {
-            return true;
-        }
+    private static boolean getIsRoot() {
         if (SystemUtils.IS_OS_WINDOWS_XP) {
             // Query the SYSTEM registry hive.
             try {
@@ -324,10 +319,10 @@ public class Compat {
             }
             return true;
         } else if (SystemUtils.IS_OS_LINUX) {
-            // TODO Need to implements this for linux.
-            return false;
+            // User may override this using -Duser.name
+            return "root".equals(System.getProperty("user.name"));
         }
-        // Otherwise: Windows 7 not running as Admin.
+        // Otherwise: Windows 7+ not running as Admin.
         return false;
     }
 

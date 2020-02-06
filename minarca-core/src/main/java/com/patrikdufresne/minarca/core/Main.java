@@ -339,6 +339,7 @@ public class Main {
         System.out.println("    --username | -u  The user name to be used for authentication");
         System.out.println("    --password | -p  The password to use for authentication. Will prompt if not provided.");
         System.out.println("    --name | -n      The repository name to be used.");
+        System.out.println("    --force | -f     Force the link even if the repository name already exists.");
         System.out.println("");
         System.out.println("unlink: unlink this minarca client from server");
         System.out.println("    no options");
