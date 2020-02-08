@@ -75,7 +75,22 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
-## Server / Client v3.4.0 (2020-12-30)
+## Server / Client v3.4.1 (2020-02-08)
+
+Little bug fixes following the previous release.
+
+ * Server: Upgrade the rdiffweb v1.2.1
+     * Fix 404 error when trying to access other users repo as admin
+     * Fix logging format for cherrypy logs to matches rdiffweb format
+     * Add log rotation by default
+ * Server: Enforce permissions on `/etc/minarca` and `/var/log/minarca` to reduce visibility to only minarca user
+ * Client: Fix cryptic character installation due to bad encoding for French locale
+ * Client: Fix year in about dialog for French locale
+ * Client: Document the `--force` command line option for `link` operation
+ * Client: Relocate the configuration under `/etc/minarca` when ran as root
+ * Client: Add default symlink to `minarca` in `/usr/sbin/` to make is part of PATH for root user
+
+## Server / Client v3.4.0 (2020-01-30)
 
  * Server: Upgrade to rdiffweb v1.2.0
      * Add explicit testing for Debian Stretch & Buster
