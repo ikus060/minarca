@@ -59,9 +59,12 @@ client_sonar:
   image: debian:stretch
   script:
   - cd minarca-client
+  - apt-get update && apt-get -qq install icoutils nsis cron gettext maven curl openjdk-8-jdk-headless
+  - rm /etc/java-8-openjdk/accessibility.properties
+  # Get version
   - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
   - echo "REVISION=$REVISION"
-  - apt-get update && apt-get -qq install icoutils nsis cron gettext maven
+  # Test
   - mvn -B -Drevision=${REVISION} -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN clean verify org.jacoco:jacoco-maven-plugin:prepare-agent clean verify sonar:sonar
 
 client_build:
@@ -69,12 +72,14 @@ client_build:
   image: debian:stretch
   script:
   - cd minarca-client
-  - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
-  - echo "REVISION=$REVISION"
   # Setup authenticode
-  - apt-get update && apt-get -qq install libssl-dev libcurl4-gnutls-dev autoconf osslsigncode icoutils nsis cron gettext maven
+  - apt-get update && apt-get -qq install libssl-dev libcurl4-gnutls-dev autoconf osslsigncode icoutils nsis cron gettext maven curl openjdk-8-jdk-headless
+  - rm /etc/java-8-openjdk/accessibility.properties
   - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
   - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
+  # Get version
+  - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
+  - echo "REVISION=$REVISION"
   - mvn -B -Drevision=${REVISION} -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
   # Rename deb
   - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
