@@ -56,11 +56,11 @@ quota_test_py3:
 client_sonar:
   stage: build
   allow_failure: true
-  image: debian:stretch
+  image: maven:3-jdk-8
   script:
   - cd minarca-client
-  - apt-get update && apt-get -qq install icoutils nsis cron gettext maven curl openjdk-8-jdk-headless git
-  - rm /etc/java-8-openjdk/accessibility.properties
+  - apt-get update
+  - apt-get -qq install icoutils nsis cron gettext
   # Get version
   - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
   - echo "REVISION=$REVISION"
@@ -69,12 +69,11 @@ client_sonar:
 
 client_build:
   stage: build
-  image: debian:stretch
+  image: maven:3-jdk-8
   script:
   - cd minarca-client
   # Setup authenticode
-  - apt-get update && apt-get -qq install osslsigncode icoutils nsis cron gettext maven curl openjdk-8-jdk-headless git
-  - rm /etc/java-8-openjdk/accessibility.properties
+  - apt-get update && apt-get -qq install osslsigncode icoutils nsis cron gettext
   - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
   - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
   # Get version
