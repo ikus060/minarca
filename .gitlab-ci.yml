@@ -59,7 +59,7 @@ client_sonar:
   image: debian:stretch
   script:
   - cd minarca-client
-  - apt-get update && apt-get -qq install icoutils nsis cron gettext maven curl openjdk-8-jdk-headless
+  - apt-get update && apt-get -qq install icoutils nsis cron gettext maven curl openjdk-8-jdk-headless git
   - rm /etc/java-8-openjdk/accessibility.properties
   # Get version
   - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
@@ -73,7 +73,7 @@ client_build:
   script:
   - cd minarca-client
   # Setup authenticode
-  - apt-get update && apt-get -qq install libssl-dev libcurl4-gnutls-dev autoconf osslsigncode icoutils nsis cron gettext maven curl openjdk-8-jdk-headless
+  - apt-get update && apt-get -qq install libssl-dev libcurl4-gnutls-dev autoconf osslsigncode icoutils nsis cron gettext maven curl openjdk-8-jdk-headless git
   - rm /etc/java-8-openjdk/accessibility.properties
   - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
   - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
