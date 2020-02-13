@@ -129,6 +129,11 @@ public class Compat {
      */
     public static File STATUS_FILE;
 
+    /**
+     * Define the location of minarca log files.
+     */
+    public static String LOG_FOLDER = System.getProperty("log.folder", Compat.TEMP);
+
     static {
         // Use a static block to declare constant value in the right order.
         LOGGER = LoggerFactory.getLogger(Compat.class);
@@ -224,7 +229,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */{
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
             if (isAdmin) {
                 return "/etc/minarca";
             } else {
@@ -248,7 +253,7 @@ public class Compat {
         }
         if (SystemUtils.IS_OS_WINDOWS) { // $NON-NLS-1$
             return getLocalAppData(isAdmin) + "/minarca";
-        } else /* if (SystemUtils.IS_OS_LINUX) */{
+        } else /* if (SystemUtils.IS_OS_LINUX) */ {
             if (isAdmin) {
                 return "/var/lib/minarca";
             } else {

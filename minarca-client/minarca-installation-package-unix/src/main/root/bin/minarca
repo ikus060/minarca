@@ -115,9 +115,15 @@ fi
 # Change working directory
 cd "$BASEDIR"
 
+# Default to user home directory
+LOG_FOLDER=${XDG_DATA_HOME:-$HOME/.local/share}/minarca/
+if [ "$USER" = "root" ]; then
+    LOG_FOLDER=/var/log/
+fi
+
 # Execute java command line
 exec "$JAVACMD" $JAVA_OPTS  \
   -classpath "$CLASSPATH" \
-  -Dlog.folder=$HOME/.local/share/minarca/ \
+  -Dlog.folder=$LOG_FOLDER \
   $MAIN \
   "$@"

@@ -60,8 +60,14 @@ public class PowerManagement {
     }
 
     private static void inhibitLinux() {
+        DBusConnection session;
         try {
-            DBusConnection session = DBusConnection.getConnection(DBusBusType.SESSION);
+            session = DBusConnection.getConnection(DBusBusType.SESSION);
+        } catch (RuntimeException | DBusException e) {
+            LOGGER.info("d-bus not available, cannot inhibit gnome session");
+            return;
+        }
+        try {
             DBusInterface proxy = session.getRemoteObject("org.gnome.SessionManager", "/org/gnome/SessionManager", SessionManager.class);
             DBusAsyncReply<?> reply = session.callMethodAsync(proxy, "Inhibit", "minarca", new UInt32(0), "Inhibiting", INHIBIT_FLAG_4);
             int timeout = 1000;
@@ -148,8 +154,14 @@ public class PowerManagement {
     }
 
     private static void uninhibitLinux() {
+        DBusConnection session;
         try {
-            DBusConnection session = DBusConnection.getConnection(DBusBusType.SESSION);
+            session = DBusConnection.getConnection(DBusBusType.SESSION);
+        } catch (RuntimeException | DBusException e) {
+            LOGGER.info("d-bus not available, cannot uninhibit gnome session");
+            return;
+        }
+        try {
             DBusInterface proxy = session.getRemoteObject("org.gnome.SessionManager", "/org/gnome/SessionManager", SessionManager.class);
             DBusAsyncReply<?> reply = session.callMethodAsync(proxy, "Uninhibit", inhibitCookie);
             int timeout = 1000;
@@ -162,7 +174,7 @@ public class PowerManagement {
                 }
             }
         } catch (RuntimeException | DBusException e) {
-            LOGGER.warn("inhibit gnome session return an error", e);
+            LOGGER.warn("uninhibit gnome session return an error", e);
         }
     }
 

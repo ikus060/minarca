@@ -129,6 +129,7 @@ public class Main {
         case "--backup":
             boolean force = parseBoolArgument(args, "--force", "-f");
             checkEnv();
+            printContinueLogging();
             backup(force);
             break;
         case "crontab":
@@ -272,6 +273,13 @@ public class Main {
             }
         }
         return false;
+    }
+
+    /**
+     * Print a message as a hint to the user to tell him we are logging to a file.
+     */
+    private static void printContinueLogging() {
+        System.out.println(_("Continue logging to ") + Compat.LOG_FOLDER + "/minarca.log");
     }
 
     /**

@@ -5,6 +5,8 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
+import static com.patrikdufresne.minarca.core.Localized._;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.IdentityMissingException;
+import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
 import com.patrikdufresne.minarca.core.APIException.SshMissingException;
 import com.patrikdufresne.minarca.core.APIException.UntrustedHostKey;
 import com.patrikdufresne.minarca.core.GlobPattern;
@@ -158,7 +161,11 @@ public class RdiffBackup {
         // (C:\, D:\, etc). To support this scenario, we need to run
         // rdiff-backup multiple time on the same computer. Once for each Root
         // to be backuped (if required).
-        for (File root : getActiveRoots(patterns)) {
+        List<File> roots = getActiveRoots(patterns);
+        if(roots.isEmpty()) {
+            throw new MissConfiguredException(_("nothing to backup, make sure you have at least one valid include patterns"));
+        }
+        for (File root : roots) {
             // Construct the command line.
             List<String> args = new ArrayList<String>();
             if (SystemUtils.IS_OS_WINDOWS) {
