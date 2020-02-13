@@ -162,7 +162,7 @@ public class RdiffBackup {
         // rdiff-backup multiple time on the same computer. Once for each Root
         // to be backuped (if required).
         List<File> roots = getActiveRoots(patterns);
-        if(roots.isEmpty()) {
+        if (roots.isEmpty()) {
             throw new MissConfiguredException(_("nothing to backup, make sure you have at least one valid include patterns"));
         }
         for (File root : roots) {
