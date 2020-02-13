@@ -159,9 +159,14 @@ Section "Installation of ${AppName}" SecAppFiles
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   
-  ; Download and install java.
+  ; Download and install java and tweak the secure protocol for download.
+  ; http://forums.winamp.com/showthread.php?t=198596&page=14
+  !define IE_NETCONFIG "Software\Microsoft\Windows\CurrentVersion\Internet Settings"
+  ReadRegDWORD $9 HKCU "${IE_NETCONFIG}" "SecureProtocols"
+  WriteRegDWORD HKCU "${IE_NETCONFIG}" "SecureProtocols" 0x00000A80
   call DownloadAndInstallJREIfNecessary
- 
+  WriteRegDWORD HKCU "${IE_NETCONFIG}" "SecureProtocols" $9
+
 SectionEnd
  
  
