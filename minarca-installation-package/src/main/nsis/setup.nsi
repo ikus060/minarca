@@ -18,10 +18,12 @@ SetCompressor bzip2
   !addincludedir ${includedir}
   !addplugindir ${plugindir}
   !define JRE_VERSION "1.8"
-  !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98426"
-  !define JRE_URL_64 "http://javadl.sun.com/webapps/download/AutoDL?BundleId=98428"
+  # JAVA 8u241
+  !define JRE_URL "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=241534_1f5b5a70bf22433b84d0e960903adac8"
+  !define JRE_URL_64 "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=241536_1f5b5a70bf22433b84d0e960903adac8"
   !include "JREDyna_Inetc.nsh"
   !include "nsProcess.nsh"
+  
 
 ;--------------------------------
 ;Configuration
