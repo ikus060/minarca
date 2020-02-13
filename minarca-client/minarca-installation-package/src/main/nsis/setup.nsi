@@ -19,6 +19,7 @@ SetCompressor bzip2
   !addplugindir ${plugindir}
   !define JRE_VERSION "1.8"
   !include "StrFunc.nsh"
+  ${StrLoc}
   !include "JREDyna_Inetc.nsh"
   !include "nsProcess.nsh"
   
