@@ -16,7 +16,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -50,8 +49,6 @@ import com.patrikdufresne.minarca.core.internal.MinarcaExecutable;
 import com.patrikdufresne.minarca.core.internal.PowerManagement;
 import com.patrikdufresne.minarca.core.internal.RdiffBackup;
 import com.patrikdufresne.minarca.core.internal.Scheduler;
-import com.patrikdufresne.minarca.core.internal.SchedulerLinux;
-import com.patrikdufresne.minarca.core.internal.SchedulerWindows;
 import com.patrikdufresne.minarca.core.model.CurrentUser;
 import com.patrikdufresne.minarca.core.model.MinarcaInfo;
 import com.patrikdufresne.minarca.core.model.Repo;
@@ -202,6 +199,7 @@ public class API {
         t.setDaemon(true);
         t.start();
 
+        boolean uninhibit = false;
         try {
             checkConfig();
 
@@ -227,6 +225,7 @@ public class API {
             // Prevent Computer from sleeping. during backup.
             try {
                 PowerManagement.inhibit();
+                uninhibit = true;
             } catch (Exception e) {
                 LOGGER.warn("error to inhibit computer");
             }
@@ -252,10 +251,12 @@ public class API {
             throw (e instanceof APIException ? (APIException) e : new APIException(e));
         } finally {
             // Prevent Computer from sleeping.
-            try {
-                PowerManagement.uninhibit();
-            } catch (Exception e) {
-                LOGGER.warn("error to uninhibit computer");
+            if (uninhibit) {
+                try {
+                    PowerManagement.uninhibit();
+                } catch (Exception e) {
+                    LOGGER.warn("error to uninhibit computer");
+                }
             }
         }
 
@@ -326,9 +327,9 @@ public class API {
             case 302:
                 // Try to provide usefule guidance for http vs https URL
                 if (e.getMessage().contains("Location: https://") && baseurl.startsWith("http://")) {
-                    throw new APIException(_(
-                            "{0} is redirected to another location. Double check if the URL should start with https:// instead of http://",
-                            baseurl), e);
+                    throw new APIException(
+                            _("{0} is redirected to another location. Double check if the URL should start with https:// instead of http://", baseurl),
+                            e);
                 }
                 throw new APIException(_("{0} is redirected to another location. Please provide the canonical URL.", baseurl), e);
             case 401:
