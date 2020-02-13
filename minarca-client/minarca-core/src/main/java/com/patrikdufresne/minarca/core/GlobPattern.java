@@ -86,7 +86,7 @@ public class GlobPattern {
         return value
                 .replace("${home}", SystemUtils.USER_HOME)
                 .replace("${user.home}", SystemUtils.USER_HOME)
-                .replace("${log.folder}", System.getProperty("log.folder", Compat.TEMP))
+                .replace("${log.folder}", Compat.LOG_FOLDER)
                 .replace("${root}", Compat.getRootsPath()[0].toString())
                 .replace("${temp}", Compat.TEMP);
     }
