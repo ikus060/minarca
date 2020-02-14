@@ -106,7 +106,9 @@ public class Main {
             return;
         } catch (Exception e) {
             System.err
-                    .println(_("Unexpected error happened during the linking process with the server. Verify connectivity with the server and try again later."));
+                    .println(
+                            _(
+                                    "Unexpected error happened during the linking process with the server. Verify connectivity with the server and try again later."));
             System.exit(1);
             return;
         }
@@ -279,6 +281,10 @@ public class Main {
      * Print a message as a hint to the user to tell him we are logging to a file.
      */
     private static void printContinueLogging() {
+        // Do not print anything to stdout when running in cron.
+        if (System.console() == null) {
+            return;
+        }
         System.out.println(_("Continue logging to ") + Compat.LOG_FOLDER + "/minarca.log");
     }
 
