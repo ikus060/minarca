@@ -460,6 +460,8 @@ public class API {
         // If the backup doesn't exists on the remote server, start an empty initial backup.
         if (!repos.isEmpty()) {
             LOGGER.debug("repository already exists");
+            // Create the scheduler, mark minarca as configured.
+            Scheduler.instance().create();
             config.setConfigured(true, true);
             config.save();
             return;
