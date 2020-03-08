@@ -75,6 +75,24 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
+## Server / Client v3.4.3 (2020-03-08)
+
+Continue to stabilize the previous release with little bug fixes and minor improvement for the end user.
+
+ * Server: Upgrade the rdiffweb v1.2.2
+     * Enhance the repository to invite users to refresh the repository when the view is empty.
+     * Deprecate support for cherrypy 4, 5, 6 and 7
+     * Improve loading of repository data (cache status and entries)
+     * Restore compatibility with SQLite 3.7 (CentOS7)
+ * Client: Linux - Raise an error when the patterns don't match any files instead of silently succeeding without backuping anything.
+ * Client: Linux - Move logs to /var/log when running as root.
+ * Client: Linux - Silently ignore error when failing to inhibit on Linux when d-bus is not available.
+ * Client: Linux - From command line adds a "continue logging..." to help the user know where to look for logs.
+ * Client: Linux - When running from cron do not print "continue logging..." to avoid sending email to root user.
+ * Client: Windows - Install Java 8 Update 241 when Java is not available.
+ * Client: Windows - Enable TLS1.2 during installation to allow download and installation of Java
+ * Client: When linking for the first time, make sure to create a scheduled task even when the repository already exists.
+
 ## Server / Client v3.4.1 (2020-02-08)
 
 Little bug fixes following the previous release.
