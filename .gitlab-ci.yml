@@ -19,7 +19,7 @@ server_test_py27:
   stage: build
   script:
   - cd minarca-server
-  - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
+  - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
   - pip install pip setuptools tox nose coverage --upgrade
   - python setup.py build
   - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
@@ -29,7 +29,7 @@ server_test_py3:
   stage: build
   script:
   - cd minarca-server
-  - apt-get update && apt-get -qq install python-pysqlite2 libldap2-dev libsasl2-dev rdiff-backup node-less
+  - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
   - pip install pip setuptools tox nose coverage --upgrade
   - python setup.py build
   - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
