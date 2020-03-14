@@ -486,6 +486,9 @@ public class CListItem extends Composite {
         if (rightValueText != null) {
             rightValueText.setForeground(color);
         }
+        if (rightValueHelpText != null) {
+            rightValueHelpText.setForeground(color);
+        }
     }
 
     /**
