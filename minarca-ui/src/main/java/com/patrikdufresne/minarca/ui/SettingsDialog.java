@@ -185,6 +185,7 @@ public class SettingsDialog extends Dialog {
             public void run() {
                 // Test the connectivity with minarca server using test-server.
                 String text;
+                String fHelpText = _("to {0} as {1}", API.instance().config().getRemotehost(), API.instance().config().getUsername());;
                 boolean linked;
                 try {
                     API.instance().testServer();
@@ -207,6 +208,7 @@ public class SettingsDialog extends Dialog {
 
                         // Update the value of status item
                         statusItem.setValue(fText);
+                        statusItem.setValueHelpText(fHelpText);
 
                         // Update the colour of the status.
                         ft.setSkinClass(statusItem, !fLinked ? AppFormToolkit.CLASS_ERROR : AppFormToolkit.CLASS_SUCESS);
