@@ -132,7 +132,7 @@ public class Compat {
     /**
      * Define the location of minarca log files.
      */
-    public static String LOG_FOLDER = System.getProperty("log.folder", Compat.TEMP);
+    public static String LOG_FOLDER;
 
     static {
         // Use a static block to declare constant value in the right order.
@@ -146,6 +146,7 @@ public class Compat {
         PID_FILE_GUI = new File(DATA_HOME, "gui.pid");
         TEMP = getTemp();
         HOME = getHome(IS_ADMIN);
+        LOG_FOLDER = System.getProperty("log.folder", Compat.TEMP);
 
         STATUS_FILE = new File(Compat.DATA_HOME, "status.properties");
 
