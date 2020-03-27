@@ -103,8 +103,9 @@ client_windows:
   - mvn -B -Drevision=${REVISION} clean verify
   
 
-server_package_deb:
+server_package_deb_stretch:
   stage: build
+  image: debian:stretch
   script:
   - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
   - pip2 install setuptools_scm
@@ -115,6 +116,25 @@ server_package_deb:
   - sed -i "s/%VERSION%/$VERSION/" debian/changelog
   - sed -i "s/%DATE%/$RELEASE_DATE/" debian/changelog
   - DH_VIRTUALENV_INSTALL_ROOT=/opt/ dpkg-buildpackage -us -uc
+  - mv minarca-server_$VERSION_amd64.deb minarca-server_$VERSION_amd64_stretch.deb
+  artifacts:
+    paths:
+    - minarca-server_*.deb
+    
+server_package_deb_buster:
+  stage: build
+  image: debian:buster
+  script:
+  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
+  - pip2 install setuptools_scm
+  - cd minarca-server
+  - export VERSION=$(python setup.py --version)
+  - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
+  - export RELEASE_DATE="$(date '+%a, %d %b %Y %X') +0000"
+  - sed -i "s/%VERSION%/$VERSION/" debian/changelog
+  - sed -i "s/%DATE%/$RELEASE_DATE/" debian/changelog
+  - DH_VIRTUALENV_INSTALL_ROOT=/opt/ dpkg-buildpackage -us -uc
+  - mv minarca-server_$VERSION_amd64.deb minarca-server_$VERSION_amd64_buster.deb
   artifacts:
     paths:
     - minarca-server_*.deb
@@ -123,13 +143,13 @@ server_test_deb_stretch:
   stage: test-package
   image: debian:stretch
   script: 
-  - bash ./tests/install-server-deb.sh ./minarca-server_*.deb
+  - bash ./tests/install-server-deb.sh ./minarca-server_*_stretch.deb
   
 server_test_deb_buster:
   stage: test-package
   image: debian:buster
   script: 
-  - bash ./tests/install-server-deb.sh ./minarca-server_*.deb
+  - bash ./tests/install-server-deb.sh ./minarca-server_*_buster.deb
 
 client_test_deb_stretch:
   stage: test-package
@@ -178,9 +198,12 @@ server_promote:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   # Publish to kalo
-  - export MINARCA_DEB_FILE=$(ls -1 minarca-server_*.deb)
-  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest_amd64.deb
+  - export MINARCA_DEB_STRETCH=$(ls -1 minarca-server_*_stretch.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_STRETCH www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_STRETCH /var/www/patrikdufresne/archive/minarca/minarca-server_stretch_amd64.deb
+  - export MINARCA_DEB_BUSTER=$(ls -1 minarca-server_*_buster.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_BUSTER www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_BUSTER /var/www/patrikdufresne/archive/minarca/minarca-server_buster_amd64.deb
 
 client_publish:
   stage: publish
