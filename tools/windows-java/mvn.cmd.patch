@@ -1,0 +1,11 @@
+--- mvn.cmd.orig	2019-11-29 20:15:00.051621683 -0500
++++ mvn.cmd	2019-11-29 20:14:34.727823350 -0500
+@@ -169,7 +169,7 @@
+ 
+ :endReadAdditionalConfig
+ 
+-for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
++for %%i in (%MAVEN_HOME%\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
+ set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
+ 
+ "%JAVACMD%" ^
