@@ -32,6 +32,9 @@ debian9-py3:
 debian9-py2:
   <<: *prebuild
 
+debian9-java:
+  <<: *prebuild
+
 # TODO Split this by python version and OS.
 server_test_py27: 
   stage: build
