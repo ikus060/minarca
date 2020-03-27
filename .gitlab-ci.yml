@@ -121,7 +121,7 @@ server_package_deb_stretch:
   stage: build
   image: debian:stretch
   script:
-  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd
+  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd python3-setuptools-scm
   - pip3 install setuptools_scm
   - cd minarca-server
   - export VERSION=$(python3 setup.py --version)
@@ -139,8 +139,7 @@ server_package_deb_buster:
   stage: build
   image: debian:buster
   script:
-  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd
-  - pip3 install setuptools_scm
+  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd python3-setuptools-scm
   - cd minarca-server
   - export VERSION=$(python3 setup.py --version)
   - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
