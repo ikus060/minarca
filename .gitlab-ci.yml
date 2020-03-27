@@ -26,6 +26,9 @@ stages:
 debian10-py3:
   <<: *prebuild
 
+debian9-py3:
+  <<: *prebuild
+
 debian9-py2:
   <<: *prebuild
 
@@ -117,7 +120,7 @@ client_windows:
 
 server_package_deb_stretch:
   stage: build
-  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py2-$CI_PIPELINE_IID
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py3-$CI_PIPELINE_IID
   script:
   - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
   - pip2 install setuptools_scm
