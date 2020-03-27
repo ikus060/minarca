@@ -119,7 +119,7 @@ client_windows:
 
 server_package_deb_stretch:
   stage: build
-  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py3-$CI_PIPELINE_IID
+  image: debian:stretch
   script:
   - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd
   - pip3 install setuptools_scm
@@ -137,7 +137,7 @@ server_package_deb_stretch:
     
 server_package_deb_buster:
   stage: build
-  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-py3-$CI_PIPELINE_IID
+  image: debian:buster
   script:
   - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd
   - pip3 install setuptools_scm
