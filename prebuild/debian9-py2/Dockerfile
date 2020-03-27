@@ -1,7 +1,7 @@
 FROM buildpack-deps:stretch
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python-dev libldap2-dev libsasl2-dev rdiff-backup build-essential curl && \
+    apt-get install -y --no-install-recommends python-setuptools python-dev libldap2-dev libsasl2-dev rdiff-backup build-essential curl && \
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python get-pip.py && \
     pip install virtualenv nose coverage tox --upgrade && \
