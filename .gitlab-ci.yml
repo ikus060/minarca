@@ -119,20 +119,34 @@ server_package_deb:
     paths:
     - minarca-server_*.deb
 
-server_test_deb:
+server_test_deb_stretch:
   stage: test-package
   image: debian:stretch
   script: 
   - bash ./tests/install-server-deb.sh ./minarca-server_*.deb
+  
+server_test_deb_buster:
+  stage: test-package
+  image: debian:buster
+  script: 
+  - bash ./tests/install-server-deb.sh ./minarca-server_*.deb
 
-client_test_deb:
+client_test_deb_stretch:
   stage: test-package
   image: debian:stretch
   before_script: []
   script:
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
   - bash ./tests/install-client-deb.sh
-  
+
+client_test_deb_buster:
+  stage: test-package
+  image: debian:buster
+  before_script: []
+  script:
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
+  - bash ./tests/install-client-deb.sh
+
 client_test_exe:
   stage: test-package
   image: debian:stretch
