@@ -1,12 +1,3 @@
-image: ikus060/docker-debian-py2-py3:stretch
-
-stages:
-- build
-- test-package
-- publish
-- deploy
-- test-integration
-
 variables:
   PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
   MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
@@ -14,10 +5,35 @@ variables:
                -Djava.awt.headless=true
                -Dmaven.repo.local=.m2/repository"
 
+stages:
+- prebuild
+- build
+- test-package
+- publish
+- deploy
+- test-integration
+
+.prebuild:  &prebuild
+  image: docker:stable
+  stage: prebuild
+  script:
+  - "export BUILD_PATH=prebuild/${CI_JOB_NAME}"
+  - "export TAG=$DOCKER_REGISTRY/pdsl/minarca-build:${CI_JOB_NAME}-$CI_PIPELINE_IID"
+  - docker login $DOCKER_REGISTRY -u $DOCKER_USR -p $DOCKER_PWD
+  - docker build -t $TAG $BUILD_PATH
+  - docker push $TAG
+
+debian10-py3:
+  <<: *prebuild
+
+debian9-py2:
+  <<: *prebuild
+
 # TODO Split this by python version and OS.
 server_test_py27: 
   stage: build
-  script:
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py2-$CI_PIPELINE_IID
+  script: 
   - cd minarca-server
   - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
   - pip install pip setuptools tox nose coverage --upgrade
@@ -27,7 +43,8 @@ server_test_py27:
   
 server_test_py3: 
   stage: build
-  script:
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-py3-$CI_PIPELINE_IID
+  script: 
   - cd minarca-server
   - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
   - pip install pip setuptools tox nose coverage --upgrade
@@ -37,6 +54,7 @@ server_test_py3:
   
 quota_test_py27: 
   stage: build
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py2-$CI_PIPELINE_IID
   script:
   - cd minarca-quota-api
   - pip install pip setuptools tox nose coverage --upgrade
@@ -46,7 +64,8 @@ quota_test_py27:
   
 quota_test_py3: 
   stage: build
-  script:
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-py3-$CI_PIPELINE_IID
+  script: 
   - cd minarca-quota-api
   - pip install pip setuptools tox nose coverage --upgrade
   - python setup.py build
@@ -105,7 +124,7 @@ client_windows:
 
 server_package_deb_stretch:
   stage: build
-  image: debian:stretch
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py2-$CI_PIPELINE_IID
   script:
   - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
   - pip2 install setuptools_scm
@@ -123,10 +142,10 @@ server_package_deb_stretch:
     
 server_package_deb_buster:
   stage: build
-  image: debian:buster
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-py3-$CI_PIPELINE_IID
   script:
   - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
-  - pip2 install setuptools_scm
+  - pip3 install setuptools_scm
   - cd minarca-server
   - export VERSION=$(python setup.py --version)
   - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
