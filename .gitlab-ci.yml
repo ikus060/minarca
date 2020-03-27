@@ -36,7 +36,6 @@ server_test_py27:
   script: 
   - cd minarca-server
   - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
-  - python setup.py build
   - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
   - tox --sitepackages
   
@@ -46,7 +45,6 @@ server_test_py3:
   script: 
   - cd minarca-server
   - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
-  - python setup.py build
   - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
   - tox --sitepackages
   
@@ -55,7 +53,6 @@ quota_test_py27:
   image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py2-$CI_PIPELINE_IID
   script:
   - cd minarca-quota-api
-  - python setup.py build
   - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
   - tox --sitepackages
   
@@ -64,7 +61,7 @@ quota_test_py3:
   image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-py3-$CI_PIPELINE_IID
   script: 
   - cd minarca-quota-api
-  - python setup.py build
+  - python3 setup.py build
   - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
   - tox --sitepackages
 
