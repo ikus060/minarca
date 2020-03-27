@@ -122,10 +122,10 @@ server_package_deb_stretch:
   stage: build
   image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py3-$CI_PIPELINE_IID
   script:
-  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
-  - pip2 install setuptools_scm
+  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd
+  - pip3 install setuptools_scm
   - cd minarca-server
-  - export VERSION=$(python setup.py --version)
+  - export VERSION=$(python3 setup.py --version)
   - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %X') +0000"
   - sed -i "s/%VERSION%/$VERSION/" debian/changelog
@@ -140,10 +140,10 @@ server_package_deb_buster:
   stage: build
   image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-py3-$CI_PIPELINE_IID
   script:
-  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
+  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd
   - pip3 install setuptools_scm
   - cd minarca-server
-  - export VERSION=$(python setup.py --version)
+  - export VERSION=$(python3 setup.py --version)
   - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %X') +0000"
   - sed -i "s/%VERSION%/$VERSION/" debian/changelog
