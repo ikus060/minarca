@@ -27,8 +27,10 @@ pip-log.txt
 .settings
 /ez_setup
 .pydevproject
-coverage.xml
-nosetests.xml
+coverage*.xml
+nosetests*.xml
 /sonar-project.properties
 /.eggs/
 deb_dist
+/authenticode-certs.pem
+/authenticode.pem
