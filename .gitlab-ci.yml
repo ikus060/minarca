@@ -13,53 +13,21 @@ stages:
 - deploy
 - test-integration
 
-.prebuild:  &prebuild
-  image: docker:stable
-  stage: prebuild
-  script:
-  - "export BUILD_PATH=prebuild/${CI_JOB_NAME}"
-  - "export TAG=$DOCKER_REGISTRY/pdsl/minarca-build:${CI_JOB_NAME}-$CI_PIPELINE_IID"
-  - docker login $DOCKER_REGISTRY -u $DOCKER_USR -p $DOCKER_PWD
-  - docker build -t $TAG $BUILD_PATH
-  - docker push $TAG
-
-debian10-py3:
-  <<: *prebuild
-  
-debian10-dh-build:
-  <<: *prebuild
-
-debian9-py3:
-  <<: *prebuild
-
-debian9-py2:
-  <<: *prebuild
-
-debian9-java:
-  <<: *prebuild
-  
-debian9-dh-build:
-  <<: *prebuild
-
 # TODO Split this by python version and OS.
 server_test_py27: 
-  stage: build
-  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py2-$CI_PIPELINE_IID
-  script: 
-  - cd minarca-server
-  - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
-  - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
-  - tox --sitepackages
+  variables:
+    PYTHON: python2
+    DIST: buster
+  script:
+  - make test-server
   
 server_test_py3: 
-  stage: build
-  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-py3-$CI_PIPELINE_IID
-  script: 
-  - cd minarca-server
-  - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
-  - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
-  - tox --sitepackages
-  
+  variables:
+    PYTHON: python3
+    DIST: buster
+  script:
+  - make test-server
+
 quota_test_py27: 
   stage: build
   image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-py2-$CI_PIPELINE_IID

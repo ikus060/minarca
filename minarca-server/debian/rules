@@ -4,7 +4,7 @@
 	dh $@ --with python-virtualenv --with systemd
 
 override_dh_virtualenv:
-	dh_virtualenv --install-suffix minarca
+	dh_virtualenv --install-suffix minarca --python python3
 
 override_dh_systemd_start:
 	dh_systemd_start --restart-after-upgrade
