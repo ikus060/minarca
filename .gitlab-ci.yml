@@ -25,6 +25,9 @@ stages:
 
 debian10-py3:
   <<: *prebuild
+  
+debian10-dh-build:
+  <<: *prebuild
 
 debian9-py3:
   <<: *prebuild
@@ -33,6 +36,9 @@ debian9-py2:
   <<: *prebuild
 
 debian9-java:
+  <<: *prebuild
+  
+debian9-dh-build:
   <<: *prebuild
 
 # TODO Split this by python version and OS.
@@ -119,9 +125,8 @@ client_windows:
 
 server_package_deb_stretch:
   stage: build
-  image: debian:stretch
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian9-dh-build-$CI_PIPELINE_IID
   script:
-  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd python3-setuptools python3-setuptools-scm git
   - cd minarca-server
   - export VERSION=$(python3 setup.py --version)
   - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
@@ -136,9 +141,8 @@ server_package_deb_stretch:
     
 server_package_deb_buster:
   stage: build
-  image: debian:buster
+  image: $DOCKER_REGISTRY/pdsl/minarca-build:debian10-dh-build-$CI_PIPELINE_IID
   script:
-  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd python3-setuptools python3-setuptools-scm git
   - cd minarca-server
   - export VERSION=$(python3 setup.py --version)
   - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
