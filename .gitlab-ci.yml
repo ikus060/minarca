@@ -1,4 +1,4 @@
-image: buildpack-deps:buster
+image: $DOCKER_REGISTRY/pdsl/${CI_PROJECT_NAME}:dind-$CI_PIPELINE_IID
 variables: 
   PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
   MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
@@ -7,11 +7,21 @@ variables:
                -Dmaven.repo.local=.m2/repository"
 
 stages:
+- prebuild
 - test-build
 - test-package
 - publish
 - deploy
 - test-integration
+
+prebuild:
+  stage: prebuild
+  image: docker
+  script:
+  - export TAG=$DOCKER_REGISTRY/pdsl/${CI_PROJECT_NAME}:dind-$CI_PIPELINE_IID
+  - docker build -t $TAG tools/dind
+  - docker login $DOCKER_REGISTRY -u $DOCKER_USR -p $DOCKER_PWD
+  - docker push $TAG
 
 .test-build: &test-build
   stage: test-build

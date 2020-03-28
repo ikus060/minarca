@@ -90,7 +90,7 @@ test-client:
 		minarca-build:${DIST}-java \
 		mvn -B -Drevision=${VERSION} clean verify sonar:sonar
 
-package-client: docker-${DIST}-java
+build-client: docker-${DIST}-java
 ifdef AUTHENTICODE_CERT
 	echo "$AUTHENTICODE_CERT" | tr -d '\r' > authenticode-certs.pem
 	echo "$AUTHENTICODE_KEY" | tr -d '\r' > authenticode.pem
