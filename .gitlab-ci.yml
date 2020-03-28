@@ -19,52 +19,51 @@ stages:
   - make $TARGET
 
 # TODO Split this by python version and OS.
-test_server_py27: 
+test-server_py27: 
   <<: *test-build
   variables:
     PYTHON: python2
     DIST: buster
     TARGET: test-server
 
-test_server_py3: 
+test-server_py3: 
   <<: *test-build
   variables:
     PYTHON: python3
     DIST: buster
     TARGET: test-server
   
-test_quota_api_py27: 
+test-quota-api_py27: 
   <<: *test-build
   variables:
     PYTHON: python2
     DIST: buster
     TARGET: test-quota-api
     
-test_quota_api_py3: 
+test-quota-api_py3: 
   <<: *test-build
   variables:
     PYTHON: python3
     DIST: buster
     TARGET: test-quota-api
 
-test_client:
+test-client_linux:
   <<: *test-build
   variables:
     PYTHON: python3
-    DIST: buster
+    DIST: stretch
     TARGET: test-client
 
-test_client_windows:
+test-client_windows:
   <<: *test-build
   variables:
-    PYTHON: python3
     DIST: windows
     TARGET: build-client
 
-build_client:
+build-client:
   <<: *test-build
   variables:
-    DIST: buster
+    DIST: stretch
     TARGET: build-client
   artifacts:
     paths:

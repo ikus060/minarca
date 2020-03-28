@@ -34,3 +34,11 @@ nosetests*.xml
 deb_dist
 /authenticode-certs.pem
 /authenticode.pem
+
+/*.deb
+/*.exe
+/*.dsc
+/*.buildinfo
+/*.changes
+/*.tar.gz
+/minarca-server/debian/changelog

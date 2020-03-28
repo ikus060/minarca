@@ -7,7 +7,7 @@ CI_PROJECT_NAME := minarca
 #
 # == Variables ==
 #
-VERSION := $(shell python3 minarca-server/setup.py --version)
+VERSION := $(shell curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash)
 
 RELEASE_DATE := $(shell date '+%a, %d %b %Y %X') +0000
 
@@ -69,18 +69,16 @@ test-quota-api:
 	    tox --sitepackages -e ${TOXENV}
 
 minarca-server/debian/changelog:
-	sed "s/%VERSION%/$DEB_VERSION}/" minarca-server/debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > minarca-server/debian/changelog
+	sed "s/%VERSION%/${DEB_VERSION}/" minarca-server/debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > minarca-server/debian/changelog
 
-minarca-server_${DEB_VERSION}_amd64.deb: minarca-server/debian/changelog docker-${DIST}-buildpackage
+build-server-deb: minarca-server/debian/changelog docker-${DIST}-buildpackage
 	docker run \
 		-v=`pwd`:/build \
 		-w=/build/minarca-server \
 		-e DH_VIRTUALENV_INSTALL_ROOT=/opt/ \
 		-e SETUPTOOLS_SCM_PRETEND_VERSION=${VERSION} \
 		minarca-build:${DIST}-buildpackage \
-		dpkg-buildpackage -us -uc
-
-build-server-deb: minarca-server_${DEB_VERSION}_amd64.deb
+		bash -c "dpkg-buildpackage -us -uc && dpkg-buildpackage -Tclean"
 
 #
 # == Minarca client ==
