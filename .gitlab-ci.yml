@@ -1,4 +1,5 @@
-variables:
+image: buildpack-deps:buster
+variables: 
   PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
   MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
                -Dorg.slf4j.simpleLogger.showDateTime=true
