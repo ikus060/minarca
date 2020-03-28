@@ -91,7 +91,7 @@ test-client:
 		mvn -B -Drevision=${VERSION} clean verify sonar:sonar
 
 package-client: docker-${DIST}-java
-ifdef $(AUTHENTICODE_CERT)
+ifdef AUTHENTICODE_CERT
 	echo "$AUTHENTICODE_CERT" | tr -d '\r' > authenticode-certs.pem
 	echo "$AUTHENTICODE_KEY" | tr -d '\r' > authenticode.pem
 endif
