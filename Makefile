@@ -33,7 +33,7 @@ endif
 
 # Check if Authenticate is provided to sign the
 # exe in windows build
-ifdef $(AUTHENTICODE_CERT)
+ifdef AUTHENTICODE_CERT
 MAVEN_CLIENT_ARGS := -Dsign.certs.path=authenticode-certs.pem -Dsign.key.path=authenticode.pem -Dsign.passphrase=${AUTHENTICODE_PASSPHRASE}
 endif
 
