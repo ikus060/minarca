@@ -92,8 +92,8 @@ test-client:
 
 build-client: docker-${DIST}-java
 ifdef AUTHENTICODE_CERT
-	echo "$AUTHENTICODE_CERT" | tr -d '\r' > authenticode-certs.pem
-	echo "$AUTHENTICODE_KEY" | tr -d '\r' > authenticode.pem
+	echo "${AUTHENTICODE_CERT}" | tr -d '\r' > authenticode-certs.pem
+	echo "${AUTHENTICODE_KEY}" | tr -d '\r' > authenticode.pem
 endif
 	docker run \
 		-v=`pwd`:/build \

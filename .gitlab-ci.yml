@@ -6,6 +6,12 @@ variables:
                -Djava.awt.headless=true
                -Dmaven.repo.local=.m2/repository"
 
+services:
+  - docker:dind
+
+before_script:
+  - docker info
+
 stages:
 - prebuild
 - test-build
