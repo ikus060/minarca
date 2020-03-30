@@ -1,147 +1,200 @@
-image: ikus060/docker-debian-py2-py3:stretch
+variables:
+  #PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
+  MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+               -Dorg.slf4j.simpleLogger.showDateTime=true
+               -Djava.awt.headless=true
+               -Dmaven.repo.local=.m2/repository"
 
 stages:
+- prebuild
 - build
 - test-package
 - publish
 - deploy
 - test-integration
 
-variables:
-  PIP_EXTRA_INDEX_URL: https://nexus.patrikdufresne.com/repository/pypi/simple
-  MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
-               -Dorg.slf4j.simpleLogger.showDateTime=true
-               -Djava.awt.headless=true
-               -Dmaven.repo.local=.m2/repository"
+.prebuild:  &prebuild
+  image: docker:stable
+  stage: prebuild
+  script:
+  - "export BUILD_PATH=tools/${CI_JOB_NAME}"
+  - "export TAG=$DOCKER_REGISTRY/pdsl/minarca-prebuild-${CI_JOB_NAME}:$CI_PIPELINE_IID"
+  - docker login $DOCKER_REGISTRY -u $DOCKER_USR -p $DOCKER_PWD
+  - docker build -t $TAG $BUILD_PATH
+  - docker push $TAG
+
+buster-python3:
+  <<: *prebuild
+  
+buster-buildpackage:
+  <<: *prebuild
+  
+stretch-python3:
+  <<: *prebuild
+
+stretch-python2:
+  <<: *prebuild
+
+stretch-buildpackage:
+  <<: *prebuild
+  
+stretch-java:
+  <<: *prebuild
+  
+windows-java:
+  <<: *prebuild
 
 # TODO Split this by python version and OS.
-server_test_py27: 
+.test-server: &test-server
   stage: build
-  script:
+  image: $DOCKER_REGISTRY/pdsl/minarca-prebuild-$IMAGE:$CI_PIPELINE_IID
+  script: 
   - cd minarca-server
-  - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
-  - pip install pip setuptools tox nose coverage --upgrade
-  - python setup.py build
-  - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
-  - tox --sitepackages
-  
-server_test_py3: 
-  stage: build
-  script:
-  - cd minarca-server
-  - apt-get update && apt-get -qq install libldap2-dev libsasl2-dev rdiff-backup node-less
-  - pip install pip setuptools tox nose coverage --upgrade
-  - python setup.py build
-  - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
-  - tox --sitepackages
-  
-quota_test_py27: 
-  stage: build
-  script:
-  - cd minarca-quota-api
-  - pip install pip setuptools tox nose coverage --upgrade
-  - python setup.py build
-  - export TOXENV=`tox --listenvs | grep "^py27" | tr '\n' ','`
-  - tox --sitepackages
-  
-quota_test_py3: 
-  stage: build
-  script:
-  - cd minarca-quota-api
-  - pip install pip setuptools tox nose coverage --upgrade
-  - python setup.py build
-  - export TOXENV=`tox --listenvs | grep "^py3" | tr '\n' ','`
+  - export TOXENV=`tox --listenvs | grep "$TOXFACTOR" | tr '\n' ','`
+  - echo TOXENV=$TOXENV
   - tox --sitepackages
 
-client_sonar:
+test-server_stretch_python2: 
+  <<: *test-server
+  variables:
+    IMAGE: stretch-python2
+
+test-server_stretch_python3: 
+  <<: *test-server
+  variables:
+    IMAGE: stretch-python3
+  
+test-server_buster_python3: 
+  <<: *test-server
+  variables:
+    IMAGE: buster-python3
+
+.test-quota-api: &test-quota-api
   stage: build
-  allow_failure: true
-  image: debian:stretch
+  image: $DOCKER_REGISTRY/pdsl/minarca-prebuild-$IMAGE:$CI_PIPELINE_IID
+  script: 
+  - cd minarca-quota-api
+  - export TOXENV=`tox --listenvs | grep "$TOXFACTOR" | tr '\n' ','`
+  - echo TOXENV=$TOXENV
+  - tox --sitepackages
+
+test-quota-api_stretch_python2:
+  <<: *test-quota-api
+  variables:
+    IMAGE: stretch-python2
+
+test-quota-api_buster_python3:
+  <<: *test-quota-api
+  variables:
+    IMAGE: buster-python3
+
+.test-client: &test-client
+  stage: build
+  image: $DOCKER_REGISTRY/pdsl/minarca-prebuild-$IMAGE:$CI_PIPELINE_IID
   script:
   - cd minarca-client
-  - apt-get update && apt-get -qq install icoutils nsis cron gettext maven curl openjdk-8-jdk-headless git
-  - rm /etc/java-8-openjdk/accessibility.properties
   # Get version
   - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
   - echo "REVISION=$REVISION"
   # Test
-  - mvn -B -Drevision=${REVISION} -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN clean verify org.jacoco:jacoco-maven-plugin:prepare-agent clean verify sonar:sonar
+  - mvn -B -Drevision=${REVISION} $MAVEN_ARGS
+  # Move dist files
+  - mv minarca-installation-package-deb/target/*.deb ./.. || true
+  - mv minarca-installation-package/target/*.exe ./.. || true
+  - mv ../minarca-installation-package-deb_*_all.deb ../minarca-client_${REVISION}_all.deb || true
 
-client_build:
-  stage: build
-  image: debian:stretch
-  script:
-  - cd minarca-client
-  # Setup authenticode
-  - apt-get update && apt-get -qq install osslsigncode icoutils nsis cron gettext maven curl openjdk-8-jdk-headless git
-  - rm /etc/java-8-openjdk/accessibility.properties
-  - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
-  - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
-  # Get version
-  - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
-  - echo "REVISION=$REVISION"
-  - mvn -B -Drevision=${REVISION} -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
-  # Rename deb
-  - "[ -e minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb ] || mv minarca-installation-package-deb/target/*.deb minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb"
-  - mv minarca-installation-package-deb/target/minarca-installation-package-deb_${REVISION}_all.deb minarca-installation-package-deb/target/minarca-client_${REVISION}_all.deb
-  artifacts:
-    paths:
-    - minarca-client/minarca-installation-package/target/*.exe
-    - minarca-client/minarca-installation-package-deb/target/*.deb
+test-client_stretch:
+  <<: *test-client
+  variables:
+    IMAGE: stretch-java
+    MAVEN_ARGS: -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN clean verify org.jacoco:jacoco-maven-plugin:prepare-agent clean verify sonar:sonar
 
-client_windows:
-  stage: build
-  image: ikus060/docker-wine-maven:3-jdk-8
-  script:
-  - cd minarca-client
-  - export REVISION="$(curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh | bash -)"
-  - echo "REVISION=$REVISION"
-  # Start a virtual frame buffer
+test-client_windows:
+  <<: *test-client
+  variables:
+    IMAGE: windows-java
+    MAVEN_ARGS: clean verify
+  before_script:
   - (Xvfb :99 &)
   - export DISPLAY=:99
-  # Run unit test only, since the build is not working on windows
-  - mvn -B -Drevision=${REVISION} clean verify
-  
 
-server_package_deb:
+build-client:
+  <<: *test-client
+  variables:
+    IMAGE: stretch-java
+    MAVEN_ARGS: -Dsign.certs.path=/tmp/authenticode-certs.pem -Dsign.key.path=/tmp/authenticode.pem -Dsign.passphrase=$AUTHENTICODE_PASSPHRASE  clean install
+  before_script:
+  # Setup authenticode
+  - echo "$AUTHENTICODE_CERT" | tr -d '\r' > /tmp/authenticode-certs.pem
+  - echo "$AUTHENTICODE_KEY" | tr -d '\r' > /tmp/authenticode.pem
+  artifacts:
+    paths:
+    - minarca-client*.exe
+    - minarca-client*.deb
+
+.build-server: &build-server
   stage: build
+  image: $DOCKER_REGISTRY/pdsl/minarca-prebuild-$IMAGE:$CI_PIPELINE_IID
   script:
-  - apt-get update && apt-get -y install dh-make dh-virtualenv dh-systemd build-essential python-all libldap2-dev libsasl2-dev
-  - pip2 install setuptools_scm
   - cd minarca-server
-  - export VERSION=$(python setup.py --version)
+  - export VERSION=$(python3 setup.py --version)
+  - export DIST=$(lsb_release -c -s)
+  - export DEB_VERSION="$VERSION+$DIST"
   - export SETUPTOOLS_SCM_PRETEND_VERSION=$VERSION
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %X') +0000"
-  - sed -i "s/%VERSION%/$VERSION/" debian/changelog
+  - sed -i "s/%VERSION%/$DEB_VERSION/" debian/changelog
   - sed -i "s/%DATE%/$RELEASE_DATE/" debian/changelog
   - DH_VIRTUALENV_INSTALL_ROOT=/opt/ dpkg-buildpackage -us -uc
   artifacts:
     paths:
     - minarca-server_*.deb
 
-server_test_deb:
+build-server_stretch:
+  <<: *build-server
+  variables:
+    IMAGE: stretch-buildpackage
+    
+build-server_buster:
+  <<: *build-server
+  variables:
+    IMAGE: buster-buildpackage
+
+test-server_stretch_deb:
   stage: test-package
   image: debian:stretch
   script: 
-  - bash ./tests/install-server-deb.sh ./minarca-server_*.deb
-
-client_test_deb:
-  stage: test-package
-  image: debian:stretch
-  before_script: []
-  script:
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
-  - bash ./tests/install-client-deb.sh
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
+  - bash ./tests/install-server-deb.sh $MINARCA_DEB_FILE
   
-client_test_exe:
+test-server_buster_deb:
+  stage: test-package
+  image: debian:buster
+  script:
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
+  - bash ./tests/install-server-deb.sh $MINARCA_DEB_FILE
+
+test-client_stretch_deb:
   stage: test-package
   image: debian:stretch
-  before_script: []
   script:
-  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client/minarca-installation-package/target/*.exe)
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
+  - bash ./tests/install-client-deb.sh
+
+test-client_buster_deb:
+  stage: test-package
+  image: debian:buster
+  script:
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
+  - bash ./tests/install-client-deb.sh
+
+test-client_windows_exe:
+  stage: test-package
+  image: debian:stretch
+  script:
+  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
   - bash ./tests/install-client-win.sh
 
-server_publish:
+publish-server:
   stage: publish
   except:
   - tags
@@ -153,7 +206,7 @@ server_publish:
   - chmod 700 ~/.ssh
   - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
 
-server_promote:
+promote-server:
   stage: publish
   only:
   - tags
@@ -164,11 +217,14 @@ server_promote:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   # Publish to kalo
-  - export MINARCA_DEB_FILE=$(ls -1 minarca-server_*.deb)
-  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest_amd64.deb
+  - export MINARCA_DEB_STRETCH=$(ls -1 minarca-server_*_stretch.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_STRETCH www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_STRETCH /var/www/patrikdufresne/archive/minarca/minarca-server_stretch_amd64.deb
+  - export MINARCA_DEB_BUSTER=$(ls -1 minarca-server_*_buster.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_BUSTER www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_BUSTER /var/www/patrikdufresne/archive/minarca/minarca-server_buster_amd64.deb
 
-client_publish:
+publish-client:
   stage: publish
   environment:
     name: dev
@@ -180,8 +236,8 @@ client_publish:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   # Publish to kalo
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
-  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client/minarca-installation-package/target/*.exe)
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
+  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
   - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
   - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
 
@@ -199,8 +255,8 @@ client_promote:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   # Publish to kalo
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
-  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client/minarca-installation-package/target/*.exe)
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
+  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
   - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
   - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
@@ -226,9 +282,11 @@ deploy_staging_sestican:
   # Install minarca
   - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
   - echo MINARCA_VERSION=$MINARCA_VERSION
+  - export DEB_VERSION=$MINARCA_VERSION+stretch
+  - echo DEB_VERSION=$DEB_VERSION
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit sestican
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$DEB_VERSION" --limit sestican
   
 deploy_prod_ranculos:
   stage: deploy
@@ -251,9 +309,11 @@ deploy_prod_ranculos:
   script:
   - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
   - echo MINARCA_VERSION=$MINARCA_VERSION
+  - export DEB_VERSION=$MINARCA_VERSION+stretch
+  - echo DEB_VERSION=$DEB_VERSION
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$MINARCA_VERSION" --limit ranculos,mercor
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$DEB_VERSION" --limit ranculos,mercor
   
 test_link_debian_stretch:
   image: debian:stretch
@@ -261,7 +321,7 @@ test_link_debian_stretch:
   variables:
     MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
   script: 
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
   - bash ./tests/install-client-deb.sh
   - bash ./tests/link-link-deb-linux.sh
   
@@ -271,7 +331,7 @@ test_link_debian_buster:
   variables:
     MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
   script: 
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client/minarca-installation-package-deb/target/*.deb)
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
   - bash ./tests/install-client-deb.sh
   - bash ./tests/link-link-deb-linux.sh
 
@@ -283,7 +343,7 @@ test_link_debian_buster:
 #    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
 #  allow_failure: true
 #  script: 
-#  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client/minarca-installation-package/target/*.exe)
+#  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
 #  - bash ./tests/install-client-win.sh
 #  - bash ./tests/link-link-win.sh
   
