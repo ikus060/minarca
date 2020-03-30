@@ -174,7 +174,7 @@
                                       <then>
                                         <move file="@{file}" tofile="@{file}.unsigned" />
                                         <echo message="Sign @{file}" />
-                                        <exec executable="@{osslsigncode-path}" dir="${project.build.directory}" failonerror="true">
+                                        <exec executable="@{osslsigncode-path}" dir="${basedir}/.." failonerror="true">
                                           <arg value="-certs" />
                                           <arg value="@{certs-file}" />
                                           <arg value="-key" />

@@ -41,6 +41,7 @@ ENV WINEPATH="C:\maven\bin;C:\java\jdk\bin;C:\windows\system32;C:\windows;C:\win
 
 # Install maven
 ADD mvn.cmd.patch /mvn.cmd.patch
+ADD mvn /usr/bin/mvn
 RUN set -x \
     && apt-get update && apt-get install -y --no-install-recommends dos2unix && apt-get clean \
     && wget -nv -O apache-maven.tar.gz "$MVN_URL" \
@@ -51,6 +52,5 @@ RUN set -x \
     && patch -l "$WINEPREFIX/drive_c/maven/bin/mvn.cmd" /mvn.cmd.patch \
     && unix2dos "$WINEPREFIX/drive_c/maven/bin/mvn.cmd" \
     && rm /mvn.cmd.patch \
-    && echo 'wine cmd /c C:\\\\maven\\\\bin\\\\mvn.cmd "$@"' > /usr/bin/mvn \
     && chmod +x /usr/bin/mvn \
-    && /usr/bin/mvn -version 
+    && /usr/bin/mvn -version
