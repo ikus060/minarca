@@ -16,3 +16,7 @@ case "$1" in
         chmod 0750 "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
     ;;
 esac
+
+#DEBHELPER#
+
+exit 0
