@@ -16,6 +16,11 @@ You may stop start the service using systemd:
     
 Once installed, continue reading about how to configure minarca-server.
 
+You may access the web interface at http://localhost:8080 using:
+
+    * username: admin
+    * password: admin123 
+
 ## Setup Storage
 
 Compared to rdiffweb, Minarca intend to take over the management of your storage and for that reason,
