@@ -12,8 +12,8 @@ case "$1" in
         fi
         # Create folder for logs.
         mkdir -p "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
-        chown minarca:minarca "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
-        chmod 0750 "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
+        chown -R minarca:minarca "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
+        chmod -R 0750 "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME"
     ;;
 esac
 
