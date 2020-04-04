@@ -32,8 +32,8 @@ nosetests*.xml
 /sonar-project.properties
 /.eggs/
 deb_dist
-/authenticode-certs.pem
-/authenticode.pem
+/minarca-client/authenticode-certs.pem
+/minarca-client/authenticode.pem
 
 /*.deb
 /*.exe
@@ -42,3 +42,6 @@ deb_dist
 /*.changes
 /*.tar.gz
 /minarca-server/debian/changelog
+/minarca-server/debian/minarca-server
+/minarca-server/debian/*debhelper*
+/minarca-server/debian/files

@@ -10,4 +10,4 @@ RUN apt-get update && \
 # Needed. Otherwise break python3 encoding.
 # see https://bugs.python.org/issue19846
 ENV LANG=C.UTF-8
-ENV TOXFACTOR=py2
+ENV PYTHON=python2

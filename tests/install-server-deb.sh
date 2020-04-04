@@ -9,7 +9,7 @@ set -x
 
 # Install webserver package=
 apt-get update && apt-get install -y curl
-apt install -y "$1"
+apt install -y "./$1"
 
 # Start minarca
 su -c "/opt/minarca/bin/rdiffweb --config=/etc/minarca/minarca-server.conf" minarca &
