@@ -165,7 +165,7 @@ test-client-exe: ${MINARCA_CLIENT_EXE_FILE}
 #
 MINARCA_SERVER_DEB_FILE = minarca-server_${DEB_VERSION}_amd64.deb
 
-${MINARCA_SERVER_DEB_FILE}:
+${MINARCA_SERVER_DEB_FILE}: docker-${DIST}-buildpackage
 	sed "s/%VERSION%/${DEB_VERSION}/" minarca-server/debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > minarca-server/debian/changelog
 	$(call docker_run,minarca-server,${IMAGE_BUILDPACKAGE},dpkg-buildpackage -us -uc)
 	$(call docker_run,minarca-server,${IMAGE_BUILDPACKAGE},dpkg-buildpackage -Tclean)
