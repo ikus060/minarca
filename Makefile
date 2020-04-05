@@ -53,9 +53,11 @@ version:
 	
 debversion:
 	@echo "${DEB_VERSION}"
+	
+debfile:
+	@echo "${MINARCA_SERVER_DEB_FILE}"
 
-
-.PHONY: all test build  test-server test-quota-api test-client test-client-deb test-client-exe test-server-deb build-client build-server prebuild $(DOCKER_IMAGES)
+.PHONY: all test build  test-server test-quota-api test-client test-client-deb test-client-exe build-client build-server prebuild $(DOCKER_IMAGES)
 
 #
 # == Prebuild ==
@@ -171,6 +173,3 @@ ${MINARCA_SERVER_DEB_FILE}: docker-${DIST}-buildpackage
 	$(call docker_run,minarca-server,${IMAGE_BUILDPACKAGE},dpkg-buildpackage -Tclean)
 
 build-server: ${MINARCA_SERVER_DEB_FILE}
-
-test-server-deb: ${MINARCA_SERVER_DEB_FILE}
-	$(call docker_run,.,${IMAGE_DEBIAN},bash ./tests/install-server-deb.sh ${MINARCA_SERVER_DEB_FILE})
