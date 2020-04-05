@@ -99,21 +99,19 @@ build-server_buster:
     - minarca-server_*.deb
 
 test-server_stretch_deb:
-  <<: *make
   stage: test-package
   image: buildpack-deps:stretch
-  variables:
-    TARGET: test-server-deb
-  before_script:
-  - apt-get update && apt-get install make
-      
+  script: 
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
+  - bash ./tests/install-server-deb.sh $MINARCA_DEB_FILE
+  
 test-server_buster_deb:
-  <<: *make
   stage: test-package
   image: buildpack-deps:buster
-  variables:
-    TARGET: test-server-deb
-    
+  script:
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
+  - bash ./tests/install-server-deb.sh $MINARCA_DEB_FILE
+
 test-client_stretch_deb:
   stage: test-package
   image: buildpack-deps:stretch
