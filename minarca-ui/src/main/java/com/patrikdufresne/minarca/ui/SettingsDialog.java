@@ -185,7 +185,8 @@ public class SettingsDialog extends Dialog {
             public void run() {
                 // Test the connectivity with minarca server using test-server.
                 String text;
-                String fHelpText = _("to {0} as {1}", API.instance().config().getRemotehost(), API.instance().config().getUsername());;
+                String fHelpText = _("to {0} as {1}", API.instance().config().getRemotehost(), API.instance().config().getUsername());
+                ;
                 boolean linked;
                 try {
                     API.instance().testServer();
