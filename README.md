@@ -36,16 +36,18 @@ Then start a backup in few minutes by installing minarca client for [Windows](ht
 
 **Minarca Server**
 
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb"><img alt="Minarca Server for Ubuntu/Debian Linux version" src="https://img.shields.io/badge/download-Minaca--server--for--Debian-green?&logo=debian&style=for-the-badge"></a>
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb"><img alt="Minarca Server for Ubuntu/Debian Linux version" src="https://img.shields.io/badge/download-Minarca%20server-brightgreen"></a>
+
+Read more about [how to installation Minarca server](doc/installation.md).
 
 Note: While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
 
 **Minarca Client**
 
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minaca--client--for--Debian-green?&logo=debian&style=for-the-badge"></a>
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minarca%20for%20Debian-brightgreen"></a>
 <br/>
 <br/>
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minaca--client--for--Windows-green?&logo=windows&style=for-the-badge"></a>
+<a href="http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca%20for%20Windows-brightgreen"></a>
 
 Note: While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
 
