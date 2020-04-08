@@ -77,6 +77,23 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
+## Server / Client v3.5.0 (2020-04-08)
+
+This release focus mostly on providing a Debian Buster compatible packages. A good effort was made to provide an easy-to-use package for Debian and making sure it's well tested in an automated way to avoid regression and speedup further release.
+
+ * Server: Upgrade the rdiffweb v1.2.2
+     * Restore file and folder in a subprocess to make the download start faster
+     * Fix encoding of archive on Python3.6 (CentOS 7) by using PAX format
+     * Add support to restore files and folders using rdiff-backup2
+     * Remove obsolete dependencies `pysqlite2`
+     * Fix issue creating duplicate entries of repository in database
+ * Server: Remove `python-pysqlite2` from debian package dependencies
+ * Server: Fix to make sure the `minarca-server` service unit is enabled and started after installation.
+ * Server: Force owner and group recursively on Minarca's folder during installation
+ * Client: Add username and hostname in the status info to ease debugging
+ * Documentation: Add information about [how to run minarca-client when users are not logged](doc/minarca-client.md#why-is-my-backup-not-running-)
+ * Documentation: Provide default user and password to login after [installation](doc/installation.md#install-minarca-server)
+
 ## Server / Client v3.4.3 (2020-03-08)
 
 Continue to stabilize the previous release with little bug fixes and minor improvement for the end user.
