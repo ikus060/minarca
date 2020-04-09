@@ -155,13 +155,14 @@ promote-server:
   - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
-  # Publish to kalo
-  - export MINARCA_DEB_STRETCH=$(ls -1 minarca-server_*_stretch.deb)
-  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_STRETCH www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_STRETCH /var/www/patrikdufresne/archive/minarca/minarca-server_stretch_amd64.deb
-  - export MINARCA_DEB_BUSTER=$(ls -1 minarca-server_*_buster.deb)
-  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_BUSTER www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_BUSTER /var/www/patrikdufresne/archive/minarca/minarca-server_buster_amd64.deb
+  # Public stretch package to kalo
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+stretch_amd64.deb
+  # Public buster package to kalo
+  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
+  - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+buster_amd64.deb
 
 publish-client:
   stage: publish
