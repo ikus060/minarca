@@ -81,12 +81,13 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 This release focus mostly on providing a Debian Buster compatible packages. A good effort was made to provide an easy-to-use package for Debian and making sure it's well tested in an automated way to avoid regression and speedup further release.
 
- * Server: Upgrade the rdiffweb v1.2.2
+ * Server: Upgrade the rdiffweb v1.3.1
      * Restore file and folder in a subprocess to make the download start faster
      * Fix encoding of archive on Python3.6 (CentOS 7) by using PAX format
      * Add support to restore files and folders using rdiff-backup2
      * Remove obsolete dependencies `pysqlite2`
      * Fix issue creating duplicate entries of repository in database
+     * Enforce password encryption by using {SSHA} scheme
  * Server: Remove `python-pysqlite2` from debian package dependencies
  * Server: Fix to make sure the `minarca-server` service unit is enabled and started after installation.
  * Server: Force owner and group recursively on Minarca's folder during installation
