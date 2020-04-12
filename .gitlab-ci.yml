@@ -236,6 +236,7 @@ deploy_prod_ranculos:
   - master
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "False"
+    DIST: stretch
   environment:
     name: prod
     url: https://www.minarca.net
@@ -246,10 +247,8 @@ deploy_prod_ranculos:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
-  - export MINARCA_VERSION=$(cd minarca-server; python ./setup.py --version)
-  - echo MINARCA_VERSION=$MINARCA_VERSION
-  - export DEB_VERSION=$MINARCA_VERSION+stretch
-  - echo DEB_VERSION=$DEB_VERSION
+  - export URL=http://www.patrikdufresne.com/archive/minarca/nightly/minarca-server_$(make debversion)_amd64.deb
+  - echo URL=$URL
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
   - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$DEB_VERSION" --limit ranculos,mercor
