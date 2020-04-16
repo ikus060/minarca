@@ -221,11 +221,11 @@ deploy_staging_sestican:
   - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "! dpkg -s minarca-server || apt remove -y minarca-server --purge"
   - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "rm -Rf /etc/minarca/; rm -Rf /backups/"
   # Install minarca
-  - export URL=http://www.patrikdufresne.com/archive/minarca/nightly/minarca-server_$(make debversion)_amd64.deb
-  - echo URL=$URL
+  - export DEB_VERSION=$(make debversion)
+  - echo DEB_VERSION=$DEB_VERSION
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_url=$URL" --limit sestican
+  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$DEB_VERSION" --limit sestican
   
 deploy_prod_ranculos:
   stage: deploy
@@ -247,8 +247,8 @@ deploy_prod_ranculos:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   script:
-  - export URL=http://www.patrikdufresne.com/archive/minarca/nightly/minarca-server_$(make debversion)_amd64.deb
-  - echo URL=$URL
+  - export DEB_VERSION=$(make debversion)
+  - echo DEB_VERSION=$DEB_VERSION
   - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
   - cd ansible-config
   - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$DEB_VERSION" --limit ranculos,mercor
