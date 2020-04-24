@@ -4,7 +4,11 @@ variables:
                -Dorg.slf4j.simpleLogger.showDateTime=true
                -Djava.awt.headless=true
                -Dmaven.repo.local=.m2/repository"
-
+  APT_DEV_BUSTER: https://nexus.ikus-soft.com/repository/minarca-apt-dev-buster/
+  APT_DEV_STRETCH: https://nexus.ikus-soft.com/repository/minarca-apt-dev-stretch/
+  APT_RELEASE_BUSTER: https://nexus.ikus-soft.com/repository/minarca-apt-release-buster/
+  APT_RELEASE_STRETCH: https://nexus.ikus-soft.com/repository/minarca-apt-release-stretch/
+  
 stages:
 - prebuild
 - build
@@ -144,6 +148,26 @@ publish-server:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+
+publish-apt:
+  stage: publish
+  image: buildpack-deps:buster
+  script: |
+    # Publish client and server to APT repo.
+    # Minarca Server Stretch
+    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
+    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_STRETCH"
+    [ -z "$CI_COMMIT_TAG" ] || curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_STRETCH" 
+    # Minarca Server Buster
+    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
+    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_BUSTER"
+    [ -z "$CI_COMMIT_TAG" ] || curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_BUSTER"
+    # Minarca Client
+    export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
+    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_STRETCH"
+    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_BUSTER"
+    [ -z "$CI_COMMIT_TAG" ] || curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_STRETCH"
+    [ -z "$CI_COMMIT_TAG" ] || curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_BUSTER"
 
 promote-server:
   stage: publish
