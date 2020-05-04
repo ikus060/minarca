@@ -12,7 +12,7 @@ You may start by replacing "Minarca" with your company name by setting the
 `HeaderName` configuration. This value will be used in page's title and
 in the navigation bar.
 
-    HeaderName=My Compagny name - Backups
+    HeaderName=My Company name - Backups
 
 You may also provide your own logo to replace the default one. You must have a
 `.png` file and a `.ico` file deployed on the server.
@@ -33,6 +33,14 @@ theme are available: `default`, `orange`. You may request a new color scheme
 using a [support request](http://www.patrikdufresne.com/en/support/#form).
 
     DefaultTheme=default
+    
+It's also possible to customized how the users are reaching your company by
+defining a custom web page. By defining this option, users needing your help
+from the Minarca client application will be redirect to this page instead of
+the default Minarca web site.
+
+    MinarcaHelpURL = https://my-company.com/support
+    
 
 ## Setting up LDAP sign-in
 

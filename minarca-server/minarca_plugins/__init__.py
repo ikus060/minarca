@@ -69,13 +69,20 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     _minarca_remotehost = Option('MinarcaRemoteHost')
     _minarca_identity = Option('MinarcaRemoteHostIdentity', default='/etc/ssh')
     _restrited_basedir = BoolOption('MinarcaRestrictedToBasedDir', default=True)
+    _redirect_help = Option('MinarcaHelpURL', default='https://www.ikus-soft.com/en/support/#form')
 
     def __init__(self, app):
         self.app = app
         self.app.root.api.minarca = self.get_minarca
+        self.app.root.help = self.get_help
         self.session = requests.Session()
         self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
         self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
+
+    @cherrypy.expose
+    @cherrypy.config(**{'tools.authform.on': False, 'tools.i18n.on': False, 'tools.authbasic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
+    def get_help(self):
+        raise cherrypy.HTTPRedirect(self._redirect_help)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

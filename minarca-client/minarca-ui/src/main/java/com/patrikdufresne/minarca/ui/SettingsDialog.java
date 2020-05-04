@@ -615,7 +615,8 @@ public class SettingsDialog extends Dialog {
      * Called when user press to help button.
      */
     private void helpPressed() {
-        Program.launch(_("http://www.patrikdufresne.com/en/minarca/faq/"));
+        String url = API.instance().config().getConfigured() ? API.instance().config().getRemoteUrl() + "/help/" : "https://www.ikus-soft.com/en/support/#form";
+        Program.launch(url);
     }
 
 }
