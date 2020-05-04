@@ -2,7 +2,7 @@
 !define AppName "Minarca"
 ; Used for paths
 !define ShortName "minarca"
-!define Vendor "Patrik Dufresne Service Logiciel inc."
+!define Vendor "Ikus Soft inc."
 !define AppExeFile ""
  
 ;--------------------------------
@@ -107,12 +107,6 @@ SetCompressor bzip2
   !insertmacro JREINFO_LANGUAGE
   
 ;--------------------------------
-;Language Strings
-
-LangString APP_IS_RUNNING ${LANG_ENGLISH} "The installation process detected ${AppName} is running. Please close it and try again."
-LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté que ${AppName} est en cours d'exécution. S'il vous plaît, fermez l'application et essayez à nouveau."
-  
-;--------------------------------
 ;Reserve Files
   
   ;If you are using solid compression, files that are required before
@@ -123,6 +117,13 @@ LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté 
  
 ;--------------------------------
 ;Language Strings
+
+  ;DisplayName
+  LangString DisplayName ${LANG_ENGLISH} "Minarca Backup"
+  LangString DisplayName ${LANG_FRENCH} "Sauvegarde Minarca"
+
+  LangString APP_IS_RUNNING ${LANG_ENGLISH} "The installation process detected ${AppName} is running. Please close it and try again."
+  LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté que ${AppName} est en cours d'exécution. S'il vous plaît, fermez l'application et essayez à nouveau."
  
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
@@ -134,7 +135,7 @@ LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté 
 ;--------------------------------
 ;Installer Sections
  
-Section "Installation of ${AppName}" SecAppFiles
+Section "Installation of $(DisplayName)" SecAppFiles
   
   ; Remove files
   RMDir /r "$INSTDIR\lib"
@@ -148,7 +149,7 @@ Section "Installation of ${AppName}" SecAppFiles
   WriteRegStr HKLM "SOFTWARE\${Vendor}\${ShortName}" "" $INSTDIR
  
   !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "${AppName}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$(DisplayName)"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\minarca.ico"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${AppVersion}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${Vendor}"
@@ -173,13 +174,13 @@ SectionEnd
 Section "Start menu shortcuts" SecCreateShortcut
 
   SectionIn 1	; Can be unselected
-  CreateDirectory "$SMPROGRAMS\${AppName}"
+  CreateDirectory "$SMPROGRAMS\$(DisplayName)"
   ${If} ${RunningX64}
-    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarcaui64.exe" "" "$INSTDIR\minarca.ico" 0
-    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarcaui64.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\bin\minarcaui64.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$SMPROGRAMS\${AppName}\$(DisplayName).lnk" "$INSTDIR\bin\minarcaui64.exe" "" "$INSTDIR\minarca.ico" 0
   ${Else}
-    CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\bin\minarcaui.exe" "" "$INSTDIR\minarca.ico" 0
-    CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\bin\minarcaui.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\bin\minarcaui.exe" "" "$INSTDIR\minarca.ico" 0
+    CreateShortCut "$SMPROGRAMS\${AppName}\$(DisplayName).lnk" "$INSTDIR\bin\minarcaui.exe" "" "$INSTDIR\minarca.ico" 0
   ${EndIf}
   
 SectionEnd
@@ -237,7 +238,7 @@ FunctionEnd
 ;Finish Section
 
 Function LaunchLink
-	ExecShell "" "$SMPROGRAMS\${AppName}\${AppName}.lnk"
+	ExecShell "" "$SMPROGRAMS\${AppName}\$(DisplayName).lnk"
 FunctionEnd
 
 ;--------------------------------
@@ -249,9 +250,9 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   DeleteRegKey HKLM  "SOFTWARE\${Vendor}\${AppName}"
   ; remove shortcuts, if any.
-  Delete "$SMPROGRAMS\${AppName}\*.*"
-  RMDir /r "$SMPROGRAMS\${AppName}"
-  Delete "$DESKTOP\${AppName}.lnk"
+  Delete "$SMPROGRAMS\$(AppName)\*.*"
+  RMDir /r "$SMPROGRAMS\$(AppName)"
+  Delete "$DESKTOP\$(DisplayName).lnk"
   ; remove files
   RMDir /r "$INSTDIR"
  
