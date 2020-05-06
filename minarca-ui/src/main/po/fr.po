@@ -202,10 +202,6 @@ msgstr "Impossible de dissocier ce système !"
 msgid "An error occurred while unlinking this system."
 msgstr "Une erreur s'est produite lors de la dissociation de ce système."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:615
-msgid "http://www.patrikdufresne.com/en/minarca/faq/"
-msgstr "http://www.patrikdufresne.com/fr/minarca/faq/"
-
 #: com/patrikdufresne/minarca/ui/AboutDialog.java:59
 #, java-format
 msgid "About {0}"
