@@ -193,10 +193,6 @@ msgstr ""
 msgid "An error occurred while unlinking this system."
 msgstr ""
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:615
-msgid "http://www.patrikdufresne.com/en/minarca/faq/"
-msgstr ""
-
 #: com/patrikdufresne/minarca/ui/AboutDialog.java:59
 #, java-format
 msgid "About {0}"

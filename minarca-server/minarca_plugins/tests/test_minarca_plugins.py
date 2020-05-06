@@ -17,15 +17,14 @@ from __future__ import unicode_literals
 from io import open
 import logging
 import os
-from rdiffweb.test import WebCase, AppTestCase
 import shutil
 import tempfile
 import unittest
 
 import httpretty
-from mock.mock import MagicMock  # @UnresolvedImport
 from mockldap import MockLdap
 import pkg_resources
+from rdiffweb.test import WebCase, AppTestCase
 
 from minarca_plugins import MinarcaUserSetup
 
@@ -229,6 +228,18 @@ class MinarcaDiskSpaceTest(WebCase):
         self.getPage("/api/minarca", headers=headers)
         self.assertInBody('remotehost')
         self.assertInBody('sestican.patrikdufresne.com')
+        
+    def test_get_help(self):
+        # Check if help get redirect
+        self.getPage("/help")
+        self.assertStatus(303)
+        self.assertHeader('Location', 'https://www.ikus-soft.com/en/support/#form')
+        
+        # Check if the URL can be changed
+        self.app.cfg['minarcahelpurl'] = 'https://example.com/help/'
+        self.getPage("/help")
+        self.assertStatus(303)
+        self.assertHeader('Location', 'https://example.com/help/')
 
 
 class MinarcaSshKeysTest(AppTestCase):
