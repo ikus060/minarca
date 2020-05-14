@@ -183,24 +183,22 @@ public class SelectiveDialog extends Dialog {
         if (parent.getChildren().length > 0) {
             new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
         }
-        // Define label
-        String label;
-        if (pattern.isGlobbing()) {
-            label = _("Custom pattern");
-        } else {
-            if (pattern.isFileExists()) {
-                label = FSV.getSystemDisplayName(new File(pattern.value()));
-                if (label == null) {
-                    label = pattern.value();
-                }
-            } else {
-                label = pattern.value();
-                label += " " + _("(not exists)");
-            }
-        }
+
         // Create an item.
-        CListItem item = new CListItem(parent, label);
+        CListItem item = new CListItem(parent);
+        // Define label
+        String label = pattern.toString();
+        item.setToolTipText(label);
+        if (label.length() > PATH_MAX_LENGTH) {
+            item.setTitle(label.substring(0, PATH_MAX_LENGTH) + Dialog.ELLIPSIS);
+        } else {
+            item.setTitle(label.toString());
+        }
+        
+        // Create Include/Exclude button.
         SwitchButton button = item.createSwitchButton();
+        button.setTextOff(_("Exclude"));
+        button.setTextOn(_("Include"));
         button.setToolTipText(_("Include / Exclude"));
         button.setSelection(pattern.isInclude());
         button.addSelectionListener(new SelectionAdapter() {
@@ -209,15 +207,6 @@ public class SelectiveDialog extends Dialog {
                 handleToggleSwitch(e, pattern, idx);
             }
         });
-
-        // Update the item labels
-        String helptext = pattern.toString();
-        item.setToolTipText(helptext);
-        if (helptext.length() > PATH_MAX_LENGTH) {
-            item.setTitleHelpText(helptext.substring(0, PATH_MAX_LENGTH) + Dialog.ELLIPSIS);
-        } else {
-            item.setTitleHelpText(helptext.toString());
-        }
 
         // Create Delete button if required.
         Button deleteButton = item.createButtonDelete();
@@ -295,21 +284,23 @@ public class SelectiveDialog extends Dialog {
         // Check if file exists
         GlobPattern p = new GlobPattern(true, file);
         if (!p.isFileExists()) {
-            DetailMessageDialog.openInformation(
-                    getShell(),
-                    getShell().getText(),
-                    _("Selected item doesn't exists!"),
-                    _("The path `{0}` cannot be include because it doesn't exists.", file));
+            DetailMessageDialog
+                    .openInformation(
+                            getShell(),
+                            getShell().getText(),
+                            _("Selected item doesn't exists!"),
+                            _("The path `{0}` cannot be include because it doesn't exists.", file));
             return;
         }
 
         // Check if modification required.
         if (patterns.contains(p)) {
-            DetailMessageDialog.openInformation(
-                    getShell(),
-                    getShell().getText(),
-                    _("Selected item is already include!"),
-                    _("The path `{0}` is already include in you selective backup.", file));
+            DetailMessageDialog
+                    .openInformation(
+                            getShell(),
+                            getShell().getText(),
+                            _("Selected item is already include!"),
+                            _("The path `{0}` is already include in you selective backup.", file));
             return;
         }
 
