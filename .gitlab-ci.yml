@@ -230,72 +230,34 @@ deploy_staging_sestican:
   stage: deploy
   image: ikus060/ansible
   variables:
-    ANSIBLE_HOST_KEY_CHECKING: "False"
     DIST: stretch
   environment:
     name: staging
     url: https://test.minarca.net
-  before_script:
-  - eval $(ssh-agent -s)
-  - echo "$GITLAB_SSH_IDENTITY" | tr -d '\r' | ssh-add - > /dev/null
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  script:
-  # Delete previous installation
-  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "! dpkg -s minarca-server || apt remove -y minarca-server --purge"
-  - ssh -o StrictHostKeyChecking=no root@sestican.patrikdufresne.com "rm -Rf /etc/minarca/; rm -Rf /backups/"
-  # Install minarca
-  - export DEB_VERSION=$(make debversion)
-  - echo DEB_VERSION=$DEB_VERSION
-  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
-  - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$DEB_VERSION" --limit sestican
-  
-deploy_prod_ranculos:
-  stage: deploy
-  image: ikus060/ansible
-  when: manual
-  only: 
-  - tags
-  - master
-  variables:
-    ANSIBLE_HOST_KEY_CHECKING: "False"
-    DIST: stretch
-  environment:
-    name: prod
-    url: https://www.minarca.net
-  before_script:
-  - eval $(ssh-agent -s)
-  - echo "$RANCULOS_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
-  - echo "$MERCOR_ROOT_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
   script:
   - export DEB_VERSION=$(make debversion)
   - echo DEB_VERSION=$DEB_VERSION
-  - git clone "http://${GITLAB_USR}:${GITLAB_PWD}@git.patrikdufresne.com/pdsl/ansible-config.git"
-  - cd ansible-config
-  - ansible-playbook minarca.yml -i pdsl --extra-vars "ansible_user=root minarca_server_version=$DEB_VERSION" --limit ranculos,mercor
+  - curl -X POST -F token=36bae86778d901fc6b2d6453a41844 -F "ref=master" -F "variables[MINARCA_VERSION]=$DEB_VERSION" https://gitlab.com/api/v4/projects/18716492/trigger/pipeline
   
-test_link_debian_stretch:
-  image: debian:stretch
-  stage: test-integration
-  variables:
-    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
-  script: 
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-  - bash ./tests/install-client-deb.sh
-  - bash ./tests/link-link-deb-linux.sh
+#test_link_debian_stretch:
+#  image: debian:stretch
+#  stage: test-integration
+#  variables:
+#    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
+#  script: 
+#  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
+#  - bash ./tests/install-client-deb.sh
+#  - bash ./tests/link-link-deb-linux.sh
   
-test_link_debian_buster:
-  image: debian:buster
-  stage: test-integration
-  variables:
-    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
-  script: 
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-  - bash ./tests/install-client-deb.sh
-  - bash ./tests/link-link-deb-linux.sh
+#test_link_debian_buster:
+#  image: debian:buster
+#  stage: test-integration
+#  variables:
+#    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
+#  script: 
+#  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
+#  - bash ./tests/install-client-deb.sh
+#  - bash ./tests/link-link-deb-linux.sh
 
 # This test is not working and fail because of issue with wine.
 #test_link_win:
