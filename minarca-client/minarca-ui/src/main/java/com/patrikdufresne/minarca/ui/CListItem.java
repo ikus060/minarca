@@ -483,6 +483,9 @@ public class CListItem extends Composite {
         if (leftTitleLabel != null) {
             leftTitleLabel.setForeground(color);
         }
+        if (leftTitleHelpLabel != null) {
+            leftTitleHelpLabel.setForeground(color);
+        }
         if (rightValueText != null) {
             rightValueText.setForeground(color);
         }

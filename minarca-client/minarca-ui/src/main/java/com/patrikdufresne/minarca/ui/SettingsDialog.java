@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.bouncycastle.util.Strings;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
@@ -153,7 +154,7 @@ public class SettingsDialog extends Dialog {
 
                         // Update help text with Success or Failure
                         // Update value with last date.
-                        lastruntimeItem.setValue(state.getLocalized());
+                        lastruntimeItem.setTitleHelpText(state.getLocalized());
                         switch (state.getLastResult()) {
                         case RUNNING:
                         case SUCCESS:
@@ -208,8 +209,8 @@ public class SettingsDialog extends Dialog {
                         }
 
                         // Update the value of status item
-                        statusItem.setValue(fText);
-                        statusItem.setValueHelpText(fHelpText);
+                        statusItem.setTitle(fText);
+                        statusItem.setTitleHelpText(fHelpText);
 
                         // Update the colour of the status.
                         ft.setSkinClass(statusItem, !fLinked ? AppFormToolkit.CLASS_ERROR : AppFormToolkit.CLASS_SUCESS);
@@ -302,7 +303,7 @@ public class SettingsDialog extends Dialog {
         statusItemlist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         // Last backup
         lastruntimeItem = new CListItem(statusItemlist, _("Last Backup"));
-        lastruntimeItem.setValue(StringUtils.EMPTY);
+        lastruntimeItem.setTitleHelpText(StringUtils.EMPTY);
         stopStartButton = lastruntimeItem.createButton(_("Start backup"));
         stopStartButton.setEnabled(false);
         stopStartButton.addSelectionListener(new SelectionAdapter() {
@@ -313,13 +314,13 @@ public class SettingsDialog extends Dialog {
         });
         new Label(statusItemlist, SWT.SEPARATOR | SWT.HORIZONTAL);
         // Connectivity status.
-        statusItem = new CListItem(statusItemlist, _("Connectivity status"));
-        statusItem.setValue(StringUtils.EMPTY);
+        statusItem = new CListItem(statusItemlist, _("Verifying connectivity..."));
+        statusItem.setTitleHelpText(StringUtils.EMPTY);
         // statusItem.setTitleHelpText(_("{0} @ {1} / {2}", API.instance().config().getUsername(),
         // API.instance().config().getRemotehost(),
         // API.instance().config().getRepositoryName()));
         unlinkButton = statusItem.createButton(_("Unlink"));
-        unlinkButton.setToolTipText(_("Unlink you system from Minarca"));
+        unlinkButton.setToolTipText(_("Unlink your system from the backup server."));
         unlinkButton.setEnabled(false);
         unlinkButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -383,8 +384,8 @@ public class SettingsDialog extends Dialog {
         CList backupItemlist = new CList(comp, SWT.BORDER);
         backupItemlist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         // Browse
-        CListItem browseItem = new CListItem(backupItemlist, _("Go to Minarca website"));
-        Button browseButton = browseItem.createButton(_("Browse my backup"));
+        CListItem browseItem = new CListItem(backupItemlist, _("Browse or restore your files"));
+        Button browseButton = browseItem.createButton(_("Go to my backups"));
         browseButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -396,8 +397,7 @@ public class SettingsDialog extends Dialog {
          * Selective backup
          */
         CListItem selectiveBackupItem = new CListItem(backupItemlist, _("Selective backup"));
-        selectiveBackupItem.setTitleHelpText(_("Allow you to select files and folders to backup."));
-        Button selectiveButton = selectiveBackupItem.createButton(_("Select my files"));
+        Button selectiveButton = selectiveBackupItem.createButton(_("Choose files to backup"));
         selectiveButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
