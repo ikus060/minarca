@@ -67,21 +67,21 @@ debfile:
 DOCKER_IMAGES = $(subst tools/,build-,$(wildcard tools/*))
 
 # Name few docker images that get reused
-IMAGE_PYTHON = ${DOCKER_IMAGE_BASENAME}${DIST}-${PYTHON}:${DOCKER_TAG}
-IMAGE_JAVA = ${DOCKER_IMAGE_BASENAME}${DIST}-java8:${DOCKER_TAG}
-IMAGE_BUILDPACKAGE = ${DOCKER_IMAGE_BASENAME}${DIST}-buildpackage:${DOCKER_TAG}
+IMAGE_PYTHON = ${DOCKER_IMAGE_BASENAME}:${DIST}-${PYTHON}-${DOCKER_TAG}
+IMAGE_JAVA = ${DOCKER_IMAGE_BASENAME}:${DIST}-java8-${DOCKER_TAG}
+IMAGE_BUILDPACKAGE = ${DOCKER_IMAGE_BASENAME}:${DIST}-buildpackage-${DOCKER_TAG}
 IMAGE_DEBIAN = buildpack-deps:${DIST}
 
 # Check if running in gitlab CICD
 CI ?=
 ifeq ($(CI),true)
-DOCKER_IMAGE_BASENAME = ${DOCKER_REGISTRY}/pdsl/${CI_PROJECT_NAME}-prebuild-
-DOCKER_TAG = ${CI_PIPELINE_IID}
+DOCKER_IMAGE_BASENAME = ${CI_REGISTRY_IMAGE}
+DOCKER_TAG = ${CI_COMMIT_REF_SLUG}
 define docker_run
 pushd $(1) >/dev/null && $(3) && popd >/dev/null
 endef
 else
-DOCKER_IMAGE_BASENAME = ${CI_PROJECT_NAME}-prebuild-
+DOCKER_IMAGE_BASENAME = ${CI_PROJECT_NAME}
 DOCKER_TAG = latest
 define docker_run
 docker run --rm -e TOXENV -v=`pwd`:/build -w=/build/$(1) $(2) $(3)
@@ -96,12 +96,13 @@ docker-%: tools/%
 	@echo "running in CI - skip docker build $*"
 	
 build-%: tools/%
-	docker build -t ${DOCKER_IMAGE_BASENAME}$*:${DOCKER_TAG} $<
-	docker login ${DOCKER_REGISTRY} -u ${DOCKER_USR} -p ${DOCKER_PWD}
-	docker push ${DOCKER_IMAGE_BASENAME}$*:${DOCKER_TAG}
+	-docker pull ${DOCKER_IMAGE_BASENAME}:$*-latest
+	docker build --cache-from ${DOCKER_IMAGE_BASENAME}:$*-latest -t ${DOCKER_IMAGE_BASENAME}:$*-${DOCKER_TAG} -t ${DOCKER_IMAGE_BASENAME}:$*-latest $<
+	docker push ${DOCKER_IMAGE_BASENAME}:$*-${DOCKER_TAG}
+	docker push ${DOCKER_IMAGE_BASENAME}:$*-latest
 else
 docker-%: tools/%
-	docker build -t ${DOCKER_IMAGE_BASENAME}$*:${DOCKER_TAG} $<
+	docker build -t ${DOCKER_IMAGE_BASENAME}:$*-${DOCKER_TAG} $<
 endif
 
 #
