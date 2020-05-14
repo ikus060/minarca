@@ -20,6 +20,8 @@ stages:
 prebuild:  
   image: docker:stable
   stage: prebuild
+  services:
+    - docker:dind
   script:
   - apk add make bash
   - make prebuild
