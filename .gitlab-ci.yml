@@ -54,7 +54,7 @@ build-windows-java8:
 # TODO Split this by python version and OS.
 .make: &make
   stage: build
-  image: $CI_REGISTRY_IMAGE:$IMAGE-$CI_COMMIT_REF_SLUG
+  image: $CI_REGISTRY_IMAGE:$IMAGE-$CI_COMMIT_SHORT_SHA
   script:
   - make $TARGET
 

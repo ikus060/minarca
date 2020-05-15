@@ -76,7 +76,7 @@ IMAGE_DEBIAN = buildpack-deps:${DIST}
 CI ?=
 ifeq ($(CI),true)
 DOCKER_IMAGE_BASENAME = ${CI_REGISTRY_IMAGE}
-DOCKER_TAG = ${CI_COMMIT_REF_SLUG}
+DOCKER_TAG = ${CI_COMMIT_SHORT_SHA}
 define docker_run
 pushd $(1) >/dev/null && $(3) && popd >/dev/null
 endef
