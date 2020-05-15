@@ -17,19 +17,44 @@ stages:
 - deploy
 - test-integration
 
-prebuild:  
+.prebuild: &prebuild
   image: docker:stable
   stage: prebuild
   services:
     - docker:dind
   script:
   - apk add make bash
-  - make prebuild
+  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+  - make $CI_JOB_NAME
+
+build-buster-buildpackage:
+  <<: *prebuild
+
+build-buster-java8:
+  <<: *prebuild
+  
+build-buster-python3:
+  <<: *prebuild
+  
+build-stretch-buildpackage:
+  <<: *prebuild
+  
+build-stretch-java8:
+  <<: *prebuild
+  
+build-stretch-python2:
+  <<: *prebuild
+
+build-stretch-python3:
+  <<: *prebuild
+
+build-windows-java8:
+  <<: *prebuild
 
 # TODO Split this by python version and OS.
 .make: &make
   stage: build
-  image: $DOCKER_REGISTRY/pdsl/minarca-prebuild-$IMAGE:$CI_PIPELINE_IID
+  image: $CI_REGISTRY_IMAGE:$IMAGE-$CI_COMMIT_REF_SLUG
   script:
   - make $TARGET
 
