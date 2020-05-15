@@ -6,6 +6,7 @@
 # Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
+
 """
 Created on Jan 23, 2016
 
@@ -24,6 +25,7 @@ import unittest
 import httpretty
 from mockldap import MockLdap
 import pkg_resources
+from rdiffweb.core.store import ADMIN_ROLE
 from rdiffweb.test import WebCase, AppTestCase
 
 from minarca_plugins import MinarcaUserSetup
@@ -63,7 +65,7 @@ class MinarcaUserSetupTest(WebCase):
         if user_root is not None:
             b['user_root'] = user_root
         if is_admin is not None:
-            b['is_admin'] = str(bool(is_admin)).lower()
+            b['role'] = str(ADMIN_ROLE)
         self.getPage("/admin/users/", method='POST', body=b)
     
     def test_add_user_without_user_root(self):

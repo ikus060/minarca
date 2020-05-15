@@ -75,6 +75,8 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         self.app = app
         self.app.root.api.minarca = self.get_minarca
         self.app.root.help = self.get_help
+        self.app.cfg['footername'] = 'Minarca'
+        self.app.cfg['footerurl'] = 'https://www.ikus-soft.com/en/minarca/'
         self.session = requests.Session()
         self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
         self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
