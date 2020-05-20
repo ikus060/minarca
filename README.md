@@ -77,6 +77,27 @@ The Minarca website is http://www.patrikdufresne.com/en/minarca/.
 
 # Changelog
 
+## Server / Client v3.6.0 (2020-05-20)
+
+ * Server: Upgrade to rdiffweb v1.4.0
+     * Fix lookup of executable rdiff-backup and rdiffweb-restore to search in current virtualenv first
+     * Fix repository view when multiple repo paths are conflicting
+     * Fix logging of rdiffweb-restore subprocess
+     * Fix single repository discovery when a user's home is a rdiff-backup repository
+     * [SPONSORED] Add a new setting at the user level to define the user's role. Admin,
+       Maintainer and User. Admin are allowed to do everything. Maintainer are
+       allowed to browse and delete repo. Users are only allowed to browse. #94
+     * Add "Powered by" in the web interface footer #91
+     * Display a nice error message when trying to delete admin user #93
+     * Introduce usage of wtforms and flash in admin users for better form validation. #96 #97
+ * Server: Fix default permission during installation on Debian for /etc/minarca, /var/log/minarca, /backups/ to define the proper owner and restrict permission.
+ * Client: Clarify the application purpose for the user by renaming the link to "Minarca Backup"
+ * Start publishing DEB into [APT repositories](https://nexus.ikus-soft.com/#browse/search/apt=format%3Dapt%20AND%20version%3D3.6.0*)
+ * [SPONSORED] Server: Allow redirection of http://localhost:8080/help to a custom help page for your business
+ * [SPONSORED] Client: Redirect the help button (?) to your business custom help page
+ * Client: Minor changes to the layout to improve user's usability
+ * Update French translation
+
 ## Server / Client v3.5.0 (2020-04-08)
 
 This release focus mostly on providing a Debian Buster compatible packages. A good effort was made to provide an easy-to-use package for Debian and making sure it's well tested in an automated way to avoid regression and speedup further release.
