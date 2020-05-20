@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-31 13:59-0500\n"
+"POT-Creation-Date: 2020-05-20 08:25-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,34 +17,127 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: com/patrikdufresne/minarca/core/internal/RdiffBackup.java:166
+msgid ""
+"nothing to backup, make sure you have at least one valid include patterns"
+msgstr ""
+
 #: com/patrikdufresne/minarca/core/Main.java:109
 msgid ""
 "Unexpected error happened during the linking process with the server. Verify "
 "connectivity with the server and try again later."
 msgstr ""
 
-#: com/patrikdufresne/minarca/core/Main.java:253
+#: com/patrikdufresne/minarca/core/Main.java:254
 msgid "arguments is required"
 msgstr ""
 
-#: com/patrikdufresne/minarca/core/Main.java:291
+#: com/patrikdufresne/minarca/core/Main.java:286
+msgid "Continue logging to "
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/Main.java:303
 msgid "Last backup: "
 msgstr ""
 
-#: com/patrikdufresne/minarca/core/Main.java:297
+#: com/patrikdufresne/minarca/core/Main.java:309
 msgid "Connected"
 msgstr ""
 
-#: com/patrikdufresne/minarca/core/Main.java:299
+#: com/patrikdufresne/minarca/core/Main.java:311
 msgid "Not connected"
 msgstr ""
 
-#: com/patrikdufresne/minarca/core/Main.java:302
+#: com/patrikdufresne/minarca/core/Main.java:314
 msgid "Not configured"
 msgstr ""
 
-#: com/patrikdufresne/minarca/core/Main.java:304
+#: com/patrikdufresne/minarca/core/Main.java:316
 msgid "Connectivity status: "
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:107
+msgid "Copyright (c) 2019 - Patrik Dufresne Service Logiciel inc."
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:220
+msgid "fail to read selective backup settings"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:246
+msgid "Backup interrupted"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:275
+msgid "Missing repository name"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:278
+msgid "Missing username"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:281
+msgid "Missing remote host"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:284
+msgid "Missing remote server URL"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:289
+msgid "identity file doesn't exists or is not accessible"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:295
+msgid ""
+"remote server identity (known_hosts) file doesn't exists or is not accessible"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:301
+msgid "selective backup settings are missing"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:331
+#, java-format
+msgid ""
+"{0} is redirected to another location. Double check if the URL should start "
+"with https:// instead of http://"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:334
+#, java-format
+msgid ""
+"{0} is redirected to another location. Please provide the canonical URL."
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:338
+msgid "Unknown server error."
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:344
+msgid "Fail to validate SSL certificate."
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:346
+#, java-format
+msgid "{0}''s server IP address could not be found."
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:348
+#, java-format
+msgid "{0} is not a valid URL."
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:350
+msgid "Authentication failed for unknown reason."
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:402
+msgid "repository name cannot be empty"
+msgstr ""
+
+#: com/patrikdufresne/minarca/core/API.java:403
+msgid "repository must only contains letters, numbers, dash (-) and dot (.)"
 msgstr ""
 
 #: com/patrikdufresne/minarca/core/Status.java:152
@@ -79,90 +172,6 @@ msgstr ""
 
 #: com/patrikdufresne/minarca/core/Status.java:219
 msgid "Unknown"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:110
-msgid "Copyright (c) 2019 - Patrik Dufresne Service Logiciel inc."
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:222
-msgid "fail to read selective backup settings"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:247
-msgid "Backup interrupted"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:274
-msgid "Missing repository name"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:277
-msgid "Missing username"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:280
-msgid "Missing remote host"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:283
-msgid "Missing remote server URL"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:288
-msgid "identity file doesn't exists or is not accessible"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:294
-msgid ""
-"remote server identity (known_hosts) file doesn't exists or is not accessible"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:300
-msgid "selective backup settings are missing"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:330
-#, java-format
-msgid ""
-"{0} is redirected to another location. Double check if the URL should start "
-"with https:// instead of http://"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:333
-#, java-format
-msgid ""
-"{0} is redirected to another location. Please provide the canonical URL."
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:337
-msgid "Unknown server error."
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:343
-msgid "Fail to validate SSL certificate."
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:345
-#, java-format
-msgid "{0}''s server IP address could not be found."
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:347
-#, java-format
-msgid "{0} is not a valid URL."
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:349
-msgid "Authentication failed for unknown reason."
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:401
-msgid "repository name cannot be empty"
-msgstr ""
-
-#: com/patrikdufresne/minarca/core/API.java:402
-msgid "repository must only contains letters, numbers, dash (-) and dot (.)"
 msgstr ""
 
 #: com/patrikdufresne/minarca/core/APIException.java:23

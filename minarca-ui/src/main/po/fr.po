@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-01 11:41-0400\n"
+"POT-Creation-Date: 2020-05-20 08:26-0400\n"
 "PO-Revision-Date: 2019-08-27 13:37+0000\n"
 "Last-Translator: Patrik Dufresne <info@patrikdufresne.com>\n"
 "Language-Team: No linguistic content\n"
@@ -15,114 +15,111 @@ msgstr ""
 "X-Loco-Parser: loco_parse_po\n"
 "X-Generator: Loco https://localise.biz/\n"
 
-#: com/patrikdufresne/minarca/ui/DetailMessageDialog.java:530
-msgid "copy"
-msgstr "copier"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:68
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:69
 msgid "About"
 msgstr "À propos"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:151
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:152
 msgid "Stop backup"
 msgstr "Arrêt de la sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:151
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:303
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:152
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:307
 msgid "Start backup"
 msgstr "Début de la sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:192
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:189
+#, java-format
+msgid "to {0} as {1}"
+msgstr "à {0} entant que {1}"
+
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:195
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:253
 msgid "Connected"
 msgstr "Connecté"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:197
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:200
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:296
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:300
 msgid "Minarca status"
 msgstr "Statut de Minarca"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:301
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:305
 msgid "Last Backup"
 msgstr "Dernière sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:313
-msgid "Connectivity status"
-msgstr "Statut de la connectivité"
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:317
+msgid "Verifying connectivity..."
+msgstr "Vérification de la connectivité ..."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:318
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:322
 msgid "Unlink"
 msgstr "Dissocier"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:319
-msgid "Unlink you system from Minarca"
-msgstr "Dissocier votre système de Minarca."
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:323
+msgid "Unlink your system from the backup server."
+msgstr "Dissociez votre système du serveur de sauvegarde."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:334
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:338
 msgid "Schedule"
 msgstr "Planification"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:338
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:342
 msgid "Define the backup frequency"
 msgstr "Définissez la fréquence de sauvegarde."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:345
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:349
 msgid "Hourly"
 msgstr "À l'heure"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:347
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:351
 msgid "Daily"
 msgstr "Journalier"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:349
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:353
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:351
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:355
 msgid "Monthly"
 msgstr "Mensuellement"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:378
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:382
 msgid "Backup"
 msgstr "Sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:383
-msgid "Go to Minarca website"
-msgstr "Aller sur le site web de Minarca"
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:387
+msgid "Browse or restore your files"
+msgstr "Parcourez ou restaurez vos fichiers"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:384
-msgid "Browse my backup"
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:388
+msgid "Go to my backups"
 msgstr "Parcourir ma sauvegarde"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:395
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:399
 #: com/patrikdufresne/minarca/ui/SelectiveDialog.java:91
 msgid "Selective backup"
 msgstr "Sauvegarde sélective"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:396
-msgid "Allow you to select files and folders to backup."
-msgstr "Vous permet de sélectionner les fichiers et dossiers à sauvegarder."
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:400
+msgid "Choose files to backup"
+msgstr "Choisissez les fichiers à sauvegarder"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:397
-msgid "Select my files"
-msgstr "Sélectionnez mes fichiers"
-
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:481
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:484
 msgid "Can't change backup schedule!"
 msgstr "Vous ne pouvez pas changer la programmation de la sauvegarde !"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:482
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:485
 msgid "Fail to reschedule the backup task."
 msgstr "Impossible de replanifier la tâche de sauvegarde."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:506
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:509
 msgid "Error updating selective backup configuration"
 msgstr "Erreur lors de la configuration de la sauvegarde sélective"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:507
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:510
 msgid ""
 "Can't change the configuration for unknown reason. If the problem persists, "
 "try re-installing Minarca."
@@ -130,11 +127,11 @@ msgstr ""
 "Impossible de modifier la configuration pour une raison inconnue. Si le "
 "problème persiste, essayez de réinstaller Minarca."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:524
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:527
 msgid "Are you sure you want to stop the current running backup?"
 msgstr "Êtes-vous sûr de vouloir arrêter la sauvegarde en cours?"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:525
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:528
 msgid ""
 "You are about to stop the running backup. Interupting the backup may "
 "temporarily disrupt data restore. Are you sure you want to continue?"
@@ -143,19 +140,19 @@ msgstr ""
 "d'exécution. L'interruption de la sauvegarde peut perturber temporairement "
 "la restauration de vos données. Êtes-vous certain de vouloir continuer?"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:543
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:546
 msgid "Can't stop running backup!"
 msgstr "Impossible d'interrompre la sauvegarde en cours!"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:544
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:547
 msgid "An error occurred while stopping the backup."
 msgstr "Une erreur s'est produite lors de l'arrêt de la sauvegarde."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:553
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:556
 msgid "Do you want to backup your system now?"
 msgstr "Voulez-vous lancer une sauvegarde de votre système maintenant ?"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:554
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:557
 msgid ""
 "You are about to backup your system to Minarca. This operation may take some "
 "time. While this operation is running you may safely close the Minarca "
@@ -165,23 +162,23 @@ msgstr ""
 "processus peut prendre un certain temps. Durant ce processus, vous pouvez "
 "fermer l'application Minarca."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:572
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:575
 msgid "Can't backup this system!"
 msgstr "Impossible de sauvegarder ce système !"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:573
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:576
 msgid "An error occurred while backuping this system."
 msgstr "Une erreur s'est produite lors de la sauvegarde de ce système."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:587
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:590
 msgid "Confirm unlink"
 msgstr "Confirmer la dissociation"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:588
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:591
 msgid "Are you sure you want to unlink this system from Minarca?"
 msgstr "Êtes-vous sûr de vouloir dissocier ce système de Minarca?"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:589
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:592
 msgid ""
 "You are about to unlink this system from Minarca. This system will no longer "
 "backup it self. Previous backup data will not be lost."
@@ -190,30 +187,96 @@ msgstr ""
 "sera plus sauvegardé automatiquement. Les sauvegardes précédentes ne seront "
 "pas perdues."
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:603
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:606
 msgid "Error"
 msgstr "Erreur"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:603
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:606
 msgid "Can't unlink this system!"
 msgstr "Impossible de dissocier ce système !"
 
-#: com/patrikdufresne/minarca/ui/SettingsDialog.java:603
+#: com/patrikdufresne/minarca/ui/SettingsDialog.java:606
 msgid "An error occurred while unlinking this system."
 msgstr "Une erreur s'est produite lors de la dissociation de ce système."
 
-#: com/patrikdufresne/minarca/ui/AboutDialog.java:59
-#, java-format
-msgid "About {0}"
-msgstr "À propos de {0}"
-
-#: com/patrikdufresne/minarca/ui/AboutDialog.java:102
-msgid "Minarca is an all integrated online backup solution."
-msgstr "Minarca est une solution de sauvegarde en ligne complètement intégrée."
-
-#: com/patrikdufresne/minarca/ui/Main.java:138
+#: com/patrikdufresne/minarca/ui/Main.java:139
 msgid "Minarca"
 msgstr "Minarca"
+
+#: com/patrikdufresne/minarca/ui/DetailMessageDialog.java:530
+msgid "copy"
+msgstr "copier"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:55
+msgid "Restore defaults"
+msgstr "Réinitialiser"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:126
+msgid ""
+"Select files or folders you want to include or exclude from your backup."
+msgstr ""
+"Sélectionnez les fichiers ou les dossiers que vous souhaitez inclure ou "
+"exclure de votre sauvegarde."
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:150
+msgid "Add folder..."
+msgstr "Ajouter un dossier ..."
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:159
+msgid "Add file..."
+msgstr "Ajouter un fichier ..."
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:200
+msgid "Exclude"
+msgstr "Exclure"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:201
+msgid "Include"
+msgstr "Inclure"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:202
+msgid "Include / Exclude"
+msgstr "Inclure / Exclure"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:213
+msgid "Delete"
+msgstr "Supprimer"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:262
+msgid "Select a folder to be added to your selective backup."
+msgstr "Sélectionnez un dossier à ajouter à votre sauvegarde sélective."
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:291
+msgid "Selected item doesn't exists!"
+msgstr "L'article sélectionné n'existe pas!"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:292
+#, java-format
+msgid "The path `{0}` cannot be include because it doesn't exists."
+msgstr "L'emplacement `{0}` ne peut être inclus car il n'existe pas."
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:302
+msgid "Selected item is already include!"
+msgstr "L'article sélectionné est déjà inclus!"
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:303
+#, java-format
+msgid "The path `{0}` is already include in you selective backup."
+msgstr "L'emplacement `{0}` est déjà inclus dans votre sauvegarde sélective."
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:319
+msgid "Selected item is excluded by another pattern."
+msgstr "L'article sélectionné est exclu par un autre modèle."
+
+#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:321
+#, java-format
+msgid ""
+"The path `{0}` is currently excluded by another pattern. You may need to "
+"reorganize your patterns to properly include the selected item."
+msgstr ""
+"L'emplacement `{0}` est actuellement exclu par un autre modèle. Vous devriez "
+"possiblement réorganiser vos paramètres de sauvegarde sélective pour inclure "
+"l'article sélectionné."
 
 #: com/patrikdufresne/minarca/ui/SetupDialog.java:118
 msgid "Setup Minarca"
@@ -314,74 +377,12 @@ msgstr ""
 msgid "Unexpected error occured"
 msgstr "Une erreur inattendue s'est produite"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:55
-msgid "Restore defaults"
-msgstr "Réinitialiser"
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:126
-msgid ""
-"Select files or folders you want to include or exclude from your backup."
-msgstr ""
-"Sélectionnez les fichiers ou les dossiers que vous souhaitez inclure ou "
-"exclure de votre sauvegarde."
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:150
-msgid "Add folder..."
-msgstr "Ajouter un dossier ..."
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:159
-msgid "Add file..."
-msgstr "Ajouter un fichier ..."
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:189
-msgid "Custom pattern"
-msgstr "Modèle personnalisé"
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:198
-msgid "(not exists)"
-msgstr "(n'existe pas)"
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:204
-msgid "Include / Exclude"
-msgstr "Inclure / Exclure"
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:224
-msgid "Delete"
-msgstr "Supprimer"
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:273
-msgid "Select a folder to be added to your selective backup."
-msgstr "Sélectionnez un dossier à ajouter à votre sauvegarde sélective."
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:301
-msgid "Selected item doesn't exists!"
-msgstr "L'article sélectionné n'existe pas!"
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:302
+#: com/patrikdufresne/minarca/ui/AboutDialog.java:59
 #, java-format
-msgid "The path `{0}` cannot be include because it doesn't exists."
-msgstr "L'emplacement `{0}` ne peut être inclus car il n'existe pas."
+msgid "About {0}"
+msgstr "À propos de {0}"
 
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:311
-msgid "Selected item is already include!"
-msgstr "L'article sélectionné est déjà inclus!"
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:312
-#, java-format
-msgid "The path `{0}` is already include in you selective backup."
-msgstr "L'emplacement `{0}` est déjà inclus dans votre sauvegarde sélective."
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:328
-msgid "Selected item is excluded by another pattern."
-msgstr "L'article sélectionné est exclu par un autre modèle."
-
-#: com/patrikdufresne/minarca/ui/SelectiveDialog.java:330
-#, java-format
-msgid ""
-"The path `{0}` is currently excluded by another pattern. You may need to "
-"reorganize your patterns to properly include the selected item."
-msgstr ""
-"L'emplacement `{0}` est actuellement exclu par un autre modèle. Vous devriez "
-"possiblement réorganiser vos paramètres de sauvegarde sélective pour inclure "
-"l'article sélectionné."
+#: com/patrikdufresne/minarca/ui/AboutDialog.java:102
+msgid "Minarca is an all integrated online backup solution."
+msgstr "Minarca est une solution de sauvegarde en ligne complètement intégrée."
 
