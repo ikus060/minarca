@@ -23,6 +23,7 @@ stages:
   services:
     - docker:dind
   script:
+  - set
   - apk add make bash
   - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
   - make $CI_JOB_NAME
