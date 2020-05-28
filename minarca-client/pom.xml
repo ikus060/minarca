@@ -9,7 +9,6 @@
 	<name>minarca-root</name>
 	<modules>
 	    <module>minarca-core</module>
-		<module>minarca-icons</module>
 		<module>minarca-ui</module>
 		<module>minarca-installation-package</module>
 		<module>minarca-installation-package-unix</module>
