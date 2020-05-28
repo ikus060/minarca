@@ -27,11 +27,11 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.patrikdufresne</groupId>
-                                    <artifactId>minarca-icons</artifactId>
+                                    <artifactId>minarca-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}/generated-resources/icons</outputDirectory>
+                            <outputDirectory>${project.build.directory}/generated-icons</outputDirectory>
                         </configuration>
                     </execution>
                     <!-- Copy SWT jars for supported platform. -->
