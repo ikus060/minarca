@@ -1,15 +1,16 @@
 # Installation
 
-# Install Minarca-Server
+## Quick installation
 
 On a Debian Linux server:
 
-    wget http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb
-    sudo apt install ./minarca-server_latest_amd64.deb
+    curl https://www.ikus-soft.com/archive/minarca/nightly/get-minarca.sh | sh -
 
-This should install Minarca server and all required dependencies. The server should be running on http://127.0.0.1:8080 listening on all interfaces.
+This should install Minarca server and all required dependencies.
 
-You may stop start the service using systemd:
+The server should be running on http://127.0.0.1:8080 listening on all interfaces.
+
+You may stop or start the service using systemd:
 
     sudo service minarca-server stop
     sudo service minarca-server start
@@ -20,6 +21,17 @@ You may access the web interface at http://localhost:8080 using:
 
     * username: admin
     * password: admin123 
+
+## Long installation
+
+On a Debian Linux server:
+
+    sudo apt-get update
+    sudo apt-get install apt-transport-https ca-certificates gnupg
+    curl https://www.ikus-soft.com/archive/minarca/public.key | sudo apt-key add -
+    echo "deb https://nexus.ikus-soft.com/repository/minarca-apt-release-buster/ buster main" | sudo tee /etc/apt/sources.list.d/minarca.list
+    apt-get update
+    apt-get install minarca-server
 
 ## Setup Storage
 
