@@ -176,6 +176,8 @@ publish-server:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   - scp -o StrictHostKeyChecking=no ./minarca-server_*.deb www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  # Publish get-minarca.sh script
+  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
 
 publish-apt:
   stage: publish
@@ -207,20 +209,20 @@ promote-server:
   - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
-  # Public stretch package to kalo
+  # Publish stretch package to kalo
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
   - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+stretch_amd64.deb
-  # Public buster package to kalo
+  # Publish buster package to kalo
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
   - scp -o StrictHostKeyChecking=no ./$MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+buster_amd64.deb
+  # Publish get-minarca.sh script
+  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  
 
 publish-client:
   stage: publish
-  environment:
-    name: dev
-    url: http://www.patrikdufresne.com/archive/minarca/nightly/minarca-client-${REVISION}.exe
   script:
   # Setup authentication
   - eval $(ssh-agent -s)
@@ -237,9 +239,6 @@ client_promote:
   stage: publish
   only:
   - tags
-  environment:
-    name: latest
-    url: http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe
   script:
   # Setup authentication
   - eval $(ssh-agent -s)
@@ -254,6 +253,20 @@ client_promote:
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
   - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_DEB_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
 
+deploy_docker_debian_stretch:
+  stage: deploy
+  image: buildpack-deps:stretch
+  script:
+  - export MINARCA_VERSION=$(make debversion)
+  - ./get-minarca.sh --dev --version $MINARCA_VERSION
+
+deploy_docker_debian_buster:
+  stage: deploy
+  image: buildpack-deps:buster
+  script:
+  - export MINARCA_VERSION=$(make debversion)
+  - ./get-minarca.sh --dev --version $MINARCA_VERSION
+
 deploy_staging_sestican:
   stage: deploy
   image: ikus060/ansible
@@ -263,9 +276,9 @@ deploy_staging_sestican:
     name: staging
     url: https://test.minarca.net
   script:
-  - export DEB_VERSION=$(make debversion)
-  - echo DEB_VERSION=$DEB_VERSION
-  - curl -X POST -F token=36bae86778d901fc6b2d6453a41844 -F "ref=master" -F "variables[MINARCA_VERSION]=$DEB_VERSION" https://gitlab.com/api/v4/projects/18716492/trigger/pipeline
+  - export MINARCA_VERSION=$(make debversion)
+  - echo MINARCA_VERSION=$MINARCA_VERSION
+  - curl -X POST -F token=36bae86778d901fc6b2d6453a41844 -F "ref=master" -F "variables[MINARCA_VERSION]=$MINARCA_VERSION" https://gitlab.com/api/v4/projects/18716492/trigger/pipeline
   
 #test_link_debian_stretch:
 #  image: debian:stretch
