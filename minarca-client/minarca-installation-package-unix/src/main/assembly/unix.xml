@@ -11,7 +11,7 @@
     <fileSets>
         <!-- Include 128px icons -->
         <fileSet>
-            <directory>target/generated-resources/icons/com/patrikdufresne/minarca/ui</directory>
+            <directory>target/generated-icons/com/patrikdufresne/minarca/ui</directory>
             <includes>
                 <include>*128*</include>
             </includes>

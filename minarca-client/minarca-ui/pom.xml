@@ -82,11 +82,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.patrikdufresne</groupId>
-			<artifactId>minarca-icons</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.patrikdufresne</groupId>
 			<artifactId>com.patrikdufresne.switchbutton</artifactId>
 			<version>1.0</version>
 		</dependency>

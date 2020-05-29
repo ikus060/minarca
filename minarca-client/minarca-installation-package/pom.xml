@@ -60,11 +60,12 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.patrikdufresne</groupId>
-                                    <artifactId>minarca-icons</artifactId>
+                                    <artifactId>minarca-ui</artifactId>
                                     <version>${project.version}</version>
+                                    <includes>com/patrikdufresne/minarca/ui/*.ico</includes>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}/generated-resources/icons</outputDirectory>
+                            <outputDirectory>${project.build.directory}/generated-icons</outputDirectory>
                         </configuration>
                     </execution>
                     <!-- Copy SWT jars for supported platform. -->
@@ -118,7 +119,7 @@
                             <resources>
                                 <resource>
                                     <filtering>false</filtering>
-                                    <directory>${project.build.directory}/generated-resources/icons/com/patrikdufresne/minarca/ui</directory>
+                                    <directory>${project.build.directory}/generated-icons/com/patrikdufresne/minarca/ui</directory>
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.directory}/package</outputDirectory>
