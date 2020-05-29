@@ -215,6 +215,8 @@
                                 <exec osfamily="unix" executable="makensis" dir="${project.build.directory}/package" failonerror="true">
                                     <!-- Avoid changing working directory -->
                                     <arg value="-NOCD" />
+                                    <arg value="-INPUTCHARSET" />
+                                    <arg value="UTF8" />
                                     <arg value="-Dincludedir=${basedir}/src/main/nsis/include" />
                                     <arg value="-Dplugindir=${basedir}/src/main/nsis/plugin" />
                                     <arg value="-DAppVersion=${AppVersion}" />
