@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-20 08:25-0400\n"
 "PO-Revision-Date: 2019-08-27 13:26+0000\n"
-"Last-Translator: Patrik Dufresne <info@patrikdufresne.com>\n"
+"Last-Translator: Patrik Dufresne <patrik@ikus-soft.com>\n"
 "Language-Team: No linguistic content\n"
 "Language: zxx\n"
 "MIME-Version: 1.0\n"
@@ -57,8 +57,8 @@ msgid "Connectivity status: "
 msgstr "Statut de connectivité:"
 
 #: com/patrikdufresne/minarca/core/API.java:107
-msgid "Copyright (c) 2019 - Patrik Dufresne Service Logiciel inc."
-msgstr "Droit d'auteur © 2019 - Patrik Dufresne Service Logiciel inc."
+msgid "Copyright (C) 2020 - IKUS Software inc."
+msgstr "Droit d'auteur © 2020 - Logiciels IKUS inc."
 
 #: com/patrikdufresne/minarca/core/API.java:220
 msgid "fail to read selective backup settings"
