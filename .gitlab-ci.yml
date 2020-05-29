@@ -88,11 +88,11 @@ test-quota-api_buster_python3:
     TARGET: test-quota-api
     IMAGE: buster-python3
 
-test-client_stretch:
+test-client_buster:
   <<: *make
   variables:
     TARGET: test-client
-    IMAGE: stretch-java8
+    IMAGE: buster-java8
 
 test-client_windows:
   <<: *make
@@ -105,7 +105,7 @@ build-client:
   <<: *make
   variables:
     TARGET: build-client
-    IMAGE: stretch-java8
+    IMAGE: buster-java8
   artifacts:
     paths:
     - minarca-client*.exe
@@ -161,7 +161,7 @@ test-client_windows_exe:
   stage: test-package
   image: buildpack-deps:stretch
   script:
-  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
+  - export MINARCA_EXE_FILE=$(ls -1 minarca-client*.exe)
   - bash ./tests/install-client-win.sh
 
 publish-www-dev:

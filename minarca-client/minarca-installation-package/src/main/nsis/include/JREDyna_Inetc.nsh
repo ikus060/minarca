@@ -25,26 +25,26 @@
 ;Language Strings
 !macro JREINFO_LANGUAGE
   LangString JRE_NOT_FOUND_TITLE ${LANG_ENGLISH} "JRE Installation or Update Required"
-  LangString JRE_NOT_FOUND_TITLE ${LANG_FRENCH} "Installation ou mise à jour requise de JRE"
+  LangString JRE_NOT_FOUND_TITLE ${LANG_FRENCH} "Installation ou mise Ã  jour requise de JRE"
   LangString JRE_NOT_FOUND_SUBTITLE ${LANG_ENGLISH} "This application requires Java ${JRE_VERSION} or higher."
-  LangString JRE_NOT_FOUND_SUBTITLE ${LANG_FRENCH} "Cette application nécessite Java ${JRE_VERSION} ou supérieur."
+  LangString JRE_NOT_FOUND_SUBTITLE ${LANG_FRENCH} "Cette application nÃ©cessite Java ${JRE_VERSION} ou supÃ©rieur."
   LangString JRE_NOT_FOUND_LABEL ${LANG_ENGLISH} "This application requires installation of the JRE. This will be downloaded and installed as part of the installation."
-  LangString JRE_NOT_FOUND_LABEL ${LANG_FRENCH} "Cette application nécessite l'installation de Java Runtime Environment (JRE). Il sera téléchargé et installé lors de cette installation."
+  LangString JRE_NOT_FOUND_LABEL ${LANG_FRENCH} "Cette application nÃ©cessite l'installation de Java Runtime Environment (JRE). Il sera tÃ©lÃ©chargÃ© et installÃ© lors de cette installation."
   
   LangString JRE_NOT_FOUND ${LANG_ENGLISH} "No JRE Found"
-  LangString JRE_NOT_FOUND ${LANG_FRENCH} "Aucun JRE trouvé"
+  LangString JRE_NOT_FOUND ${LANG_FRENCH} "Aucun JRE trouvÃ©"
   LangString JRE_OLD_FOUND ${LANG_ENGLISH} "Old JRE found"
-  LangString JRE_OLD_FOUND ${LANG_FRENCH} "Veille version de JRE trouvé"
+  LangString JRE_OLD_FOUND ${LANG_FRENCH} "Veille version de JRE trouvÃ©"
   LangString JRE_FOUND ${LANG_ENGLISH} "JRE found"
-  LangString JRE_FOUND ${LANG_FRENCH} "JRE trouvé"
+  LangString JRE_FOUND ${LANG_FRENCH} "JRE trouvÃ©"
   LangString JRE_LAUNCH_SETUP ${LANG_ENGLISH} "Launching JRE setup"
   LangString JRE_LAUNCH_SETUP ${LANG_FRENCH} "Lancement de l'installation de JRE"
   LangString JRE_SETUP_COMPLETE ${LANG_ENGLISH} "JRE Setup finished"
-  LangString JRE_SETUP_COMPLETE ${LANG_FRENCH} "Installation de JRE terminée"
+  LangString JRE_SETUP_COMPLETE ${LANG_FRENCH} "Installation de JRE terminÃ©e"
   LangString JRE_DOWNLOAD ${LANG_ENGLISH} "About to download JRE from "
-  LangString JRE_DOWNLOAD ${LANG_FRENCH} "Téléchargement de JRE à partir de "
+  LangString JRE_DOWNLOAD ${LANG_FRENCH} "TÃ©lÃ©chargement de JRE Ã  partir de "
   LangString JRE_DETECT_VERSION ${LANG_ENGLISH} "Detecting JRE Version"
-  LangString JRE_DETECT_VERSION ${LANG_FRENCH} "Détection de la version de JRE"
+  LangString JRE_DETECT_VERSION ${LANG_FRENCH} "DÃ©tection de la version de JRE"
 !macroend
 
 ;--------------------------------  
