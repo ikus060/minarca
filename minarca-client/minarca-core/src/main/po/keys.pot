@@ -57,7 +57,7 @@ msgid "Connectivity status: "
 msgstr ""
 
 #: com/patrikdufresne/minarca/core/API.java:107
-msgid "Copyright (c) 2019 - Patrik Dufresne Service Logiciel inc."
+msgid "Copyright (C) 2020 - IKUS Software inc."
 msgstr ""
 
 #: com/patrikdufresne/minarca/core/API.java:220

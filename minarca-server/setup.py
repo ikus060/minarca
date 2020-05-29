@@ -3,8 +3,8 @@
 #
 # Minarca Server
 #
-# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
-# Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+# Copyright (C) 2020 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
 from __future__ import print_function
@@ -15,12 +15,12 @@ setuptools.setup(
     name="minarca-server",
     use_scm_version={"root": "..", "relative_to": __file__},
     description='Minarca Web Server',
-    long_description='Provide Minarca web server to visualize your backup.',
-    author='Patrik Dufresne Service Logiciel inc.',
-    author_email='support@patrikdufresne.com',
-    maintainer='Patrik Dufresne Service Logiciel inc.',
-    maintainer_email='support@patrikdufresne.com',
-    url='http://www.patrikdufresne.com/en/minarca/',
+    long_description='Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage.',
+    author='IKUS Software inc.',
+    author_email='support@ikus-soft.com',
+    maintainer='IKUS Software inc.',
+    maintainer_email='support@ikus-soft.com',
+    url='https://www.ikus-soft.com/en/minarca/',
     include_package_data=True,
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
     packages=['minarca_plugins'],

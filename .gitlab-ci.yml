@@ -177,16 +177,16 @@ publish-www-dev:
   - chmod 700 ~/.ssh
   # publish server
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
   # publish client
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
   - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
-  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
   # Publish get-minarca.sh script
-  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
 
 publish-apt-dev:
   stage: publish
@@ -215,21 +215,21 @@ publish-www-release:
   - chmod 700 ~/.ssh
   # Publish stretch package to kalo
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+stretch_amd64.deb
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+stretch_amd64.deb
   # Publish buster package to kalo
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+buster_amd64.deb
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+buster_amd64.deb
   # Publish client to kalo
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
   - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
-  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.patrikdufresne.com ln -fs $(basename $MINARCA_DEB_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
+  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_DEB_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
   # Publish get-minarca.sh script
-  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.patrikdufresne.com:/var/www/patrikdufresne/archive/minarca/
+  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
 
 publish-apt-release:
   stage: publish

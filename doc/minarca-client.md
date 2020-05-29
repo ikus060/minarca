@@ -6,19 +6,19 @@
 
 **With Command Line:**
 
-    wget http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb
+    wget https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb
     apt install ./minarca-client_latest_all.deb
 
 **With a User interface:**
 
- 1. Download the latest Debian package from [here](http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb).
+ 1. Download the latest Debian package from [here](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb).
  2. Double click on the package to install it using your favourite tool.
 
 *Notice: To improve the user experience we are working to make a PPA available.*
 
 ### On Windows
 
- 1. Download the latest Windows installer from [here](http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe).
+ 1. Download the latest Windows installer from [here](https://www.ikus-soft.com/archive/minarca/minarca-latest-install.exe).
  2. Double click on the package to install it.
 
 ### Link your client with Minarca Server
@@ -61,7 +61,7 @@ To access your data on the Minarca Web interface, we recommend the following bro
 
 ### How do I sign up for Minarca.net SaaS ?
 
-You may subscribe to our [Minarca.net SaaS](https://www.minarca.net) (Software as a service) which allow you to benefit from Minarca without installing a server. To subscribe, you may fill the [subscription form](http://www.patrikdufresne.com/en/support/#form) or send an email to [support@patrikdufresne.com](mailto:support@patrikdufresne.com). We will contact you to finalize your subscription, either by email or phone, depending on your preference.
+You may subscribe to our [Minarca.net SaaS](https://www.minarca.net) (Software as a service) which allow you to benefit from Minarca without installing a server. To subscribe, you may fill the [subscription form](https://www.ikus-soft.com/en/support/#form) or send an email to [support@ikus-soft.com](mailto:support@ikus-soft.com). We will contact you to finalize your subscription, either by email or phone, depending on your preference.
 
 ### How do I install Minarca Client?
 
@@ -173,7 +173,7 @@ If you back up a device for the first time and it does not appear in the **Repos
 
 ### I cannot link my computer when installing Minarca.
 
-While linking your computer to Minarca, you see the message **An unknown error has occurred! If the problem persists, try reinstalling Minarca**. If the problem still persists, contact us online by filling out the [**Help Form**](http://www.patrikdufresne.com/en/support/#form).
+While linking your computer to Minarca, you see the message **An unknown error has occurred! If the problem persists, try reinstalling Minarca**. If the problem still persists, contact us online by filling out the [**Help Form**](https://www.ikus-soft.com/en/support/#form).
 
 ### Why is my backup not running ?
 

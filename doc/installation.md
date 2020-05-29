@@ -66,8 +66,8 @@ Something similar to the following should make it work in most environment:
 
 On a Windows or Debian workstation, download the appropriate installer.
 
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minaca--client--for--Debian-green?&logo=debian&style=for-the-badge"></a>
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minaca--client--for--Windows-green?&logo=windows&style=for-the-badge"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minaca--client--for--Debian-green?&logo=debian&style=for-the-badge"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minaca--client--for--Windows-green?&logo=windows&style=for-the-badge"></a>
 
 Then launch the execution of the installer and follow the instructions. On Debian workstation, it's preferable to install the packages using Gdebi.
 

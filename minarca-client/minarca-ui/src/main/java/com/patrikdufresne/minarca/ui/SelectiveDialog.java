@@ -194,7 +194,7 @@ public class SelectiveDialog extends Dialog {
         } else {
             item.setTitle(label.toString());
         }
-        
+
         // Create Include/Exclude button.
         SwitchButton button = item.createSwitchButton();
         button.setTextOff(_("Exclude"));
@@ -284,23 +284,21 @@ public class SelectiveDialog extends Dialog {
         // Check if file exists
         GlobPattern p = new GlobPattern(true, file);
         if (!p.isFileExists()) {
-            DetailMessageDialog
-                    .openInformation(
-                            getShell(),
-                            getShell().getText(),
-                            _("Selected item doesn't exists!"),
-                            _("The path `{0}` cannot be include because it doesn't exists.", file));
+            DetailMessageDialog.openInformation(
+                    getShell(),
+                    getShell().getText(),
+                    _("Selected item doesn't exists!"),
+                    _("The path `{0}` cannot be include because it doesn't exists.", file));
             return;
         }
 
         // Check if modification required.
         if (patterns.contains(p)) {
-            DetailMessageDialog
-                    .openInformation(
-                            getShell(),
-                            getShell().getText(),
-                            _("Selected item is already include!"),
-                            _("The path `{0}` is already include in you selective backup.", file));
+            DetailMessageDialog.openInformation(
+                    getShell(),
+                    getShell().getText(),
+                    _("Selected item is already include!"),
+                    _("The path `{0}` is already include in you selective backup.", file));
             return;
         }
 
