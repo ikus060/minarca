@@ -1,6 +1,4 @@
 #!/bin/sh
-# Minarca Server
-#
 # Copyright (C) 2020 Patrik Dufresne Service Logiciel inc. All rights reserved.
 # Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
@@ -72,11 +70,7 @@ while [ $# -gt 0 ] ; do
     -d | --dev) DEV=1;;
     -V | --version)
       shift
-      case "$1" in
-      *+*) PACKAGE="minarca-server=$1";;
-      *) PACKAGE="minarca-server=$1+$DEBIAN_DISTRIBUTION";;
-      esac
-      ;;
+      PACKAGE="minarca-server=$1";;
     *)
       echo "Option $1 not supported. Ignored." >&2
       exit 1
