@@ -22,7 +22,7 @@
 	<repositories>
 		<repository>
 			<id>patrikdufresne</id>
-			<url>http://nexus.patrikdufresne.com/content/groups/public/</url>
+			<url>https://nexus.ikus-soft.com/content/groups/public/</url>
 		</repository>
 	</repositories>
 	<build>
