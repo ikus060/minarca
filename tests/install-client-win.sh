@@ -1,8 +1,8 @@
 #!/bin/bash
 # Integration test to verify installation of exe in wine
 #
-# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
-# Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+# Copyright (C) 2020 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 set -e
 set -x
@@ -11,7 +11,7 @@ set -x
 MINARCA_EXE_FILE=${MINARCA_EXE_FILE:-./minarca-latest-install.exe}
 if [ ! -e "$MINARCA_EXE_FILE" ]; then
     apt update && apt install -y wget
-    wget -O $MINARCA_EXE_FILE http://www.patrikdufresne.com/archive/minarca/${MINARCA_EXE_FILE##*/}
+    wget -O $MINARCA_EXE_FILE https://www.ikus-soft.com/archive/minarca/${MINARCA_EXE_FILE##*/}
 fi
 
 # Install wine

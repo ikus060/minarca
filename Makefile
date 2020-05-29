@@ -1,7 +1,7 @@
 # Minarca Server
 #
-# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
-# Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+# Copyright (C) 2020 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 #
 # Targets:
@@ -20,7 +20,7 @@ CI_PROJECT_NAME ?= minarca
 # == Variables ==
 #
 # Version of pacakges base on git tags.
-VERSION := $(shell curl http://git.patrikdufresne.com/pdsl/maven-scm-version/raw/master/version.sh 2>/dev/null | bash)
+VERSION := $(shell curl https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash)
 
 # Release date for Debian pacakge
 RELEASE_DATE = $(shell date '+%a, %d %b %Y %X') +0000

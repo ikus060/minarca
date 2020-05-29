@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2019, Patrik Dufresne Service Logiciel inc. All rights reserved.
- * Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+ * Copyright (C) 2020, IKUS Software inc. All rights reserved.
+ * IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
  * Use is subject to license terms.
  */
 package com.patrikdufresne.minarca.core;
@@ -104,7 +104,7 @@ public class API {
      * @return
      */
     public static String getCopyrightText() {
-        return _("Copyright (c) 2019 - Patrik Dufresne Service Logiciel inc.");
+        return _("Copyright (C) 2020 - IKUS Software inc.");
     }
 
     /**

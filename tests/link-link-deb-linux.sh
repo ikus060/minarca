@@ -1,8 +1,8 @@
 #!/bin/bash
 # Integration test to verify if the server accept link from minarca-client.
 #
-# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
-# Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+# Copyright (C) 2020 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 set -e
 set -x
@@ -18,7 +18,7 @@ MINARCA_REPOSITORYNAME=${MINARCA_REPOSITORYNAME:-test}
 # Install minarca-client
 if [ ! -e "$MINARCA_DEB_FILE" ]; then
     apt update && apt install -y wget
-    wget -O $MINARCA_DEB_FILE http://www.patrikdufresne.com/archive/minarca/${MINARCA_DEB_FILE##*/}
+    wget -O $MINARCA_DEB_FILE https://www.ikus-soft.com/archive/minarca/${MINARCA_DEB_FILE##*/}
 fi
 apt update && apt install -y $MINARCA_DEB_FILE
 

@@ -2,18 +2,18 @@
 
 <p align="center">
   <strong>
-    <a href="http://www.patrikdufresne.com/en/minarca/">website</a>
+    <a href="https://www.ikus-soft.com/en/minarca/">website</a>
     •
-    <a href="https://github.com/ikus060/minarca/blob/master/doc/index.md">docs</a>
+    <a href="https://gitlab.com/ikus-soft/minarca/-/blob/master/doc/index.md">docs</a>
     •
-    <a href="https://groups.google.com/forum/#!forum/rdiffweb">community</a>
+    <a href="https://groups.google.com/forum/#!forum/minarca">community</a>
   </strong>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/ikus060/minarca"></a>
-  <a href="https://github.com/ikus060/minarca/blob/master/doc/index.md"><img alt="Documentation" src="https://img.shields.io/badge/code-documented-brightgreen.svg?style=flat-square"></a>
-  <a href="https://git.patrikdufresne.com/pdsl/minarca/pipelines"><img alt="Build" src="https://git.patrikdufresne.com/pdsl/minarca/badges/master/pipeline.svg"></a>
+  <a href="https://gitlab.com/ikus-soft/minarca/-/blob/master/doc/index.md"><img alt="Documentation" src="https://img.shields.io/badge/code-documented-brightgreen.svg?style=flat-square"></a>
+  <a href="https://gitlab.com/ikus-soft/minarca/pipelines"><img alt="Build" src="https://gitlab.com/ikus-soft/minarca/badges/master/pipeline.svg"></a>
 </p>
 
 <h1 align="center">
@@ -30,13 +30,13 @@ Minarca is a **free and open-source** backup software providing end-to-end integ
 
 Check how Minarca is working without installing the server. We have setup a testing environment for you. You may login to https://test.minarca.net/ using the default username / password: admin / admin123
 
-Then start a backup in few minutes by installing minarca client for [Windows](http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe) or [Linux/Debian](http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb). 
+Then start a backup in few minutes by installing minarca client for [Windows](https://www.ikus-soft.com/archive/minarca/minarca-latest-install.exe) or [Linux/Debian](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb). 
 
 ## Download & Install
 
 **Minarca Server**
 
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-server_latest_amd64.deb"><img alt="Minarca Server for Ubuntu/Debian Linux version" src="https://img.shields.io/badge/download-Minarca%20server-brightgreen"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-server_latest_amd64.deb"><img alt="Minarca Server for Ubuntu/Debian Linux version" src="https://img.shields.io/badge/download-Minarca%20server-brightgreen"></a>
 
 Read more about [how to installation Minarca server](doc/installation.md).
 
@@ -44,10 +44,10 @@ Note: While it's possible to get Minarca Server working on other Linux distribut
 
 **Minarca Client**
 
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minarca%20for%20Debian-brightgreen"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minarca%20for%20Debian-brightgreen"></a>
 <br/>
 <br/>
-<a href="http://www.patrikdufresne.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca%20for%20Windows-brightgreen"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca%20for%20Windows-brightgreen"></a>
 
 Note: While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
 
@@ -59,21 +59,21 @@ Bug reports should be reported on the Minarca development web site at https://gi
 
 ## Professional support
 
-Professional support for Minarca is available by contacting [Patrik Dufresne Service Logiciel](http://www.patrikdufresne.com/en/support/#form).
+Professional support for Minarca is available by contacting [IKUS Software inc.](https://www.ikus-soft.com/en/support/#form).
 
 # About Minarca
 
 Minarca Server is written in Python and is released as open source project under the 
 GNU AFFERO GENERAL PUBLIC LICENSE (AGPLv3). All source code and documentation are
-Copyright Patrik Dufresne Service Logiciel inc. <info@patrikdufresne.com>
+Copyright IKUS Software inc. <support@ikus-soft.com>
 
-Minarca Server is actively developed by [Patrik Dufresne](http://patrikdufresne.com)
+Minarca Server is actively developed by [IKU Software inc.](https://ikus-soft.com)
 since April 2015.
 
-The Minarca Server source code is hosted on [private Gitlab](https://git.patrikdufresne.com/pdsl/minarca)
+The Minarca Server source code is hosted on [Gitlab](https://gitlab.com/ikus-soft/minarca)
 and mirrored to [Github](https://github.com/ikus060/minarca).
 
-The Minarca website is http://www.patrikdufresne.com/en/minarca/.
+The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 

@@ -30,7 +30,7 @@ value for this options using `[..]`.
 
 You may also pick a different color scheme to matches your branding. Only two
 theme are available: `default`, `orange`. You may request a new color scheme
-using a [support request](http://www.patrikdufresne.com/en/support/#form).
+using a [support request](https://www.ikus-soft.com/en/support/#form).
 
     DefaultTheme=default
     

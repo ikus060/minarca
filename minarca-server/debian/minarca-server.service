@@ -1,6 +1,6 @@
 [Unit]
 Description=Minarca Web Server
-Documentation=http://www.patrikdufresne.com/en/minarca/
+Documentation=https://www.ikus-soft.com/en/minarca/
 
 [Service]
 ExecStart=/opt/minarca/bin/rdiffweb --config=/etc/minarca/minarca-server.conf

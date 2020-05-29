@@ -3,8 +3,8 @@
 #
 # Minarca Quota API
 #
-# Copyright (C) 2019 Patrik Dufresne Service Logiciel inc. All rights reserved.
-# Patrik Dufresne Service Logiciel PROPRIETARY/CONFIDENTIAL.
+# Copyright (C) 2020 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
 from __future__ import print_function
@@ -16,8 +16,8 @@ setuptools.setup(
     use_scm_version={"root": "..", "relative_to": __file__},
     description='Minarca Quota RESTful API',
     long_description='Provide a RESTful API to access and update the the user quota.',
-    author='Patrik Dufresne Service Logiciel inc.',
-    url='http://www.patrikdufresne.com/',
+    author='IKUS Software inc.',
+    url='https://www.ikus-soft.com/en/minarca/',
     packages=['minarca_quota_api'],
     include_package_data=True,
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
