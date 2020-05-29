@@ -25,7 +25,7 @@ export WINEDEBUG=fixme-all
 # Install minarca exe in wine
 export DISPLAY=:1
 Xvfb :1 -screen 0 1280x960x24 &
-wine ./$MINARCA_EXE_FILE /S
+wine ./$MINARCA_EXE_FILE /S || true
 
 # Add wine shortcut
 echo 'wine "C:\\users\\root\\Local Settings\\Application Data\\minarca\\bin\\minarca.exe" "$@"' > /usr/bin/minarca
