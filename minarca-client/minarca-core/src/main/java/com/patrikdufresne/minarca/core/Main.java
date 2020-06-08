@@ -64,7 +64,7 @@ public class Main {
         LOGGER.info("starting backup");
         // Run the backup.
         try {
-            API.instance().backup(false, force);
+            API.instance().backup(force);
         } catch (Exception e) {
             System.err.println("error during backup: " + e.getMessage());
             System.exit(2);
