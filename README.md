@@ -36,8 +36,10 @@ Then start a backup in few minutes by installing minarca client for [Windows](ht
 
 **Minarca Server**
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-server_latest_amd64.deb"><img alt="Minarca Server for Ubuntu/Debian Linux version" src="https://img.shields.io/badge/download-Minarca%20server-brightgreen"></a>
+On Debian Stretch and Buster:
 
+    curl https://www.ikus-soft.com/archive/minarca/get-minarca.sh | sh -
+    
 Read more about [how to installation Minarca server](doc/installation.md).
 
 Note: While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
