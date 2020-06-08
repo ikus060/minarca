@@ -1,7 +1,7 @@
 # Command line to convert SVG files into png and ico.
-convert minarca_16.svg -size 16x16 minarca_16.png
-convert minarca_16.svg -size 22x22 minarca_22.png
-convert minarca_16.svg -size 32x32 minarca_32.png
-convert minarca_128.svg -size 48x48 minarca_48.png
-convert minarca_128.svg -size 128x128 minarca_128.png
+convert -background none minarca_16.svg -resize 16x16 minarca_16.png
+convert -background none -density 300 minarca_16.svg -resize 22x22 minarca_22.png
+convert -background none -density 300 minarca_16.svg -resize 32x32 minarca_32.png
+convert -background none minarca_128.svg -resize 48x48 minarca_48.png
+convert -background none minarca_128.svg -resize 128x128 minarca_128.png
 icotool -c -o minarca.ico minarca_16.png minarca_32.png minarca_48.png minarca_128.png
