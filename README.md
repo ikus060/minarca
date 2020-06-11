@@ -25,7 +25,9 @@ Minarca is a **free and open-source** backup software providing end-to-end integ
 
 **Simple** to install, to configure and to manage, Minarca will not waste your time. Minarca makes user data easily accessible by providing a rich **web interface** to recover the files.
 
-**Minarca client** may be used to simplify the integration of new computers running **Windows or Linux Debian**. It's user interface and command line interface allow simple usage for **desktop users or headless servers**. Minarca also keep interoperability with legacy installation of rdiff-backup.
+**Minarca client** may be used to simplify the integration of new computers running **Windows or Linux Debian**. It's user interface and command line interface allow simple usage for **desktop users or headless servers**. Minarca also keep interoperability with legacy installation of [rdiff-backup](https://rdiff-backup.net/).
+
+Based on [rdiffweb](https://www.ikus-soft.com/en/rdiffweb/), **Minarca Server** may be used to browse, **restore your data easily** with a convenient web interface accessible from everywhere.
 
 ## Getting started
 
@@ -242,3 +244,9 @@ Little bug fixes following the previous release.
 * Client: Update french translation
 * Client: Add command line interface 
 * Client: Verify if process is running using pid file on all platform
+
+# Related projects
+
+* [rdiffweb](https://www.ikus-soft.com/en/rdiffweb/): web interface 
+* [rdiff-backup](https://rdiff-backup.net/): core engine used to run the backup
+
