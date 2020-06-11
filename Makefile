@@ -20,7 +20,7 @@ CI_PROJECT_NAME ?= minarca
 # == Variables ==
 #
 # Version of pacakges base on git tags.
-VERSION := $(shell curl https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash)
+VERSION := $(shell curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash)
 
 # Release date for Debian pacakge
 RELEASE_DATE = $(shell date '+%a, %d %b %Y %X') +0000
@@ -128,9 +128,9 @@ MINARCA_CLIENT_DEB_FILE = minarca-client_${VERSION}_all.deb
 MINARCA_CLIENT_EXE_FILE = minarca-client_${VERSION}.exe
 
 ifneq ($(SONAR_URL),)
-MAVEN_TEST_ARGS=-Dsonar.host.url=${SONAR_URL} -Dsonar.login=${SONAR_TOKEN} clean verify org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar
+MAVEN_TEST_ARGS=-Dsonar.host.url=${SONAR_URL} -Dsonar.login=${SONAR_TOKEN} org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 else
-MAVEN_TEST_ARGS=clean verify
+MAVEN_TEST_ARGS=org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:jacoco-maven-plugin:report
 endif
 	
 test-client: docker-${DIST}-java8
