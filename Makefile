@@ -81,7 +81,7 @@ else
 DOCKER_IMAGE_BASENAME = ${CI_PROJECT_NAME}
 DOCKER_TAG = latest
 define docker_run
-docker run --rm -e TOXENV -v=`pwd`:/build -w=/build/$(1) $(2) $(3)
+docker run --rm --user `id -u` -e TOXENV -v=`pwd`:/build -w=/build/$(1) $(2) $(3)
 endef
 endif
 
@@ -127,6 +127,7 @@ test-quota-api: docker-${DIST}-${PYTHON}
 MINARCA_CLIENT_DEB_FILE = minarca-client_${VERSION}_all.deb
 MINARCA_CLIENT_EXE_FILE = minarca-client_${VERSION}.exe
 
+MAVEN_ARGS=-Drevision=${VERSION} -Duser.home=/tmp
 ifneq ($(SONAR_URL),)
 MAVEN_TEST_ARGS=-Dsonar.host.url=${SONAR_URL} -Dsonar.login=${SONAR_TOKEN} org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 else
@@ -134,7 +135,7 @@ MAVEN_TEST_ARGS=org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:
 endif
 	
 test-client: docker-${DIST}-java8
-	$(call docker_run,minarca-client,${IMAGE_JAVA},mvn -B -Drevision=${VERSION} ${MAVEN_TEST_ARGS})
+	$(call docker_run,minarca-client,${IMAGE_JAVA},mvn ${MAVEN_ARGS} ${MAVEN_TEST_ARGS})
 	
 # Check if Authenticate is provided to sign the
 # exe in windows build
@@ -147,7 +148,7 @@ ifdef AUTHENTICODE_CERT
 	echo "$${AUTHENTICODE_CERT}" > minarca-client/authenticode-certs.pem
 	echo "$${AUTHENTICODE_KEY}" > minarca-client/authenticode.pem
 endif
-	$(call docker_run,minarca-client,${IMAGE_JAVA},mvn -B -Drevision=${VERSION} ${MAVEN_BUILD_ARGS} clean install)
+	$(call docker_run,minarca-client,${IMAGE_JAVA},mvn ${MAVEN_ARGS} ${MAVEN_BUILD_ARGS} clean install)
 	$(call docker_run,.,${IMAGE_JAVA},mv minarca-client/minarca-installation-package-deb/target/minarca-installation-package-deb_*_all.deb ${MINARCA_CLIENT_DEB_FILE})
 	$(call docker_run,.,${IMAGE_JAVA},mv minarca-client/minarca-installation-package/target/minarca-client-*.exe ${MINARCA_CLIENT_EXE_FILE})
 
@@ -172,3 +173,16 @@ ${MINARCA_SERVER_DEB_FILE}: docker-${DIST}-buildpackage
 	mv minarca-server_${VERSION}_amd64.deb minarca-server_${DEB_VERSION}_amd64.deb
 
 build-server: ${MINARCA_SERVER_DEB_FILE}
+
+
+#
+# == Translation ==
+#
+gettext: gettext-client
+
+gettext-client:
+	$(call docker_run,minarca-client/minarca-core,${IMAGE_JAVA},mvn ${MAVEN_ARGS} gettext:gettext)
+	$(call docker_run,minarca-client/minarca-core,${IMAGE_JAVA},mvn ${MAVEN_ARGS} gettext:merge)
+	$(call docker_run,minarca-client/minarca-ui,${IMAGE_JAVA},mvn ${MAVEN_ARGS} gettext:gettext)
+	$(call docker_run,minarca-client/minarca-ui,${IMAGE_JAVA},mvn ${MAVEN_ARGS} gettext:merge)
+
