@@ -1,28 +1,19 @@
-# Build Minarca Client
+# Build
 
-To build minarca client you need to install maven and icotool (used to create
-.ico file from pngs). The following command should install them and there
-dependencies.
+This project provide a make script to automate the building process. This
+script make extensive use of docker. So you must have a working docker
+engine running.
 
-    sudo apt-get install maven icoutils
-
-Once the dependencies are installed, should may compile minarca as follow:
-
-    mvn clean install
-
+    make build-client
+    
 # Translation
 
 minarca project uses gettext plugin to support translation using `.pot` and
 `.po` files. You may update the translation or add a new translation as follow.
 
-To extract translatable string and update the `.pot` file
+To extract translatable string and update the `.pot` file and update the translation file `.po`
 
-    mvn gettext:gettext
-
-To update the translation file `.po`
-
-    mvn gettext:merge
-
+    make gettext-client
 
 # Code signing
 

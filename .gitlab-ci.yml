@@ -192,6 +192,7 @@ publish-apt-dev:
   stage: publish
   image: buildpack-deps:buster
   script: |
+    set -e
     # Minarca Server Stretch
     export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
     curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_STRETCH"

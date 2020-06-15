@@ -17,27 +17,47 @@ import org.junit.Test;
 public class StatusTest {
 
     @Test
-    public void testSetLastStatus() throws APIException, InterruptedException, ConfigurationException {
+    public void setLastStatus() throws APIException, InterruptedException, ConfigurationException {
         Date now = new Date();
 
         // Check with failure
-        Status.setLastStatus(LastResult.FAILURE);
+        Status.setLastStatus(LastResult.FAILURE, "some error message");
         assertEquals(LastResult.FAILURE, Status.fromFile().getLastResult());
         assertThat(Status.fromFile().getLastResultDate(), Matchers.greaterThanOrEqualTo(now));
 
         // Check with success
         now = new Date();
-        Status.setLastStatus(LastResult.SUCCESS);
+        Status.setLastStatus(LastResult.SUCCESS, null);
         assertEquals(LastResult.SUCCESS, Status.fromFile().getLastResult());
         assertThat(Status.fromFile().getLastResultDate(), Matchers.greaterThanOrEqualTo(now));
         Date previous = Status.fromFile().getLastSuccess();
         assertThat(Status.fromFile().getLastSuccess(), Matchers.greaterThanOrEqualTo(now));
 
         // Check with failure again
-        Status.setLastStatus(LastResult.FAILURE);
+        Status.setLastStatus(LastResult.FAILURE, "some error message");
         assertEquals(LastResult.FAILURE, Status.fromFile().getLastResult());
         assertThat(Status.fromFile().getLastResultDate(), Matchers.greaterThanOrEqualTo(now));
         assertEquals(Status.fromFile().getLastSuccess(), previous);
+
+    }
+
+    @Test
+    public void setLastStatusWithDetails() throws APIException, InterruptedException, ConfigurationException {
+        // Empty string
+        Status.setLastStatus(LastResult.FAILURE, null);
+        assertEquals(null, Status.fromFile().getDetails());
+
+        // Empty string
+        Status.setLastStatus(LastResult.FAILURE, "");
+        assertEquals("", Status.fromFile().getDetails());
+
+        // With single string
+        Status.setLastStatus(LastResult.FAILURE, "some error message");
+        assertEquals("some error message", Status.fromFile().getDetails());
+
+        // With single string
+        Status.setLastStatus(LastResult.FAILURE, "some, error, message");
+        assertEquals("some, error, message", Status.fromFile().getDetails());
 
     }
 

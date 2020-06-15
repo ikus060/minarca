@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-20 08:25-0400\n"
+"POT-Creation-Date: 2020-06-12 15:50+0000\n"
 "PO-Revision-Date: 2019-08-27 13:26+0000\n"
 "Last-Translator: Patrik Dufresne <patrik@ikus-soft.com>\n"
 "Language-Team: No linguistic content\n"
@@ -18,7 +18,9 @@ msgstr ""
 #: com/patrikdufresne/minarca/core/internal/RdiffBackup.java:166
 msgid ""
 "nothing to backup, make sure you have at least one valid include patterns"
-msgstr "rien à sauvegarder, assurez-vous d'avoir au moins un modèle d'inclusion valide"
+msgstr ""
+"rien à sauvegarder, assurez-vous d'avoir au moins un modèle d'inclusion "
+"valide"
 
 #: com/patrikdufresne/minarca/core/Main.java:109
 msgid ""
@@ -56,50 +58,51 @@ msgstr "Pas configuré"
 msgid "Connectivity status: "
 msgstr "Statut de connectivité:"
 
-#: com/patrikdufresne/minarca/core/API.java:107
+#: com/patrikdufresne/minarca/core/API.java:108
 msgid "Copyright (C) 2020 - IKUS Software inc."
 msgstr "Droit d'auteur © 2020 - Logiciels IKUS inc."
 
-#: com/patrikdufresne/minarca/core/API.java:220
+#: com/patrikdufresne/minarca/core/API.java:211
+#: com/patrikdufresne/minarca/core/API.java:212
 msgid "fail to read selective backup settings"
 msgstr "Impossible de lire les paramètres de sauvegarde sélective"
 
-#: com/patrikdufresne/minarca/core/API.java:246
-msgid "Backup interrupted"
-msgstr "Sauvegarde interrompue"
+#: com/patrikdufresne/minarca/core/API.java:238
+msgid "backup interrupted"
+msgstr "sauvegarde interrompue"
 
-#: com/patrikdufresne/minarca/core/API.java:275
+#: com/patrikdufresne/minarca/core/API.java:321
 msgid "Missing repository name"
 msgstr "Nom du dépôt manquant"
 
-#: com/patrikdufresne/minarca/core/API.java:278
+#: com/patrikdufresne/minarca/core/API.java:324
 msgid "Missing username"
 msgstr "Nom d'usager manquant"
 
-#: com/patrikdufresne/minarca/core/API.java:281
+#: com/patrikdufresne/minarca/core/API.java:327
 msgid "Missing remote host"
 msgstr "Nom de l'hôte manquant"
 
-#: com/patrikdufresne/minarca/core/API.java:284
+#: com/patrikdufresne/minarca/core/API.java:330
 msgid "Missing remote server URL"
 msgstr "Lien URL du serveur distant manquant"
 
-#: com/patrikdufresne/minarca/core/API.java:289
+#: com/patrikdufresne/minarca/core/API.java:335
 msgid "identity file doesn't exists or is not accessible"
 msgstr "le fichier d'identité n'existe pas ou n'est pas accessible"
 
-#: com/patrikdufresne/minarca/core/API.java:295
+#: com/patrikdufresne/minarca/core/API.java:341
 msgid ""
 "remote server identity (known_hosts) file doesn't exists or is not accessible"
 msgstr ""
 "le fichier d'identité du serveur distant (hôte connu) n'existe pas ou n'est "
 "pas accessible"
 
-#: com/patrikdufresne/minarca/core/API.java:301
+#: com/patrikdufresne/minarca/core/API.java:347
 msgid "selective backup settings are missing"
 msgstr "paramètres de sauvegarde sélective manquants"
 
-#: com/patrikdufresne/minarca/core/API.java:331
+#: com/patrikdufresne/minarca/core/API.java:377
 #, java-format
 msgid ""
 "{0} is redirected to another location. Double check if the URL should start "
@@ -108,7 +111,7 @@ msgstr ""
 "{0} est redirigé vers un autre emplacement. Vérifiez si l'URL doit commencer "
 "par https: // au lieu de http: //"
 
-#: com/patrikdufresne/minarca/core/API.java:334
+#: com/patrikdufresne/minarca/core/API.java:380
 #, java-format
 msgid ""
 "{0} is redirected to another location. Please provide the canonical URL."
@@ -116,69 +119,69 @@ msgstr ""
 "{0} est redirigé vers un autre emplacement. S'il vous plaît fournir l'URL "
 "canonique."
 
-#: com/patrikdufresne/minarca/core/API.java:338
+#: com/patrikdufresne/minarca/core/API.java:384
 msgid "Unknown server error."
 msgstr "Une erreur inconnue s'est produite ."
 
-#: com/patrikdufresne/minarca/core/API.java:344
+#: com/patrikdufresne/minarca/core/API.java:390
 msgid "Fail to validate SSL certificate."
 msgstr "Échec de la validation du certificat SSL."
 
-#: com/patrikdufresne/minarca/core/API.java:346
+#: com/patrikdufresne/minarca/core/API.java:392
 #, java-format
 msgid "{0}''s server IP address could not be found."
 msgstr "L'adresse IP du serveur de {0} n'a pas été trouvée."
 
-#: com/patrikdufresne/minarca/core/API.java:348
+#: com/patrikdufresne/minarca/core/API.java:394
 #, java-format
 msgid "{0} is not a valid URL."
 msgstr "{0} n'est pas une URL valide."
 
-#: com/patrikdufresne/minarca/core/API.java:350
+#: com/patrikdufresne/minarca/core/API.java:396
 msgid "Authentication failed for unknown reason."
 msgstr "Identification non réussie pour des raisons inconnues."
 
-#: com/patrikdufresne/minarca/core/API.java:402
+#: com/patrikdufresne/minarca/core/API.java:448
 msgid "repository name cannot be empty"
 msgstr "Le nom du dépôt ne peut être vide"
 
-#: com/patrikdufresne/minarca/core/API.java:403
+#: com/patrikdufresne/minarca/core/API.java:449
 msgid "repository must only contains letters, numbers, dash (-) and dot (.)"
 msgstr ""
 "le dépôt doit contenir seulement des lettres, chiffres, tiret (-) et point "
 "(.)"
 
-#: com/patrikdufresne/minarca/core/Status.java:152
+#: com/patrikdufresne/minarca/core/Status.java:162
 #: com/patrikdufresne/minarca/core/Config.java:267
 #: com/patrikdufresne/minarca/core/Config.java:273
 msgid "fail to save config"
 msgstr "échec de l'enregistrement des configurations"
 
-#: com/patrikdufresne/minarca/core/Status.java:207
+#: com/patrikdufresne/minarca/core/Status.java:224
 msgid "Running"
 msgstr "Exécution en cours"
 
-#: com/patrikdufresne/minarca/core/Status.java:209
+#: com/patrikdufresne/minarca/core/Status.java:226
 msgid "Successful"
 msgstr "Réussi"
 
-#: com/patrikdufresne/minarca/core/Status.java:211
+#: com/patrikdufresne/minarca/core/Status.java:228
 msgid "Failed"
 msgstr "Échec"
 
-#: com/patrikdufresne/minarca/core/Status.java:213
+#: com/patrikdufresne/minarca/core/Status.java:230
 msgid "Never run"
 msgstr "Jamais"
 
-#: com/patrikdufresne/minarca/core/Status.java:215
+#: com/patrikdufresne/minarca/core/Status.java:232
 msgid "Stale"
 msgstr "Bloqué"
 
-#: com/patrikdufresne/minarca/core/Status.java:217
+#: com/patrikdufresne/minarca/core/Status.java:234
 msgid "Interrupted"
 msgstr "Interrompue"
 
-#: com/patrikdufresne/minarca/core/Status.java:219
+#: com/patrikdufresne/minarca/core/Status.java:236
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -206,52 +209,52 @@ msgstr "Impossible de générer la clé de sécurité."
 msgid "identity file %s is missing"
 msgstr "le fichier d'identité %s est manquant"
 
-#: com/patrikdufresne/minarca/core/APIException.java:92
+#: com/patrikdufresne/minarca/core/APIException.java:94
 msgid "Initial backup did not complete successfully."
 msgstr "échec de la sauvegarde initiale."
 
-#: com/patrikdufresne/minarca/core/APIException.java:106
+#: com/patrikdufresne/minarca/core/APIException.java:113
 msgid "Initial backup didn't run."
 msgstr "La sauvegarde initiale n'a pas fonctionné."
 
-#: com/patrikdufresne/minarca/core/APIException.java:120
+#: com/patrikdufresne/minarca/core/APIException.java:127
 msgid "Initial backup is still running."
 msgstr "La sauvegarde initiale est toujours en cours d'exécution."
 
-#: com/patrikdufresne/minarca/core/APIException.java:134
+#: com/patrikdufresne/minarca/core/APIException.java:141
 msgid "Fail to link computer."
 msgstr "Impossible d'associer votre ordinateur."
 
-#: com/patrikdufresne/minarca/core/APIException.java:149
+#: com/patrikdufresne/minarca/core/APIException.java:156
 msgid "minarca is missing"
 msgstr "Minarca est manquant "
 
-#: com/patrikdufresne/minarca/core/APIException.java:178
+#: com/patrikdufresne/minarca/core/APIException.java:185
 #, java-format
 msgid "Repository name {0} already exists."
 msgstr "Le nom de dépôt {0} est déjà utilisé"
 
-#: com/patrikdufresne/minarca/core/APIException.java:191
+#: com/patrikdufresne/minarca/core/APIException.java:198
 msgid "Scheduled task not found"
 msgstr "La tâche planifiée est introuvable"
 
-#: com/patrikdufresne/minarca/core/APIException.java:205
+#: com/patrikdufresne/minarca/core/APIException.java:212
 msgid "ssh is missing"
 msgstr "la clé SSH est manquante"
 
-#: com/patrikdufresne/minarca/core/APIException.java:213
+#: com/patrikdufresne/minarca/core/APIException.java:220
 msgid "You don't have sufficient permissions to execute this application!"
 msgstr ""
 "Vous ne disposez pas des autorisations nécessaires pour exécuter cette "
 "application !"
 
-#: com/patrikdufresne/minarca/core/APIException.java:224
+#: com/patrikdufresne/minarca/core/APIException.java:231
 msgid ""
 "Minarca doesn't support your operating system. This application will close."
 msgstr ""
 "Minarca ne supporte pas votre système d'exploitation. L'application va "
 "fermer."
 
-#: com/patrikdufresne/minarca/core/APIException.java:233
+#: com/patrikdufresne/minarca/core/APIException.java:240
 msgid "Remote SSH host is not trusted"
 msgstr "L'hôte SSH distant n'est pas digne de confiance"

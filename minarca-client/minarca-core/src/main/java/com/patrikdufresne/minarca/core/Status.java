@@ -29,19 +29,12 @@ public class Status {
 
     private static final transient Logger LOGGER = LoggerFactory.getLogger(Status.class);
 
-    /**
-     * Property name.
-     */
+    private static final String PROPERTY_DETAILS = "details";
+
     private static final String PROPERTY_LAST_DATE = "lastdate";
 
-    /**
-     * Property name.
-     */
     private static final String PROPERTY_LAST_RESULT = "lastresult";
 
-    /**
-     * Property name.
-     */
     private static final String PROPERTY_LAST_SUCCESS = "lastsuccess";
 
     /**
@@ -56,43 +49,55 @@ public class Status {
             status = load(Compat.STATUS_FILE);
         } catch (ConfigurationException e1) {
             LOGGER.warn("can't load properties {}", Compat.STATUS_FILE);
-            return new Status(LastResult.UNKNOWN, null, null);
+            return new Status(LastResult.UNKNOWN, null, null, null);
         }
         // Last date
-        Date lastDate;
-        try {
-            Long value = status.getLong(PROPERTY_LAST_DATE);
-            lastDate = new Date(value.longValue());
-        } catch (Exception e) {
-            lastDate = null;
-        }
+        Date lastDate = getDate(status, PROPERTY_LAST_DATE, null);
         // Last success
-        Date lastSuccess;
-        try {
-            Long value = status.getLong(PROPERTY_LAST_SUCCESS);
-            lastSuccess = new Date(value.longValue());
-        } catch (Exception e) {
-            lastSuccess = null;
-        }
+        Date lastSuccess = getDate(status, PROPERTY_LAST_SUCCESS, null);
         // Last Results
-        LastResult lastResult;
+        LastResult lastResult = getLastResult(status, PROPERTY_LAST_RESULT, LastResult.HAS_NOT_RUN);
+        // If we miss two (2) timestamp, the backup is stale.
+        if (LastResult.RUNNING.equals(lastResult)) {
+            if (lastDate != null && lastDate.getTime() < System.currentTimeMillis() - (API.RUNNING_DELAY * 2)) {
+                lastResult = LastResult.STALE;
+            }
+        }
+        // Last date
+        String details = status.getString(PROPERTY_DETAILS);
+        return new Status(lastResult, lastDate, lastSuccess, details);
+    }
+
+    /**
+     * Read a date from a property configuration.
+     * 
+     * @param status
+     *            the property configuration
+     * @param key
+     *            the key to be read
+     * @param defaultValue
+     *            the default value if the key is invalid or undefined
+     * @return the value.
+     */
+    private static Date getDate(PropertiesConfiguration status, String key, Date defaultValue) {
+        try {
+            Long value = status.getLong(key);
+            return new Date(value.longValue());
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private static LastResult getLastResult(PropertiesConfiguration status, String key, LastResult defaultValue) {
         try {
             String value = status.getString(PROPERTY_LAST_RESULT);
             if (value == null) {
-                lastResult = LastResult.HAS_NOT_RUN;
-            } else {
-                lastResult = LastResult.valueOf(value);
-                if (LastResult.RUNNING.equals(lastResult)) {
-                    Date now = new Date();
-                    if (lastDate != null && lastDate.getTime() < now.getTime() - (API.RUNNING_DELAY * 2)) {
-                        lastResult = LastResult.STALE;
-                    }
-                }
+                return defaultValue;
             }
+            return LastResult.valueOf(value);
         } catch (Exception e) {
-            lastResult = LastResult.UNKNOWN;
+            return LastResult.UNKNOWN;
         }
-        return new Status(lastResult, lastDate, lastSuccess);
     }
 
     /**
@@ -104,10 +109,11 @@ public class Status {
      */
     private static PropertiesConfiguration load(File file) throws ConfigurationException {
         PropertiesConfiguration properties = new PropertiesConfiguration();
-        properties = new PropertiesConfiguration(file);
         properties.setLogger(new NoOpLog());
         properties.setAutoSave(false);
         properties.setReloadingStrategy(new FileChangedReloadingStrategy());
+        properties.setListDelimiter('\0');
+        properties.load(file);
         return properties;
     }
 
@@ -128,11 +134,11 @@ public class Status {
      * 
      * @param state
      *            the right state.
-     * @param date
-     *            the date
+     * @param details
+     *            the status details.
      * @throws APIException
      */
-    protected static void setLastStatus(LastResult state) throws APIException {
+    protected static void setLastStatus(LastResult state, String details) throws APIException {
         Validate.notNull(state);
         Properties newStatus = new Properties();
         String now = Long.toString(new Date().getTime());
@@ -140,10 +146,14 @@ public class Status {
         newStatus.setProperty(PROPERTY_LAST_DATE, now);
         if (LastResult.SUCCESS.equals(state)) {
             newStatus.setProperty(PROPERTY_LAST_SUCCESS, now);
+            newStatus.setProperty(PROPERTY_DETAILS, "");
         } else {
             Date d = fromFile().getLastSuccess();
             if (d != null) {
                 newStatus.setProperty(PROPERTY_LAST_SUCCESS, Long.toString(d.getTime()));
+            }
+            if (details != null) {
+                newStatus.setProperty(PROPERTY_DETAILS, details);
             }
         }
         try {
@@ -153,16 +163,23 @@ public class Status {
         }
     }
 
-    private Date lastDate;
+    private final String details;
 
-    private LastResult lastResult;
+    private final Date lastDate;
 
-    private Date lastSuccess;
+    private final LastResult lastResult;
 
-    public Status(LastResult lastResult, Date lastDate, Date lastSuccess) {
+    private final Date lastSuccess;
+
+    public Status(LastResult lastResult, Date lastDate, Date lastSuccess, String details) {
         Validate.notNull(this.lastResult = lastResult);
         this.lastDate = lastDate;
         this.lastSuccess = lastSuccess;
+        this.details = details;
+    }
+
+    public String getDetails() {
+        return details;
     }
 
     /**
