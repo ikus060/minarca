@@ -88,8 +88,15 @@ public class APIException extends Exception {
      */
     public static class InitialBackupFailedException extends APIException {
 
-        public InitialBackupFailedException(Exception cause) {
-            super(_("Initial backup did not complete successfully."), cause);
+        private final String details;
+
+        public InitialBackupFailedException(String details) {
+            super(_("Initial backup did not complete successfully."));
+            this.details = details;
+        }
+
+        public String getDetails() {
+            return details;
         }
 
     }
@@ -102,8 +109,8 @@ public class APIException extends Exception {
      */
     public static class InitialBackupHasNotRunException extends APIException {
 
-        public InitialBackupHasNotRunException(Exception cause) {
-            super(_("Initial backup didn't run."), cause);
+        public InitialBackupHasNotRunException() {
+            super(_("Initial backup didn't run."));
         }
 
     }
@@ -116,8 +123,8 @@ public class APIException extends Exception {
      */
     public static class InitialBackupRunningException extends APIException {
 
-        public InitialBackupRunningException(Exception cause) {
-            super(_("Initial backup is still running."), cause);
+        public InitialBackupRunningException() {
+            super(_("Initial backup is still running."));
         }
 
     }

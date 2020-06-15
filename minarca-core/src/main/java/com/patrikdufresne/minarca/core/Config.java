@@ -251,7 +251,7 @@ public class Config {
         try {
             this.patterns = GlobPattern.readPatterns(this.globPatternsFile);
         } catch (IOException e) {
-            LOGGER.warn("can't glob patterns from {}", this.confFile);
+            LOGGER.warn("can't read glob patterns from {}", this.confFile);
         }
     }
 

@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
+import com.patrikdufresne.minarca.core.APIException.InitialBackupFailedException;
 import com.patrikdufresne.minarca.core.APIException.RepositoryNameAlreadyInUseException;
 import com.patrikdufresne.minarca.core.Client;
 import com.patrikdufresne.minarca.core.internal.Compat;
@@ -192,7 +193,7 @@ public class SetupDialog extends Dialog {
         final Label connectError = this.ft.createLabel(comp, StringUtils.EMPTY);
         connectError.setLayoutData(new TableWrapData(TableWrapData.FILL));
         final DefaultToolTip connectErrorToolTip = new DefaultToolTip(connectError, ToolTip.NO_RECREATE, false);
-        
+
         // Computer name
         this.ft.createLabel(comp, _("Repository name"), AppFormToolkit.CLASS_BOLD);
         final Text computerNameText = ft.createText(comp, "", SWT.BORDER);
@@ -241,21 +242,21 @@ public class SetupDialog extends Dialog {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                        	if(e != null) {
-                        		connectError.setText(e.getMessage());
-                        		StringWriter buf =new StringWriter();
-                        		e.printStackTrace(new PrintWriter(buf));
-                        		connectErrorToolTip.setText(buf.toString());
-                        		connectErrorToolTip.activate();
-                        		ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, AppFormToolkit.CLASS_ERROR);
-                        		linkButton.setEnabled(false);
-                        	} else {
-                        		connectError.setText(_("Connected"));
-                        		connectErrorToolTip.setText(null);
-                        		connectErrorToolTip.deactivate();
-                        		ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, AppFormToolkit.CLASS_SUCESS);
-                        		linkButton.setEnabled(StringUtils.isNotBlank(computerName));
-                        	}
+                            if (e != null) {
+                                connectError.setText(e.getMessage());
+                                StringWriter buf = new StringWriter();
+                                e.printStackTrace(new PrintWriter(buf));
+                                connectErrorToolTip.setText(buf.toString());
+                                connectErrorToolTip.activate();
+                                ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, AppFormToolkit.CLASS_ERROR);
+                                linkButton.setEnabled(false);
+                            } else {
+                                connectError.setText(_("Connected"));
+                                connectErrorToolTip.setText(null);
+                                connectErrorToolTip.deactivate();
+                                ft.setSkinClass(connectError, AppFormToolkit.CLASS_SMALL, AppFormToolkit.CLASS_SUCESS);
+                                linkButton.setEnabled(StringUtils.isNotBlank(computerName));
+                            }
                         }
                     });
                 });
@@ -288,16 +289,20 @@ public class SetupDialog extends Dialog {
                             progress.done();
                             if (e1 == null) {
                                 SetupDialog.this.close();
-                            } else {
-                                progress.showError();
-                                DetailMessageDialog
-                                        .openWarning(
-                                                getShell(),
-                                                Display.getAppName(),
-                                                _("A problem happend during the linking process to Minarca server!"),
-                                                e1.getMessage(),
-                                                e1);
+                                return;
                             }
+                            // Show the exception.
+                            progress.showError();
+                            String message = e1.getLocalizedMessage();
+                            String details = e1 instanceof InitialBackupFailedException ? ((InitialBackupFailedException) e1).getDetails() : null;
+                            DetailMessageDialog
+                                    .openWarning(
+                                            getShell(),
+                                            Display.getAppName(),
+                                            _("A problem happend during the linking process to Minarca server!"),
+                                            message,
+                                            details);
+
                         }
                     });
                 });

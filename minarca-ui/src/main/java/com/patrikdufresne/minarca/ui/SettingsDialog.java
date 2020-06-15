@@ -566,7 +566,7 @@ public class SettingsDialog extends Dialog {
 
             // Start backup
             try {
-                API.instance().backup(true, true);
+                API.instance().backupAsync(true);
             } catch (Exception e) {
                 LOGGER.error("an error occurred while backuping this computer", e);
                 DetailMessageDialog.openError(

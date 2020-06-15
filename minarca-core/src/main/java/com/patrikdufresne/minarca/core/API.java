@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLException;
 
@@ -154,22 +155,13 @@ public class API {
     /**
      * Used to start a backup.
      * 
-     * @param background
-     *            True to asynchronously start the backup process. This operation usually used the system scheduler to
-     *            run the backup task in background.
      * @param force
      *            True to force the execution of
      * 
      * @throws APIException
      * @throws InterruptedException
      */
-    public void backup(boolean background, boolean force) throws APIException, InterruptedException {
-        // To run in background, we start a new minarca process.
-        if (background) {
-            MinarcaExecutable minarca = new MinarcaExecutable();
-            minarca.backup(force);
-            return;
-        }
+    public void backup(boolean force) throws APIException, InterruptedException {
 
         // If not forced, we need to check if it's time to run a backup.
         if (!force && !isBackupTime(config)) {
@@ -183,7 +175,7 @@ public class API {
                 try {
                     while (true) {
                         try {
-                            Status.setLastStatus(LastResult.RUNNING);
+                            Status.setLastStatus(LastResult.RUNNING, null);
                         } catch (APIException e) {
                             // Nothing to do.
                         }
@@ -216,7 +208,7 @@ public class API {
             if (patterns.isEmpty()) {
                 t.interrupt();
                 LOGGER.info("fail to read patterns");
-                Status.setLastStatus(LastResult.FAILURE);
+                Status.setLastStatus(LastResult.FAILURE, _("fail to read selective backup settings"));
                 throw new APIException(_("fail to read selective backup settings"));
             }
             // Add sets of patterns
@@ -237,16 +229,16 @@ public class API {
             // Run backup.
             rdiffbackup.backup(patterns, repositoryName);
             t.interrupt();
-            Status.setLastStatus(LastResult.SUCCESS);
+            Status.setLastStatus(LastResult.SUCCESS, null);
             LOGGER.info("backup SUCCESS");
         } catch (InterruptedException e) {
             t.interrupt();
-            Status.setLastStatus(LastResult.INTERRUPT);
-            LOGGER.info("backup INTERUPT", e);
-            throw new APIException(_("Backup interrupted"), e);
+            Status.setLastStatus(LastResult.INTERRUPT, null);
+            LOGGER.info("backup interrupted", e);
+            throw new APIException(_("backup interrupted"), e);
         } catch (Exception e) {
             t.interrupt();
-            Status.setLastStatus(LastResult.FAILURE);
+            Status.setLastStatus(LastResult.FAILURE, e.getMessage());
             LOGGER.info("backup FAILED", e);
             throw (e instanceof APIException ? (APIException) e : new APIException(e));
         } finally {
@@ -260,6 +252,60 @@ public class API {
             }
         }
 
+    }
+
+    /**
+     * Cause the backup to be invoke in a separate process.
+     * 
+     * @throws APIException
+     */
+    public void backupAsync(boolean force) throws APIException {
+        MinarcaExecutable minarca = new MinarcaExecutable();
+        minarca.backup(force);
+    }
+
+    /**
+     * Causes the backup be invoked in a separate process. The thread which calls this method is suspended until the
+     * process completes.
+     * 
+     * @param timeoutSec
+     *            the time to wait for process to complete.
+     * @return the backup status.
+     * @throws InterruptedException
+     * @throws TimeoutException
+     * @throws APIException
+     */
+    public Status backupSync(boolean force, int timeoutSec) throws InterruptedException, TimeoutException, APIException {
+
+        // Keep track of the previous status.
+        Date lastResults = status().getLastResultDate();
+
+        // Start the backup in baclground.
+        backupAsync(force);
+
+        // Wait for backup to run
+        do {
+            Thread.sleep(RUNNING_DELAY);
+            timeoutSec -= RUNNING_DELAY / 1000;
+
+            // Check if the status changed. If not keep waiting.
+            Status status = status();
+            if (Objects.equals(lastResults, status.getLastResultDate())) {
+                continue;
+            }
+
+            // Check if backup task is completed.
+            switch (status.getLastResult()) {
+            case RUNNING:
+            case HAS_NOT_RUN:
+                continue;
+            default:
+                return status;
+            }
+        } while (timeoutSec > 0);
+
+        // Throw exception if timeout is reached.
+        throw new TimeoutException();
     }
 
     /**
@@ -457,7 +503,7 @@ public class API {
         // Create default schedule
         config.setSchedule(Schedule.DAILY, false);
 
-        // If the backup doesn't exists on the remote server, start an empty initial backup.
+        // If the backup already exists. We are done!
         if (!repos.isEmpty()) {
             LOGGER.debug("repository already exists");
             // Create the scheduler, mark minarca as configured.
@@ -467,49 +513,35 @@ public class API {
             return;
         }
 
-        // Empty the include
+        // If the backup doesn't exists on the remote server, start an empty initial backup.
         List<GlobPattern> previousPatterns = config.getGlobPatterns();
         config.setGlobPatterns(Arrays.asList(new GlobPattern(false, Compat.getRootsPath()[0] + "**")), false);
-
-        // Reset Last result
-        Date lastResultDate = status().getLastResultDate();
-
-        // Run backup
         config.save();
-        backup(true, true);
-
-        // Refresh list of repositories (10 min)
-        int attempt = Integer.getInteger("minarca.link.timeoutsec", 600 /* 5*60*100 */) * 1000 / RUNNING_DELAY;
-        do {
-            Thread.sleep(RUNNING_DELAY);
-            attempt--;
-            try {
-                client.updateRepositories();
-                // Check if repo exists in minarca.
-                repos = client.getCurrentUserInfo().findRepos(repositoryName);
-                if (!repos.isEmpty()) {
-                    LOGGER.debug("repository {} found", repositoryName);
-                    break;
-                }
-            } catch (IOException e) {
-                LOGGER.warn("io error", e);
+        Status status;
+        try {
+            int timeoutSec = Integer.getInteger("minarca.link.timeoutsec", 600 /* 5*60 */);
+            status = backupSync(true, timeoutSec);
+        } catch (TimeoutException e) {
+            throw new InitialBackupRunningException();
+        } finally {
+            // Restore previous glob patterns
+            if (previousPatterns.isEmpty()) {
+                previousPatterns = GlobPattern.DEFAULTS;
             }
-            // Check if backup task is completed.
-            Status status = status();
-            if (!Objects.equals(lastResultDate, status.getLastResultDate()) && !LastResult.RUNNING.equals(status.getLastResult())) {
-                LOGGER.debug("schedule task not running");
-                attempt = Math.min(attempt, 1);
-            }
-        } while (attempt > 0);
-
-        // Restore glob patterns
-        if (previousPatterns.isEmpty()) {
-            previousPatterns = GlobPattern.DEFAULTS;
+            config.setGlobPatterns(previousPatterns, false);
         }
-        config.setGlobPatterns(previousPatterns, false);
+
+        // Lookup for our repository.
+        try {
+            client.updateRepositories();
+            repos = client.getCurrentUserInfo().findRepos(repositoryName);
+        } catch (IOException e) {
+            LOGGER.warn("io error", e);
+        }
 
         // Check if repository exists.
         if (repos.isEmpty()) {
+            LOGGER.warn("repository {} not found", repositoryName);
 
             // Unset properties
             config.setUsername(null, false);
@@ -518,14 +550,14 @@ public class API {
             config.save();
 
             // Check if the backup schedule ran.
-            switch (status().getLastResult()) {
+            switch (status.getLastResult()) {
             case RUNNING:
-                throw new InitialBackupRunningException(null);
-            case FAILURE:
             case STALE:
-                throw new InitialBackupFailedException(null);
+                throw new InitialBackupRunningException();
+            case FAILURE:
+                throw new InitialBackupFailedException(status.getDetails());
             case HAS_NOT_RUN:
-                throw new InitialBackupHasNotRunException(null);
+                throw new InitialBackupHasNotRunException();
             case SUCCESS:
             case UNKNOWN:
             default:
