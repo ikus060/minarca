@@ -82,7 +82,24 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
-## Server / Client v3.6.0 (2020-05-20)
+## v3.7.0 (2020-06-24)
+
+This new release officially adds the installation of Minarca using an APT repository for Debian Stretch and Debian Buster.
+Take a look at the updated [installation steps](doc/installation.md). Quickly, the installation become easy as `curl https://www.ikus-soft.com/archive/minarca/nightly/get-minarca.sh | sh -`.
+
+ * Server: Upgrade to rdiffweb v1.5.0
+     * Change formatting of Last Backup date for "Updated 3 weeks ago" to ease the readability
+     * Add support for Debian Bullseye
+     * Add support for Python 3.8 (rdiffweb#104)
+     * Add warning in the users list view when a root directory is invalid (rdiffweb#30)
+     * Add options to control search depthness (rdiffweb#1)
+     * Print a warning in the log when the "DefaultTheme" value is not valid (rdiffweb#90)
+ * Client: Upgrade to NSIS v3 installers to provide a better integration for Windows 10 
+ * Client: Icons are up to date with better resolutions
+ * Client: Provide more details about the error when the first backup is failing during linking
+ * Doc: Replace PDSL by IKUS Software Inc. in licensing and documentation
+
+## v3.6.0 (2020-05-20)
 
  * Server: Upgrade to rdiffweb v1.4.0
      * Fix lookup of executable rdiff-backup and rdiffweb-restore to search in current virtualenv first
@@ -103,7 +120,7 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
  * Client: Minor changes to the layout to improve user's usability
  * Update French translation
 
-## Server / Client v3.5.0 (2020-04-08)
+## v3.5.0 (2020-04-08)
 
 This release focus mostly on providing a Debian Buster compatible packages. A good effort was made to provide an easy-to-use package for Debian and making sure it's well tested in an automated way to avoid regression and speedup further release.
 
@@ -121,7 +138,7 @@ This release focus mostly on providing a Debian Buster compatible packages. A go
  * Documentation: Add information about [how to run minarca-client when users are not logged](doc/minarca-client.md#why-is-my-backup-not-running-)
  * Documentation: Provide default user and password to login after [installation](doc/installation.md#install-minarca-server)
 
-## Server / Client v3.4.3 (2020-03-08)
+## v3.4.3 (2020-03-08)
 
 Continue to stabilize the previous release with little bug fixes and minor improvement for the end user.
 
@@ -139,7 +156,7 @@ Continue to stabilize the previous release with little bug fixes and minor impro
  * Client: Windows - Enable TLS1.2 during installation to allow download and installation of Java
  * Client: When linking for the first time, make sure to create a scheduled task even when the repository already exists.
 
-## Server / Client v3.4.1 (2020-02-08)
+## v3.4.1 (2020-02-08)
 
 Little bug fixes following the previous release.
 
@@ -154,7 +171,7 @@ Little bug fixes following the previous release.
  * Client: Relocate the configuration under `/etc/minarca` when ran as root
  * Client: Add default symlink to `minarca` in `/usr/sbin/` to make is part of PATH for root user
 
-## Server / Client v3.4.0 (2020-01-30)
+## v3.4.0 (2020-01-30)
 
  * Server: Upgrade to rdiffweb v1.2.0
      * Add explicit testing for Debian Stretch & Buster
@@ -174,7 +191,7 @@ Little bug fixes following the previous release.
  * Automate testing of Windows 
  * Update documentation
 
-## Server / Client v3.3.0 (2019-11-06)
+## v3.3.0 (2019-11-06)
 
  * Server: Upgrade to rdiffweb v1.1.0
 	 * Change repository URL to username/repo-name - in preparation to add ACL in future release
