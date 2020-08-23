@@ -207,7 +207,7 @@ publish-apt-dev:
 publish-www-release:
   stage: publish
   only:
-  - tags
+  - /^[0-9]+\.[0-9]+\.[0-9]+$/
   script:
   # Setup authentication
   - eval $(ssh-agent -s)
