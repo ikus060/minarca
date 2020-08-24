@@ -45,3 +45,4 @@ deb_dist
 /minarca-server/debian/minarca-server
 /minarca-server/debian/*debhelper*
 /minarca-server/debian/files
+/minarca-server/~
