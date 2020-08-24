@@ -1,4 +1,0 @@
-#!/bin/bash
-(Xvfb :99 &)
-export DISPLAY=:99
-wine cmd /c C:\\maven\\bin\\mvn.cmd "$@"

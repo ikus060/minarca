@@ -7,105 +7,79 @@ variables:
   APT_DEV_STRETCH: https://nexus.ikus-soft.com/repository/minarca-apt-dev-stretch/
   APT_RELEASE_BUSTER: https://nexus.ikus-soft.com/repository/minarca-apt-release-buster/
   APT_RELEASE_STRETCH: https://nexus.ikus-soft.com/repository/minarca-apt-release-stretch/
-  
+
+services:
+- docker:dind
+
 stages:
-- prebuild
 - build
 - test-package
 - publish
 - deploy
 - test-integration
 
-.prebuild: &prebuild
-  image: docker:stable
-  stage: prebuild
-  services:
-    - docker:dind
-  script:
-  - set
-  - apk add make bash
-  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
-  - make $CI_JOB_NAME
-
-build-buster-buildpackage:
-  <<: *prebuild
-
-build-buster-java8:
-  <<: *prebuild
-  
-build-buster-python3:
-  <<: *prebuild
-  
-build-stretch-buildpackage:
-  <<: *prebuild
-  
-build-stretch-java8:
-  <<: *prebuild
-  
-build-stretch-python2:
-  <<: *prebuild
-
-build-stretch-python3:
-  <<: *prebuild
-
-build-windows-java8:
-  <<: *prebuild
-
 # TODO Split this by python version and OS.
 .make: &make
   stage: build
-  image: $CI_REGISTRY_IMAGE:$IMAGE-$CI_COMMIT_SHORT_SHA
+  image: docker
+  before_script:
+  - apk add make curl git bash
   script:
   - make $TARGET
 
-test-server_stretch_python2: 
+test-server_stretch-py2: 
   <<: *make
   variables:
     TARGET: test-server
-    IMAGE: stretch-python2
+    DIST: stretch
+    PYTHON: py2
 
-test-server_stretch_python3: 
+test-server_stretch-py3: 
   <<: *make
   variables:
     TARGET: test-server
-    IMAGE: stretch-python3
+    DIST: stretch
+    PYTHON: py3
   
 test-server_buster_python3: 
   <<: *make
   variables:
     TARGET: test-server
-    IMAGE: buster-python3
+    DIST: buster
+    PYTHON: py3
 
-test-quota-api_stretch_python2:
+test-quota-api_stretch-py2:
   <<: *make
   variables:
     TARGET: test-quota-api
-    IMAGE: stretch-python2
+    DIST: stretch
+    PYTHON: py2
 
-test-quota-api_buster_python3:
+test-quota-api_stretch-py3:
   <<: *make
   variables:
     TARGET: test-quota-api
-    IMAGE: buster-python3
+    DIST: stretch
+    PYTHON: py3
 
-test-client_buster:
+test-client_linux:
   <<: *make
   variables:
     TARGET: test-client
-    IMAGE: buster-java8
+    DIST: buster
 
 test-client_windows:
   <<: *make
   variables:
     TARGET: test-client
-    IMAGE: windows-java8
     SONAR_URL: ""
+    DIST: windows
 
 build-client:
   <<: *make
   variables:
     TARGET: build-client
-    IMAGE: buster-java8
+    DIST: buster
   artifacts:
     paths:
     - minarca-client*.exe
@@ -115,7 +89,7 @@ build-server_stretch:
   <<: *make
   variables:
     TARGET: build-server
-    IMAGE: stretch-buildpackage
+    DIST: stretch
   artifacts:
     paths:
     - minarca-server_*+stretch_amd64.deb
@@ -124,7 +98,7 @@ build-server_buster:
   <<: *make
   variables:
     TARGET: build-server
-    IMAGE: buster-buildpackage
+    DIST: buster
   artifacts:
     paths:
     - minarca-server_*+buster_amd64.deb
@@ -159,14 +133,12 @@ test-client_buster_deb:
 
 test-client_windows_exe:
   stage: test-package
-  image: buildpack-deps:stretch
   script:
   - export MINARCA_EXE_FILE=$(ls -1 minarca-client*.exe)
   - bash ./tests/install-client-win.sh
 
 publish-www-dev:
   stage: publish
-  image: buildpack-deps:buster
   except:
   - tags
   script:
@@ -190,7 +162,6 @@ publish-www-dev:
 
 publish-apt-dev:
   stage: publish
-  image: buildpack-deps:buster
   script: |
     set -e
     # Minarca Server Stretch
@@ -234,7 +205,6 @@ publish-www-release:
 
 publish-apt-release:
   stage: publish
-  image: buildpack-deps:buster
   only:
   - /^[0-9]+\.[0-9]+\.[0-9]+$/
   script: |
@@ -251,21 +221,19 @@ publish-apt-release:
 
 deploy_docker_debian_stretch:
   stage: deploy
-  image: buildpack-deps:stretch
   script:
   - export MINARCA_VERSION=$(make version)
   - ./get-minarca.sh --dev --version $MINARCA_VERSION
 
 deploy_docker_debian_buster:
   stage: deploy
-  image: buildpack-deps:buster
   script:
   - export MINARCA_VERSION=$(make version)
   - ./get-minarca.sh --dev --version $MINARCA_VERSION
 
 deploy_staging_sestican:
   stage: deploy
-  image: ikus060/ansible
+  image: buildpack-deps:buster
   variables:
     DIST: stretch
   environment:
