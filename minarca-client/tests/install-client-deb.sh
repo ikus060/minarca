@@ -8,5 +8,5 @@ set -e
 set -x
 
 apt update
-apt install -y ./$MINARCA_DEB_FILE
+apt install -y ./$1
 /opt/minarca/bin/minarca --version
