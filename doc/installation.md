@@ -4,7 +4,7 @@
 
 On a Debian Linux server:
 
-    curl https://www.ikus-soft.com/archive/minarca/nightly/get-minarca.sh | sh -
+    curl -L https://www.ikus-soft.com/archive/minarca/nightly/get-minarca.sh | sh -
 
 This should install Minarca server and all required dependencies.
 
@@ -28,7 +28,7 @@ On a Debian Linux server:
 
     sudo apt-get update
     sudo apt-get install apt-transport-https ca-certificates gnupg
-    curl https://www.ikus-soft.com/archive/minarca/public.key | sudo apt-key add -
+    curl -L https://www.ikus-soft.com/archive/minarca/public.key | sudo apt-key add -
     echo "deb https://nexus.ikus-soft.com/repository/minarca-apt-release-buster/ buster main" | sudo tee /etc/apt/sources.list.d/minarca.list
     apt-get update
     apt-get install minarca-server
