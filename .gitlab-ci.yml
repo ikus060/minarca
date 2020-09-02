@@ -12,133 +12,73 @@ services:
 - docker:dind
 
 stages:
-- build
-- test-package
-- publish
+- test
+- bdist
+- test-bdist
+- upload
 - deploy
 - test-integration
 
 # TODO Split this by python version and OS.
 .make: &make
-  stage: build
   image: docker
   before_script:
   - apk add make curl git bash
   script:
   - make $TARGET
 
-test-server_stretch-py2: 
+test_stretch:
   <<: *make
+  stage: test
   variables:
-    TARGET: test-server
+    TARGET: test
     DIST: stretch
-    PYTHON: py2
 
-test-server_stretch-py3: 
+test_buster:
   <<: *make
+  stage: test
   variables:
-    TARGET: test-server
-    DIST: stretch
-    PYTHON: py3
-  
-test-server_buster_python3: 
-  <<: *make
-  variables:
-    TARGET: test-server
-    DIST: buster
-    PYTHON: py3
-
-test-quota-api_stretch-py2:
-  <<: *make
-  variables:
-    TARGET: test-quota-api
-    DIST: stretch
-    PYTHON: py2
-
-test-quota-api_stretch-py3:
-  <<: *make
-  variables:
-    TARGET: test-quota-api
-    DIST: stretch
-    PYTHON: py3
-
-test-client_linux:
-  <<: *make
-  variables:
-    TARGET: test-client
+    TARGET: test
     DIST: buster
 
-test-client_windows:
+bdist_stretch:
   <<: *make
+  stage: bdist
   variables:
-    TARGET: test-client
-    SONAR_URL: ""
-    DIST: windows
+    TARGET: bdist
+    DIST: stretch
+  artifacts:
+    paths:
+    - minarca-server_*+stretch_amd64.deb
 
-build-client:
+bdist_buster:
   <<: *make
+  stage: bdist
   variables:
-    TARGET: build-client
+    TARGET: bdist
     DIST: buster
   artifacts:
     paths:
     - minarca-client*.exe
     - minarca-client*.deb
-
-build-server_stretch:
-  <<: *make
-  variables:
-    TARGET: build-server
-    DIST: stretch
-  artifacts:
-    paths:
-    - minarca-server_*+stretch_amd64.deb
-    
-build-server_buster:
-  <<: *make
-  variables:
-    TARGET: build-server
-    DIST: buster
-  artifacts:
-    paths:
     - minarca-server_*+buster_amd64.deb
 
-test-server_stretch_deb:
-  stage: test-package
-  image: buildpack-deps:stretch
-  script: 
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-  - bash ./tests/install-server-deb.sh $MINARCA_DEB_FILE
-  
-test-server_buster_deb:
-  stage: test-package
-  image: buildpack-deps:buster
-  script:
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-  - bash ./tests/install-server-deb.sh $MINARCA_DEB_FILE
+test-bdist_stretch:
+  <<: *make
+  stage: test-bdist
+  variables:
+    TARGET: test-bdist
+    DIST: stretch
 
-test-client_stretch_deb:
-  stage: test-package
-  image: buildpack-deps:stretch
-  script:
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-  - bash ./tests/install-client-deb.sh
+test-bdist_buster:
+  <<: *make
+  stage: test-bdist
+  variables:
+    TARGET: test-bdist
+    DIST: buster
 
-test-client_buster_deb:
-  stage: test-package
-  image: buildpack-deps:buster
-  script:
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-  - bash ./tests/install-client-deb.sh
-
-test-client_windows_exe:
-  stage: test-package
-  script:
-  - export MINARCA_EXE_FILE=$(ls -1 minarca-client*.exe)
-  - bash ./tests/install-client-win.sh
-
-publish-www-dev:
-  stage: publish
+upload-www-dev:
+  stage: upload
   except:
   - tags
   script:
@@ -160,8 +100,8 @@ publish-www-dev:
   # Publish get-minarca.sh script
   - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
 
-publish-apt-dev:
-  stage: publish
+upload-apt-dev:
+  stage: upload
   script: |
     set -e
     # Minarca Server Stretch
@@ -175,8 +115,8 @@ publish-apt-dev:
     curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_STRETCH"
     curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_BUSTER"
 
-publish-www-release:
-  stage: publish
+upload-www-release:
+  stage: upload
   only:
   - /^[0-9]+\.[0-9]+\.[0-9]+$/
   script:
@@ -203,8 +143,8 @@ publish-www-release:
   # Publish get-minarca.sh script
   - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
 
-publish-apt-release:
-  stage: publish
+upload-apt-release:
+  stage: upload
   only:
   - /^[0-9]+\.[0-9]+\.[0-9]+$/
   script: |
@@ -221,21 +161,23 @@ publish-apt-release:
 
 deploy_docker_debian_stretch:
   stage: deploy
+  image: buildpack-deps:stretch
   script:
-  - export MINARCA_VERSION=$(make version)
+  - export MINARCA_VERSION=$(cd minarca-server; make version)
+  - echo MINARCA_VERSION=$MINARCA_VERSION
   - ./get-minarca.sh --dev --version $MINARCA_VERSION
 
 deploy_docker_debian_buster:
   stage: deploy
+  image: buildpack-deps:buster
   script:
-  - export MINARCA_VERSION=$(make version)
+  - export MINARCA_VERSION=$(cd minarca-server; make version)
+  - echo MINARCA_VERSION=$MINARCA_VERSION
   - ./get-minarca.sh --dev --version $MINARCA_VERSION
 
 deploy_staging_sestican:
   stage: deploy
   image: buildpack-deps:buster
-  variables:
-    DIST: stretch
   environment:
     name: staging
     url: https://test.minarca.net

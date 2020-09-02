@@ -8,7 +8,7 @@ set -e
 set -x
 
 # Download the client
-MINARCA_EXE_FILE=${MINARCA_EXE_FILE:-./minarca-latest-install.exe}
+MINARCA_EXE_FILE=${1:-./minarca-latest-install.exe}
 if [ ! -e "$MINARCA_EXE_FILE" ]; then
     apt update && apt install -y wget
     wget -O $MINARCA_EXE_FILE https://www.ikus-soft.com/archive/minarca/${MINARCA_EXE_FILE##*/}
