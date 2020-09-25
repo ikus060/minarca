@@ -8,16 +8,12 @@ package com.patrikdufresne.minarca.core;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.PrintStream;
 import java.security.Permission;
-import java.util.Locale;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class MainTest {
@@ -135,6 +131,14 @@ public class MainTest {
             assertTrue(outContent.toString().contains("exclude **/toberemove"));
         }
 
+    }
+
+    /**
+     * Call with <code>minarca link --name</code>
+     */
+    @Test
+    public void testParseArgumentsWithMissingValue() {
+        assertNull(Main.parseArgument(new String[] { "link", "--name" }, false, null, "--name", "-n"));
     }
 
 }

@@ -242,14 +242,14 @@ public class Main {
      *            Name of the arguments.
      * @return The arguments value.
      */
-    private static String parseArgument(String[] args, boolean required, String defaultValue, String... names) {
-        for (int i = 0; i < args.length; i++) {
+    protected static String parseArgument(String[] args, boolean required, String defaultValue, String... names) {
+        for (int i = 0; i < args.length - 1; i++) {
             if (Arrays.asList(names).contains(args[i])) {
                 i++;
                 return args[i];
             }
         }
-        // If the arguments is required, validaate and exit.
+        // If the arguments is required, validate and exit.
         if (required) {
             System.err.println(StringUtils.join(names, ", ") + " " + _("arguments is required"));
             System.exit(1);
