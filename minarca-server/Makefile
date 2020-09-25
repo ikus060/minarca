@@ -62,7 +62,7 @@ UID = $(shell id -u)
 # == Main targets ==
 #
 
-all: test bdist test-bdist
+all: test bdist
 
 test:
 	export TOXENV="${TOXENV}"; \
@@ -76,9 +76,6 @@ ${MINARCA_SERVER_DEB_FILE}:
 	$(call docker_run,${IMAGE_BUILDPACKAGE},chown ${UID} ../minarca-server_${VERSION}_amd64.deb)
 	mv -f ../minarca-server_${VERSION}_amd64.deb ${MINARCA_SERVER_DEB_FILE}
 	rm -f debian/changelog
-
-test-bdist: ${MINARCA_SERVER_DEB_FILE}
-	$(call docker_run,${IMAGE_BUILDPACKAGE},bash ./tests/install-server-deb.sh ${MINARCA_SERVER_DEB_FILE})
 
 clean:
 	$(call docker_run,${IMAGE_PYTHON},rm -Rf debian/changelog ${MINARCA_SERVER_DEB_FILE} .tox .eggs minarca_server.egg-info .coverage coverage*.xml nosetests*.xml)

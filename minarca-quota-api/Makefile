@@ -34,7 +34,7 @@ TOXENV=$(shell $(call docker_run,minarca-server,${IMAGE_PYTHON}, tox --listenvs 
 #
 # == Main targets ==
 #
-all: test bdist test-bdist clean
+all: test bdist clean
 
 test:
 	export TOXENV="${TOXENV}"; \
@@ -43,11 +43,8 @@ test:
 bdist:
 	echo "TODO implement distribution package for quota api"
 
-test-bdist:
-	echo "TODO implement binary distribution test for quota api"
-
 clean:
 	rm -Rf .tox .eggs minarca_quota_api.egg-info .coverage coverage*.xml nosetests*.xml
 
-.PHONY: test bdist test-bdist clean
+.PHONY: test bdist clean
 

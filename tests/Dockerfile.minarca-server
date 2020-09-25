@@ -1,0 +1,14 @@
+FROM buildpack-deps:buster
+
+EXPOSE 22
+EXPOSE 8080
+
+ARG MINARCA_VERSION
+
+RUN curl -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh -o /tmp/get-minarca.sh && \
+  bash /tmp/get-minarca.sh --dev --version "$MINARCA_VERSION" && \
+  rm /tmp/get-minarca.sh && \
+  ssh-keygen -A && \
+  mkdir -p /run/sshd
+
+CMD [ "bash", "-c", "(/usr/sbin/sshd -D &) && /opt/minarca/bin/rdiffweb --config=/etc/minarca/minarca-server.conf" ]

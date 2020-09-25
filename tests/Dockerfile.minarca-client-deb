@@ -1,0 +1,13 @@
+ARG DIST=buster
+
+FROM buildpack-deps:${DIST}
+
+ARG MINARCA_VERSION
+
+RUN curl --fail -L https://www.ikus-soft.com/archive/minarca/minarca-client_${MINARCA_VERSION}_all.deb -o /tmp/minarca-client.deb && \
+  apt update && apt -y install /tmp/minarca-client.deb && \
+  /opt/minarca/bin/minarca --version
+ADD test.sh /
+RUN chmod +x /test.sh
+
+CMD [ "/test.sh" ]
