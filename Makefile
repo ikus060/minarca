@@ -54,7 +54,7 @@ UID = $(shell id -u)
 # == Main targets ==
 #
 
-all: test bdist test-bdist clean
+all: test bdist clean
 
 test:
 	$(call docker_run,${IMAGE_JAVA},apt update && apt -y install ${CLIENT_DEPENDS} --no-install-recommends && mvn ${MAVEN_ARGS} ${MAVEN_TEST_ARGS})
@@ -71,14 +71,6 @@ endif
 	$(call docker_run,${IMAGE_JAVA},mv -f ./minarca-installation-package/target/minarca-client-*.exe ${MINARCA_CLIENT_EXE_FILE})
 	$(call docker_run,${IMAGE_JAVA},chown ${UID} ${MINARCA_CLIENT_EXE_FILE} ${MINARCA_CLIENT_DEB_FILE})
 
-test-bdist: test-bdist-deb test-bdist-exe
-
-test-bdist-deb: ${MINARCA_CLIENT_DEB_FILE}
-	$(call docker_run,${IMAGE_DEBIAN},bash ./tests/install-client-deb.sh ${MINARCA_CLIENT_DEB_FILE})
-
-test-bdist-exe: ${MINARCA_CLIENT_EXE_FILE}
-	$(call docker_run,${IMAGE_WINDOWS},bash ./tests/install-client-win.sh ${MINARCA_CLIENT_EXE_FILE})
-
 gettext:
 	$(call docker_run,${IMAGE_JAVA},cd minarca-core && mvn ${MAVEN_ARGS} gettext:gettext)
 	$(call docker_run,${IMAGE_JAVA},cd minarca-core && mvn ${MAVEN_ARGS} gettext:merge)
@@ -90,5 +82,5 @@ clean:
 	rm -f authenticode-certs.pem
 	rm -f authenticode.pem
 
-.PHONY: all test bdist test-bdist test-bdist-deb test-bdist-exe gettext clean
+.PHONY: all test bdist gettext clean
 
