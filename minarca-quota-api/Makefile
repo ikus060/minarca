@@ -24,7 +24,7 @@ IMAGE_PYTHON = ikus060/python:debian${DIST_VERSION}-${PYTHON}
 
 # Check if running in gitlab CICD
 define docker_run
-docker run --rm -e TOXENV -v=`pwd`/..:/build/ -w=/build/minarca-quota-api $(1) bash -c "$(2)"
+docker run -i --rm -e TOXENV -v=`pwd`/..:/build/ -w=/build/minarca-quota-api $(1) bash -c "$(2)"
 endef
 
 COMMA := ,
