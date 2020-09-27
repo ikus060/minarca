@@ -1,1 +1,0 @@
-This folder contains script to be executed for testing.

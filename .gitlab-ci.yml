@@ -14,10 +14,9 @@ services:
 stages:
 - test
 - bdist
-- test-bdist
 - upload
+- integration-tests
 - deploy
-- test-integration
 
 # TODO Split this by python version and OS.
 .make: &make
@@ -63,20 +62,6 @@ bdist_buster:
     - minarca-client*.deb
     - minarca-server_*+buster_amd64.deb
 
-test-bdist_stretch:
-  <<: *make
-  stage: test-bdist
-  variables:
-    TARGET: test-bdist
-    DIST: stretch
-
-test-bdist_buster:
-  <<: *make
-  stage: test-bdist
-  variables:
-    TARGET: test-bdist
-    DIST: buster
-
 upload-www-dev:
   stage: upload
   except:
@@ -89,16 +74,16 @@ upload-www-dev:
   - chmod 700 ~/.ssh
   # publish server
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
   # publish client
   - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
   - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
-  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
   # Publish get-minarca.sh script
-  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/nightly/
+  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
 
 upload-apt-dev:
   stage: upload
@@ -138,7 +123,7 @@ upload-www-release:
   - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
   - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
   - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-latest-install.exe
+  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest.exe
   - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_DEB_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
   # Publish get-minarca.sh script
   - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
@@ -159,21 +144,15 @@ upload-apt-release:
     curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_STRETCH"
     curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_BUSTER"
 
-deploy_docker_debian_stretch:
-  stage: deploy
-  image: buildpack-deps:stretch
+integration-tests:
+  stage: integration-tests
+  image: docker
+  before_script:
+  - apk add make curl git bash docker-compose
   script:
   - export MINARCA_VERSION=$(cd minarca-server; make version)
   - echo MINARCA_VERSION=$MINARCA_VERSION
-  - ./get-minarca.sh --dev --version $MINARCA_VERSION
-
-deploy_docker_debian_buster:
-  stage: deploy
-  image: buildpack-deps:buster
-  script:
-  - export MINARCA_VERSION=$(cd minarca-server; make version)
-  - echo MINARCA_VERSION=$MINARCA_VERSION
-  - ./get-minarca.sh --dev --version $MINARCA_VERSION
+  - make integration-tests
 
 deploy_staging_sestican:
   stage: deploy
@@ -182,39 +161,8 @@ deploy_staging_sestican:
     name: staging
     url: https://test.minarca.net
   script:
-  - export MINARCA_VERSION=$(make version)
+  - export MINARCA_VERSION=$(cd minarca-server; make version)
   - echo MINARCA_VERSION=$MINARCA_VERSION
   - curl -X POST -F token=36bae86778d901fc6b2d6453a41844 -F "ref=master" -F "variables[MINARCA_VERSION]=$MINARCA_VERSION" https://gitlab.com/api/v4/projects/18716492/trigger/pipeline
   
-#test_link_debian_stretch:
-#  image: debian:stretch
-#  stage: test-integration
-#  variables:
-#    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
-#  script: 
-#  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-#  - bash ./tests/install-client-deb.sh
-#  - bash ./tests/link-link-deb-linux.sh
-  
-#test_link_debian_buster:
-#  image: debian:buster
-#  stage: test-integration
-#  variables:
-#    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
-#  script: 
-#  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-#  - bash ./tests/install-client-deb.sh
-#  - bash ./tests/link-link-deb-linux.sh
-
-# This test is not working and fail because of issue with wine.
-#test_link_win:
-#  image: debian:buster
-#  stage: test-integration
-#  variables:
-#    MINARCA_REPOSITORYNAME: test-${CI_JOB_ID}
-#  allow_failure: true
-#  script: 
-#  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
-#  - bash ./tests/install-client-win.sh
-#  - bash ./tests/link-link-win.sh
   

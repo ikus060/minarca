@@ -22,7 +22,7 @@ setuptools.setup(
     maintainer_email='support@ikus-soft.com',
     url='https://www.ikus-soft.com/en/minarca/',
     include_package_data=True,
-    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+    python_requires='>=3.5',
     packages=['minarca_plugins'],
     setup_requires=[
         "setuptools_scm",

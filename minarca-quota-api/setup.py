@@ -20,13 +20,12 @@ setuptools.setup(
     url='https://www.ikus-soft.com/en/minarca/',
     packages=['minarca_quota_api'],
     include_package_data=True,
-    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+    python_requires='>=3.5',
     setup_requires=[
         "setuptools_scm",
     ],
     install_requires=[
         'cherrypy',
-        "future>=0.15.2",
     ],
     # requirement for testing
     tests_require=[
