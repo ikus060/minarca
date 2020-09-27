@@ -43,5 +43,6 @@ setuptools.setup(
     entry_points={
         'rdiffweb.IUserChangeListener': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],
         'rdiffweb.IUserQuota': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],
+        "console_scripts": ["minarca-shell = minarca_plugins.shell:main"]
     },
 )
