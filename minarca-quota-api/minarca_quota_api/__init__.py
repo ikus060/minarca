@@ -12,18 +12,13 @@ Created on Mar 7, 2018
 @author: Patrik Dufresne
 """
 
-from __future__ import unicode_literals
-
-from builtins import str, bytes
-import cherrypy
-from future.utils.surrogateescape import encodefilename
 import logging
 import os
 import pwd
 import subprocess
 import sys
 
-PY3 = sys.version_info[0] == 3
+import cherrypy
 
 USERS = {'minarca': os.environ.get('MINARCA_QUOTA_SECRET', 'secret')}
 
@@ -32,10 +27,7 @@ POOL = os.environ.get('MINARCA_QUOTA_POOL', 'rpool/minarca')
 
 def _getpwnam(user):
     assert isinstance(user, str)
-    if PY3:
-        return pwd.getpwnam(user)
-    else:
-        return pwd.getpwnam(encodefilename(user))
+    return pwd.getpwnam(user)
 
 
 def validate_password(realm, username, password):

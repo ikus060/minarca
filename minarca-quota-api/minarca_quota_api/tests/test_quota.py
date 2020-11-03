@@ -12,13 +12,10 @@ Created on Mar 7, 2018
 @author: Patrik Dufresne
 """
 
-from __future__ import unicode_literals
-
 from base64 import b64encode
 import cherrypy
 from cherrypy.test import helper
-from collections import namedtuple
-from future.backports.urllib.parse import urlencode
+from urllib.parse import urlencode
 from mock import MagicMock
 import unittest
 

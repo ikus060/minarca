@@ -37,7 +37,7 @@ IMAGE_BUILDPACKAGE = buildpack-deps:${DIST}
 
 # Check if running in gitlab CICD
 define docker_run
-docker run --rm -e TOXENV -v=`pwd`/..:/build/ -w=/build/minarca-server $(1) bash -c "$(2)"
+docker run -i --rm -e TOXENV -v=`pwd`/..:/build/ -w=/build/minarca-server $(1) bash -c "$(2)"
 endef
 
 # Version of pacakges base on git tags.
@@ -62,26 +62,23 @@ UID = $(shell id -u)
 # == Main targets ==
 #
 
-all: test bdist test-bdist
+all: test bdist
 
 test:
 	export TOXENV="${TOXENV}"; \
-	$(call docker_run,${IMAGE_PYTHON},apt update && apt -y install ${SERVER_DEPENDS} && tox)
+	$(call docker_run,${IMAGE_PYTHON},apt update && apt -y install ${SERVER_DEPENDS} --no-install-recommends && tox)
 
 bdist: ${MINARCA_SERVER_DEB_FILE}
 
 ${MINARCA_SERVER_DEB_FILE}: 
 	sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
-	$(call docker_run,${IMAGE_BUILDPACKAGE},apt update && apt -y install ${SERVER_BUILD_DEPENDS} && dpkg-buildpackage -us -uc -b && dpkg-buildpackage -Tclean)
+	$(call docker_run,${IMAGE_BUILDPACKAGE},apt update && apt -y install ${SERVER_BUILD_DEPENDS} --no-install-recommends && dpkg-buildpackage -us -uc -b && dpkg-buildpackage -Tclean)
 	$(call docker_run,${IMAGE_BUILDPACKAGE},chown ${UID} ../minarca-server_${VERSION}_amd64.deb)
 	mv -f ../minarca-server_${VERSION}_amd64.deb ${MINARCA_SERVER_DEB_FILE}
 	rm -f debian/changelog
 
-test-bdist: ${MINARCA_SERVER_DEB_FILE}
-	$(call docker_run,${IMAGE_BUILDPACKAGE},bash ./tests/install-server-deb.sh ${MINARCA_SERVER_DEB_FILE})
-
 clean:
-	rm -Rf debian/changelog ${MINARCA_SERVER_DEB_FILE} .tox .eggs minarca_server.egg-info .coverage coverage*.xml nosetests*.xml
+	$(call docker_run,${IMAGE_PYTHON},rm -Rf debian/changelog ${MINARCA_SERVER_DEB_FILE} .tox .eggs minarca_server.egg-info .coverage coverage*.xml nosetests*.xml)
 
 version:
 	@echo ${VERSION}

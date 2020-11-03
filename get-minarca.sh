@@ -64,13 +64,16 @@ PACKAGE="minarca-server"
 while [ $# -gt 0 ] ; do
   case "$1" in
     -h | --help)
-        echo "Usage: get-minarca.sh [--dev] [--version VERSION]"
-        exit 0
-        ;;
+      echo "Usage: get-minarca.sh [--dev] [--version VERSION]"
+      exit 0
+      ;;
     -d | --dev) DEV=1;;
     -V | --version)
       shift
-      PACKAGE="minarca-server=$1";;
+      if [ "$1" != "latest" ]; then
+          PACKAGE="minarca-server=$1"
+      fi
+      ;;
     *)
       echo "Option $1 not supported. Ignored." >&2
       exit 1

@@ -18,7 +18,7 @@
 
 ### On Windows
 
- 1. Download the latest Windows installer from [here](https://www.ikus-soft.com/archive/minarca/minarca-latest-install.exe).
+ 1. Download the latest Windows installer from [here](https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe).
  2. Double click on the package to install it.
 
 ### Link your client with Minarca Server

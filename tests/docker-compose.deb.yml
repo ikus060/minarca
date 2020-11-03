@@ -1,0 +1,30 @@
+version: '3'
+
+networks:
+  integration-tests:
+    driver: bridge
+
+services:
+    minarca-server:
+        build:
+          context: .
+          dockerfile: Dockerfile.minarca-server
+          args:
+            - DIST=${SERVER_DIST}
+            - MINARCA_VERSION
+        networks:
+          - integration-tests
+
+    minarca-client:
+        build:
+          context: .
+          dockerfile: Dockerfile.minarca-client-deb
+          args:
+            - DIST=${SERVER_DIST}
+            - MINARCA_VERSION
+        environment:
+          MINARCA_REMOTE_URL: http://minarca-server:8080/
+        depends_on:
+          - minarca-server
+        networks:
+          - integration-tests

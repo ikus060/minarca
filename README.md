@@ -33,7 +33,7 @@ Based on [rdiffweb](https://www.ikus-soft.com/en/rdiffweb/), **Minarca Server** 
 
 Check how Minarca is working without installing the server. We have setup a testing environment for you. You may login to https://test.minarca.net/ using the default username / password: admin / admin123
 
-Then start a backup in few minutes by installing minarca client for [Windows](https://www.ikus-soft.com/archive/minarca/minarca-latest-install.exe) or [Linux/Debian](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb). 
+Then start a backup in few minutes by installing minarca client for [Windows](https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe) or [Linux/Debian](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb). 
 
 ## Download & Install
 
@@ -52,7 +52,7 @@ Note: While it's possible to get Minarca Server working on other Linux distribut
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minarca%20for%20Debian-brightgreen"></a>
 <br/>
 <br/>
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-latest-install.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca%20for%20Windows-brightgreen"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca%20for%20Windows-brightgreen"></a>
 
 Note: While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
 
@@ -85,7 +85,7 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 ## v3.7.0 (2020-06-24)
 
 This new release officially adds the installation of Minarca using an APT repository for Debian Stretch and Debian Buster.
-Take a look at the updated [installation steps](doc/installation.md). Quickly, the installation become easy as `curl https://www.ikus-soft.com/archive/minarca/nightly/get-minarca.sh | sh -`.
+Take a look at the updated [installation steps](doc/installation.md). Quickly, the installation become easy as `curl https://www.ikus-soft.com/archive/minarca/get-minarca.sh | sh -`.
 
  * Server: Upgrade to rdiffweb v1.5.0
      * Change formatting of Last Backup date for "Updated 3 weeks ago" to ease the readability
