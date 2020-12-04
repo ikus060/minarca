@@ -5,6 +5,16 @@ networks:
     driver: bridge
 
 services:
+    minarca-quota-api:
+        build:
+          context: .
+          dockerfile: Dockerfile.minarca-quota-api
+          args:
+            - DIST=${SERVER_DIST}
+            - MINARCA_VERSION
+        networks:
+          - integration-tests
+
     minarca-server:
         build:
           context: .
@@ -12,9 +22,11 @@ services:
           args:
             - DIST=${SERVER_DIST}
             - MINARCA_VERSION
+        depends_on:
+          - minarca-quota-api
         networks:
           - integration-tests
-
+          
     minarca-client:
         build:
           context: .

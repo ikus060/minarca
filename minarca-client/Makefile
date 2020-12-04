@@ -32,7 +32,7 @@ docker run -i --rm -e TOXENV -v=`pwd`/..:/build/ -w=/build/minarca-client $(1) b
 endef
 
 # Version of pacakges base on git tags.
-VERSION := $(shell curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash)
+VERSION := $(shell curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
 
 MINARCA_CLIENT_DEB_FILE = ../minarca-client_${VERSION}_all.deb
 MINARCA_CLIENT_EXE_FILE = ../minarca-client_${VERSION}.exe
@@ -78,9 +78,7 @@ gettext:
 	$(call docker_run,${IMAGE_JAVA},cd minarca-ui && mvn ${MAVEN_ARGS} gettext:merge)
 
 clean:
-	$(call docker_run,${IMAGE_JAVA},mvn ${MAVEN_ARGS} clean)
-	rm -f authenticode-certs.pem
-	rm -f authenticode.pem
+	$(call docker_run,${IMAGE_JAVA},rm -f authenticode-certs.pem authenticode.pem target)
 
 .PHONY: all test bdist gettext clean
 

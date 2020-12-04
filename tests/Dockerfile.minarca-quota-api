@@ -1,0 +1,18 @@
+FROM buildpack-deps:buster
+
+EXPOSE 22
+EXPOSE 8080
+
+ARG MINARCA_VERSION
+
+RUN curl -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh -o /tmp/get-minarca.sh && \
+  bash /tmp/get-minarca.sh --dev --package minarca-quota-api --version "$MINARCA_VERSION"  && \
+  rm /tmp/get-minarca.sh && \
+  ssh-keygen -A && \
+  mkdir -p /run/sshd && \
+  rm /etc/minarca/minarca-quota-api.conf
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost:8081/ || exit 1
+  
+CMD [ "/opt/minarca-quota-api/bin/minarca-quota-api" ]

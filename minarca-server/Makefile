@@ -13,7 +13,6 @@
 # Define the distribution to be build: buster, stretch, sid, etc.
 SHELL = /bin/sh
 DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
-PYTHON ?= py3
 
 # List package dependencies
 SERVER_DEPENDS = libldap2-dev libsasl2-dev rdiff-backup
@@ -31,30 +30,23 @@ DIST_VERSION = 10
 else ifeq ($(DIST),bullseye)
 DIST_VERSION = 11
 endif
-IMAGE_PYTHON = ikus060/python:debian${DIST_VERSION}-${PYTHON}
-
+IMAGE_PYTHON = ikus060/python:debian${DIST_VERSION}-py3
 IMAGE_BUILDPACKAGE = buildpack-deps:${DIST}
 
 # Check if running in gitlab CICD
 define docker_run
-docker run -i --rm -e TOXENV -v=`pwd`/..:/build/ -w=/build/minarca-server $(1) bash -c "$(2)"
+docker run -i --rm -v=`pwd`/..:/build/ -w=/build/minarca-server $(1) bash -c "$(2)"
 endef
 
 # Version of pacakges base on git tags.
-VERSION := $(shell curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash)
+VERSION := $(shell curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
 
 # Release date for Debian pacakge
 RELEASE_DATE = $(shell date '+%a, %d %b %Y %H:%M:%S') +0000
 
 # Version specific to debian pacakges
 # That include the distribution name
-DEB_VERSION = ${VERSION}+${DIST}
-
-MINARCA_SERVER_DEB_FILE = ../minarca-server_${DEB_VERSION}_amd64.deb
-
-COMMA := ,
-TOXFACTOR = ${PYTHON}
-TOXENV=$(shell $(call docker_run,${IMAGE_PYTHON}, tox --listenvs | grep '${TOXFACTOR}' | tr '\n' '${COMMA}'))
+MINARCA_SERVER_DEB_FILE = ../minarca-server_${VERSION}_amd64.deb
 
 UID = $(shell id -u)
 
@@ -62,19 +54,17 @@ UID = $(shell id -u)
 # == Main targets ==
 #
 
-all: test bdist
+all: test bdist clean
 
 test:
-	export TOXENV="${TOXENV}"; \
-	$(call docker_run,${IMAGE_PYTHON},apt update && apt -y install ${SERVER_DEPENDS} --no-install-recommends && tox)
+	$(call docker_run,${IMAGE_PYTHON},apt update && apt -y install ${SERVER_DEPENDS} --no-install-recommends && PIP_EXTRA_INDEX_URL=https://nexus.ikus-soft.com/repository/pypi-group/simple/ tox)
 
 bdist: ${MINARCA_SERVER_DEB_FILE}
 
 ${MINARCA_SERVER_DEB_FILE}: 
 	sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
-	$(call docker_run,${IMAGE_BUILDPACKAGE},apt update && apt -y install ${SERVER_BUILD_DEPENDS} --no-install-recommends && dpkg-buildpackage -us -uc -b && dpkg-buildpackage -Tclean)
-	$(call docker_run,${IMAGE_BUILDPACKAGE},chown ${UID} ../minarca-server_${VERSION}_amd64.deb)
-	mv -f ../minarca-server_${VERSION}_amd64.deb ${MINARCA_SERVER_DEB_FILE}
+	$(call docker_run,${IMAGE_BUILDPACKAGE},apt update && apt -y install ${SERVER_BUILD_DEPENDS} --no-install-recommends && PIP_EXTRA_INDEX_URL=https://nexus.ikus-soft.com/repository/pypi-group/simple/ dpkg-buildpackage -us -uc -b && dpkg-buildpackage -Tclean)
+	$(call docker_run,${IMAGE_BUILDPACKAGE},chown ${UID} ${MINARCA_SERVER_DEB_FILE})
 	rm -f debian/changelog
 
 clean:

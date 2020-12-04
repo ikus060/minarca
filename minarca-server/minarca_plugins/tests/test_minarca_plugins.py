@@ -6,14 +6,11 @@
 # Copyright (C) 2020 IKUS Software inc. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-
 """
 Created on Jan 23, 2016
 
 @author: Patrik Dufresne
 """
-
-from __future__ import unicode_literals
 
 from io import open
 import logging
@@ -21,6 +18,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from unittest.mock import MagicMock
 
 import httpretty
 from mockldap import MockLdap
@@ -29,21 +27,24 @@ from rdiffweb.core.store import ADMIN_ROLE
 from rdiffweb.test import WebCase, AppTestCase
 
 from minarca_plugins import MinarcaUserSetup
+import minarca_plugins
 
 
 class MinarcaUserSetupTest(WebCase):
-    
+
     # Reset app and testcases on every test
     reset_app = True
     # Login as admin before each test
     login = True
-    
+
     @classmethod
     def setup_server(cls):
+        if not os.path.isdir('/tmp/minarca-test'):
+            os.mkdir('/tmp/minarca-test')
         WebCase.setup_server(default_config={
             'MinarcaUserBaseDir': '/tmp/minarca-test',
             })
-        
+
     def setUp(self):
         if not os.path.isdir('/tmp/minarca-test'):
             os.mkdir('/tmp/minarca-test')
@@ -52,7 +53,7 @@ class MinarcaUserSetupTest(WebCase):
     def tearDown(self):
         WebCase.tearDown(self)
         shutil.rmtree('/tmp/minarca-test')
-    
+
     def _add_user(self, username=None, email=None, password=None, user_root=None, is_admin=None):
         b = {}
         b['action'] = 'add'
@@ -67,7 +68,7 @@ class MinarcaUserSetupTest(WebCase):
         if is_admin is not None:
             b['role'] = str(ADMIN_ROLE)
         self.getPage("/admin/users/", method='POST', body=b)
-    
+
     def test_add_user_without_user_root(self):
         """
         Add user without user_root
@@ -79,7 +80,7 @@ class MinarcaUserSetupTest(WebCase):
         self.assertInBody("User added successfully.")
         user = self.app.store.get_user('mtest1')
         self.assertEquals('/tmp/minarca-test/mtest1', user.user_root)
-    
+
     def test_add_user_with_user_root(self):
         """
         Add user with user_root
@@ -91,9 +92,9 @@ class MinarcaUserSetupTest(WebCase):
         self.assertInBody("User added successfully.")
         user = self.app.store.get_user('mtest2')
         self.assertEquals('/tmp/minarca-test/mtest2', user.user_root)
-    
 
-class MinarcaDiskSpaceTest(WebCase):
+
+class MinarcaTest(WebCase):
 
     # Reset app and testcases on every test
     reset_app = True
@@ -165,39 +166,10 @@ class MinarcaDiskSpaceTest(WebCase):
         self.assertEquals('bob@test.com', self.app.store.get_user('bob').email)
         self.assertEquals('/tmp/minarca-test/bob', self.app.store.get_user('bob').user_root)
 
-    @httpretty.activate
-    def test_set_disk_quota(self):
-        httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
-                               body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
-        userobj = self.app.store.add_user('bob')
-        self.plugin.set_disk_quota(userobj, quota=1234567)
-
-    @httpretty.activate
-    def test_update_userquota_401(self):
-        # Checks if exception is raised when authentication is failing.
-        httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/bob",
-                               status=401)
-        # Make sure an exception is raised.
-        userobj = self.app.store.add_user('bob')
-        with self.assertRaises(Exception):
-            self.plugin.set_disk_quota(userobj, quota=1234567)
-
-    @httpretty.activate
-    def test_get_disk_usage(self):
-        """
-        Check if value is available.
-        """
-        # Checks if exception is raised when authentication is failing.
-        httpretty.register_uri(httpretty.GET, "http://localhost:8081/quota/bob",
-                               body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
-        # Make sure an exception is raised.
-        userobj = self.app.store.add_user('bob')
-        self.assertEquals({"avail": 2147483648, "used": 0, "size": 2147483648}, self.plugin.get_disk_usage(userobj))
-        
     def test_get_api_minarca(self):
         self.app.cfg['minarcaremotehost'] = None
         self.app.cfg['minarcaremotehostidentity'] = None
-        
+
         self._login('bob', 'password')
         self.getPage("/api/minarca")
         # Check version
@@ -207,7 +179,7 @@ class MinarcaDiskSpaceTest(WebCase):
         self.assertInBody('127.0.0.1')
         # Check identity
         self.assertInBody('identity')
-        
+
     def test_get_api_minarca_identity(self):
         self.app.cfg['minarcaremotehost'] = "test.examples:2222"
         self.app.cfg['minarcaremotehostidentity'] = pkg_resources.resource_filename(__name__, '')  # @UndefinedVariable
@@ -218,7 +190,7 @@ class MinarcaDiskSpaceTest(WebCase):
     def test_get_api_minarca_with_reverse_proxy(self):
         self.app.cfg['minarcaremotehost'] = None
         self.app.cfg['minarcaremotehostidentity'] = None
-        
+
         # When behind an apache reverse proxy, minarca server should make use
         # of the Header to determine the public hostname provided.
         self._login('bob', 'password')
@@ -230,18 +202,75 @@ class MinarcaDiskSpaceTest(WebCase):
         self.getPage("/api/minarca", headers=headers)
         self.assertInBody('remotehost')
         self.assertInBody('sestican.patrikdufresne.com')
-        
+
     def test_get_help(self):
         # Check if help get redirect
         self.getPage("/help")
         self.assertStatus(303)
         self.assertHeader('Location', 'https://www.ikus-soft.com/en/support/#form')
-        
+
         # Check if the URL can be changed
         self.app.cfg['minarcahelpurl'] = 'https://example.com/help/'
         self.getPage("/help")
         self.assertStatus(303)
         self.assertHeader('Location', 'https://example.com/help/')
+
+
+class MinarcaUserQuota(AppTestCase):
+    """
+    Test Get/Set user quota
+    """
+
+    def setUp(self):
+        # Create folder
+        if not os.path.isdir('/tmp/minarca-test'):
+            os.mkdir('/tmp/minarca-test')
+        # Setup app
+        AppTestCase.setUp(self)
+        # Override some config
+        self.app.cfg['minarcaquotaapiurl'] = 'http://minarca:secret@localhost:8081/'
+        self.app.cfg['minarcauserbasedir'] = '/tmp/minarca-test'
+        # Start the plugin.
+        self.plugin = MinarcaUserSetup(self.app)
+
+    def tearDown(self):
+        WebCase.tearDown(self)
+        # Remove folder
+        shutil.rmtree('/tmp/minarca-test')
+
+    @httpretty.activate
+    def test_set_disk_quota(self):
+        userobj = self.app.store.add_user('bob')
+        httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/" + str(userobj.userid),
+                               body='{"avail": 2147483648, "used": 0, "size": 2147483648}')
+        # Mock call to chattr because it might fail on filesystem not supporting projectid.
+        minarca_plugins.subprocess.check_output = MagicMock()
+        # Set quota
+        self.plugin.set_disk_quota(userobj, quota=1234567)
+        # Check if subprocessis called twice
+        self.assertEquals(2, minarca_plugins.subprocess.check_output.call_count, "subprocess.check_output should be called")
+
+    @httpretty.activate
+    def test_update_userquota_401(self):
+        userobj = self.app.store.add_user('bob')
+        # Checks if exception is raised when authentication is failing.
+        httpretty.register_uri(httpretty.POST, "http://localhost:8081/quota/" + str(userobj.userid),
+                               status=401)
+        # Make sure an exception is raised.
+        with self.assertRaises(Exception):
+            self.plugin.set_disk_quota(userobj, quota=1234567)
+
+    @httpretty.activate
+    def test_get_disk_usage(self):
+        """
+        Check if value is available.
+        """
+        # Make sure an exception is raised.
+        userobj = self.app.store.add_user('bob')
+        # Checks if exception is raised when authentication is failing.
+        httpretty.register_uri(httpretty.GET, "http://localhost:8081/quota/" + str(userobj.userid),
+                               body='{"used": 1234, "size": 2147483648}')
+        self.assertEquals(1234, self.plugin.get_disk_usage(userobj))
 
 
 class MinarcaSshKeysTest(AppTestCase):
@@ -251,58 +280,58 @@ class MinarcaSshKeysTest(AppTestCase):
     USERNAME = 'admin'
 
     PASSWORD = 'test'
-    
+
     base_dir = tempfile.mkdtemp(prefix='minarca_tests_')
-    
+
     default_config = { 'MinarcaUserBaseDir': base_dir, }
-    
+
     reset_testcases = True
-    
+
     def setUp(self):
         AppTestCase.setUp(self)
         if not os.path.isdir(self.base_dir):
             os.mkdir(self.base_dir)
-    
+
     def tearDown(self):
         shutil.rmtree(self.base_dir)
         AppTestCase.tearDown(self)
-    
+
     def assertAuthorizedKeys(self, expected):
         filename = os.path.join(self.base_dir, '.ssh', 'authorized_keys')
         with open(filename, 'r', encoding='utf-8') as f:
             data = f.read()
         self.assertEqual(data, expected)
-    
+
     def test_update_authorized_keys(self):
         self.plugin = MinarcaUserSetup(self.app)
         self.plugin._update_authorized_keys()
-    
+
     def test_add_key(self):
         # Read the key from a file
         filename = pkg_resources.resource_filename(__name__, 'test_publickey_ssh_rsa.pub')  # @UndefinedVariable
-        with open(filename, 'r', encoding='utf8') as f: 
+        with open(filename, 'r', encoding='utf8') as f:
             key = f.readline()
-        
+
         # Add the key to the user.
         userobj = self.app.store.add_user('testuser')
         userobj.add_authorizedkey(key)
         user_root = userobj.user_root
-        
+
         # Validate
         self.assertAuthorizedKeys(
-            '''command="/opt/minarca/bin/minarca-shell 'testuser' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
-        
+            '''command="/opt/minarca-server/bin/minarca-shell 'testuser' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
+
         # Update user's home
         user_root = os.path.join(self.base_dir, 'testing')
         userobj.user_root = user_root
 
         # Validate
         self.assertAuthorizedKeys(
-            '''command="/opt/minarca/bin/minarca-shell 'testuser' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
-        
+            '''command="/opt/minarca-server/bin/minarca-shell 'testuser' '%s'",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
+
         # Deleting the user should delete it's keys
         userobj.delete()
-        
+
         # Validate
         self.assertAuthorizedKeys('')
 

@@ -60,20 +60,21 @@ esac
 # Parse arguments
 #
 DEV=0
-PACKAGE="minarca-server"
+PACKAGE="${PACKAGE:-minarca-server}"
+VERSION="${VERSION:-latest}"
 while [ $# -gt 0 ] ; do
   case "$1" in
     -h | --help)
-      echo "Usage: get-minarca.sh [--dev] [--version VERSION]"
+      echo "Usage: get-minarca.sh [--dev] [--package PACKAGE] [--version VERSION]"
       exit 0
       ;;
     -d | --dev) DEV=1;;
+    -p | --package)
+      shift
+      PACKAGE=$1;;
     -V | --version)
       shift
-      if [ "$1" != "latest" ]; then
-          PACKAGE="minarca-server=$1"
-      fi
-      ;;
+      VERSION=$1;;
     *)
       echo "Option $1 not supported. Ignored." >&2
       exit 1
@@ -144,6 +145,9 @@ fi
 
 call "Updating repositories again..." apt-get update
 
+if [ "$VERSION" != "latest" ]; then
+  PACKAGE="$PACKAGE=$VERSION"
+fi
 call "Installing $PACKAGE..." apt-get install -y $PACKAGE
 
 echo "Success!"
