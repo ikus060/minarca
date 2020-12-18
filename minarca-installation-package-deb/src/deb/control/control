@@ -1,5 +1,5 @@
 Package: [[deb.name]]
-Version: [[version]]
+Version: [[revision]]
 Section: misc
 Priority: optional
 Architecture: all
