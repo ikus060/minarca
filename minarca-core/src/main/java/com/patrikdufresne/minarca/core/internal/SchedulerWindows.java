@@ -198,7 +198,7 @@ public class SchedulerWindows extends Scheduler {
 
         // FIXME looking at command output is not the best since it change according to user language.
         if (ERROR_PATTERN.matcher(data).find()) {
-            throw new APIException("fail to schedule task");
+            throw new APIException("fail to schedule task: " + data);
         }
     }
 
