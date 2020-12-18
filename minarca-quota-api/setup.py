@@ -14,8 +14,8 @@ import setuptools
 setuptools.setup(
     name="minarca-quota-api",
     use_scm_version={"root": "..", "relative_to": __file__},
-    description='Minarca Quota RESTful API',
-    long_description='Provide a RESTful API to access and update the the user quota.',
+    description='Minarca Quota API',
+    long_description='Provide utilities to setup Quota management for rdiffweb / minarca-server.',
     author='IKUS Software inc.',
     url='https://www.ikus-soft.com/en/minarca/',
     packages=['minarca_quota_api'],
@@ -26,6 +26,7 @@ setuptools.setup(
     ],
     install_requires=[
         'cherrypy',
+        'ConfigArgParse'
     ],
     # requirement for testing
     tests_require=[
@@ -33,5 +34,8 @@ setuptools.setup(
         "pytest",
         "coverage",
     ],
-    entry_points={"console_scripts": ["minarca-quota-api = minarca_quota_api:run"], },
+    entry_points={
+        "console_scripts": [
+            "minarca-quota-api = minarca_quota_api:run"
+        ], },
 )

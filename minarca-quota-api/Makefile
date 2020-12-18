@@ -6,7 +6,6 @@
 #
 SHELL = /bin/sh
 DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
-PYTHON ?= py3
 
 #
 # == Variables ==
@@ -20,16 +19,23 @@ DIST_VERSION = 10
 else ifeq ($(DIST),bullseye)
 DIST_VERSION = 11
 endif
-IMAGE_PYTHON = ikus060/python:debian${DIST_VERSION}-${PYTHON}
+IMAGE_PYTHON = ikus060/python:debian${DIST_VERSION}-py3
+IMAGE_BUILDPACKAGE = buildpack-deps:${DIST}
 
 # Check if running in gitlab CICD
 define docker_run
-docker run -i --rm -e TOXENV -v=`pwd`/..:/build/ -w=/build/minarca-quota-api $(1) bash -c "$(2)"
+docker run -i --rm -v=`pwd`/..:/build/ -w=/build/minarca-quota-api $(1) bash -c "$(2)"
 endef
 
-COMMA := ,
-TOXFACTOR = ${PYTHON}
-TOXENV=$(shell $(call docker_run,minarca-server,${IMAGE_PYTHON}, tox --listenvs | grep '${TOXFACTOR}' | tr '\n' '${COMMA}'))
+# Version of pacakges base on git tags.
+VERSION := $(shell curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
+
+# Release date for Debian pacakge
+RELEASE_DATE = $(shell date '+%a, %d %b %Y %H:%M:%S') +0000
+
+MINARCA_QUOTA_API_DEB_FILE = ../minarca-quota-api_${VERSION}_amd64.deb
+
+UID = $(shell id -u)
 
 #
 # == Main targets ==
@@ -37,14 +43,19 @@ TOXENV=$(shell $(call docker_run,minarca-server,${IMAGE_PYTHON}, tox --listenvs 
 all: test bdist clean
 
 test:
-	export TOXENV="${TOXENV}"; \
 	$(call docker_run,${IMAGE_PYTHON},tox)
 
-bdist:
-	echo "TODO implement distribution package for quota api"
+bdist: ${MINARCA_QUOTA_API_DEB_FILE}
+
+${MINARCA_QUOTA_API_DEB_FILE}: 
+	sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
+	$(call docker_run,${IMAGE_BUILDPACKAGE}, apt update && apt install -y devscripts && apt build-dep -y . && dpkg-buildpackage -b && dpkg-buildpackage -Tclean)
+	$(call docker_run,${IMAGE_BUILDPACKAGE},chown ${UID} ${MINARCA_QUOTA_API_DEB_FILE})
+	rm -f debian/changelog
 
 clean:
-	rm -Rf .tox .eggs minarca_quota_api.egg-info .coverage coverage*.xml nosetests*.xml
+	$(call docker_run,${IMAGE_PYTHON},rm -Rf .tox .eggs minarca_quota_api.egg-info .coverage coverage*.xml nosetests*.xml)
+
 
 .PHONY: test bdist clean
 

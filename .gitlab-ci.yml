@@ -12,8 +12,7 @@ services:
 - docker:dind
 
 stages:
-- test
-- bdist
+- test-and-bdist
 - upload
 - integration-tests
 - deploy
@@ -26,33 +25,36 @@ stages:
   script:
   - make $TARGET
 
-test_stretch:
+test:stretch:
   <<: *make
-  stage: test
+  stage: test-and-bdist
   variables:
     TARGET: test
     DIST: stretch
 
-test_buster:
+test:buster:
   <<: *make
-  stage: test
+  stage: test-and-bdist
   variables:
     TARGET: test
     DIST: buster
 
-bdist_stretch:
+bdist:stretch:
   <<: *make
-  stage: bdist
+  stage: test-and-bdist
   variables:
     TARGET: bdist
     DIST: stretch
   artifacts:
     paths:
-    - minarca-server_*+stretch_amd64.deb
+    - minarca-client*.exe
+    - minarca-client*.deb
+    - minarca-server_*_amd64.deb
+    - minarca-quota-api_*_amd64.deb
 
-bdist_buster:
+bdist:buster:
   <<: *make
-  stage: bdist
+  stage: test-and-bdist
   variables:
     TARGET: bdist
     DIST: buster
@@ -60,90 +62,70 @@ bdist_buster:
     paths:
     - minarca-client*.exe
     - minarca-client*.deb
-    - minarca-server_*+buster_amd64.deb
+    - minarca-server_*_amd64.deb
+    - minarca-quota-api_*_amd64.deb
 
-upload-www-dev:
+upload:stretch:apt:
   stage: upload
-  except:
-  - tags
-  script:
-  # Publish to kalo
-  - eval $(ssh-agent -s)
-  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  # publish server
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  # publish client
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  # Publish get-minarca.sh script
-  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-
-upload-apt-dev:
-  stage: upload
+  dependencies:
+  - bdist:stretch
   script: |
     set -e
-    # Minarca Server Stretch
-    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_STRETCH"
-    # Minarca Server Buster
-    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_BUSTER"
+    if [ -z "$CI_COMMIT_TAG" ]; then
+      APT_URL="$APT_DEV_STRETCH"
+    else
+      APT_URL="$APT_RELEASE_STRETCH"
+    fi
+    # Minarca Server
+    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*_amd64.deb)
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
+    # Minarca Quota API
+    export MINARCA_QUOTA_DEB_FILE=$(ls -1 ./minarca-quota-api_*_amd64.deb)
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_QUOTA_DEB_FILE" "$APT_URL"
     # Minarca Client
     export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_STRETCH"
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_DEV_BUSTER"
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
 
-upload-www-release:
+upload:buster:apt:
   stage: upload
-  only:
-  - /^[0-9]+\.[0-9]+\.[0-9]+$/
-  script:
-  # Setup authentication
-  - eval $(ssh-agent -s)
-  - echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  # Publish stretch package to kalo
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+stretch_amd64.deb
-  # Publish buster package to kalo
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs /var/www/patrikdufresne/archive/minarca/$MINARCA_DEB_FILE /var/www/patrikdufresne/archive/minarca/minarca-server_latest+buster_amd64.deb
-  # Publish client to kalo
-  - export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-  - export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
-  - scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  - scp -o StrictHostKeyChecking=no $MINARCA_DEB_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest.exe
-  - ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_DEB_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest_all.deb
-  # Publish get-minarca.sh script
-  - scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-
-upload-apt-release:
-  stage: upload
-  only:
-  - /^[0-9]+\.[0-9]+\.[0-9]+$/
+  dependencies:
+  - bdist:buster
   script: |
-    # Minarca Server Stretch
-    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+stretch_amd64.deb)
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_STRETCH" 
-    # Minarca Server Buster
-    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*+buster_amd64.deb)
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_BUSTER"
+    set -e
+    if [ -z "$CI_COMMIT_TAG" ]; then
+      APT_URL="$APT_DEV_BUSTER"
+    else
+      APT_URL="$APT_RELEASE_BUSTER"
+    fi
+    # Minarca Server
+    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*_amd64.deb)
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
+    # Minarca Quota API
+    export MINARCA_QUOTA_DEB_FILE=$(ls -1 ./minarca-quota-api_*_amd64.deb)
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_QUOTA_DEB_FILE" "$APT_URL"
     # Minarca Client
     export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_STRETCH"
-    curl -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_RELEASE_BUSTER"
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
 
+upload:buster:www:
+  stage: upload
+  dependencies:
+  - bdist:buster
+  script: |
+    # Publish to kalo
+    eval $(ssh-agent -s)
+    echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+    # publish client
+    export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
+    scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+    # Publish get-minarca.sh script
+    scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+    if [ ! -z "$CI_COMMIT_TAG" ]; then
+      ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest.exe
+    fi
+    
 integration-tests:
   stage: integration-tests
   image: docker
@@ -164,5 +146,3 @@ deploy_staging_sestican:
   - export MINARCA_VERSION=$(cd minarca-server; make version)
   - echo MINARCA_VERSION=$MINARCA_VERSION
   - curl -X POST -F token=36bae86778d901fc6b2d6453a41844 -F "ref=master" -F "variables[MINARCA_VERSION]=$MINARCA_VERSION" https://gitlab.com/api/v4/projects/18716492/trigger/pipeline
-  
-  

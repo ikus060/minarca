@@ -1,0 +1,9 @@
+[Unit]
+Description=Minarca Quota API Server
+Documentation=https://www.ikus-soft.com/en/minarca/
+
+[Service]
+ExecStart=/opt/minarca-quota-api/bin/minarca-quota-api
+
+[Install]
+WantedBy=multi-user.target

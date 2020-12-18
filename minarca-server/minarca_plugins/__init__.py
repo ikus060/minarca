@@ -7,9 +7,6 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-from __future__ import unicode_literals
-
-from builtins import str
 import grp
 from io import StringIO
 from io import open
@@ -17,32 +14,53 @@ import logging
 import os
 import pwd
 import stat
+import subprocess
+from sys import stderr
 import sys
 import urllib
-
-import pkg_resources
-import requests
+from urllib.parse import urlparse, urljoin
 
 import cherrypy
+import pkg_resources
 from rdiffweb.core import RdiffError, authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
 from rdiffweb.core.config import Option, IntOption, BoolOption
-try:
-    from rdiffweb.core.store import IUserChangeListener, IUserQuota, UserObject
-except:
-    # rdiffweb <= 1.1.0
-    from rdiffweb.core.user import IUserChangeListener, IUserQuota, UserObject
+from rdiffweb.core.quota import QuotaException, QuotaUnsupported, DefaultUserQuota, IUserQuota
+from rdiffweb.core.store import IUserChangeListener, UserObject
+import requests
+from requests.exceptions import HTTPError
 
-PY3 = sys.version_info[0] == 3
-
-try:
-    from urllib.parse import urlparse, urljoin  # @UnresolvedImport @UnusedImport
-except:
-    from urlparse import urljoin  # @UnresolvedImport @UnusedImport @Reimport
-    from urlparse import urlparse  # @UnresolvedImport @UnusedImport @Reimport
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
+
+
+def raise_for_status(r):
+    """
+    Raise exception if the http return an error.
+    """
+
+    http_error_msg = ''
+    if isinstance(r.reason, bytes):
+        # We attempt to decode utf-8 first because some servers
+        # choose to localize their reason strings. If the string
+        # isn't utf-8, we fall back to iso-8859-1 for all other
+        # encodings. (See PR #3538)
+        try:
+            reason = r.reason.decode('utf-8')
+        except UnicodeDecodeError:
+            reason = r.reason.decode('iso-8859-1')
+    else:
+        reason = r.reason
+
+    if 400 <= r.status_code < 500:
+        http_error_msg = u'%s Client Error: %s for url: %s' % (r.status_code, reason, r.text)
+
+    elif 500 <= r.status_code < 600:
+        http_error_msg = u'%s Server Error: %s for url: %s' % (r.status_code, reason, r.text)
+
+    if http_error_msg:
+        raise HTTPError(http_error_msg, response=self)
 
 
 class TimeoutHTTPAdapter(requests.adapters.HTTPAdapter):
@@ -58,13 +76,13 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     This plugin provide feedback information to the users about the disk usage.
     Since we define quota, this plugin display the user's quota.
     """
-    
-    _quota_api_url = Option('MinarcaQuotaApiUrl', 'http://minarca:secret@localhost:8081/')
+
+    _quota_api_url = Option('MinarcaQuotaApiUrl', '')
     _mode = IntOption('MinarcaUserDirMode', 0o0770)
     _owner = Option('MinarcaUserDirOwner', 'minarca')
     _group = Option('MinarcaUserDirGroup', 'minarca')
     _basedir = Option('MinarcaUserBaseDir', default='/backups/')
-    _minarca_shell = Option('MinarcaShell', default='/opt/minarca/bin/minarca-shell')
+    _minarca_shell = Option('MinarcaShell', default='/opt/minarca-server/bin/minarca-shell')
     _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
     _minarca_remotehost = Option('MinarcaRemoteHost')
     _minarca_identity = Option('MinarcaRemoteHostIdentity', default='/etc/ssh')
@@ -89,12 +107,12 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_minarca(self):
-        
+
         # RemoteHost
         remotehost = self._minarca_remotehost
         if not remotehost:
             remotehost = urlparse(cherrypy.request.base).hostname
-        
+
         # Identity known_hosts
         identity = ""
         files = [f for f in os.listdir(self._minarca_identity) if f.startswith('ssh_host') if f.endswith('.pub')]
@@ -105,71 +123,85 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
                     identity += "[" + hostname + "]:" + port + " " + fh.read()
                 else:
                     identity += remotehost + " " + fh.read()
-        
+
         # Get remote host value from config or from URL
         return {
             "version": pkg_resources.get_distribution("minarca-server").version,
             "remotehost": remotehost,
             "identity": identity,
         }
-        
+
     def get_disk_usage(self, userobj):
         """
         Return the user disk space.
         """
         assert isinstance(userobj, UserObject)
-        
+        # Fallback to default user quota if quota url is not provided.
+        if not self._quota_api_url:
+            return DefaultUserQuota.get_disk_usage(self, userobj)
         # Get Quota from web service
-        url = os.path.join(self._quota_api_url, 'quota', userobj.username)
-        r = self.session.get(url, timeout=1)
-        r.raise_for_status()
-        diskspace = r.json()
-        assert diskspace and isinstance(diskspace, dict) and 'avail' in diskspace and 'used' in diskspace and 'size' in diskspace
-        return diskspace
+        url = os.path.join(self._quota_api_url, 'quota', str(userobj.userid))
+        try:
+            r = self.session.get(url, timeout=1)
+            r.raise_for_status()
+            diskspace = r.json()
+            return diskspace['used']
+        except:
+            logger.warn('fail to get user quota [%s]', userobj.username, exc_info=1)
+            return 0
 
     def get_disk_quota(self, userobj):
         """
         Get's user's disk quota.
         """
-        return self.get_disk_usage(userobj)['size']
+        # Fallback to default user quota if quota url is not provided.
+        if not self._quota_api_url:
+            return DefaultUserQuota.get_disk_usage(self, userobj)
+        # Get Quota from web service
+        url = os.path.join(self._quota_api_url, 'quota', str(userobj.userid))
+        try:
+            r = self.session.get(url, timeout=1)
+            r.raise_for_status()
+            diskspace = r.json()
+            return diskspace['size']
+        except:
+            logger.warn('fail to get user quota [%s]', userobj.username, exc_info=1)
+            return 0
 
     def set_disk_quota(self, userobj, quota):
         """
         Sets the user's quota.
         """
-        assert isinstance(userobj, UserObject)
-        assert quota
-        
+        # Fallback to default user quota if quota url is not provided.
+        if not self._quota_api_url:
+            return DefaultUserQuota.get_disk_usage(self, userobj)
+
         # Always update unless quota not define
-        logger.info('set  user [%s] quota [%s]', userobj.username, quota)
-        url = os.path.join(self._quota_api_url, 'quota', userobj.username)
-        r = self.session.post(url, data={'size': quota}, timeout=1)
-        r.raise_for_status()
-        diskspace = r.json()
-        assert diskspace and isinstance(diskspace, dict) and 'avail' in diskspace and 'used' in diskspace and 'size' in diskspace
-        return diskspace
-    
+        try:
+            logger.info('set user [%s] quota [%s]', userobj.username, quota)
+            url = os.path.join(self._quota_api_url, 'quota', str(userobj.userid))
+            r = self.session.post(url, data={'size': quota}, timeout=1)
+            raise_for_status(r)
+        except Exception as e:
+            logger.warn("fail to update user root quota", exc_info=1)
+            raise QuotaException(str(e))
+
+        # Update user root attribute
+        try:
+            # Add +P attribute to user's home directory
+            subprocess.check_output(["/usr/bin/chattr", "-R", "+P", userobj.user_root], stderr=subprocess.STDOUT)
+            # Force project id on directory
+            subprocess.check_output(["/usr/bin/chattr", "-R", "-p", str(userobj.userid), userobj.user_root], stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            raise QuotaException(e.output)
+        except Exception as e:
+            raise QuotaException(str(e))
+
     def user_logined(self, userobj, attrs):
         """
         Need to verify LDAP quota and update ZFS quota if required.
         """
-        assert isinstance(userobj, UserObject)
-        # TODO This is specific to Minarca Saas. We need to change this.
-        # Get quota value from LDAP field.
-        quota = False
-        descriptions = attrs and attrs.get('description')
-        if descriptions:
-            quota_gb = [
-                int(x[1:]) for x in descriptions
-                if x.startswith(b"v") and x[1:].isdigit()]
-            if quota_gb:
-                quota_gb = max(quota_gb)
-                quota = quota_gb * 1024 * 1024 * 1024
-        
-        # If we found a quota value, use quota api to set it.
-        logger.info('found user [%s] quota [%s] from attrs', userobj.username, quota)
-        if quota:
-            userobj.disk_quota = quota
+        pass
 
     def user_added(self, userobj, attrs):
         """
@@ -196,7 +228,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         if 'authorizedkeys' in attrs or 'user_root' in attrs:
             # TODO schedule a background task to update the authorized_keys.
             self._update_authorized_keys()
-            
+
     def user_deleted(self, username):
         """
         When user get dleted, update the authorized_key.
@@ -214,10 +246,10 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         # mail might be a list.
         if hasattr(mail, '__getitem__') and len(mail):
             mail = mail[0]
-            
+
         if isinstance(mail, bytes):
             mail = mail.decode('utf-8')
-            
+
         logger.info('update user [%s] email from LDAP [%s]', userobj.username, mail)
         userobj.email = mail
 
@@ -237,7 +269,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         # Persist the value if different then original
         if userobj.user_root != user_root:
             userobj.user_root = user_root
-            
+
         # Create folder if inside our base dir and missing.
         if user_root.startswith(self._basedir) and not os.path.exists(user_root):
             logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
@@ -248,13 +280,13 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
                 # Change owner
                 os.chown(user_root, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
             except:
-                logger.exception('fail to create user [%s] root dir [%s]', userobj.username, user_root)
+                logger.warn('fail to create user [%s] root dir [%s]', userobj.username, user_root)
 
     def _update_authorized_keys(self):
         """
         Used to update the authorized_keys of minarca user.
         """
-        
+
         # Create ssh subfolder
         ssh_dir = os.path.join(self._basedir, '.ssh')
         if not os.path.exists(ssh_dir):
@@ -264,7 +296,7 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
                 os.chown(ssh_dir, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
             except:
                 logger.warn("fail to set permissions on [%s] folder", ssh_dir)
-        
+
         # Create the authorized_keys file
         filename = os.path.join(ssh_dir, 'authorized_keys')
         if not os.path.exists(filename):
@@ -276,25 +308,25 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
                 val = os.stat(ssh_dir)
                 # Also try to change owner
                 os.chown(filename, val.st_uid, val.st_gid)
-        
+
         # Get list of keys
         seen = set()
         new_data = StringIO()
         for userobj in self.app.store.users():
             for key in userobj.authorizedkeys:
-                
+
                 if key.fingerprint in seen:
                     logger.warn("duplicates key %s, sshd will ignore it")
                 else:
                     seen.add(key.fingerprint)
-                    
+
                 # Add option to the key
                 options = """command="%s '%s' '%s'",%s""" % (self._minarca_shell, userobj.username, userobj.user_root, self._auth_options)
                 key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
-                
+
                 # Write the new key
                 authorizedkeys.add(new_data, key)
-        
+
         # Write the new file
         logger.info("updating authorized_keys file [%s]", filename)
         with open(filename, 'w', encoding='utf-8') as f:

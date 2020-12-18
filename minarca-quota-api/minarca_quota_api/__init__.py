@@ -19,98 +19,93 @@ import subprocess
 import sys
 
 import cherrypy
+import configargparse
 
-USERS = {'minarca': os.environ.get('MINARCA_QUOTA_SECRET', 'secret')}
-
-POOL = os.environ.get('MINARCA_QUOTA_POOL', 'rpool/minarca')
-
-
-def _getpwnam(user):
-    assert isinstance(user, str)
-    return pwd.getpwnam(user)
+from minarca_quota_api.zfs_quota import set_quota, get_quota, \
+    is_project_quota_enabled
 
 
-def validate_password(realm, username, password):
-    if username in USERS and USERS[username] == password:
-        return True
-    return False
+def _parse_args(args):
+    parser = configargparse.ArgParser(
+        prog='minarca-quota-api',
+        description='Web server to manage user quota.',
+        default_config_files=['/etc/minarca/minarca-quota-api.conf', '/etc/minarca/minarca-quota-api.conf.d/*.conf'],
+        add_env_var_help=True, auto_env_var_prefix='MINARCA_QUOTA_')
+    parser.add('-f', '--config', is_config_file=True, help='configuration file path')
+
+    parser.add('--serverhost', metavar='IP', help='Define the IP address to listen to.', default='127.0.0.1')
+    parser.add('--serverport', metavar='PORT', help='Define the port to listen to.', default='8081', type=int)
+    parser.add('--logfile', metavar='FILE', help='Define the location of the log file.', default='')
+    parser.add('--logaccessfile', metavar='FILE', help='Define the location of the access log file.', default='')
+    parser.add('--pool', '--zfs-pool', metavar='POOL', help="Define the ZFS pool to be updated with user's quota.", default='rpool/minarca')
+    parser.add('--secret', metavar='SECRET', help="Secret to be used to authenticate to the service.", default='secret')
+    return parser.parse_args(args)
 
 
-@cherrypy.tools.auth_basic(realm='minarca-api', checkpassword=validate_password)
+def _error_page(**kwargs):
+    """
+    Custom error page to return plain text error message.
+    """
+    cherrypy.response.headers['Content-Type'] = 'text/plain'
+    return kwargs.get('message')
+
+
 class Root(object):
+
+    def __init__(self, pool):
+        self.pool = pool
 
     @cherrypy.expose
     def index(self):
+        cherrypy.response.headers['Content-Type'] = 'text/plain'
         return 'Minarca Quota API'
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def quota(self, user, size=None):
+        cherrypy.response.headers['Content-Type'] = 'text/plain'
         assert isinstance(user, str) or isinstance(user, bytes) and user
-        if isinstance(user, bytes):
-            user = user.decode('utf-8')
+        user = int(user)
         if size:
             size = int(size)
 
         if cherrypy.request.method in ['PUT', 'POST']:
-            return self.set_quota(user, size)
-        else:
-            return self.get_quota(user)
+            cherrypy.log('update user [%s] quota [%s]' % (user, size))
+            set_quota(projectid=user, pool=self.pool, quota=size)
 
-    def get_quota(self, user):
-        """Get user disk quota and space."""
-
-        # Get value using zfs (as exact value).
-        args = ['/sbin/zfs', 'get', '-p', '-H', '-o', 'value', 'userused@%s,userquota@%s,used,available' % (user, user), POOL]
         cherrypy.log('get user [%s] quota' % user)
-        cherrypy.log('execute command line: %s' % ' '.join(args))
-        try:
-            output = subprocess.check_output(args)
-        except subprocess.CalledProcessError as e:
-            cherrypy.log(e.output)
-            raise cherrypy.HTTPError(500, 'fail to get user quota')
-
-        values = output.splitlines()
-        if len(values) != 4:
-            cherrypy.log('fail to get user disk space: %s' % (output,), severity=logging.ERROR)
-            raise cherrypy.HTTPError(500, 'fail to get user quota')
-        userused, userquota, used, available = [0 if x == '-' else int(x) for x in values]
-
-        # If size is 0, the user doesn't have a quota.
-        if userquota:
-            return {"size": userquota, "used": userused, "avail": max(0, userquota - userused)}
-        else:
-            return {"size": used + available, "used": used, "avail": available}
-
-    def set_quota(self, user, quota):
-        """Update the user quota. Return True if quota update is successful."""
-
-        # Get user id (also check if local user).
-        try:
-            uid = _getpwnam(user).pw_uid
-        except KeyError:
-            raise cherrypy.HTTPError(500, 'invalid user')
-
-        # Check if system user (for security)
-        if uid < 1000:
-            cherrypy.log('user quota cannot be set for system user [%s]' % user)
-            raise cherrypy.HTTPError(500, 'invalid user')
-
-        cherrypy.log('update user [%s] quota [%s]' % (user, quota))
-        args = ['/sbin/zfs', 'set', 'userquota@%s=%s' % (user, quota), POOL]
-        cherrypy.log('execute command line: %s' % ' '.join(args))
-        try:
-            subprocess.check_output(args)
-        except subprocess.CalledProcessError as e:
-            cherrypy.log(e.output)
-            raise cherrypy.HTTPError(500, 'fail to set user quota')
-        # Return the new quota value.
-        return self.get_quota(user)
+        return get_quota(projectid=user, pool=self.pool)
 
 
-def run():
+def run(args=None):
+    args = _parse_args(sys.argv[1:] if args is None else args)
+
+    # Configure authentication.
+    checkpassword = cherrypy.lib.auth_basic.checkpassword_dict({'minarca': args.secret})  # @UndefinedVariable
+    basic_auth = {'tools.auth_basic.on': True,
+                  'tools.auth_basic.realm': 'earth',
+                  'tools.auth_basic.checkpassword': checkpassword,
+                  'tools.auth_basic.accept_charset': 'UTF-8',
+    }
+    app_config = { '/' : basic_auth }
+
+    # configure web server
     cherrypy.config.update({
-        'server.socket_host': os.environ.get('MINARCA_QUOTA_HOST', '127.0.0.1'),
-        'server.socket_port': int(os.environ.get('MINARCA_QUOTA_PORT', '8081')),
+        'server.socket_host': args.serverhost,
+        'server.socket_port': args.serverport,
+        'log.access_file':  args.logaccessfile,
+        'log.error_file':  args.logfile,
+        'error_page.default': _error_page,
+        'environment': 'production',
     })
-    cherrypy.quickstart(Root(), '/')
+
+    # Check if ZFS project quota is enabled.
+    if not is_project_quota_enabled(pool=args.pool):
+        cherrypy.log("ZFS project quota is not enabled for the pool %s. pool and or dataset must be upgraded" % args.pool)
+
+    # start app
+    cherrypy.quickstart(Root(pool=args.pool), '/', config=app_config)
+
+
+if __name__ == '__main__':  # Script executed directly?
+    run()

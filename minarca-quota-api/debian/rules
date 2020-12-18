@@ -7,7 +7,7 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=$(shell python3 setup.py --version)
 	dh $@ --with python-virtualenv --with systemd --builddirectory=build
 
 override_dh_virtualenv:
-	dh_virtualenv --install-suffix minarca-server --python python3
+	dh_virtualenv --install-suffix minarca-quota-api --python python3
 
 override_dh_systemd_start:
 	dh_systemd_start --restart-after-upgrade
