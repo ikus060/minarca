@@ -8,9 +8,6 @@ variables:
   APT_RELEASE_BUSTER: https://nexus.ikus-soft.com/repository/minarca-apt-release-buster/
   APT_RELEASE_STRETCH: https://nexus.ikus-soft.com/repository/minarca-apt-release-stretch/
 
-services:
-- docker:dind
-
 stages:
 - test-and-bdist
 - upload
@@ -20,6 +17,8 @@ stages:
 # TODO Split this by python version and OS.
 .make: &make
   image: docker
+  services:
+  - docker:dind
   before_script:
   - apk add make curl git bash
   script:
@@ -127,13 +126,12 @@ upload:buster:www:
     fi
     
 integration-tests:
+  <<: *make
   stage: integration-tests
-  image: docker
-  before_script:
-  - apk add make curl git bash docker-compose
   script:
   - export MINARCA_VERSION=$(cd minarca-server; make version)
   - echo MINARCA_VERSION=$MINARCA_VERSION
+  - apk add docker-compose
   - make integration-tests
 
 deploy_staging_sestican:
