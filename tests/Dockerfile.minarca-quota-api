@@ -5,7 +5,7 @@ EXPOSE 8080
 
 ARG MINARCA_VERSION
 
-RUN curl -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh -o /tmp/get-minarca.sh && \
+RUN curl --fail -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh -o /tmp/get-minarca.sh && \
   bash /tmp/get-minarca.sh --dev --package minarca-quota-api --version "$MINARCA_VERSION"  && \
   rm /tmp/get-minarca.sh && \
   ssh-keygen -A && \
