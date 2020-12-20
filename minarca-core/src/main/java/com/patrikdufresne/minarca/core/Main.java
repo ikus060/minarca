@@ -9,6 +9,7 @@ import static com.patrikdufresne.minarca.core.Localized._;
 
 import java.io.Console;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -157,7 +158,7 @@ public class Main {
         case "exclude":
             checkEnv();
             boolean include = action.equals("include");
-            List<GlobPattern> list = API.instance().config().getGlobPatterns();
+            List<GlobPattern> list = new ArrayList<>(API.instance().config().getGlobPatterns());
             for (int i = 1; i < args.length; i++) {
                 if (include) {
                     list.add(new GlobPattern(true, args[i]));
