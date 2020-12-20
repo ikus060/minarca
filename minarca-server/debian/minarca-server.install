@@ -1,6 +1,3 @@
-data/etc/sudoers.d/minarca                   /etc/sudoers.d/
 data/etc/minarca/minarca-server.conf         /etc/minarca/
-data/etc/minarca/minarca-shell.conf          /etc/minarca/
-data/opt/minarca-server/bin/minarca-shell    /opt/minarca-server/bin/
 data/opt/minarca-server/share/minarca.ico    /opt/minarca-server/share/
 data/opt/minarca-server/share/minarca_22.png /opt/minarca-server/share/
