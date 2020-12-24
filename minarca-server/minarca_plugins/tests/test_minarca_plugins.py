@@ -12,9 +12,11 @@ Created on Jan 23, 2016
 @author: Patrik Dufresne
 """
 
+import grp
 from io import open
 import logging
 import os
+import pwd
 import shutil
 import tempfile
 import unittest
@@ -26,7 +28,7 @@ import pkg_resources
 from rdiffweb.core.store import ADMIN_ROLE
 from rdiffweb.test import WebCase, AppTestCase
 
-from minarca_plugins import MinarcaUserSetup
+from minarca_plugins import MinarcaUserSetup, MinarcaQuota
 import minarca_plugins
 
 
@@ -231,7 +233,7 @@ class MinarcaUserQuota(AppTestCase):
         self.app.cfg['minarcaquotaapiurl'] = 'http://minarca:secret@localhost:8081/'
         self.app.cfg['minarcauserbasedir'] = '/tmp/minarca-test'
         # Start the plugin.
-        self.plugin = MinarcaUserSetup(self.app)
+        self.plugin = MinarcaQuota(self.app)
 
     def tearDown(self):
         WebCase.tearDown(self)
@@ -283,7 +285,11 @@ class MinarcaSshKeysTest(AppTestCase):
 
     base_dir = tempfile.mkdtemp(prefix='minarca_tests_')
 
-    default_config = { 'MinarcaUserBaseDir': base_dir, }
+    default_config = {
+        'MinarcaUserBaseDir': base_dir,
+        'MinarcaUserDirOwner': pwd.getpwuid(os.getuid()).pw_name,
+        'MinarcaUserDirGroup': grp.getgrgid(os.getgid()).gr_name,
+    }
 
     reset_testcases = True
 

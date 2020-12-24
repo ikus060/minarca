@@ -30,7 +30,6 @@ from rdiffweb.core.store import IUserChangeListener, UserObject
 import requests
 from requests.exceptions import HTTPError
 
-
 # Define logger for this module
 logger = logging.getLogger(__name__)
 
@@ -71,13 +70,12 @@ class TimeoutHTTPAdapter(requests.adapters.HTTPAdapter):
         return super(TimeoutHTTPAdapter, self).send(*args, **kwargs)
 
 
-class MinarcaUserSetup(IUserChangeListener, IUserQuota):
+class MinarcaUserSetup(IUserChangeListener):
     """
     This plugin provide feedback information to the users about the disk usage.
     Since we define quota, this plugin display the user's quota.
     """
 
-    _quota_api_url = Option('MinarcaQuotaApiUrl', '')
     _mode = IntOption('MinarcaUserDirMode', 0o0770)
     _owner = Option('MinarcaUserDirOwner', 'minarca')
     _group = Option('MinarcaUserDirGroup', 'minarca')
@@ -95,9 +93,11 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
         self.app.root.help = self.get_help
         self.app.cfg['footername'] = 'Minarca'
         self.app.cfg['footerurl'] = 'https://www.ikus-soft.com/en/minarca/'
-        self.session = requests.Session()
-        self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
-        self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
+        # On startup Upgrade the authorized_keys in case the configuration changed.
+        try:
+            self._update_authorized_keys()
+        except:
+            logger.error("fail to update authorized_keys files on startup", exc_info=1)
 
     @cherrypy.expose
     @cherrypy.config(**{'tools.authform.on': False, 'tools.i18n.on': False, 'tools.authbasic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
@@ -130,6 +130,156 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
             "remotehost": remotehost,
             "identity": identity,
         }
+
+    def user_logined(self, userobj, attrs):
+        """
+        Need to verify LDAP quota and update ZFS quota if required.
+        """
+        pass
+
+    def user_added(self, userobj, attrs):
+        """
+        When added (manually or not). Try to get data from LDAP.
+        """
+        assert isinstance(userobj, UserObject)
+        try:
+            self._update_user_email(userobj, attrs)
+        except:
+            logger.warning('fail to update user [%s] email from LDAP', userobj.username, exc_info=1)
+        try:
+            self._update_user_root(userobj, attrs)
+        except:
+            logger.warning('fail to update user [%s] root', userobj.username, exc_info=1)
+
+    def user_attr_changed(self, userobj, attrs={}):
+        """
+        Listen to users attributes change to update the minarca authorized_keys.
+        """
+        if 'user_root' in attrs:
+            self._update_user_root(userobj, attrs)
+
+        # Update minarca's authorized_keys when users update their ssh keys.
+        if 'authorizedkeys' in attrs or 'user_root' in attrs:
+            # TODO schedule a background task to update the authorized_keys.
+            try:
+                self._update_authorized_keys()
+            except:
+                logger.error("fail to update authorized_keys files on user_attr_changed", exc_info=1)
+
+    def user_deleted(self, username):
+        """
+        When user get deleted, update the authorized_key.
+        """
+        try:
+            self._update_authorized_keys()
+        except:
+            logger.error("fail to update authorized_keys files on user_deleted", exc_info=1)
+
+    def _update_user_email(self, userobj, attrs):
+        """
+        Called to update the user email and home directory from LDAP info.
+        """
+        # Get user email from LDAP
+        mail = attrs and attrs.get('mail', None)
+        if not mail:
+            return
+        # mail might be a list.
+        if hasattr(mail, '__getitem__') and len(mail):
+            mail = mail[0]
+
+        if isinstance(mail, bytes):
+            mail = mail.decode('utf-8')
+
+        logger.info('update user [%s] email from LDAP [%s]', userobj.username, mail)
+        userobj.email = mail
+
+    def _update_user_root(self, userobj, attrs):
+        """
+        Called to update the user's home directory. Either to define it with
+        default value or restrict it to base dir.
+        """
+        # Define default user_home if not provided
+        user_root = userobj.user_root or os.path.join(self._basedir, userobj.username)
+        # Normalise path to avoid relative path.
+        user_root = os.path.abspath(user_root)
+        # Verify if the user_root is inside base dir.
+        if self._restrited_basedir and not user_root.startswith(self._basedir):
+            logger.warn('restrict user [%s] root [%s] to base dir [%s]', userobj.username, user_root, self._basedir)
+            user_root = os.path.join(self._basedir, userobj.username)
+        # Persist the value if different then original
+        if userobj.user_root != user_root:
+            userobj.user_root = user_root
+
+        # Create folder if inside our base dir and missing.
+        if user_root.startswith(self._basedir) and not os.path.exists(user_root):
+            logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
+            try:
+                os.mkdir(user_root)
+                # Change mode
+                os.chmod(user_root, self._mode)
+                # Change owner
+                os.chown(user_root, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
+            except:
+                logger.warn('fail to create user [%s] root dir [%s]', userobj.username, user_root)
+
+    def _update_authorized_keys(self):
+        """
+        Used to update the authorized_keys of minarca user.
+        """
+
+        # Create ssh subfolder
+        ssh_dir = os.path.join(self._basedir, '.ssh')
+        if not os.path.exists(ssh_dir):
+            logger.info("creating .ssh folder [%s]", ssh_dir)
+            os.mkdir(ssh_dir, 0o700)
+
+        os.chown(ssh_dir, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
+
+        # Create the authorized_keys file
+        filename = os.path.join(ssh_dir, 'authorized_keys')
+        if not os.path.exists(filename):
+            logger.info("creating authorized_keys [%s]", filename)
+            with open(filename, 'w+'):
+                os.utime(filename, None)
+                # change file permissions
+                os.chmod(filename, stat.S_IRUSR | stat.S_IWUSR)
+                val = os.stat(ssh_dir)
+                # Also try to change owner
+                os.chown(filename, val.st_uid, val.st_gid)
+
+        # Get list of keys
+        seen = set()
+        new_data = StringIO()
+        for userobj in self.app.store.users():
+            for key in userobj.authorizedkeys:
+
+                if key.fingerprint in seen:
+                    logger.warn("duplicates key %s, sshd will ignore it")
+                else:
+                    seen.add(key.fingerprint)
+
+                # Add option to the key
+                options = """command="%s '%s' '%s'",%s""" % (self._minarca_shell, userobj.username, userobj.user_root, self._auth_options)
+                key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
+
+                # Write the new key
+                authorizedkeys.add(new_data, key)
+
+        # Write the new file
+        logger.info("updating authorized_keys file [%s]", filename)
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(new_data.getvalue())
+
+
+class MinarcaQuota(IUserQuota):
+
+    _quota_api_url = Option('MinarcaQuotaApiUrl', '')
+
+    def __init__(self, app):
+        self.app = app
+        self.session = requests.Session()
+        self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
+        self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
 
     def get_disk_usage(self, userobj):
         """
@@ -196,138 +346,3 @@ class MinarcaUserSetup(IUserChangeListener, IUserQuota):
             raise QuotaException(e.output)
         except Exception as e:
             raise QuotaException(str(e))
-
-    def user_logined(self, userobj, attrs):
-        """
-        Need to verify LDAP quota and update ZFS quota if required.
-        """
-        pass
-
-    def user_added(self, userobj, attrs):
-        """
-        When added (manually or not). Try to get data from LDAP.
-        """
-        assert isinstance(userobj, UserObject)
-        try:
-            self._update_user_email(userobj, attrs)
-        except:
-            logger.warning('fail to update user [%s] email from LDAP', userobj.username, exc_info=1)
-        try:
-            self._update_user_root(userobj, attrs)
-        except:
-            logger.warning('fail to update user [%s] root', userobj.username, exc_info=1)
-
-    def user_attr_changed(self, userobj, attrs={}):
-        """
-        Listen to users attributes change to update the minarca authorized_keys.
-        """
-        if 'user_root' in attrs:
-            self._update_user_root(userobj, attrs)
-
-        # Update minarca's authorized_keys when users update their ssh keys.
-        if 'authorizedkeys' in attrs or 'user_root' in attrs:
-            # TODO schedule a background task to update the authorized_keys.
-            self._update_authorized_keys()
-
-    def user_deleted(self, username):
-        """
-        When user get dleted, update the authorized_key.
-        """
-        self._update_authorized_keys()
-
-    def _update_user_email(self, userobj, attrs):
-        """
-        Called to update the user email and home directory from LDAP info.
-        """
-        # Get user email from LDAP
-        mail = attrs and attrs.get('mail', None)
-        if not mail:
-            return
-        # mail might be a list.
-        if hasattr(mail, '__getitem__') and len(mail):
-            mail = mail[0]
-
-        if isinstance(mail, bytes):
-            mail = mail.decode('utf-8')
-
-        logger.info('update user [%s] email from LDAP [%s]', userobj.username, mail)
-        userobj.email = mail
-
-    def _update_user_root(self, userobj, attrs):
-        """
-        Called to update the user's home directory. Either to define it with
-        default value or restrict it to base dir.
-        """
-        # Define default user_home if not provided
-        user_root = userobj.user_root or os.path.join(self._basedir, userobj.username)
-        # Normalise path to avoid relative path.
-        user_root = os.path.abspath(user_root)
-        # Verify if the user_root is inside base dir.
-        if self._restrited_basedir and not user_root.startswith(self._basedir):
-            logger.warn('restrict user [%s] root [%s] to base dir [%s]', userobj.username, user_root, self._basedir)
-            user_root = os.path.join(self._basedir, userobj.username)
-        # Persist the value if different then original
-        if userobj.user_root != user_root:
-            userobj.user_root = user_root
-
-        # Create folder if inside our base dir and missing.
-        if user_root.startswith(self._basedir) and not os.path.exists(user_root):
-            logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
-            try:
-                os.mkdir(user_root)
-                # Change mode
-                os.chmod(user_root, self._mode)
-                # Change owner
-                os.chown(user_root, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
-            except:
-                logger.warn('fail to create user [%s] root dir [%s]', userobj.username, user_root)
-
-    def _update_authorized_keys(self):
-        """
-        Used to update the authorized_keys of minarca user.
-        """
-
-        # Create ssh subfolder
-        ssh_dir = os.path.join(self._basedir, '.ssh')
-        if not os.path.exists(ssh_dir):
-            logger.info("creating .ssh folder [%s]", ssh_dir)
-            os.mkdir(ssh_dir, 0o700)
-            try:
-                os.chown(ssh_dir, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
-            except:
-                logger.warn("fail to set permissions on [%s] folder", ssh_dir)
-
-        # Create the authorized_keys file
-        filename = os.path.join(ssh_dir, 'authorized_keys')
-        if not os.path.exists(filename):
-            logger.info("creating authorized_keys [%s]", filename)
-            with open(filename, 'w+'):
-                os.utime(filename, None)
-                # change file permissions
-                os.chmod(filename, stat.S_IRUSR | stat.S_IWUSR)
-                val = os.stat(ssh_dir)
-                # Also try to change owner
-                os.chown(filename, val.st_uid, val.st_gid)
-
-        # Get list of keys
-        seen = set()
-        new_data = StringIO()
-        for userobj in self.app.store.users():
-            for key in userobj.authorizedkeys:
-
-                if key.fingerprint in seen:
-                    logger.warn("duplicates key %s, sshd will ignore it")
-                else:
-                    seen.add(key.fingerprint)
-
-                # Add option to the key
-                options = """command="%s '%s' '%s'",%s""" % (self._minarca_shell, userobj.username, userobj.user_root, self._auth_options)
-                key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
-
-                # Write the new key
-                authorizedkeys.add(new_data, key)
-
-        # Write the new file
-        logger.info("updating authorized_keys file [%s]", filename)
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(new_data.getvalue())

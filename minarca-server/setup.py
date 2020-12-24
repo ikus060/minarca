@@ -28,7 +28,7 @@ setuptools.setup(
         "setuptools_scm",
     ],
     install_requires=[
-        "rdiffweb==2.0.3a5",
+        "rdiffweb==2.0.3a6.dev2+g2431245",
         "cherrypy>=16.0.0",
         "requests",
     ],
@@ -42,7 +42,7 @@ setuptools.setup(
     # Declare entry point
     entry_points={
         'rdiffweb.IUserChangeListener': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],
-        'rdiffweb.IUserQuota': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],
+        'rdiffweb.IUserQuota': ['MinarcaUserSetup = minarca_plugins:MinarcaQuota'],
         "console_scripts": ["minarca-shell = minarca_plugins.shell:main"]
     },
 )
