@@ -1,0 +1,12 @@
+MINARCA_LOG=/var/log/minarca
+
+case "$1" in
+  configure)
+        # Create folder for logs.
+        mkdir -p "$MINARCA_LOG"
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0
