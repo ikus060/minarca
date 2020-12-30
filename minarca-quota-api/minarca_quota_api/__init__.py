@@ -13,6 +13,7 @@ Created on Mar 7, 2018
 """
 
 import logging
+import logging.handlers
 import os
 import pwd
 import subprocess
@@ -23,6 +24,8 @@ import configargparse
 
 from minarca_quota_api.zfs_quota import set_quota, get_quota, \
     is_project_quota_enabled
+
+logger = logging.getLogger(__name__)
 
 
 def _parse_args(args):
@@ -50,6 +53,64 @@ def _error_page(**kwargs):
     return kwargs.get('message')
 
 
+def _setup_logging(log_file, log_access_file, level):
+    """
+    Configure the logging system for cherrypy.
+    """
+    assert isinstance(logging.getLevelName(level), int)
+
+    def remove_cherrypy_date(record):
+        """Remove the leading date for cherrypy error."""
+        if record.name.startswith('cherrypy.error'):
+            record.msg = record.msg[23:].strip()
+        return True
+
+    def add_ip(record):
+        """Add request IP to record."""
+        if hasattr(cherrypy, 'serving'):
+            request = cherrypy.serving.request
+            remote = request.remote
+            record.ip = remote.name or remote.ip
+            # If the request was forwarded by a reverse proxy
+            if 'X-Forwarded-For' in request.headers:
+                record.ip = request.headers['X-Forwarded-For']
+        return True
+
+    def add_username(record):
+        """Add current username to record."""
+        record.user = cherrypy.request and cherrypy.request.login or "anonymous"
+        return True
+
+    cherrypy.config.update({'log.screen': False, 'log.access_file': '', 'log.error_file': ''})
+    cherrypy.engine.unsubscribe('graceful', cherrypy.log.reopen_files)
+
+    # Configure root logger
+    logger = logging.getLogger('')
+    logger.level = logging.getLevelName(level)
+    if log_file:
+        print("continue logging to %s" % log_file)
+        default_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=10485760, backupCount=20)
+    else:
+        default_handler = logging.StreamHandler(sys.stdout)
+    default_handler.addFilter(remove_cherrypy_date)
+    default_handler.addFilter(add_ip)
+    default_handler.addFilter(add_username)
+    default_handler.setFormatter(logging.Formatter("[%(asctime)s][%(levelname)-7s][%(ip)s][%(user)s][%(threadName)s][%(name)s] %(message)s"))
+    logger.addHandler(default_handler)
+
+    # Configure cherrypy access logger
+    cherrypy_access = logging.getLogger('cherrypy.access')
+    cherrypy_access.propagate = False
+    if log_access_file:
+        handler = logging.handlers.RotatingFileHandler(log_access_file, maxBytes=10485760, backupCount=20)
+        cherrypy_access.addHandler(handler)
+
+    # Configure cherrypy error logger
+    cherrypy_error = logging.getLogger('cherrypy.error')
+    cherrypy_error.propagate = False
+    cherrypy_error.addHandler(default_handler)
+
+
 class Root(object):
 
     def __init__(self, pool):
@@ -64,21 +125,30 @@ class Root(object):
     @cherrypy.tools.json_out()
     def quota(self, user, size=None):
         cherrypy.response.headers['Content-Type'] = 'text/plain'
-        assert isinstance(user, str) or isinstance(user, bytes) and user
-        user = int(user)
-        if size:
-            size = int(size)
+        # Validate userid
+        try:
+            user = int(user)
+        except:
+            raise cherrypy.HTTPError(400, 'invalid uid: ' + user)
+        # Validate size
+        try:
+            if size:
+                size = int(size)
+        except:
+            raise cherrypy.HTTPError(400, 'invalid size: ' + size)
 
         if cherrypy.request.method in ['PUT', 'POST']:
-            cherrypy.log('update user [%s] quota [%s]' % (user, size))
+            logger.info('update user [%s] quota [%s]' % (user, size))
             set_quota(projectid=user, pool=self.pool, quota=size)
 
-        cherrypy.log('get user [%s] quota' % user)
+        logger.info('get user [%s] quota' % user)
         return get_quota(projectid=user, pool=self.pool)
 
 
 def run(args=None):
     args = _parse_args(sys.argv[1:] if args is None else args)
+
+    _setup_logging(log_file=args.logfile, log_access_file=args.logaccessfile, level='INFO')
 
     # Configure authentication.
     checkpassword = cherrypy.lib.auth_basic.checkpassword_dict({'minarca': args.secret})  # @UndefinedVariable
@@ -87,14 +157,12 @@ def run(args=None):
                   'tools.auth_basic.checkpassword': checkpassword,
                   'tools.auth_basic.accept_charset': 'UTF-8',
     }
-    app_config = { '/' : basic_auth }
+    app_config = { '/': basic_auth }
 
     # configure web server
     cherrypy.config.update({
         'server.socket_host': args.serverhost,
         'server.socket_port': args.serverport,
-        'log.access_file':  args.logaccessfile,
-        'log.error_file':  args.logfile,
         'error_page.default': _error_page,
         'environment': 'production',
     })

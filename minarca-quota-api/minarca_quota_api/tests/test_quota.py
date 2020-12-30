@@ -32,7 +32,7 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
     setup_server = staticmethod(setup_server)
 
     interactive = False
-    
+
     def test_gc(self):
         pass
 
@@ -49,12 +49,13 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
         headers = [("Authorization", "Basic " + b64encode(b"minarca:secret").decode('ascii'))]
         self.getPage('/quota/123', headers=headers)
         self.assertStatus(200)
-        
-    def test_get_quota_with_name(self):
+
+    def test_get_quota_with_invalid_name(self):
         # Make the query
         headers = [("Authorization", "Basic " + b64encode(b"minarca:secret").decode('ascii'))]
         self.getPage('/quota/someuser', headers=headers)
-        self.assertStatus(500)
+        self.assertStatus(400)
+        self.assertInBody("invalid uid: someuser")
 
     def test_set_quota(self):
         # Mock the command line call
@@ -80,6 +81,16 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
         self.assertStatus(500)
         # Check if the error message is in the body
         self.assertInBody("this is a error message")
+
+    def test_set_quota_with_invalid_size(self):
+        # Make the query
+        headers = [("Authorization", "Basic " + b64encode(b"minarca:secret").decode('ascii'))]
+        body = urlencode([(b'size', b'foo')])
+        self.getPage('/quota/123', method='PUT', headers=headers, body=body)
+        # Make sure to return HTTP error 500 when exception occur.
+        self.assertStatus(400)
+        # Check if the error message is in the body
+        self.assertInBody("invalid size: foo")
 
 
 if __name__ == "__main__":

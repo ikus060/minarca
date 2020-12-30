@@ -20,8 +20,6 @@ import tempfile
 
 from rdiffweb.core.config import read_config
 
-logger = logging.getLogger(__name__)
-
 
 def _parse_args(args):
     parser = argparse.ArgumentParser(description='Minarca shell called to handle incoming SSH connection.')
@@ -39,12 +37,19 @@ def _setup_logging(cfg):
     # location of the minarca-shell log file.
     rdiffweb_logfile = cfg.get('logfile', '/var/log/minarca/server.log')
     shell_logfile = os.path.join(os.path.dirname(rdiffweb_logfile), 'shell.log')
+    fmt = "[%(asctime)s][%(levelname)-7s][%(ip)s][%(user)s][%(threadName)s][%(name)s] %(message)s"
     try:
-        logging.basicConfig(filename=shell_logfile, level=logging.DEBUG)
+        logging.basicConfig(
+            filename=shell_logfile,
+            level=logging.DEBUG,
+            format=fmt)
     except FileNotFoundError:
         # If the file can't be open will need to log to a temporary file.
         shell_logfile = os.path.join(tempfile.gettempdir(), 'minarca-shell.log')
-        logging.basicConfig(filename=shell_logfile, level=logging.DEBUG)
+        logging.basicConfig(
+            filename=shell_logfile,
+            level=logging.DEBUG,
+            format=fmt)
 
 
 def _exec(cmd, cwd):
@@ -68,14 +73,23 @@ def _load_config():
 
 
 def main(args=None):
+    # Read the configuration and setup logging
+    cfg = _load_config()
+    _setup_logging(cfg)
+
     # Parse arguments
     args = _parse_args(args or sys.argv[1:])
     username = args.username
     userroot = args.userroot
 
+    # Add current user and ip address to logging context
+    ip = os.environ.get('SSH_CLIENT', '').split(' ')[0]
+    logger = logging.getLogger(__name__)
+    logger = logging.LoggerAdapter(logger, {'user':username, 'ip':ip})
+
     # Check if folder exists
     if not os.path.isdir(userroot):
-        logger.info("user %s in %s invalid user home: %s", username, userroot, userroot)
+        logger.info("invalid user home: %s", userroot)
         print("ERROR user home directory is miss configured.", file=sys.stderr)
         sys.exit(1)
 
@@ -85,9 +99,7 @@ def main(args=None):
         print("ERROR no command provided.", file=sys.stderr)
         sys.exit(1)
 
-    # Read the configuration and setup logging
-    cfg = _load_config()
-    _setup_logging(cfg)
+    # Get extra arguments for rdiff-backup.
     _extra_args = cfg.get('rdiffbackup_args', [])
     if _extra_args:
         _extra_args = _extra_args.split(' ')
@@ -101,7 +113,7 @@ def main(args=None):
             cwd=userroot)
     elif ssh_original_command == "rdiff-backup --server":
         # When called by legacy rdiff-backup.
-        logger.info("user %s in %s running legacy command: %s", username, userroot, ssh_original_command)
+        logger.info("running legacy command: %s", ssh_original_command)
         _exec(
             cmd=["rdiff-backup", "--server"] + _extra_args,
             cwd=userroot)
@@ -111,11 +123,11 @@ def main(args=None):
         reponame = ssh_original_command
         repopath = os.path.normpath(os.path.join(userroot, reponame))
         if not repopath.startswith(userroot):
-            logger.info("user %s in %s invalid repo: %s", username, userroot, reponame)
+            logger.info("invalid repo: %s", reponame)
             print("ERROR repository name %s is not valid" % reponame, file=sys.stderr)
             exit(1)
         # Start rdiff-backup server
-        logger.info("starting rdiff-backup for user %s in repopath: %s", username, repopath)
+        logger.info("starting rdiff-backup in repopath: %s", repopath)
         _exec(
             cmd=['rdiff-backup', '--server', '--restrict=' + reponame] + _extra_args,
             cwd=userroot)
