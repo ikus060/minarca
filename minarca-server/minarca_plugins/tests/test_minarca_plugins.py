@@ -218,6 +218,38 @@ class MinarcaTest(WebCase):
         self.assertHeader('Location', 'https://example.com/help/')
 
 
+class MinarcaAdminLogView(WebCase):
+
+    login = True
+
+    @classmethod
+    def setup_server(cls):
+        if not os.path.isdir('/tmp/minarca-test'):
+            os.mkdir('/tmp/minarca-test')
+        with open('/tmp/minarca-test/server.log', 'w') as f:
+            f.write('data')
+        with open('/tmp/minarca-test/shell.log', 'w') as f:
+            f.write('data')
+        with open('/tmp/minarca-test/quota-api.log', 'w') as f:
+            f.write('data')
+        WebCase.setup_server(default_config={
+            'logfile': '/tmp/minarca-test/server.log',
+            'minarcaquotaapiurl': 'http://localhost:8081',
+        })
+
+    @classmethod
+    def tearDownClass(cls):
+        if os.path.isdir('/tmp/minarca-test'):
+            shutil.rmtree('/tmp/minarca-test')
+
+    def test_adminview(self):
+        self.getPage('/admin/logs')
+        self.assertStatus(200)
+        self.assertInBody('server.log', 'server log should be in admin view')
+        self.assertInBody('shell.log', 'minarca-shell log should be in admin view')
+        self.assertInBody('quota-api.log', 'minarca-quota-api log should be in admin view')
+
+
 class MinarcaUserQuota(AppTestCase):
     """
     Test Get/Set user quota
