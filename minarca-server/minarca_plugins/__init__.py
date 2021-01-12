@@ -76,6 +76,8 @@ class MinarcaUserSetup(IUserChangeListener):
     Since we define quota, this plugin display the user's quota.
     """
 
+    _logfile = Option('LogFile')
+    _logaccessfile = Option('LogAccessFile')
     _mode = IntOption('MinarcaUserDirMode', 0o0770)
     _owner = Option('MinarcaUserDirOwner', 'minarca')
     _group = Option('MinarcaUserDirGroup', 'minarca')
@@ -93,6 +95,11 @@ class MinarcaUserSetup(IUserChangeListener):
         self.app.root.help = self.get_help
         self.app.cfg['footername'] = 'Minarca'
         self.app.cfg['footerurl'] = 'https://www.ikus-soft.com/en/minarca/'
+
+        # Monkey patch admin view to show minarca-shell.
+        self._orig_get_log_files = self.app.root.admin._get_log_files
+        self.app.root.admin._get_log_files = self._get_log_files
+
         # On startup Upgrade the authorized_keys in case the configuration changed.
         try:
             self._update_authorized_keys()
@@ -103,6 +110,13 @@ class MinarcaUserSetup(IUserChangeListener):
     @cherrypy.config(**{'tools.authform.on': False, 'tools.i18n.on': False, 'tools.authbasic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
     def get_help(self):
         raise cherrypy.HTTPRedirect(self._redirect_help)
+
+    def _get_log_files(self):
+        """Patched version of _get_log_files"""
+        minarca_shell_logfile = os.path.join(os.path.dirname(self._logfile or '/var/log/minarca/server.log'), 'shell.log')
+        logfiles = self._orig_get_log_files()
+        logfiles.append(minarca_shell_logfile)
+        return logfiles
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -273,6 +287,7 @@ class MinarcaUserSetup(IUserChangeListener):
 
 class MinarcaQuota(IUserQuota):
 
+    _logfile = Option('LogFile')
     _quota_api_url = Option('MinarcaQuotaApiUrl', '')
 
     def __init__(self, app):
@@ -280,6 +295,12 @@ class MinarcaQuota(IUserQuota):
         self.session = requests.Session()
         self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
         self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
+
+        # Monkey patch admin view to show quota.log.
+        if self._quota_api_url:
+            self._orig_get_log_files = self.app.root.admin._get_log_files
+            self.app.root.admin._get_log_files = self._get_log_files
+        
 
     def get_disk_usage(self, userobj):
         """
@@ -317,6 +338,14 @@ class MinarcaQuota(IUserQuota):
         except:
             logger.warn('fail to get user quota [%s]', userobj.username, exc_info=1)
             return 0
+
+    def _get_log_files(self):
+        """Patched version of _get_log_files"""
+        logfiles = self._orig_get_log_files()
+        minarca_quota_logfile = os.path.join(os.path.dirname(self._logfile or '/var/log/minarca/server.log'), 'quota-api.log')
+        if os.path.isfile(minarca_quota_logfile):
+            logfiles.append(minarca_quota_logfile)
+        return logfiles
 
     def set_disk_quota(self, userobj, quota):
         """
