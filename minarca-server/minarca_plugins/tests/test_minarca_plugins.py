@@ -248,6 +248,7 @@ class MinarcaAdminLogView(WebCase):
         self.assertInBody('server.log', 'server log should be in admin view')
         self.assertInBody('shell.log', 'minarca-shell log should be in admin view')
         self.assertInBody('quota-api.log', 'minarca-quota-api log should be in admin view')
+        self.assertNotInBody('Error getting file content')
 
 
 class MinarcaUserQuota(AppTestCase):
