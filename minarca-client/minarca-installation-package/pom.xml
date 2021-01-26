@@ -189,7 +189,7 @@
                                           <arg value="-h" />
                                           <arg value="@{hash}" />
                                           <arg value="-t" />
-                                          <arg value="http://timestamp.globalsign.com/scripts/timstamp.dll" />
+                                          <arg value="http://timestamp.digicert.com" />
                                           <arg value="-in" />
                                           <arg value="@{file}.unsigned" />
                                           <arg value="-out" />
