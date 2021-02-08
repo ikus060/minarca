@@ -102,7 +102,7 @@ public class Main {
             API.instance().link(repositoryname, client, force);
             System.out.println("link sucessful");
         } catch (APIException e) {
-            System.err.println(e.getMessage());
+            System.err.println(e.getMessage() + _("Check log file:") + Compat.LOG_FOLDER + "/minarca.log");
             System.exit(1);
             return;
         } catch (Exception e) {
