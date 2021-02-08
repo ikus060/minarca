@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Minarca server
 #
@@ -12,13 +11,67 @@ Created on Sep. 25, 2020
 '''
 
 import argparse
+from functools import reduce
 import logging
+import operator
 import os
-from subprocess import Popen
+import shutil
+import subprocess
 import sys
 import tempfile
 
 from rdiffweb.core.config import read_config
+from snakeoil.contexts import SplitExec
+from snakeoil.osutils.mount import mount, MS_BIND, MS_REC, MS_RDONLY
+from snakeoil.process import namespaces
+
+
+class Jail(SplitExec):
+    """
+    Responsible to provide a context manager to split execution into a separate
+    process, then using user namespace and chroot isolate the execution
+    into a sandbox.
+    
+    path will be the only writable folder. Everything else is read-only.
+    
+    Only part of the filesystem is available: /bin, /lib, /lib64, /opt, /usr
+
+    See https://lwn.net/Articles/531114/ about Linux User Namespace.
+    """
+
+    def __init__(self, path=None):
+        SplitExec.__init__(self)
+        self.root = tempfile.mkdtemp(prefix='minarca-jail-')
+        self.path = path
+        if self.path:
+            self.path = os.path.abspath(self.path)
+
+    def _child_setup(self):
+        # Create a user namespace for isolation.
+        namespaces.simple_unshare(user=True, mount=True, uts=False, net=True, pid=False)
+
+        # Mount proc
+        os.mkdir(os.path.join(self.root, 'proc'))
+        mount(source='/proc', target=os.path.join(self.root, 'proc'), fstype=None, flags=MS_BIND | MS_REC)
+        # Create default mountpoint to run executables.
+        for mountpoint in ['/bin', '/lib', '/lib64', '/usr', '/opt']:
+            if not os.path.isdir(mountpoint):
+                continue
+            dest = os.path.join(self.root, mountpoint[1:])
+            os.mkdir(dest)
+            mount(source=mountpoint, target=dest, fstype=None, flags=reduce(operator.or_, [MS_BIND, MS_REC, MS_RDONLY], 0))
+        # Create custom mount point
+        if self.path:
+            dest = os.path.join(self.root, self.path[1:])
+            os.makedirs(dest)
+            mount(source=self.path, target=dest, fstype=None, flags=reduce(operator.or_, [MS_BIND, MS_REC], 0))
+        # chroot
+        os.chmod(self.root, 0o700)
+        os.chroot(self.root)
+        os.chdir('/')
+
+    def _cleanup(self):
+        shutil.rmtree(self.root)
 
 
 def _parse_args(args):
@@ -52,14 +105,13 @@ def _setup_logging(cfg):
             format=fmt)
 
 
-def _exec(cmd, cwd):
-
-    with Popen(cmd, cwd=cwd, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno()) as p:
-        try:
-            return p.wait(timeout=None)
-        except:
-            p.kill()
-            raise
+def _jail(userroot, args):
+    """
+    Create a chroot jail using namespaces to isolate completely
+    rdiff-backup execution.
+    """
+    with Jail(userroot):
+        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
 
 
 def _load_config():
@@ -108,29 +160,16 @@ def main(args=None):
     # or we get called by minarca client which replace the command by the name of the repository.
     if ssh_original_command in ["echo -n 1", "echo -n host is alive", "/usr/bin/rdiff-backup -V"]:
         # Used by backup-ninja to verify connectivity
-        _exec(
-            cmd=ssh_original_command.split(' '),
-            cwd=userroot)
-    elif ssh_original_command == "rdiff-backup --server":
-        # When called by legacy rdiff-backup.
-        logger.info("running legacy command: %s", ssh_original_command)
-        _exec(
-            cmd=["rdiff-backup", "--server"] + _extra_args,
-            cwd=userroot)
+        subprocess.check_call(ssh_original_command.split(' '), env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
     else:
         # When called by minarca client, the command should be the name of the repository.
         # Validate if the repository is valid.
-        reponame = ssh_original_command
-        repopath = os.path.normpath(os.path.join(userroot, reponame))
-        if not repopath.startswith(userroot):
-            logger.info("invalid repo: %s", reponame)
-            print("ERROR repository name %s is not valid" % reponame, file=sys.stderr)
-            exit(1)
-        # Start rdiff-backup server
-        logger.info("starting rdiff-backup in repopath: %s", repopath)
-        _exec(
-            cmd=['rdiff-backup', '--server', '--restrict=' + reponame] + _extra_args,
-            cwd=userroot)
+        cmd = ['rdiff-backup', '--server'] + _extra_args
+        logger.info("running command [%s] in jail [%s]", ' '.join(cmd), userroot)
+        try:
+            _jail(userroot, cmd)
+        except OSError:
+            logger.error("Fail to create rdiff-backup jail. If you are running minarca-shell in Docker, make sure you started the container with `--privileged`. If you are on Debian, make sure to disable userns hardening `echo 1 > /proc/sys/kernel/unprivileged_userns_clone`.", exc_info=1)
 
 
 if __name__ == '__main__':

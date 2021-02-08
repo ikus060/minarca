@@ -35,7 +35,7 @@ IMAGE_BUILDPACKAGE = buildpack-deps:${DIST}
 
 # Check if running in gitlab CICD
 define docker_run
-docker run -i --rm -v=`pwd`/..:/build/ -w=/build/minarca-server $(1) bash -c "$(2)"
+docker run -i --privileged --rm -v=`pwd`/..:/build/ -w=/build/minarca-server $(1) bash -c "$(2)"
 endef
 
 # Version of pacakges base on git tags.
