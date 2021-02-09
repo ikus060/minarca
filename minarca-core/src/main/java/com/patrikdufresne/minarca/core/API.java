@@ -239,7 +239,7 @@ public class API {
         } catch (Exception e) {
             t.interrupt();
             Status.setLastStatus(LastResult.FAILURE, e.getMessage());
-            LOGGER.info("backup FAILED", e);
+            LOGGER.error("backup FAILED", e);
             throw (e instanceof APIException ? (APIException) e : new APIException(e));
         } finally {
             // Prevent Computer from sleeping.

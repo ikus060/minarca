@@ -117,7 +117,8 @@ cd "$BASEDIR"
 
 # Default to user home directory
 LOG_FOLDER=${XDG_DATA_HOME:-$HOME/.local/share}/minarca/
-if [ "$USER" = "root" ]; then
+UID=$(id -u)
+if [ "$UID" = "0" ]; then
     LOG_FOLDER=/var/log/
 fi
 
