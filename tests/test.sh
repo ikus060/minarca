@@ -21,7 +21,7 @@ if [ -z "$WINEPREFIX" ]; then
     minarca --version
     
     # Link minarca
-    minarca link --remoteurl $MINARCA_REMOTE_URL --username $MINARCA_USERNAME --password $MINARCA_PASSWORD --name $MINARCA_REPOSITORYNAME
+    minarca link --remoteurl $MINARCA_REMOTE_URL --username $MINARCA_USERNAME --password $MINARCA_PASSWORD --name $MINARCA_REPOSITORYNAME || (cat /var/log/minarca.log && exit 1)
     
     # Include files in backup
     minarca include /etc /var /home

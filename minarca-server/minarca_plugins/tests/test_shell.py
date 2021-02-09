@@ -7,16 +7,20 @@ import contextlib
 import io
 import os
 import shutil
+from stat import ST_MODE
+import sys
 import tempfile
+from unittest import mock
 import unittest
 
-from mock import MagicMock
-
 from minarca_plugins import shell
+from minarca_plugins.shell import Jail
+import subprocess
 
 USERNAME = 'joe'
 USERROOT = tempfile.gettempdir() + '/backups/joe'
 OUTPUT = tempfile.gettempdir() + '/output.txt'
+PY_VERSION = (sys.version_info.major, sys.version_info.minor)
 
 
 class Test(unittest.TestCase):
@@ -67,28 +71,56 @@ class Test(unittest.TestCase):
             value = f.read()
             self.assertEqual(b'1', value, "output of `echo -n 1` should be 1")
 
-    def test_main_with_rdiff_backup_server(self):
-        shell._exec = MagicMock()
+    @mock.patch('minarca_plugins.shell._jail')
+    def test_main_with_rdiff_backup_server(self, rdiff_backup_jail_mock):
         os.environ["SSH_ORIGINAL_COMMAND"] = "rdiff-backup --server"
         try:
             shell.main([USERNAME, USERROOT])
         finally:
             del os.environ["SSH_ORIGINAL_COMMAND"]
-        shell._exec.assert_called_once_with(
-            cmd=['rdiff-backup', '--server'],
-            cwd='/tmp/backups/joe')
+        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['rdiff-backup', '--server'])
 
-    def test_main_with_minarca_repo(self):
-        shell._exec = MagicMock()
+    @mock.patch('minarca_plugins.shell._jail')
+    def test_main_with_minarca_repo(self, rdiff_backup_jail_mock):
         os.environ["SSH_ORIGINAL_COMMAND"] = "my-computer"
         try:
             shell.main([USERNAME, USERROOT])
         finally:
             del os.environ["SSH_ORIGINAL_COMMAND"]
-        shell._exec.assert_called_once_with(
-            cmd=['rdiff-backup', '--server', '--restrict=my-computer'],
-            cwd='/tmp/backups/joe',
-        )
+        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['rdiff-backup', '--server'])
+
+    def test_jail(self):
+        # Write a file in jail folder
+        with open(os.path.join(USERROOT, 'test.txt'), 'w') as f:
+            f.write('coucou')
+        # Run jail and print content of the file.
+        with open(OUTPUT, 'wb') as f:
+            with contextlib.redirect_stdout(f):
+                with contextlib.redirect_stderr(f):
+                    shell._jail(USERROOT, ['cat', 'test.txt'])
+        # Validate the file output.
+        with open(OUTPUT, 'rb') as f:
+            value = f.read()
+            if PY_VERSION < (3, 6):
+                # On debian stretch, we use an old snakeoil package, that miss behave when tested.
+                self.assertEqual(b'coucoucoucou', value, "output of `echo coucou` should be `coucou`")
+            else:
+                self.assertEqual(b'coucou', value, "content of `test.txt` should be `coucou`")
+
+    def test_jail_readonly_bin(self):
+        # Skip this test if running as root. Because root can write everywhere
+        if os.getuid() == 0:
+            return
+        # Try to write in /bin directory should fail.
+        with Jail(USERROOT):
+            with self.assertRaises(OSError):
+                with open("/bin/test.yxy", 'w') as f:
+                    f.write('foo')
+
+    def test_jail_proc(self):
+        # Try to write in /bin directory should fail.
+        with Jail(USERROOT):
+            subprocess.check_call(['ps', '-ef'])
 
 
 if __name__ == "__main__":

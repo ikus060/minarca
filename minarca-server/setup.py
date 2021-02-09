@@ -10,6 +10,15 @@
 from __future__ import print_function
 
 import setuptools
+import sys
+
+# snakeoil package drop support for py35, py36, and py37
+PY_VERSION = (sys.version_info.major, sys.version_info.minor)
+snakeoil_ver="snakeoil"
+if PY_VERSION < (3, 8):
+    snakeoil_ver = "snakeoil<0.9.0"
+if PY_VERSION < (3, 6):
+    snakeoil_ver = "snakeoil<0.8.0"
 
 setuptools.setup(
     name="minarca-server",
@@ -31,6 +40,7 @@ setuptools.setup(
         "rdiffweb==2.1.0",
         "cherrypy>=16.0.0",
         "requests",
+        snakeoil_ver,
     ],
     # required packages for build process
     tests_require=[

@@ -16,6 +16,8 @@ case "$1" in
         chmod -R 0750 "$MINARCA_ETC" "$MINARCA_LOG"
         chown minarca:minarca "$MINARCA_HOME"
         chmod 0750 "$MINARCA_HOME"
+        # Enable user namespace (Disable debian hardening)
+        echo 1 > /proc/sys/kernel/unprivileged_userns_clone
     ;;
 esac
 

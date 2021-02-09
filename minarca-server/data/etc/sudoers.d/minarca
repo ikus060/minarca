@@ -1,7 +1,0 @@
-## Allow minarca-shell to create repositories using the local users permissions
-## This is required for minarca to manage users quota.
-##
-## CAUTION: Any syntax error will break sudo.
-##
-minarca ALL = (ALL:minarca) NOPASSWD: /usr/bin/rdiff-backup --server*
-minarca ALL = (ALL:minarca) NOPASSWD: /bin/chmod *

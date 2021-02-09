@@ -20,6 +20,7 @@ services:
           dockerfile: Dockerfile.minarca-server
           args:
             - MINARCA_VERSION
+        privileged: true
         depends_on:
           - minarca-quota-api
         networks:
