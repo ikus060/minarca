@@ -111,7 +111,7 @@ def _jail(userroot, args):
     rdiff-backup execution.
     """
     with Jail(userroot):
-        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
+        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'HOME': userroot}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
 
 
 def _load_config():
