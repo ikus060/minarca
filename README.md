@@ -82,6 +82,51 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## v3.8.0 (2021-02-17)
+
+This new version bring two major features Minarca: A user quota management ready for production and a more secure minarca-shell to handle incoming SSH connection.
+
+ * Server: Upgrade to rdiffweb v2.1.0
+    * Re-implement logic to update repositories views to remove duplicates and avoid nesting repo. #107
+    * Handle elapsed time of days in the graph. Thanks [Nathaniel van Diepen](https://github.com/Eeems) contributions.
+    * Rebrand all link to ikus-soft.com
+    * Update documentation to install rdiffweb
+    * Remove obsolete minify dependency
+    * Drop support for python2
+    * Provide null translation if translation catalogues are not found
+    * Pass a LANG environment variable to rdiff-backup restore process to fix encoding issue #112
+    * Remove obsolete python shebang
+    * Remove execution bit (+x) on python modules
+    * Provide `--help` and `--version` on `rdiffweb` executable
+    * Improve cherrypy version detection
+    * Do not update translation files (.mo) during build
+    * Debian package: Remove dh-systemd from Debian build dependencies (https://bugs.debian.org/871312we)
+    * Improve Quota management:
+      * `QuotaSetCmd`, `QuotaGetCmd` and `QuotaUsedCmd` options could be used to customize how to set the quota for your environment.
+      * Display user's quota in User View
+      * Display user's quota in Admin View
+      * Allow admin to update user quota from Admin View when `QuotaSetCmd` is defined.
+      * Allow admin to define user quota using human readable value (e.g.: GiB, TiB, etc.)
+      * Improve logging around quota management
+    * Improve robustness when service is starting
+    * Improve robustness when repository has wrong permission defined (e.g.: when some files not readable)
+    * Add user id in Admin view
+    * Replace `UserObject(1)` by the actual username in log file to improve debugging
+ * Server: Drops support for python 2.7
+ * Server: Improve ZFS Quota Management to use project quota. #95
+ * Server: Add minarca-quota-api and minarca-shell logs to admin view #126
+ * Server: Adjust the logging format to be similar in all components
+ * Server: Re-impleent minarca-shell in pure python to be more integrated with rdiffweb/minarca
+ * Server: Update authorized_keys when server get restarted to reflect any config or database change #127
+ * Server: Increase security of SSH connexion by user user namespace to create chroot jail #121
+ * Server: Define `$HOME` when creating user namespace to work arround python calling `getpwuid()`
+ * Client: Improve error message when Scheduled Task refused to be created in Windows
+ * Client: Fix `minarca` command line parsing for include|exclude #125 #120
+ * Client: Adjust the logging format to be similar to server log
+ * Client: Create log file to /var/log/minarca.log when the `uid` is root
+ * Doc: Update installation steps rdiffweb/#109
+ * Doc: Provide mode architectural details #70
+
 ## v3.7.0 (2020-06-24)
 
 This new release officially adds the installation of Minarca using an APT repository for Debian Stretch and Debian Buster.
