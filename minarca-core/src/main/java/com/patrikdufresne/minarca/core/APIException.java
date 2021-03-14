@@ -34,7 +34,7 @@ public class APIException extends Exception {
     public static class ConnectivityException extends APIException {
 
         public ConnectivityException(Exception cause) {
-            super(_("Failed to establish connectivity with the server. Verfy if the URL provided is valid and responding."), cause);
+            super(_("Failed to establish connectivity with the server. Verify if the URL provided is valid and responding."), cause);
         }
 
     }
