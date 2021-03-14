@@ -7,6 +7,7 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
+import argparse
 import grp
 from io import StringIO
 from io import open
@@ -22,9 +23,10 @@ from urllib.parse import urlparse, urljoin
 
 import cherrypy
 import pkg_resources
+import rdiffweb
 from rdiffweb.core import RdiffError, authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
-from rdiffweb.core.config import Option, IntOption, BoolOption
+from rdiffweb.core.config import Option
 from rdiffweb.core.quota import QuotaException, QuotaUnsupported, DefaultUserQuota, IUserQuota
 from rdiffweb.core.store import IUserChangeListener, UserObject
 import requests
@@ -76,35 +78,133 @@ class MinarcaUserSetup(IUserChangeListener):
     Since we define quota, this plugin display the user's quota.
     """
 
-    _logfile = Option('LogFile')
-    _logaccessfile = Option('LogAccessFile')
-    _mode = IntOption('MinarcaUserDirMode', 0o0770)
-    _owner = Option('MinarcaUserDirOwner', 'minarca')
-    _group = Option('MinarcaUserDirGroup', 'minarca')
-    _basedir = Option('MinarcaUserBaseDir', default='/backups/')
-    _minarca_shell = Option('MinarcaShell', default='/opt/minarca-server/bin/minarca-shell')
-    _auth_options = Option('MinarcaAuthOptions', default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
-    _minarca_remotehost = Option('MinarcaRemoteHost')
-    _minarca_identity = Option('MinarcaRemoteHostIdentity', default='/etc/ssh')
-    _restrited_basedir = BoolOption('MinarcaRestrictedToBasedDir', default=True)
-    _redirect_help = Option('MinarcaHelpURL', default='https://www.ikus-soft.com/en/support/#form')
+    _logfile = Option('log_file')
+    _logaccessfile = Option('log_access_file')
+    _mode = Option('minarca_user_dir_mode')
+    _owner = Option('minarca_user_dir_owner')
+    _group = Option('minarca_user_dir_group')
+    _basedir = Option('minarca_user_base_dir')
+    _minarca_shell = Option('minarca_shell')
+    _auth_options = Option('minarca_auth_options')
+    _minarca_remotehost = Option('minarca_remote_host')
+    _minarca_identity = Option('minarca_remote_host_identity')
+    _restrited_basedir = Option('minarca_restricted_to_based_dir')
+    _redirect_help = Option('minarca_help_url')
+
+    @classmethod
+    def add_arguments(cls, parser):
+        parser.add(
+            '--minarca-user-dir-mode', '--minarcauserdirmode',
+            metavar='MODE',
+            help=argparse.SUPPRESS,
+            type=int,
+            default=0o0770)
+
+        parser.add(
+            '--minarca-user-dir-owner', '--minarcauserdirowner',
+            metavar='OWNER',
+            help=argparse.SUPPRESS,
+            default='minarca')
+
+        parser.add(
+            '--minarca-user-dir-group', '--minarcauserdirgroup',
+            metavar='GROUP',
+            help=argparse.SUPPRESS,
+            default='minarca')
+
+        parser.add(
+            '--minarca-user-base-dir', '--minarcauserbasedir', '--minarcausersetupbasedir',
+            metavar='FOLDER',
+            help="""base directory where all the backup should reside. Any
+                user_root outside this repository will be refused.""",
+            default='/backups/')
+
+        parser.add(
+            '--minarca-restricted-to-based-dir', '--minarcarestrictedtobaseddir',
+            action='store_true',
+            help=argparse.SUPPRESS,
+            default=True)
+
+        parser.add(
+            '--minarca-shell', '--minarcashell',
+            metavar='FILE',
+            help="""location of minarca-shell to be used to handle SSH
+                connection. This is used to configure `authorized_keys` to
+                restrict SSH command line to be executed""",
+            default='/opt/minarca-server/bin/minarca-shell')
+
+        parser.add(
+            '--minarca-auth-options', '--minarcaauthoptions',
+            metavar='OPTIONS',
+            help="""authentication option to be passed to `authorized_keys`.
+                This is used to limit the user's permission on the SSH Server,
+                effectively disabling X11 forwarding, port forwarding and PTY.""",
+            default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty')
+
+        parser.add(
+            '--minarca-remote-host', '--minarcaremotehost',
+            metavar='HOST:PORT',
+            help="""the remote SSH identity. This value is queried by Minarca
+                Client to link and back up to the server. If not provided, the
+                HTTP URL is used as a base. You may need to change this value
+                if the SSH server is accessible using a different IP address
+                or if not running on port 22. e.g.: ssh.example.com:2222""")
+
+        parser.add(
+            '--minarca-remote-host-identity', '--minarcaremotehostidentity',
+            metavar='FOLDER',
+            help="""location of SSH server identity. This value is queried by
+                Minarca Client to authenticate the server. You may need to
+                change this value if SSH service and the Web service are not
+                running on the same server.""",
+            default="/etc/ssh")
+
+        parser.add(
+            '--minarca-help-url', '--minarcahelpurl',
+            metavar='URL',
+            help="""custom URL where to redirect user clicking on help button""",
+            default="https://www.ikus-soft.com/en/support/#form")
+
+        parser.add(
+            '--minarca-rdiff-backup-extra-args', '--rdiffbackup-args',
+            metavar='ARGS',
+            help="""list of extra argumenst to be pass to rdiff-backup server. e.g.: --no-compression""")
+
+        # Replace default config file
+        parser._default_config_files = ['/etc/minarca/minarca-server.conf', '/etc/minarca/conf.d/*.conf']
+
+        # Override a couple of arguments with Minarca.
+        parser.set_defaults(
+            database_uri='/etc/minarca/rdw.db',
+            default_theme='orange',
+            favicon=pkg_resources.resource_filename(__name__, 'minarca.ico'),  # @UndefinedVariable
+            footer_name='Minarca',
+            footer_url='https://www.ikus-soft.com/en/minarca/',
+            header_name='Minarca',
+            header_logo=pkg_resources.resource_filename(__name__, 'minarca_22.png'),  # @UndefinedVariable
+            log_access_file='/var/log/minarca/access.log',
+            log_file='/var/log/minarca/server.log',
+            welcome_msg={
+                '':'A <b>free and open-source</b> backup software providing end-to-end integration to put you in control of your backup strategy.<br/><br/><a href="https://www.ikus-soft.com/en/minarca/">website</a> • <a href="https://www.ikus-soft.com/en/minarca/doc/">docs</a> • <a href="https://groups.google.com/d/forum/minarca">community</a>',
+                'fr':'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://www.ikus-soft.com/fr/minarca/">site web</a> • <a href="https://www.ikus-soft.com/fr/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>',
+            }
+        )
 
     def __init__(self, app):
         self.app = app
         self.app.root.api.minarca = self.get_minarca
         self.app.root.help = self.get_help
-        self.app.cfg['footername'] = 'Minarca'
-        self.app.cfg['footerurl'] = 'https://www.ikus-soft.com/en/minarca/'
 
         # Monkey patch admin view to show minarca-shell.
         self._orig_get_log_files = self.app.root.admin._get_log_files
         self.app.root.admin._get_log_files = self._get_log_files
 
+        # FIXME at this point store is not yet created.
         # On startup Upgrade the authorized_keys in case the configuration changed.
-        try:
-            self._update_authorized_keys()
-        except:
-            logger.error("fail to update authorized_keys files on startup", exc_info=1)
+        # try:
+        #    self._update_authorized_keys()
+        # except:
+        #    logger.error("fail to update authorized_keys files on startup", exc_info=1)
 
     @cherrypy.expose
     @cherrypy.config(**{'tools.authform.on': False, 'tools.i18n.on': False, 'tools.authbasic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
@@ -287,8 +387,15 @@ class MinarcaUserSetup(IUserChangeListener):
 
 class MinarcaQuota(IUserQuota):
 
-    _logfile = Option('LogFile')
-    _quota_api_url = Option('MinarcaQuotaApiUrl', '')
+    _logfile = Option('log_file')
+    _quota_api_url = Option('minarca_quota_api_url')
+
+    @classmethod
+    def add_arguments(cls, parser):
+        parser.add(
+            '--minarca-quota-api-url', '--minarcaquotaapiurl',
+            metavar='URL',
+            help="url to minarca-quota-api server")
 
     def __init__(self, app):
         self.app = app
@@ -300,7 +407,6 @@ class MinarcaQuota(IUserQuota):
         if self._quota_api_url:
             self._orig_get_log_files = self.app.root.admin._get_log_files
             self.app.root.admin._get_log_files = self._get_log_files
-        
 
     def get_disk_usage(self, userobj):
         """
@@ -375,3 +481,7 @@ class MinarcaQuota(IUserQuota):
             raise QuotaException(e.output)
         except Exception as e:
             raise QuotaException(str(e))
+
+
+def main(args=None):
+    rdiffweb.main.main(args)

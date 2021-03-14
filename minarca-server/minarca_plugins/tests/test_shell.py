@@ -7,7 +7,7 @@ import contextlib
 import io
 import os
 import shutil
-from stat import ST_MODE
+import subprocess
 import sys
 import tempfile
 from unittest import mock
@@ -15,7 +15,6 @@ import unittest
 
 from minarca_plugins import shell
 from minarca_plugins.shell import Jail
-import subprocess
 
 USERNAME = 'joe'
 USERROOT = tempfile.gettempdir() + '/backups/joe'
@@ -118,9 +117,8 @@ class Test(unittest.TestCase):
                     f.write('foo')
 
     def test_jail_proc(self):
-        # Try to write in /bin directory should fail.
         with Jail(USERROOT):
-            subprocess.check_call(['ps', '-ef'])
+            subprocess.check_call(['ps'], stdout=subprocess.PIPE)
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ setuptools.setup(
         "setuptools_scm",
     ],
     install_requires=[
-        "rdiffweb==2.1.0",
+        "rdiffweb==2.1.1.dev42+gff7e160",
         "cherrypy>=16.0.0",
         "requests",
         snakeoil_ver,
