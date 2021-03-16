@@ -318,7 +318,7 @@ class MinarcaUserSetup(IUserChangeListener):
         user_root = os.path.abspath(user_root)
         # Verify if the user_root is inside base dir.
         if self._restrited_basedir and not user_root.startswith(self._basedir):
-            logger.warn('restrict user [%s] root [%s] to base dir [%s]', userobj.username, user_root, self._basedir)
+            logger.warning('restrict user [%s] root [%s] to base dir [%s]', userobj.username, user_root, self._basedir)
             user_root = os.path.join(self._basedir, userobj.username)
         # Persist the value if different then original
         if userobj.user_root != user_root:
@@ -334,7 +334,7 @@ class MinarcaUserSetup(IUserChangeListener):
                 # Change owner
                 os.chown(user_root, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
             except:
-                logger.warn('fail to create user [%s] root dir [%s]', userobj.username, user_root)
+                logger.warning('fail to create user [%s] root dir [%s]', userobj.username, user_root)
 
     def _update_authorized_keys(self):
         """
@@ -368,7 +368,7 @@ class MinarcaUserSetup(IUserChangeListener):
             for key in userobj.authorizedkeys:
 
                 if key.fingerprint in seen:
-                    logger.warn("duplicates key %s, sshd will ignore it")
+                    logger.warning("duplicates key %s, sshd will ignore it")
                 else:
                     seen.add(key.fingerprint)
 
@@ -424,7 +424,7 @@ class MinarcaQuota(IUserQuota):
             diskspace = r.json()
             return diskspace['used']
         except:
-            logger.warn('fail to get user quota [%s]', userobj.username, exc_info=1)
+            logger.warning('fail to get user quota [%s]', userobj.username, exc_info=1)
             return 0
 
     def get_disk_quota(self, userobj):
@@ -442,7 +442,7 @@ class MinarcaQuota(IUserQuota):
             diskspace = r.json()
             return diskspace['size']
         except:
-            logger.warn('fail to get user quota [%s]', userobj.username, exc_info=1)
+            logger.warning('fail to get user quota [%s]', userobj.username, exc_info=1)
             return 0
 
     def _get_log_files(self):
@@ -468,7 +468,7 @@ class MinarcaQuota(IUserQuota):
             r = self.session.post(url, data={'size': quota}, timeout=1)
             raise_for_status(r)
         except Exception as e:
-            logger.warn("fail to update user root quota", exc_info=1)
+            logger.warning("fail to update user root quota", exc_info=1)
             raise QuotaException(str(e))
 
         # Update user root attribute
