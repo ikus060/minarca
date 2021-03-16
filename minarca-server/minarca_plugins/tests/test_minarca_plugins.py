@@ -84,13 +84,13 @@ class MinarcaUserSetupTest(AbstractMinarcaTest):
         Make sure the user_root getg populated with default value from basedir.
         """
         # Check if minarca base dir is properly defined
-        self.assertEquals('/tmp/minarca-test', self.app.cfg.minarca_user_base_dir)
+        self.assertEqual('/tmp/minarca-test', self.app.cfg.minarca_user_base_dir)
 
         #  Add user to be listed
         self._add_user("mtest1", None, "mtest1", None, False)
         self.assertInBody("User added successfully.")
         user = self.app.store.get_user('mtest1')
-        self.assertEquals('/tmp/minarca-test/mtest1', user.user_root)
+        self.assertEqual('/tmp/minarca-test/mtest1', user.user_root)
 
     def test_add_user_with_user_root(self):
         """
@@ -102,7 +102,7 @@ class MinarcaUserSetupTest(AbstractMinarcaTest):
         self._add_user("mtest2", None, "mtest2", "/home/mtest2", False)
         self.assertInBody("User added successfully.")
         user = self.app.store.get_user('mtest2')
-        self.assertEquals('/tmp/minarca-test/mtest2', user.user_root)
+        self.assertEqual('/tmp/minarca-test/mtest2', user.user_root)
 
     def test_default_arguments(self):
         self.assertEqual("orange", self.app.cfg.default_theme)
@@ -173,8 +173,8 @@ class MinarcaTest(AbstractMinarcaTest):
         self.assertIsNotNone(userobj)
         self.assertIsNotNone(self.app.store.get_user('bob'))
         # Check if profile get update from Ldap info.
-        self.assertEquals('bob@test.com', self.app.store.get_user('bob').email)
-        self.assertEquals('/tmp/minarca-test/bob', self.app.store.get_user('bob').user_root)
+        self.assertEqual('bob@test.com', self.app.store.get_user('bob').email)
+        self.assertEqual('/tmp/minarca-test/bob', self.app.store.get_user('bob').user_root)
 
 
 class MinarcaRemoteIdentityTest(AbstractMinarcaTest):
@@ -293,7 +293,7 @@ class MinarcaUserQuota(AppTestCase):
         # Set quota
         self.plugin.set_disk_quota(userobj, quota=1234567)
         # Check if subprocessis called twice
-        self.assertEquals(2, minarca_plugins.subprocess.check_output.call_count, "subprocess.check_output should be called")
+        self.assertEqual(2, minarca_plugins.subprocess.check_output.call_count, "subprocess.check_output should be called")
 
     @httpretty.activate
     def test_update_userquota_401(self):
@@ -315,7 +315,7 @@ class MinarcaUserQuota(AppTestCase):
         # Checks if exception is raised when authentication is failing.
         httpretty.register_uri(httpretty.GET, "http://localhost:8081/quota/" + str(userobj.userid),
                                body='{"used": 1234, "size": 2147483648}')
-        self.assertEquals(1234, self.plugin.get_disk_usage(userobj))
+        self.assertEqual(1234, self.plugin.get_disk_usage(userobj))
 
 
 class MinarcaSshKeysTest(AppTestCase):
