@@ -32,29 +32,35 @@ from minarca_plugins import MinarcaUserSetup, MinarcaQuota
 import minarca_plugins
 
 
-class MinarcaUserSetupTest(WebCase):
+class AbstractMinarcaTest(WebCase):
+    """
+    Abstract test class to setup minarca for testing.
+    """
 
-    # Reset app and testcases on every test
-    reset_app = True
-    # Login as admin before each test
+    @classmethod
+    def setup_class(cls):
+        if not os.path.isdir('/tmp/minarca-test'):
+            os.mkdir('/tmp/minarca-test')
+        # Use temporary folder for base dir
+        cls.default_config['MinarcaUserBaseDir'] = '/tmp/minarca-test'
+        # Use current user for owner and group
+        cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[0]
+        cls.default_config['MinarcaUserDirGroup'] = pwd.getpwuid(os.getuid())[0]
+        super(AbstractMinarcaTest, cls).setup_class()
+
+    @classmethod
+    def teardown_class(cls):
+        shutil.rmtree('/tmp/minarca-test', ignore_errors=True)
+        super(AbstractMinarcaTest, cls).teardown_class()
+
+
+class MinarcaUserSetupTest(AbstractMinarcaTest):
+
     login = True
 
     @classmethod
-    def setup_server(cls):
-        if not os.path.isdir('/tmp/minarca-test'):
-            os.mkdir('/tmp/minarca-test')
-        WebCase.setup_server(default_config={
-            'MinarcaUserBaseDir': '/tmp/minarca-test',
-            })
-
-    def setUp(self):
-        if not os.path.isdir('/tmp/minarca-test'):
-            os.mkdir('/tmp/minarca-test')
-        WebCase.setUp(self)
-
-    def tearDown(self):
-        WebCase.tearDown(self)
-        shutil.rmtree('/tmp/minarca-test')
+    def setup_class(cls):
+        super(MinarcaUserSetupTest, cls).setup_class()
 
     def _add_user(self, username=None, email=None, password=None, user_root=None, is_admin=None):
         b = {}
@@ -77,11 +83,14 @@ class MinarcaUserSetupTest(WebCase):
         
         Make sure the user_root getg populated with default value from basedir.
         """
+        # Check if minarca base dir is properly defined
+        self.assertEqual('/tmp/minarca-test', self.app.cfg.minarca_user_base_dir)
+
         #  Add user to be listed
         self._add_user("mtest1", None, "mtest1", None, False)
         self.assertInBody("User added successfully.")
         user = self.app.store.get_user('mtest1')
-        self.assertEquals('/tmp/minarca-test/mtest1', user.user_root)
+        self.assertEqual('/tmp/minarca-test/mtest1', user.user_root)
 
     def test_add_user_with_user_root(self):
         """
@@ -93,14 +102,21 @@ class MinarcaUserSetupTest(WebCase):
         self._add_user("mtest2", None, "mtest2", "/home/mtest2", False)
         self.assertInBody("User added successfully.")
         user = self.app.store.get_user('mtest2')
-        self.assertEquals('/tmp/minarca-test/mtest2', user.user_root)
+        self.assertEqual('/tmp/minarca-test/mtest2', user.user_root)
+
+    def test_default_arguments(self):
+        self.assertEqual("orange", self.app.cfg.default_theme)
+        self.assertIn("minarca.ico", self.app.cfg.favicon)
+        self.assertEqual("Minarca", self.app.cfg.footer_name)
+        self.assertEqual("Minarca", self.app.cfg.header_name)
+        self.assertIn("minarca_22.png", self.app.cfg.header_logo)
+        self.assertEqual("/var/log/minarca/access.log", self.app.cfg.log_access_file)
+        self.assertEqual("/var/log/minarca/server.log", self.app.cfg.log_file)
+        self.assertIn('minarca', self.app.cfg.welcome_msg[''])
+        self.assertIn('minarca', self.app.cfg.welcome_msg['fr'])
 
 
-class MinarcaTest(WebCase):
-
-    # Reset app and testcases on every test
-    reset_app = True
-    reset_testcases = False
+class MinarcaTest(AbstractMinarcaTest):
 
     # Disable interactive mode.
     interactive = False
@@ -116,7 +132,7 @@ class MinarcaTest(WebCase):
         'uid': ['bob'],
         'cn': ['bob'],
         'userPassword': ['password'],
-        'homeDirectory': '/tmp/bob',
+        'homeDirectory': '/tmp/minarca-test/bob',
         'mail': ['bob@test.com'],
         'description': ['v2'],
         'objectClass': ['person', 'organizationalPerson', 'inetOrgPerson', 'posixAccount']})
@@ -129,25 +145,18 @@ class MinarcaTest(WebCase):
         bob,
     ])
 
-    @classmethod
-    def setup_server(cls):
-        WebCase.setup_server(default_config={
-            'AddMissingUser': 'true',
-            'LdapUri': '__default__',
-            'LdapBaseDn': 'dc=nodomain',
-            'MinarcaUserBaseDir': '/tmp/minarca-test',
-            })
+    default_config = {
+        'AddMissingUser': 'true',
+        'LdapUri': '__default__',
+        'LdapBaseDn': 'dc=nodomain',
+    }
 
     def setUp(self):
-        self.app.store.get_user('admin').user_root = '/tmp'
         # Mock LDAP
         self.mockldap = MockLdap(self.directory)
         self.mockldap.start()
         self.ldapobj = self.mockldap['ldap://localhost/']
         WebCase.setUp(self)
-        self.plugin = MinarcaUserSetup(self.app)
-        if not os.path.isdir('/tmp/minarca-test'):
-            os.mkdir('/tmp/minarca-test')
 
     def tearDown(self):
         WebCase.tearDown(self)
@@ -155,7 +164,6 @@ class MinarcaTest(WebCase):
         self.mockldap.stop()
         del self.ldapobj
         del self.mockldap
-        shutil.rmtree('/tmp/minarca-test')
 
     def test_login(self):
         """
@@ -165,14 +173,28 @@ class MinarcaTest(WebCase):
         self.assertIsNotNone(userobj)
         self.assertIsNotNone(self.app.store.get_user('bob'))
         # Check if profile get update from Ldap info.
-        self.assertEquals('bob@test.com', self.app.store.get_user('bob').email)
-        self.assertEquals('/tmp/minarca-test/bob', self.app.store.get_user('bob').user_root)
+        self.assertEqual('bob@test.com', self.app.store.get_user('bob').email)
+        self.assertEqual('/tmp/minarca-test/bob', self.app.store.get_user('bob').user_root)
+
+
+class MinarcaRemoteIdentityTest(AbstractMinarcaTest):
+
+    default_config = {
+        'minarcaremotehost': "test.examples:2222",
+        'minarcaremotehostidentity': pkg_resources.resource_filename(__name__, '')  # @UndefinedVariable
+    }
+
+    def test_get_api_minarca_identity(self):
+        self._login(self.USERNAME, self.PASSWORD)
+        data = self.getJson("/api/minarca/")
+        self.assertIn("[test.examples]:2222", data['identity'])
+
+
+class MinarcaRemoteIdentityNoneTest(AbstractMinarcaTest):
+
+    login = True
 
     def test_get_api_minarca(self):
-        self.app.cfg['minarcaremotehost'] = None
-        self.app.cfg['minarcaremotehostidentity'] = None
-
-        self._login('bob', 'password')
         self.getPage("/api/minarca")
         # Check version
         self.assertInBody('version')
@@ -182,20 +204,10 @@ class MinarcaTest(WebCase):
         # Check identity
         self.assertInBody('identity')
 
-    def test_get_api_minarca_identity(self):
-        self.app.cfg['minarcaremotehost'] = "test.examples:2222"
-        self.app.cfg['minarcaremotehostidentity'] = pkg_resources.resource_filename(__name__, '')  # @UndefinedVariable
-        self._login(self.USERNAME, self.PASSWORD)
-        data = self.getJson("/api/minarca/")
-        self.assertIn("[test.examples]:2222", data['identity'])
-
     def test_get_api_minarca_with_reverse_proxy(self):
-        self.app.cfg['minarcaremotehost'] = None
-        self.app.cfg['minarcaremotehostidentity'] = None
 
         # When behind an apache reverse proxy, minarca server should make use
         # of the Header to determine the public hostname provided.
-        self._login('bob', 'password')
         headers = [
             ('X-Forwarded-For', '10.255.1.106'),
             ('X-Forwarded-Host', 'sestican.patrikdufresne.com'),
@@ -205,42 +217,38 @@ class MinarcaTest(WebCase):
         self.assertInBody('remotehost')
         self.assertInBody('sestican.patrikdufresne.com')
 
-    def test_get_help(self):
-        # Check if help get redirect
-        self.getPage("/help")
-        self.assertStatus(303)
-        self.assertHeader('Location', 'https://www.ikus-soft.com/en/support/#form')
 
+class MinarcaHelpTest(AbstractMinarcaTest):
+
+    default_config = {
+        'minarcahelpurl': 'https://example.com/help/'
+    }
+
+    def test_get_help(self):
         # Check if the URL can be changed
-        self.app.cfg['minarcahelpurl'] = 'https://example.com/help/'
         self.getPage("/help")
         self.assertStatus(303)
         self.assertHeader('Location', 'https://example.com/help/')
 
 
-class MinarcaAdminLogView(WebCase):
+class MinarcaAdminLogView(AbstractMinarcaTest):
+
+    default_config = {
+        'logfile': '/tmp/minarca-test/server.log',
+        'minarcaquotaapiurl': 'http://localhost:8081',
+    }
 
     login = True
 
     @classmethod
-    def setup_server(cls):
-        if not os.path.isdir('/tmp/minarca-test'):
-            os.mkdir('/tmp/minarca-test')
+    def setup_class(cls):
+        super(MinarcaAdminLogView, cls).setup_class()
         with open('/tmp/minarca-test/server.log', 'w') as f:
             f.write('data')
         with open('/tmp/minarca-test/shell.log', 'w') as f:
             f.write('data')
         with open('/tmp/minarca-test/quota-api.log', 'w') as f:
             f.write('data')
-        WebCase.setup_server(default_config={
-            'logfile': '/tmp/minarca-test/server.log',
-            'minarcaquotaapiurl': 'http://localhost:8081',
-        })
-
-    @classmethod
-    def tearDownClass(cls):
-        if os.path.isdir('/tmp/minarca-test'):
-            shutil.rmtree('/tmp/minarca-test')
 
     def test_adminview(self):
         self.getPage('/admin/logs')
@@ -256,15 +264,17 @@ class MinarcaUserQuota(AppTestCase):
     Test Get/Set user quota
     """
 
+    default_config = {
+        'minarcaquotaapiurl': 'http://minarca:secret@localhost:8081/',
+        'minarcauserbasedir': '/tmp/minarca-test'
+    }
+
     def setUp(self):
         # Create folder
         if not os.path.isdir('/tmp/minarca-test'):
             os.mkdir('/tmp/minarca-test')
         # Setup app
         AppTestCase.setUp(self)
-        # Override some config
-        self.app.cfg['minarcaquotaapiurl'] = 'http://minarca:secret@localhost:8081/'
-        self.app.cfg['minarcauserbasedir'] = '/tmp/minarca-test'
         # Start the plugin.
         self.plugin = MinarcaQuota(self.app)
 
@@ -283,7 +293,7 @@ class MinarcaUserQuota(AppTestCase):
         # Set quota
         self.plugin.set_disk_quota(userobj, quota=1234567)
         # Check if subprocessis called twice
-        self.assertEquals(2, minarca_plugins.subprocess.check_output.call_count, "subprocess.check_output should be called")
+        self.assertEqual(2, minarca_plugins.subprocess.check_output.call_count, "subprocess.check_output should be called")
 
     @httpretty.activate
     def test_update_userquota_401(self):
@@ -305,17 +315,13 @@ class MinarcaUserQuota(AppTestCase):
         # Checks if exception is raised when authentication is failing.
         httpretty.register_uri(httpretty.GET, "http://localhost:8081/quota/" + str(userobj.userid),
                                body='{"used": 1234, "size": 2147483648}')
-        self.assertEquals(1234, self.plugin.get_disk_usage(userobj))
+        self.assertEqual(1234, self.plugin.get_disk_usage(userobj))
 
 
 class MinarcaSshKeysTest(AppTestCase):
     """
     Collections of tests related to ssh keys file update.
     """
-    USERNAME = 'admin'
-
-    PASSWORD = 'test'
-
     base_dir = tempfile.mkdtemp(prefix='minarca_tests_')
 
     default_config = {

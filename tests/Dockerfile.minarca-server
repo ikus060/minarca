@@ -19,5 +19,5 @@ RUN curl --fail -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh -o /
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost:8080/ || exit 1
   
-CMD [ "bash", "-c", "(/usr/sbin/sshd -D &) && (/opt/minarca-server/bin/rdiffweb --config=/etc/minarca/minarca-server.conf &) && tail -f /var/log/auth.log /var/log/minarca/*.log" ]
+CMD [ "bash", "-c", "(/usr/sbin/sshd -D &) && (/opt/minarca-server/bin/rdiffweb &) && tail -f /var/log/auth.log /var/log/minarca/*.log" ]
 
