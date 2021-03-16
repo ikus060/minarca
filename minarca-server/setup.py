@@ -44,11 +44,13 @@ setuptools.setup(
     ],
     # required packages for build process
     tests_require=[
+        "nose",
         "mock>=1.3.0",
         "mockldap>=0.2.6",
         "httpretty",
         "pytest",
     ],
+    test_suite='nose.collector',
     # Declare entry point
     entry_points={
         'rdiffweb.IUserChangeListener': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],

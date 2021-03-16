@@ -30,10 +30,12 @@ setuptools.setup(
     ],
     # requirement for testing
     tests_require=[
+        "nose",
         "mock>=1.3.0",
         "pytest",
         "coverage",
     ],
+    test_suite='nose.collector',
     entry_points={
         "console_scripts": [
             "minarca-quota-api = minarca_quota_api:run"

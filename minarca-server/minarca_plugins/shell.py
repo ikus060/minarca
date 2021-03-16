@@ -103,7 +103,7 @@ def _jail(userroot, args):
     rdiff-backup execution.
     """
     with Jail(userroot):
-        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'HOME': userroot}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
+        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'HOME': userroot})
 
 
 def main(args=None):
@@ -137,7 +137,7 @@ def main(args=None):
     _extra_args = cfg.minarca_rdiff_backup_extra_args
     if _extra_args:
         _extra_args = _extra_args.split(' ')
-    else: 
+    else:
         _extra_args = []
 
     # Either we get called by rdiff-backup directly
