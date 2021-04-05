@@ -39,7 +39,7 @@ Then start a backup in few minutes by installing minarca client for [Windows](ht
 
 **Minarca Server**
 
-On Debian Stretch and Buster:
+On Debian Buster:
 
     curl https://www.ikus-soft.com/archive/minarca/get-minarca.sh | sh -
     

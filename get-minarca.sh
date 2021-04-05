@@ -35,6 +35,7 @@ if [ -f /etc/debian_version ]; then
     case "`cat /etc/debian_version`" in
     9*)  DEBIAN_DISTRIBUTION=stretch;;
     10*) DEBIAN_DISTRIBUTION=buster;;
+    11*) DEBIAN_DISTRIBUTION=bullseye;;
     *)
       >&2 echo "Error: Linux distribution not supported."
       exit 1

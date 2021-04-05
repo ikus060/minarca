@@ -12,9 +12,7 @@ DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
 #
 
 # Name few docker images that get reused
-ifeq ($(DIST),stretch)
-DIST_VERSION = 9
-else ifeq ($(DIST),buster)
+ifeq ($(DIST),buster)
 DIST_VERSION = 10
 else ifeq ($(DIST),bullseye)
 DIST_VERSION = 11
