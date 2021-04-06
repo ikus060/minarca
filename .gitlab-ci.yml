@@ -85,11 +85,18 @@ upload:buster:www:
 integration-tests:
   <<: *make
   stage: integration-tests
+  allow_failure: True
   script:
   - export MINARCA_VERSION=$(cd minarca-server; make version)
-  - echo MINARCA_VERSION=$MINARCA_VERSION
+  - echo MINARCA_VERSION=$MINARCA_SERVER_VERSION
+  - cd integration-tests
   - apk add docker-compose
-  - make integration-tests
+  # Test latest version of client & server
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=debian:buster ./run.sh
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=win32         ./run.sh
+  # Test backward compatibility with 3.8.0 (rdiff-backup-1.2.8)
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=debian:buster ./run.sh
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=win32         ./run.sh
 
 deploy_staging_sestican:
   stage: deploy

@@ -15,7 +15,6 @@ SHELL = /bin/sh
 DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
 
 # List package dependencies
-SERVER_DEPENDS = libldap2-dev libsasl2-dev rdiff-backup
 SERVER_BUILD_DEPENDS = dh-make dh-virtualenv dh-systemd python3-pip python3-dev python3-setuptools libffi-dev libldap2-dev libsasl2-dev git build-essential lsb-release
 
 #
@@ -55,7 +54,7 @@ UID = $(shell id -u)
 all: test bdist clean
 
 test:
-	$(call docker_run,${IMAGE_PYTHON},apt update && apt -y install ${SERVER_DEPENDS} --no-install-recommends && PIP_EXTRA_INDEX_URL=https://nexus.ikus-soft.com/repository/pypi-group/simple/ tox)
+	$(call docker_run,${IMAGE_PYTHON},apt update && apt -y install libldap2-dev libsasl2-dev rdiff-backup --no-install-recommends && PIP_EXTRA_INDEX_URL=https://nexus.ikus-soft.com/repository/pypi-group/simple/ tox)
 
 bdist: ${MINARCA_SERVER_DEB_FILE}
 

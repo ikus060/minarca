@@ -17,7 +17,7 @@ if [ -z "$WINEPREFIX" ]; then
 
     # Install minarca client (For Linux)
     curl --fail -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh -o /tmp/get-minarca.sh
-    bash /tmp/get-minarca.sh --dev --package minarca-client --version "$MINARCA_VERSION"
+    bash /tmp/get-minarca.sh --dev --package minarca-client --version "$MINARCA_CLIENT_VERSION"
     minarca --version
     
     # Link minarca
@@ -32,8 +32,8 @@ if [ -z "$WINEPREFIX" ]; then
 else
   
     # Install minarca client (For Windows)
-    MINARCA_INSTALL_FILE=minarca-client_${MINARCA_VERSION}.exe
-    if [ "${MINARCA_VERSION}" = "latest" ]; then
+    MINARCA_INSTALL_FILE=minarca-client_${MINARCA_CLIENT_VERSION}.exe
+    if [ "${MINARCA_CLIENT_VERSION}" = "latest" ]; then
         MINARCA_INSTALL_FILE=minarca-latest-install.exe;
     fi
     curl --fail -L https://www.ikus-soft.com/archive/minarca/${MINARCA_INSTALL_FILE} -o /tmp/minarca-install.exe

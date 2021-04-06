@@ -175,27 +175,17 @@ public class Compat {
      */
     private static String chcp() {
         try {
-            Process p = new ProcessBuilder().command("cmd.exe", "/c", "chcp").redirectErrorStream(true).start();
-            StreamHandler sh = new StreamHandler(p, Charset.defaultCharset());
-            if (p.waitFor() != 0) {
-                return null;
-            }
+            String output = ProcessUtils.checkCall("cmd.exe", "/c", "chcp");
             // Parse a line similar to
             // Page de codes active : 850
-            String output = sh.getOutput();
             Matcher m = Pattern.compile("[0-9]+").matcher(output);
             if (!m.find()) {
                 return null;
             }
             return m.group(0);
         } catch (IOException e) {
-            // Swallow
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // Swallow. Should no happen
-            Thread.currentThread().interrupt();
+            throw new IllegalStateException("can't get default encoding", e);
         }
-        throw new IllegalStateException("can't get default encoding");
     }
 
     /**
@@ -498,21 +488,10 @@ public class Compat {
         if (args != null) {
             command.addAll(Arrays.asList(args));
         }
-        LOGGER.debug("executing {}", StringUtils.join(command, " "));
         try {
-            Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
-            StreamHandler sh = new StreamHandler(p);
-            if (p.waitFor() != 0) {
-                throw new APIException(sh.getOutput());
-            }
-            return sh.getOutput();
+            return ProcessUtils.checkCall(command);
         } catch (IOException e) {
-            throw new APIException("fail to create subprocess", e);
-        } catch (InterruptedException e) {
-            // Swallow. Should no happen
-            LOGGER.warn("process interrupted", e);
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("reg.exe process interrupted");
+            throw new IllegalStateException("fail to query or update windows registry", e);
         }
     }
 

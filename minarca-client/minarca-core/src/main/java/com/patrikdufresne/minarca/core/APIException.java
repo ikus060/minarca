@@ -11,6 +11,14 @@ import java.io.File;
 
 public class APIException extends Exception {
 
+    public static class RdiffBackupMissingException extends APIException {
+
+        public RdiffBackupMissingException() {
+            super(_("rdiff-backup is missing"));
+        }
+
+    }
+
     /**
      * Raised when the client fail to authenticate with the server. (Map to HTTP status code 401)
      * 

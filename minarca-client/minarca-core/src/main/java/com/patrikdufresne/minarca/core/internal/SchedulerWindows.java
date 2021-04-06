@@ -5,8 +5,6 @@
  */
 package com.patrikdufresne.minarca.core.internal;
 
-import static com.patrikdufresne.minarca.core.Localized._;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +14,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -161,6 +158,7 @@ public class SchedulerWindows extends Scheduler {
      * @see http ://www.windowsnetworking.com/kbase/WindowsTips/WindowsXP/AdminTips
      *      /Utilities/XPschtaskscommandlineutilityreplacesAT.exe.html
      */
+    @Override
     public synchronized void create() throws APIException {
         LOGGER.debug("creating schedule task [{}]", TASK_NAME);
 
@@ -194,7 +192,12 @@ public class SchedulerWindows extends Scheduler {
         args.add("HOURLY");
 
         // Execute the command.
-        String data = execute(args);
+        String data;
+        try {
+            data = schtasks(args);
+        } catch (IOException e) {
+            throw new APIException("fail to schedule task", e);
+        }
 
         // FIXME looking at command output is not the best since it change according to user language.
         if (ERROR_PATTERN.matcher(data).find()) {
@@ -209,9 +212,15 @@ public class SchedulerWindows extends Scheduler {
      *            the task to be deleted.
      * @throws APIException
      */
+    @Override
     public synchronized boolean delete() throws APIException {
         LOGGER.debug("deleting schedule task [{}]", TASK_NAME);
-        String data = execute("/Delete", "/F", "/TN", TASK_NAME);
+        String data;
+        try {
+            data = schtasks("/Delete", "/F", "/TN", TASK_NAME);
+        } catch (IOException e) {
+            return false;
+        }
         return data.contains("SUCCESS");
     }
 
@@ -220,26 +229,13 @@ public class SchedulerWindows extends Scheduler {
      * 
      * @throws APIException
      */
-    String execute(List<String> args) throws APIException {
+    String schtasks(List<String> args) throws IOException {
         List<String> command = new ArrayList<String>();
         command.add("schtasks.exe");
         if (args != null) {
             command.addAll(args);
         }
-        LOGGER.debug("executing {}", StringUtils.join(command, " "));
-        try {
-            Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
-            StreamHandler sh = new StreamHandler(p);
-            p.waitFor();
-            return sh.getOutput();
-        } catch (IOException e) {
-            throw new APIException("fail to create subprocess", e);
-        } catch (InterruptedException e) {
-            // Swallow. Should no happen
-            LOGGER.warn("process interrupted", e);
-            Thread.currentThread().interrupt();
-        }
-        return null;
+        return ProcessUtils.checkCall(command);
     }
 
     /**
@@ -249,8 +245,8 @@ public class SchedulerWindows extends Scheduler {
      * @return
      * @throws APIException
      */
-    private String execute(String... args) throws APIException {
-        return execute(Arrays.asList(args));
+    private String schtasks(String... args) throws IOException {
+        return schtasks(Arrays.asList(args));
     }
 
     /**
@@ -308,13 +304,13 @@ public class SchedulerWindows extends Scheduler {
      * @return the task information.
      * @throws APIException
      */
-    private TaskInfoWin internalQueryCsv(String taskname) throws APIException {
+    private TaskInfoWin internalQueryCsv(String taskname) throws IOException {
         // Execute the query command.
         String data;
         if (SystemUtils.IS_OS_WINDOWS_2003 || SystemUtils.IS_OS_WINDOWS_XP) {
-            data = execute("/Query", "/FO", "CSV", "/V");
+            data = schtasks("/Query", "/FO", "CSV", "/V");
         } else {
-            data = execute("/Query", "/FO", "CSV", "/V", "/TN", taskname);
+            data = schtasks("/Query", "/FO", "CSV", "/V", "/TN", taskname);
         }
         // Read the first line
         Scanner scanner = new Scanner(data);
@@ -353,7 +349,7 @@ public class SchedulerWindows extends Scheduler {
      * @param taskname
      * @throws APIException
      */
-    private TaskInfoWin query(String taskname) throws APIException {
+    private TaskInfoWin query(String taskname) throws IOException {
         Validate.notNull(taskname);
         return internalQueryCsv(taskname);
     }

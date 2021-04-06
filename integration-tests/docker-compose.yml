@@ -10,7 +10,7 @@ services:
           context: .
           dockerfile: Dockerfile.minarca-quota-api
           args:
-            - MINARCA_VERSION
+            - MINARCA_SERVER_VERSION
         networks:
           - integration-tests
 
@@ -19,7 +19,7 @@ services:
           context: .
           dockerfile: Dockerfile.minarca-server
           args:
-            - MINARCA_VERSION
+            - MINARCA_SERVER_VERSION
         privileged: true
         depends_on:
           - minarca-quota-api
@@ -34,7 +34,7 @@ services:
             - DIST=$CLIENT_DIST
         environment:
           MINARCA_REMOTE_URL: http://minarca-server:8080/
-          MINARCA_VERSION: "$MINARCA_VERSION"
+          MINARCA_CLIENT_VERSION: "$MINARCA_CLIENT_VERSION"
         depends_on:
           - minarca-server
         networks:
