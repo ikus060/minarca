@@ -69,4 +69,20 @@ public class ProcessUtilsTest {
         }
     }
 
+    @Test
+    public void testCheckCallWithInvalidExecutable() {
+        try {
+            ProcessUtils.checkCall("invalid");
+            fail("expect IOException");
+        } catch (IOException e) {
+            // Success
+        }
+    }
+
+    @Test
+    public void testCheckCall() throws IOException {
+        String output = ProcessUtils.checkCall("echo", "coucou");
+        assertEquals("coucou\n", output);
+    }
+
 }
