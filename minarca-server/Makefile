@@ -10,7 +10,7 @@
 #
 #    build:		Generate distribution packages for all components 
 #
-# Define the distribution to be build: buster, stretch, sid, etc.
+# Define the distribution to be build: buster, sid, etc.
 SHELL = /bin/sh
 DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
 
@@ -23,9 +23,7 @@ SERVER_BUILD_DEPENDS = dh-make dh-virtualenv dh-systemd python3-pip python3-dev 
 #
 
 # Name few docker images that get reused
-ifeq ($(DIST),stretch)
-DIST_VERSION = 9
-else ifeq ($(DIST),buster)
+ifeq ($(DIST),buster)
 DIST_VERSION = 10
 else ifeq ($(DIST),bullseye)
 DIST_VERSION = 11

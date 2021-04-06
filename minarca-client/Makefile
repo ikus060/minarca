@@ -10,7 +10,7 @@
 #
 #    build:		Generate distribution packages for all components 
 #
-# Define the distribution to be build: buster, stretch, sid, etc.
+# Define the distribution to be build: buster, sid, etc.
 SHELL = /bin/sh
 DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
 
