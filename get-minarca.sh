@@ -139,9 +139,9 @@ gQE3m8lXH8dR1xPpHljQOAViq/QvCyBjviRwNZ38JxooZZxIPhvTqaMI8567l3cH
 =EPRn
 -----END PGP PUBLIC KEY BLOCK-----" | apt-key add - 
 
-echo "deb https://nexus.ikus-soft.com/repository/minarca-apt-release-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" > /etc/apt/sources.list.d/minarca.list
+echo "deb https://nexus.ikus-soft.com/repository/apt-release-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" > /etc/apt/sources.list.d/minarca.list
 if [ $DEV -eq 1 ]; then
-    echo "deb https://nexus.ikus-soft.com/repository/minarca-apt-dev-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" >> /etc/apt/sources.list.d/minarca.list
+    echo "deb https://nexus.ikus-soft.com/repository/apt-dev-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" >> /etc/apt/sources.list.d/minarca.list
 fi
 
 call "Updating repositories again..." apt-get update
