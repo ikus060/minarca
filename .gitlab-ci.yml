@@ -3,8 +3,8 @@ variables:
                -Dorg.slf4j.simpleLogger.showDateTime=true
                -Djava.awt.headless=true
                -Dmaven.repo.local=.m2/repository"
-  APT_DEV_BUSTER: https://nexus.ikus-soft.com/repository/minarca-apt-dev-buster/
-  APT_RELEASE_BUSTER: https://nexus.ikus-soft.com/repository/minarca-apt-release-buster/
+  APT_DEV_BUSTER: https://nexus.ikus-soft.com/repository/apt-dev-buster/
+  APT_RELEASE_BUSTER: https://nexus.ikus-soft.com/repository/apt-release-buster/
 
 stages:
 - test-and-bdist

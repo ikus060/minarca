@@ -29,7 +29,7 @@ On a Debian Linux server:
     sudo apt-get update
     sudo apt-get install apt-transport-https ca-certificates gnupg
     curl -L https://www.ikus-soft.com/archive/minarca/public.key | sudo apt-key add -
-    echo "deb https://nexus.ikus-soft.com/repository/minarca-apt-release-buster/ buster main" | sudo tee /etc/apt/sources.list.d/minarca.list
+    echo "deb https://nexus.ikus-soft.com/repository/apt-release-buster/ buster main" | sudo tee /etc/apt/sources.list.d/minarca.list
     apt-get update
     apt-get install minarca-server
 
