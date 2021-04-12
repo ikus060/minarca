@@ -8,9 +8,16 @@ package com.patrikdufresne.minarca.core.internal;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
@@ -26,6 +33,8 @@ import com.sun.jna.platform.win32.WinNT.HANDLE;
  * 
  */
 public class ProcessUtils {
+
+    private static final transient Logger LOGGER = LoggerFactory.getLogger(ProcessUtils.class);
 
     /**
      * Data structure to hold basic process information retrieved using the pid.
@@ -191,7 +200,45 @@ public class ProcessUtils {
                 // Nothing to do
             }
         }
+    }
 
+    public static String checkCall(String... args) throws IOException {
+        return checkCall(Arrays.asList(args));
+    }
+
+    public static String checkCall(List<String> args) throws IOException {
+        return checkCall(args, null, Charset.defaultCharset());
+    }
+
+    /**
+     * Execute the given command line
+     * 
+     * @return stdout and stderr
+     * @throws IOException
+     */
+    public static String checkCall(List<String> args, File cwd, Charset charset) throws IOException {
+        Validate.notNull(args);
+        Validate.isTrue(args.size() > 0);
+
+        LOGGER.debug("executing command: {}", StringUtils.join(args, " "));
+        ProcessBuilder builder = new ProcessBuilder().command(args).redirectErrorStream(true);
+        if (cwd != null) {
+            builder.directory(cwd);
+        }
+        Process p = builder.start();
+        try {
+            StreamHandler sh = new StreamHandler(p, Charset.defaultCharset());
+            int exitCode = p.waitFor();
+            if (exitCode != 0) {
+                throw new IOException("command [" + StringUtils.join(args, " ") + "] exit with error code: " + exitCode + "\n" + sh.getOutput());
+            }
+            return sh.getOutput();
+        } catch (InterruptedException e) {
+            p.destroy();
+            // Swallow. Should no happen
+            Thread.currentThread().interrupt();
+            return null;
+        }
     }
 
 }

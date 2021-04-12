@@ -15,7 +15,7 @@ SHELL = /bin/sh
 DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
 
 # List package dependencies
-CLIENT_DEPENDS = osslsigncode icoutils nsis cron gettext
+CLIENT_DEPENDS = osslsigncode icoutils nsis cron gettext rdiff-backup
 
 #
 # == Variables ==

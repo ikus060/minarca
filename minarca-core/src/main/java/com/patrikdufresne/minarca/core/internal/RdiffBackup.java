@@ -9,6 +9,7 @@ import static com.patrikdufresne.minarca.core.Localized._;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,10 +20,11 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.patrikdufresne.minarca.core.API;
 import com.patrikdufresne.minarca.core.APIException;
 import com.patrikdufresne.minarca.core.APIException.IdentityMissingException;
 import com.patrikdufresne.minarca.core.APIException.MissConfiguredException;
-import com.patrikdufresne.minarca.core.APIException.SshMissingException;
+import com.patrikdufresne.minarca.core.APIException.RdiffBackupMissingException;
 import com.patrikdufresne.minarca.core.APIException.UntrustedHostKey;
 import com.patrikdufresne.minarca.core.GlobPattern;
 
@@ -218,43 +220,15 @@ public class RdiffBackup {
      *            the arguments list.
      * @throws APIException
      */
-    protected void execute(List<String> command, File workingDir) throws APIException, InterruptedException {
-        Validate.notNull(command);
-        Validate.isTrue(command.size() > 0);
-        LOGGER.debug("executing {}", StringUtils.join(command, " "));
-        Process p;
+    protected void execute(List<String> args, File workingDir) throws APIException {
         try {
-            // Execute the process.
-            ProcessBuilder builder = new ProcessBuilder();
-            if (workingDir != null) {
-                builder.directory(workingDir);
-            }
-            p = builder.command(command).redirectErrorStream(true).start();
+            ProcessUtils.checkCall(args, workingDir, Charset.defaultCharset());
         } catch (IOException e) {
-            LOGGER.warn("fail to create subprocess");
-            throw new APIException("fail to create subprocess", e);
-        }
-        try {
-            // Attach stream handle to answer a password when prompted
-            StreamHandler sh = new StreamHandler(p, Compat.CHARSET_PROCESS, true);
-            // Wait for process to complete
-            int returnCode = p.waitFor();
-            String output = sh.getOutput();
-            // Check for error message.
-            if (output.contains("Host key verification failed.")) {
+            if (e.getMessage().contains("Host key verification failed.")) {
                 // OpenSSH error.
                 throw new UntrustedHostKey();
-            } else if (output.contains("Connection abandoned.")) {
-                throw new APIException(sh.getOutput());
             }
-            // Check return code,
-            if (returnCode != 0) {
-                throw new APIException(sh.getOutput());
-            }
-        } catch (InterruptedException e) {
-            LOGGER.warn("rdiff-backup process interrupted", e);
-            p.destroy();
-            throw new InterruptedException("rdiff-backup process interrupted");
+            throw new APIException(e.getMessage());
         }
     }
 
@@ -263,8 +237,35 @@ public class RdiffBackup {
      * 
      * @return
      */
-    protected File getRdiffbackupLocation() {
-        return Compat.searchFile(RDIFF_BACKUP, System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
+    protected File getRdiffBackupLocation() throws APIException.RdiffBackupMissingException {
+        File file = Compat.searchFile(RDIFF_BACKUP, System.getProperty(PROPERTY_RDIFF_BACKUP_LOCATION), "./rdiff-backup-1.2.8/", "./bin/");
+        if (file == null) {
+            throw new APIException.RdiffBackupMissingException();
+        }
+        return file;
+    }
+
+    /**
+     * Return the version of rdiff-backup.
+     * 
+     * @return rdiff-backup version e.g. <code>1.2.8</code>
+     * @throws RdiffBackupMissingException
+     */
+    protected String getRdiffBackupVersion() throws RdiffBackupMissingException {
+        File file = getRdiffBackupLocation();
+        String output;
+        try {
+            output = ProcessUtils.checkCall(file.toString(), "--version");
+        } catch (IOException e) {
+            throw new IllegalStateException("can't determine rdiff-backup version", e);
+        }
+        // Check if it matches our patterns
+        output = output.trim();
+        if (!output.matches("rdiff-backup [a-b0-9\\.]+")) {
+            throw new IllegalStateException("can't determine rdiff-backup version: " + output);
+        }
+        // Extract version.
+        return output.replace("rdiff-backup ", "");
     }
 
     /**
@@ -281,17 +282,29 @@ public class RdiffBackup {
     }
 
     /**
+     * Return a user agent string. <code>
+     * Minarca/{version} rdiff-backup/version ({distribution}; {platform version}) 
+     * </code>
+     * 
+     * @return
+     * @throws RdiffBackupMissingException
+     */
+    protected String getUserAgent() throws RdiffBackupMissingException {
+        String minarcaVersion = "minarca/" + API.getCurrentVersion();
+        String rdiffBackupVersion = "rdiff-backup/" + getRdiffBackupVersion();
+        String os = SystemUtils.OS_NAME + " " + SystemUtils.OS_VERSION + " " + SystemUtils.OS_ARCH;
+        return minarcaVersion + " " + rdiffBackupVersion + " (" + os + ")";
+    }
+
+    /**
      * Utility method to start a rdiff-backup process.
      * 
      * @param extraArgs
      * @throws APIException
      */
-    protected void rdiffbackup(File workingDir, List<String> extraArgs, String path) throws APIException, InterruptedException {
+    protected void rdiffbackup(File workingDir, List<String> extraArgs, String path) throws APIException {
         // Get location of rdiff-backup.
-        File rdiffbackup = getRdiffbackupLocation();
-        if (rdiffbackup == null) {
-            throw new APIException("missing rdiff-backup");
-        }
+        File rdiffbackup = getRdiffBackupLocation();
         // Construct the command line.
         List<String> args = new ArrayList<String>();
         args.add(rdiffbackup.toString());
@@ -308,7 +321,7 @@ public class RdiffBackup {
         // Define the remote schema for each platform.
         args.add("--remote-schema");
         File ssh = getSshLocation();
-        if (ssh == null) throw new SshMissingException();
+        if (ssh == null) throw new APIException.SshMissingException();
         String extraOptions = "";
         if (getAcceptHostKey()) extraOptions += "-oStrictHostKeyChecking=no ";
         if (StringUtils.isNotBlank(remoteport)) extraOptions += "-p " + this.remoteport + " ";
@@ -317,12 +330,12 @@ public class RdiffBackup {
         // Last argument is the command line to be executed. This should be the repository name.
         // minarca-shell will make use if it.
         args.add(String.format(
-                "%s %s-oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s %s",
+                "%s %s-oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='%s' -oIdentitiesOnly=yes -i '%s' %%s '%s'",
                 ssh,
                 extraOptions,
                 knownHostsFile,
                 identityFile,
-                path));
+                getUserAgent()));
         // Add extra args.
         args.addAll(extraArgs);
         // Add remote host.
