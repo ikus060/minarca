@@ -27,7 +27,7 @@ public class SchedulerWindowsTest {
         String winxpdata = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("winxp.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(winxpdata).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(winxpdata).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -44,7 +44,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Program Files\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -61,7 +61,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-hourly.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -79,7 +79,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-weekly.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -96,7 +96,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-monthly.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -113,7 +113,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-daily.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -130,7 +130,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win7-fr-daily-running.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\vmuser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -146,7 +146,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-hourly.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -162,7 +162,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-daily.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -178,7 +178,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-weekly.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());
@@ -194,7 +194,7 @@ public class SchedulerWindowsTest {
         String win7data = IOUtils.toString(SchedulerWindowsTest.class.getResourceAsStream("win10-en-monthly.data"));
 
         SchedulerWindows s = Mockito.spy(new SchedulerWindows());
-        Mockito.doReturn(win7data).when(s).execute(Mockito.anyList());
+        Mockito.doReturn(win7data).when(s).schtasks(Mockito.anyList());
         Mockito.doReturn(new File("C:\\Users\\IEUser\\AppData\\Local\\minarca\\bin\\minarca64.exe")).when(s).getExeLocation();
 
         assertTrue(s.exists());

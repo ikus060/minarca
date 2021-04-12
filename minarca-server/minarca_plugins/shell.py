@@ -10,7 +10,7 @@ Created on Sep. 25, 2020
 @author: Patrik Dufresne
 '''
 
-import argparse
+from distutils import spawn
 from functools import reduce
 import logging
 import operator
@@ -74,14 +74,6 @@ class Jail(SplitExec):
         shutil.rmtree(self.root)
 
 
-def _parse_args(args):
-    parser = argparse.ArgumentParser(description='Minarca shell called to handle incoming SSH connection.')
-    parser.add_argument('username')
-    parser.add_argument('userroot')
-    # TODO parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
-    return parser.parse_args(args)
-
-
 def _setup_logging(cfg):
     """
     Configure minarca-shell log file.
@@ -106,15 +98,24 @@ def _jail(userroot, args):
         subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'HOME': userroot})
 
 
-def main(args=None):
+def _find_rdiff_backup(version=2):
+    assert version in [1, 2]
+    if version == 1:
+        executable = 'rdiff-backup-1.2'
+    else:
+        executable = 'rdiff-backup'
+    path = os.path.dirname(sys.executable) + os.pathsep + os.environ['PATH']
+    return spawn.find_executable(executable, path)
+
+
+def main():
     # Read the configuration and setup logging
     cfg = parse_args(args=[])
     _setup_logging(cfg)
 
     # Parse arguments
-    args = _parse_args(args or sys.argv[1:])
-    username = args.username
-    userroot = args.userroot
+    username = os.environ.get('MINARCA_USERNAME')
+    userroot = os.environ.get('MINARCA_USER_ROOT')
 
     # Add current user and ip address to logging context
     ip = os.environ.get('SSH_CLIENT', '').split(' ')[0]
@@ -122,7 +123,7 @@ def main(args=None):
     logger = logging.LoggerAdapter(logger, {'user':username, 'ip':ip})
 
     # Check if folder exists
-    if not os.path.isdir(userroot):
+    if not userroot or not os.path.isdir(userroot):
         logger.info("invalid user home: %s", userroot)
         print("ERROR user home directory is miss configured.", file=sys.stderr)
         sys.exit(1)
@@ -142,13 +143,34 @@ def main(args=None):
 
     # Either we get called by rdiff-backup directly
     # or we get called by minarca client which replace the command by the name of the repository.
-    if ssh_original_command in ["echo -n 1", "echo -n host is alive", "/usr/bin/rdiff-backup -V"]:
+    if ssh_original_command in ["echo -n 1", "echo -n host is alive"]:
         # Used by backup-ninja to verify connectivity
         subprocess.check_call(ssh_original_command.split(' '), env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
+    elif ssh_original_command in ["/usr/bin/rdiff-backup -V"]:
+        rdiff_backup = _find_rdiff_backup()
+        subprocess.check_call([rdiff_backup, '-V'], env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
     else:
-        # When called by minarca client, the command should be the name of the repository.
-        # Validate if the repository is valid.
-        cmd = ['rdiff-backup', '--server'] + _extra_args
+        if ssh_original_command in ["rdiff-backup --server"]:
+            # When called directly by rdiff-backup.
+            # So let use default rdiff-backup version.
+            rdiff_backup = _find_rdiff_backup(version=2)
+        elif 'minarca/' in ssh_original_command:
+            # When called by Minarca, we receive a user agent string.
+            if 'rdiff-backup/1.2.8' in ssh_original_command:
+                rdiff_backup = _find_rdiff_backup(version=1)
+            elif 'rdiff-backup/2.0' in ssh_original_command:
+                rdiff_backup = _find_rdiff_backup(version=2)
+            else:
+                logger.info("unsupported version: %s", ssh_original_command)
+                print("ERROR unsupported version: %s" % ssh_original_command, file=sys.stderr)
+                exit(1)
+        else:
+            # When called by legacy minarca client with rdiff-backup v1.2.8.
+            # the command should be the name of the repository.
+            rdiff_backup = _find_rdiff_backup(version=1)
+
+        # Run the server in chroot jail.
+        cmd = [rdiff_backup, '--server'] + _extra_args
         logger.info("running command [%s] in jail [%s]", ' '.join(cmd), userroot)
         try:
             _jail(userroot, cmd)

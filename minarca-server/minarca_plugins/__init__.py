@@ -373,7 +373,14 @@ class MinarcaUserSetup(IUserChangeListener):
                     seen.add(key.fingerprint)
 
                 # Add option to the key
-                options = """command="%s '%s' '%s'",%s""" % (self._minarca_shell, userobj.username, userobj.user_root, self._auth_options)
+                
+                
+                options = """command="export MINARCA_USERNAME='{username}' MINARCA_USER_ROOT='{user_root}';{minarca_shell}",{auth_options}""".format(
+                    minarca_shell=self._minarca_shell,
+                    username=userobj.username,
+                    user_root=userobj.user_root,
+                    auth_options=self._auth_options)
+
                 key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
 
                 # Write the new key

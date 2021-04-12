@@ -247,18 +247,15 @@ public class Crontab {
         if (args != null) {
             command.addAll(args);
         }
-        LOGGER.trace("executing {}", StringUtils.join(command, " "));
         try {
-            Process p = new ProcessBuilder().command(command).redirectErrorStream(true).start();
-            StreamHandler sh = new StreamHandler(p);
-            p.waitFor();
-            return sh.getOutput();
-        } catch (InterruptedException e) {
-            // Swallow. Should no happen
-            LOGGER.warn("process interrupted", e);
-            Thread.currentThread().interrupt();
+            return ProcessUtils.checkCall(command);
+        } catch (IOException e) {
+            // Ignore exit code 1, when the crontab is not defined for the user.
+            if (e.getMessage().contains("no crontab for")) {
+                return "";
+            }
+            throw e;
         }
-        return null;
     }
 
     /**

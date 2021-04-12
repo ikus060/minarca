@@ -14,7 +14,7 @@ import sys
 
 # snakeoil package drop support for py35, py36, and py37
 PY_VERSION = (sys.version_info.major, sys.version_info.minor)
-snakeoil_ver="snakeoil"
+snakeoil_ver = "snakeoil"
 if PY_VERSION < (3, 8):
     snakeoil_ver = "snakeoil<0.9.0"
 if PY_VERSION < (3, 6):
@@ -38,6 +38,7 @@ setuptools.setup(
     ],
     install_requires=[
         "rdiffweb==2.1.1.dev78+g34f1634",
+        "rdiff-backup>=2.0.1,<3",
         "cherrypy>=16.0.0",
         "requests",
         snakeoil_ver,

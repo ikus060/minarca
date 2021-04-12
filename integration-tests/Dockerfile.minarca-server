@@ -1,12 +1,18 @@
-FROM buildpack-deps:buster
+ARG DIST=debian:buster
+FROM ${DIST}
 
 EXPOSE 22
 EXPOSE 8080
 
-ARG MINARCA_VERSION
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl
+
+ARG MINARCA_SERVER_VERSION
 
 RUN curl --fail -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh -o /tmp/get-minarca.sh && \
-  bash /tmp/get-minarca.sh --dev --version "$MINARCA_VERSION" && \
+  bash /tmp/get-minarca.sh --dev --version "$MINARCA_SERVER_VERSION" && \
   rm /tmp/get-minarca.sh && \
   ssh-keygen -A && \
   mkdir -p /run/sshd && \

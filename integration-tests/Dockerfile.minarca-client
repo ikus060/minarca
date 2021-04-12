@@ -1,0 +1,12 @@
+ARG DIST=debian:buster
+FROM ${DIST}
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl
+
+ADD test.sh /
+RUN chmod +x /test.sh
+
+CMD [ "/test.sh" ]
