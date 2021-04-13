@@ -38,7 +38,6 @@ setuptools.setup(
     ],
     install_requires=[
         "rdiffweb==2.2.0a3",
-        "rdiff-backup>=2.0.1,<3",
         "cherrypy>=16.0.0",
         "requests",
         snakeoil_ver,
