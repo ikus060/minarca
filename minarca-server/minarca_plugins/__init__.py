@@ -199,12 +199,11 @@ class MinarcaUserSetup(IUserChangeListener):
         self._orig_get_log_files = self.app.root.admin._get_log_files
         self.app.root.admin._get_log_files = self._get_log_files
 
-        # FIXME at this point store is not yet created.
         # On startup Upgrade the authorized_keys in case the configuration changed.
-        # try:
-        #    self._update_authorized_keys()
-        # except:
-        #    logger.error("fail to update authorized_keys files on startup", exc_info=1)
+        try:
+            self._update_authorized_keys()
+        except:
+            logger.error("fail to update authorized_keys files on startup", exc_info=1)
 
     @cherrypy.expose
     @cherrypy.config(**{'tools.authform.on': False, 'tools.i18n.on': False, 'tools.authbasic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
@@ -373,8 +372,7 @@ class MinarcaUserSetup(IUserChangeListener):
                     seen.add(key.fingerprint)
 
                 # Add option to the key
-                
-                
+
                 options = """command="export MINARCA_USERNAME='{username}' MINARCA_USER_ROOT='{user_root}';{minarca_shell}",{auth_options}""".format(
                     minarca_shell=self._minarca_shell,
                     username=userobj.username,
