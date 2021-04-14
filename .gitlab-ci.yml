@@ -5,6 +5,8 @@ variables:
                -Dmaven.repo.local=.m2/repository"
   APT_DEV_BUSTER: https://nexus.ikus-soft.com/repository/apt-dev-buster/
   APT_RELEASE_BUSTER: https://nexus.ikus-soft.com/repository/apt-release-buster/
+  APT_DEV_BULLSEYE: https://nexus.ikus-soft.com/repository/apt-dev-bullseye/
+  APT_RELEASE_BULLSEYE: https://nexus.ikus-soft.com/repository/apt-release-bullseye/
 
 stages:
 - test-and-bdist
@@ -28,6 +30,13 @@ test:buster:
   variables:
     TARGET: test
     DIST: buster
+    
+test:bullseye:
+  <<: *make
+  stage: test-and-bdist
+  variables:
+    TARGET: test
+    DIST: bullseye
 
 bdist:buster:
   <<: *make
@@ -42,17 +51,28 @@ bdist:buster:
     - minarca-server_*_amd64.deb
     - minarca-quota-api_*_amd64.deb
 
-upload:buster:apt:
+bdist:bullseye:
+  <<: *make
+  stage: test-and-bdist
+  variables:
+    TARGET: bdist
+    DIST: bullseye
+  artifacts:
+    paths:
+    - minarca-client*.deb
+    - minarca-server_*_amd64.deb
+    - minarca-quota-api_*_amd64.deb
+
+.upload: &upload
   stage: upload
-  dependencies:
-  - bdist:buster
   script: |
     set -e
     if [ -z "$CI_COMMIT_TAG" ]; then
-      APT_URL="$APT_DEV_BUSTER"
+      APT_URL=APT_DEV_${DIST^^}
     else
-      APT_URL="$APT_RELEASE_BUSTER"
+      APT_URL=APT_RELEASE_${DIST^^}
     fi
+    APT_URL=${!APT_URL}
     # Minarca Server
     export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*_amd64.deb)
     curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
@@ -63,7 +83,21 @@ upload:buster:apt:
     export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
     curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
 
-upload:buster:www:
+upload:buster:apt:
+  <<: *upload
+  variables:
+    DIST: buster
+  dependencies:
+  - bdist:buster
+  
+upload:bullseye:apt:
+  <<: *upload
+  variables:
+    DIST: bullseye
+  dependencies:
+  - bdist:bullseye
+  
+upload:client:www:
   stage: upload
   dependencies:
   - bdist:buster
@@ -81,26 +115,29 @@ upload:buster:www:
     if [ ! -z "$CI_COMMIT_TAG" ]; then
       ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest.exe
     fi
-    
+
 integration-tests:
   <<: *make
   stage: integration-tests
   allow_failure: True
+  dependencies: []
   script:
   - export MINARCA_VERSION=$(cd minarca-server; make version)
-  - echo MINARCA_VERSION=$MINARCA_SERVER_VERSION
+  - echo MINARCA_VERSION=$MINARCA_VERSION
   - cd integration-tests
   - apk add docker-compose
   # Test latest version of client & server
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=debian:buster ./run.sh
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=win32         ./run.sh
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=debian:bullseye ./run.sh
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=debian:buster   ./run.sh
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=win32           ./run.sh
   # Test backward compatibility with 3.8.0 (rdiff-backup-1.2.8)
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=debian:buster ./run.sh
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=win32         ./run.sh
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=debian:buster   ./run.sh
+  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=win32           ./run.sh
 
 deploy_staging_sestican:
   stage: deploy
   image: buildpack-deps:buster
+  dependencies: []
   environment:
     name: staging
     url: https://test.minarca.net

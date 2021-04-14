@@ -32,12 +32,13 @@ fi
 #
 if [ -f /etc/debian_version ]; then
     DEBIAN=1
-    case "`cat /etc/debian_version`" in
+    DEBIAN_VERSION=$(cat /etc/debian_version)
+    case "$DEBIAN_VERSION" in
     9*)  DEBIAN_DISTRIBUTION=stretch;;
     10*) DEBIAN_DISTRIBUTION=buster;;
-    11*) DEBIAN_DISTRIBUTION=bullseye;;
+    bullseye*) DEBIAN_DISTRIBUTION=bullseye;;
     *)
-      >&2 echo "Error: Linux distribution not supported."
+      >&2 echo "Error: Debian Linux distribution not supported: $DEBIAN_VERSION"
       exit 1
       ;;
     esac
@@ -140,10 +141,8 @@ gQE3m8lXH8dR1xPpHljQOAViq/QvCyBjviRwNZ38JxooZZxIPhvTqaMI8567l3cH
 -----END PGP PUBLIC KEY BLOCK-----" | apt-key add - 
 
 echo "deb https://nexus.ikus-soft.com/repository/apt-release-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" > /etc/apt/sources.list.d/minarca.list
-echo "deb https://nexus.ikus-soft.com/repository/minarca-apt-release-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" >> /etc/apt/sources.list.d/minarca.list
 if [ $DEV -eq 1 ]; then
     echo "deb https://nexus.ikus-soft.com/repository/apt-dev-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" >> /etc/apt/sources.list.d/minarca.list
-    echo "deb https://nexus.ikus-soft.com/repository/minarca-apt-dev-$DEBIAN_DISTRIBUTION/ $DEBIAN_DISTRIBUTION main" >> /etc/apt/sources.list.d/minarca.list
 fi
 
 call "Updating repositories again..." apt-get update
