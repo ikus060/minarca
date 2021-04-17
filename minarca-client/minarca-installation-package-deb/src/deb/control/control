@@ -7,4 +7,4 @@ Depends: jdk (>= 1.7)
 Maintainer: IKUS Software inc. <support@ikus-soft.com>
 Description: Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage.
 Distribution: development
-Depends: default-jre-headless, rdiff-backup, ssh-client, cron
+Depends: default-jre-headless, rdiff-backup|rdiff-backup-1.2|rdiff-backup-2.0, ssh-client, cron
