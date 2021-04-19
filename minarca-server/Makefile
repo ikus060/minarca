@@ -15,7 +15,7 @@ SHELL = /bin/sh
 DIST ?= $(shell env -i bash -c '. /etc/os-release; echo $$VERSION_CODENAME')
 
 # List package dependencies
-SERVER_BUILD_DEPENDS = dh-make dh-virtualenv dh-systemd python3-pip python3-dev python3-setuptools libffi-dev libldap2-dev libsasl2-dev git build-essential lsb-release
+SERVER_BUILD_DEPENDS = dh-make dh-virtualenv python3-pip python3-dev python3-setuptools libffi-dev libldap2-dev libsasl2-dev git build-essential lsb-release
 
 #
 # == Variables ==

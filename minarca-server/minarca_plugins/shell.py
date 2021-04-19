@@ -99,11 +99,11 @@ def _jail(userroot, args):
 
 
 def _find_rdiff_backup(version=2):
-    assert version in [1, 2]
+    assert version in [1, 2], 'rdiff-backup version unsupported'
     if version == 1:
         executable = 'rdiff-backup-1.2'
     else:
-        executable = 'rdiff-backup'
+        executable = 'rdiff-backup-2.0'
     path = os.path.dirname(sys.executable) + os.pathsep + os.environ['PATH']
     return spawn.find_executable(executable, path)
 
