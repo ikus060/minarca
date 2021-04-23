@@ -326,7 +326,7 @@ public class Main {
         System.out.println("    minarca backup [--force]");
         System.out.println("    minarca stop [--force]");
         System.out.println("    minarca status");
-        System.out.println("    minarca link --remoteurl URL --username USERNAME [--password PASSWORD] --name REPOSITORYNAME");
+        System.out.println("    minarca link --remoteurl URL --username USERNAME [--password PASSWORD] --name REPOSITORYNAME [--force]");
         System.out.println("    minarca unlink");
         System.out.println("    minarca include <FILES>");
         System.out.println("    minarca exclude <FILES>");
@@ -352,7 +352,7 @@ public class Main {
         System.out.println("    --username | -u  The user name to be used for authentication");
         System.out.println("    --password | -p  The password to use for authentication. Will prompt if not provided.");
         System.out.println("    --name | -n      The repository name to be used.");
-        System.out.println("    --force | -f     Force the link even if the repository name already exists.");
+        System.out.println("    --force | -f     Force the opperation.");
         System.out.println("");
         System.out.println("unlink: unlink this minarca client from server");
         System.out.println("    no options");
