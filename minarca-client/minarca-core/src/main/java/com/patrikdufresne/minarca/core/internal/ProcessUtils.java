@@ -51,6 +51,10 @@ public class ProcessUtils {
          * The file name. e.g.: minarca.exe
          */
         public String name;
+        /**
+         * Arguments
+         */
+        public String args;
     }
 
     /**
@@ -87,14 +91,14 @@ public class ProcessUtils {
         if (pidfile.exists()) {
             int pid;
             try {
-                pid = Integer.valueOf(FileUtils.readFileToString(pidfile));
+                pid = Integer.valueOf(FileUtils.readFileToString(pidfile).trim());
             } catch (NumberFormatException e) {
                 // If the file is empty, or contains invalid data, that won't get converted to an integer. Process can't
                 // be found.
                 throw new NoSuchProcess();
             }
             ProcessInfo p = ProcessUtils.getPid(pid);
-            if (p != null && (processName == null || p.name.equals(processName))) {
+            if (p != null && (processName == null || p.name.equals(processName) || p.args.contains(processName))) {
                 return p;
             }
             throw new NoSuchProcess();
@@ -112,11 +116,9 @@ public class ProcessUtils {
      */
     public static ProcessInfo getPid(int pid) throws NoSuchProcess {
         if (SystemUtils.IS_OS_WINDOWS) {
-
             HANDLE p = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_ALL_ACCESS, false, pid);
             if (p != null) {
                 try {
-
                     final char[] filePathUnicode = new char[1025];
                     int length = Psapi.INSTANCE.GetModuleFileNameExW(p, null, filePathUnicode, filePathUnicode.length - 1);
                     if (length == 0) {
@@ -126,6 +128,7 @@ public class ProcessUtils {
                     ProcessInfo data = new ProcessInfo();
                     data.pid = pid;
                     data.name = new File(new String(filePathUnicode)).getName();
+                    data.args = "";
                     return data;
 
                 } finally {
@@ -135,17 +138,17 @@ public class ProcessUtils {
         }
 
         /* Linux */
-        File cmdline = new File("/proc/" + pid + "/exe");
-        if (cmdline.exists()) {
-            try {
-                File exe = cmdline.getCanonicalFile();
+        try {
+            String cmdline = checkCall("ps", "-ho", "cmd", "-p", Integer.toString(pid));
+            if (!cmdline.isEmpty()) {
                 ProcessInfo data = new ProcessInfo();
                 data.pid = pid;
-                data.name = exe.getName();
+                data.name = cmdline.split(" ", 2)[0];
+                data.args = cmdline.split(" ", 2)[1];
                 return data;
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
             }
+        } catch (IOException e) {
+            // Exit code 1 - process doesn't exists.
         }
         throw new NoSuchProcess();
     }
