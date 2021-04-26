@@ -31,7 +31,7 @@ public class ProcessUtilsTest {
         int pid = ProcessUtils.pid();
         ProcessInfo p = ProcessUtils.getPid(pid);
         assertNotNull(p);
-        assertTrue("process name should be java:" + p.name, p.name.startsWith("java"));
+        assertTrue("process name should be java:" + p.name, p.name.contains("java"));
     }
 
     @Test
