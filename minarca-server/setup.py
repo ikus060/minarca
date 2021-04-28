@@ -40,6 +40,7 @@ setuptools.setup(
         "rdiffweb==2.2.0a5",
         "cherrypy>=16.0.0",
         "requests",
+        "tzlocal",
         snakeoil_ver,
     ],
     # required packages for build process

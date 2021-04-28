@@ -13,8 +13,11 @@ import tempfile
 from unittest import mock
 import unittest
 
+from tzlocal import get_localzone
+
 from minarca_plugins import shell
 from minarca_plugins.shell import Jail
+
 
 USERNAME = 'joe'
 USERROOT = tempfile.gettempdir() + '/backups/joe'
@@ -48,7 +51,8 @@ class Test(unittest.TestCase):
                     finally:
                         del os.environ["MINARCA_USERNAME"]
                         del os.environ["MINARCA_USER_ROOT"]
-        self.assertTrue('ERROR no command provided.' in f.getvalue(), msg='%s' % f.getvalue())
+        self.assertTrue(
+            'ERROR no command provided.' in f.getvalue(), msg='%s' % f.getvalue())
 
     def test_main_with_echo_command(self):
         with open(OUTPUT, 'wb') as f:
@@ -79,7 +83,8 @@ class Test(unittest.TestCase):
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
             del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
+        rdiff_backup_jail_mock.assert_called_once_with(
+            '/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
 
     @mock.patch('minarca_plugins.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
     @mock.patch('minarca_plugins.shell._jail')
@@ -95,13 +100,15 @@ class Test(unittest.TestCase):
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
             del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
+        rdiff_backup_jail_mock.assert_called_once_with(
+            '/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
         find_rdiff_backup_mock.assert_called_once_with(version=1)
 
     @mock.patch('minarca_plugins.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
     @mock.patch('minarca_plugins.shell._jail')
     def test_main_with_minarca_with_128(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
-        # Minarca is sending a user agent string containing the rdiff-backup version.
+        # Minarca is sending a user agent string containing the rdiff-backup
+        # version.
         os.environ['MINARCA_USERNAME'] = USERNAME
         os.environ['MINARCA_USER_ROOT'] = USERROOT
         os.environ["SSH_ORIGINAL_COMMAND"] = "minarca/3.8.0 rdiff-backup/1.2.8 (Linux 5.11.8-051108-generic amd64)"
@@ -111,13 +118,15 @@ class Test(unittest.TestCase):
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
             del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
+        rdiff_backup_jail_mock.assert_called_once_with(
+            '/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
         find_rdiff_backup_mock.assert_called_once_with(version=1)
 
     @mock.patch('minarca_plugins.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
     @mock.patch('minarca_plugins.shell._jail')
     def test_main_with_minarca_with_205(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
-        # Minarca is sending a user agent string containing the rdiff-backup version.
+        # Minarca is sending a user agent string containing the rdiff-backup
+        # version.
         os.environ['MINARCA_USERNAME'] = USERNAME
         os.environ['MINARCA_USER_ROOT'] = USERROOT
         os.environ["SSH_ORIGINAL_COMMAND"] = "minarca/3.8.0 rdiff-backup/2.0.5 (Linux 5.11.8-051108-generic amd64)"
@@ -127,7 +136,8 @@ class Test(unittest.TestCase):
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
             del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
+        rdiff_backup_jail_mock.assert_called_once_with(
+            '/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
         find_rdiff_backup_mock.assert_called_once_with(version=2)
 
     def test_jail(self):
@@ -150,6 +160,13 @@ class Test(unittest.TestCase):
     def test_jail_proc(self):
         with Jail(USERROOT):
             subprocess.check_call(['ps'], stdout=subprocess.PIPE)
+
+    def test_jail_tz(self):
+        tz = get_localzone().zone
+        shell._jail(USERROOT, ['/bin/bash', '-c', 'echo $TZ > tz.txt'])
+        with open(os.path.join(USERROOT, 'tz.txt'), 'r') as f:
+            self.assertEqual(tz + '\n', f.read(),
+                             "timezone should be define in jail")
 
 
 if __name__ == "__main__":

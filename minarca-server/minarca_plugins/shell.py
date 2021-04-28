@@ -24,6 +24,7 @@ from rdiffweb.core.config import parse_args
 from snakeoil.contexts import SplitExec
 from snakeoil.osutils.mount import mount, MS_BIND, MS_REC, MS_RDONLY
 from snakeoil.process import namespaces
+from tzlocal import get_localzone
 
 
 class Jail(SplitExec):
@@ -55,7 +56,7 @@ class Jail(SplitExec):
         mount(source='/proc', target=os.path.join(self.root, 'proc'), fstype=None, flags=MS_BIND | MS_REC)
         # Create default mountpoint to run executables.
         for mountpoint in ['/bin', '/lib', '/lib64', '/usr', '/opt']:
-            if not os.path.isdir(mountpoint):
+            if not os.path.exists(mountpoint):
                 continue
             dest = os.path.join(self.root, mountpoint[1:])
             os.mkdir(dest)
@@ -94,8 +95,9 @@ def _jail(userroot, args):
     Create a chroot jail using namespaces to isolate completely
     rdiff-backup execution.
     """
+    tz = get_localzone().zone
     with Jail(userroot):
-        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'HOME': userroot})
+        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'TZ':tz, 'HOME': userroot})
 
 
 def _find_rdiff_backup(version=2):
