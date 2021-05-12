@@ -446,7 +446,7 @@ public class API {
     public void link(final String repositoryName, Client client, boolean force) throws APIException, InterruptedException, IOException {
         Validate.notNull(client);
         Validate.notEmpty(repositoryName, _("repository name cannot be empty"));
-        Validate.isTrue(repositoryName.matches("[a-zA-Z][a-zA-Z0-9\\-\\.]*"), _("repository must only contains letters, numbers, dash (-) and dot (.)"));
+        Validate.isTrue(repositoryName.matches("[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*"), _("repository must only contains letters, numbers, dash (-) and dot (.)"));
 
         /*
          * Check if repository name is already in uses.
