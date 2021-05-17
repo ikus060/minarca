@@ -39,10 +39,6 @@ Then start a backup in few minutes by installing minarca client for [Windows](ht
 
 **Minarca Server**
 
-On Debian Buster:
-
-    curl https://www.ikus-soft.com/archive/minarca/get-minarca.sh | sh -
-    
 Read more about [how to installation Minarca server](doc/installation.md).
 
 Note: While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
@@ -53,8 +49,6 @@ Note: While it's possible to get Minarca Server working on other Linux distribut
 <br/>
 <br/>
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca%20for%20Windows-brightgreen"></a>
-
-Note: While it's possible to get Minarca Client working on other Linux distributions, only Debian-based distribution will be supported.
 
 # Support
 
@@ -81,6 +75,44 @@ and mirrored to [Github](https://github.com/ikus060/minarca).
 The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
+
+## v3.9.0 (2021-05-17)
+
+This new version include alot of changes from Rdiffweb release (https://www.ikus-soft.com/en/blog/2021-05-11-rdiffweb-v220/)
+
+ * Server: Upgrade to Rdiffweb v2.2.0
+   * Use ConfigArgPare for configuration to support configuration file, environment variables and arguments to configure rdiffweb (rdiffweb#114)
+   * Fix cache in localization module
+   * Add `ldap-add-default-role` and `ldap-add-default-userroot` option to define default value for role and user root when creating user from LDAP (rdiffweb#125)
+   * Support PostgreSQL database by replacing our storage layer by SQLAlchemy rdiffweb#126
+   * Fix to retrieve user quota only for valid user_root (rdiffweb#135)
+   * Add option `disable-ssh-keys` to disable SSH Key management
+   * Use absolute URL everywhere
+   * Add support for `X-Forward-For`, `X-Forward-proto` and other reverse proxy header when generating absolute URL
+   * Drop Debian Strech support
+   * Implement a new background scheduler using apscheduler rdiffweb#82
+   * Use background job to send email notification to avoid blocking web page loading (rdiffweb#47)
+   * Use background job to delete repository to avoid blocking web page loading (rdiffweb#48)
+   * Allow deleting a specific file or folder from the history using `rdiff-backup-delete` (rdiffweb#128)
+   * Improve support for `session-dir` (rdiffweb#131)
+   * Add option `admin-password` to define administrator password for better security
+   * Improve performance of repository browsing 
+   * Add a new view to display logs of a specific repository
+   * Allow downloading the log
+   * Define a default limit to graph statistics to make it display faster
+   * Fix `get-quota-cmd` option to properly return a value
+ * Server: Migrate APT repository to `https://nexus.ikus-soft.com/repository/apt-release-buster`
+ * Server: Transparently support `rdiff-backup` v1.2.8 and v2.0.5 (#134)
+ * Server: Update `authorization_keys` file on restart
+ * Server: Drop Debian Stretch support
+ * Server: Add support for Debian Bullseye
+ * Server: Provide default `session-dir` to persist user session between restart
+ * Server: Upgrade Debian packaging
+ * Server: Fix timezone detection in minarca-shell causing all date to be displayed as UTC in web interface.
+ * Client: Support `rdiff-backup` v1.2.8 or v2.0.5
+ * Client: Improve command line help
+ * Client: Improve detection of already running process to avoid exeution of multiple minarca client instance
+ * Client: Support repository name starting with number
 
 ## v3.8.0 (2021-02-17)
 
