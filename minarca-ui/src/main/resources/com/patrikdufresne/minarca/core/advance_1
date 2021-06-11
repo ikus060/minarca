@@ -1,3 +1,0 @@
-# Exclude minarca logs from the backup.
--${log.folder}/minarca*.log
--${log.folder}/minarca*.txt

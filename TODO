@@ -1,0 +1,11 @@
+* dmg installer : https://dmgbuild.readthedocs.io/en/latest/
+  with personalization
+* deb installer : https://pypi.org/project/stdeb/
+* translation
+* TODO Make PySimpleUI>=4.45.0.3 See https://github.com/PySimpleGUI/PySimpleGUI/issues/3529
+* Show Details / Show Logs on error ?
+* Create an "AboutDialog"
+* Consider using --terminal-verbosity 4 and --verbosity 5
+* Re-work the initial backup to create a repository without increment to allow
+  rdiff-backup complete a rela initial backup. This probably need collaboration
+  of minarca-shell to initialize an empty repo.

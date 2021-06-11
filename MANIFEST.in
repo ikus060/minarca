@@ -1,0 +1,5 @@
+# Copyright (C) 2021 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
+
+recursive-include minarca_client *.png *.icns *.ico *.svg *.gif

@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+export DH_VIRTUALENV_INSTALL_ROOT=/opt/
+export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_MINARCA_CLIENT=$(shell python3 setup.py --version)
+
+%:
+	dh $@ --with python-virtualenv --builddirectory=build
+
+override_dh_virtualenv:
+	dh_virtualenv --install-suffix minarca-client --setuptools-test --python python3
