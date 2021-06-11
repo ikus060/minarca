@@ -46,3 +46,4 @@ deb_dist
 /minarca-server/debian/*debhelper*
 /minarca-server/debian/files
 /minarca-server/~
+/.DS_Store

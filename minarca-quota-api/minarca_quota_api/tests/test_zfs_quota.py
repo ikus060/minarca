@@ -1,7 +1,7 @@
 '''
 Created on Dec. 8, 2020
 
-@author: Patrik Dufresne
+@author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 import unittest
 from unittest.mock import patch

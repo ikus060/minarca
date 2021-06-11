@@ -9,14 +9,11 @@
 """
 Created on Mar 7, 2018
 
-@author: Patrik Dufresne
+@author: Patrik Dufresne <patrik@ikus-soft.com>
 """
 
 import logging
 import logging.handlers
-import os
-import pwd
-import subprocess
 import sys
 
 import cherrypy
@@ -128,13 +125,13 @@ class Root(object):
         # Validate userid
         try:
             user = int(user)
-        except:
+        except ValueError:
             raise cherrypy.HTTPError(400, 'invalid uid: ' + user)
         # Validate size
         try:
             if size:
                 size = int(size)
-        except:
+        except ValueError:
             raise cherrypy.HTTPError(400, 'invalid size: ' + size)
 
         if cherrypy.request.method in ['PUT', 'POST']:
@@ -152,12 +149,13 @@ def run(args=None):
 
     # Configure authentication.
     checkpassword = cherrypy.lib.auth_basic.checkpassword_dict({'minarca': args.secret})  # @UndefinedVariable
-    basic_auth = {'tools.auth_basic.on': True,
-                  'tools.auth_basic.realm': 'earth',
-                  'tools.auth_basic.checkpassword': checkpassword,
-                  'tools.auth_basic.accept_charset': 'UTF-8',
+    basic_auth = {
+        'tools.auth_basic.on': True,
+        'tools.auth_basic.realm': 'earth',
+        'tools.auth_basic.checkpassword': checkpassword,
+        'tools.auth_basic.accept_charset': 'UTF-8',
     }
-    app_config = { '/': basic_auth }
+    app_config = {'/': basic_auth}
 
     # configure web server
     cherrypy.config.update({

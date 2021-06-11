@@ -9,7 +9,7 @@
 """
 Created on Mar 7, 2018
 
-@author: Patrik Dufresne
+@author: Patrik Dufresne <patrik@ikus-soft.com>
 """
 
 from base64 import b64encode

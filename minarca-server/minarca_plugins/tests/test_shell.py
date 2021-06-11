@@ -1,7 +1,7 @@
 '''
 Created on Sep. 25, 2020
 
-@author: Patrik Dufresne
+@author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 import contextlib
 import io
@@ -36,7 +36,7 @@ class Test(unittest.TestCase):
         shutil.rmtree(USERROOT, ignore_errors=True)
         try:
             os.remove(OUTPUT)
-        except:
+        except Exception:
             pass
 
     def test_main_without_ssh_original_command(self):

@@ -12,7 +12,7 @@ from __future__ import print_function
 import setuptools
 
 setuptools.setup(
-    name="minarca-quota-api",
+    name="minarca_quota_api",
     use_scm_version={"root": "..", "relative_to": __file__},
     description='Minarca Quota API',
     long_description='Provide utilities to setup Quota management for rdiffweb / minarca-server.',
@@ -22,7 +22,7 @@ setuptools.setup(
     include_package_data=True,
     python_requires='>=3.5',
     setup_requires=[
-        "setuptools_scm",
+        "setuptools_scm>=5.0.1",
     ],
     install_requires=[
         'cherrypy',

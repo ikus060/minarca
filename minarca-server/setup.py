@@ -21,7 +21,7 @@ if PY_VERSION < (3, 6):
     snakeoil_ver = "snakeoil<0.8.0"
 
 setuptools.setup(
-    name="minarca-server",
+    name="minarca_server",
     use_scm_version={"root": "..", "relative_to": __file__},
     description='Minarca Web Server',
     long_description='Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage.',
@@ -34,10 +34,10 @@ setuptools.setup(
     python_requires='>=3.5',
     packages=['minarca_plugins'],
     setup_requires=[
-        "setuptools_scm",
+        "setuptools_scm>=5.0.1",
     ],
     install_requires=[
-        "rdiffweb==2.3.1",
+        "rdiffweb==2.3.2.dev7+g9d9d7e4",
         "cherrypy>=16.0.0",
         "requests",
         "tzlocal",

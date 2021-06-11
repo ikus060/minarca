@@ -1,0 +1,189 @@
+# -*- mode: python ; coding: utf-8 -*-
+#
+# Copyright (C) 2021 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
+#
+# This script is used by pyinstaller to freeze the python code into an
+# executable for all supported platform.
+#
+# For Windows, it creates the required installation package and sign the
+# executable when available.
+#
+# For MacOS, it creates a redistributable .app archived into a .dgm file.
+#
+
+import platform
+import subprocess
+import tempfile
+import pkg_resources
+import re
+from PyInstaller.utils.hooks import copy_metadata
+
+#
+# Common values
+#
+icon = 'minarca_client/ui/images/minarca.ico'
+macos_icon = 'minarca_client/ui/images/minarca.icns'
+version = pkg_resources.get_distribution("minarca_client").version
+block_cipher = None
+
+
+
+# Include openssh client for windows
+if platform.system() == "Windows":
+    openssh= [('minarca_client/core/openssh', 'minarca_client/core/openssh')]
+else:
+    openssh = []
+
+a = Analysis(
+    ['minarca_client/main.py'],
+    pathex=[],
+    binaries=[],
+    datas=copy_metadata('minarca_client') + copy_metadata('rdiff-backup') + openssh + [
+        ('README.md', '.'),
+        ('LICENSE', '.'),
+        ('minarca_client/ui/images', 'minarca_client/ui/images'),
+    ],
+    hiddenimports=[],
+    hookspath=[],
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False)
+
+pyz = PYZ(
+    a.pure, a.zipped_data,
+    cipher=block_cipher)
+
+# On OSX and Linux, we use the same binary for console and windowed.
+exe_w = EXE(
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name='minarcaw' if platform.system() == "Windows" else 'minarca',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    icon=icon,
+    console=False)
+all_exe = [exe_w]
+
+# We need another executable on Windows for console mode.
+if platform.system() == "Windows":
+    exe_c = EXE(
+        pyz,
+        a.scripts,
+        [],
+        exclude_binaries=True,
+        name='minarca',
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=False,
+        icon=icon,
+        console=True)
+    all_exe += [exe_c]
+
+coll = COLLECT(
+    *all_exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    name='minarca')
+
+#
+# Packaging
+#
+if platform.system() == "Darwin":
+
+    # Create app bundle
+    app = BUNDLE(
+        coll,
+        name='Minarca.app',
+        icon=macos_icon,
+        bundle_identifier='com.ikus-soft.minarca',
+        version=version,
+    )
+
+    # Binary smoke test
+    subprocess.check_call(['dist/minarca.app/Contents/MacOS/minarca', '--version'])
+    
+    # Generate dmg image
+    app_file = os.path.abspath('dist/Minarca.app')
+    dmg_file = os.path.abspath('dist/minarca-client_%s.dmg' % version)
+    subprocess.check_call([
+        'dmgbuild',
+        '-s', 'minarca.dmgbuild',
+        '-D', 'app=' + app_file,
+        'Minarca',
+        dmg_file])
+
+elif platform.system() == "Windows":
+    
+    def sign_exe(path):
+        if not os.environ.get('AUTHENTICODE_CERT'):
+            print('AUTHENTICODE_CERT is missing, skip signing')
+            return
+    
+        # Write cert to file
+        cert_file = tempfile.mktemp(suffix='.key')
+        with open(cert_file, 'w') as f:
+            f.write(os.environ['AUTHENTICODE_CERT'])
+        # Write key to file
+        key_file = tempfile.mktemp(suffix='.pem')
+        with open(key_file, 'w') as f:
+            f.write(os.environ['AUTHENTICODE_KEY'])
+        passphrase = os.environ['AUTHENTICODE_PASSPHRASE']
+        # Create pfx
+        pfx_file = tempfile.mktemp()
+        subprocess.check_call(['openssl', 'pkcs12', '-inkey', key_file, '-in', cert_file, '-passin', 'pass:%s' % passphrase, '-passout', 'pass:%s' % passphrase, '-export', '-out', pfx_file])
+        # Sign executable.
+        subprocess.check_call(['signtool', 'sign', '/f', pfx_file, '/p', passphrase, '/t', 'http://timestamp.digicert.com', path])
+    
+    # Sign executable
+    sign_exe('dist/minarca/minarca.exe')
+    
+    # For NSIS, we need to convert the license encoding
+    with open('dist/minarca/LICENSE', 'r', encoding='UTF-8') as input:
+        with open('dist/minarca/LICENSE.txt', 'w', encoding='ISO-8859-1') as out:
+            out.write(input.read())
+    
+    # Create installer using NSIS
+    exe_version = re.search('.*([0-9].[0-9].[0-9].[0-9])', '0.0.0.3.9.1~dev').group(1)
+    nsi_file = os.path.abspath('minarca.nsi')
+    setup_file = os.path.abspath('dist/minarca-client_%s.exe' % version)
+    subprocess.check_call([
+        'makensis',
+        '-NOCD',
+        '-INPUTCHARSET',
+        'UTF8',
+        '-DAppVersion=' + exe_version,
+        '-DOutFile=' + setup_file,
+        nsi_file],
+        cwd='dist/minarca')
+
+    # Sign installer
+    sign_exe(setup_file)
+    
+    # Binary smoke test
+    subprocess.check_call(['dist/minarca/minarca.exe', '--version'])
+
+else:
+
+    # For linux simply create a tar.gz with the folder
+    targz_file = os.path.abspath('dist/minarca-client_%s.tar.gz' % version)
+    subprocess.check_call([
+        'tar',
+        '-zcvf',
+        targz_file,
+        'minarca'],
+    cwd=os.path.abspath('./dist'))
+    

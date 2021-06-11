@@ -16,18 +16,15 @@ import os
 import pwd
 import stat
 import subprocess
-from sys import stderr
-import sys
-import urllib
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 
 import cherrypy
 import pkg_resources
 import rdiffweb
-from rdiffweb.core import RdiffError, authorizedkeys
+from rdiffweb.core import authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
 from rdiffweb.core.config import Option
-from rdiffweb.core.quota import QuotaException, QuotaUnsupported, DefaultUserQuota, IUserQuota
+from rdiffweb.core.quota import QuotaException, DefaultUserQuota, IUserQuota
 from rdiffweb.core.store import IUserChangeListener, UserObject
 import requests
 from requests.exceptions import HTTPError
@@ -55,13 +52,15 @@ def raise_for_status(r):
         reason = r.reason
 
     if 400 <= r.status_code < 500:
-        http_error_msg = u'%s Client Error: %s for url: %s' % (r.status_code, reason, r.text)
+        http_error_msg = u'%s Client Error: %s for url: %s' % (
+            r.status_code, reason, r.text)
 
     elif 500 <= r.status_code < 600:
-        http_error_msg = u'%s Server Error: %s for url: %s' % (r.status_code, reason, r.text)
+        http_error_msg = u'%s Server Error: %s for url: %s' % (
+            r.status_code, reason, r.text)
 
     if http_error_msg:
-        raise HTTPError(http_error_msg, response=self)
+        raise HTTPError(http_error_msg, response=r)
 
 
 class TimeoutHTTPAdapter(requests.adapters.HTTPAdapter):
@@ -171,22 +170,25 @@ class MinarcaUserSetup(IUserChangeListener):
             help="""list of extra argumenst to be pass to rdiff-backup server. e.g.: --no-compression""")
 
         # Replace default config file
-        parser._default_config_files = ['/etc/minarca/minarca-server.conf', '/etc/minarca/conf.d/*.conf']
+        parser._default_config_files = [
+            '/etc/minarca/minarca-server.conf', '/etc/minarca/conf.d/*.conf']
 
         # Override a couple of arguments with Minarca.
         parser.set_defaults(
             database_uri='/etc/minarca/rdw.db',
             default_theme='orange',
-            favicon=pkg_resources.resource_filename(__name__, 'minarca.ico'),  # @UndefinedVariable
+            favicon=pkg_resources.resource_filename(
+                __name__, 'minarca.ico'),  # @UndefinedVariable
             footer_name='Minarca',
             footer_url='https://www.ikus-soft.com/en/minarca/',
             header_name='Minarca',
-            header_logo=pkg_resources.resource_filename(__name__, 'minarca_22.png'),  # @UndefinedVariable
+            header_logo=pkg_resources.resource_filename(
+                __name__, 'minarca_22.png'),  # @UndefinedVariable
             log_access_file='/var/log/minarca/access.log',
             log_file='/var/log/minarca/server.log',
             welcome_msg={
-                '':'A <b>free and open-source</b> backup software providing end-to-end integration to put you in control of your backup strategy.<br/><br/><a href="https://www.ikus-soft.com/en/minarca/">website</a> • <a href="https://www.ikus-soft.com/en/minarca/doc/">docs</a> • <a href="https://groups.google.com/d/forum/minarca">community</a>',
-                'fr':'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://www.ikus-soft.com/fr/minarca/">site web</a> • <a href="https://www.ikus-soft.com/fr/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>',
+                '': 'A <b>free and open-source</b> backup software providing end-to-end integration to put you in control of your backup strategy.<br/><br/><a href="https://www.ikus-soft.com/en/minarca/">website</a> • <a href="https://www.ikus-soft.com/en/minarca/doc/">docs</a> • <a href="https://groups.google.com/d/forum/minarca">community</a>',
+                'fr': 'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://www.ikus-soft.com/fr/minarca/">site web</a> • <a href="https://www.ikus-soft.com/fr/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>',
             }
         )
 
@@ -199,11 +201,13 @@ class MinarcaUserSetup(IUserChangeListener):
         self._orig_get_log_files = self.app.root.admin._get_log_files
         self.app.root.admin._get_log_files = self._get_log_files
 
-        # On startup Upgrade the authorized_keys in case the configuration changed.
+        # On startup Upgrade the authorized_keys in case the configuration
+        # changed.
         try:
             self._update_authorized_keys()
-        except:
-            logger.error("fail to update authorized_keys files on startup", exc_info=1)
+        except Exception:
+            logger.error(
+                "fail to update authorized_keys files on startup", exc_info=1)
 
     @cherrypy.expose
     @cherrypy.config(**{'tools.authform.on': False, 'tools.i18n.on': False, 'tools.authbasic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
@@ -212,7 +216,8 @@ class MinarcaUserSetup(IUserChangeListener):
 
     def _get_log_files(self):
         """Patched version of _get_log_files"""
-        minarca_shell_logfile = os.path.join(os.path.dirname(self._logfile or '/var/log/minarca/server.log'), 'shell.log')
+        minarca_shell_logfile = os.path.join(os.path.dirname(
+            self._logfile or '/var/log/minarca/server.log'), 'shell.log')
         logfiles = self._orig_get_log_files()
         logfiles.append(minarca_shell_logfile)
         return logfiles
@@ -228,7 +233,8 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Identity known_hosts
         identity = ""
-        files = [f for f in os.listdir(self._minarca_identity) if f.startswith('ssh_host') if f.endswith('.pub')]
+        files = [f for f in os.listdir(self._minarca_identity) if f.startswith(
+            'ssh_host') if f.endswith('.pub')]
         for fn in files:
             with open(os.path.join(self._minarca_identity, fn)) as fh:
                 if ':' in remotehost:
@@ -257,12 +263,14 @@ class MinarcaUserSetup(IUserChangeListener):
         assert isinstance(userobj, UserObject)
         try:
             self._update_user_email(userobj, attrs)
-        except:
-            logger.warning('fail to update user [%s] email from LDAP', userobj.username, exc_info=1)
+        except Exception:
+            logger.warning(
+                'fail to update user [%s] email from LDAP', userobj.username, exc_info=1)
         try:
             self._update_user_root(userobj, attrs)
-        except:
-            logger.warning('fail to update user [%s] root', userobj.username, exc_info=1)
+        except Exception:
+            logger.warning(
+                'fail to update user [%s] root', userobj.username, exc_info=1)
 
     def user_attr_changed(self, userobj, attrs={}):
         """
@@ -276,8 +284,9 @@ class MinarcaUserSetup(IUserChangeListener):
             # TODO schedule a background task to update the authorized_keys.
             try:
                 self._update_authorized_keys()
-            except:
-                logger.error("fail to update authorized_keys files on user_attr_changed", exc_info=1)
+            except Exception:
+                logger.error(
+                    "fail to update authorized_keys files on user_attr_changed", exc_info=1)
 
     def user_deleted(self, username):
         """
@@ -285,8 +294,9 @@ class MinarcaUserSetup(IUserChangeListener):
         """
         try:
             self._update_authorized_keys()
-        except:
-            logger.error("fail to update authorized_keys files on user_deleted", exc_info=1)
+        except Exception:
+            logger.error(
+                "fail to update authorized_keys files on user_deleted", exc_info=1)
 
     def _update_user_email(self, userobj, attrs):
         """
@@ -303,7 +313,8 @@ class MinarcaUserSetup(IUserChangeListener):
         if isinstance(mail, bytes):
             mail = mail.decode('utf-8')
 
-        logger.info('update user [%s] email from LDAP [%s]', userobj.username, mail)
+        logger.info(
+            'update user [%s] email from LDAP [%s]', userobj.username, mail)
         userobj.email = mail
 
     def _update_user_root(self, userobj, attrs):
@@ -312,12 +323,14 @@ class MinarcaUserSetup(IUserChangeListener):
         default value or restrict it to base dir.
         """
         # Define default user_home if not provided
-        user_root = userobj.user_root or os.path.join(self._basedir, userobj.username)
+        user_root = userobj.user_root or os.path.join(
+            self._basedir, userobj.username)
         # Normalise path to avoid relative path.
         user_root = os.path.abspath(user_root)
         # Verify if the user_root is inside base dir.
         if self._restrited_basedir and not user_root.startswith(self._basedir):
-            logger.warning('restrict user [%s] root [%s] to base dir [%s]', userobj.username, user_root, self._basedir)
+            logger.warning(
+                'restrict user [%s] root [%s] to base dir [%s]', userobj.username, user_root, self._basedir)
             user_root = os.path.join(self._basedir, userobj.username)
         # Persist the value if different then original
         if userobj.user_root != user_root:
@@ -325,15 +338,18 @@ class MinarcaUserSetup(IUserChangeListener):
 
         # Create folder if inside our base dir and missing.
         if user_root.startswith(self._basedir) and not os.path.exists(user_root):
-            logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
+            logger.info(
+                'creating user [%s] root dir [%s]', userobj.username, user_root)
             try:
                 os.mkdir(user_root)
                 # Change mode
                 os.chmod(user_root, self._mode)
                 # Change owner
-                os.chown(user_root, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
-            except:
-                logger.warning('fail to create user [%s] root dir [%s]', userobj.username, user_root)
+                os.chown(user_root, pwd.getpwnam(self._owner).pw_uid,
+                         grp.getgrnam(self._group).gr_gid)
+            except Exception:
+                logger.warning(
+                    'fail to create user [%s] root dir [%s]', userobj.username, user_root)
 
     def _update_authorized_keys(self):
         """
@@ -346,7 +362,8 @@ class MinarcaUserSetup(IUserChangeListener):
             logger.info("creating .ssh folder [%s]", ssh_dir)
             os.mkdir(ssh_dir, 0o700)
 
-        os.chown(ssh_dir, pwd.getpwnam(self._owner).pw_uid, grp.getgrnam(self._group).gr_gid)
+        os.chown(ssh_dir, pwd.getpwnam(self._owner).pw_uid,
+                 grp.getgrnam(self._group).gr_gid)
 
         # Create the authorized_keys file
         filename = os.path.join(ssh_dir, 'authorized_keys')
@@ -379,7 +396,8 @@ class MinarcaUserSetup(IUserChangeListener):
                     user_root=userobj.user_root,
                     auth_options=self._auth_options)
 
-                key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
+                key = AuthorizedKey(
+                    options=options, keytype=key.keytype, key=key.key, comment=key.comment)
 
                 # Write the new key
                 authorizedkeys.add(new_data, key)
@@ -405,8 +423,10 @@ class MinarcaQuota(IUserQuota):
     def __init__(self, app):
         self.app = app
         self.session = requests.Session()
-        self.session.mount('https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
-        self.session.mount('http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
+        self.session.mount(
+            'https://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
+        self.session.mount(
+            'http://', TimeoutHTTPAdapter(pool_connections=2, pool_maxsize=5))
 
         # Monkey patch admin view to show quota.log.
         if self._quota_api_url:
@@ -428,8 +448,9 @@ class MinarcaQuota(IUserQuota):
             r.raise_for_status()
             diskspace = r.json()
             return diskspace['used']
-        except:
-            logger.warning('fail to get user quota [%s]', userobj.username, exc_info=1)
+        except Exception:
+            logger.warning(
+                'fail to get user quota [%s]', userobj.username, exc_info=1)
             return 0
 
     def get_disk_quota(self, userobj):
@@ -446,14 +467,16 @@ class MinarcaQuota(IUserQuota):
             r.raise_for_status()
             diskspace = r.json()
             return diskspace['size']
-        except:
-            logger.warning('fail to get user quota [%s]', userobj.username, exc_info=1)
+        except Exception:
+            logger.warning(
+                'fail to get user quota [%s]', userobj.username, exc_info=1)
             return 0
 
     def _get_log_files(self):
         """Patched version of _get_log_files"""
         logfiles = self._orig_get_log_files()
-        minarca_quota_logfile = os.path.join(os.path.dirname(self._logfile or '/var/log/minarca/server.log'), 'quota-api.log')
+        minarca_quota_logfile = os.path.join(os.path.dirname(
+            self._logfile or '/var/log/minarca/server.log'), 'quota-api.log')
         if os.path.isfile(minarca_quota_logfile):
             logfiles.append(minarca_quota_logfile)
         return logfiles
@@ -469,7 +492,8 @@ class MinarcaQuota(IUserQuota):
         # Always update unless quota not define
         try:
             logger.info('set user [%s] quota [%s]', userobj.username, quota)
-            url = os.path.join(self._quota_api_url, 'quota', str(userobj.userid))
+            url = os.path.join(self._quota_api_url,
+                               'quota', str(userobj.userid))
             r = self.session.post(url, data={'size': quota}, timeout=1)
             raise_for_status(r)
         except Exception as e:
@@ -479,9 +503,11 @@ class MinarcaQuota(IUserQuota):
         # Update user root attribute
         try:
             # Add +P attribute to user's home directory
-            subprocess.check_output(["/usr/bin/chattr", "-R", "+P", userobj.user_root], stderr=subprocess.STDOUT)
+            subprocess.check_output(
+                ["/usr/bin/chattr", "-R", "+P", userobj.user_root], stderr=subprocess.STDOUT)
             # Force project id on directory
-            subprocess.check_output(["/usr/bin/chattr", "-R", "-p", str(userobj.userid), userobj.user_root], stderr=subprocess.STDOUT)
+            subprocess.check_output(["/usr/bin/chattr", "-R", "-p", str(
+                userobj.userid), userobj.user_root], stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             raise QuotaException(e.output)
         except Exception as e:

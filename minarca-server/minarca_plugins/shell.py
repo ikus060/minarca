@@ -7,7 +7,7 @@
 '''
 Created on Sep. 25, 2020
 
-@author: Patrik Dufresne
+@author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 
 from distutils import spawn
@@ -32,9 +32,9 @@ class Jail(SplitExec):
     Responsible to provide a context manager to split execution into a separate
     process, then using user namespace and chroot isolate the execution
     into a sandbox.
-    
+
     path will be the only writable folder. Everything else is read-only.
-    
+
     Only part of the filesystem is available: /bin, /lib, /lib64, /opt, /usr
 
     See https://lwn.net/Articles/531114/ about Linux User Namespace.
@@ -100,7 +100,7 @@ def _jail(userroot, args):
     """
     tz = get_localzone().zone
     with Jail(userroot):
-        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'TZ':tz, 'HOME': userroot})
+        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'TZ': tz, 'HOME': userroot})
 
 
 def _find_rdiff_backup(version=2):
@@ -109,7 +109,9 @@ def _find_rdiff_backup(version=2):
         executable = 'rdiff-backup-1.2'
     else:
         executable = 'rdiff-backup-2.0'
-    path = os.path.dirname(sys.executable) + os.pathsep + os.environ['PATH']
+    path = os.path.dirname(sys.executable)
+    if 'PATH' in os.environ:
+        path += os.pathsep + os.environ['PATH']
     return spawn.find_executable(executable, path)
 
 
@@ -125,7 +127,7 @@ def main():
     # Add current user and ip address to logging context
     ip = os.environ.get('SSH_CLIENT', '').split(' ')[0]
     logger = logging.getLogger(__name__)
-    logger = logging.LoggerAdapter(logger, {'user':username, 'ip':ip})
+    logger = logging.LoggerAdapter(logger, {'user': username, 'ip': ip})
 
     # Check if folder exists
     if not userroot or not os.path.isdir(userroot):

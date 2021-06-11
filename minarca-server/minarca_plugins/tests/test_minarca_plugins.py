@@ -9,7 +9,7 @@
 """
 Created on Jan 23, 2016
 
-@author: Patrik Dufresne
+@author: Patrik Dufresne <patrik@ikus-soft.com>
 """
 
 import grp
@@ -26,23 +26,26 @@ import httpretty
 from mockldap import MockLdap
 import pkg_resources
 from rdiffweb.core.store import ADMIN_ROLE
-from rdiffweb.test import WebCase, AppTestCase
+import rdiffweb.test
 
 from minarca_plugins import MinarcaUserSetup, MinarcaQuota
 import minarca_plugins
 
 
-class AbstractMinarcaTest(WebCase):
+class AbstractMinarcaTest(rdiffweb.test.WebCase):
     """
     Abstract test class to setup minarca for testing.
     """
 
     @classmethod
     def setup_class(cls):
+        if cls is AbstractMinarcaTest:
+            raise unittest.SkipTest("%s is an abstract base class" % cls.__name__)
         if not os.path.isdir('/tmp/minarca-test'):
             os.mkdir('/tmp/minarca-test')
         # Use temporary folder for base dir
         cls.default_config['MinarcaUserBaseDir'] = '/tmp/minarca-test'
+        tempfile.tempdir = '/tmp/minarca-test'
         # Use current user for owner and group
         cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[0]
         cls.default_config['MinarcaUserDirGroup'] = pwd.getpwuid(os.getuid())[0]
@@ -50,8 +53,9 @@ class AbstractMinarcaTest(WebCase):
 
     @classmethod
     def teardown_class(cls):
-        shutil.rmtree('/tmp/minarca-test', ignore_errors=True)
         super(AbstractMinarcaTest, cls).teardown_class()
+        shutil.rmtree('/tmp/minarca-test', ignore_errors=True)
+        tempfile.tempdir = None
 
 
 class MinarcaUserSetupTest(AbstractMinarcaTest):
@@ -80,7 +84,7 @@ class MinarcaUserSetupTest(AbstractMinarcaTest):
     def test_add_user_without_user_root(self):
         """
         Add user without user_root
-        
+
         Make sure the user_root getg populated with default value from basedir.
         """
         # Check if minarca base dir is properly defined
@@ -95,7 +99,7 @@ class MinarcaUserSetupTest(AbstractMinarcaTest):
     def test_add_user_with_user_root(self):
         """
         Add user with user_root
-        
+
         Make sure the user_root get redefined inside basedir.
         """
         #  Add user to be listed
@@ -156,10 +160,10 @@ class MinarcaTest(AbstractMinarcaTest):
         self.mockldap = MockLdap(self.directory)
         self.mockldap.start()
         self.ldapobj = self.mockldap['ldap://localhost/']
-        WebCase.setUp(self)
+        super().setUp()
 
     def tearDown(self):
-        WebCase.tearDown(self)
+        super().tearDown()
         # Stop patching ldap.initialize and reset state.
         self.mockldap.stop()
         del self.ldapobj
@@ -259,7 +263,7 @@ class MinarcaAdminLogView(AbstractMinarcaTest):
         self.assertNotInBody('Error getting file content')
 
 
-class MinarcaUserQuota(AppTestCase):
+class MinarcaUserQuota(rdiffweb.test.AppTestCase):
     """
     Test Get/Set user quota
     """
@@ -273,15 +277,17 @@ class MinarcaUserQuota(AppTestCase):
         # Create folder
         if not os.path.isdir('/tmp/minarca-test'):
             os.mkdir('/tmp/minarca-test')
+        tempfile.tempdir = '/tmp/minarca-test'
         # Setup app
-        AppTestCase.setUp(self)
+        super().setUp()
         # Start the plugin.
         self.plugin = MinarcaQuota(self.app)
 
     def tearDown(self):
-        WebCase.tearDown(self)
+        super().tearDown()
         # Remove folder
         shutil.rmtree('/tmp/minarca-test')
+        tempfile.tempdir = None
 
     @httpretty.activate
     def test_set_disk_quota(self):
@@ -318,7 +324,7 @@ class MinarcaUserQuota(AppTestCase):
         self.assertEqual(1234, self.plugin.get_disk_usage(userobj))
 
 
-class MinarcaSshKeysTest(AppTestCase):
+class MinarcaSshKeysTest(rdiffweb.test.AppTestCase):
     """
     Collections of tests related to ssh keys file update.
     """
@@ -333,13 +339,15 @@ class MinarcaSshKeysTest(AppTestCase):
     reset_testcases = True
 
     def setUp(self):
-        AppTestCase.setUp(self)
         if not os.path.isdir(self.base_dir):
             os.mkdir(self.base_dir)
+        tempfile.tempdir = self.base_dir
+        super().setUp()
 
     def tearDown(self):
+        super().tearDown()
         shutil.rmtree(self.base_dir)
-        AppTestCase.tearDown(self)
+        tempfile.tempdir = None
 
     def assertAuthorizedKeys(self, expected):
         filename = os.path.join(self.base_dir, '.ssh', 'authorized_keys')

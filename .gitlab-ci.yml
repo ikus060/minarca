@@ -3,145 +3,339 @@ variables:
                -Dorg.slf4j.simpleLogger.showDateTime=true
                -Djava.awt.headless=true
                -Dmaven.repo.local=.m2/repository"
-  APT_DEV_BUSTER: https://nexus.ikus-soft.com/repository/apt-dev-buster/
-  APT_RELEASE_BUSTER: https://nexus.ikus-soft.com/repository/apt-release-buster/
-  APT_DEV_BULLSEYE: https://nexus.ikus-soft.com/repository/apt-dev-bullseye/
-  APT_RELEASE_BULLSEYE: https://nexus.ikus-soft.com/repository/apt-release-bullseye/
+  MINARCA_DEV_REMOTE_URL: https://minarca-dev.ikus-soft.com
+  MINARCA_DEV_USERNAME: admin
+  MINARCA_DEV_PASSWORD: admin123
 
 stages:
-- test-and-bdist
+- test
+- bdist
 - upload
-- integration-tests
 - deploy
+- e2e-test
 
-# TODO Split this by python version and OS.
-.make: &make
-  image: docker
-  services:
-  - docker:dind
+test:flake8:
   before_script:
-  - apk add make curl git bash
+  - apt update && apt -y --no-install-recommends install $DEPENDS
+  image: ikus060/python:$DIST-py3
+  parallel:
+    matrix:
+    - TARGET: minarca-client
+      DEPENDS: cron librsync-dev python3-tk libacl1-dev
+    - TARGET: minarca-server
+      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+      PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
+    - TARGET: minarca-quota-api
+      DEPENDS: bash
   script:
-  - make $TARGET
-
-test:buster:
-  <<: *make
-  stage: test-and-bdist
+  - cd $TARGET
+  - tox -e flake8
+  stage: test
   variables:
-    TARGET: test
-    DIST: buster
+    DIST: debian11
+
+test:deb:
+  before_script:
+  - apt update && apt -y --no-install-recommends install $DEPENDS
+  image: ikus060/python:$DIST-py3
+  parallel:
+    matrix:
+    - TARGET: minarca-client
+      DIST: [debian10, debian11, groovy]
+      DEPENDS: cron librsync-dev python3-tk libacl1-dev
+    - TARGET: minarca-server
+      DIST: [debian10, debian11, groovy]
+      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+    - TARGET: minarca-quota-api
+      DIST: [debian10, debian11, groovy]
+      DEPENDS: bash
+  script:
+  - cd $TARGET
+  - tox -e py3
+  stage: test
     
-test:bullseye:
-  <<: *make
-  stage: test-and-bdist
-  variables:
-    TARGET: test
-    DIST: bullseye
+test:win32:
+  before_script:
+  - choco install python3 --version=3.7.9 -y -f --forcex86
+  - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;"
+  - $Env:path
+  - python.exe -VV
+  - pip.exe install tox
+  script:
+  - cd minarca-client
+  - tox.exe  -e py3
+  stage: test
+  tags:
+  - shared-windows
+  - windows
+  - windows-1809
 
-bdist:buster:
-  <<: *make
-  stage: test-and-bdist
-  variables:
-    TARGET: bdist
-    DIST: buster
+test:macos:
+  script:
+  - cd minarca-client
+  - tox  -e py3
+  stage: test
+  tags:
+  - macos
+
+bdist:deb:
   artifacts:
     paths:
-    - minarca-client*.exe
-    - minarca-client*.deb
-    - minarca-server_*_amd64.deb
-    - minarca-quota-api_*_amd64.deb
-
-bdist:bullseye:
-  <<: *make
-  stage: test-and-bdist
+    - "*/dist/*/*_amd64.deb"
+  image: buildpack-deps:$DIST
+  needs: []
+  parallel:
+    matrix:
+    - TARGET: minarca-client
+      DIST: [buster, bullseye, groovy]
+      DEPENDS: python3 cron librsync-dev libacl1-dev
+    - TARGET: minarca-server
+      DIST: [buster, bullseye, groovy]
+      DEPENDS: python3
+      PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
+      TZ: UTC
+    - TARGET: minarca-quota-api
+      DIST: [buster, bullseye, groovy]
+      DEPENDS: python3
+  script:
+  - apt update && apt -y --no-install-recommends install devscripts $DEPENDS
+  - cd $TARGET
+  - export VERSION=$(curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
+  - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
+  - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
+  - apt build-dep -y .
+  - dpkg-buildpackage -b
+  - mkdir -p "./dist/$DIST/"
+  - mv ../*.deb "./dist/$DIST/"
+  stage: bdist
   variables:
-    TARGET: bdist
-    DIST: bullseye
+   DH_VERBOSE: "1"
+   GIT_DEPTH: "0"
+
+# For Linux, we need to build on a oldest glibc version possible.
+# For us, this is Debian stretch. 2.24
+bdist:linux:
   artifacts:
     paths:
-    - minarca-client*.deb
-    - minarca-server_*_amd64.deb
-    - minarca-quota-api_*_amd64.deb
+    - "minarca-client/dist/minarca-client_*.tar.gz"
+  before_script:
+  - apt update && apt -y --no-install-recommends install librsync-dev libacl1-dev git
+  - pip3 install tox
+  image: python:3.7-stretch
+  needs: []  
+  script:
+  - cd minarca-client
+  - tox -e pyinstaller
+  stage: bdist
 
-.upload: &upload
-  stage: upload
+bdist:macos:
+  artifacts:
+    paths:
+    - "minarca-client/dist/minarca-client_*.dmg"
+  before_script:
+  - pip3 install tox
+  needs: []  
+  tags:
+  - macos
+  script:
+  - cd minarca-client
+  - tox -e pyinstaller
+  stage: bdist
+
+bdist:win32:
+  artifacts:
+    paths:
+    - "minarca-client/dist/minarca-client_*.exe"
+  before_script:
+  - Invoke-WebRequest -UseBasicParsing -Uri http://checkip.dyndns.org/
+  - choco install openssl -y
+  - Invoke-WebRequest -UseBasicParsing -Uri https://community.chocolatey.org/api/v2/
+  - choco install python3 --version=3.7.9 -y -f --forcex86
+  - choco install nsis -y
+  - choco install ksign -y
+  - choco install openssl -y
+  - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
+  - $Env:path
+  - python.exe -VV
+  - pip.exe install tox
+  needs: []  
+  script:
+  - cd minarca-client
+  - tox.exe -e pyinstaller
+  stage: bdist
+  tags:
+  - shared-windows
+  - windows
+  - windows-1809
+
+upload:deb:
+  needs:
+  - bdist:deb
+  parallel:
+    matrix:
+    - TARGET: minarca-client
+      DIST: [buster, bullseye, groovy]
+    - TARGET: minarca-server
+      DIST: [buster, bullseye, groovy]
+      DEPENDS: python3
+    - TARGET: minarca-quota-api
+      DIST: [buster, bullseye, groovy]
   script: |
     set -e
+    set -x
     if [ -z "$CI_COMMIT_TAG" ]; then
-      APT_URL=APT_DEV_${DIST^^}
+      APT_URL="https://nexus.ikus-soft.com/repository/apt-dev-${DIST}/"
     else
-      APT_URL=APT_RELEASE_${DIST^^}
+      APT_URL="https://nexus.ikus-soft.com/repository/apt-release-${DIST}/"
     fi
-    APT_URL=${!APT_URL}
     # Minarca Server
-    export MINARCA_DEB_FILE=$(ls -1 ./minarca-server_*_amd64.deb)
-    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
-    # Minarca Quota API
-    export MINARCA_QUOTA_DEB_FILE=$(ls -1 ./minarca-quota-api_*_amd64.deb)
-    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_QUOTA_DEB_FILE" "$APT_URL"
-    # Minarca Client
-    export MINARCA_DEB_FILE=$(ls -1 ./minarca-client*.deb)
-    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$MINARCA_DEB_FILE" "$APT_URL"
-
-upload:buster:apt:
-  <<: *upload
-  variables:
-    DIST: buster
-  dependencies:
-  - bdist:buster
-  
-upload:bullseye:apt:
-  <<: *upload
-  variables:
-    DIST: bullseye
-  dependencies:
-  - bdist:bullseye
-  
-upload:client:www:
+    export FILE=$(ls -1 ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb)
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$FILE" "$APT_URL"
   stage: upload
-  dependencies:
-  - bdist:buster
+
+.upload-file: &upload-file
   script: |
+    set -x
+    set -e
     # Publish to kalo
     eval $(ssh-agent -s)
     echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
     mkdir -p ~/.ssh
     chmod 700 ~/.ssh
     # publish client
-    export MINARCA_EXE_FILE=$(ls -1 ./minarca-client*.exe)
-    scp -o StrictHostKeyChecking=no $MINARCA_EXE_FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+    export FILE=$(ls -1 $FILENAME)
+    scp -o StrictHostKeyChecking=no $FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
     # Publish get-minarca.sh script
     scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
     if [ ! -z "$CI_COMMIT_TAG" ]; then
-      ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $MINARCA_EXE_FILE) /var/www/patrikdufresne/archive/minarca/minarca-client_latest.exe
+      ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $FILE) /var/www/patrikdufresne/archive/minarca/$FILENAME_LATEST
     fi
+  stage: upload
 
-integration-tests:
-  <<: *make
-  stage: integration-tests
+upload:linux:
+  <<: *upload-file
+  needs:
+  - bdist:linux
+  variables:
+    FILENAME: ./minarca-client/dist/minarca-client*.tar.gz
+    FILENAME_LATEST: minarca-client-latest.tar.gz
+    
+upload:macos:
+  <<: *upload-file
+  needs:
+  - bdist:macos
+  variables:
+    FILENAME: ./minarca-client/dist/minarca-client*.dmg
+    FILENAME_LATEST: minarca-client-latest.dmg
+
+upload:win32:
+  <<: *upload-file
+  needs:
+  - bdist:win32
+  variables:
+    FILENAME: ./minarca-client/dist/minarca-client*.exe
+    FILENAME_LATEST: minarca-client-latest.exe
+
+deploy:dev:
   allow_failure: True
-  dependencies: []
-  script:
-  - export MINARCA_VERSION=$(cd minarca-server; make version)
-  - echo MINARCA_VERSION=$MINARCA_VERSION
-  - cd integration-tests
-  - apk add docker-compose
-  # Test latest version of client & server
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=debian:bullseye ./run.sh
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=debian:buster   ./run.sh
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=$MINARCA_VERSION MINARCA_CLIENT_DIST=win32           ./run.sh
-  # Test backward compatibility with 3.8.0 (rdiff-backup-1.2.8)
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=debian:buster   ./run.sh
-  - MINARCA_SERVER_VERSION=$MINARCA_VERSION MINARCA_CLIENT_VERSION=3.8.0            MINARCA_CLIENT_DIST=win32           ./run.sh
-
-deploy_staging_sestican:
-  stage: deploy
-  image: buildpack-deps:buster
-  dependencies: []
   environment:
-    name: staging
-    url: https://test.minarca.net
+    name: dev
+    url: https://dev.minarca.net
+  needs: 
+  - bdist:deb
+  image: registry.gitlab.com/finestructure/pipeline-trigger
   script:
-  - export MINARCA_VERSION=$(cd minarca-server; make version)
-  - echo MINARCA_VERSION=$MINARCA_VERSION
-  - curl -X POST -F token=36bae86778d901fc6b2d6453a41844 -F "ref=master" -F "variables[MINARCA_VERSION]=$MINARCA_VERSION" https://gitlab.com/api/v4/projects/18716492/trigger/pipeline
+    - apk update && apk add git
+    - export DEB_VERSION=$(ls -1 minarca-server/dist/buster/minarca-server_*_amd64.deb | cut -d '_' -f 2)
+    - echo DEB_VERSION=$DEB_VERSION
+    # Trigger ansible-config pipeline
+    - trigger -a "$ANSIBLE_PIPELINE_GITLAB_API_TOKEN" -t master -e "MINARCA_VERSION=$DEB_VERSION" -p 36bae86778d901fc6b2d6453a41844 18716492
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+
+e2e-test:deb:
+  allow_failure: True
+  needs:
+  - deploy:dev
+  - bdist:deb
+  image: buildpack-deps:$DIST
+  parallel:
+    matrix:
+    - TARGET: minarca-client
+      DIST: [buster, bullseye, groovy]
+  script:
+    - apt update
+    - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
+    - minarca --version
+    - minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
+    - minarca -d status
+    - minarca -d include /etc /var /home
+    - minarca -d backup --force
+  stage: e2e-test
+  variables:
+    GIT_STRATEGY: none
+
+e2e-test:linux:
+  allow_failure: True
+  needs:
+  - deploy:dev
+  - bdist:linux
+  image: buildpack-deps:buster
+  script:
+    - apt update && apt install -y cron openssh-client
+    - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
+    - ./minarca --version
+    - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
+    - ./minarca -d include /etc /var /home
+    - ./minarca -d status
+    - ./minarca -d backup --force
+  stage: e2e-test
+  variables:
+    GIT_STRATEGY: none
+
+e2e-test:macos:
+  allow_failure: True
+  needs:
+  - deploy:dev
+  - bdist:macos
+  before_script:
+  - rm -Rf /Applications/Minarca.app
+  - rm -Rf $HOME/Library/Preferences/Minarca
+  script:
+  - hdiutil attach minarca-client/dist/minarca-client_*.dmg
+  - cp -r /Volumes/Minarca/Minarca.app /Applications/
+  - /Applications/Minarca.app/Contents/MacOS/minarca --version
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d include "$HOME/Documents"
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d status
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d backup --force
+  stage: e2e-test
+  tags:
+  - macos
+  variables:
+    GIT_STRATEGY: none
+
+e2e-test:win32:
+  allow_failure: True
+  needs:
+  - deploy:dev
+  - bdist:win32
+  script:
+  - $file=Get-ChildItem minarca-client/dist/minarca-client_*.exe
+  - Start-Process -wait "$file" /S
+  - dir "C:\Program Files\Minarca"
+  - $Env:path += ";C:\Program Files\Minarca"
+  - $Env:path
+  - minarca.exe --version
+  - minarca.exe -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
+  - minarca.exe -d include /etc /var /home
+  - minarca.exe -d status
+  - minarca.exe -d backup --force
+  stage: e2e-test
+  tags:
+  - shared-windows
+  - windows
+  - windows-1809
+  variables:
+    GIT_STRATEGY: none

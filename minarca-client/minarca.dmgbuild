@@ -1,0 +1,36 @@
+# -*- coding: utf-8 -*-
+# Minarca client
+#
+# Copyright (C) 2021 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
+#
+# This script is used by `dmgbuild` to build a Mac OS X installer for Minarca Client.
+#
+
+import plistlib
+import os.path
+
+def icon_from_app(app_path):
+    plist_path = os.path.join(app_path, 'Contents', 'Info.plist')
+    with open(plist_path, 'rb') as f:
+        plist = plistlib.load(f)
+    icon_name = plist['CFBundleIconFile']
+    icon_root,icon_ext = os.path.splitext(icon_name)
+    if not icon_ext:
+        icon_ext = '.icns'
+    icon_name = icon_root + icon_ext
+    return os.path.join(app_path, 'Contents', 'Resources', icon_name)
+
+application = defines.get('app')
+appname = os.path.basename(application)
+format = defines.get('format', 'UDBZ')
+size = defines.get('size', None)
+files = [ application ]
+symlinks = { 'Applications': '/Applications' }
+badge_icon = icon_from_app(application)
+icon_locations = {
+    appname:        (140, 120),
+    'Applications': (500, 120)
+}
+background = 'builtin-arrow'
