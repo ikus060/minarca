@@ -54,6 +54,9 @@ class Jail(SplitExec):
         # Mount proc
         os.mkdir(os.path.join(self.root, 'proc'))
         mount(source='/proc', target=os.path.join(self.root, 'proc'), fstype=None, flags=MS_BIND | MS_REC)
+        # Mount /dev/null
+        os.mkdir(os.path.join(self.root, 'dev'))
+        os.mknod(os.path.join(self.root, 'dev/null'), 0o0666, device=os.makedev(1, 3))
         # Create default mountpoint to run executables.
         for mountpoint in ['/bin', '/lib', '/lib64', '/usr', '/opt']:
             if not os.path.exists(mountpoint):
