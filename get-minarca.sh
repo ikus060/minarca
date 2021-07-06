@@ -36,6 +36,7 @@ if [ -f /etc/debian_version ]; then
     case "$DEBIAN_VERSION" in
     9*)  DEBIAN_DISTRIBUTION=stretch;;
     10*) DEBIAN_DISTRIBUTION=buster;;
+    11*) DEBIAN_DISTRIBUTION=bullseye;;
     bullseye*) DEBIAN_DISTRIBUTION=bullseye;;
     *)
       >&2 echo "Error: Debian Linux distribution not supported: $DEBIAN_VERSION"
