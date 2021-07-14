@@ -2,7 +2,7 @@ MINARCA_USER=minarca
 MINARCA_HOME=/backups/
 MINARCA_ETC=/etc/minarca
 MINARCA_LOG=/var/log/minarca
-MINARCA_SESSION=/var/run/minarca
+MINARCA_SESSION=/var/lib/minarca
 
 case "$1" in
   configure)
