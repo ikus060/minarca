@@ -1,1 +1,2 @@
 opt/rdiff-backup-2.0/bin/rdiff-backup-delete  opt/minarca-server/bin/rdiff-backup-delete
+opt/rdiff-backup-2.0/bin/rdiff-backup         opt/minarca-server/bin/rdiff-backup
