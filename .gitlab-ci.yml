@@ -135,7 +135,7 @@ bdist:macos:
     paths:
     - "minarca-client/dist/minarca-client_*.dmg"
   before_script:
-  - pip3 install tox
+    - pip3 install tox
   needs: []  
   tags:
   - macos
@@ -149,16 +149,22 @@ bdist:win32:
     paths:
     - "minarca-client/dist/minarca-client_*.exe"
   before_script:
-  - Invoke-WebRequest -UseBasicParsing -Uri http://checkip.dyndns.org/
-  - choco install openssl -y
-  - Invoke-WebRequest -UseBasicParsing -Uri https://community.chocolatey.org/api/v2/
+  # Install required dependencies for building on Windows
+  # python is used for building
+  # openssl is required to generate certificate
+  # nsis for creating installer
+  # osslsigncode to sign binaries
   - choco install python3 --version=3.7.9 -y -f --forcex86
-  - choco install nsis -y
-  - choco install ksign -y
   - choco install openssl -y
-  - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
+  - choco install nsis -y
+  - wget.exe https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
+  - 7z x osslsigncode_2.2_windows.zip -oC:\osslsigncode
+  - $Env:path += ";C:\osslsigncode;C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
   - $Env:path
+  # Sanity check
   - python.exe -VV
+  - osslsigncode.exe --version
+  # Install tox
   - pip.exe install tox
   needs: []  
   script:
@@ -305,7 +311,8 @@ e2e-test:macos:
   - rm -Rf /Applications/Minarca.app
   - rm -Rf $HOME/Library/Preferences/Minarca
   script:
-  - hdiutil attach minarca-client/dist/minarca-client_*.dmg
+  - "[ ! -e /Volumes/Minarca ] || hdiutil detach /Volumes/Minarca"
+  - hdiutil attach minarca-client/dist/minarca-client_*.dmg 
   - cp -r /Volumes/Minarca/Minarca.app /Applications/
   - /Applications/Minarca.app/Contents/MacOS/minarca --version
   - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
@@ -317,6 +324,7 @@ e2e-test:macos:
   - macos
   variables:
     GIT_STRATEGY: none
+    LC_ALL: "en_US.UTF-8"
 
 e2e-test:win32:
   allow_failure: True

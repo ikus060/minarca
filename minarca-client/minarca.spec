@@ -12,7 +12,7 @@
 #
 # For MacOS, it creates a redistributable .app archived into a .dgm file.
 #
-
+import os
 import platform
 import subprocess
 import tempfile
@@ -29,10 +29,9 @@ version = pkg_resources.get_distribution("minarca_client").version
 block_cipher = None
 
 
-
 # Include openssh client for windows
 if platform.system() == "Windows":
-    openssh= [('minarca_client/core/openssh', 'minarca_client/core/openssh')]
+    openssh = [('minarca_client/core/openssh', 'minarca_client/core/openssh')]
 else:
     openssh = []
 
@@ -99,6 +98,30 @@ coll = COLLECT(
     upx_exclude=[],
     name='minarca')
 
+# Extract certificate from environment variable.
+cert_file = tempfile.mktemp(suffix='.key')
+key_file = tempfile.mktemp(suffix='.pem')
+passphrase = os.environ.get('AUTHENTICODE_PASSPHRASE')
+if os.environ.get('AUTHENTICODE_CERT'):
+    # Write cert to file
+    with open(cert_file, 'w') as f:
+        f.write(os.environ['AUTHENTICODE_CERT'])
+    # Write key to file
+    with open(key_file, 'w') as f:
+        f.write(os.environ['AUTHENTICODE_KEY'])
+    # Get Common Name from certificate subject
+    cert_subject = subprocess.check_output(
+        ['openssl', 'x509', '-noout', '-subject', '-in', cert_file],
+        text=True).strip()
+    cert_cn = cert_subject.partition('/CN=')[2]
+    # Code signing on Windows required pfx file.
+    pfx_file = tempfile.mktemp(suffix='.pfx')
+    subprocess.check_call(
+        ['openssl', 'pkcs12', '-inkey', key_file, '-in', cert_file, '-passin',
+         'pass:%s' % passphrase, '-passout', 'pass:%s' % passphrase, '-export', '-out', pfx_file])
+else:
+    print('AUTHENTICODE_CERT is missing, skip signing')
+
 #
 # Packaging
 #
@@ -112,12 +135,26 @@ if platform.system() == "Darwin":
         bundle_identifier='com.ikus-soft.minarca',
         version=version,
     )
+    app_file = os.path.abspath('dist/Minarca.app')
 
     # Binary smoke test
-    subprocess.check_call(['dist/minarca.app/Contents/MacOS/minarca', '--version'])
-    
+    subprocess.check_call(
+        ['dist/minarca.app/Contents/MacOS/minarca', '--version'])
+
+    # Sign Application Bundle
+    if os.environ.get('AUTHENTICODE_CERT'):
+        # Add certificate to loging keychain
+        keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
+        subprocess.check_call(
+            ['security', 'import', pfx_file, '-k', keychain, '-P', passphrase])
+        # Sign MacOS X App bundle
+        # --deep to sign subcomponents
+        # --keychain to limit keychain lookup
+        # See https://www.unix.com/man-page/osx/1/codesign/
+        subprocess.check_call(
+            ['codesign', '--deep', '--keychain', keychain, '--sign', cert_cn, app_file])
+
     # Generate dmg image
-    app_file = os.path.abspath('dist/Minarca.app')
     dmg_file = os.path.abspath('dist/minarca-client_%s.dmg' % version)
     subprocess.check_call([
         'dmgbuild',
@@ -127,37 +164,46 @@ if platform.system() == "Darwin":
         dmg_file])
 
 elif platform.system() == "Windows":
-    
+
     def sign_exe(path):
         if not os.environ.get('AUTHENTICODE_CERT'):
-            print('AUTHENTICODE_CERT is missing, skip signing')
             return
-    
-        # Write cert to file
-        cert_file = tempfile.mktemp(suffix='.key')
-        with open(cert_file, 'w') as f:
-            f.write(os.environ['AUTHENTICODE_CERT'])
-        # Write key to file
-        key_file = tempfile.mktemp(suffix='.pem')
-        with open(key_file, 'w') as f:
-            f.write(os.environ['AUTHENTICODE_KEY'])
-        passphrase = os.environ['AUTHENTICODE_PASSPHRASE']
-        # Create pfx
-        pfx_file = tempfile.mktemp()
-        subprocess.check_call(['openssl', 'pkcs12', '-inkey', key_file, '-in', cert_file, '-passin', 'pass:%s' % passphrase, '-passout', 'pass:%s' % passphrase, '-export', '-out', pfx_file])
         # Sign executable.
-        subprocess.check_call(['signtool', 'sign', '/f', pfx_file, '/p', passphrase, '/t', 'http://timestamp.digicert.com', path])
-    
+        unsigned = tempfile.mktemp(suffix='.exe')
+        os.rename(path, unsigned)
+        subprocess.check_call([
+            'osslsigncode.exe',
+            'sign',
+            '-certs',
+            cert_file,
+            '-key',
+            key_file,
+            '-pass',
+            passphrase,
+            '-n',
+            'Minarca',
+            '-i',
+            'https://minarca.org',
+            '-h',
+            'sha2',
+            '-t',
+            'http://timestamp.digicert.com',
+            '-in',
+            unsigned,
+            '-out',
+            path])
+
     # Sign executable
     sign_exe('dist/minarca/minarca.exe')
-    
+
     # For NSIS, we need to convert the license encoding
     with open('dist/minarca/LICENSE', 'r', encoding='UTF-8') as input:
         with open('dist/minarca/LICENSE.txt', 'w', encoding='ISO-8859-1') as out:
             out.write(input.read())
-    
+
     # Create installer using NSIS
-    exe_version = re.search('.*([0-9].[0-9].[0-9].[0-9])', '0.0.0.3.9.1~dev').group(1)
+    exe_version = re.search(
+        '.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
     nsi_file = os.path.abspath('minarca.nsi')
     setup_file = os.path.abspath('dist/minarca-client_%s.exe' % version)
     subprocess.check_call([
@@ -172,7 +218,7 @@ elif platform.system() == "Windows":
 
     # Sign installer
     sign_exe(setup_file)
-    
+
     # Binary smoke test
     subprocess.check_call(['dist/minarca/minarca.exe', '--version'])
 
@@ -185,5 +231,4 @@ else:
         '-zcvf',
         targz_file,
         'minarca'],
-    cwd=os.path.abspath('./dist'))
-    
+        cwd=os.path.abspath('./dist'))
