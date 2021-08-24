@@ -17,7 +17,8 @@ stages:
 test:flake8:
   before_script:
   - apt update && apt -y --no-install-recommends install $DEPENDS
-  image: ikus060/python:$DIST-py3
+  - pip install tox
+  image: python:3
   parallel:
     matrix:
     - TARGET: minarca-client
@@ -37,17 +38,18 @@ test:flake8:
 test:deb:
   before_script:
   - apt update && apt -y --no-install-recommends install $DEPENDS
-  image: ikus060/python:$DIST-py3
+  - pip install tox
+  image: python:3-$DIST
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [debian10, debian11, groovy]
+      DIST: [buster, bullseye]
       DEPENDS: cron librsync-dev python3-tk libacl1-dev
     - TARGET: minarca-server
-      DIST: [debian10, debian11, groovy]
+      DIST: [buster, bullseye]
       DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
     - TARGET: minarca-quota-api
-      DIST: [debian10, debian11, groovy]
+      DIST: [buster, bullseye]
       DEPENDS: bash
   script:
   - cd $TARGET
