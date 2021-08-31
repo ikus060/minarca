@@ -39,10 +39,13 @@ class TextDialog(Dialog):
                ellipsis='start', tooltip='My tooltip', ** TEXT_DEFAULT)],
             [T('This is a long text with custom tooltip.', size=(25, 1),
                ellipsis='start', tooltip='My tooltip', ** TEXT_DEFAULT)],
+            # Wrap
+            [T('This is a very long test that should wrap on multiple time. To make this work Text() widget must be created in a special way.',
+               size=(None, 3), expand_x=True, expand_y=True, **TEXT_DEFAULT)],
         ]
         return layout
 
 
 if __name__ == "__main__":
     dlg = TextDialog()
-    dlg.open()
+    dlg.open(size=(500, 500))

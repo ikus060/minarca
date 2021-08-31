@@ -6,7 +6,7 @@ Created on Mar 22, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from gettext import gettext as _
+from minarca_client.locale import _
 from minarca_client.core import Backup, RepositoryNameExistsError
 from minarca_client.core.exceptions import HttpAuthenticationError
 from minarca_client.ui.theme import TEXT_HEADER1, TEXT_SMALL, TEXT_STRONG
@@ -111,7 +111,7 @@ class SetupDialog(Dialog):
                 self.window,
                 _('Invalid connection information !'),
                 _('Invalid connection information !'),
-                _("The information you have entered for the connection to Minarca are invalid.\n\n " + str(e))
+                _("The information you have entered for the connection to Minarca are invalid.\n\n%s" % str(e))
             ))
             return
         except Exception as e:
@@ -122,7 +122,7 @@ class SetupDialog(Dialog):
                 _('Failed to connect to remote server'),
                 _('Failed to connect to remote server'),
                 _("An error occurred during the connection to Minarca "
-                  "server.\n\nDetails: " + str(e))
+                  "server.\n\nDetails: %s" % str(e))
             ))
             return
         finally:

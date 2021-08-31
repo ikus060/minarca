@@ -9,7 +9,7 @@ Created on Jun. 7, 2021
 
 from datetime import timedelta
 import datetime
-from gettext import gettext as _
+from minarca_client.locale import _
 import logging
 import os
 import re

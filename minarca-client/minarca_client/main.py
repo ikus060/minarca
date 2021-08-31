@@ -2,8 +2,9 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
+
 from argparse import ArgumentParser
-from gettext import gettext as _
+from minarca_client.locale import _
 from minarca_client import __version__
 from minarca_client.core import (Backup, BackupError, NotRunningError,
                                  NotScheduleError, RepositoryNameExistsError, RunningError)
@@ -13,10 +14,12 @@ import getpass
 import logging
 import logging.handlers
 import os
+
 import signal
 import sys
 from minarca_client.ui.connect import SetupDialog
 from minarca_client.ui.home import HomeDialog
+
 
 _EXIT_BACKUP_FAIL = 1
 _EXIT_ALREADY_LINKED = 2
@@ -204,7 +207,7 @@ def _parse_args(args):
     sub.add_argument(
         '-r', '--remoteurl',
         required=True,
-        help=_("URL to the remove minarca server. e.g.: http://example.com:8080/"))
+        help=_("URL to the remote minarca server. e.g.: http://example.com:8080/"))
     sub.add_argument(
         '-u', '--username',
         required=True,
@@ -219,7 +222,7 @@ def _parse_args(args):
     sub.add_argument(
         '--force',
         action='store_true',
-        help=_("link to remote server event if the repository name already exists"))
+        help=_("link to remote server even if the repository name already exists"))
     sub.set_defaults(func=_link)
 
     # patterns

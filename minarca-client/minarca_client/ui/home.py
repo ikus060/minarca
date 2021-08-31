@@ -7,7 +7,7 @@ Created on Mar 22, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 from PySimpleGUI.PySimpleGUI import popup_get_file, popup_get_folder
-from gettext import gettext as _
+from minarca_client.locale import _
 from minarca_client.core import Backup
 from minarca_client.core.compat import get_home
 from minarca_client.core.config import Pattern, Settings
@@ -363,7 +363,8 @@ class HomeDialog(Dialog):
             metadata=self._handle_pattern_list)
         pattern_list.set_patterns(self.backup.get_patterns())
         return [
-            [T(_('Select file and folder to include or exclude from backup.'), **TEXT_DEFAULT)],
+            [T(_('Select files'), **TEXT_HEADER1)],
+            [T(_('Select file and folder to include or exclude from backup.'), size=(None, 2), auto_size_text=False)],
             [B(_('Add File'), metadata=self._handle_add_file),
              B(_('Add Folder'), metadata=self._handle_add_folder),
              B(_('Add Pattern'), metadata=self._handle_add_pattern),
@@ -380,7 +381,8 @@ class HomeDialog(Dialog):
         selected_label = self._get_frequency_label(schedule_value)
         labels = [f[1] for f in self._get_frequencies()]
         return [
-            [T(_('Select how often you want your backup to be performed.'))],
+            [T(_('Schedule'), **TEXT_HEADER1)],
+            [T(_('Select how often you want your backup to be performed.'), size=(None, 2), auto_size_text=False)],
             [HR()],
             [T(_('Frequency'), size=(15, 1), **TEXT_STRONG),
              pull_right(C(

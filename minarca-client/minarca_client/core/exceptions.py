@@ -3,7 +3,7 @@ Created on Jun. 27, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from gettext import gettext as _
+from minarca_client.locale import _
 
 
 class RepositoryNameExistsError(Exception):

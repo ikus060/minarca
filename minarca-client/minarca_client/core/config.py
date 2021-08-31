@@ -8,7 +8,7 @@ Created on Jun. 8, 2021
 '''
 from collections import namedtuple
 from functools import total_ordering
-from gettext import gettext as _
+from minarca_client.locale import _
 from minarca_client.core.compat import (IS_LINUX, IS_MAC, IS_WINDOWS, get_home,
                                         get_temp)
 import datetime
