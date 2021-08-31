@@ -6,7 +6,7 @@ Created on Jun. 30, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from gettext import gettext as _
+from minarca_client.locale import _
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.ui.theme import (MINARCA_ICON, TEXT_DEFAULT, TEXT_STRONG,
                                      TTK_THEME, pull_right)

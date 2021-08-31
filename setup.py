@@ -16,7 +16,7 @@ import sys
 install_requires = [
     "javaproperties",
     "psutil",
-    "PySimpleGUI",
+    "PySimpleGUI==4.47.0",  # Fix this to avoid untested changes.
     "rdiff-backup==2.0.5",
     "requests",
     "wakepy",

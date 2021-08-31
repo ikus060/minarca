@@ -7,7 +7,7 @@ Created on Jun. 7, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 from distutils import spawn
-from gettext import gettext as _
+from minarca_client.locale import _
 import datetime
 import distutils.spawn
 import os
