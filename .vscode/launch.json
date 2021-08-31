@@ -10,14 +10,19 @@
             "request": "launch",
             "module": "minarca_client.main",
             "args": ["ui"],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "LANGUAGE": "fr",
+            }
         },
         {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": false,
         }
     ]
 }
