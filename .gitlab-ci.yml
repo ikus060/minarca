@@ -89,7 +89,7 @@ bdist:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy]
+      DIST: [buster, bullseye, groovy, hirsute]
       DEPENDS: python3 cron librsync-dev libacl1-dev
     - TARGET: minarca-server
       DIST: [buster, bullseye, groovy]
@@ -182,7 +182,7 @@ upload:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy]
+      DIST: [buster, bullseye, groovy, hirsute]
     - TARGET: minarca-server
       DIST: [buster, bullseye, groovy]
       DEPENDS: python3
@@ -271,7 +271,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy]
+      DIST: [buster, bullseye, groovy, hirsute]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
