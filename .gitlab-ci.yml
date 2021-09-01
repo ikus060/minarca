@@ -323,7 +323,6 @@ e2e-test:macos:
   tags:
   - macos
   variables:
-    GIT_STRATEGY: none
     LC_ALL: "en_US.UTF-8"
 
 e2e-test:win32:
