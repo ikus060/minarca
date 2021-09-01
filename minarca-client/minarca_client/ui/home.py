@@ -364,7 +364,7 @@ class HomeDialog(Dialog):
         pattern_list.set_patterns(self.backup.get_patterns())
         return [
             [T(_('Select files'), **TEXT_HEADER1)],
-            [T(_('Select file and folder to include or exclude from backup.'), size=(None, 2), auto_size_text=False)],
+            [T(_('Select file and folder to include or exclude from backup.'), wrap=True)],
             [B(_('Add File'), metadata=self._handle_add_file),
              B(_('Add Folder'), metadata=self._handle_add_folder),
              B(_('Add Pattern'), metadata=self._handle_add_pattern),
@@ -382,7 +382,7 @@ class HomeDialog(Dialog):
         labels = [f[1] for f in self._get_frequencies()]
         return [
             [T(_('Schedule'), **TEXT_HEADER1)],
-            [T(_('Select how often you want your backup to be performed.'), size=(None, 2), auto_size_text=False)],
+            [T(_('Select how often you want your backup to be performed.'), wrap=True)],
             [HR()],
             [T(_('Frequency'), size=(15, 1), **TEXT_STRONG),
              pull_right(C(
