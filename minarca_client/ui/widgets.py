@@ -385,6 +385,7 @@ class Text(sg.Text):
 
     def __init__(self, *args, **kwargs):
         self._ellipsis = kwargs.pop('ellipsis', None)
+        self._wrap = kwargs.pop('wrap', False)
         sg.Text.__init__(self, *args, **kwargs)
         # Keep reference to the original value.
         self._text = self.DisplayText
@@ -442,6 +443,12 @@ class Text(sg.Text):
             return
 
         sg.Text.set_tooltip(self, self.Tooltip)
+
+    def __setattr__(self, name, value):
+        sg.Text.__setattr__(self, name, value)  # @UndefinedVariable
+        # Intercept when widget is create.
+        if name == 'Widget' and value is not None and self._wrap:
+            value.bind('<Configure>', lambda e: value.config(wraplen=value.winfo_width()))
 
 
 T = Text = _wrap(Text, pad=(0, 0), **TEXT_DEFAULT)

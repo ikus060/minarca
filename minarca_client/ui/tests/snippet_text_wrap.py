@@ -1,15 +1,15 @@
-import PySimpleGUI as sg  # @UnresolvedImport
+import PySimpleGUI as sg
+from minarca_client.ui.widgets import Text
 
 
 def main():
-    # Create initial layout
-    layout = [[sg.Text('This is a very long test that should wrap on multiple time. To make this work Text() widget must be created in a special way.', size=(None, 3), expand_x=True)]]
 
-    # Create windows
-    window = sg.Window('Window Title', layout, size=(200, 200))
-    event, values = window.read(timeout=0)
+    layout = [[Text('This is a very long test that should wrap on multiple time. To make this work Text() widget must be created in a special way.',
+                    wrap=True, expand_x=True, size=(-1, -1), key='TEXT')]]
+    window = sg.Window('Window Title', layout, size=(
+        200, 200), resizable=True, finalize=True)
 
-    while True:  # Event Loop
+    while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             break
