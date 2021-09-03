@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Minarca Backup
+Name[fr]=Sauvegarde Minarca
+Comment=Minarca a centralized management of data backups
+Comment[fr]=Minarca une gestion centralisée des sauvegardes de données
+Exec=/opt/minarca-client/bin/minarcaw
+Icon=/opt/minarca-client/minarca_128.png
+Terminal=false

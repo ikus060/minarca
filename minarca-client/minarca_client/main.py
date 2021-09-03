@@ -8,7 +8,7 @@ from minarca_client.locale import _
 from minarca_client import __version__
 from minarca_client.core import (Backup, BackupError, NotRunningError,
                                  NotScheduleError, RepositoryNameExistsError, RunningError)
-from minarca_client.core.compat import get_log_file, IS_WINDOWS, IS_MAC
+from minarca_client.core.compat import get_log_file
 from minarca_client.core.config import Pattern, Settings
 import getpass
 import logging
@@ -154,9 +154,11 @@ def _unlink():
 
 def _parse_args(args):
     parser = ArgumentParser(
-        prog="minarca",
-        description="Description",
+        description="Minarca manage your combuter backups by linking your computer with a centralized server and running backups on a given schedule.",
         add_help=True)
+    # Check if the application should default to GUI mode.
+    is_ui = parser.prog in ['minarcaw', 'minarcaw.exe']
+
     parser.add_argument(
         '-v', '--version',
         action='version',
@@ -165,10 +167,14 @@ def _parse_args(args):
         '-d', '--debug',
         action='store_true')
 
+    #
+    # Define subcommands
+    #
+    subparsers = parser.add_subparsers(dest='subcommand', required=not is_ui)
+    if is_ui:
+        parser.set_defaults(func=_ui)
+
     # Backup
-    subparsers = parser.add_subparsers(
-        dest='subcommand',
-        required=True)
     sub = subparsers.add_parser(
         'backup',
         help=_('start a backup'))
@@ -277,10 +283,10 @@ def _parse_args(args):
         help=_('unlink this minarca client from server'))
     sub.set_defaults(func=_unlink)
 
-    # unlink
+    # ui
     sub = subparsers.add_parser(
         'ui',
-        help=_('open graphical user interface (default if no arguments)'))
+        help=_('open graphical user interface (default when calling minarcaw)'))
     sub.set_defaults(func=_ui)
 
     # Quick hack to support previous `--backup`, `--stop`
@@ -319,11 +325,6 @@ def main(args=None):
     # Parse the arguments
     if args is None:
         args = sys.argv[1:]
-    # If we get called using minarcaw.exe without any other arguments,
-    # we open graphical user interface.
-    if ((IS_WINDOWS and 'minarcaw.exe' in sys.argv[0] and len(args) == 0) or (IS_MAC and len(args) == 0)):
-        _configure_logging(debug=False)
-        return _ui()
     args = _parse_args(args)
     # Remove func from args
     kwargs = {k: v for k, v in args._get_kwargs() if k not in [
