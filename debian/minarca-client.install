@@ -1,0 +1,2 @@
+debian/minarca-client.desktop /usr/share/applications
+minarca_client/ui/images/minarca_128.png /opt/minarca-client/
