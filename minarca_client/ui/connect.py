@@ -99,13 +99,16 @@ class SetupDialog(Dialog):
                 password=password,
                 repository_name=repository_name,
                 force=force)
+            self.window.write_event_value('callback', self._link_end)
         except RepositoryNameExistsError:
             logger.info('repository name `%s` already exists' %
                         repository_name)
+            self.window.write_event_value('callback', self._link_end)
             self.window.write_event_value(
                 'callback', self._prompt_link_force)
             return
         except (HttpAuthenticationError) as e:
+            self.window.write_event_value('callback', self._link_end)
             self.window.write_event_value('callback', (
                 show_warning,
                 self.window,
@@ -116,6 +119,7 @@ class SetupDialog(Dialog):
             return
         except Exception as e:
             logger.exception('fail to connect')
+            self.window.write_event_value('callback', self._link_end)
             self.window.write_event_value('callback', (
                 show_error,
                 self.window,
@@ -125,8 +129,7 @@ class SetupDialog(Dialog):
                   "server.\n\nDetails: %s" % str(e))
             ))
             return
-        finally:
-            self.window.write_event_value('callback', self._link_end)
+
         # Link completed - Close Window.
         self.close()
 

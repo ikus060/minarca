@@ -291,6 +291,7 @@ if IS_WINDOWS:
 
     import pythoncom  # @UnresolvedImport
     import pywintypes  # @UnresolvedImport
+    import win32api  # @UnresolvedImport
     import win32com.client  # @UnresolvedImport
 
     class WindowsScheduler():
@@ -312,6 +313,9 @@ if IS_WINDOWS:
                 return False
 
         def create(self, force=False):
+            """
+            Create entry in Windows Task Scheduler.
+            """
             if self.exists():
                 if force:
                     # Delete the task.
@@ -362,13 +366,31 @@ if IS_WINDOWS:
                 TASK_LOGON_NONE)
 
         def delete(self):
+            """
+            Delete entry from Task Scheduler.
+
+            This operation might required priviledge escalation.
+            """
             root_folder = self.scheduler.GetFolder('\\')
             try:
                 task = root_folder.GetTask('\\' + self.NAME)
             except pywintypes.com_error:  # @UndefinedVariable
                 # Task doesn't exists
                 return
-            root_folder.DeleteTask(task.Name, 0)
+            # Try deleting with current priviledges.
+            try:
+                root_folder.DeleteTask(task.Name, 0)
+            except pywintypes.com_error as e:
+                # If operation is denied, try deleting the task using runas
+                # command line.
+                winerror = e.excepinfo[5]
+                if winerror == -2147024891:  # Access denied.
+                    retcode = subprocess.call(
+                        ['SCHTASKS.exe', '/Delete', '/TN', 'Minarca Backup', '/F'])
+                    if retcode == 0:
+                        return
+                    raise OSError(None, win32api.FormatMessage(
+                        winerror), None, winerror)
 
     Scheduler = WindowsScheduler
 
