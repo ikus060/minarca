@@ -57,13 +57,13 @@ pyz = PYZ(
     a.pure, a.zipped_data,
     cipher=block_cipher)
 
-# On OSX and Linux, we use the same binary for console and windowed.
+# First executable for windowed mode.
 exe_w = EXE(
     pyz,
     a.scripts,
     [],
     exclude_binaries=True,
-    name='minarcaw' if platform.system() == "Windows" else 'minarca',
+    name='minarcaw',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -72,21 +72,20 @@ exe_w = EXE(
     console=False)
 all_exe = [exe_w]
 
-# We need another executable on Windows for console mode.
-if platform.system() == "Windows":
-    exe_c = EXE(
-        pyz,
-        a.scripts,
-        [],
-        exclude_binaries=True,
-        name='minarca',
-        debug=False,
-        bootloader_ignore_signals=False,
-        strip=False,
-        upx=False,
-        icon=icon,
-        console=True)
-    all_exe += [exe_c]
+# Another executable on for console mode.
+exe_c = EXE(
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name='minarca',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    icon=icon,
+    console=True)
+all_exe += [exe_c]
 
 coll = COLLECT(
     *all_exe,

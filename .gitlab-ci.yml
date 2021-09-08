@@ -276,6 +276,7 @@ e2e-test:deb:
     - apt update
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
     - minarca --version
+    - /opt/minarca/bin/minarcaw --version
     - minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
     - minarca -d status
     - minarca -d include /etc /var /home
@@ -294,6 +295,7 @@ e2e-test:linux:
     - apt update && apt install -y cron openssh-client
     - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
     - ./minarca --version
+    - ./minarcaw --version
     - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
     - ./minarca -d include /etc /var /home
     - ./minarca -d status
@@ -315,6 +317,7 @@ e2e-test:macos:
   - hdiutil attach minarca-client/dist/minarca-client_*.dmg 
   - cp -r /Volumes/Minarca/Minarca.app /Applications/
   - /Applications/Minarca.app/Contents/MacOS/minarca --version
+  - /Applications/Minarca.app/Contents/MacOS/minarcaw --version
   - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
   - /Applications/Minarca.app/Contents/MacOS/minarca -d include "$HOME/Documents"
   - /Applications/Minarca.app/Contents/MacOS/minarca -d status
@@ -337,6 +340,7 @@ e2e-test:win32:
   - $Env:path += ";C:\Program Files\Minarca"
   - $Env:path
   - minarca.exe --version
+  - minarcaw.exe --version
   - minarca.exe -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
   - minarca.exe -d include /etc /var /home
   - minarca.exe -d status
