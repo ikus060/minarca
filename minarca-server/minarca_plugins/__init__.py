@@ -176,7 +176,7 @@ class MinarcaUserSetup(IUserChangeListener):
         # Override a couple of arguments with Minarca.
         parser.set_defaults(
             database_uri='/etc/minarca/rdw.db',
-            default_theme='orange',
+            default_theme='blue',
             favicon=pkg_resources.resource_filename(
                 __name__, 'minarca.ico'),  # @UndefinedVariable
             footer_name='Minarca',

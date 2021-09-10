@@ -29,7 +29,7 @@ value for this options using `[..]`.
     WelcomeMsg[fr]=Un message <b>de bienvenue</b> à afficher à l'utilisateur.
 
 You may also pick a different color scheme to matches your branding. Only two
-theme are available: `default`, `orange`. You may request a new color scheme
+theme are available: `default`, `blue`, `orange`. You may request a new color scheme
 using a [support request](https://www.ikus-soft.com/en/support/#form).
 
     DefaultTheme=default

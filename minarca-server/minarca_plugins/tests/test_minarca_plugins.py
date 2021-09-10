@@ -109,7 +109,7 @@ class MinarcaUserSetupTest(AbstractMinarcaTest):
         self.assertEqual('/tmp/minarca-test/mtest2', user.user_root)
 
     def test_default_arguments(self):
-        self.assertEqual("orange", self.app.cfg.default_theme)
+        self.assertEqual("blue", self.app.cfg.default_theme)
         self.assertIn("minarca.ico", self.app.cfg.favicon)
         self.assertEqual("Minarca", self.app.cfg.footer_name)
         self.assertEqual("Minarca", self.app.cfg.header_name)
