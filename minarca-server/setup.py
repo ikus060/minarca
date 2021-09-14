@@ -47,7 +47,6 @@ setuptools.setup(
     tests_require=[
         "nose",
         "mock>=1.3.0",
-        "mockldap>=0.2.6",
         "httpretty",
         "pytest",
     ],

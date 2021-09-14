@@ -251,21 +251,13 @@ class MinarcaUserSetup(IUserChangeListener):
         }
 
     def user_logined(self, userobj, attrs):
-        """
-        Need to verify LDAP quota and update ZFS quota if required.
-        """
         pass
 
     def user_added(self, userobj, attrs):
         """
-        When added (manually or not). Try to get data from LDAP.
+        When added (manually or not). Update user's attributes.
         """
         assert isinstance(userobj, UserObject)
-        try:
-            self._update_user_email(userobj, attrs)
-        except Exception:
-            logger.warning(
-                'fail to update user [%s] email from LDAP', userobj.username, exc_info=1)
         try:
             self._update_user_root(userobj, attrs)
         except Exception:
@@ -297,25 +289,6 @@ class MinarcaUserSetup(IUserChangeListener):
         except Exception:
             logger.error(
                 "fail to update authorized_keys files on user_deleted", exc_info=1)
-
-    def _update_user_email(self, userobj, attrs):
-        """
-        Called to update the user email and home directory from LDAP info.
-        """
-        # Get user email from LDAP
-        mail = attrs and attrs.get('mail', None)
-        if not mail:
-            return
-        # mail might be a list.
-        if hasattr(mail, '__getitem__') and len(mail):
-            mail = mail[0]
-
-        if isinstance(mail, bytes):
-            mail = mail.decode('utf-8')
-
-        logger.info(
-            'update user [%s] email from LDAP [%s]', userobj.username, mail)
-        userobj.email = mail
 
     def _update_user_root(self, userobj, attrs):
         """

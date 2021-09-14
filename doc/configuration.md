@@ -40,66 +40,6 @@ from the Minarca client application will be redirect to this page instead of
 the default Minarca web site.
 
     MinarcaHelpURL = https://my-company.com/support
-    
-
-## Setting up LDAP sign-in
-
-If you have an LDAP directory service such as Active Directory or OpenLDAP in
-your organisation, you can configure Minarca so that your users can sign in with
-their LDAP credentials. 
-
-Add the following to `/etc/minarca/minarca-server.conf`, edited for your needs.
-
-    LdapBaseDn=dc=nodomain
-    LdapBindDn=
-    LdapBindPassword=
-    LdapFilter=(objectClass=posixAccount)
-    LDAPGroupAttribute=memberUid
-    LDAPGroupAttributeIsDN=False
-    LdapRequiredGroup=cn=minarca,ou=Groups,dc=nodomain
-    LdapTls=True
-    LdapUri=ldap://192.168.1.100:389
-
-**Ldap connection options**
-
-| Parameter | Description | Required | Example |
-| --- | --- | --- | --- |
-| LdapUri | URIs containing only the schema, the host, and the port. | Yes | ldap://localhost:389 | 
-| LdapTls | `true` to enable TLS. Default to `false` | No | false |
-| LdapProtocolVersion | Version of LDAP in use either 2 or 3. Default to 3. | No | 3 |
-| LdapBaseDn | The DN of the branch of the directory where all searches should start from. | Yes | dc=my,dc=domain | 
-| LdapBindDn | An optional DN used to bind to the server when searching for entries. If not provided, will use an anonymous bind. | No | cn=manager,dc=my,dc=domain |
-| LdapBindPassword |  A bind password to use in conjunction with `LdapBindDn`. Note that the bind password is probably sensitive data, and should be properly protected. You should only use the LdapBindDn and LdapBindPassword if you absolutely need them to search the directory. | No | mypassword |
-| LdapAttribute | The attribute to search username. If no attributes are provided, the default is to use `uid`. It's a good idea to choose an attribute that will be unique across all entries in the subtree you will be using. | No | cn | 
-| LdapScope | The scope of the search. Can be either `base`, `onelevel` or `subtree`. Default to `subtree`. | No | onelevel |
-| LdapFilter | A valid LDAP search filter. If not provided, defaults to `(objectClass=*)`, which will search for all objects in the tree. | No | (objectClass=*) | 
-| LdapNetworkTimeout | Optional timeout value. Default to 10 sec. | No | 10 |
-| LdapTimeout | Optional timeout value. Default to 300 sec. | No | 300 |
-
-**AddMissingUser**
-
-To reduce management, it's possible to let Minarca create and configure user's on the fly if the LDAP credentials are valid. The user will be created with default home directory under `/backups/<username>/`. User's email will also be fetched from LDAP database.
-
-Default value: `false`
-
-Valid options: `false`, `true`
-
-**LdapCheckShadowExpire**
-
-Minarca as the abilities to support the user's `shadowExpire` field define in
-LDAP server to check if the login may no longer be used.
-
-Default value: `false`
-
-Valid options: `false`, `true`
-
-**LdapAllowPasswordChange**
-
-Depending of your LDAP permissions, your users may be allowed to edit their own password from Minarca web interface. If you want to enable this feature, your must set this option to `true`.
-
-Default value: `false`
-
-Valid options: `false`, `true`
 
 ## Configure email notification
 

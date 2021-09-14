@@ -23,7 +23,6 @@ import unittest
 from unittest.mock import MagicMock
 
 import httpretty
-from mockldap import MockLdap
 import pkg_resources
 from rdiffweb.core.store import ADMIN_ROLE
 import rdiffweb.test
@@ -40,15 +39,18 @@ class AbstractMinarcaTest(rdiffweb.test.WebCase):
     @classmethod
     def setup_class(cls):
         if cls is AbstractMinarcaTest:
-            raise unittest.SkipTest("%s is an abstract base class" % cls.__name__)
+            raise unittest.SkipTest(
+                "%s is an abstract base class" % cls.__name__)
         if not os.path.isdir('/tmp/minarca-test'):
             os.mkdir('/tmp/minarca-test')
         # Use temporary folder for base dir
         cls.default_config['MinarcaUserBaseDir'] = '/tmp/minarca-test'
         tempfile.tempdir = '/tmp/minarca-test'
         # Use current user for owner and group
-        cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[0]
-        cls.default_config['MinarcaUserDirGroup'] = pwd.getpwuid(os.getuid())[0]
+        cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[
+            0]
+        cls.default_config['MinarcaUserDirGroup'] = pwd.getpwuid(os.getuid())[
+            0]
         super(AbstractMinarcaTest, cls).setup_class()
 
     @classmethod
@@ -88,7 +90,8 @@ class MinarcaUserSetupTest(AbstractMinarcaTest):
         Make sure the user_root getg populated with default value from basedir.
         """
         # Check if minarca base dir is properly defined
-        self.assertEqual('/tmp/minarca-test', self.app.cfg.minarca_user_base_dir)
+        self.assertEqual('/tmp/minarca-test',
+                         self.app.cfg.minarca_user_base_dir)
 
         #  Add user to be listed
         self._add_user("mtest1", None, "mtest1", None, False)
@@ -114,78 +117,19 @@ class MinarcaUserSetupTest(AbstractMinarcaTest):
         self.assertEqual("Minarca", self.app.cfg.footer_name)
         self.assertEqual("Minarca", self.app.cfg.header_name)
         self.assertIn("minarca_22.png", self.app.cfg.header_logo)
-        self.assertEqual("/var/log/minarca/access.log", self.app.cfg.log_access_file)
+        self.assertEqual("/var/log/minarca/access.log",
+                         self.app.cfg.log_access_file)
         self.assertEqual("/var/log/minarca/server.log", self.app.cfg.log_file)
         self.assertIn('minarca', self.app.cfg.welcome_msg[''])
         self.assertIn('minarca', self.app.cfg.welcome_msg['fr'])
-
-
-class MinarcaTest(AbstractMinarcaTest):
-
-    # Disable interactive mode.
-    interactive = False
-
-    # Data for LDAP mock.
-    basedn = ('dc=nodomain', {
-        'dc': ['nodomain'],
-        'o': ['nodomain']})
-    people = ('ou=People,dc=nodomain', {
-        'ou': ['People'],
-        'objectClass': ['organizationalUnit']})
-    bob = ('uid=bob,ou=People,dc=nodomain', {
-        'uid': ['bob'],
-        'cn': ['bob'],
-        'userPassword': ['password'],
-        'homeDirectory': '/tmp/minarca-test/bob',
-        'mail': ['bob@test.com'],
-        'description': ['v2'],
-        'objectClass': ['person', 'organizationalPerson', 'inetOrgPerson', 'posixAccount']})
-
-    # This is the content of our mock LDAP directory. It takes the form
-    # {dn: {attr: [value, ...], ...}, ...}.
-    directory = dict([
-        basedn,
-        people,
-        bob,
-    ])
-
-    default_config = {
-        'AddMissingUser': 'true',
-        'LdapUri': '__default__',
-        'LdapBaseDn': 'dc=nodomain',
-    }
-
-    def setUp(self):
-        # Mock LDAP
-        self.mockldap = MockLdap(self.directory)
-        self.mockldap.start()
-        self.ldapobj = self.mockldap['ldap://localhost/']
-        super().setUp()
-
-    def tearDown(self):
-        super().tearDown()
-        # Stop patching ldap.initialize and reset state.
-        self.mockldap.stop()
-        del self.ldapobj
-        del self.mockldap
-
-    def test_login(self):
-        """
-        Check if new user is created with user_root and email.
-        """
-        userobj = self.app.store.login('bob', 'password')
-        self.assertIsNotNone(userobj)
-        self.assertIsNotNone(self.app.store.get_user('bob'))
-        # Check if profile get update from Ldap info.
-        self.assertEqual('bob@test.com', self.app.store.get_user('bob').email)
-        self.assertEqual('/tmp/minarca-test/bob', self.app.store.get_user('bob').user_root)
 
 
 class MinarcaRemoteIdentityTest(AbstractMinarcaTest):
 
     default_config = {
         'minarcaremotehost': "test.examples:2222",
-        'minarcaremotehostidentity': pkg_resources.resource_filename(__name__, '')  # @UndefinedVariable
+        # @UndefinedVariable
+        'minarcaremotehostidentity': pkg_resources.resource_filename(__name__, '')
     }
 
     def test_get_api_minarca_identity(self):
@@ -258,8 +202,10 @@ class MinarcaAdminLogView(AbstractMinarcaTest):
         self.getPage('/admin/logs')
         self.assertStatus(200)
         self.assertInBody('server.log', 'server log should be in admin view')
-        self.assertInBody('shell.log', 'minarca-shell log should be in admin view')
-        self.assertInBody('quota-api.log', 'minarca-quota-api log should be in admin view')
+        self.assertInBody(
+            'shell.log', 'minarca-shell log should be in admin view')
+        self.assertInBody(
+            'quota-api.log', 'minarca-quota-api log should be in admin view')
         self.assertNotInBody('Error getting file content')
 
 
@@ -299,7 +245,8 @@ class MinarcaUserQuota(rdiffweb.test.AppTestCase):
         # Set quota
         self.plugin.set_disk_quota(userobj, quota=1234567)
         # Check if subprocessis called twice
-        self.assertEqual(2, minarca_plugins.subprocess.check_output.call_count, "subprocess.check_output should be called")
+        self.assertEqual(2, minarca_plugins.subprocess.check_output.call_count,
+                         "subprocess.check_output should be called")
 
     @httpretty.activate
     def test_update_userquota_401(self):
@@ -361,7 +308,8 @@ class MinarcaSshKeysTest(rdiffweb.test.AppTestCase):
 
     def test_add_key(self):
         # Read the key from a file
-        filename = pkg_resources.resource_filename(__name__, 'test_publickey_ssh_rsa.pub')  # @UndefinedVariable
+        filename = pkg_resources.resource_filename(
+            __name__, 'test_publickey_ssh_rsa.pub')  # @UndefinedVariable
         with open(filename, 'r', encoding='utf8') as f:
             key = f.readline()
 
