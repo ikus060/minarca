@@ -22,6 +22,13 @@ import configargparse
 from minarca_quota_api.zfs_quota import set_quota, get_quota, \
     is_project_quota_enabled
 
+try:
+    import pkg_resources
+    __version__ = pkg_resources.get_distribution("minarca-quota-api").version
+except Exception:
+    __version__ = 'DEV'
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +39,7 @@ def _parse_args(args):
         default_config_files=['/etc/minarca/minarca-quota-api.conf', '/etc/minarca/minarca-quota-api.conf.d/*.conf'],
         add_env_var_help=True, auto_env_var_prefix='MINARCA_QUOTA_')
     parser.add('-f', '--config', is_config_file=True, help='configuration file path')
-
+    parser.add('-v', '--version', action='version', version='minarca-quota-api ' + __version__)
     parser.add('--serverhost', metavar='IP', help='Define the IP address to listen to.', default='127.0.0.1')
     parser.add('--serverport', metavar='PORT', help='Define the port to listen to.', default='8081', type=int)
     parser.add('--logfile', metavar='FILE', help='Define the location of the log file.', default='')

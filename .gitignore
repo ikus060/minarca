@@ -28,7 +28,6 @@ pip-log.txt
 /ez_setup
 .pydevproject
 coverage*.xml
-nosetests*.xml
 /sonar-project.properties
 /.eggs/
 deb_dist

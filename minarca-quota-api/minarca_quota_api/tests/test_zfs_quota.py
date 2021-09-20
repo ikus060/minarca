@@ -23,8 +23,3 @@ class ZFSQuotaTest(unittest.TestCase):
         # Test with values
         check_output_mock.return_value = '1234\n5678\n'
         self.assertEqual({'size': 5678, 'used': 1234}, get_quota('tank', projectid=1))
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

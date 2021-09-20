@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
                     os.environ['MINARCA_USERNAME'] = USERNAME
                     os.environ['MINARCA_USER_ROOT'] = USERROOT
                     try:
-                        shell.main()
+                        shell.main([])
                     finally:
                         del os.environ["MINARCA_USERNAME"]
                         del os.environ["MINARCA_USER_ROOT"]
@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
                     os.environ['MINARCA_USER_ROOT'] = USERROOT
                     os.environ["SSH_ORIGINAL_COMMAND"] = "echo -n 1"
                     try:
-                        shell.main()
+                        shell.main([])
                     finally:
                         del os.environ["MINARCA_USERNAME"]
                         del os.environ["MINARCA_USER_ROOT"]
@@ -78,7 +78,7 @@ class Test(unittest.TestCase):
         os.environ['MINARCA_USER_ROOT'] = USERROOT
         os.environ["SSH_ORIGINAL_COMMAND"] = "rdiff-backup --server"
         try:
-            shell.main()
+            shell.main([])
         finally:
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
@@ -95,7 +95,7 @@ class Test(unittest.TestCase):
         os.environ['MINARCA_USER_ROOT'] = USERROOT
         os.environ["SSH_ORIGINAL_COMMAND"] = "my-computer"
         try:
-            shell.main()
+            shell.main([])
         finally:
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
@@ -113,7 +113,7 @@ class Test(unittest.TestCase):
         os.environ['MINARCA_USER_ROOT'] = USERROOT
         os.environ["SSH_ORIGINAL_COMMAND"] = "minarca/3.8.0 rdiff-backup/1.2.8 (Linux 5.11.8-051108-generic amd64)"
         try:
-            shell.main()
+            shell.main([])
         finally:
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
@@ -131,7 +131,7 @@ class Test(unittest.TestCase):
         os.environ['MINARCA_USER_ROOT'] = USERROOT
         os.environ["SSH_ORIGINAL_COMMAND"] = "minarca/3.8.0 rdiff-backup/2.0.5 (Linux 5.11.8-051108-generic amd64)"
         try:
-            shell.main()
+            shell.main([])
         finally:
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
@@ -167,8 +167,3 @@ class Test(unittest.TestCase):
         with open(os.path.join(USERROOT, 'tz.txt'), 'r') as f:
             self.assertEqual(tz + '\n', f.read(),
                              "timezone should be define in jail")
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

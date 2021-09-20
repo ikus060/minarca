@@ -37,20 +37,17 @@ setuptools.setup(
         "setuptools_scm>=5.0.1",
     ],
     install_requires=[
-        "rdiffweb==2.3.3",
+        "rdiffweb==2.3.4.dev6+g1c4d7a3",
         "cherrypy>=16.0.0",
         "requests",
-        "tzlocal",
+        "tzlocal~=2.0",
         snakeoil_ver,
     ],
     # required packages for build process
-    tests_require=[
-        "nose",
-        "mock>=1.3.0",
+    extras_require={'test': [
         "httpretty",
         "pytest",
-    ],
-    test_suite='nose.collector',
+    ]},
     # Declare entry point
     entry_points={
         'rdiffweb.IUserChangeListener': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],

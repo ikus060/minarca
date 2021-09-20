@@ -1,10 +1,8 @@
 {
-    "python.testing.nosetestArgs": [
-        "minarca-server", "minarca-client"
-    ],
-    "python.testing.pytestEnabled": false,
+    "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
-    "python.testing.nosetestsEnabled": true,
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
-    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.formatting.provider": "autopep8",
+    "python.formatting.autopep8Args": [
+        "--max-line-length=200"
+    ]
 }

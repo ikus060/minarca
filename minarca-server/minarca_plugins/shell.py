@@ -19,12 +19,19 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import argparse
 
 from rdiffweb.core.config import parse_args
 from snakeoil.contexts import SplitExec
 from snakeoil.osutils.mount import mount, MS_BIND, MS_REC, MS_RDONLY
 from snakeoil.process import namespaces
 from tzlocal import get_localzone
+
+try:
+    import pkg_resources
+    __version__ = pkg_resources.get_distribution("minarca-server").version
+except Exception:
+    __version__ = 'DEV'
 
 
 class Jail(SplitExec):
@@ -115,7 +122,11 @@ def _find_rdiff_backup(version=2):
     return spawn.find_executable(executable, path)
 
 
-def main():
+def main(args=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
+    parser.parse_args(args)
+
     # Read the configuration and setup logging
     cfg = parse_args(args=[])
     _setup_logging(cfg)

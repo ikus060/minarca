@@ -7,8 +7,6 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-from __future__ import print_function
-
 import setuptools
 
 setuptools.setup(
@@ -29,15 +27,12 @@ setuptools.setup(
         'ConfigArgParse'
     ],
     # requirement for testing
-    tests_require=[
-        "nose",
-        "mock>=1.3.0",
+    extras_require={'test': [
         "pytest",
-        "coverage",
-    ],
-    test_suite='nose.collector',
+    ]},
     entry_points={
         "console_scripts": [
             "minarca-quota-api = minarca_quota_api:run"
-        ], },
+        ],
+    },
 )

@@ -13,12 +13,11 @@ Created on Mar 7, 2018
 """
 
 from base64 import b64encode
-import unittest
 from urllib.parse import urlencode
 
 import cherrypy
 from cherrypy.test import helper
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import minarca_quota_api
 from minarca_quota_api.zfs_quota import ZFSQuotaException
@@ -91,8 +90,3 @@ class TestQuota(helper.CPWebCase):  # @UndefinedVariable
         self.assertStatus(400)
         # Check if the error message is in the body
         self.assertInBody("invalid size: foo")
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

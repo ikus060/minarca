@@ -3,12 +3,22 @@
 export DH_VIRTUALENV_INSTALL_ROOT=/opt/
 export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_MINARCA_SERVER=$(shell python3 setup.py --version)
 
+DH_VENV_DIR=debian/minarca-server/opt/minarca-server
+
 %:
 	dh $@ --with python-virtualenv --builddirectory=build
 
 override_dh_virtualenv:
-	dh_virtualenv --install-suffix minarca-server --python python3
+	dh_virtualenv --install-suffix minarca-server --python python3 --extra-pip-arg "--quiet"
+	# Smoke test
+	$(DH_VENV_DIR)/bin/python $(DH_VENV_DIR)/bin/rdiffweb --version
+	$(DH_VENV_DIR)/bin/python $(DH_VENV_DIR)/bin/minarca-shell --version
 
 override_dh_installsystemd:
 	dh_installsystemd --restart-after-upgrade
 
+execute_after_dh_builddeb:
+	# Run test after creation of debian packages to avoid poluting the binary with test dependencies.
+	# Run test with pytest
+	$(DH_VENV_DIR)/bin/python -m pip install responses httpretty pytest
+	$(DH_VENV_DIR)/bin/python -m pytest

@@ -63,11 +63,9 @@ setuptools.setup(
         "setuptools_scm>=5.0.1",
     ],
     # required packages for build process
-    tests_require=[
-        "nose",
+    extras_require={'test': [
         "responses",
-    ],
-    test_suite='nose.collector',
+    ]},
     # Declare an entry point when package get installed using pip.
     entry_points={
         "console_scripts": ["minarca = minarca_client.main:main"],

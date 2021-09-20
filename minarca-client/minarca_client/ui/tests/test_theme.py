@@ -13,7 +13,3 @@ class TestTheme(unittest.TestCase):
     def test_minarca_icon(self):
         self.assertIsNotNone(MINARCA_ICON)
         self.assertTrue(os.path.isfile(MINARCA_ICON))
-
-
-if __name__ == "__main__":
-    unittest.main()

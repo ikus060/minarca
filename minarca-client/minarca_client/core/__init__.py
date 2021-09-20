@@ -331,7 +331,7 @@ class Backup():
             exists = any(repository_name == r.get('name') or r.get('name').startswith(
                 repository_name + '/') for r in current_user.get('repos', []))
             if not force and exists:
-                logger.warn(
+                logger.warning(
                     _('fail to link because repository with name `%s` already exists on remote server') % repository_name)
                 raise RepositoryNameExistsError(repository_name)
 

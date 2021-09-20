@@ -41,7 +41,7 @@ class TestCompat(unittest.TestCase):
 
     @mock.patch('subprocess.check_output', side_effect=mock_subprocess_check_output)
     def test_get_user_agent(self, *unused):
-        self.assertEquals(
+        self.assertEqual(
             MATCH("minarca/* rdiff-backup/2.0.5 (*)"), compat.get_user_agent())
 
     @mock.patch('subprocess.check_output', side_effect=mock_subprocess_check_output)
@@ -156,8 +156,3 @@ class TestScheduler(unittest.TestCase):
         self.assertTrue(s.exists())
         s.delete()
         self.assertFalse(s.exists())
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.test_get_config_home']
-    unittest.main()

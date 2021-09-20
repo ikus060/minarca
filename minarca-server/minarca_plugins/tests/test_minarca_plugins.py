@@ -14,7 +14,6 @@ Created on Jan 23, 2016
 
 import grp
 from io import open
-import logging
 import os
 import pwd
 import shutil
@@ -335,9 +334,3 @@ class MinarcaSshKeysTest(rdiffweb.test.AppTestCase):
 
         # Validate
         self.assertAuthorizedKeys('')
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    logging.basicConfig(level=logging.DEBUG)
-    unittest.main()

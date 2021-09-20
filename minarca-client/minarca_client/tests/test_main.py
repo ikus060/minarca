@@ -74,7 +74,7 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main.Backup')
     def test_args_debug(self, mock_backup):
         main.main(['-d', 'stop'])
-        self.assertEquals(logging.DEBUG, logging.getLogger().level)
+        self.assertEqual(logging.DEBUG, logging.getLogger().level)
 
     def test_args_none(self):
         with self.assertRaises(SystemExit):
@@ -283,8 +283,3 @@ class TestMainParseArgs(unittest.TestCase):
     def test_unlink(self, mock_backup):
         _unlink()
         mock_backup.return_value.unlink.assert_called_once_with()
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

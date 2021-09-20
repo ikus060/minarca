@@ -63,7 +63,3 @@ class TestRdiffweb(unittest.TestCase):
         self.assertEqual("3.9.1", data['version'])
         self.assertEqual("test.minarca.net:2222", data['remotehost'])
         self.assertEqual(IDENTITY, data['identity'])
-
-
-if __name__ == "__main__":
-    unittest.main()

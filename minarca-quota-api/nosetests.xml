@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuite name="nosetests" tests="3" errors="1" failures="0" skip="0"><testcase classname="nose.failure.Failure" name="runTest" time="0.000"><error type="builtins.ModuleNotFoundError" message="No module named 'mock'"><![CDATA[Traceback (most recent call last):
+  File "/usr/lib/python3.8/unittest/case.py", line 60, in testPartExecutor
+    yield
+  File "/usr/lib/python3.8/unittest/case.py", line 676, in run
+    self._callTestMethod(testMethod)
+  File "/usr/lib/python3.8/unittest/case.py", line 633, in _callTestMethod
+    method()
+  File "/home/ikus060/.local/share/virtualenvs/minarca.git-AnmhButH/lib/python3.8/site-packages/nose/failure.py", line 39, in runTest
+    raise self.exc_val.with_traceback(self.tb)
+  File "/home/ikus060/.local/share/virtualenvs/minarca.git-AnmhButH/lib/python3.8/site-packages/nose/loader.py", line 417, in loadTestsFromName
+    module = self.importer.importFromPath(
+  File "/home/ikus060/.local/share/virtualenvs/minarca.git-AnmhButH/lib/python3.8/site-packages/nose/importer.py", line 47, in importFromPath
+    return self.importFromDir(dir_path, fqname)
+  File "/home/ikus060/.local/share/virtualenvs/minarca.git-AnmhButH/lib/python3.8/site-packages/nose/importer.py", line 94, in importFromDir
+    mod = load_module(part_fqname, fh, filename, desc)
+  File "/usr/lib/python3.8/imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "/usr/lib/python3.8/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 702, in _load
+  File "<frozen importlib._bootstrap>", line 671, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 783, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/ikus060/workspace/PDSL/minarca.git/minarca-quota-api/minarca_quota_api/tests/test_quota.py", line 21, in <module>
+    from mock import MagicMock
+ModuleNotFoundError: No module named 'mock'
+]]></error></testcase><testcase classname="minarca_quota_api.tests.test_zfs_quota.ZFSQuotaTest" name="test_get_quota" time="0.001"></testcase><testcase classname="minarca_quota_api.tests.test_zfs_quota.ZFSQuotaTest" name="test_set_quota" time="0.001"></testcase></testsuite>
