@@ -296,7 +296,7 @@ e2e-test:linux:
     - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
     - ./minarca --version
     - ./minarcaw --version
-    - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
+    - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
     - ./minarca -d include /etc /var /home
     - ./minarca -d status
     - ./minarca -d backup --force
