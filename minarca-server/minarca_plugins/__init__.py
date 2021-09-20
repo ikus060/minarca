@@ -24,7 +24,7 @@ import rdiffweb
 from rdiffweb.core import authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
 from rdiffweb.core.config import Option
-from rdiffweb.core.quota import QuotaException, DefaultUserQuota, IUserQuota
+from rdiffweb.core.quota import QuotaException, DefaultUserQuota
 from rdiffweb.core.store import IUserChangeListener, UserObject
 import requests
 from requests.exceptions import HTTPError
@@ -381,7 +381,7 @@ class MinarcaUserSetup(IUserChangeListener):
             f.write(new_data.getvalue())
 
 
-class MinarcaQuota(IUserQuota):
+class MinarcaQuota(DefaultUserQuota):
 
     _logfile = Option('log_file')
     _quota_api_url = Option('minarca_quota_api_url')
@@ -413,7 +413,7 @@ class MinarcaQuota(IUserQuota):
         assert isinstance(userobj, UserObject)
         # Fallback to default user quota if quota url is not provided.
         if not self._quota_api_url:
-            return DefaultUserQuota.get_disk_usage(self, userobj)
+            return super().get_disk_usage(userobj)
         # Get Quota from web service
         url = os.path.join(self._quota_api_url, 'quota', str(userobj.userid))
         try:
@@ -432,7 +432,7 @@ class MinarcaQuota(IUserQuota):
         """
         # Fallback to default user quota if quota url is not provided.
         if not self._quota_api_url:
-            return DefaultUserQuota.get_disk_usage(self, userobj)
+            return super().get_disk_quota(userobj)
         # Get Quota from web service
         url = os.path.join(self._quota_api_url, 'quota', str(userobj.userid))
         try:
@@ -460,7 +460,7 @@ class MinarcaQuota(IUserQuota):
         """
         # Fallback to default user quota if quota url is not provided.
         if not self._quota_api_url:
-            return DefaultUserQuota.get_disk_usage(self, userobj)
+            super().set_disk_quota(userobj, quota)
 
         # Always update unless quota not define
         try:

@@ -13,21 +13,21 @@ Created on Jan 23, 2016
 """
 
 import grp
-from io import open
 import os
 import pwd
 import shutil
 import tempfile
 import unittest
+from io import open
 from unittest.mock import MagicMock
 
 import httpretty
-import pkg_resources
-from rdiffweb.core.store import ADMIN_ROLE
-import rdiffweb.test
-
-from minarca_plugins import MinarcaUserSetup, MinarcaQuota
 import minarca_plugins
+import pkg_resources
+import rdiffweb.test
+from minarca_plugins import MinarcaQuota, MinarcaUserSetup
+from rdiffweb.core.quota import QuotaUnsupported
+from rdiffweb.core.store import ADMIN_ROLE
 
 
 class AbstractMinarcaTest(rdiffweb.test.WebCase):
@@ -268,6 +268,47 @@ class MinarcaUserQuota(rdiffweb.test.AppTestCase):
         httpretty.register_uri(httpretty.GET, "http://localhost:8081/quota/" + str(userobj.userid),
                                body='{"used": 1234, "size": 2147483648}')
         self.assertEqual(1234, self.plugin.get_disk_usage(userobj))
+
+
+class MinarcaWithoutUserQuota(AbstractMinarcaTest):
+
+    default_config = {
+        'minarcaquotaapiurl': '',
+        'minarcauserbasedir': '/tmp/minarca-test'
+    }
+
+    login = True
+
+    def test_get_location(self):
+        """
+        Given an empty minarca_quota_api_url
+        When location page get request
+        Then the disk usage is repported using the default behaviour.
+        """
+        # Make sure disk usage fall back to default behaviour.
+        self.getPage('/')
+        self.assertStatus(200)
+        self.assertInBody('Usage')
+
+    def test_get_disk_usage(self):
+        """
+        Given an empty minarca_quota_api_url
+        When disk usage get requested
+        Then the disk usage is repported using the default behaviour.
+        """
+        userobj = self.app.store.add_user('bob')
+        self.assertIsNotNone(userobj.disk_quota)
+        self.assertIsNotNone(userobj.disk_usage)
+
+    def test_set_disk_quota(self):
+        """
+        Given an empty minarca_quota_api_url
+        When trying to set disk quota
+        A QuotaUnsupported exception get raised
+        """
+        userobj = self.app.store.add_user('bob')
+        with self.assertRaises(QuotaUnsupported):
+            userobj.disk_quota = 12345
 
 
 class MinarcaSshKeysTest(rdiffweb.test.AppTestCase):
