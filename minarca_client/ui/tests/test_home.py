@@ -50,7 +50,3 @@ class HomeTest(unittest.TestCase):
         settings.save()
         self.assertEqual(('http://examples.com', 'user @ examples.com:2222::repo'),
                          self.dlg._get_remote_text())
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -546,7 +546,3 @@ class TestBackup(unittest.TestCase):
         self.assertEqual(False, config['configured'])
         # Validation
         mock_scheduler.return_value.delete.assert_called_once()
-
-
-if __name__ == "__main__":
-    unittest.main()

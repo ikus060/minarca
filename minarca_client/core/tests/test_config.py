@@ -70,7 +70,7 @@ class PatternsTest(unittest.TestCase):
         patterns.save()
         with open('patterns', 'r') as f:
             data = f.read()
-        self.assertEquals(
+        self.assertEqual(
             "# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
 
     @skipIf(IS_WINDOWS, 'only or unix')
@@ -225,7 +225,3 @@ class StatusTest(unittest.TestCase):
         self.assertTrue("lastsuccess=1622832320000" in data)
         self.assertTrue("lastdate=" not in data)
         self.assertTrue("details=" not in data)
-
-
-if __name__ == "__main__":
-    unittest.main()
