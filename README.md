@@ -33,22 +33,15 @@ Based on [rdiffweb](https://www.ikus-soft.com/en/rdiffweb/), **Minarca Server** 
 
 Check how Minarca is working without installing the server. We have setup a testing environment for you. You may login to https://test.minarca.net/ using the default username / password: admin / admin123
 
-Then start a backup in few minutes by installing minarca client for [Windows](https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe) or [Linux/Debian](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb). 
+Then start a backup in few minutes by installing minarca client for [Windows](https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe) or [Linux/Debian](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb).
 
 ## Download & Install
 
-**Minarca Server**
+[Minarca Download Page](https://www.ikus-soft.com/en/minarca/download/)
 
-Read more about [how to installation Minarca server](doc/installation.md).
+[Minarca Server Installation steps](https://www.ikus-soft.com/archive/minarca/doc/installation.html)
 
-Note: While it's possible to get Minarca Server working on other Linux distributions, only Debian-based distribution is officially supported.
-
-**Minarca Client**
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minarca%20for%20Debian-brightgreen"></a>
-<br/>
-<br/>
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca%20for%20Windows-brightgreen"></a>
+[Minarca Agent Installation steps](https://www.ikus-soft.com/archive/minarca/doc/minarca-client.html#installation)
 
 # Support
 
