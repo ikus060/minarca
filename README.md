@@ -1,4 +1,4 @@
-![Minarca Logo](doc/resources/banner.png)
+![Minarca Logo](minarca-client/doc/_static/banner.png)
 
 <p align="center">
   <strong>
@@ -75,6 +75,31 @@ and mirrored to [Github](https://github.com/ikus060/minarca).
 The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
+
+## v4.0.0 (2021-09-20)
+
+This new version include a new Minarca client with better integration with the operating system. This new version also include support for MacOS !
+
+ * Server: Upgrade to Rdiffweb v2.3.4
+   * Skip email notification if `email-host` configuration is not provided rdiffweb#157
+   * Skip email notification when the new attribute value has the same value rdiffweb#159
+   * USE LDAP `mail` attribute when creating new user from LDAP directory rdiffweb#156
+   * Provide a new theme `blue` to match IKUS Soft colors rdiffweb#158
+   * Automatically update user's repository list based on user's home directory
+   * Update default `session-dir` location to `/var/lib/rdiffweb/session` to avoid using `/var/run` rdiffweb#148
+   * Improve timezone handling to display date with local timezone using javascript rdiffweb#143
+   * Improve charts by replacing d3js by chartkick rdiffweb#122
+   * Replace the status view by something meaningful with chartkick rdiffweb#122
+   * Provide Docker image with Rdiffweb `docker pull ikus060/rdiffweb` rdiffweb#55
+   * Fix file and folder sorting rdiffweb#143
+ * Server: Improve creation of SSH Chroot jail by creating `/dev/null` in the jail 
+ * Server: Use new `blue` theme by default
+ * Server: Fix installation stability on Debian Bullseye
+ * Server: Update default minarca favicon
+ * Server: Update french translatiom
+ * Client: Re-implement minarca-client in python #87
+ * Client: Sign MacOS Application Bundle #149
+ * Client: Provide french translation
 
 ## v3.9.0 (2021-05-17)
 

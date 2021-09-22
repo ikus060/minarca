@@ -10,6 +10,7 @@ variables:
 stages:
 - test
 - bdist
+- doc
 - upload
 - deploy
 - e2e-test
@@ -176,6 +177,20 @@ bdist:win32:
   - windows
   - windows-1809
 
+doc:
+  artifacts:
+    paths:
+    - ./minarca-client/.tox/doc/tmp
+  before_script:
+    - apt update && apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
+    - pip install tox
+  image: python:3
+  needs: []
+  script:
+  - cd minarca-client
+  - tox -e doc
+  stage: doc
+
 upload:deb:
   needs:
   - bdist:deb
@@ -211,14 +226,22 @@ upload:deb:
     mkdir -p ~/.ssh
     chmod 700 ~/.ssh
     # publish client
-    export FILE=$(ls -1 $FILENAME)
-    scp -o StrictHostKeyChecking=no $FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-    # Publish get-minarca.sh script
-    scp -o StrictHostKeyChecking=no ./get-minarca.sh www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
+    export FILE=$(ls -1d $FILENAME)
+    scp -r -o StrictHostKeyChecking=no $FILE www-data@kalo.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
     if [[ "$CI_COMMIT_TAG" == *.*.? ]]; then
-      ssh -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $FILE) /var/www/patrikdufresne/archive/minarca/$FILENAME_LATEST
+      ssh -r -o StrictHostKeyChecking=no www-data@kalo.ikus-soft.com ln -fs $(basename $FILE) /var/www/patrikdufresne/archive/minarca/$FILENAME_LATEST
     fi
   stage: upload
+
+upload:get-minarca:
+  <<: *upload-file
+  before_script:
+    - mv get-minarca.sh get-minarca-dev.sh
+  needs:
+  - bdist:linux
+  variables:
+    FILENAME: ./get-minarca-dev.sh
+    FILENAME_LATEST: get-minarca.sh
 
 upload:linux:
   <<: *upload-file
@@ -243,6 +266,16 @@ upload:win32:
   variables:
     FILENAME: ./minarca-client/dist/minarca-client*.exe
     FILENAME_LATEST: minarca-client-latest.exe
+
+upload:doc:
+  <<: *upload-file
+  before_script:
+    - mv ./minarca-client/.tox/doc/tmp/html doc-dev
+  needs:
+  - doc
+  variables:
+    FILENAME: doc-dev
+    FILENAME_LATEST: doc
 
 deploy:dev:
   allow_failure: True

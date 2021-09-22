@@ -1,4 +1,4 @@
-# Minarca Server Configuration options
+# Configuration
 
 Minarca Server is configured by setting the relevant options in `/etc/minarca/minarca-server.conf`.
 New installation will have a new file created with default values to get started.
@@ -17,8 +17,8 @@ in the navigation bar.
 You may also provide your own logo to replace the default one. You must have a
 `.png` file and a `.ico` file deployed on the server.
 
-	FavIcon=/etc/minarca-server/my-brand.ico
-	HeaderLogo=/etc/minarca-server/my-logo-22.png
+    FavIcon=/etc/minarca-server/my-brand.ico
+    HeaderLogo=/etc/minarca-server/my-logo-22.png
 
 You may also replace the welcome message displayed in the login page where users
 are redirected to authenticate. You may include HTML tags in this option to
@@ -33,7 +33,7 @@ theme are available: `default`, `blue`, `orange`. You may request a new color sc
 using a [support request](https://www.ikus-soft.com/en/support/#form).
 
     DefaultTheme=default
-    
+
 It's also possible to customized how the users are reaching your company by
 defining a custom web page. By defining this option, users needing your help
 from the Minarca client application will be redirect to this page instead of
@@ -158,3 +158,36 @@ Read the quota configuration.
 | MinarcaAuthOptions | Default SSH auth options. This is used to limit the user's permission on the SSH Server, effectively disabling X11 forwarding, port forwarding and PTY. | No | default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' |
 | MinarcaRemoteHost | URL defining the remote SSH identity. This value is queried by Minarca Client to link and back up to the server. If not provided, the HTTP URL is used as a base. You may need to change this value if the SSH server is accessible using a different IP address or if not running on port 22. | No | ssh.example.com:2222 |
 | MinarcaRemoteHostIdentity | Location of SSH server identity. This value is queried by Minarca Client to authenticate the server. You may need to change this value if SSH service and the Web service are not running on the same server. (Default: /etc/ssh) | No | /etc/ssh |
+
+## Quota Management
+
+Minarca provide user base quota management. This allow you to define fixed
+amount of disk space for each user. If a user backup reach the quota, the
+backup will fail.
+
+This feature might be used by service provider to define the maximum disk space
+allocated to a user based on the price of the service.
+
+Default implementation of users quota support only ZFS storage. But you may
+customize this to fit your file system and deployment by configure the command
+line to be executed.
+
+First, install `minarca-quota-api` on the storage server. This might be the
+same server as Minarca Web Server or a different one depending on your setup.
+
+In Minarca web server configuration file `/etc/minarca/minarca-server.conf`,
+you must define the location of the quota API service to be used to set and
+fetch the disk usage.
+
+    MinarcaQuotaApiUrl=http://minarca:secret@localhost:8081/ 
+
+
+You may also change Minarca's configuration in :
+
+### Troubleshooting
+
+**List project id**
+
+    #     lsattr -p /backups
+    1 -----------------P- /backups/admin
+    2 -----------------P- /backups/john
