@@ -270,11 +270,13 @@ upload:win32:
 upload:doc:
   <<: *upload-file
   before_script:
-    - mv ./minarca-client/.tox/doc/tmp/html doc-dev
+    - export VERSION=$(cd minarca-client; python3 setup.py --version)
+    - mv ./minarca-client/.tox/doc/tmp/html doc-$VERSION
+  image: python:3
   needs:
   - doc
   variables:
-    FILENAME: doc-dev
+    FILENAME: doc-*
     FILENAME_LATEST: doc
 
 deploy:dev:
