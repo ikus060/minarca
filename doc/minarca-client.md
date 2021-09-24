@@ -1,51 +1,82 @@
-# Minarca-Client (Desktop Agent)
+# Minarca Client Installation
 
-## Installation
+## System requirements
 
-## Minarca-Client installation
+Minarca client could be installed on almost any hardware without
+restriction. You are limited to the following operating system.
 
-On a Windows or Debian workstation, download the appropriate installer.
+* Supported Operating System:
+  * Windows 7 (64bit)
+  * Windows 10 (64bit)
+  * MacOS Catalina (Intel)
+  * MacOS BigSur (Intel)
+  * Debian Buster (64bit)
+  * Debian Bullseye (64bit)
+  * Ubuntu Groovy (64bit)
+  * Ubuntu Hirsute (64bit)
+  * Linux (64bit)
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb"><img alt="Minarca Client for Linux/Debian" src="https://img.shields.io/badge/download-Minaca--client--for--Debian-green?&logo=debian&style=for-the-badge"></a>
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minaca--client--for--Windows-green?&logo=windows&style=for-the-badge"></a>
+## Installation Steps
 
-Then launch the execution of the installer and follow the instructions. On Debian workstation, it's preferable to install the packages using Gdebi.
+Installation steps mostly depends on your operating system. Follow the step appropriate for your system.
+
+## Installation on Windows
+
+On a Windows workstation, download the appropriate installer.
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca-blue?&logo=windows&style=for-the-badge"></a>
+
+Then launch the execution of the installer and follow the instructions.
+
+## Installation on MacOS
+
+On a Windows workstation, download the appropriate installer.
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.dmg"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca-blue?&logo=apple&style=for-the-badge"></a>
+
+Open the disk image and drag-n-drop Minarca to your Applications folder.
+
+![Open Minarca Disk image with Finder](minarca-macos-disk-image.png)
+
+Then open Minarca Application !
+
+If you get the following, you might need to right click on Minarca Application and
+click "Open" to skip the certificate validation.
+
+![Minarca can't be open because Appel cannot check it for malicious software.](macos-installation-issue.png)
+
+## Installation on Ubuntu or Debian
+
+On a Ubuntu or Debian workstation, download the appropriate installer.
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.deb"><img alt="Minarca Client for Debian" src="https://img.shields.io/badge/download-Minarca-blue?&logo=debian&style=for-the-badge"></a>
+
+On Debian workstation, it's preferable to install the packages using Gdebi.
 
 Once installed, a shortcut to Minarca should be available on your desktop or start menu. Use it to start Minarca.
 
-### On Linux
+## Installation on Linux
 
-**With Command Line:**
+For other Linux distribution, you may download a portable package.
 
-    wget https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb
-    apt install ./minarca-client_latest_all.deb
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.tar.gz"><img alt="Minarca Client for Linux" src="https://img.shields.io/badge/download-Minarca-blue?&logo=linux&style=for-the-badge"></a>
 
-**With a User interface:**
+Extract it's content to a folder and launch `minarcaw` executable or `minarca` from command line.
 
- 1. Download the latest Debian package from [here](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb).
- 2. Double click on the package to install it using your favourite tool.
+## Link your client with Minarca Server
 
-*Notice: To improve the user experience we are working to make a PPA available.*
+Pre-requisite: You need to have a functional Mianrca Server deployed. You may use <https://test.minarca.net> which is made available for testing purpose.
 
-### On Windows
+**From User Interface:**
 
- 1. Download the latest Windows installer from [here](https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe).
- 2. Double click on the package to install it.
-
-### Link your client with Minarca Server
-
-Pre-requisite: You need to have a functional Mianrca Server deployed. You may use https://test.minarca.net which is made available for testing purpose.
+1. Simply open `minarcaw`. If you have installed Minarca client you should be able to launch the client from your start menu.
+2. If Minarca is not yet linked to a server, a Setup dialog will be shown to allow you to configure Minarca with you server.
+3. You must provide the URL to you Minarca server, a username and password.
+4. You must also provide a repository name.
 
 **From Command line:**
 
     minarca link --force --remoteurl {{minarca_client_remote_url}} --username {{minarca_client_user}} --password {{minarca_client_pass}} --name {{ansible_hostname}}
-
-**From User Interface:**
-
-1. Simply open `minarcaui`. If you have installed Minarca client you should be able to launch the client from your start menu.
-2. If Minarca is not yet linked to a server, a Setup dialog will be shown to allow you to configure Minarca with you server.
-3. You must provide the URL to you Minarca server, a username and password.
-4. You must also provide a repository name.
 
 ## Troubleshooting
 
