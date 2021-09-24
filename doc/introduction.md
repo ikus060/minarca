@@ -2,19 +2,19 @@
 
 ## What is Minarca ?
 
-Minarca est une solution de sauvegarde de données permettant de centraliser la gestion de vos sauvegardes. Cette solution a pour avantage d'être facile à installer sur un serveur dédié et permet aussi d'installer facilement un agent appeler minarca-client sur les ordinateurs a sauvegarder. 
+Minarca is a data backup solution allowing to centralize the management of your backups. This solution has the advantage of being easy to install on a dedicated server and also allows you to easily install an agent called minarca-client on the computers to back up. 
 
-Minarca ce veux une solution de sauvegarde sans tracas, incluant toutes les fonctionnalités dont vous avez besoin afin de mieux servir vos usagers. L'agent minarca est disponible pour les plateformes majeurs tel Windows Mac OS et Linux. Vous permettant ainsi d'utiliser une seule solution afin de sauvegarder l'ensemble de votre parc informatique.
+Minarca is a hassle-free backup solution, including all the features you need to better serve your users. The minarca agent is available for all major platforms such as Windows Mac OS and Linux. This allows you to use a single solution to backup your entire computer system.
 
 ## Architecture
 
-La solution de sauvegarde Minarca se décompose en plusieurs composants.
+The Minarca backup solution consists of several components.
 
-D'abord du côté serveur, une application web vous permet de gérer les sauvegardes de vos usages et et dans configurer l'accès. Cette interface web permet aussi de parcourir la sauvegarde et de restaurer des données à partir de votre navigateur Web. Ce composant est une version modifiée de Riffweb.
+First, on the server side, a web application allows you to manage the backups of your users and to configure the access. This web interface also allows you to browse the backup and restore data from your web browser. This component is a modified version of Riffweb.
 
-En plus de cette application web, on installe aussi un autre composant appeler Minarca-shell qui s'occupe de recevoir les connexions entrantes via le protocole SSH, de valider l'authentification et l'autorisation de l'usager pour faire une sauvegarde et aussi isolé chaque usager et leur dépôt.
+In addition to this web application, we also install another component called Minarca-shell that takes care of receiving incoming connections via the SSH protocol, validating the authentication and authorization of the user to make a backup, and also isolating each user and their repository.
 
- le dernier composant,nommer Minarca client, doit être installé sur les ordinateurs devant être sauvegardées. Ce composant agit comme un agent sur l'ordinateur et s'occupe de coordonner la sauvegarde de données vers le serveur Minarca. En utilisant cet argent il est possible de sélectionner les fichiers et répertoires de vente être sauvegardé et la fréquence de la sauvegarde. 'l'agent Minarca peut être utiliser via une interface utilisateur ou en ligne de commande.
+The last component, named Minarca client, must be installed on the computers to be backed up. This component acts as an agent on the computer and takes care of coordinating the data backup to the Minarca server. Using this agent it is possible to select the files and directories to be backed up and the frequency of the backup.  The Minarca agent can be used via a user interface or command line.
 
 ![Minarca Architecture overview](architecture-overview.png)
 
@@ -27,19 +27,19 @@ En plus de cette application web, on installe aussi un autre composant appeler M
 * Email notification: emails can be sent to keep you informed when backup fails
 * Statistics visualization: web interface to view backup statistics provided by Rdiff-backup.
 * Disk Quota: manage disk space allocated to each user.
-* Integrated Agent: maybe used to quickly backup your data without ny technical knowledge
+* Integrated Agent: may be used to quickly backup your data without any technical knowledge
 * Compatibility support: allow usability with legacy rdiff-backup v1.2.8 and v2.0.5 agent
-* User repository isolation: incomming request are completly isolated from each other
-* Automated SSH management: no requirement to manually generate SSH identity, SSH authentication is completly automated and doesn't required intervention
+* User repository isolation: incoming request are completely isolated from each other
+* Automated SSH management: no requirement to manually generate SSH identity, SSH authentication is completely automated and doesn't required intervention
 * Open source: no secrets. Rdiffweb is a free open-source software. The source code is licensed under GPL v3.
 * Support: business support will be available through [Ikus Software](https://ikus-soft.com).
 * Rdiff-backup: used as the main backup software you benefit from its stability, cross-platform. And you can still use it the way you are used to with the command line.
 
 ## Software stack
 
-Minarca software consists of a 3 components: minarca-server, minarca-shell, minarca-client.
+Minarca software consists of 3 components: minarca-server, minarca-shell, minarca-client.
 
-Aside from the web interface, which uses HTML and JavaScript everything else is written in Python programming language.
+Aside from the web interface, which uses HTML and JavaScript, everything else is written in Python programming language.
 
 ## Getting help
 

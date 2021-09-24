@@ -64,11 +64,11 @@ On a Debian Linux server:
 ## Setup Storage
 
 Compared to Rdiffweb, Minarca intend to take over the management of your storage and for that reason,
-need to enforce some rules regarding how your storage should be layout.
+needs to enforce some rules regarding how your storage layout should be.
 
 You need to define a folder where all your backups will reside. Everything under this folder will then be managed by Minarca. By default, this folder is `/backups`. If you want a different folder update the parameter `MinarcaUserBaseDir` in minarca configuration.
 
-When installing, this folder will be created with the right ownership and permissions. If you have created this folder your self, make sure the ownership is set to `minarca:minarca` and permissions to `-rwxr-x---`.
+When installing, this folder will be created with the right ownership and permissions. If you have created this folder yourself, make sure the ownership is set to `minarca:minarca` and permissions to `-rwxr-x---`.
 
     chown minarca:minarca /backups/
     chmod 0750 /backups/
@@ -77,7 +77,7 @@ When installing, this folder will be created with the right ownership and permis
 
 On a fresh Debian installation, Minarca is working fine with the default SSH server
 configuration (etc/ssh/sshd_config), but if you have enforce some configuration in your SSH
-server, you may need to update it's configuration to allow "minarca" user to authenticate.
+server, you may need to update its configuration to allow "minarca" user to authenticate.
 
 Something similar to the following should make it work in most environment:
 
@@ -102,8 +102,8 @@ first uninstall Rdiffweb.
 
 ### 2. Migrate Rdiffweb user database
 
-Rdiffweb is persisting users database in `/etc/rdiffweb` while Minarca
-is persisting the data to `/etc/minarca`. If you want to keep your users
+Rdiffweb saves the user database in `/etc/rdiffweb` while Minarca
+saves the data to `/etc/minarca`. If you want to keep your users
 preferences, you must copy the database to Minarca folder.
 
     cp /etc/rdiffweb/rdw.db /etc/minarca/rdw.db
@@ -117,12 +117,12 @@ Proceed with the installation of Minarca.
 
 ### 5. Review Minarca configuration
 
-When installing Minarca, a new configuration file get created in
+When installing Minarca, a new configuration file gets created in
 `/etc/minarca/minarca-server.conf`. You should review the configuration file
 according to your previous Rdiffweb configuration.
 
 Make sure to set `MinarcaRestrictedToBasedDir` to `false` if your user's home
-directory are not located under a single directory.
+directories are not located under a single directory.
 
 Restart the service when you are done reviewing the configuration.
 
@@ -131,8 +131,8 @@ Restart the service when you are done reviewing the configuration.
 ### 6. Change permissions 
 
 Minarca web server is not running as root and required the data to be readable
-and writable by minarca user. If you backups are all located under `/backups/`
-as it was recommended by Rdiffweb documentation. You may run the following
+and writable by minarca user. If your backups are all located under `/backups/`
+as it was recommended by Rdiffweb documentation, you may run the following
 command to update the permissions.
 
     sudo chown -R minarca:minarca /backups/
