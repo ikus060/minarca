@@ -1,4 +1,4 @@
-# Installation
+# Minarca Server Installation
 
 ## System requirements
 
@@ -24,18 +24,7 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 * Storage: consider the storage according to your backup needs. A couple of terabytes should be considered for the long term. Ideally, you should consider hardware or ZFS raid for your storage. If you plan to support user quota, make sure that your file system supports it. E.g. ext4 and ZFS. Other file systems might not be well supported.
 * Temporary storage: Rdiffweb requires a temporary storage location that is used during the restoration process. This location should be greater than 8gb. This temporary storage will be closer to the web application. Ideally, it should be in ram using tmpfs.
 
-### Minarca agent requirement
-
-* Supported Operating System:
-  * Windows (64bit)
-  * Mac OS (Intel)
-  * Debian Buster (64bit)
-  * Debian Bullseye (64bit)
-  * Ubuntu Groovy (64bit)
-  * Ubuntu Hirsute (64bit)
-  * Linux (64bit)
-
-## Minarca Server installation
+## Installation Steps
 
 Two different solutions are available to install Minarca Server. You should pick the right solution for your environment.
 
