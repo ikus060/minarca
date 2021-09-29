@@ -138,13 +138,13 @@ def _ui():
     backup = Backup()
     if not backup.is_linked():
         dlg = SetupDialog()
-        dlg.open()
+        dlg.mainloop()
         if not backup.is_linked():
-            # Operation cancel by user
+            # Operation canceled by user
             return
 
     home = HomeDialog()
-    home.open()
+    home.mainloop()
 
 
 def _unlink():

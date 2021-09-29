@@ -1,0 +1,16 @@
+<Frame>
+    <Frame pack-fill="x">
+        <Label text="Schedule" pack-side="left" style="H1.primary.TLabel" pack-pady="10" />
+    </Frame>
+    <Frame pack-fill="x">
+        <Label text="Select how often you want your backup to be performed." pack-side="left" wrap="1"/>
+    </Frame>
+    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
+    <Frame pack-fill="x">
+        <Label style="strong.primary.TLabel" text="Frequency" width="15" pack-side="left" />
+        <Radiobutton value="1" text="Hourly" variable="{{schedule}}" pack-anchor="e" width="22"/>
+        <Radiobutton value="24" text="Daily" variable="{{schedule}}" pack-anchor="e" width="22"/>
+        <Radiobutton value="168" text="Weekly" variable="{{schedule}}" pack-anchor="e" width="22"/>
+        <Radiobutton value="720" text="Monthly" variable="{{schedule}}" pack-anchor="e" width="22"/>
+    </Frame>
+</Frame>

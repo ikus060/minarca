@@ -1,0 +1,48 @@
+<Tk geometry="970x500" title="Minarca Backup" className="Minarca">
+    <Frame pack-fill="both" pack-expand="true" padding="10">
+        <Frame pack-fill="both" pack-side="left" padding="5">
+            <!--Placeholder to align next frame-->
+            <Frame pack-fill="x" pack-expand="1" />
+            <Frame pack-fill="x" pack-expand="1">
+                <Label image="{{minarca_image_path}}" pack-pady="15" />
+                <Label style="H1.primary.TLabel" justify="center" text="Welcome to Minarca !" />
+                <Label width="35" wrap="1" justify="center"
+                    text="To configure Minarca to backup your data, you must provide URL to Minarca server. This information should be provided by your system administrator." />
+            </Frame>
+            <!--Placeholder to align previous frame-->
+            <Frame pack-fill="x" pack-expand="1" />
+        </Frame>
+        <Frame pack-fill="both" pack-side="right" pack-expand="1" padding="5">
+            <Labelframe pack-fill="both" pack-side="right" pack-expand="1" padding="25" text="Connectivity information">
+                <Frame pack-fill="both" pack-side="right" pack-expand="1">
+                    <!--Remote -->
+                    <Label text="Remote Minarca server" style="strong.primary.TLabel" pack-fill="x" />
+                    <Label text="e.g.: https://www.servername.com" style="small.primary.TLabel" pack-fill="x" />
+                    <Entry textvariable="{{remoteurl}}" pack-fill="x" pack-pady="5"
+                        state="{{'disabled' if linking else '!disabled'}}" />
+                    <!-- Username -->
+                    <Label text="Username" style="strong.primary.TLabel" pack-fill="x" />
+                    <Entry textvariable="{{username}}" pack-fill="x" pack-pady="5"
+                        state="{{'disabled' if linking else '!disabled'}}" />
+                    <!-- Password -->
+                    <Label text="Password" style="strong.primary.TLabel" pack-fill="x" />
+                    <Entry textvariable="{{password}}" show="•" pack-fill="x" pack-pady="5"
+                        state="{{'disabled' if linking else '!disabled'}}" />
+                    <!--Repository name-->
+                    <Label text="Repository name" style="strong.primary.TLabel" pack-fill="x" />
+                    <Entry textvariable="{{repository_name}}" pack-fill="x" pack-pady="5"
+                        state="{{'disabled' if linking else '!disabled'}}" />
+                    <!-- Buttons -->
+                    <Frame pack-fill="x" pack-expand="1">
+                        <Button text="Close" command="close" pack-side="left" pack-padx="3" style="secondary.TButton"
+                            cursor="hand2" />
+                        <Button text="Submit" command="link" pack-side="left" pack-padx="3"
+                            state="{{'disabled' if not valid_form or linking else '!disabled'}}"
+                            cursor="{{'hand2' if valid_form else ''}}" />
+                        <Label image="{{animated_gif_path}}" visible="{{linking}}" pack-side="left" compound="left" text="Connecting..."/>
+                    </Frame>
+                </Frame>
+            </Labelframe>
+        </Frame>
+    </Frame>
+</Tk>
