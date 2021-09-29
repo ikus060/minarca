@@ -1,0 +1,23 @@
+<Frame pack-fill="both">
+    <Frame pack-fill="x">
+        <Label text="Select files" pack-side="left" style="H1.primary.TLabel" pack-pady="10" />
+    </Frame>
+    <Frame pack-fill="x">
+        <Label text="Select file and folder to include or exclude from backups." pack-side="left" wrap="1" />
+    </Frame>
+    <Frame pack-fill="x">
+        <Button text="Add file" command="add_file_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
+        <Button text="Add folder" command="add_folder_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
+        <Button text="Add ..." command="add_custom_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
+    </Frame>
+    <ScrolledFrame pack-fill="both" style="danger.TFrame" pack-expand="1">
+        <Frame for="item in patterns" pack-fill="x" pack-pady="3" pack-expand="1">
+            <Label text="{{item.comment or item.pattern}}" pack-side="left">
+                <ToolTip text="{{item.pattern}}" />
+            </Label>
+            <Button text="&#128465;" command="remove_pattern(item)" pack-side="right" style="Outline.TButton" />
+            <Button pack-side="right" pack-padx="2" command="toggle_pattern(item)" text="{{check_button_text(item)}}"
+                style="Squaretoggle.Toolbutton" width="10" selected="{{item.include}}" />
+        </Frame>
+    </ScrolledFrame>
+</Frame>

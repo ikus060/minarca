@@ -89,7 +89,7 @@ class TestMainParseArgs(unittest.TestCase):
     def test_args_ui_is_not_linked(self, mock_setup_dlg):
         main.main(['ui'])
         mock_setup_dlg.assert_called_once()
-        mock_setup_dlg.return_value.open.assert_called_once()
+        mock_setup_dlg.return_value.mainloop.assert_called_once()
 
     @mock.patch('minarca_client.main.SetupDialog')
     @mock.patch('minarca_client.main.HomeDialog')
@@ -97,7 +97,7 @@ class TestMainParseArgs(unittest.TestCase):
         main.main(['ui'])
         mock_setup_dlg.assert_not_called()
         mock_home_dlg.assert_called_once()
-        mock_home_dlg.return_value.open.assert_called_once()
+        mock_home_dlg.return_value.mainloop.assert_called_once()
 
     @mock.patch('minarca_client.main.Backup')
     def test_link(self, mock_backup):
