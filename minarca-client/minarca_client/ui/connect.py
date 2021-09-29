@@ -1,165 +1,109 @@
-# Copyright (C) 2021 IKUS Software inc. All rights reserved.
-# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
-# Use is subject to license terms.
-'''
-Created on Mar 22, 2021
-
-@author: Patrik Dufresne <patrik@ikus-soft.com>
-'''
-from minarca_client.locale import _
-from minarca_client.core import Backup, RepositoryNameExistsError
-from minarca_client.core.exceptions import HttpAuthenticationError
-from minarca_client.ui.theme import TEXT_HEADER1, TEXT_SMALL, TEXT_STRONG
-from minarca_client.ui.widgets import (B, Dialog, I, P, Spin, T, show_error,
-                                       show_warning, show_yes_no)
-import PySimpleGUI as sg
 import logging
 import threading
+import tkinter.messagebox
+
+import pkg_resources
+from minarca_client.core import Backup, RepositoryNameExistsError
+from minarca_client.core.exceptions import HttpAuthenticationError
+from minarca_client.locale import _
+from minarca_client.ui import tkvue
+from minarca_client.ui.theme import style
 
 logger = logging.getLogger(__name__)
 
 
-_COL_WIDTH = 35
+def _default_repository_name():
+    """
+    Return a default value for the repository name.
+    """
+    try:
+        import socket
+        hostname = socket.gethostname()
+    except Exception:
+        import platform
+        hostname = platform.node()
+    return hostname.split('.')[0]
 
 
-class SetupDialog(Dialog):
+class SetupDialog(tkvue.Component):
+    template = pkg_resources.resource_string('minarca_client.ui', 'templates/setup.html')
 
-    def _get_default_repository_name(self):
-        """
-        Return a default value for the repository name.
-        """
-        try:
-            import socket
-            hostname = socket.gethostname()
-        except Exception:
-            import platform
-            hostname = platform.node()
-        return hostname.split('.')[0]
+    def __init__(self, master=None):
+        self.backup = Backup()
+        self.data = tkvue.Context({
+            'remoteurl': self.backup.get_settings('remoteurl'),
+            'remoteurl_valid': tkvue.computed(lambda context: context.remoteurl.startswith('http://') or context.remoteurl.startswith('https://')),
+            'username': self.backup.get_settings('username'),
+            'username_valid': tkvue.computed(lambda context: 0 < len(context.username)),
+            'password': '',
+            'password_valid': tkvue.computed(lambda context: 0 < len(context.password)),
+            'repository_name': _default_repository_name(),
+            'repository_name_valid': tkvue.computed(lambda context: 0 < len(context.repository_name)),
+            'valid_form': tkvue.computed(lambda context: context.remoteurl_valid and context.username_valid and context.password_valid and context.repository_name_valid),
+            'help_message': tkvue.computed(lambda context: SetupDialog._validate_form(context)),
+            'linking': False,  # True during linking process
+            'minarca_image_path': pkg_resources.resource_filename('minarca_client.ui', 'images/minarca_128.png'),
+            'animated_gif_path': pkg_resources.resource_filename('minarca_client.ui', 'images/spin_32.gif')
+        })
+        super().__init__(master=master)
+        style(self.root)
+        # Bind a couple of event form multi thread processing.
+        self.root.bind('<<prompt_link_force>>', self._prompt_link_force)
+        cmd = self.root.register(self._show_warning)
+        self.root.bind('<<show_warning>>', cmd + " %d")
+        self.root.bind('<<close>>', self.close)
 
-    def _layout(self):
+    def link(self, force=False):
+        self.data.linking = True
+        # Start background thread.
+        self._thread = threading.Thread(
+            target=self._link,
+            daemon=True,
+            kwargs={'force': force}
+        ).start()
 
-        left = [
-            [T(_("Welcome to Minarca !"),
-                justification='c', **TEXT_HEADER1)],
-            [T(_("To configure Minarca to backup your data, you must provide "
-                 "the URL of a Minara server. This information should be "
-                 "provided by your system administrator."),
-               size=(_COL_WIDTH + 5, 5), justification='c')]
-        ]
-        right = [
-            [T(_("Remote Minarca server"),
-               size=(_COL_WIDTH, 1), background_color='#ebebeb', **TEXT_STRONG)],
-            [I(size=(_COL_WIDTH, 1), key='remoteurl',
-               metadata=self._validate_form, enable_events=True)],
-            [T(_('e.g.: https://www.minarca.net/'),
-               background_color='#ebebeb', **TEXT_SMALL)],
-            # Username
-            [T(_("Username"),
-               size=(_COL_WIDTH, 1), background_color='#ebebeb', **TEXT_STRONG)],
-            [I(size=(_COL_WIDTH, 1), key='username',
-               metadata=self._validate_form, enable_events=True)],
-            # Password
-            [T(_("Password"),
-               size=(_COL_WIDTH, 1), background_color='#ebebeb', **TEXT_STRONG)],
-            [P(size=(_COL_WIDTH, 1),
-               key='password', metadata=self._validate_form, enable_events=True)],
-            # Repository name
-            [T(_("Repository name"),
-               size=(_COL_WIDTH, 1), background_color='#ebebeb', **TEXT_STRONG)],
-            [I(size=(_COL_WIDTH, 1), key='repository_name',
-               default_text=self._get_default_repository_name(),
-               metadata=self._validate_form,
-               enable_events=True, pad_bottom=20)],
-            # Error message
-            [T('', size=(_COL_WIDTH, 1), key='error',
-               background_color='#ebebeb', **TEXT_SMALL)],
-            # Submit
-            [B(_('Submit'), size=(7, 1), key='submit', metadata=self._link_start, disabled=True, bind_return_key=True),
-             B(_('Cancel'), size=(7, 1), key='quit', metadata=self.close),
-             Spin(key='spin', size=32, background_color='#ebebeb', visible=False)],
-        ]
-
-        layout = [[
-            sg.Column(left, justification='c', element_justification='c'),
-            sg.Column([[sg.Column(right, pad=(19, 19), background_color='#ebebeb')]],
-                      background_color='#ebebeb'),
-        ]]
-
-        return layout
-
-    def _link(self, remoteurl, username, password, repository_name, force):
+    def _link(self, force):
         """
         This function should be called in a separate thread to avoid blocking the UI.
         """
         try:
-            backup = Backup()
-            backup.link(
-                remoteurl=remoteurl,
-                username=username,
-                password=password,
-                repository_name=repository_name,
+            self.backup.link(
+                remoteurl=self.data.remoteurl,
+                username=self.data.username,
+                password=self.data.password,
+                repository_name=self.data.repository_name,
                 force=force)
-            self.window.write_event_value('callback', self._link_end)
+            # Link completed - Close Window.
+            self.root.event_generate('<<close>>')
         except RepositoryNameExistsError:
             logger.info('repository name `%s` already exists' %
-                        repository_name)
-            self.window.write_event_value('callback', self._link_end)
-            self.window.write_event_value(
-                'callback', self._prompt_link_force)
-            return
+                        self.data.repository_name)
+            self.root.event_generate('<<prompt_link_force>>')
         except (HttpAuthenticationError) as e:
-            self.window.write_event_value('callback', self._link_end)
-            self.window.write_event_value('callback', (
-                show_warning,
-                self.window,
-                _('Invalid connection information !'),
-                _('Invalid connection information !'),
-                _("The information you have entered for the connection to Minarca are invalid.\n\n%s" % str(e))
-            ))
-            return
+            logger.exception('authentication failed')
+            self._event_generate_show_warning(
+                title=_('Invalid connection information !'),
+                message=_('Invalid connection information !'),
+                detail=_("The information you have entered for the connection to Minarca are invalid.\n\n%s" % str(e)))
         except Exception as e:
             logger.exception('fail to connect')
-            self.window.write_event_value('callback', self._link_end)
-            self.window.write_event_value('callback', (
-                show_error,
-                self.window,
-                _('Failed to connect to remote server'),
-                _('Failed to connect to remote server'),
-                _("An error occurred during the connection to Minarca "
-                  "server.\n\nDetails: %s" % str(e))
-            ))
-            return
+            self._event_generate_show_warning(
+                title=_('Failed to connect to remote server'),
+                message=_('Failed to connect to remote server'),
+                detail=_("An error occurred during the connection to Minarca "
+                         "server.\n\nDetails: %s" % str(e)))
 
-        # Link completed - Close Window.
-        self.close()
-
-    def _link_end(self):
+    def close(self, event=None):
         """
-        Call back function when the linking process is completed.
+        Close this window.
         """
-        self.window['spin'].update(visible=False)
-        self.window.set_cursor('')
+        self.data.linking = False
+        # self.root.destroy()
 
-    def _link_start(self, force=False):
-        # Start spinning wheel
-        self.window['spin'].update(visible=True)
-        # Set wait cursor
-        self.window.set_cursor('exchange')
-        # Start background thread.
-        self._thread = threading.Thread(target=self._link, daemon=True, kwargs={
-            'remoteurl': self.window['remoteurl'].get(),
-            'username': self.window['username'].get(),
-            'password': self.window['password'].get(),
-            'repository_name': self.window['repository_name'].get(),
-            'force': force}).start()
-
-    def _loop(self, event, values):
-        # Update animation
-        self.window['spin'].update_animation()
-
-    def _prompt_link_force(self):
-        button_idx = show_yes_no(
-            self.window,
+    def _prompt_link_force(self, event):
+        button_idx = tkinter.messagebox.askyesno(
+            master=self.root,
+            icon='question',
             title=_('Repository name already exists'),
             message=_('Do you want to replace the existing repository ?'),
             detail=_("The repository name you have entered already exists on "
@@ -169,24 +113,20 @@ class SetupDialog(Dialog):
         )
         if not button_idx:
             # Operation cancel by user
+            self.data.linking = False
             return
-        self._link_start(force=True)
+        self._link(force=True)
 
-    def _validate_form(self):
-        """
-        Check if the input is valid. Return None if the form is valid.
-        Return a message if the form is invalid.
-        """
-        error = None
-        if (not self.window['username'].get()
-            or not self.window['password'].get()
-                or not self.window['remoteurl'].get()):
-            error = _("Enter authentication information.")
-        elif not self.window['repository_name'].get():
-            error = _(
-                "Enter a valid repository name to represent this computer in Minarca.")
-        # Update the window status.
-        self.window['error'].update(value=error or _(
-            'Click Submit button to start connecting.'))
-        self.window['submit'].update(
-            disabled=bool(error))
+    def _event_generate_show_warning(self, title, message, detail):
+        self.root.event_generate(
+            '<<show_warning>>',
+            data={'title': title, 'message': message, 'detail': detail})
+
+    def _show_warning(self, event_data):
+        self.data.linking = False
+        event_data = eval(event_data)
+        tkinter.messagebox.showwarning(
+            master=self.root,
+            icon='warning',
+            **event_data
+        )

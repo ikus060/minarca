@@ -23,30 +23,25 @@ class HomeTest(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.cwd)
         self.tmp.cleanup()
+        self.dlg.destroy()
 
-    def test_get_last_backup_text(self):
+    def test_last_backup_text(self):
         # Check value for each available status.
         for s in Status.LAST_RESULTS:
-            status = self.dlg.backup.get_status()
-            status['lastresult'] = s
-            status.save()
-            value = self.dlg._get_last_backup_text()
+            self.dlg.status.data.lastresult = s
+            value = self.dlg.status.last_backup_text(self.dlg.status.data)
             self.assertIsNotNone(value)
 
-    def test_get_remote_text_undefined(self):
-        settings = self.dlg.backup.get_settings()
-        if 'remoteurl' in settings:
-            del settings['remoteurl']
-        settings.save()
-        self.assertEqual(('None', 'None @ None::None'),
-                         self.dlg._get_remote_text())
+    def test_remote_text_undefined(self):
+        self.dlg.status.data.remoteurl = None
+        value = self.dlg.status.remote_text_tooltip(self.dlg.status.data)
+        self.assertEqual('None @ None::None', value)
 
     def test_get_remote_text(self):
-        settings = self.dlg.backup.get_settings()
-        settings['remoteurl'] = 'http://examples.com'
-        settings['username'] = 'user'
-        settings['remotehost'] = 'examples.com:2222'
-        settings['repositoryname'] = 'repo'
-        settings.save()
-        self.assertEqual(('http://examples.com', 'user @ examples.com:2222::repo'),
-                         self.dlg._get_remote_text())
+        context = self.dlg.status.data
+        context['remoteurl'] = 'http://examples.com'
+        context['username'] = 'user'
+        context['remotehost'] = 'examples.com:2222'
+        context['repositoryname'] = 'repo'
+        value = self.dlg.status.remote_text_tooltip(self.dlg.status.data)
+        self.assertEqual('user @ examples.com:2222::repo', value)
