@@ -89,6 +89,45 @@ Something similar to the following should make it work in most environment:
             AllowTcpForwarding no
             PermitTTY no
 
+## Minarca with Docker or LXC
+
+When installing Minarca into a dedicated server or a virtual machine, the
+process is seamless. If you are installing Minarca in a container like
+Docker or LXC, you must pay attention to configure the container properly.
+
+Minarca-Shell, the component responsible to handle SSH connection and isolate
+each user's connection, is using a Kernel feature
+called [user namespaces](https://man7.org/linux/man-pages/man7/user_namespaces.7.html).
+This feature is used by Minarca-Shell to create a chroot jail to completely
+isolate each user SSH connection. That same feature is used by many applications[^1] [^2]
+for improved hardening. Without this feature, Minarca-Shell will refuse any incoming
+SSH connection and throw errors.
+
+When installing Minarca on a dedicated server or a virtual machine, the installation
+process take care of enabling this feature if not already enabled. When installing Minarca
+in a container, it's not enough because this feature might be disabled by your container
+orchestration like Docker or LXC.
+
+### For Docker
+
+The container needs to be started with `privileged`:
+
+    docker run -privileged
+
+### For LXC
+
+The container need to be started with `security.nesting`:
+
+    lxc launch ubuntu nestc1 -c security.nesting=true
+
+### For Proxmox VE (lxc)
+
+The container must be configured with feature `nesting=1`.
+
+Edit `/etc/pve/lxc/100.conf` by adding:
+
+    features: nesting=1
+
 ## Migrating from Rdiffweb to Minarca
 
 If you already have an installation of Rdiffweb, you may migrate relatively
