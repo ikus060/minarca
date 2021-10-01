@@ -12,8 +12,9 @@ Welcome to Minarca's documentation!
    
    introduction
    installation
-   configuration
    minarca-client
+   configuration
+   settings
    faq
    support-backupninja
    development
