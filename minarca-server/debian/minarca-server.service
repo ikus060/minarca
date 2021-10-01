@@ -3,7 +3,7 @@ Description=Minarca Web Server
 Documentation=https://www.ikus-soft.com/en/minarca/
 
 [Service]
-ExecStart=/opt/minarca-server/bin/rdiffweb
+ExecStart=/opt/minarca-server/bin/minarca-server
 User=minarca
 Group=minarca
 
