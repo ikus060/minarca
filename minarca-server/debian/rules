@@ -11,7 +11,7 @@ DH_VENV_DIR=debian/minarca-server/opt/minarca-server
 override_dh_virtualenv:
 	dh_virtualenv --install-suffix minarca-server --python python3 --extra-pip-arg "--quiet"
 	# Smoke test
-	$(DH_VENV_DIR)/bin/python $(DH_VENV_DIR)/bin/rdiffweb --version
+	$(DH_VENV_DIR)/bin/python $(DH_VENV_DIR)/bin/minarca-server --version
 	$(DH_VENV_DIR)/bin/python $(DH_VENV_DIR)/bin/minarca-shell --version
 
 override_dh_installsystemd:
