@@ -37,5 +37,4 @@ def style(master):
         s.configure('H1.%s.TLabel' % i, font=["Helvetica", "36"])
         s.configure('small.%s.TLabel' % i, font=["Helvetica", "10"])
         s.configure('strong.%s.TLabel' % i, font=["Helvetica", "14", "bold"])
-        #s.configure('%s.TButton' % i, focuscolor=s.colors.selectfg)
     s.configure('Tooltip.TLabel', background="#ffffe0")

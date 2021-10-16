@@ -1,6 +1,5 @@
 
 
-import pkg_resources
 from minarca_client.ui import tkvue
 
 
