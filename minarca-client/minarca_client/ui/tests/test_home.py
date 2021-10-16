@@ -3,13 +3,18 @@ Created on Jul. 20, 2021
 
 @author: ikus060
 '''
-import unittest
-from minarca_client.ui.home import HomeDialog
-from minarca_client.core.config import Status
 import os
 import tempfile
+import unittest
+
+from minarca_client.core.compat import IS_LINUX
+from minarca_client.core.config import Status
+from minarca_client.ui.home import HomeDialog
+
+NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
 
+@unittest.skipIf(IS_LINUX and NO_DISPLAY)
 class HomeTest(unittest.TestCase):
 
     def setUp(self):
