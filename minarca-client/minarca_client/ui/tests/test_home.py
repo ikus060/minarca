@@ -14,7 +14,7 @@ from minarca_client.ui.home import HomeDialog
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
 
-@unittest.skipIf(IS_LINUX and NO_DISPLAY)
+@unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class HomeTest(unittest.TestCase):
 
     def setUp(self):
