@@ -43,6 +43,7 @@ a = Analysis(
         ('README.md', '.'),
         ('LICENSE', '.'),
         ('minarca_client/ui/images', 'minarca_client/ui/images'),
+        ('minarca_client/ui/templates', 'minarca_client/ui/templates'),
     ],
     hiddenimports=[],
     hookspath=[],
