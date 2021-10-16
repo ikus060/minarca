@@ -6,8 +6,9 @@ Created on Jun. 25, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+from tkinter import ttk
+
 import pkg_resources
-import ttkbootstrap
 from minarca_client.core.compat import IS_MAC, IS_WINDOWS
 
 # Reference to application icons.
@@ -30,10 +31,11 @@ assert themes_file
 
 
 def style(master):
-    s = ttkbootstrap.Style(master=master, theme='minarca', themes_file=themes_file)
+    s = ttk.Style(master=master)
+    s.theme_use('clam')
     for i in ['primary', 'secondary', 'success', 'info', 'warning', 'danger']:
         s.configure('H1.%s.TLabel' % i, font=["Helvetica", "36"])
         s.configure('small.%s.TLabel' % i, font=["Helvetica", "10"])
         s.configure('strong.%s.TLabel' % i, font=["Helvetica", "14", "bold"])
-        s.configure('%s.TButton' % i, focuscolor=s.colors.selectfg)
+        #s.configure('%s.TButton' % i, focuscolor=s.colors.selectfg)
     s.configure('Tooltip.TLabel', background="#ffffe0")

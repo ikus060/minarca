@@ -18,7 +18,6 @@ install_requires = [
     "psutil",
     "rdiff-backup==2.0.5",
     "requests",
-    "ttkbootstrap",
     "wakepy",
 ]
 
