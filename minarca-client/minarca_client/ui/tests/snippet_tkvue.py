@@ -1,7 +1,6 @@
 
 
 import pkg_resources
-import ttkbootstrap
 from minarca_client.ui import tkvue
 
 
@@ -112,13 +111,6 @@ class RootDialog(tkvue.Component):
         people.append(name)
         self.data.people = people
         self.data.new_people_name = ''
-
-    def style(self, master):
-        s = ttkbootstrap.Style(master=master, theme='minarca', themes_file=pkg_resources.resource_filename('minarca_client.ui', 'templates/themes.json'))
-        for i in ['primary', 'secondary', 'success', 'info', 'warning', 'danger']:
-            s.configure('H1.%s.TLabel' % i, font=["Helvetica", "36"])
-            s.configure('strong.%s.TLabel' % i, font=["Helvetica", "14", "bold"])
-        s.configure('Tooltip.TLabel', background="#ffffe0")
 
 
 if __name__ == "__main__":
