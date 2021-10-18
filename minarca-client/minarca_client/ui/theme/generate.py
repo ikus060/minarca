@@ -36,9 +36,9 @@ def main():
         for image in tkinter.image_names():
             if image.startswith("pyimage"):
                 root.call(image, 'write', f'{basedir}/{image}.png')
-                f.write(f'image create photo {image} -file [file join [file dirname [info script]] {image}.png]\n')
+                f.write(f'image create photo {theme_name}_{image} -file [file join [file dirname [info script]] {image}.png]\n')
         f.write(f'ttk::style theme create {theme_name} -parent clam -settings {{')
-        f.write(script)
+        f.write(script.replace('pyimage', f'{theme_name}_pyimage'))
         f.write('}')
 
     # Try loading the new theme for sanity check.
