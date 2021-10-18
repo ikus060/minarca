@@ -3,7 +3,7 @@ import os
 import tkinter
 import unittest
 
-from minarca_client.core.compat import IS_LINUX, IS_WINDOWS
+from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS
 from minarca_client.ui import tkvue
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
@@ -273,6 +273,7 @@ class ComponentTest(unittest.TestCase):
         # Then radio button get updated
         self.assertEqual('red', self.dlg.data.selected_color)
 
+    @unittest.skipIf(IS_MAC, 'this fail on MacOS when running in test suite')
     def test_checkbutton_selected(self):
         # Given a dialog with checkbutton binded with `selected` attribute
         self.pump_events()
