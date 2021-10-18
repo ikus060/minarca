@@ -6,6 +6,7 @@ Created on Jun. 25, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+import os
 from tkinter import ttk
 
 import pkg_resources
@@ -25,16 +26,13 @@ if IS_MAC:
 else:
     BASE_FONT_SIZE = 14
 
+
 # Location of minarca theme.
-themes_file = pkg_resources.resource_filename('minarca_client.ui', 'templates/themes.json')
-assert themes_file
+minarca_theme = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca.tcl')
+assert os.path.isfile(minarca_theme)
 
 
 def style(master):
     s = ttk.Style(master=master)
-    s.theme_use('clam')
-    for i in ['primary', 'secondary', 'success', 'info', 'warning', 'danger']:
-        s.configure('H1.%s.TLabel' % i, font=["Helvetica", "36"])
-        s.configure('small.%s.TLabel' % i, font=["Helvetica", "10"])
-        s.configure('strong.%s.TLabel' % i, font=["Helvetica", "14", "bold"])
-    s.configure('Tooltip.TLabel', background="#ffffe0")
+    s.tk.call('source', minarca_theme)
+    s.theme_use('minarca')

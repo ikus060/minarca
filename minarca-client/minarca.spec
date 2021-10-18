@@ -44,6 +44,7 @@ a = Analysis(
         ('LICENSE', '.'),
         ('minarca_client/ui/images', 'minarca_client/ui/images'),
         ('minarca_client/ui/templates', 'minarca_client/ui/templates'),
+        ('minarca_client/ui/theme', 'minarca_client/ui/theme'),
     ],
     hiddenimports=[],
     hookspath=[],
