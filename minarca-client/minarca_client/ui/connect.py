@@ -98,7 +98,7 @@ class SetupDialog(tkvue.Component):
         Close this window.
         """
         self.data.linking = False
-        # self.root.destroy()
+        self.root.destroy()
 
     def _prompt_link_force(self, event):
         button_idx = tkinter.messagebox.askyesno(
