@@ -4,6 +4,7 @@ import tkinter
 import tkinter.filedialog
 import tkinter.simpledialog
 import webbrowser
+import minarca_client
 
 import pkg_resources
 from minarca_client.core import Backup, RunningError
@@ -18,11 +19,12 @@ logger = logging.getLogger(__name__)
 
 class HomeDialog(tkvue.Component):
     template = pkg_resources.resource_string('minarca_client.ui', 'templates/home.html')
-    data = tkvue.Context({
-        'active_view': 'home',
-    })
 
     def __init__(self, *args, **kwargs):
+        self.data = tkvue.Context({
+            'active_view': 'home',
+            'version': 'v' + minarca_client.__version__
+        })
         super().__init__(*args, **kwargs)
         style(self.root)
 
