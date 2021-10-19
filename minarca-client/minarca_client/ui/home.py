@@ -164,9 +164,9 @@ class StatusView(tkvue.Component):
                 self.data['lastdate'] = status['lastdate']
                 self.data['details'] = status['details']
 
-    def start_stop_backup(self, event):
+    def start_stop_backup(self):
         try:
-            self.backup.start(True, fork=True)
+            self.backup.start(force=True, fork=True)
         except RunningError:
             self.backup.stop()
         except Exception:

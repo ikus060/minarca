@@ -5,7 +5,9 @@ Created on Jul. 20, 2021
 '''
 import os
 import tempfile
+import tkinter
 import unittest
+from unittest.mock import MagicMock
 
 from minarca_client.core.compat import IS_LINUX
 from minarca_client.core.config import Status
@@ -30,6 +32,10 @@ class HomeTest(unittest.TestCase):
         self.tmp.cleanup()
         self.dlg.destroy()
 
+    def pump_events(self):
+        while self.dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
+            pass
+
     def test_last_backup_text(self):
         # Check value for each available status.
         for s in Status.LAST_RESULTS:
@@ -50,3 +56,13 @@ class HomeTest(unittest.TestCase):
         context['repositoryname'] = 'repo'
         value = self.dlg.status.remote_text_tooltip(self.dlg.status.data)
         self.assertEqual('user @ examples.com:2222::repo', value)
+
+    def test_invoke_start_backup(self):
+        # Given a Home dialog with a start_stop button
+        self.pump_events()
+        self.dlg.status.backup = MagicMock()
+        self.assertIsNotNone(self.dlg.status.start_stop_button)
+        # When invoking the button
+        self.dlg.status.start_stop_button.invoke()
+        # Then backup start
+        self.dlg.status.backup.start.assert_called_once_with(force=True, fork=True)
