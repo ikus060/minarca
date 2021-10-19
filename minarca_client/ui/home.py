@@ -145,7 +145,7 @@ class StatusView(tkvue.Component):
             # Operation cancel by user.
             return
         self.backup.unlink()
-        self.window.close()
+        self.root.winfo_toplevel().destroy()
 
     def browse_remote(self):
         """
