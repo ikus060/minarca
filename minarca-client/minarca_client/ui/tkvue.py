@@ -3,12 +3,15 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import collections
+import logging
 import tkinter
 from html.parser import HTMLParser
 from itertools import chain
 from tkinter import ttk
 
 from minarca_client.locale import gettext
+
+logger = logging.getLogger(__name__)
 
 _namespaces = [ttk]  # List of packages to lookup for widgets.
 _components = {}  # component registry.
@@ -54,6 +57,10 @@ def extract_tkvue(fileobj, keywords, comment_tags, options):
     extractor.feed(fileobj.read().decode(encoding))
     for entry in extractor.messages:
         yield entry
+
+
+def report_callback_exception(exc, val, tb):
+    logger.exception('Exception in Tkinter callback')
 
 
 class Context(collections.abc.MutableMapping):
@@ -643,6 +650,7 @@ class TkVue():
                 screenName=attrs.pop('screenname', None),
                 baseName=attrs.pop('basename', None),
                 className=attrs.pop('classname', 'Tk'))
+            widget.report_callback_exception = report_callback_exception
             # Call functions e.g. geometry, title
             for k, v in attrs.items():
                 func = getattr(widget, k, None)
