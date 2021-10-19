@@ -130,7 +130,7 @@ class StatusView(tkvue.Component):
             return _('Stop backup')
         return _('Start backup')
 
-    def unlink(self, event):
+    def unlink(self):
         """
         Called to un register this agent from minarca server.
         """
