@@ -409,16 +409,22 @@ class ScrolledFrame(ttk.Frame):
                 # update the inner frame's width to fill the canvas
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
 
-        def _on_mousewheel(event, scroll):
-            canvas.yview_scroll(int(scroll), "units")
+        def _on_mousewheel(event):
+            if event.num == 5 or event.delta < 0:
+                scroll = 1
+            elif event.num == 4 or event.delta > 0:
+                scroll = -1
+            canvas.yview_scroll(scroll, "units")
 
         def _bind_to_mousewheel(event):
-            canvas.bind_all("<Button-4>", lambda event: _on_mousewheel(event, scroll=-1))
-            canvas.bind_all("<Button-5>", lambda event: _on_mousewheel(event, scroll=1))
+            canvas.bind_all("<Button-4>", _on_mousewheel)
+            canvas.bind_all("<Button-5>", _on_mousewheel)
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)  # On Windows
 
         def _unbind_from_mousewheel(event):
             canvas.unbind_all("<Button-4>")
             canvas.unbind_all("<Button-5>")
+            canvas.unbind_all("<MouseWheel>")  # On Windows
 
         ttk.Frame.__init__(self, master, *args, **kw)
 
