@@ -145,7 +145,7 @@ class StatusView(tkvue.Component):
         self.backup.unlink()
         self.window.close()
 
-    def browse_remote(self, event):
+    def browse_remote(self):
         """
         Open web browser.
         """
