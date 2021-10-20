@@ -3,13 +3,20 @@ Created on Jul. 20, 2021
 
 @author: ikus060
 '''
-import unittest
-from minarca_client.ui.home import HomeDialog
-from minarca_client.core.config import Status
 import os
 import tempfile
+import tkinter
+import unittest
+from unittest.mock import MagicMock
+
+from minarca_client.core.compat import IS_LINUX
+from minarca_client.core.config import Status
+from minarca_client.ui.home import HomeDialog
+
+NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
 
+@unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class HomeTest(unittest.TestCase):
 
     def setUp(self):
@@ -23,30 +30,39 @@ class HomeTest(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.cwd)
         self.tmp.cleanup()
+        self.dlg.destroy()
 
-    def test_get_last_backup_text(self):
+    def pump_events(self):
+        while self.dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
+            pass
+
+    def test_last_backup_text(self):
         # Check value for each available status.
         for s in Status.LAST_RESULTS:
-            status = self.dlg.backup.get_status()
-            status['lastresult'] = s
-            status.save()
-            value = self.dlg._get_last_backup_text()
+            self.dlg.status.data.lastresult = s
+            value = self.dlg.status.last_backup_text(self.dlg.status.data)
             self.assertIsNotNone(value)
 
-    def test_get_remote_text_undefined(self):
-        settings = self.dlg.backup.get_settings()
-        if 'remoteurl' in settings:
-            del settings['remoteurl']
-        settings.save()
-        self.assertEqual(('None', 'None @ None::None'),
-                         self.dlg._get_remote_text())
+    def test_remote_text_undefined(self):
+        self.dlg.status.data.remoteurl = None
+        value = self.dlg.status.remote_text_tooltip(self.dlg.status.data)
+        self.assertEqual('None @ None::None', value)
 
     def test_get_remote_text(self):
-        settings = self.dlg.backup.get_settings()
-        settings['remoteurl'] = 'http://examples.com'
-        settings['username'] = 'user'
-        settings['remotehost'] = 'examples.com:2222'
-        settings['repositoryname'] = 'repo'
-        settings.save()
-        self.assertEqual(('http://examples.com', 'user @ examples.com:2222::repo'),
-                         self.dlg._get_remote_text())
+        context = self.dlg.status.data
+        context['remoteurl'] = 'http://examples.com'
+        context['username'] = 'user'
+        context['remotehost'] = 'examples.com:2222'
+        context['repositoryname'] = 'repo'
+        value = self.dlg.status.remote_text_tooltip(self.dlg.status.data)
+        self.assertEqual('user @ examples.com:2222::repo', value)
+
+    def test_invoke_start_backup(self):
+        # Given a Home dialog with a start_stop button
+        self.pump_events()
+        self.dlg.status.backup = MagicMock()
+        self.assertIsNotNone(self.dlg.status.start_stop_button)
+        # When invoking the button
+        self.dlg.status.start_stop_button.invoke()
+        # Then backup start
+        self.dlg.status.backup.start.assert_called_once_with(force=True, fork=True)
