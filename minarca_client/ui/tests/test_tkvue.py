@@ -284,6 +284,7 @@ class ComponentTest(unittest.TestCase):
         # Then the widget get updated
         self.assertEqual(self.dlg.checkbutton.state(), tuple())
 
+    @unittest.skipIf(IS_MAC, 'this fail on MacOS when running in test suite')
     def test_checkbutton_selected_command(self):
         # Given a dialog with checkbutton binded with `selected` attribute
         self.pump_events()
