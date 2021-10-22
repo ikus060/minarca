@@ -6,16 +6,18 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from minarca_client.core import compat
-from minarca_client.core.compat import (IS_LINUX, IS_MAC, IS_WINDOWS, Scheduler,
-                                        ssh_keygen)
-from minarca_client.tests.test import MATCH
-from unittest import mock
-from unittest.case import skipUnless
 import os
 import subprocess
+import sys
 import tempfile
 import unittest
+from unittest import mock
+from unittest.case import skipUnless
+
+from minarca_client.core import compat
+from minarca_client.core.compat import (IS_LINUX, IS_MAC, IS_WINDOWS,
+                                        Scheduler, redirect_ouput, ssh_keygen)
+from minarca_client.tests.test import MATCH
 
 _echo_rdiff_backup_version = ['cmd.exe', '/c', 'echo',
                               'rdiff-backup 2.0.5'] if IS_WINDOWS else ['echo', 'rdiff-backup 2.0.5']
@@ -57,6 +59,46 @@ class TestCompat(unittest.TestCase):
             self.assertTrue(f.read().startswith("ssh-rsa "))
         with open('private.key') as f:
             self.assertEqual(MATCH('-----BEGIN * PRIVATE KEY-----*'), f.read())
+
+    def test_redirect_ouput_with_python_stderr(self):
+        # Given a logger
+        logger = mock.MagicMock()
+        # When redirecting stderr to this logger
+        with redirect_ouput(logger):
+            sys.stderr.write('stderr')
+        # Then value is send to logger
+        logger.debug.assert_called_once_with(' local:stderr')
+        # Then after redirect, output is not sent to logger
+        logger.debug.reset_mock()
+        sys.stderr.write('stderr')
+        logger.debug.assert_not_called()
+
+    def test_redirect_ouput_with_python_stdout(self):
+        # Given a logger
+        logger = mock.MagicMock()
+        # When redirecting stdout to this logger
+        with redirect_ouput(logger):
+            sys.stdout.write('stdout')
+        # Then value is send to logger
+        logger.debug.assert_called_once_with(' local:stdout')
+        # Then after redirect, output is not sent to logger
+        logger.debug.reset_mock()
+        sys.stderr.write('stdout')
+        logger.debug.assert_not_called()
+
+    def test_redirect_ouput_with_subprocess_stderr(self):
+        # Given a logger
+        logger = mock.MagicMock()
+        # When redirecting stdout to this logger
+        stderr_fd = sys.stderr.fileno()
+        with redirect_ouput(logger):
+            os.write(stderr_fd, b'error')
+        # Then value is send to logger
+        logger.debug.assert_called_once_with('remote: error')
+        logger.debug.reset_mock()
+        # Then writting back to stderr should work
+        os.write(stderr_fd, b'error')
+        logger.debug.assert_not_called()
 
 
 @skipUnless(IS_LINUX, 'Only for Unix')
