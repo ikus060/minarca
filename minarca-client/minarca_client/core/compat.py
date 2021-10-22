@@ -246,11 +246,14 @@ def redirect_ouput(logger):
     Also need to redirect stderr at file descriptor level because it's used by
     ssh.exe sub-process.
     """
+    _stop_event = threading.Event()
 
     def _reader_thread(fd):
         with open(fd, 'r') as f:
-            for line in f:
+            line = f.readline()
+            while line and not _stop_event.is_set():
                 logger.debug('remote: ' + line.rstrip())
+                line = f.readline()
 
     if IS_WINDOWS and (sys.stderr is None or sys.stderr.__class__.__name__ == 'NullWriter'):
         # With PyInstaller, stderr is undefined.
@@ -285,6 +288,9 @@ def redirect_ouput(logger):
         if stderr_copy:
             os.dup2(stderr_copy.fileno(), _old_stderr_fd)
             stderr_copy.close()
+        # Stop thread
+        _stop_event.set()
+        t.join()
 
 
 if IS_WINDOWS:
