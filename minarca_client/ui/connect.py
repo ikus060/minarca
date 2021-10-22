@@ -31,14 +31,14 @@ class SetupDialog(tkvue.Component):
     def __init__(self, master=None):
         self.backup = Backup()
         self.data = tkvue.Context({
-            'remoteurl': self.backup.get_settings('remoteurl'),
-            'remoteurl_valid': tkvue.computed(lambda context: context.remoteurl.startswith('http://') or context.remoteurl.startswith('https://')),
-            'username': self.backup.get_settings('username'),
-            'username_valid': tkvue.computed(lambda context: 0 < len(context.username)),
+            'remoteurl': self.backup.get_settings('remoteurl') or '',
+            'remoteurl_valid': tkvue.computed(lambda context: context.remoteurl and (context.remoteurl.startswith('http://') or context.remoteurl.startswith('https://'))),
+            'username': self.backup.get_settings('username') or '',
+            'username_valid': tkvue.computed(lambda context: context.username and 0 < len(context.username)),
             'password': '',
-            'password_valid': tkvue.computed(lambda context: 0 < len(context.password)),
+            'password_valid': tkvue.computed(lambda context: context.password and 0 < len(context.password)),
             'repository_name': _default_repository_name(),
-            'repository_name_valid': tkvue.computed(lambda context: 0 < len(context.repository_name)),
+            'repository_name_valid': tkvue.computed(lambda context: context.repository_name and 0 < len(context.repository_name)),
             'valid_form': tkvue.computed(lambda context: context.remoteurl_valid and context.username_valid and context.password_valid and context.repository_name_valid),
             'help_message': tkvue.computed(lambda context: SetupDialog._validate_form(context)),
             'linking': False,  # True during linking process

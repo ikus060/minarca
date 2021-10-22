@@ -36,7 +36,7 @@
                     <Frame pack-fill="x" pack-expand="1">
                         <Button text="Close" command="close" pack-side="left" pack-padx="3" style="secondary.TButton"
                             cursor="hand2" />
-                        <Button text="Submit" command="link" pack-side="left" pack-padx="3"
+                        <Button id="submitbutton" text="Submit" command="link" pack-side="left" pack-padx="3"
                             state="{{'disabled' if not valid_form or linking else '!disabled'}}"
                             cursor="{{'hand2' if valid_form else ''}}" />
                         <Label image="{{animated_gif_path}}" visible="{{linking}}" pack-side="left" compound="left" text="Connecting..."/>
