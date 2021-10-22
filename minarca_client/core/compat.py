@@ -248,9 +248,15 @@ def redirect_ouput(logger):
     """
 
     def _reader_thread(fd):
-        with open(fd, 'r') as f:
-            for line in f:
-                logger.debug('remote: ' + line.rstrip())
+        try:
+            with open(fd, 'r') as f:
+                line = f.readline()
+                while line:
+                    logger.debug('remote: ' + line.rstrip())
+                    line = f.readline()
+        except OSError:
+            # OS Error 9 may happen in case of race condition.
+            logger.exception('fail to pipe')
 
     if IS_WINDOWS and (sys.stderr is None or sys.stderr.__class__.__name__ == 'NullWriter'):
         # With PyInstaller, stderr is undefined.
@@ -285,6 +291,10 @@ def redirect_ouput(logger):
         if stderr_copy:
             os.dup2(stderr_copy.fileno(), _old_stderr_fd)
             stderr_copy.close()
+        # Clsoe pipe
+        os.close(w_fd)
+        # Stop thread
+        t.join()
 
 
 if IS_WINDOWS:
