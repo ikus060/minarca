@@ -46,3 +46,5 @@ deb_dist
 /minarca-server/debian/files
 /minarca-server/~
 /.DS_Store
+pytestdebug.log
+xunit.xml
