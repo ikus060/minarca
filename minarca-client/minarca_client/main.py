@@ -4,7 +4,6 @@
 
 
 from argparse import ArgumentParser
-from io import UnsupportedOperation
 from minarca_client.locale import _
 from minarca_client import __version__
 from minarca_client.core import (Backup, BackupError, NotRunningError,
@@ -315,8 +314,8 @@ def _configure_logging(debug=False):
     # Configure stdout
     # With non_interactive mode, only print error.
     try:
-        interactive = os.isatty(sys.stdout.fileno())
-    except UnsupportedOperation:
+        interactive = sys.stdout and os.isatty(sys.stdout.fileno())
+    except Exception:
         interactive = False
     default_level = logging.INFO if interactive else logging.ERROR
     console = logging.StreamHandler(stream=sys.stdout)
