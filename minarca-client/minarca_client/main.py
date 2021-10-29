@@ -4,6 +4,7 @@
 
 
 from argparse import ArgumentParser
+from io import UnsupportedOperation
 from minarca_client.locale import _
 from minarca_client import __version__
 from minarca_client.core import (Backup, BackupError, NotRunningError,
@@ -296,7 +297,7 @@ def _parse_args(args):
 
 def _configure_logging(debug=False):
     """
-    Configure logging system
+    Configure logging system. Make stdout quiet when running within a cron job.
     """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
@@ -311,10 +312,16 @@ def _configure_logging(debug=False):
     file_handler.setLevel(logging.DEBUG)
     root.addHandler(file_handler)
 
-    # configure stdout.
+    # Configure stdout
+    # With non_interactive mode, only print error.
+    try:
+        interactive = os.isatty(sys.stdout.fileno())
+    except UnsupportedOperation:
+        interactive = False
+    default_level = logging.INFO if interactive else logging.ERROR
     console = logging.StreamHandler(stream=sys.stdout)
     console.setFormatter(logging.Formatter("%(message)s"))
-    console.setLevel(logging.DEBUG if debug else logging.INFO)
+    console.setLevel(logging.DEBUG if debug else default_level)
     root.addHandler(console)
 
 
