@@ -69,6 +69,30 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## v4.0.6
+
+* Make output log quiet when minarca is launch within a cronjob to avoid receiving email for successful execution
+
+## v4.0.5
+
+* Add python3-distutil as dependencies for Debian package to avoid exception when starting `minarca` without it
+
+## v4.0.4
+
+* Improve stderr redirection when rdiff-backup is launch to avoid leaking threads
+* Improve user interface testing
+
+## v4.0.1
+
+* Server: Upgrade to Rdiffweb v2.3.7
+  * Mitigate CSRF vulnerability using cookies with `SameSite=Lax`
+  * Mitigate CSRF vulnerability by validating the `Origin` header when a form is submited
+  * Improve usage of WTForm for all form validation
+* Generate docuemntation using Sphinx
+* Remove usage of PySimpleGUI library to create user interface #160 #147
+* Use ttkbootstrap to generate Tkinter Theme
+* Display current version in Minarca user interface
+
 ## v4.0.0 (2021-09-20)
 
 This new version include a new Minarca client with better integration with the operating system. This new version also include support for MacOS !
