@@ -71,7 +71,7 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 ## v4.0.6
 
-* Make output log quiet when minarca is launch withon a cronjob to avoid receive email for every successful execution
+* Make output log quiet when minarca is launch within a cronjob to avoid receiving email for successful execution
 
 ## v4.0.5
 
