@@ -375,7 +375,7 @@ e2e-test:win32:
   - $Env:path += ";C:\Program Files\Minarca"
   - $Env:path
   - $p = Start "C:\Program Files\Minarca\minarcaw.exe" -PassThru
-  - if ( $p.HasExited -eq True ) { exit 1 }
+  - if ( $p.HasExited ) { exit 1 }
   - $p.kill()
   - minarca.exe --version
   - minarca.exe -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
