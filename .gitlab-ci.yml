@@ -217,31 +217,23 @@ upload:deb:
   stage: upload
 
 .upload-file: &upload-file
+  image: python:3
   script: |
     set -x
     set -e
-    # Publish to kalo
-    eval $(ssh-agent -s)
-    echo "$KALO_WWWDATA_PRIVATEKEY" | tr -d '\r' | ssh-add - > /dev/null
-    mkdir -p ~/.ssh
-    chmod 700 ~/.ssh
-    # publish client
+    # publish to nexus
+    export VERSION=$(cd minarca-client; python3 setup.py --version)
     export FILE=$(ls -1d $FILENAME)
-    scp -r -o StrictHostKeyChecking=no $FILE www-data@archive.ikus-soft.com:/var/www/patrikdufresne/archive/minarca/
-    if [[ "$CI_COMMIT_TAG" == *.*.? ]]; then
-      ssh -o StrictHostKeyChecking=no www-data@archive.ikus-soft.com ln -sfn $(basename $FILE) /var/www/patrikdufresne/archive/minarca/$FILENAME_LATEST
-    fi
+    cd $(dirname $FILE)
+    find $(basename $FILE) -type f -exec curl --fail -u "$NEXUS_USR:$NEXUS_PWD" --upload-file "{}" https://nexus.ikus-soft.com/repository/archive/minarca/$VERSION/{} \;
   stage: upload
 
 upload:get-minarca:
   <<: *upload-file
-  before_script:
-    - mv get-minarca.sh get-minarca-dev.sh
   needs:
   - bdist:linux
   variables:
-    FILENAME: ./get-minarca-dev.sh
-    FILENAME_LATEST: get-minarca.sh
+    FILENAME: ./get-minarca.sh
 
 upload:linux:
   <<: *upload-file
@@ -249,7 +241,6 @@ upload:linux:
   - bdist:linux
   variables:
     FILENAME: ./minarca-client/dist/minarca-client*.tar.gz
-    FILENAME_LATEST: minarca-client-latest.tar.gz
     
 upload:macos:
   <<: *upload-file
@@ -257,7 +248,6 @@ upload:macos:
   - bdist:macos
   variables:
     FILENAME: ./minarca-client/dist/minarca-client*.dmg
-    FILENAME_LATEST: minarca-client-latest.dmg
 
 upload:win32:
   <<: *upload-file
@@ -265,19 +255,15 @@ upload:win32:
   - bdist:win32
   variables:
     FILENAME: ./minarca-client/dist/minarca-client*.exe
-    FILENAME_LATEST: minarca-client-latest.exe
 
 upload:doc:
   <<: *upload-file
   before_script:
-    - export VERSION=$(cd minarca-client; python3 setup.py --version)
-    - mv ./minarca-client/.tox/doc/tmp/html doc-$VERSION
-  image: python:3
+    - mv ./minarca-client/.tox/doc/tmp/html doc
   needs:
   - doc
   variables:
-    FILENAME: doc-*
-    FILENAME_LATEST: doc
+    FILENAME: doc
 
 deploy:dev:
   allow_failure: True
