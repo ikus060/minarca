@@ -370,11 +370,12 @@ e2e-test:win32:
   - bdist:win32
   script:
   - $file=Get-ChildItem minarca-client/dist/minarca-client_*.exe
-  - Start-Process -wait "$file" /S
+  - Start -wait "$file" /S
   - dir "C:\Program Files\Minarca"
   - $Env:path += ";C:\Program Files\Minarca"
   - $Env:path
   - $p = Start "C:\Program Files\Minarca\minarcaw.exe" -PassThru
+  - Start-Sleep 1
   - if ( $p.HasExited ) { exit 1 }
   - $p.kill()
   - minarca.exe --version
