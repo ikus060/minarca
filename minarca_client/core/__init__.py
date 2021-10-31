@@ -253,6 +253,13 @@ class Backup():
                 return settings['remoteurl']
         return "%s/browse/%s/%s" % (settings['remoteurl'], settings['username'], settings['repositoryname'])
 
+    def get_help_url(self):
+        """
+        Return a URL to help.
+        """
+        settings = self.get_settings()
+        return "%s/help" % (settings['remoteurl'],)
+
     def get_settings(self, key=None):
         """
         Return configuration.

@@ -25,12 +25,17 @@ class HomeDialog(tkvue.Component):
             'active_view': 'home',
             'version': 'v' + minarca_client.__version__
         })
+        self.backup = Backup()
         super().__init__(*args, **kwargs)
         style(self.root)
 
     def set_active_view(self, name):
         assert name in ['home', 'patterns', 'schedule']
         self.data.active_view = name
+
+    def show_help(self):
+        help_url = self.backup.get_help_url()
+        webbrowser.open(help_url)
 
 
 class StatusView(tkvue.Component):
