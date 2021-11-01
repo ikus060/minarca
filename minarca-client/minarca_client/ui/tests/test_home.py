@@ -7,6 +7,7 @@ import os
 import tempfile
 import tkinter
 import unittest
+from unittest import mock
 from unittest.mock import MagicMock
 
 from minarca_client.core.compat import IS_LINUX
@@ -66,3 +67,18 @@ class HomeTest(unittest.TestCase):
         self.dlg.status.start_stop_button.invoke()
         # Then backup start
         self.dlg.status.backup.start.assert_called_once_with(force=True, fork=True)
+
+    @mock.patch('minarca_client.ui.home.webbrowser')
+    def test_invoke_show_help(self, mock_webbrowser):
+        # Given a remotehost
+        settings = self.dlg.backup.get_settings()
+        settings['remoteurl'] = 'http://examples.com'
+        settings.save()
+        # Given a Home dialog with help button
+        self.pump_events()
+        self.assertIsNotNone(self.dlg.status.start_stop_button)
+        # When invoking the button
+        self.dlg.help_button.invoke()
+        self.pump_events()
+        # Then backup start
+        mock_webbrowser.open.assert_called_once_with('http://examples.com/help')
