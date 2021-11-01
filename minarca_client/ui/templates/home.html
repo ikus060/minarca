@@ -2,16 +2,21 @@
     <Frame pack-fill="both" pack-expand="true" padding="10">
         <Frame pack-fill="y" pack-side="left">
             <Button id="button_home" style="{{'primary.TButton' if active_view == 'home' else 'secondary.TButton'}}"
-                command="set_active_view('home')" pack-fill="x" pack-padx="4" pack-pady="2" width="22" text="Home" cursor="hand2" />
+                command="set_active_view('home')" pack-fill="x" pack-padx="4" pack-pady="2" width="22" text="Home"
+                cursor="hand2" />
             <Button id="button_patterns"
                 style="{{'primary.TButton' if active_view == 'patterns' else 'secondary.TButton'}}"
-                command="set_active_view('patterns')" pack-fill="x" pack-padx="4" pack-pady="2" width="22" text="Select files"
-                cursor="hand2" />
+                command="set_active_view('patterns')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
+                text="Select files" cursor="hand2" />
             <Button id="button_schedule"
                 style="{{'primary.TButton' if active_view == 'schedule' else 'secondary.TButton'}}"
-                command="set_active_view('schedule')" pack-fill="x" pack-padx="4" pack-pady="2" width="22" text="Schedule"
-                cursor="hand2" />
-            <Label text="{{version}}" pack-side="bottom" pack-anchor="w" style="small.secondary.TLabel" />
+                command="set_active_view('schedule')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
+                text="Schedule" cursor="hand2" />
+            <Frame pack-side="bottom" pack-fill="x">
+                <Button id="help_button" text="Support?" pack-side="left" pack-anchor="e" style="secondary.Link.TButton"
+                    command="show_help" />
+                <Label text="{{version}}" pack-side="left" style="small.secondary.TLabel" />
+            </Frame>
         </Frame>
         <Frame pack-fill="both" pack-side="right" pack-expand="1" pack-padx="3">
             <StatusView id="status" pack-fill="both" pack-expand="1" visible="{{active_view == 'home'}}" />

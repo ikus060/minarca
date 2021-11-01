@@ -50,7 +50,7 @@ def extract_tkvue(fileobj, keywords, comment_tags, options):
 
         def handle_starttag(self, tag, attrs):
             for name, value in attrs:
-                if name in ['text', 'title']:
+                if name in ['text', 'title'] and not value.startswith('{{'):
                     self.messages.append((self.lineno, 'gettext', value, []))
 
     extractor = ExtractorParser()

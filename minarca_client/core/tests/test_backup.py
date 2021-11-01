@@ -272,6 +272,17 @@ class TestBackup(unittest.TestCase):
         self.assertEqual('http://remotehost/browse/username/test-repo/C',
                          self.backup.get_remote_url())
 
+    def test_get_help_url(self):
+        config = Settings(self.backup.config_file)
+        config['remotehost'] = 'remotehost'
+        config['remoteurl'] = 'http://remotehost'
+        config['repositoryname'] = 'test-repo'
+        config['username'] = 'username'
+        config.save()
+        # Get value
+        self.assertEqual('http://remotehost/help',
+                         self.backup.get_help_url())
+
     def test_get_status(self):
         status = self.backup.get_status()
         self.assertIsNotNone(status)
