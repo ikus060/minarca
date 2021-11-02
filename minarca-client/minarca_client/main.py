@@ -60,8 +60,7 @@ def _link(remoteurl, username, name, force, password=None):
         sys.exit(_EXIT_ALREADY_LINKED)
     # Prompt for password if missing.
     if not password:
-        print(_('password: '))
-        password = getpass.getpass()
+        password = getpass.getpass(prompt=_('password: '))
     if not password:
         print(_('a password is required'))
         sys.exit(_EXIT_MISSING_PASSWD)
