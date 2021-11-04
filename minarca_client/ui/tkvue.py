@@ -396,7 +396,7 @@ class Label(ttk.Label):
 
 class ScrolledFrame(ttk.Frame):
     """
-    Let provide our own Scrolled frame because ttkwidgets scrolled frame is miss behaving.
+    Let provide our own Scrolled frame.
     """
 
     def __init__(self, master, *args, **kw):
@@ -417,6 +417,10 @@ class ScrolledFrame(ttk.Frame):
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
 
         def _on_mousewheel(event):
+            # Skip scroll if cvans is bigger then content.
+            if canvas.yview() == (0.0, 1.0):
+                return
+            # Pick scroll directio dependinds of event <Button-?> or delta value <MouseWheel>
             if event.num == 5 or event.delta < 0:
                 scroll = 1
             elif event.num == 4 or event.delta > 0:
@@ -432,6 +436,10 @@ class ScrolledFrame(ttk.Frame):
             canvas.unbind_all("<Button-4>")
             canvas.unbind_all("<Button-5>")
             canvas.unbind_all("<MouseWheel>")  # On Windows
+
+        def _update_bg(event):
+            bg = ttk.Style().lookup('TFrame', 'background')
+            canvas.configure(bg=bg)
 
         ttk.Frame.__init__(self, master, *args, **kw)
 
@@ -456,6 +464,7 @@ class ScrolledFrame(ttk.Frame):
         canvas.bind('<Configure>', _configure_canvas)
         canvas.bind('<Enter>', _bind_to_mousewheel)
         canvas.bind('<Leave>', _unbind_from_mousewheel)
+        canvas.bind('<<ThemeChanged>>', _update_bg)
 
 
 def getwidget(name):
