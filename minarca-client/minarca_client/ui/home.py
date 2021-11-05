@@ -23,7 +23,12 @@ class HomeDialog(tkvue.Component):
     def __init__(self, *args, **kwargs):
         self.data = tkvue.Context({
             'active_view': 'home',
-            'version': 'v' + minarca_client.__version__
+            'version': 'v' + minarca_client.__version__,
+            'minarca_logo_path': pkg_resources.resource_filename('minarca_client.ui', 'images/minarca_22.png'),
+            'status_icon_path': pkg_resources.resource_filename('minarca_client.ui', 'images/status_16.png'),
+            'patterns_icon_path': pkg_resources.resource_filename('minarca_client.ui', 'images/patterns_16.png'),
+            'schedule_icon_path': pkg_resources.resource_filename('minarca_client.ui', 'images/schedule_16.png'),
+            'help_icon_path': pkg_resources.resource_filename('minarca_client.ui', 'images/help_16.png'),
         })
         self.backup = Backup()
         super().__init__(*args, **kwargs)
@@ -54,6 +59,7 @@ class StatusView(tkvue.Component):
             # Computed variables
             'header_text': self.header_text,
             'header_text_style': self.header_text_style,
+            'header_image_path': self.header_image_path,
             'start_stop_text': self.start_stop_text,
             'last_backup_text': self.last_backup_text,
             'remote_text_tooltip': self.remote_text_tooltip,
@@ -98,10 +104,20 @@ class StatusView(tkvue.Component):
         lastresult = context.lastresult
         if lastresult in ['SUCCESS', 'RUNNING']:
             return 'H1.success.TLabel'
-        elif lastresult in ['FAILURE', 'INTERRUPT']:
+        elif lastresult in ['UNKNOWN', 'INTERRUPT']:
             return 'H1.info.TLabel'
         # Default
         return 'H1.danger.TLabel'
+    
+    @tkvue.computed
+    def header_image_path(self, context):
+        lastresult = context.lastresult
+        if lastresult in ['SUCCESS', 'RUNNING']:
+            return pkg_resources.resource_filename('minarca_client.ui', 'images/success_24.png')
+        elif lastresult in ['UNKNOWN', 'INTERRUPT']:
+            return pkg_resources.resource_filename('minarca_client.ui', 'images/info_24.png')
+        # Default
+        return pkg_resources.resource_filename('minarca_client.ui', 'images/error_24.png')
 
     @tkvue.computed
     def last_backup_text(self, context):
@@ -210,7 +226,8 @@ class PatternsView(tkvue.Component):
         self.backup = Backup()
         self.data = tkvue.Context({
             'patterns': self.backup.get_patterns(),
-            'check_button_text': lambda item: _('Included') if item.include else _('Excluded')
+            'check_button_text': lambda item: _('Included') if item.include else _('Excluded'),
+            'trash_icon_path': pkg_resources.resource_filename('minarca_client.ui', 'images/trash_16.png'),
         })
         super().__init__(*args, **kwargs)
 

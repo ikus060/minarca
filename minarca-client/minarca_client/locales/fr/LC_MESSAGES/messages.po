@@ -539,8 +539,8 @@ msgstr "Vous pouvez fournir un modèle personnalisé pour inclure ou exclure le 
 "Le modèle personnalisé peut inclure le caractère générique `*` ou `?`."
 
 #: minarca_client/ui/templates/home.html:4
-msgid "Home"
-msgstr "Acceuil"
+msgid "Status"
+msgstr "État"
 
 #: minarca_client/ui/templates/home.html:7
 #: minarca_client/ui/templates/patterns.html:3

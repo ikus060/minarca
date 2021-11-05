@@ -9,13 +9,12 @@ class RootDialog(tkvue.Component):
 <Tk geometry="970x500" title="TKVue Test" className="TKVue">
     <Frame pack-fill="both" pack-expand="1">
         <!-- Load image from variable -->
-        <Label id="label" pack-fill="both" pack-expand="1" text="foo" image="{{icon_path}}" />
-        <Label text="coucou" />
+        <Label id="label" pack-fill="both" pack-expand="1" text="gastonf" image="{{icon_path}}" compound="left"/>
     </Frame>
 </Tk>
     """
     data = tkvue.Context({
-        'icon_path': pkg_resources.resource_filename('minarca_client.ui', 'images/minarca_48.png')
+        'icon_path': pkg_resources.resource_filename('minarca_client.ui', 'images/minarca_22.png')
     })
 
 

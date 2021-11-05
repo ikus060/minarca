@@ -20,13 +20,6 @@ elif IS_MAC:
 else:
     MINARCA_ICON = pkg_resources.resource_filename(__name__, 'images/minarca_128.png')
 
-# On Mac OS X the DPI is not the same. The font size must be bigger
-if IS_MAC:
-    BASE_FONT_SIZE = 19  # 14 x 96/72
-else:
-    BASE_FONT_SIZE = 14
-
-
 # Location of minarca theme.
 minarca_theme = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca.tcl')
 assert os.path.isfile(minarca_theme)

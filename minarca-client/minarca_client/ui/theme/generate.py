@@ -24,9 +24,10 @@ def main():
     settings = s._theme_objects[theme_name].settings
     # Add few fixes.
     for i in ['primary', 'secondary', 'success', 'info', 'warning', 'danger']:
-        settings[f'H1.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "36"]}}
-        settings[f'small.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "10"]}}
-        settings[f'strong.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "14", "bold"]}}
+        settings[f'H1.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-24", "bold"]}}
+        settings[f'navbar.{i}.Inverse.TLabel'] = {'configure': {'font': ["Helvetica", "-20"]}}
+        settings[f'small.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-10"]}}
+        settings[f'strong.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-14", "bold"]}}
     settings['Tooltip.TLabel'] = {'configure': {'background': "#ffffe0"}}
     # Generate script.
     script = tkinter.ttk._script_from_settings(settings)

@@ -59,10 +59,6 @@ def extract_tkvue(fileobj, keywords, comment_tags, options):
         yield entry
 
 
-def report_callback_exception(exc, val, tb):
-    logger.exception('Exception in Tkinter callback')
-
-
 class Context(collections.abc.MutableMapping):
 
     def __init__(self, initial_data={}, parent=None):
@@ -198,6 +194,51 @@ class Context(collections.abc.MutableMapping):
 
     def __bool__(self):
         return True
+
+
+def _configure_image(widget, image_path):
+    """
+    Configure the image attribute of a Label or a Button.
+
+    Support animated gif image.
+    """
+
+    def _next_frame():
+        widget.frame = (widget.frame + 1) % len(widget.frames)
+        if widget.winfo_ismapped():
+            widget.configure(image=widget.frames[widget.frame])
+        # Register next animation.
+        widget.event_id = widget.after(150, _next_frame)
+
+    # Check if image_path is the same.
+    if getattr(widget, 'image_path', None) == image_path:
+        return
+    # Create a new image
+    if image_path.endswith('.gif'):
+        widget.frame = 0
+        widget.frames = []
+        while True:
+            try:
+                image = tkinter.PhotoImage(file=image_path, format='gif -index %i' % len(widget.frames))
+                widget.frames.append(image)
+            except tkinter.TclError:
+                # An error is raised when the index is out of range.
+                break
+    else:
+        widget.frames = [tkinter.PhotoImage(file=image_path)]
+    # Update widget image with first frame.
+    widget.configure(image=widget.frames[0])
+    # Register animation.
+    if len(widget.frames) > 1:
+        widget.event_id = widget.after(100, _next_frame)
+    elif getattr(widget, 'event_id', None):
+        widget.root.after_cancel(widget.event_id)
+
+
+def _configure_wrap(widget, wrap):
+    # Support Text wrapping
+    if wrap.lower() in ['true', '1']:
+        widget.bind('<Configure>', lambda e: widget.config(wraplen=widget.winfo_width()), add='+')
 
 
 class ToolTip(ttk.Frame):
@@ -337,63 +378,6 @@ class Loop():
             self.idx -= 1
 
 
-class Label(ttk.Label):
-    """
-    Custom Label to easily support text wrapping using `wrap="true"` in layout.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.image_path = self.frames = None
-        self.frame = 0
-        self.event_id = None
-
-    def configure(self, cnf={}, **kw):
-
-        # Support Text wrapping
-        wrap = cnf.pop('wrap', kw.pop('wrap', 'false'))
-        if wrap.lower() in ['true', '1']:
-            self.bind('<Configure>', lambda e: self.config(wraplen=self.winfo_width()), add='+')
-
-        # Support Animated Image.
-        image_path = cnf.pop('image', kw.pop('image', self.image_path))
-        if image_path:
-            self._update_image(image_path)
-        super().configure(cnf, **kw)
-
-    def _next_frame(self):
-        self.frame = (self.frame + 1) % len(self.frames)
-        if self.winfo_ismapped():
-            super().configure(image=self.frames[self.frame])
-        # Register next animation.
-        self.event_id = self.after(150, self._next_frame)
-
-    def _update_image(self, image_path):
-        # Check if image_path is the same.
-        if self.image_path == image_path:
-            return
-        # Create a new image
-        if image_path.endswith('.gif'):
-            self.frame = 0
-            self.frames = []
-            while True:
-                try:
-                    image = tkinter.PhotoImage(file=image_path, format='gif -index %i' % len(self.frames))
-                    self.frames.append(image)
-                except tkinter.TclError:
-                    # An error is raised when the index is out of range.
-                    break
-        else:
-            self.frames = [tkinter.PhotoImage(file=image_path)]
-        # Update widget image with first frame.
-        super().configure(image=self.frames[0])
-        # Register animation.
-        if len(self.frames) > 1:
-            self.event_id = self.after(100, self._next_frame)
-        elif self.event_id:
-            self.root.after_cancel(self.event_id)
-
-
 class ScrolledFrame(ttk.Frame):
     """
     Let provide our own Scrolled frame.
@@ -467,10 +451,27 @@ class ScrolledFrame(ttk.Frame):
         canvas.bind('<<ThemeChanged>>', _update_bg)
 
 
+class Tk(tkinter.Tk):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        def _update_bg(event):
+            # Skip update if event is not related to TopLevel widget.
+            if self != event.widget:
+                return
+            # Update TopLevel background according to TTK Style.
+            bg = ttk.Style().lookup('TFrame', 'background')
+            self.configure(bg=bg)
+
+        self.bind('<<ThemeChanged>>', _update_bg)
+
+    def report_callback_exception(self, exc, val, tb):
+        logger.exception('Exception in Tkinter callback')
+
+
 def getwidget(name):
-    if name == 'label':
-        return Label
-    elif name == 'scrolledframe':
+    if name == 'scrolledframe':
         return ScrolledFrame
     elif name == 'tooltip':
         return ToolTip
@@ -642,6 +643,10 @@ class TkVue():
                 bind_attr(v, lambda value: widget.state(['selected' if value else '!selected', '!alternate']))
             elif k in ['text', 'title']:
                 bind_attr(v, lambda value, k=k: widget.configure(**{k: gettext(value)}))
+            elif k == 'wrap':
+                bind_attr(v, lambda value: _configure_wrap(widget, value))
+            elif k == 'image':
+                bind_attr(v, lambda value: _configure_image(widget, value))
             else:
                 bind_attr(v, lambda value, k=k: widget.configure(**{k: value}))
 
@@ -655,11 +660,10 @@ class TkVue():
         attrs = tree.attrs
         # Handle Tkinter root Window
         if tree.tag == 'tk':
-            widget = tkinter.Tk(
+            widget = Tk(
                 screenName=attrs.pop('screenname', None),
                 baseName=attrs.pop('basename', None),
                 className=attrs.pop('classname', 'Tk'))
-            widget.report_callback_exception = report_callback_exception
             # Call functions e.g. geometry, title
             for k, v in attrs.items():
                 func = getattr(widget, k, None)
