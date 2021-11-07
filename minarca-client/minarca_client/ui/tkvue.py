@@ -359,7 +359,7 @@ class ToolTip(ttk.Frame):
             print('* Error performing wm_overrideredirect in showtip *', e)
         self.tipwindow.wm_geometry("+%d+%d" % (x, y))
         self.tipwindow.wm_attributes("-topmost", 1)
-        label = ttk.Label(self.tipwindow, text=self.text, justify=tkinter.LEFT, relief=tkinter.SOLID, borderwidth=1, padding=5, style='tooltip.TLabel')
+        label = ttk.Label(self.tipwindow, text=self.text, justify=tkinter.LEFT, padding=5, style='tooltip.TLabel')
         label.pack()
 
     def hidetip(self):

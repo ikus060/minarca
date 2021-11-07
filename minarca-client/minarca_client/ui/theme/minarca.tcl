@@ -1064,4 +1064,4 @@ ttk::style configure H1.danger.TLabel -font {Helvetica -24 bold};
 ttk::style configure navbar.danger.Inverse.TLabel -font {Helvetica -20};
 ttk::style configure small.danger.TLabel -font {Helvetica -10};
 ttk::style configure strong.danger.TLabel -font {Helvetica -14 bold};
-ttk::style configure Tooltip.TLabel -background #ffffe0;}
+ttk::style configure tooltip.TLabel -background #ffffe0;}

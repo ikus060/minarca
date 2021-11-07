@@ -3,7 +3,7 @@ from minarca_client.ui import tkvue
 
 class RootDialog(tkvue.Component):
     template = """
-<TopLevel geometry="970x500" title="TKVue Test" className="TKVue">
+<TopLevel geometry="970x500" title="TKVue Test">
     <Frame pack-fill="both" pack-expand="true" padding="10">
         <Label text="Label with tooltip">
             <Tooltip text="Tooltip text for label" />

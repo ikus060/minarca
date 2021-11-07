@@ -1,7 +1,6 @@
 
 
 from minarca_client.ui import tkvue
-from minarca_client.ui.theme import style
 
 
 class RootDialog(tkvue.Component):

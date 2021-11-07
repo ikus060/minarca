@@ -102,7 +102,7 @@ def main():
         settings[f'navbar.{i}.Inverse.TLabel'] = {'configure': {'font': ["Helvetica", "-20"]}}
         settings[f'small.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-10"]}}
         settings[f'strong.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-14", "bold"]}}
-    settings['Tooltip.TLabel'] = {'configure': {'background': "#ffffe0"}}
+    settings['tooltip.TLabel'] = {'configure': {'background': "#ffffe0"}}
     # Generate script.
     script = tkinter.ttk._script_from_settings(settings)
     with open(fn, 'w', encoding='utf-8') as f:
