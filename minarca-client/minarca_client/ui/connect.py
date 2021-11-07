@@ -7,7 +7,6 @@ from minarca_client.core import Backup, RepositoryNameExistsError
 from minarca_client.core.exceptions import HttpAuthenticationError
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
-from minarca_client.ui.theme import style
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +45,6 @@ class SetupDialog(tkvue.Component):
             'animated_gif_path': pkg_resources.resource_filename('minarca_client.ui', 'images/spin_32.gif')
         })
         super().__init__(master=master)
-        style(self.root)
         # Bind a couple of event form multi thread processing.
         self.root.bind('<<prompt_link_force>>', self._prompt_link_force)
         cmd = self.root.register(self._show_warning)

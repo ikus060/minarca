@@ -157,7 +157,7 @@ class DataTest(unittest.TestCase):
 
 class Dialog(tkvue.Component):
     template = """
-    <Tk>
+    <TopLevel>
         <Frame pack-fill="x" pack-expand="1">
             <!-- Single and dual binding -->
             <Entry id="entry" textvariable="{{text_value}}" />
@@ -178,7 +178,7 @@ class Dialog(tkvue.Component):
         <Frame pack-fill="x" pack-expand="1">
             <Checkbutton id="checkbutton" text="foo" selected="{{checkbutton_selected}}" command="checkbutton_invoke"/>
         </Frame>
-    </Tk>
+    </TopLevel>
     """
 
     def __init__(self, master=None):

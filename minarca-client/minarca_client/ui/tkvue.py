@@ -4,17 +4,72 @@
 # Use is subject to license terms.
 import collections
 import logging
+import os
 import tkinter
 from html.parser import HTMLParser
 from itertools import chain
-from tkinter import ttk
+from tkinter import PhotoImage, ttk
 
 from minarca_client.locale import gettext
 
 logger = logging.getLogger(__name__)
 
-_namespaces = [ttk]  # List of packages to lookup for widgets.
+
 _components = {}  # component registry.
+
+_default_basename = None
+_default_classname = 'Tkvue'
+_default_screenname = None
+_default_theme = 'clam'
+_default_theme_source = None
+
+
+def configure_tk(basename=None, classname='Tk', screenname=None, icon=None, theme='clam', theme_source=None):
+    """
+    Use to configure default instance of Tkinter created by tkvue.
+    """
+    assert theme_source is None or os.path.isfile(theme_source)
+
+    # Disable Tkinter default root creation
+    tkinter.NoDefaultRoot()
+    global _default_basename, _default_classname, _default_screenname, _default_icon, _default_theme, _default_theme_source
+    _default_basename = basename
+    _default_classname = classname
+    _default_screenname = screenname
+    _default_icon = icon
+    _default_theme = theme
+    _default_theme_source = theme_source
+
+
+def create_toplevel(master=None):
+    """
+    Used to create a TopLevel window.
+    """
+
+    global _default_basename, _default_classname, _default_screenname, _default_icon, _default_theme, _default_theme_source
+    if master == None:
+        root = tkinter.Tk(baseName=_default_basename, className=_default_classname, screenName=_default_screenname)
+        root.report_callback_exception = lambda exc, val, tb: logger.exception('Exception in Tkinter callback')
+        if _default_theme_source:
+            root.call('source', _default_theme_source)
+        if _default_theme:
+            root.call("ttk::setTheme", _default_theme)
+        if _default_icon:
+            root.iconphoto(True, _default_icon)
+    else:
+        root = tkinter.Toplevel(master)
+
+    def _update_bg(event):
+        # Skip update if event is not related to TopLevel widget.
+        if root != event.widget:
+            return
+        # Update TopLevel background according to TTK Style.
+        bg = ttk.Style(master=root).lookup('TFrame', 'background')
+        root.configure(bg=bg)
+
+    root.bind('<<ThemeChanged>>', _update_bg)
+
+    return root
 
 
 def computed(func):
@@ -215,24 +270,32 @@ def _configure_image(widget, image_path):
         return
     # Create a new image
     if image_path.endswith('.gif'):
-        widget.frame = 0
         widget.frames = []
         while True:
             try:
-                image = tkinter.PhotoImage(file=image_path, format='gif -index %i' % len(widget.frames))
+                image = tkinter.PhotoImage(master=widget, file=image_path, format='gif -index %i' % len(widget.frames))
                 widget.frames.append(image)
             except tkinter.TclError:
                 # An error is raised when the index is out of range.
                 break
+    elif image_path in widget.image_names():
+        widget.frames = [image_path]
+    elif f'{image_path}_00' in widget.image_names():
+        widget.frames = sorted([name for name in widget.image_names() if name.startswith(f'{image_path}_')])
     else:
-        widget.frames = [tkinter.PhotoImage(file=image_path)]
+        widget.frames = [tkinter.PhotoImage(master=widget, file=image_path)]
     # Update widget image with first frame.
+    widget.frame = 0
     widget.configure(image=widget.frames[0])
     # Register animation.
     if len(widget.frames) > 1:
         widget.event_id = widget.after(100, _next_frame)
     elif getattr(widget, 'event_id', None):
         widget.root.after_cancel(widget.event_id)
+
+
+def _configure_selected(widget, value):
+    widget.state(['selected' if value else '!selected', '!alternate'])
 
 
 def _configure_wrap(widget, wrap):
@@ -422,7 +485,7 @@ class ScrolledFrame(ttk.Frame):
             canvas.unbind_all("<MouseWheel>")  # On Windows
 
         def _update_bg(event):
-            bg = ttk.Style().lookup('TFrame', 'background')
+            bg = ttk.Style(master=master).lookup('TFrame', 'background')
             canvas.configure(bg=bg)
 
         ttk.Frame.__init__(self, master, *args, **kw)
@@ -451,37 +514,19 @@ class ScrolledFrame(ttk.Frame):
         canvas.bind('<<ThemeChanged>>', _update_bg)
 
 
-class Tk(tkinter.Tk):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        def _update_bg(event):
-            # Skip update if event is not related to TopLevel widget.
-            if self != event.widget:
-                return
-            # Update TopLevel background according to TTK Style.
-            bg = ttk.Style().lookup('TFrame', 'background')
-            self.configure(bg=bg)
-
-        self.bind('<<ThemeChanged>>', _update_bg)
-
-    def report_callback_exception(self, exc, val, tb):
-        logger.exception('Exception in Tkinter callback')
-
-
 def getwidget(name):
     if name == 'scrolledframe':
         return ScrolledFrame
     elif name == 'tooltip':
         return ToolTip
+    elif name == 'toplevel':
+        return create_toplevel
     # lookup widget by name
-    for namespace in _namespaces:
-        for a in dir(namespace):
-            if a.lower() == name.lower():
-                func = getattr(namespace, a)
-                if hasattr(func, '__call__'):
-                    return func
+    for a in dir(ttk):
+        if a.lower() == name.lower():
+            func = getattr(ttk, a)
+            if hasattr(func, '__call__'):
+                return func
     # lookup in components. default to None
     return _components.get(name, None)
 
@@ -611,13 +656,13 @@ class TkVue():
             # And create appropriate variable type.
             var_type = type(context.eval(expr))
             if var_type == int:
-                var = tkinter.IntVar()
+                var = tkinter.IntVar(master=widget)
             elif var_type == float:
-                var = tkinter.DoubleVar()
+                var = tkinter.DoubleVar(master=widget)
             elif var_type == bool:
-                var = tkinter.BooleanVar()
+                var = tkinter.BooleanVar(master=widget)
             else:
-                var = tkinter.StringVar()
+                var = tkinter.StringVar(master=widget)
             # Support dual-databinding
             bind_attr(v, lambda new_value, var=var: var.set(new_value))
             var.trace_add('write', lambda *args, var=var: context.set(expr, var.get()))
@@ -641,16 +686,42 @@ class TkVue():
             elif k == 'selected':
                 # Special attribute for Button, Checkbutton
                 bind_attr(v, lambda value: widget.state(['selected' if value else '!selected', '!alternate']))
-            elif k in ['text', 'title']:
+            elif k in ['text']:
                 bind_attr(v, lambda value, k=k: widget.configure(**{k: gettext(value)}))
             elif k == 'wrap':
                 bind_attr(v, lambda value: _configure_wrap(widget, value))
             elif k == 'image':
                 bind_attr(v, lambda value: _configure_image(widget, value))
+            elif k == 'geometry':
+                # Defined on TopLevel
+                func = getattr(widget, k, None)
+                assert func, f'{k} is not a function of widget'
+                func(v)
+            elif k == 'title':
+                # Defined on TopLevel
+                func = getattr(widget, k, None)
+                assert func, f'{k} is not a function of widget'
+                func(gettext(v))
             else:
                 bind_attr(v, lambda value, k=k: widget.configure(**{k: value}))
 
         return widget
+
+    def _create_command(self, value, context):
+        """
+        Command may only be define when creating widget.
+        So let process this attribute before creating the widget.
+        """
+        assert not value.startswith('{{'), "command attributes doesn't support bindind"
+        funcs = {k: getattr(self.component, k) for k in dir(self.component) if callable(getattr(self.component, k))}
+        # May need to adjust this to detect expression.
+        if '(' in value or '=' in value:
+            def func():
+                return context.eval(value, **funcs)
+        else:
+            func = funcs.get(value, None)
+            assert func and hasattr(func, '__call__'), 'command attribute value should define a function name'
+        return func
 
     # TODO Make this function static.
     def _walk(self, master, tree, context):
@@ -658,23 +729,6 @@ class TkVue():
         assert context
         # Create widget to represent the node.
         attrs = tree.attrs
-        # Handle Tkinter root Window
-        if tree.tag == 'tk':
-            widget = Tk(
-                screenName=attrs.pop('screenname', None),
-                baseName=attrs.pop('basename', None),
-                className=attrs.pop('classname', 'Tk'))
-            # Call functions e.g. geometry, title
-            for k, v in attrs.items():
-                func = getattr(widget, k, None)
-                assert func, 'cannot find function name: ' + k
-                func(v)
-            # Create child
-            for child in tree.children:
-                self._walk(master=widget, tree=child, context=context)
-            return widget
-
-        assert master
         # Handle for loop
         if 'for' in attrs:
             widget = Loop(tree, attrs['for'], master=master, context=context, widget_factory=self._walk)

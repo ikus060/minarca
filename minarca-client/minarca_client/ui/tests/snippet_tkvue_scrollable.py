@@ -6,7 +6,7 @@ from minarca_client.ui.theme import style
 
 class RootDialog(tkvue.Component):
     template = """
-<Tk geometry="970x500" title="TKVue Test" className="TKVue">
+<TopLevel geometry="970x500" title="TKVue Test" className="TKVue">
     <Frame pack-fill="both" pack-expand="true" padding="10">
         <Label text="Static text on top of scrollable" />
         <ScrolledFrame pack-fill="both" pack-expand="1" pack-side="left">
@@ -16,7 +16,7 @@ class RootDialog(tkvue.Component):
             <Label pack-fill="x" pack-expand="1" for="i in range(1,5)" text="{{ 'right %s' % i }}" />
         </ScrolledFrame>
     </Frame>
-</Tk>
+</TopLevel>
 
 
     """

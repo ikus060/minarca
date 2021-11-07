@@ -1,26 +1,26 @@
-<Tk geometry="970x500" title="Minarca Backup" className="Minarca">
+<TopLevel geometry="970x500" title="Minarca Backup">
     <Frame pack-side="top" style="primary.TFrame" pack-fill="x">
         <!-- Header logo -->
         <Label style="primary.Inverse.TLabel" pack-side="left" pack-padx="10 0" pack-pady="10"
-            image="{{minarca_logo_path}}" />
+            image="minarca-22" />
         <Label style="navbar.primary.Inverse.TLabel" text="Minarca backup" pack-side="left" pack-anchor="w" pack-pady="5 0" />
         <!-- Help Button -->
-        <Button id="help_button" text="Help" pack-side="right" command="show_help" image="{{help_icon_path}}"
+        <Button id="help_button" text="Help" pack-side="right" command="show_help" image="help-16"
             compound="left" />
     </Frame>
     <Frame pack-fill="both" pack-expand="true" padding="5">
         <Frame pack-fill="y" pack-side="left">
             <Button id="button_home" style="{{'primary.TButton' if active_view == 'home' else 'secondary.TButton'}}"
                 command="set_active_view('home')" pack-fill="x" pack-padx="4" pack-pady="2" width="22" text="Status"
-                cursor="hand2" padding="10" image="{{status_icon_path}}" compound="left" />
+                cursor="hand2" padding="10" image="status-16" compound="left" />
             <Button id="button_patterns"
                 style="{{'primary.TButton' if active_view == 'patterns' else 'secondary.TButton'}}"
                 command="set_active_view('patterns')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
-                text="Select files" cursor="hand2" padding="10" image="{{patterns_icon_path}}" compound="left" />
+                text="Select files" cursor="hand2" padding="10" image="patterns-16" compound="left" />
             <Button id="button_schedule"
                 style="{{'primary.TButton' if active_view == 'schedule' else 'secondary.TButton'}}"
                 command="set_active_view('schedule')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
-                text="Schedule" cursor="hand2" padding="10" image="{{schedule_icon_path}}" compound="left" />
+                text="Schedule" cursor="hand2" padding="10" image="schedule-16" compound="left" />
             <Frame pack-side="bottom" pack-fill="x">
                 <Label text="{{version}}" pack-side="left" style="small.secondary.TLabel" />
             </Frame>
@@ -31,4 +31,4 @@
             <ScheduleView pack-fill="both" pack-expand="1" visible="{{active_view == 'schedule'}}" />
         </Frame>
     </Frame>
-</Tk>
+</TopLevel>

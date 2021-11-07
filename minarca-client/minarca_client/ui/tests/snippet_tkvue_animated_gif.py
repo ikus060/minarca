@@ -5,12 +5,12 @@ import pkg_resources
 
 class RootDialog(tkvue.Component):
     template = """
-<Tk geometry="970x500" title="TKVue Test" className="TKVue">
+<TopLevel geometry="970x500" title="TKVue Test" className="TKVue">
     <Frame pack-fill="both" pack-expand="true" padding="10">
         <Checkbutton text="Show animation" variable="{{show}}" />
         <Label image="{{animated_gif_path}}" visible="{{show}}"/>
     </Frame>
-</Tk>
+</TopLevel>
     """
     data = tkvue.Context({
         'show': True,

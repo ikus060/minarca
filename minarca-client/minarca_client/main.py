@@ -3,23 +3,26 @@
 # Use is subject to license terms.
 
 
-from argparse import ArgumentParser
-from minarca_client.locale import _
-from minarca_client import __version__
-from minarca_client.core import (Backup, BackupError, NotRunningError,
-                                 NotScheduleError, RepositoryNameExistsError, RunningError)
-from minarca_client.core.compat import get_log_file
-from minarca_client.core.config import Pattern, Settings
 import getpass
 import logging
 import logging.handlers
 import os
-
 import signal
 import sys
+from argparse import ArgumentParser
+
+import pkg_resources
+
+from minarca_client import __version__
+from minarca_client.core import (Backup, BackupError, NotRunningError,
+                                 NotScheduleError, RepositoryNameExistsError,
+                                 RunningError)
+from minarca_client.core.compat import get_log_file
+from minarca_client.core.config import Pattern, Settings
+from minarca_client.locale import _
 from minarca_client.ui.connect import SetupDialog
 from minarca_client.ui.home import HomeDialog
-
+from minarca_client.ui.tkvue import configure_tk
 
 _EXIT_BACKUP_FAIL = 1
 _EXIT_ALREADY_LINKED = 2
@@ -133,6 +136,10 @@ def _ui():
     """
     Entry point to start minarca user interface.
     """
+    # Configure TK with our theme.
+    theme_file = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca.tcl')
+    configure_tk(basename='Minarca', classname='Minarca', icon='minarca-128', theme='minarca', theme_source=theme_file)
+
     # If not linked, let the user configure mianrca
     backup = Backup()
     if not backup.is_linked():
