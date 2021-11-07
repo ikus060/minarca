@@ -41,8 +41,6 @@ class SetupDialog(tkvue.Component):
             'valid_form': tkvue.computed(lambda context: context.remoteurl_valid and context.username_valid and context.password_valid and context.repository_name_valid),
             'help_message': tkvue.computed(lambda context: SetupDialog._validate_form(context)),
             'linking': False,  # True during linking process
-            'minarca_image_path': pkg_resources.resource_filename('minarca_client.ui', 'images/minarca_128.png'),
-            'animated_gif_path': pkg_resources.resource_filename('minarca_client.ui', 'images/spin_32.gif')
         })
         super().__init__(master=master)
         # Bind a couple of event form multi thread processing.

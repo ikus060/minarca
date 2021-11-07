@@ -4,8 +4,8 @@ import tkinter
 import tkinter.filedialog
 import tkinter.simpledialog
 import webbrowser
-import minarca_client
 
+import minarca_client
 import pkg_resources
 from minarca_client.core import Backup, RunningError
 from minarca_client.core.compat import get_home

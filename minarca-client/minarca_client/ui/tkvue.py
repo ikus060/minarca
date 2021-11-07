@@ -8,7 +8,7 @@ import os
 import tkinter
 from html.parser import HTMLParser
 from itertools import chain
-from tkinter import PhotoImage, ttk
+from tkinter import ttk
 
 from minarca_client.locale import gettext
 
@@ -20,6 +20,7 @@ _components = {}  # component registry.
 _default_basename = None
 _default_classname = 'Tkvue'
 _default_screenname = None
+_default_icon = None
 _default_theme = 'clam'
 _default_theme_source = None
 
@@ -47,7 +48,7 @@ def create_toplevel(master=None):
     """
 
     global _default_basename, _default_classname, _default_screenname, _default_icon, _default_theme, _default_theme_source
-    if master == None:
+    if master is None:
         root = tkinter.Tk(baseName=_default_basename, className=_default_classname, screenName=_default_screenname)
         root.report_callback_exception = lambda exc, val, tb: logger.exception('Exception in Tkinter callback')
         if _default_theme_source:
@@ -291,7 +292,7 @@ def _configure_image(widget, image_path):
     if len(widget.frames) > 1:
         widget.event_id = widget.after(100, _next_frame)
     elif getattr(widget, 'event_id', None):
-        widget.root.after_cancel(widget.event_id)
+        widget.after_cancel(widget.event_id)
 
 
 def _configure_selected(widget, value):
@@ -605,25 +606,9 @@ class TkVue():
         Widget = getwidget(tag)
         assert Widget, 'cannot find widget matching tag name: ' + tag
 
-        #
-        # Command may only be define when creating widget.
-        # So let process this attribute before creating the widget.
-        #
-        def command(value):
-            assert not value.startswith('{{'), "command attributes doesn't support bindind"
-            funcs = {k: getattr(self.component, k) for k in dir(self.component) if callable(getattr(self.component, k))}
-            # May need to adjust this to detect expression.
-            if '(' in value or '=' in value:
-                def func():
-                    return context.eval(value, **funcs)
-            else:
-                func = funcs.get(value, None)
-                assert func and hasattr(func, '__call__'), 'command attribute value should define a function name'
-            return func
-
         kwargs = {}
         if 'command' in attrs:
-            kwargs['command'] = command(attrs['command'])
+            kwargs['command'] = self._create_command(attrs['command'], context)
 
         #
         # Create widget.

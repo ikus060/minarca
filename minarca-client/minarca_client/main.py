@@ -136,10 +136,6 @@ def _ui():
     """
     Entry point to start minarca user interface.
     """
-    # Configure TK with our theme.
-    theme_file = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca.tcl')
-    configure_tk(basename='Minarca', classname='Minarca', icon='minarca-128', theme='minarca', theme_source=theme_file)
-
     # If not linked, let the user configure mianrca
     backup = Backup()
     if not backup.is_linked():
