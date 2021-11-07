@@ -11,8 +11,6 @@ import signal
 import sys
 from argparse import ArgumentParser
 
-import pkg_resources
-
 from minarca_client import __version__
 from minarca_client.core import (Backup, BackupError, NotRunningError,
                                  NotScheduleError, RepositoryNameExistsError,
@@ -22,7 +20,6 @@ from minarca_client.core.config import Pattern, Settings
 from minarca_client.locale import _
 from minarca_client.ui.connect import SetupDialog
 from minarca_client.ui.home import HomeDialog
-from minarca_client.ui.tkvue import configure_tk
 
 _EXIT_BACKUP_FAIL = 1
 _EXIT_ALREADY_LINKED = 2
