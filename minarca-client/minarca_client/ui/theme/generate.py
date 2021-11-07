@@ -57,8 +57,10 @@ def create_spinner(name, svgfile, size, color):
     assert os.path.isfile(svgfile), 'svgfile must be a file: %s' % svgfile
 
     i = 0
-    for r in range(0, 360, 15):
-        cmd = ['convert', '-background', 'none', '-density', '600', svgfile, '-alpha', 'off', '-fill', color,
+    for r in range(0, 360, 45):
+        cmd = ['convert',
+               '-gravity', 'center', '-resize', f'{size}x{size}', '-extent', f'{size+2}x{size+2}',
+               '-background', 'none', '-density', '300', svgfile, '-alpha', 'off', '-fill', color,
                '-opaque', 'black', '-alpha', 'on', '-distort', 'SRT', str(r), '-resize', f'{size}x{size}', f'{name}_{i:02d}.png']
         subprocess.check_call(cmd, cwd=basedir)
         yield f'{name}_{i:02d}', f'{name}_{i:02d}.png'
