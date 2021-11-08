@@ -285,8 +285,9 @@ class PatternsView(tkvue.Component):
     def add_custom_pattern(self, pattern=None):
         if pattern is None:
             pattern = tkinter.simpledialog.askstring(
-                _("Add custom pattern"),
-                _("You may provide a custom pattern to include or exclude file.\nCustom pattern may include wildcard `*` or `?`."))
+                parent=self.root.winfo_toplevel(),
+                title=_("Add custom pattern"),
+                prompt=_("You may provide a custom pattern to include or exclude file.\nCustom pattern may include wildcard `*` or `?`."))
             # TODO Add more validation here.
             if not pattern:
                 # Operation cancel by user
