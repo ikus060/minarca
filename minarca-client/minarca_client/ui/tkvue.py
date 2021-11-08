@@ -25,7 +25,7 @@ _default_theme = 'clam'
 _default_theme_source = None
 
 
-def configure_tk(basename=None, classname='Tk', screenname=None, icon=None, theme='clam', theme_source=None):
+def configure_tk(basename=None, classname='Tk', screenname=None, icon=[], theme='clam', theme_source=None):
     """
     Use to configure default instance of Tkinter created by tkvue.
     """
@@ -33,11 +33,11 @@ def configure_tk(basename=None, classname='Tk', screenname=None, icon=None, them
 
     # Disable Tkinter default root creation
     tkinter.NoDefaultRoot()
-    global _default_basename, _default_classname, _default_screenname, _default_icon, _default_theme, _default_theme_source
+    global _default_basename, _default_classname, _default_screenname, _default_icons, _default_theme, _default_theme_source
     _default_basename = basename
     _default_classname = classname
     _default_screenname = screenname
-    _default_icon = icon
+    _default_icons = icon
     _default_theme = theme
     _default_theme_source = theme_source
 
@@ -47,7 +47,7 @@ def create_toplevel(master=None):
     Used to create a TopLevel window.
     """
 
-    global _default_basename, _default_classname, _default_screenname, _default_icon, _default_theme, _default_theme_source
+    global _default_basename, _default_classname, _default_screenname, _default_icons, _default_theme, _default_theme_source
     if master is None:
         root = tkinter.Tk(baseName=_default_basename, className=_default_classname, screenName=_default_screenname)
         root.report_callback_exception = lambda exc, val, tb: logger.exception('Exception in Tkinter callback')
@@ -55,8 +55,8 @@ def create_toplevel(master=None):
             root.call('source', _default_theme_source)
         if _default_theme:
             root.call("ttk::setTheme", _default_theme)
-        if _default_icon:
-            root.iconphoto(True, _default_icon)
+        if _default_icons:
+            root.iconphoto(True, *_default_icons)
     else:
         root = tkinter.Toplevel(master)
 
