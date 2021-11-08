@@ -27,7 +27,7 @@ if os.name == 'nt':
         # On Windows rdiff-backup is not working with python 3.9
         # Let make it a required until rdiff-backup support other python
         # version.
-        'python_requires': '>=3.7, <3.8',
+        'python_requires': '>=3.7, <3.9',
     }
 
 elif sys.platform == 'darwin':

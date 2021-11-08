@@ -6,6 +6,7 @@ variables:
   MINARCA_DEV_REMOTE_URL: https://minarca-dev.ikus-soft.com
   MINARCA_DEV_USERNAME: admin
   MINARCA_DEV_PASSWORD: admin123
+  PYTHON_VERSION_WIN32: 3.8.12
 
 stages:
 - test
@@ -59,7 +60,7 @@ test:deb:
     
 test:win32:
   before_script:
-  - choco install python3 --version=3.9.8 -y -f --forcex86
+  - choco install python3 --version=$Env:PYTHON_VERSION_WIN32 -y -f --forcex86
   - $Env:path += ";C:\Python39\Scripts\;C:\Python39\;"
   - $Env:path
   - python.exe -VV
@@ -155,7 +156,7 @@ bdist:win32:
   # openssl is required to generate certificate
   # nsis for creating installer
   # osslsigncode to sign binaries
-  - choco install python3 --version=3.9.8 -y -f --forcex86
+  - choco install python3 --version=$Env:PYTHON_VERSION_WIN32 -y -f --forcex86
   - choco install openssl -y
   - choco install nsis -y
   - wget.exe https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
