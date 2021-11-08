@@ -3,23 +3,23 @@
 # Use is subject to license terms.
 
 
-from argparse import ArgumentParser
-from minarca_client.locale import _
-from minarca_client import __version__
-from minarca_client.core import (Backup, BackupError, NotRunningError,
-                                 NotScheduleError, RepositoryNameExistsError, RunningError)
-from minarca_client.core.compat import get_log_file
-from minarca_client.core.config import Pattern, Settings
 import getpass
 import logging
 import logging.handlers
 import os
-
 import signal
 import sys
+from argparse import ArgumentParser
+
+from minarca_client import __version__
+from minarca_client.core import (Backup, BackupError, NotRunningError,
+                                 NotScheduleError, RepositoryNameExistsError,
+                                 RunningError)
+from minarca_client.core.compat import get_log_file
+from minarca_client.core.config import Pattern, Settings
+from minarca_client.locale import _
 from minarca_client.ui.connect import SetupDialog
 from minarca_client.ui.home import HomeDialog
-
 
 _EXIT_BACKUP_FAIL = 1
 _EXIT_ALREADY_LINKED = 2

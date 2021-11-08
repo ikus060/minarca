@@ -4,15 +4,14 @@ import tkinter
 import tkinter.filedialog
 import tkinter.simpledialog
 import webbrowser
-import minarca_client
 
+import minarca_client
 import pkg_resources
 from minarca_client.core import Backup, RunningError
 from minarca_client.core.compat import get_home
 from minarca_client.core.config import Pattern
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
-from minarca_client.ui.theme import style
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +22,10 @@ class HomeDialog(tkvue.Component):
     def __init__(self, *args, **kwargs):
         self.data = tkvue.Context({
             'active_view': 'home',
-            'version': 'v' + minarca_client.__version__
+            'version': 'v' + minarca_client.__version__,
         })
         self.backup = Backup()
         super().__init__(*args, **kwargs)
-        style(self.root)
 
     def set_active_view(self, name):
         assert name in ['home', 'patterns', 'schedule']
@@ -54,6 +52,7 @@ class StatusView(tkvue.Component):
             # Computed variables
             'header_text': self.header_text,
             'header_text_style': self.header_text_style,
+            'header_image_path': self.header_image_path,
             'start_stop_text': self.start_stop_text,
             'last_backup_text': self.last_backup_text,
             'remote_text_tooltip': self.remote_text_tooltip,
@@ -98,10 +97,22 @@ class StatusView(tkvue.Component):
         lastresult = context.lastresult
         if lastresult in ['SUCCESS', 'RUNNING']:
             return 'H1.success.TLabel'
-        elif lastresult in ['FAILURE', 'INTERRUPT']:
+        elif lastresult in ['UNKNOWN', 'INTERRUPT']:
             return 'H1.info.TLabel'
         # Default
         return 'H1.danger.TLabel'
+
+    @tkvue.computed
+    def header_image_path(self, context):
+        lastresult = context.lastresult
+        if lastresult == 'SUCCESS':
+            return 'success-24'
+        elif lastresult == 'RUNNING':
+            return 'spinner-24'
+        elif lastresult in ['UNKNOWN', 'INTERRUPT']:
+            return 'info-24'
+        # Default
+        return 'error-24'
 
     @tkvue.computed
     def last_backup_text(self, context):
@@ -210,7 +221,7 @@ class PatternsView(tkvue.Component):
         self.backup = Backup()
         self.data = tkvue.Context({
             'patterns': self.backup.get_patterns(),
-            'check_button_text': lambda item: _('Included') if item.include else _('Excluded')
+            'check_button_text': lambda item: _('Included') if item.include else _('Excluded'),
         })
         super().__init__(*args, **kwargs)
 
@@ -274,8 +285,9 @@ class PatternsView(tkvue.Component):
     def add_custom_pattern(self, pattern=None):
         if pattern is None:
             pattern = tkinter.simpledialog.askstring(
-                _("Add custom pattern"),
-                _("You may provide a custom pattern to include or exclude file.\nCustom pattern may include wildcard `*` or `?`."))
+                parent=self.root.winfo_toplevel(),
+                title=_("Add custom pattern"),
+                prompt=_("You may provide a custom pattern to include or exclude file.\nCustom pattern may include wildcard `*` or `?`."))
             # TODO Add more validation here.
             if not pattern:
                 # Operation cancel by user

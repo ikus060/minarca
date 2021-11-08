@@ -6,5 +6,5 @@ Name[fr]=Sauvegarde Minarca
 Comment=Minarca a centralized management of data backups
 Comment[fr]=Minarca une gestion centralisée des sauvegardes de données
 Exec=/opt/minarca/bin/minarcaw
-Icon=/opt/minarca/minarca_128.png
+Icon=/opt/minarca/minarca-128.png
 Terminal=false
