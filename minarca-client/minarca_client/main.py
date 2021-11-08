@@ -18,7 +18,7 @@ from minarca_client.core import (Backup, BackupError, NotRunningError,
 from minarca_client.core.compat import get_log_file
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.locale import _
-from minarca_client.ui.connect import SetupDialog
+from minarca_client.ui.setup import SetupDialog
 from minarca_client.ui.home import HomeDialog
 
 _EXIT_BACKUP_FAIL = 1
