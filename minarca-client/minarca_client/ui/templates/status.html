@@ -1,6 +1,6 @@
 <Frame>
-    <Frame pack-fill="x">
-        <Label pack-side="left" text="{{header_text}}" style="{{header_text_style}}" pack-pady="10" />
+    <Frame pack-fill="x" pack-pady="10">
+        <Label pack-side="left" text="{{header_text}}" style="{{header_text_style}}" image="{{header_image_path}}" compound="left" />
         <Button id="start_stop_button" command="start_stop_backup" text="{{start_stop_text}}" pack-side="right"
             style="success.TButton" cursor="hand2" />
     </Frame>
@@ -15,6 +15,7 @@
         <Button style="Link.TButton" text="{{remoteurl}}" cursor="hand2" pack-side="left" command="browse_remote">
             <ToolTip text="{{remote_text_tooltip}}" />
         </Button>
-        <Button style="Default.TButton" text="Disconnect" command="unlink" cursor="hand2" pack-side="right" />
+        <Button style="secondary.TButton" text="Disconnect" command="unlink" cursor="hand2" pack-side="right" />
     </Frame>
+    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
 </Frame>

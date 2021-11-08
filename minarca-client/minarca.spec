@@ -23,8 +23,8 @@ from PyInstaller.utils.hooks import copy_metadata
 #
 # Common values
 #
-icon = 'minarca_client/ui/images/minarca.ico'
-macos_icon = 'minarca_client/ui/images/minarca.icns'
+icon = 'minarca_client/ui/theme/minarca.ico'
+macos_icon = 'minarca_client/ui/theme/minarca.icns'
 version = pkg_resources.get_distribution("minarca_client").version
 block_cipher = None
 
@@ -42,7 +42,6 @@ a = Analysis(
     datas=copy_metadata('minarca_client') + copy_metadata('rdiff-backup') + openssh + [
         ('README.md', '.'),
         ('LICENSE', '.'),
-        ('minarca_client/ui/images', 'minarca_client/ui/images'),
         ('minarca_client/ui/templates', 'minarca_client/ui/templates'),
         ('minarca_client/ui/theme', 'minarca_client/ui/theme'),
     ],

@@ -2,14 +2,14 @@
 	"themes": [
 		{
 			"name": "minarca",
-			"font": "Helvetica 14",
+			"font": "Helvetica -16",
 			"type": "light",
 			"colors": {
 				"primary": "#1c4c72",
 				"secondary": "#d3d5d7",
-				"success": "#88a944",
-				"info": "#5ea0bc",
-				"warning": "#f57900",
+				"success": "#43ac6a",
+				"info": "#5bc0de",
+				"warning": "#E99002",
 				"danger": "#d02b27",
 				"bg": "#ffffff",
 				"fg": "#212529",
