@@ -40,9 +40,7 @@ def create_image(name, svgfile, size=16, glyph=False, color='white'):
     assert os.path.isfile(svgfile), 'svgfile must be a file: %s' % svgfile
     # TODO Convert those image magic command line into Pillow.
     if glyph:
-        real_size = round(size * 0.8)
-        cmd = ['convert', '-background', 'none', '-density', '300', svgfile, '-alpha', 'off', '-fill', color, '-opaque', 'black',
-               '-alpha', 'on', '-resize', f'{real_size}x{real_size}', '-gravity', 'north', '-extent', f'{real_size}x{size}', f'{name}.png']
+        cmd = ['convert', '-background', 'none', '-density', '300', svgfile, '-alpha', 'off', '-fill', color, '-opaque', 'black', '-alpha', 'on', '-resize', f'{size}x{size}', f'{name}.png']
     else:
         cmd = ['convert', '-background', 'none', '-density', '300', svgfile, '-resize', f'{size}x{size}', f'{name}.png']
     subprocess.check_call(cmd, cwd=basedir)
