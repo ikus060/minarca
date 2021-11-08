@@ -284,8 +284,8 @@ upload:sonar:
   stage: upload
   needs:
   - test:deb
-  - test:win32
   - test:macos
+  # - test:win32 do not include win32 because the path are invalids.
   image: sonarsource/sonar-scanner-cli
   only:
     variables:
