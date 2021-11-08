@@ -59,7 +59,7 @@ test:deb:
     
 test:win32:
   before_script:
-  - choco install python3 --version=3.7.9 -y -f --forcex86
+  - choco install python3 --version=3.9.8 -y -f --forcex86
   - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;"
   - $Env:path
   - python.exe -VV
