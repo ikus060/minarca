@@ -39,8 +39,8 @@ test:flake8:
 test:deb:
   artifacts:
     paths:
-    - ./*/coverage*.xml
-    - ./*/xunit*.xml
+    - ./*/coverage.xml
+    - ./*/xunit.xml
     expire_in: 1 day
   before_script:
   - apt update && apt -y --no-install-recommends install $DEPENDS
@@ -65,8 +65,8 @@ test:deb:
 test:win32:
   artifacts:
     paths:
-    - ./*/coverage*.xml
-    - ./*/xunit*.xml
+    - ./*/coverage.xml
+    - ./*/xunit.xml
     expire_in: 1 day
   before_script:
   - choco install python3 --version=3.7.9 -y -f --forcex86
@@ -86,8 +86,8 @@ test:win32:
 test:macos:
   artifacts:
     paths:
-    - ./*/coverage*.xml
-    - ./*/xunit*.xml
+    - ./*/coverage.xml
+    - ./*/xunit.xml
     expire_in: 1 day
   script:
   - cd minarca-client
@@ -294,7 +294,7 @@ upload:sonar:
   variables:
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
   script:
-  - sonar-scanner -X -Dsonar.python.coverage.reportPath=coverage-*.xml -Dsonar.python.xunit.reportPath=xunit-py3-cherrypy18.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,rdiffweb/test.py
+  - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py
 
 
 deploy:dev:
