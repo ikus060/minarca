@@ -155,12 +155,12 @@ bdist:win32:
   # openssl is required to generate certificate
   # nsis for creating installer
   # osslsigncode to sign binaries
-  - choco install python3 --version=3.7.11 -y -f --forcex86
+  - choco install python3 --version=3.9.8 -y -f --forcex86
   - choco install openssl -y
   - choco install nsis -y
   - wget.exe https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
   - 7z x osslsigncode_2.2_windows.zip -oC:\osslsigncode
-  - $Env:path += ";C:\osslsigncode;C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
+  - $Env:path += ";C:\osslsigncode;C:\Python39\Scripts\;C:\Python39\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
   - $Env:path
   # Sanity check
   - python.exe -VV
