@@ -124,7 +124,7 @@ bdist:linux:
   before_script:
   - apt update && apt -y --no-install-recommends install librsync-dev libacl1-dev git
   - pip3 install tox
-  image: python:3.7-stretch
+  image: python:3.9-buster
   needs: []  
   script:
   - cd minarca-client
