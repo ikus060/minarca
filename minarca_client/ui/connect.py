@@ -7,7 +7,6 @@ from minarca_client.core import Backup, RepositoryNameExistsError
 from minarca_client.core.exceptions import HttpAuthenticationError
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
-from minarca_client.ui.theme import style
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +41,8 @@ class SetupDialog(tkvue.Component):
             'valid_form': tkvue.computed(lambda context: context.remoteurl_valid and context.username_valid and context.password_valid and context.repository_name_valid),
             'help_message': tkvue.computed(lambda context: SetupDialog._validate_form(context)),
             'linking': False,  # True during linking process
-            'minarca_image_path': pkg_resources.resource_filename('minarca_client.ui', 'images/minarca_128.png'),
-            'animated_gif_path': pkg_resources.resource_filename('minarca_client.ui', 'images/spin_32.gif')
         })
         super().__init__(master=master)
-        style(self.root)
         # Bind a couple of event form multi thread processing.
         self.root.bind('<<prompt_link_force>>', self._prompt_link_force)
         cmd = self.root.register(self._show_warning)

@@ -15,7 +15,7 @@
             <Label text="{{item.comment or item.pattern}}" pack-side="left">
                 <ToolTip text="{{item.pattern}}" />
             </Label>
-            <Button text="&#128465;" command="remove_pattern(item)" pack-side="right" style="Outline.TButton" />
+            <Button command="remove_pattern(item)" pack-side="right" image="trash-16" />
             <Button pack-side="right" pack-padx="2" command="toggle_pattern(item)" text="{{check_button_text(item)}}"
                 style="Squaretoggle.Toolbutton" width="10" selected="{{item.include}}" />
         </Frame>

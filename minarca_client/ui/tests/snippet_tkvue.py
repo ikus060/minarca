@@ -5,7 +5,7 @@ from minarca_client.ui import tkvue
 
 class RootDialog(tkvue.Component):
     template = """
-<Tk geometry="970x500" title="TKVue Test" className="TKVue">
+<TopLevel geometry="970x500" title="TKVue Test" className="TKVue">
     <Frame pack-fill="both" pack-expand="true" padding="10">
         <Frame pack-fill="y" pack-side="left">
             <Button style="{{'primary.TButton' if active_view == 'list' else 'secondary.TButton'}}"
@@ -79,7 +79,7 @@ class RootDialog(tkvue.Component):
             </Frame>
         </Frame>
     </Frame>
-</Tk>
+</TopLevel>
 
 
     """

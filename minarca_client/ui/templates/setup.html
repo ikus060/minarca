@@ -1,10 +1,10 @@
-<Tk geometry="970x500" title="Minarca Backup" className="Minarca">
+<TopLevel geometry="970x500" title="Minarca Backup">
     <Frame pack-fill="both" pack-expand="true" padding="10">
         <Frame pack-fill="both" pack-side="left" padding="5">
             <!--Placeholder to align next frame-->
             <Frame pack-fill="x" pack-expand="1" />
             <Frame pack-fill="x" pack-expand="1">
-                <Label image="{{minarca_image_path}}" pack-pady="15" />
+                <Label image="minarca-128" pack-pady="15" />
                 <Label style="H1.primary.TLabel" justify="center" text="Welcome to Minarca !" />
                 <Label width="35" wrap="1" justify="center"
                     text="To configure Minarca to backup your data, you must provide URL to Minarca server. This information should be provided by your system administrator." />
@@ -39,10 +39,10 @@
                         <Button id="submitbutton" text="Submit" command="link" pack-side="left" pack-padx="3"
                             state="{{'disabled' if not valid_form or linking else '!disabled'}}"
                             cursor="{{'hand2' if valid_form else ''}}" />
-                        <Label image="{{animated_gif_path}}" visible="{{linking}}" pack-side="left" compound="left" text="Connecting..."/>
+                        <Label image="spinner-24" visible="{{linking}}" pack-side="left" compound="left" text="Connecting..."/>
                     </Frame>
                 </Frame>
             </Labelframe>
         </Frame>
     </Frame>
-</Tk>
+</TopLevel>
