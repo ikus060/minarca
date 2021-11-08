@@ -9,6 +9,8 @@ theme_file = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca
 tkvue.configure_tk(
     basename='Minarca',
     classname='Minarca',
-    icon=['minarca-16', 'minarca-32', 'minarca-128'],
+    # Put best resolution first for MacOS.
+    # Provide 16px for Windows
+    icon=['minarca-256', 'minarca-128', 'minarca-32', 'minarca-16'],
     theme='minarca',
     theme_source=theme_file)
