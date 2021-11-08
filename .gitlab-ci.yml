@@ -39,8 +39,8 @@ test:flake8:
 test:deb:
   artifacts:
     paths:
-    - */coverage*.xml
-    - */xunit*.xml
+    - ./*/coverage*.xml
+    - ./*/xunit*.xml
     expire_in: 1 day
   before_script:
   - apt update && apt -y --no-install-recommends install $DEPENDS
@@ -65,8 +65,8 @@ test:deb:
 test:win32:
   artifacts:
     paths:
-    - */coverage*.xml
-    - */xunit*.xml
+    - ./*/coverage*.xml
+    - ./*/xunit*.xml
     expire_in: 1 day
   before_script:
   - choco install python3 --version=3.7.9 -y -f --forcex86
@@ -86,8 +86,8 @@ test:win32:
 test:macos:
   artifacts:
     paths:
-    - */coverage*.xml
-    - */xunit*.xml
+    - ./*/coverage*.xml
+    - ./*/xunit*.xml
     expire_in: 1 day
   script:
   - cd minarca-client
@@ -281,9 +281,9 @@ upload:doc:
     FILENAME: doc
 
 upload:sonar:
-  stage: sonar
+  stage: upload
   needs:
-  - test:dep
+  - test:deb
   - test:win32
   - test:macos
   image: sonarsource/sonar-scanner-cli
