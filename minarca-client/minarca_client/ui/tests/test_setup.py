@@ -9,7 +9,7 @@ import tkinter
 import unittest
 
 from minarca_client.core.compat import IS_LINUX
-from minarca_client.ui.connect import SetupDialog
+from minarca_client.ui.setup import SetupDialog
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
