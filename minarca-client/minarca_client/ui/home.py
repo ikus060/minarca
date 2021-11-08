@@ -1,15 +1,14 @@
-import logging
 import webbrowser
 
 import minarca_client
-import pkg_resources
-from minarca_client.core import Backup
-from minarca_client.ui import tkvue
-import minarca_client.ui.status  # noqa
 import minarca_client.ui.patterns  # noqa
 import minarca_client.ui.schedule  # noqa
-
-logger = logging.getLogger(__name__)
+import minarca_client.ui.settings  # noqa
+import minarca_client.ui.status  # noqa
+import pkg_resources
+from minarca_client.core import Backup
+from minarca_client.locale import _
+from minarca_client.ui import tkvue
 
 
 class HomeDialog(tkvue.Component):
@@ -24,7 +23,7 @@ class HomeDialog(tkvue.Component):
         super().__init__(*args, **kwargs)
 
     def set_active_view(self, name):
-        assert name in ['home', 'patterns', 'schedule']
+        assert name in ['home', 'patterns', 'schedule', 'settings']
         self.data.active_view = name
 
     def show_help(self):

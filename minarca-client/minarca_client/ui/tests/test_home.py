@@ -11,7 +11,6 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from minarca_client.core.compat import IS_LINUX
-from minarca_client.core.config import Status
 from minarca_client.ui.home import HomeDialog
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
@@ -82,3 +81,13 @@ class HomeTest(unittest.TestCase):
         self.pump_events()
         # Then backup start
         mock_webbrowser.open.assert_called_once_with('http://examples.com/help')
+
+    def test_show_settings(self):
+        # Given home dialog
+        self.pump_events()
+        self.assertFalse(self.dlg.settings_view.root.winfo_ismapped())
+        # When invoking "Settings" button
+        self.dlg.button_settings.invoke()
+        self.pump_events()
+        # Then settings view get displayed
+        self.assertTrue(self.dlg.settings_view.root.winfo_ismapped())
