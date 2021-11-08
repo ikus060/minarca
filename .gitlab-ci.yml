@@ -6,7 +6,7 @@ variables:
   MINARCA_DEV_REMOTE_URL: https://minarca-dev.ikus-soft.com
   MINARCA_DEV_USERNAME: admin
   MINARCA_DEV_PASSWORD: admin123
-  PYTHON_VERSION_WIN32: 3.8.12
+  PYTHON_VERSION_WIN32: 3.8.10
 
 stages:
 - test
