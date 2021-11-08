@@ -37,6 +37,11 @@ test:flake8:
     DIST: debian11
 
 test:deb:
+  artifacts:
+    paths:
+    - */coverage*.xml
+    - */xunit*.xml
+    expire_in: 1 day
   before_script:
   - apt update && apt -y --no-install-recommends install $DEPENDS
   - pip install tox
@@ -58,6 +63,11 @@ test:deb:
   stage: test
     
 test:win32:
+  artifacts:
+    paths:
+    - */coverage*.xml
+    - */xunit*.xml
+    expire_in: 1 day
   before_script:
   - choco install python3 --version=3.7.9 -y -f --forcex86
   - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;"
@@ -74,6 +84,11 @@ test:win32:
   - windows-1809
 
 test:macos:
+  artifacts:
+    paths:
+    - */coverage*.xml
+    - */xunit*.xml
+    expire_in: 1 day
   script:
   - cd minarca-client
   - tox  -e py3
@@ -264,6 +279,23 @@ upload:doc:
   - doc
   variables:
     FILENAME: doc
+
+upload:sonar:
+  stage: sonar
+  needs:
+  - test:dep
+  - test:win32
+  - test:macos
+  image: sonarsource/sonar-scanner-cli
+  only:
+    variables:
+      - $SONAR_URL
+      - $SONAR_TOKEN
+  variables:
+    SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
+  script:
+  - sonar-scanner -X -Dsonar.python.coverage.reportPath=coverage-*.xml -Dsonar.python.xunit.reportPath=xunit-py3-cherrypy18.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,rdiffweb/test.py
+
 
 deploy:dev:
   allow_failure: True
