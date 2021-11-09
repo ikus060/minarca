@@ -37,6 +37,11 @@ test:flake8:
     DIST: debian11
 
 test:deb:
+  artifacts:
+    paths:
+    - ./*/coverage.xml
+    - ./*/xunit.xml
+    expire_in: 1 day
   before_script:
   - apt update && apt -y --no-install-recommends install $DEPENDS
   - pip install tox
@@ -264,6 +269,21 @@ upload:doc:
   - doc
   variables:
     FILENAME: doc
+
+upload:sonar:
+  stage: upload
+  needs:
+  - test:deb
+  image: sonarsource/sonar-scanner-cli
+  only:
+    variables:
+      - $SONAR_URL
+      - $SONAR_TOKEN
+  variables:
+    SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
+  script:
+  - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py
+
 
 deploy:dev:
   allow_failure: True
