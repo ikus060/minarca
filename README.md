@@ -13,8 +13,8 @@
 <p align="center">
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/ikus060/minarca"></a>
   <a href="https://gitlab.com/ikus-soft/minarca/pipelines"><img alt="Build" src="https://gitlab.com/ikus-soft/minarca/badges/master/pipeline.svg"></a>
-  <a href="https://sonar.ikus-soft.com/dashboard?id=com.patrikdufresne%3Aminarca-root"><img alt="Quality Gate Minarca Client" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=com.patrikdufresne%3Aminarca-root&metric=alert_status"></a>
-  <a href="https://sonar.ikus-soft.com/dashboard?id=com.patrikdufresne%3Aminarca-root"><img alt="Coverage" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=com.patrikdufresne%3Aminarca-root&metric=coverage"></a>
+  <a href="https://sonar.ikus-soft.com/dashboard?id=minarca"><img alt="Quality Gate Minarca" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=minarca&metric=alert_status"></a>
+  <a href="https://sonar.ikus-soft.com/dashboard?id=minarca"><img alt="Coverage" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=minarca&metric=coverage"></a>
 </p>
 
 <h1 align="center">
