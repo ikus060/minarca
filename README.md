@@ -4,17 +4,17 @@
   <strong>
     <a href="https://www.ikus-soft.com/en/minarca/">website</a>
     •
-    <a href="https://gitlab.com/ikus-soft/minarca/-/blob/master/doc/index.md">docs</a>
+    <a href="https://www.ikus-soft.com/en/minarca/doc">docs</a>
     •
-    <a href="https://groups.google.com/forum/#!forum/minarca">community</a>
+    <a href="https://groups.google.com/forum/#!forum/rdiffweb">community</a>
   </strong>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/ikus060/minarca"></a>
   <a href="https://gitlab.com/ikus-soft/minarca/pipelines"><img alt="Build" src="https://gitlab.com/ikus-soft/minarca/badges/master/pipeline.svg"></a>
-  <a href="https://sonar.ikus-soft.com/dashboard?id=com.patrikdufresne%3Aminarca-root"><img alt="Quality Gate Minarca Client" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=com.patrikdufresne%3Aminarca-root&metric=alert_status"></a>
-  <a href="https://sonar.ikus-soft.com/dashboard?id=com.patrikdufresne%3Aminarca-root"><img alt="Coverage" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=com.patrikdufresne%3Aminarca-root&metric=coverage"></a>
+  <a href="https://sonar.ikus-soft.com/dashboard?id=minarca"><img alt="Quality Gate Minarca" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=minarca&metric=alert_status"></a>
+  <a href="https://sonar.ikus-soft.com/dashboard?id=minarca"><img alt="Coverage" src="https://sonar.ikus-soft.com/api/project_badges/measure?project=minarca&metric=coverage"></a>
 </p>
 
 <h1 align="center">
