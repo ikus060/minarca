@@ -4,9 +4,9 @@
   <strong>
     <a href="https://www.ikus-soft.com/en/minarca/">website</a>
     •
-    <a href="https://gitlab.com/ikus-soft/minarca/-/blob/master/doc/index.md">docs</a>
+    <a href="https://www.ikus-soft.com/en/minarca/doc">docs</a>
     •
-    <a href="https://groups.google.com/forum/#!forum/minarca">community</a>
+    <a href="https://groups.google.com/forum/#!forum/rdiffweb">community</a>
   </strong>
 </p>
 
