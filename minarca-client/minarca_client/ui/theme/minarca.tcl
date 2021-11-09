@@ -1,10 +1,14 @@
 image create photo error-24 -file [file join [file dirname [info script]] error-24.png]
 image create photo info-24 -file [file join [file dirname [info script]] info-24.png]
 image create photo success-24 -file [file join [file dirname [info script]] success-24.png]
+image create photo error-16 -file [file join [file dirname [info script]] error-16.png]
 image create photo help-16 -file [file join [file dirname [info script]] help-16.png]
+image create photo info-16 -file [file join [file dirname [info script]] info-16.png]
 image create photo patterns-16 -file [file join [file dirname [info script]] patterns-16.png]
 image create photo schedule-16 -file [file join [file dirname [info script]] schedule-16.png]
+image create photo settings-16 -file [file join [file dirname [info script]] settings-16.png]
 image create photo status-16 -file [file join [file dirname [info script]] status-16.png]
+image create photo success-16 -file [file join [file dirname [info script]] success-16.png]
 image create photo trash-16 -file [file join [file dirname [info script]] trash-16.png]
 image create photo minarca-16 -file [file join [file dirname [info script]] minarca-16.png]
 image create photo minarca-22 -file [file join [file dirname [info script]] minarca-22.png]
@@ -12,6 +16,14 @@ image create photo minarca-32 -file [file join [file dirname [info script]] mina
 image create photo minarca-48 -file [file join [file dirname [info script]] minarca-48.png]
 image create photo minarca-128 -file [file join [file dirname [info script]] minarca-128.png]
 image create photo minarca-256 -file [file join [file dirname [info script]] minarca-256.png]
+image create photo spinner-16_00 -file [file join [file dirname [info script]] spinner-16_00.png]
+image create photo spinner-16_01 -file [file join [file dirname [info script]] spinner-16_01.png]
+image create photo spinner-16_02 -file [file join [file dirname [info script]] spinner-16_02.png]
+image create photo spinner-16_03 -file [file join [file dirname [info script]] spinner-16_03.png]
+image create photo spinner-16_04 -file [file join [file dirname [info script]] spinner-16_04.png]
+image create photo spinner-16_05 -file [file join [file dirname [info script]] spinner-16_05.png]
+image create photo spinner-16_06 -file [file join [file dirname [info script]] spinner-16_06.png]
+image create photo spinner-16_07 -file [file join [file dirname [info script]] spinner-16_07.png]
 image create photo spinner-24_00 -file [file join [file dirname [info script]] spinner-24_00.png]
 image create photo spinner-24_01 -file [file join [file dirname [info script]] spinner-24_01.png]
 image create photo spinner-24_02 -file [file join [file dirname [info script]] spinner-24_02.png]
@@ -706,17 +718,17 @@ Radiobutton.padding -sticky nswe -children {
 }
 ttk::style configure TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -font {Helvetica -16} -anchor center -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
-ttk::style configure primary.TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure primary.TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map primary.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
-ttk::style configure secondary.TButton -foreground #ffffff -background #d3d5d7 -bordercolor #d3d5d7 -darkcolor #d3d5d7 -lightcolor #d3d5d7 -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure secondary.TButton -foreground #ffffff -background #d3d5d7 -bordercolor #d3d5d7 -darkcolor #d3d5d7 -lightcolor #d3d5d7 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map secondary.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -bordercolor {disabled #bdbfc1 {hover !disabled} #bec0c0} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0};
-ttk::style configure success.TButton -foreground #ffffff -background #43ac6a -bordercolor #43ac6a -darkcolor #43ac6a -lightcolor #43ac6a -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure success.TButton -foreground #ffffff -background #43ac6a -bordercolor #43ac6a -darkcolor #43ac6a -lightcolor #43ac6a -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map success.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -bordercolor {disabled #bdbfc1 {hover !disabled} #3b9960} -darkcolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -lightcolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960};
-ttk::style configure info.TButton -foreground #ffffff -background #5bc0de -bordercolor #5bc0de -darkcolor #5bc0de -lightcolor #5bc0de -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure info.TButton -foreground #ffffff -background #5bc0de -bordercolor #5bc0de -darkcolor #5bc0de -lightcolor #5bc0de -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map info.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -bordercolor {disabled #bdbfc1 {hover !disabled} #52acc7} -darkcolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -lightcolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7};
-ttk::style configure warning.TButton -foreground #ffffff -background #E99002 -bordercolor #E99002 -darkcolor #E99002 -lightcolor #E99002 -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure warning.TButton -foreground #ffffff -background #E99002 -bordercolor #E99002 -darkcolor #E99002 -lightcolor #E99002 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map warning.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -bordercolor {disabled #bdbfc1 {hover !disabled} #d08002} -darkcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -lightcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002};
-ttk::style configure danger.TButton -foreground #ffffff -background #d02b27 -bordercolor #d02b27 -darkcolor #d02b27 -lightcolor #d02b27 -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure danger.TButton -foreground #ffffff -background #d02b27 -bordercolor #d02b27 -darkcolor #d02b27 -lightcolor #d02b27 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map danger.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -bordercolor {disabled #bdbfc1 {hover !disabled} #bc2722} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722};
 ttk::style configure Link.TButton -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
