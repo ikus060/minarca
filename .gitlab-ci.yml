@@ -63,11 +63,6 @@ test:deb:
   stage: test
     
 test:win32:
-  artifacts:
-    paths:
-    - ./*/coverage.xml
-    - ./*/xunit.xml
-    expire_in: 1 day
   before_script:
   - choco install python3 --version=3.7.9 -y -f --forcex86
   - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;"
@@ -84,11 +79,6 @@ test:win32:
   - windows-1809
 
 test:macos:
-  artifacts:
-    paths:
-    - ./*/coverage.xml
-    - ./*/xunit.xml
-    expire_in: 1 day
   script:
   - cd minarca-client
   - tox  -e py3
@@ -284,8 +274,6 @@ upload:sonar:
   stage: upload
   needs:
   - test:deb
-  - test:macos
-  # - test:win32 do not include win32 because the path are invalids.
   image: sonarsource/sonar-scanner-cli
   only:
     variables:
