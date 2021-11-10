@@ -107,7 +107,8 @@ class Settings(dict):
         'remoteurl': None,
         'schedule': DAILY,
         'configured': False,
-        'check_latest_version': True
+        # Load default value from environment variable to ease unittest
+        'check_latest_version': os.environ.get('MINARCA_CHECK_LATEST_VERSION', 'True') in [True, 'true', 'True', '1']
     }
 
     def __init__(self, filename):

@@ -36,7 +36,7 @@ class SettingsView(tkvue.Component):
         # Initialise stuff for latest version.
         if self.data['check_latest_version']:
             # Start background thread for latest version.
-            self._check_latest_version()
+            self.root.after(3000, self._check_latest_version)
 
     def update_check_latest_version(self, value):
         """
@@ -70,7 +70,6 @@ class SettingsView(tkvue.Component):
 
     def _check_latest_version_blocking(self):
         # Query latest version.
-        time.sleep(3)
         try:
             is_latest = self.latest_check.is_latest()
             self.data['is_latest'] = is_latest

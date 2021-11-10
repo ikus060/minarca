@@ -6,7 +6,8 @@
     <Frame pack-fill="x">
         <Label style="strong.primary.TLabel" text="Updates" width="15" pack-side="left" />
         <Frame pack-fill="x">
-            <Button text="Check now" command="_check_latest_version" pack-side="right" pack-pady="5" />
+            <Button id="check_latest_version_button" text="Check now" command="_check_latest_version" pack-side="right"
+                pack-pady="5" />
             <Checkbutton id="check_latest_version_toggle_button" text="Check for update at startup"
                 variable="{{check_latest_version}}" style="Roundtoggle.Toolbutton" pack-side="right" />
         </Frame>

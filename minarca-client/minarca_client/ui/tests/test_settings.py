@@ -7,11 +7,10 @@ import os
 import tempfile
 import tkinter
 import unittest
-from unittest import mock
+import time
 from unittest.mock import MagicMock
 
 from minarca_client.core.compat import IS_LINUX
-from minarca_client.core.config import Status
 from minarca_client.ui.home import HomeDialog
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
@@ -26,6 +25,7 @@ class SettingsTest(unittest.TestCase):
         os.chdir(self.tmp.name)
         os.environ['MINARCA_CONFIG_HOME'] = self.tmp.name
         os.environ['MINARCA_DATA_HOME'] = self.tmp.name
+        os.environ['MINARCA_CHECK_LATEST_VERSION'] = 'False'
         self.dlg = HomeDialog()
         self.dlg.set_active_view('settings')
 
@@ -55,3 +55,14 @@ class SettingsTest(unittest.TestCase):
         # Then option is updated in settings.
         self.assertEquals(True, self.dlg.backup.get_settings('check_latest_version'))
         self.assertEqual(('selected',), self.dlg.settings_view.check_latest_version_toggle_button.state())
+
+    def test_check_latest_version(self):
+        self.dlg.settings_view.latest_check = MagicMock()
+        # Given a Settings dialog
+        self.pump_events()
+        # When user click on "Check for update"
+        self.dlg.settings_view.check_latest_version_button.invoke()
+        self.pump_events()
+        # Then
+        time.sleep(1)
+        self.dlg.settings_view.latest_check.is_latest.assert_called_once()

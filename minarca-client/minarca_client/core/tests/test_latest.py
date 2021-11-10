@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import MagicMock
 
 import responses
-from minarca_client.core.latest import LATEST_VERSION_URL, LatestCheck
+from minarca_client.core.latest import LATEST_VERSION_URL, LatestCheck, LatestCheckFailed
 
 
 class LatestCheckTest(unittest.TestCase):
@@ -32,7 +32,7 @@ class LatestCheckTest(unittest.TestCase):
         responses.add(responses.GET, LATEST_VERSION_URL, body='this is some invalid error.')
         # When querying the latest information
         latest = LatestCheck()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(LatestCheckFailed):
             latest.is_latest()
 
     @responses.activate

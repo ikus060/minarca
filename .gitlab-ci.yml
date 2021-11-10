@@ -50,7 +50,7 @@ test:deb:
     matrix:
     - TARGET: minarca-client
       DIST: [buster, bullseye]
-      DEPENDS: cron librsync-dev python3-tk libacl1-dev
+      DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb
     - TARGET: minarca-server
       DIST: [buster, bullseye]
       DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
