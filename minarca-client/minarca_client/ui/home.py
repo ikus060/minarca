@@ -7,7 +7,6 @@ import minarca_client.ui.settings  # noqa
 import minarca_client.ui.status  # noqa
 import pkg_resources
 from minarca_client.core import Backup
-from minarca_client.locale import _
 from minarca_client.ui import tkvue
 
 

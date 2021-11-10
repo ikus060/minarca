@@ -3,7 +3,6 @@
 # Use is subject to license terms.
 import logging
 import threading
-import time
 import tkinter.messagebox
 import webbrowser
 
