@@ -295,10 +295,6 @@ def _configure_image(widget, image_path):
         widget.after_cancel(widget.event_id)
 
 
-def _configure_selected(widget, value):
-    widget.state(['selected' if value else '!selected', '!alternate'])
-
-
 def _configure_wrap(widget, wrap):
     # Support Text wrapping
     if wrap.lower() in ['true', '1']:

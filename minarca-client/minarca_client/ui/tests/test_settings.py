@@ -41,19 +41,19 @@ class SettingsTest(unittest.TestCase):
     def test_toggle_check_latest_version(self):
         # Given a Settings dialog
         self.pump_events()
-        self.assertEquals(True, self.dlg.backup.get_settings('check_latest_version'))
+        self.assertEqual(True, self.dlg.backup.get_settings('check_latest_version'))
         self.assertEqual(('selected',), self.dlg.settings_view.check_latest_version_toggle_button.state())
         # When user click on check_latest_version toggle button
         self.dlg.settings_view.check_latest_version_toggle_button.invoke()
         self.pump_events()
         # Then Option is updated in settings.
-        self.assertEquals(False, self.dlg.backup.get_settings('check_latest_version'))
+        self.assertEqual(False, self.dlg.backup.get_settings('check_latest_version'))
         self.assertEqual(tuple(), self.dlg.settings_view.check_latest_version_toggle_button.state())
         # When cliking again on the button
         self.dlg.settings_view.check_latest_version_toggle_button.invoke()
         self.pump_events()
         # Then option is updated in settings.
-        self.assertEquals(True, self.dlg.backup.get_settings('check_latest_version'))
+        self.assertEqual(True, self.dlg.backup.get_settings('check_latest_version'))
         self.assertEqual(('selected',), self.dlg.settings_view.check_latest_version_toggle_button.state())
 
     def test_check_latest_version(self):
