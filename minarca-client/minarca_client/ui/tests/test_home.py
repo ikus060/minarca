@@ -87,9 +87,11 @@ class HomeTest(unittest.TestCase):
     def test_show_settings(self):
         # Given home dialog
         self.pump_events()
+        self.assertTrue(self.dlg.status_view.root.winfo_ismapped())
         self.assertFalse(self.dlg.settings_view.root.winfo_ismapped())
         # When invoking "Settings" button
         self.dlg.button_settings.invoke()
         self.pump_events()
         # Then settings view get displayed
+        self.assertFalse(self.dlg.status_view.root.winfo_ismapped())
         self.assertTrue(self.dlg.settings_view.root.winfo_ismapped())
