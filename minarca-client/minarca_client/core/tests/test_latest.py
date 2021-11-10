@@ -36,7 +36,6 @@ class LatestCheckTest(unittest.TestCase):
             latest.is_latest()
 
     @responses.activate
-    @responses.activate
     def test_is_latest_with_same_version(self):
         # Given latest version 1.2.3
         responses.add(responses.GET, LATEST_VERSION_URL, body='1.2.3')
