@@ -59,7 +59,7 @@ test:deb:
       DEPENDS: bash
   script:
   - cd $TARGET
-  - tox -e py3
+  - tox
   stage: test
     
 test:win32:
@@ -71,7 +71,7 @@ test:win32:
   - pip.exe install tox
   script:
   - cd minarca-client
-  - tox.exe  -e py3
+  - tox.exe
   stage: test
   tags:
   - shared-windows
@@ -81,7 +81,7 @@ test:win32:
 test:macos:
   script:
   - cd minarca-client
-  - tox  -e py3
+  - tox
   stage: test
   tags:
   - macos
