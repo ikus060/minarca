@@ -10,7 +10,7 @@
         <Button text="Add folder" command="add_folder_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
         <Button text="Add ..." command="add_custom_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
     </Frame>
-    <ScrolledFrame pack-fill="both" pack-expand="1">
+    <ScrolledFrame id="scrolled_frame" pack-fill="both" pack-expand="1">
         <Frame for="item in patterns" pack-fill="x" pack-pady="3" pack-expand="1">
             <Label text="{{item.comment or item.pattern}}" pack-side="left">
                 <ToolTip text="{{item.pattern}}" />

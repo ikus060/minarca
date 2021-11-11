@@ -1,0 +1,26 @@
+<Frame>
+    <Frame pack-fill="x">
+        <Label text="Settings" pack-side="left" style="H1.primary.TLabel" pack-pady="10" />
+    </Frame>
+    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
+    <Frame pack-fill="x">
+        <Label style="strong.primary.TLabel" text="Updates" width="15" pack-side="left" />
+        <Frame pack-fill="x">
+            <Button id="check_latest_version_button" text="Check now" command="_check_latest_version" pack-side="right"
+                pack-pady="5" />
+            <Checkbutton id="check_latest_version_toggle_button" text="Check for update at startup"
+                variable="{{check_latest_version}}" style="Roundtoggle.Toolbutton" pack-side="right" />
+        </Frame>
+        <Label text="Checking for updates..." image="spinner-16" compound="left" visible="{{checking_for_update}}"
+            anchor="e" pack-fill="x" />
+        <Label text="Current version is up-to-date" style="success.TLabel" image="success-16" compound="left"
+            visible="{{is_latest is True}}" anchor="e" pack-fill="x" />
+        <Label text="Update available" style="info.TLabel" image="info-16" compound="left"
+            visible="{{is_latest is False}}" anchor="e" pack-fill="x" />
+        <Label text="Cannot check for updates. Try again later." style="danger.TLabel" image="error-16" compound="left"
+            visible="{{check_latest_version_error is not None}}" anchor="e" pack-fill="x">
+            <Tooltip text="{{check_latest_version_error}}" width="50" />
+        </Label>
+    </Frame>
+    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
+</Frame>
