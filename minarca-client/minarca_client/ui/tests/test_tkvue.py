@@ -258,6 +258,16 @@ class DialogWithLoop(tkvue.Component):
         super().__init__(master=master)
 
 
+class DialogWithScrolledFrame(tkvue.Component):
+    template = """
+    <TopLevel>
+        <ScrolledFrame id="scrolled_frame">
+            <Label id="label1" text="{{item}}" for="item in range(1,25)"/>
+        </ScrolledFrame>
+    </TopLevel>
+    """
+
+
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class ComponentTest(unittest.TestCase):
 
@@ -412,3 +422,7 @@ class ComponentTest(unittest.TestCase):
             dlg.pump_events()
             # Then widget get created
             self.assertEqual(2, len(dlg.winfo_children()))
+
+    def test_scrolled_frame(self):
+        with new_dialog(DialogWithScrolledFrame) as dlg:
+            dlg.pump_events()

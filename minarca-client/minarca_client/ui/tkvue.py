@@ -133,11 +133,6 @@ class Context(collections.abc.MutableMapping):
         'Make a child context, inheriting enable_nonlocal unless specified'
         return self.__class__(kwargs, parent=self)
 
-    @property
-    def root(self):
-        'Return root context (highest level ancestor)'
-        return self if self._parent is None else self._parent.root
-
     def __getattr__(self, key):
         return self[key]
 
