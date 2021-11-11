@@ -20,14 +20,19 @@
                 style="{{'primary.TButton' if active_view == 'schedule' else 'secondary.TButton'}}"
                 command="set_active_view('schedule')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
                 text="Schedule" cursor="hand2" padding="10" image="schedule-16" compound="left" />
+            <Button id="button_settings"
+                style="{{'primary.TButton' if active_view == 'settings' else 'secondary.TButton'}}"
+                command="set_active_view('settings')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
+                text="Settings" cursor="hand2" padding="10" image="settings-16" compound="left" />
             <Frame pack-side="bottom" pack-fill="x">
                 <Label text="{{version}}" pack-side="left" style="small.secondary.TLabel" />
             </Frame>
         </Frame>
         <Frame pack-fill="both" pack-side="right" pack-expand="1" pack-padx="3">
-            <StatusView id="status" pack-fill="both" pack-expand="1" visible="{{active_view == 'home'}}" />
-            <PatternsView pack-fill="both" pack-expand="1" visible="{{active_view == 'patterns'}}" />
-            <ScheduleView pack-fill="both" pack-expand="1" visible="{{active_view == 'schedule'}}" />
+            <StatusView id="status_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'home'}}" />
+            <PatternsView id="patterns_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'patterns'}}" />
+            <ScheduleView id="schedule_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'schedule'}}" />
+            <SettingsView id="settings_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'settings'}}" />
         </Frame>
     </Frame>
 </TopLevel>

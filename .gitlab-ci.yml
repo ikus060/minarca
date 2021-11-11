@@ -50,7 +50,7 @@ test:deb:
     matrix:
     - TARGET: minarca-client
       DIST: [buster, bullseye]
-      DEPENDS: cron librsync-dev python3-tk libacl1-dev
+      DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
     - TARGET: minarca-server
       DIST: [buster, bullseye]
       DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
@@ -59,7 +59,7 @@ test:deb:
       DEPENDS: bash
   script:
   - cd $TARGET
-  - tox -e py3
+  - tox
   stage: test
     
 test:win32:
@@ -71,7 +71,7 @@ test:win32:
   - pip.exe install tox
   script:
   - cd minarca-client
-  - tox.exe  -e py3
+  - tox.exe
   stage: test
   tags:
   - shared-windows
@@ -81,7 +81,7 @@ test:win32:
 test:macos:
   script:
   - cd minarca-client
-  - tox  -e py3
+  - tox
   stage: test
   tags:
   - macos
@@ -282,7 +282,7 @@ upload:sonar:
   variables:
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
   script:
-  - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py
+  - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
 
 
 deploy:dev:

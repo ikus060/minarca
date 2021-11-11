@@ -2,11 +2,27 @@
 import os
 import tkinter
 import unittest
+from contextlib import contextmanager
 
+import pkg_resources
 from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS
 from minarca_client.ui import tkvue
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
+
+
+@contextmanager
+def new_dialog(cls):
+    def pump_events():
+        while dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
+            pass
+    dlg = cls()
+    dlg.pump_events = pump_events
+    try:
+        yield dlg
+    finally:
+        dlg.destroy()
+        dlg.pump_events()
 
 
 class DataTest(unittest.TestCase):
@@ -195,113 +211,218 @@ class Dialog(tkvue.Component):
         self.data.checkbutton_selected = not self.data.checkbutton_selected
 
 
+class DialogWithImage(tkvue.Component):
+    template = """
+    <TopLevel>
+        <Button id="button" text="Button with image" image="{{image_path}}" compound="left"/>
+        <Label id="label" text="Label with image" image="{{image_path}}" compound="left"/>
+    </TopLevel>
+    """
+
+    def __init__(self, master=None):
+        self.data = tkvue.Context({
+            'image_path': None
+        })
+        super().__init__(master=master)
+
+
+class DialogWithTextWrap(tkvue.Component):
+    template = """
+    <TopLevel>
+        <Label id="label1" text="Text with wrapping" wrap="1" width="5"/>
+    </TopLevel>
+    """
+
+
+class DialogWithTooltip(tkvue.Component):
+    template = """
+    <TopLevel>
+        <Label id="label1" text="Label with tooltip">
+            <Tooltip id="tooltip" text="This is a tooltip" />
+        </Label>
+    </TopLevel>
+    """
+
+
+class DialogWithLoop(tkvue.Component):
+    template = """
+    <TopLevel>
+        <Label id="label1" text="{{item}}" for="item in items"/>
+    </TopLevel>
+    """
+
+    def __init__(self, master=None):
+        self.data = tkvue.Context({
+            'items': []
+        })
+        super().__init__(master=master)
+
+
+class DialogWithScrolledFrame(tkvue.Component):
+    template = """
+    <TopLevel>
+        <ScrolledFrame id="scrolled_frame">
+            <Label id="label1" text="{{item}}" for="item in range(1,25)"/>
+        </ScrolledFrame>
+    </TopLevel>
+    """
+
+
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class ComponentTest(unittest.TestCase):
 
-    def setUp(self):
-        self.dlg = Dialog()
-        super().setUp()
-
-    def tearDown(self):
-        self.dlg.destroy()
-        self.pump_events()
-        super().tearDown()
-
-    def pump_events(self):
-        while self.dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
-            pass
-
     def test_open_close(self):
-        self.pump_events()
+        with new_dialog(Dialog) as dlg:
+            dlg.pump_events()
 
     def test_simple_binding(self):
         # Given a dialog with a simple binding
-        self.pump_events()
-        self.assertEqual('foo', self.dlg.label.cget('text'))
-        # When updating the value of the context
-        self.dlg.data.text_value = 'bar'
-        # Then thw widget get updated
-        self.assertEqual('bar', self.dlg.label.cget('text'))
+        with new_dialog(Dialog) as dlg:
+            dlg.pump_events()
+            self.assertEqual('foo', dlg.label.cget('text'))
+            # When updating the value of the context
+            dlg.data.text_value = 'bar'
+            # Then thw widget get updated
+            self.assertEqual('bar', dlg.label.cget('text'))
 
     @unittest.skipIf(IS_WINDOWS, 'fail to reliably force focus on windows')
     def test_dual_binding(self):
         # Given a dialog with a simple binding
-        self.dlg.root.lift()
-        self.pump_events()
-        self.assertEqual('foo', self.dlg.label.cget('text'))
-        self.assertEqual('foo', self.dlg.entry.getvar(self.dlg.entry.cget('text')))
-        # Given the root windows has focus.
-        self.dlg.root.focus_force()
-        self.pump_events()
-        self.assertEqual(self.dlg.root.focus_get(), self.dlg.root)
-        # When typing into the entry field
-        self.dlg.entry.focus_set()
-        self.dlg.entry.event_generate('<i>')
-        self.pump_events()
-        # Then the store get updated
-        self.assertEqual('ifoo', self.dlg.data.text_value)
-        self.assertEqual('ifoo', self.dlg.label.cget('text'))
-        self.assertEqual('ifoo', self.dlg.entry.getvar(self.dlg.entry.cget('text')))
+        with new_dialog(Dialog) as dlg:
+            dlg.root.lift()
+            dlg.pump_events()
+            self.assertEqual('foo', dlg.label.cget('text'))
+            self.assertEqual('foo', dlg.entry.getvar(dlg.entry.cget('text')))
+            # Given the root windows has focus.
+            dlg.root.focus_force()
+            dlg.pump_events()
+            self.assertEqual(dlg.root.focus_get(), dlg.root)
+            # When typing into the entry field
+            dlg.entry.focus_set()
+            dlg.entry.event_generate('<i>')
+            dlg.pump_events()
+            # Then the store get updated
+            self.assertEqual('ifoo', dlg.data.text_value)
+            self.assertEqual('ifoo', dlg.label.cget('text'))
+            self.assertEqual('ifoo', dlg.entry.getvar(dlg.entry.cget('text')))
 
     @unittest.skipIf(IS_WINDOWS, 'fail to reliably make this test work in CICD')
     def test_visible(self):
         # Given a dialog with a simple binding
-        self.pump_events()
-        self.assertTrue(self.dlg.button.winfo_ismapped())
-        # When typing into the entry field
-        self.dlg.data.button_visible = False
-        self.pump_events()
-        # Then the store get updated
-        self.assertFalse(self.dlg.button.winfo_ismapped())
+        with new_dialog(Dialog) as dlg:
+            dlg.pump_events()
+            self.assertTrue(dlg.button.winfo_ismapped())
+            # When typing into the entry field
+            dlg.data.button_visible = False
+            dlg.pump_events()
+            # Then the store get updated
+            self.assertFalse(dlg.button.winfo_ismapped())
 
     def test_for_loop(self):
         # Given a dialog with a for loop
-        self.pump_events()
-        self.assertEqual(4, len(self.dlg.people.winfo_children()))
-        # When Adding element to the list
-        self.dlg.data.names = ['patrik', 'annik']
-        self.pump_events()
-        # Then the dialog get updated
-        self.assertEqual(2, len(self.dlg.people.winfo_children()))
+        with new_dialog(Dialog) as dlg:
+            dlg.pump_events()
+            self.assertEqual(4, len(dlg.people.winfo_children()))
+            # When Adding element to the list
+            dlg.data.names = ['patrik', 'annik']
+            dlg.pump_events()
+            # Then the dialog get updated
+            self.assertEqual(2, len(dlg.people.winfo_children()))
 
     def test_dual_binding_combo_and_radio(self):
         # Given a dialog with a for loop
-        self.pump_events()
-        # When selecting an item with radio
-        self.dlg.red.invoke()
-        self.pump_events()
-        # Then radio button get updated
-        self.assertEqual('red', self.dlg.data.selected_color)
+        with new_dialog(Dialog) as dlg:
+            dlg.pump_events()
+            # When selecting an item with radio
+            dlg.red.invoke()
+            dlg.pump_events()
+            # Then radio button get updated
+            self.assertEqual('red', dlg.data.selected_color)
 
     @unittest.skipIf(IS_MAC, 'this fail on MacOS when running in test suite')
     def test_checkbutton_selected(self):
         # Given a dialog with checkbutton binded with `selected` attribute
-        self.pump_events()
-        self.assertEqual(self.dlg.checkbutton.state(), ('selected',))
-        # When updating checkbutton_selected value
-        self.dlg.data.checkbutton_selected = False
-        self.pump_events()
-        # Then the widget get updated
-        self.assertEqual(self.dlg.checkbutton.state(), tuple())
+        with new_dialog(Dialog) as dlg:
+            dlg.pump_events()
+            self.assertEqual(dlg.checkbutton.state(), ('selected',))
+            # When updating checkbutton_selected value
+            dlg.data.checkbutton_selected = False
+            dlg.pump_events()
+            # Then the widget get updated
+            self.assertEqual(dlg.checkbutton.state(), tuple())
 
     @unittest.skipIf(IS_MAC, 'this fail on MacOS when running in test suite')
     def test_checkbutton_selected_command(self):
         # Given a dialog with checkbutton binded with `selected` attribute
-        self.pump_events()
-        self.assertEqual(self.dlg.checkbutton.state(), ('selected',))
-        # When cliking on checkbutton
-        self.dlg.checkbutton.focus_set()
-        self.dlg.checkbutton.invoke()
-        self.dlg.root.focus_set()
-        self.pump_events()
-        # Then the widget status get toggled.
-        self.assertEqual(self.dlg.data.checkbutton_selected, False)
-        self.assertEqual(self.dlg.checkbutton.state(), tuple())
-        # When cliking on checkbutton again
-        self.dlg.checkbutton.focus_set()
-        self.dlg.checkbutton.invoke()
-        self.dlg.root.focus_set()
-        self.pump_events()
-        # Then the widget status get toggled.
-        self.assertEqual(self.dlg.data.checkbutton_selected, True)
-        self.assertEqual(self.dlg.checkbutton.state(), ('selected',))
+        with new_dialog(Dialog) as dlg:
+            dlg.pump_events()
+            self.assertEqual(dlg.checkbutton.state(), ('selected',))
+            # When cliking on checkbutton
+            dlg.checkbutton.focus_set()
+            dlg.checkbutton.invoke()
+            dlg.root.focus_set()
+            dlg.pump_events()
+            # Then the widget status get toggled.
+            self.assertEqual(dlg.data.checkbutton_selected, False)
+            self.assertEqual(dlg.checkbutton.state(), tuple())
+            # When cliking on checkbutton again
+            dlg.checkbutton.focus_set()
+            dlg.checkbutton.invoke()
+            dlg.root.focus_set()
+            dlg.pump_events()
+            # Then the widget status get toggled.
+            self.assertEqual(dlg.data.checkbutton_selected, True)
+            self.assertEqual(dlg.checkbutton.state(), ('selected',))
+
+    def test_image_path(self):
+        with new_dialog(DialogWithImage) as dlg:
+            # Given a dialog with image
+            self.assertEqual('', dlg.button.cget('image'))
+            self.assertEqual('', dlg.label.cget('image'))
+            # When settings image_path
+            dlg.data['image_path'] = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca-22.png')
+            # Then Button and Label get update with an image
+            self.assertTrue(dlg.button.cget('image')[0].startswith('pyimage'))
+            self.assertTrue(dlg.label.cget('image')[0].startswith('pyimage'))
+
+    def test_tooltip(self):
+        # Given a dialog with tooltip
+        with new_dialog(DialogWithTooltip) as dlg:
+            dlg.pump_events()
+            # When forcing tooltip display
+            dlg.tooltip.showtip()
+            dlg.pump_events()
+            # Then tooltip get displayed
+            self.assertTrue(dlg.tooltip.tipwindow)
+            # When hiding tooltip
+            dlg.tooltip.hidetip()
+            dlg.pump_events()
+            # Then tooltip get hide
+            self.assertFalse(dlg.tooltip.tipwindow)
+
+    def test_loop(self):
+        # Given a dial with loop
+        with new_dialog(DialogWithLoop) as dlg:
+            dlg.pump_events()
+            self.assertEqual(0, len(dlg.winfo_children()))
+            # When updating the items
+            dlg.data['items'] = [1, 2, 3, 4]
+            dlg.pump_events()
+            # Then widget get created
+            self.assertEqual(4, len(dlg.winfo_children()))
+
+    def test_loop_removing_items(self):
+        # Given a dial with loop
+        with new_dialog(DialogWithLoop) as dlg:
+            dlg.data['items'] = [1, 2, 3, 4]
+            dlg.pump_events()
+            self.assertEqual(4, len(dlg.winfo_children()))
+            # When removing items
+            dlg.data['items'] = [3, 4]
+            dlg.pump_events()
+            # Then widget get created
+            self.assertEqual(2, len(dlg.winfo_children()))
+
+    def test_scrolled_frame(self):
+        with new_dialog(DialogWithScrolledFrame) as dlg:
+            dlg.pump_events()

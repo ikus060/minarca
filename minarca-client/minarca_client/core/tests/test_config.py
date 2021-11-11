@@ -138,7 +138,16 @@ class SettingsTest(unittest.TestCase):
         os.chdir(self.cwd)
         self.tmp.cleanup()
 
-    def test_load(self):
+    def test_load_without_file(self):
+        config = Settings('test.properties')
+        self.assertEqual(None, config['username'])
+        self.assertEqual(None, config['repositoryname'])
+        self.assertEqual(False, config['configured'])
+        self.assertEqual(24, config['schedule'])
+        # Validate default value
+        self.assertEqual(True, config['check_latest_version'])
+
+    def test_load_without_check_latest_version(self):
         with open('test.properties', 'w') as f:
             f.write("username=foo\n")
             f.write("repositoryname=bar\n")
@@ -149,6 +158,18 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual('bar', config['repositoryname'])
         self.assertEqual(True, config['configured'])
         self.assertEqual(24, config['schedule'])
+        # Validate default value
+        self.assertEqual(True, config['check_latest_version'])
+
+    def test_load_with_check_latest_version(self):
+        with open('test.properties', 'w') as f:
+            f.write("username=foo\n")
+            f.write("repositoryname=bar\n")
+            f.write("configured=true\n")
+            f.write("schedule=24\n")
+            f.write("check_latest_version=False")
+        config = Settings('test.properties')
+        self.assertEqual(False, config['check_latest_version'])
 
     def test_configured(self):
 
