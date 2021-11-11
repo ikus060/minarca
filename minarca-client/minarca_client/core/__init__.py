@@ -464,7 +464,7 @@ class Backup():
         Scheduler().create(force=True)
 
     def set_patterns(self, patterns):
-        assert patterns
+        assert isinstance(patterns, list), 'patterns should be a list'
         p = Patterns(self.patterns_file)
         p.clear()
         p.extend(patterns)

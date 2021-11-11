@@ -107,6 +107,8 @@ class Settings(dict):
         'remoteurl': None,
         'schedule': DAILY,
         'configured': False,
+        # Load default value from environment variable to ease unittest
+        'check_latest_version': os.environ.get('MINARCA_CHECK_LATEST_VERSION', 'True') in [True, 'true', 'True', '1']
     }
 
     def __init__(self, filename):
@@ -130,12 +132,12 @@ class Settings(dict):
                 self['schedule'] = int(self['schedule'])
             except (ValueError, KeyError):
                 self['schedule'] = self._DEFAULT.get('schedule')
-            # configured is boolean
-            try:
-                self['configured'] = self['configured'] in [
-                    'true', 'True', '1']
-            except KeyError:
-                self['configured'] = self._DEFAULT.get('configured')
+            # boolean fields
+            for key in ['configured', 'check_latest_version']:
+                try:
+                    self[key] = self[key] in [True, 'true', 'True', '1']
+                except KeyError:
+                    self[key] = self._DEFAULT.get(key)
 
 
 class InvalidPatternError(Exception):

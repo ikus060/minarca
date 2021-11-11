@@ -133,11 +133,6 @@ class Context(collections.abc.MutableMapping):
         'Make a child context, inheriting enable_nonlocal unless specified'
         return self.__class__(kwargs, parent=self)
 
-    @property
-    def root(self):
-        'Return root context (highest level ancestor)'
-        return self if self._parent is None else self._parent.root
-
     def __getattr__(self, key):
         return self[key]
 
@@ -295,14 +290,10 @@ def _configure_image(widget, image_path):
         widget.after_cancel(widget.event_id)
 
 
-def _configure_selected(widget, value):
-    widget.state(['selected' if value else '!selected', '!alternate'])
-
-
 def _configure_wrap(widget, wrap):
     # Support Text wrapping
     if wrap.lower() in ['true', '1']:
-        widget.bind('<Configure>', lambda e: widget.config(wraplen=widget.winfo_width()), add='+')
+        widget.bind('<Configure>', lambda e: widget.configure(wraplen=widget.winfo_width()), add='+')
 
 
 class ToolTip(ttk.Frame):
@@ -310,12 +301,14 @@ class ToolTip(ttk.Frame):
     Tooltip widget.
     """
 
-    def __init__(self, master, text='', timeout=400, **kwargs):
+    def __init__(self, master, text='', timeout=400, width=None, **kwargs):
         assert master, 'ToolTip widget required a master widget'
         assert timeout >= 0, 'timeout should be greater or equals zero (0): %s' % timeout
+        assert width is None or width > 0, 'timeout should be greater than zero (0): %s' % width
         super().__init__(master, **kwargs)
         self.widget = master
         self.text = text
+        self.width = width
         # Initialize internal variables
         self.tipwindow = None  # tooltip window.
         self.id = None  # event id
@@ -359,7 +352,9 @@ class ToolTip(ttk.Frame):
             print('* Error performing wm_overrideredirect in showtip *', e)
         self.tipwindow.wm_geometry("+%d+%d" % (x, y))
         self.tipwindow.wm_attributes("-topmost", 1)
-        label = ttk.Label(self.tipwindow, text=self.text, justify=tkinter.LEFT, padding=5, style='tooltip.TLabel')
+        label = ttk.Label(self.tipwindow, text=self.text, justify=tkinter.LEFT, padding=5, style='tooltip.TLabel', width=self.width)
+        if self.width:
+            label.bind('<Configure>', lambda e: label.configure(wraplen=label.winfo_width()), add='+')
         label.pack()
 
     def hidetip(self):
@@ -375,11 +370,14 @@ class ToolTip(ttk.Frame):
         pass
 
     def configure(self, cnf={}, **kw):
+        # Text
         self.text = cnf.pop('text', kw.pop('text', self.text))
         # Timeout
         timeout = cnf.pop('timeout', kw.pop('timeout', self.timeout))
         assert timeout >= 0, 'timeout should be greater or equals zero (0): %s' % timeout
         self.timeout = timeout
+        # Width
+        self.width = cnf.pop('width', kw.pop('width', self.width))
         # Pass other config to widget.
         super().configure(cnf, **kw)
 
@@ -388,6 +386,8 @@ class ToolTip(ttk.Frame):
             return self.text
         elif key == 'timeout':
             return self.timeout
+        elif key == 'width':
+            return self.width
         return super().cget(key)
 
     def bind(self, *args, **kwargs):

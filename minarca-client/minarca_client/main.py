@@ -17,9 +17,10 @@ from minarca_client.core import (Backup, BackupError, NotRunningError,
                                  RunningError)
 from minarca_client.core.compat import get_log_file
 from minarca_client.core.config import Pattern, Settings
+from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
-from minarca_client.ui.setup import SetupDialog
 from minarca_client.ui.home import HomeDialog
+from minarca_client.ui.setup import SetupDialog
 
 _EXIT_BACKUP_FAIL = 1
 _EXIT_ALREADY_LINKED = 2
@@ -36,6 +37,13 @@ _ARGS_ALIAS = {
 
 def _backup(force):
     signal.signal(signal.SIGINT, signal.default_int_handler)
+    # Check version
+    try:
+        latest_check = LatestCheck()
+        if not latest_check.is_latest():
+            logging.info(_('new version %s available') % latest_check.get_latest_version())
+    except LatestCheckFailed:
+        logging.info(_('fail to check for latest version'))
     backup = Backup()
     try:
         backup.start(force)

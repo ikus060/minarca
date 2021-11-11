@@ -15,9 +15,10 @@ import sys
 
 install_requires = [
     "javaproperties",
+    "packaging",
     "psutil",
     "rdiff-backup==2.0.5",
-    "requests",
+    "requests>=2.25.1",
     "wakepy",
 ]
 

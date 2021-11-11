@@ -1,3 +1,6 @@
+# Copyright (C) 2021 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
 '''
 Created on Jun. 27, 2021
 
