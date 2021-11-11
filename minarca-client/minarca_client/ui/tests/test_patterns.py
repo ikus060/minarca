@@ -8,8 +8,6 @@ import tempfile
 import tkinter
 import unittest
 from contextlib import contextmanager
-from unittest.mock import MagicMock
-from minarca_client.core import Backup
 
 from minarca_client.core.compat import IS_LINUX
 from minarca_client.core.config import Pattern
