@@ -2,12 +2,6 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-MINARCA_USER=minarca
-MINARCA_HOME=/backups/
-MINARCA_ETC=/etc/minarca
-MINARCA_LOG=/var/log/minarca
-MINARCA_SESSION=/var/lib/minarca
-
 KEYRING_PATH=/usr/share/keyrings/minarca-keyring.gpg
 
 PUBLIC_KEY="-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -82,22 +76,7 @@ add_apt_repo() {
 
 case "$1" in
   configure)
-        if ! getent passwd "$MINARCA_USER" >/dev/null; then
-            adduser --quiet --system --home "$MINARCA_HOME" --shell /bin/bash \
-                --no-create-home --gecos 'minarca repository hosting' \
-                --group "$MINARCA_USER"
-        fi
-        # Create folder for logs & session
-        mkdir -p "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME" "$MINARCA_SESSION"
-        chown -R minarca:minarca "$MINARCA_ETC" "$MINARCA_SESSION"
-        chown -R minarca:adm "$MINARCA_LOG"
-        chmod -R 0750 "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_SESSION"
-        chown minarca:minarca "$MINARCA_HOME"
-        chmod 0750 "$MINARCA_HOME"
-        # Enable user namespace (Disable debian hardening)
-        echo 1 > /proc/sys/kernel/unprivileged_userns_clone
-        # Add APT repository
-        add_apt_repo
+    add_apt_repo
     ;;
 esac
 
