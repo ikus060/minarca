@@ -6,7 +6,20 @@ Created on Jun. 27, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+
 from minarca_client.locale import _
+
+
+def raise_exception(original_exception):
+    """
+    Create a better repsentation of the given exception from an
+    rdiff-backup exception raised during it's execution.
+    """
+    for cls in [SshConnectionError, RdiffBackupError]:
+        if cls._matches(original_exception):
+            raise cls() from original_exception
+    # Raise a generic exception
+    raise BackupError() from original_exception
 
 
 class RepositoryNameExistsError(Exception):
@@ -44,11 +57,10 @@ class RdiffBackupError(BackupError):
     """
     This exception is raised when rdiff-backup process return an error.
     """
+    message = _('backup process returned non-zero exit status, check logs for more details')
 
-    def __init__(self, return_code):
-        assert return_code
-        self.message = _(
-            'backup process returned non-zero exit status %s, check logs for more details') % return_code
+    def _matches(exception):
+        return exception and isinstance(exception, SystemExit)
 
 
 class NoPatternsError(BackupError):
@@ -121,8 +133,16 @@ class HttpServerError(BackupError):
     message = _('remote server return an error, check remote server log with your administrator')
 
 
-class SshConnectionError(BackupError):
+class SshConnectionError(RdiffBackupError):
     """
-    Raise if the ssh connection failed.
+    Raised when rdiff-backup fail to establish SSH connection with remove host.
     """
-    pass
+    message = _('connection to remote backup server failed. The problem '
+                'originate from remote server. Contact you system administrator '
+                'to verify the configuration of the SSH server and the '
+                'passwordless settings of the server.')
+
+    @staticmethod
+    def _matches(exception):
+        # When truncated error occuren it's moslty an SSH issue.
+        return exception and exception.__context__ and exception.__context__.args and exception.__context__.args == ('Truncated header string (problem probably originated remotely)',)

@@ -447,7 +447,7 @@ class Backup():
                 rdiff_backup.Main.Main(args)
         except SystemExit as e:
             logging.error('rdiff-backup exit with non-zero code')
-            raise RdiffBackupError(e)
+            raise create_exception(e)
         finally:
             os.chdir(cwd)
             if ld_path:
