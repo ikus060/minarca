@@ -20,12 +20,14 @@ Package: minarca-client
 Architecture: any
 Pre-Depends:
  dpkg (>= 1.16.1),
+ gpg,
+ lsb-release,
  python3 (>= 3.5),
  ${misc:Pre-Depends}
 Depends:
  cron,
- openssh-client,
  librsync1 | librsync2,
+ openssh-client,
  python3-distutils,
  python3-packaging,
  python3-tk,
