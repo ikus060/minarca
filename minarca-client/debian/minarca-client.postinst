@@ -2,7 +2,6 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-REPO_PATH=/etc/apt/sources.list.d/minarca.list
 KEYRING_PATH=/usr/share/keyrings/minarca-keyring.gpg
 
 PUBLIC_KEY="-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -52,10 +51,32 @@ gQE3m8lXH8dR1xPpHljQOAViq/QvCyBjviRwNZ38JxooZZxIPhvTqaMI8567l3cH
 =EPRn
 -----END PGP PUBLIC KEY BLOCK-----"
 
+PREAMBLE="## THIS FILE IS AUTOMATICALLY UPDATED ##
+# Any update to this files may get lost."
+
+add_apt_repo() {
+  APT_CONFIG="`which apt-config 2> /dev/null`"
+  eval $("$APT_CONFIG" shell APT_SOURCESDIR 'Dir::Etc::sourceparts/d')
+
+
+  NEW_VERSION=$(zcat /usr/share/doc/minarca-client/changelog.gz | dpkg-parsechangelog -l- -SVersion)
+  case $NEW_VERSION in
+  *dev*)
+    CHANNEL=dev;;
+  *rc*)
+    CHANNEL=dev;;
+  *)
+    CHANNEL=release;;
+  esac
+
+  echo "$PUBLIC_KEY" | gpg --dearmor > "$KEYRING_PATH"
+  echo "$PREAMBLE" > "$APT_SOURCESDIR/minarca.list"
+  echo "deb [signed-by=$KEYRING_PATH] https://nexus.ikus-soft.com/repository/apt-$CHANNEL-$(lsb_release -sc)/ $(lsb_release -sc) main" >> "$APT_SOURCESDIR/minarca.list"
+}
+
 case "$1" in
   configure)
-    echo "$PUBLIC_KEY" | gpg --dearmor > "$KEYRING_PATH"
-    echo "deb [signed-by=$KEYRING_PATH] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > "$REPO_PATH"
+    add_apt_repo
     ;;
 esac
 
