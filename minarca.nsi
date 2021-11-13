@@ -84,9 +84,6 @@
   !insertmacro MUI_PAGE_INSTFILES
   
   ; Finish Page
-  !define MUI_FINISHPAGE_RUN
-  !define MUI_FINISHPAGE_RUN_TEXT $(RunMinarca)
-  !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH
   
   ; Uninstall confirmation
