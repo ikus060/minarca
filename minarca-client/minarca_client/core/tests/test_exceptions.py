@@ -21,7 +21,7 @@ class TestExceptions(unittest.TestCase):
         try:
             try:
                 raise rdiff_backup.connection.ConnectionReadError('Truncated header string (problem probably originated remotely)')
-            except:
+            except Exception:
                 sys.exit(1)
         except SystemExit as e:
             # When raising it as a custom exception

@@ -21,7 +21,7 @@ import subprocess
 import tempfile
 import threading
 import unittest
-from minarca_client.core.exceptions import NotConfiguredError, HttpServerError
+from minarca_client.core.exceptions import NotConfiguredError, HttpServerError, SshConnectionError
 
 IDENTITY = """[test.minarca.net]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK/Qng4S5d75rtYxklVdIkPiz4paf2pdnCEshUoailQO root@sestican
 [test.minarca.net]:2222 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCi0uz4rVsLpVl8b6ozYzL+t1Lh9P98a0tY7KqAtzFupjtZivdIYxh6jXPeonYo7egY+mFgMX22Tlrth8woRa2M= root@sestican
@@ -382,11 +382,13 @@ class TestBackup(unittest.TestCase):
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_exit_1_cmd))
     def test_rdiff_backup_return_error(self, mock_popen, *unused):
+        # Given an invalid remote host
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
         config['repositoryname'] = 'test-repo'
         config.save()
-        # Make the call
+        # When executing rdiff-backup
+        # Then an exception is raised.
         with self.assertRaises(BackupError):
             self.backup._rdiff_backup(
                 extra_args=['--include', '/home'], source='/',)
@@ -435,7 +437,8 @@ class TestBackup(unittest.TestCase):
         thread.join()
 
         # Should exit with error code 1, because remote host cannot beresolved.
-        self.assertIsInstance(self.error.args[0], SystemExit)
+        self.assertIsInstance(self.error, SshConnectionError)
+        self.assertIsInstance(self.error.__cause__, SystemExit)
 
     def test_rdiff_backup_not_configured_remotehost(self):
         config = Settings(self.backup.config_file)
