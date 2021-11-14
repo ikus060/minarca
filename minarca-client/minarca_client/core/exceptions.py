@@ -137,10 +137,10 @@ class SshConnectionError(RdiffBackupError):
     """
     Raised when rdiff-backup fail to establish SSH connection with remove host.
     """
-    message = _('connection to remote backup server failed. The problem '
-                'originate from remote server. Contact you system administrator '
-                'to verify the configuration of the SSH server and the '
-                'passwordless settings of the server.')
+    message = _('Connection to remote backup server trough password - less SSH failed. '
+                'The problem may originate from remote server. If thje problem persist, '
+                'contact your system administrator to verify the configuration of the SSH '
+                'server and the password less settings of the server.')
 
     @staticmethod
     def _matches(exception):
