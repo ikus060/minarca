@@ -7,9 +7,7 @@ Created on Jun. 7, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 
-from datetime import timedelta
 import datetime
-from minarca_client.locale import _
 import logging
 import os
 import re
@@ -17,27 +15,30 @@ import signal
 import subprocess
 import threading
 import time
+from datetime import timedelta
 
-from psutil import NoSuchProcess
 import psutil
 import rdiff_backup.Main
-from rdiff_backup.connection import ConnectionWriteError, ConnectionReadError
 import rdiff_backup.robust
 import requests
+from minarca_client.core import compat
+from minarca_client.core.compat import (IS_WINDOWS, Scheduler, get_minarca_exe,
+                                        redirect_ouput, ssh_keygen)
+from minarca_client.core.config import Datetime, Patterns, Settings, Status
+from minarca_client.core.exceptions import (BackupError,
+                                            HttpAuthenticationError,
+                                            HttpConnectionError,
+                                            HttpInvalidUrlError,
+                                            HttpServerError, NoPatternsError,
+                                            NotConfiguredError,
+                                            NotRunningError, NotScheduleError,
+                                            RepositoryNameExistsError,
+                                            RunningError, raise_exception)
+from minarca_client.locale import _
+from psutil import NoSuchProcess
+from rdiff_backup.connection import ConnectionReadError, ConnectionWriteError
 from requests.exceptions import (ConnectionError, HTTPError, InvalidSchema,
                                  MissingSchema)
-
-from minarca_client.core import compat
-from minarca_client.core.compat import (IS_WINDOWS, Scheduler,
-                                        get_minarca_exe, ssh_keygen,
-                                        redirect_ouput)
-from minarca_client.core.config import (Datetime, Patterns, Settings, Status)
-from minarca_client.core.exceptions import (
-    BackupError, HttpAuthenticationError, HttpConnectionError,
-    HttpInvalidUrlError, NoPatternsError, NotRunningError, NotScheduleError,
-    RdiffBackupError, RepositoryNameExistsError, RunningError,
-    NotConfiguredError, HttpServerError)
-
 
 _REPOSITORY_NAME_PATTERN = "^[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*$"
 
@@ -447,7 +448,7 @@ class Backup():
                 rdiff_backup.Main.Main(args)
         except SystemExit as e:
             logging.error('rdiff-backup exit with non-zero code')
-            raise RdiffBackupError(e)
+            raise_exception(e)
         finally:
             os.chdir(cwd)
             if ld_path:
