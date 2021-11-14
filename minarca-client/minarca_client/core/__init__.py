@@ -376,6 +376,11 @@ class Backup():
                 patterns.defaults()
                 patterns.save()
 
+            # Define default status
+            status = Status(self.status_file)
+            status.clear()
+            status.save()
+
             # etc.
             self.schedule()
             config['configured'] = True
