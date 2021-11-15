@@ -90,10 +90,12 @@ test:macos:
 test:macos-shared:
   # https://docs.gitlab.com/ee/ci/runners/build_cloud/macos/environment.html
   image: macos-11-xcode-12
-  script:
-    - cd minarca-client
+  before_script:
     - python3 --version
     - pip3 install tox
+  script:
+    - cd minarca-client
+    - tox
   stage: test
   tags:
     - shared-macos-amd64
@@ -160,6 +162,23 @@ bdist:macos:
   script:
     - cd minarca-client
     - tox -e pyinstaller
+  stage: bdist
+
+bdist:macos-shared:
+  # https://docs.gitlab.com/ee/ci/runners/build_cloud/macos/environment.html
+  image: macos-11-xcode-12
+  artifacts:
+    paths:
+      - "minarca-client/dist/minarca-client_*.dmg"
+  before_script:
+    - python3 --version 
+    - pip3 install tox
+  script:
+    - cd minarca-client
+    - tox -e pyinstaller
+  needs: []
+  tags:
+    - shared-macos-amd64
   stage: bdist
 
 bdist:win32:
