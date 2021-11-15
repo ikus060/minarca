@@ -1,37 +1,38 @@
 variables:
-  MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
-               -Dorg.slf4j.simpleLogger.showDateTime=true
-               -Djava.awt.headless=true
-               -Dmaven.repo.local=.m2/repository"
+  MAVEN_OPTS:
+    "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+    -Dorg.slf4j.simpleLogger.showDateTime=true
+    -Djava.awt.headless=true
+    -Dmaven.repo.local=.m2/repository"
   MINARCA_DEV_REMOTE_URL: https://minarca-dev.ikus-soft.com
   MINARCA_DEV_USERNAME: admin
   MINARCA_DEV_PASSWORD: admin123
 
 stages:
-- test
-- bdist
-- doc
-- upload
-- deploy
-- e2e-test
+  - test
+  - bdist
+  - doc
+  - upload
+  - deploy
+  - e2e-test
 
 test:flake8:
   before_script:
-  - apt update && apt -y --no-install-recommends install $DEPENDS
-  - pip install tox
+    - apt update && apt -y --no-install-recommends install $DEPENDS
+    - pip install tox
   image: python:3
   parallel:
     matrix:
-    - TARGET: minarca-client
-      DEPENDS: cron librsync-dev python3-tk libacl1-dev
-    - TARGET: minarca-server
-      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
-      PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
-    - TARGET: minarca-quota-api
-      DEPENDS: bash
+      - TARGET: minarca-client
+        DEPENDS: cron librsync-dev python3-tk libacl1-dev
+      - TARGET: minarca-server
+        DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+        PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
+      - TARGET: minarca-quota-api
+        DEPENDS: bash
   script:
-  - cd $TARGET
-  - tox -e flake8
+    - cd $TARGET
+    - tox -e flake8
   stage: test
   variables:
     DIST: debian11
@@ -39,175 +40,186 @@ test:flake8:
 test:deb:
   artifacts:
     paths:
-    - ./*/coverage.xml
-    - ./*/xunit.xml
+      - ./*/coverage.xml
+      - ./*/xunit.xml
     expire_in: 1 day
   before_script:
-  - apt update && apt -y --no-install-recommends install $DEPENDS
-  - pip install tox
+    - apt update && apt -y --no-install-recommends install $DEPENDS
+    - pip install tox
   image: python:3-$DIST
   parallel:
     matrix:
-    - TARGET: minarca-client
-      DIST: [buster, bullseye]
-      DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
-    - TARGET: minarca-server
-      DIST: [buster, bullseye]
-      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
-    - TARGET: minarca-quota-api
-      DIST: [buster, bullseye]
-      DEPENDS: bash
+      - TARGET: minarca-client
+        DIST: [buster, bullseye]
+        DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
+      - TARGET: minarca-server
+        DIST: [buster, bullseye]
+        DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+      - TARGET: minarca-quota-api
+        DIST: [buster, bullseye]
+        DEPENDS: bash
   script:
-  - cd $TARGET
-  - tox
+    - cd $TARGET
+    - tox
   stage: test
-    
+
 test:win32:
   before_script:
-  - choco install python3 --version=3.7.9 -y -f --forcex86
-  - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;"
-  - $Env:path
-  - python.exe -VV
-  - pip.exe install tox
+    - choco install python3 --version=3.7.9 -y -f --forcex86
+    - $Env:path += ";C:\Python37\Scripts\;C:\Python37\;"
+    - $Env:path
+    - python.exe -VV
+    - pip.exe install tox
   script:
-  - cd minarca-client
-  - tox.exe
+    - cd minarca-client
+    - tox.exe
   stage: test
   tags:
-  - shared-windows
-  - windows
-  - windows-1809
+    - shared-windows
+    - windows
+    - windows-1809
 
 test:macos:
   script:
-  - cd minarca-client
-  - tox
+    - cd minarca-client
+    - tox
   stage: test
   tags:
-  - macos
+    - macos
+
+test:macos-shared:
+  # https://docs.gitlab.com/ee/ci/runners/build_cloud/macos/environment.html
+  image: macos-11-xcode-12
+  script:
+    - cd minarca-client
+    - python3 --version
+    - pip3 install tox
+  stage: test
+  tags:
+    - shared-macos-amd64
 
 bdist:deb:
   artifacts:
     paths:
-    - "*/dist/*/*_amd64.deb"
+      - "*/dist/*/*_amd64.deb"
   image: buildpack-deps:$DIST
   needs: []
   parallel:
     matrix:
-    - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy, hirsute]
-      DEPENDS: python3 cron librsync-dev libacl1-dev
-    - TARGET: minarca-server
-      DIST: [buster, bullseye, groovy]
-      DEPENDS: python3
-      PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
-      TZ: UTC
-    - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, groovy]
-      DEPENDS: python3
+      - TARGET: minarca-client
+        DIST: [buster, bullseye, groovy, hirsute]
+        DEPENDS: python3 cron librsync-dev libacl1-dev
+      - TARGET: minarca-server
+        DIST: [buster, bullseye, groovy]
+        DEPENDS: python3
+        PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
+        TZ: UTC
+      - TARGET: minarca-quota-api
+        DIST: [buster, bullseye, groovy]
+        DEPENDS: python3
   script:
-  - apt update && apt -y --no-install-recommends install devscripts $DEPENDS
-  - cd $TARGET
-  - export VERSION=$(curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
-  - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
-  - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
-  - apt build-dep -y .
-  - dpkg-buildpackage -b
-  - mkdir -p "./dist/$DIST/"
-  - mv ../*.deb "./dist/$DIST/"
+    - apt update && apt -y --no-install-recommends install devscripts $DEPENDS
+    - cd $TARGET
+    - export VERSION=$(curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
+    - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
+    - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
+    - apt build-dep -y .
+    - dpkg-buildpackage -b
+    - mkdir -p "./dist/$DIST/"
+    - mv ../*.deb "./dist/$DIST/"
   stage: bdist
   variables:
-   DH_VERBOSE: "1"
-   GIT_DEPTH: "0"
+    DH_VERBOSE: "1"
+    GIT_DEPTH: "0"
 
 # For Linux, we need to build on a oldest glibc version possible.
 # For us, this is Debian stretch. 2.24
 bdist:linux:
   artifacts:
     paths:
-    - "minarca-client/dist/minarca-client_*.tar.gz"
+      - "minarca-client/dist/minarca-client_*.tar.gz"
   before_script:
-  - apt update && apt -y --no-install-recommends install librsync-dev libacl1-dev git
-  - pip3 install tox
+    - apt update && apt -y --no-install-recommends install librsync-dev libacl1-dev git
+    - pip3 install tox
   image: python:3.9-buster
-  needs: []  
+  needs: []
   script:
-  - cd minarca-client
-  - tox -e pyinstaller
+    - cd minarca-client
+    - tox -e pyinstaller
   stage: bdist
 
 bdist:macos:
   artifacts:
     paths:
-    - "minarca-client/dist/minarca-client_*.dmg"
+      - "minarca-client/dist/minarca-client_*.dmg"
   before_script:
     - pip3 install tox
-  needs: []  
+  needs: []
   tags:
-  - macos
+    - macos
   script:
-  - cd minarca-client
-  - tox -e pyinstaller
+    - cd minarca-client
+    - tox -e pyinstaller
   stage: bdist
 
 bdist:win32:
   artifacts:
     paths:
-    - "minarca-client/dist/minarca-client_*.exe"
+      - "minarca-client/dist/minarca-client_*.exe"
   before_script:
-  # Install required dependencies for building on Windows
-  # python is used for building
-  # openssl is required to generate certificate
-  # nsis for creating installer
-  # osslsigncode to sign binaries
-  - choco install python3 --version=3.7.9 -y -f --forcex86
-  - choco install openssl -y
-  - choco install nsis -y
-  - wget.exe https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
-  - 7z x osslsigncode_2.2_windows.zip -oC:\osslsigncode
-  - $Env:path += ";C:\osslsigncode;C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
-  - $Env:path
-  # Sanity check
-  - python.exe -VV
-  - osslsigncode.exe --version
-  # Install tox
-  - pip.exe install tox
-  needs: []  
+    # Install required dependencies for building on Windows
+    # python is used for building
+    # openssl is required to generate certificate
+    # nsis for creating installer
+    # osslsigncode to sign binaries
+    - choco install python3 --version=3.7.9 -y -f --forcex86
+    - choco install openssl -y
+    - choco install nsis -y
+    - wget.exe https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
+    - 7z x osslsigncode_2.2_windows.zip -oC:\osslsigncode
+    - $Env:path += ";C:\osslsigncode;C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
+    - $Env:path
+    # Sanity check
+    - python.exe -VV
+    - osslsigncode.exe --version
+    # Install tox
+    - pip.exe install tox
+  needs: []
   script:
-  - cd minarca-client
-  - tox.exe -e pyinstaller
+    - cd minarca-client
+    - tox.exe -e pyinstaller
   stage: bdist
   tags:
-  - shared-windows
-  - windows
-  - windows-1809
+    - shared-windows
+    - windows
+    - windows-1809
 
 doc:
   artifacts:
     paths:
-    - ./minarca-client/.tox/doc/tmp
+      - ./minarca-client/.tox/doc/tmp
   before_script:
     - apt update && apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
     - pip install tox
   image: python:3
   needs: []
   script:
-  - cd minarca-client
-  - tox -e doc
+    - cd minarca-client
+    - tox -e doc
   stage: doc
 
 upload:deb:
   needs:
-  - bdist:deb
+    - bdist:deb
   parallel:
     matrix:
-    - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy, hirsute]
-    - TARGET: minarca-server
-      DIST: [buster, bullseye, groovy]
-      DEPENDS: python3
-    - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, groovy]
+      - TARGET: minarca-client
+        DIST: [buster, bullseye, groovy, hirsute]
+      - TARGET: minarca-server
+        DIST: [buster, bullseye, groovy]
+        DEPENDS: python3
+      - TARGET: minarca-quota-api
+        DIST: [buster, bullseye, groovy]
   script: |
     set -e
     set -x
@@ -236,28 +248,28 @@ upload:deb:
 upload:get-minarca:
   <<: *upload-file
   needs:
-  - bdist:linux
+    - bdist:linux
   variables:
     FILENAME: ./get-minarca.sh
 
 upload:linux:
   <<: *upload-file
   needs:
-  - bdist:linux
+    - bdist:linux
   variables:
     FILENAME: ./minarca-client/dist/minarca-client*.tar.gz
-    
+
 upload:macos:
   <<: *upload-file
   needs:
-  - bdist:macos
+    - bdist:macos
   variables:
     FILENAME: ./minarca-client/dist/minarca-client*.dmg
 
 upload:win32:
   <<: *upload-file
   needs:
-  - bdist:win32
+    - bdist:win32
   variables:
     FILENAME: ./minarca-client/dist/minarca-client*.exe
 
@@ -266,14 +278,14 @@ upload:doc:
   before_script:
     - mv ./minarca-client/.tox/doc/tmp/html doc
   needs:
-  - doc
+    - doc
   variables:
     FILENAME: doc
 
 upload:sonar:
   stage: upload
   needs:
-  - test:deb
+    - test:deb
   image: sonarsource/sonar-scanner-cli
   only:
     variables:
@@ -282,16 +294,15 @@ upload:sonar:
   variables:
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
   script:
-  - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
-
+    - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
 
 deploy:dev:
   allow_failure: True
   environment:
     name: dev
     url: https://dev.minarca.net
-  needs: 
-  - bdist:deb
+  needs:
+    - bdist:deb
   image: registry.gitlab.com/finestructure/pipeline-trigger
   script:
     - apk update && apk add git
@@ -306,13 +317,13 @@ deploy:dev:
 e2e-test:deb:
   allow_failure: True
   needs:
-  - deploy:dev
-  - bdist:deb
+    - deploy:dev
+    - bdist:deb
   image: buildpack-deps:$DIST
   parallel:
     matrix:
-    - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy, hirsute]
+      - TARGET: minarca-client
+        DIST: [buster, bullseye, groovy, hirsute]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
@@ -329,8 +340,8 @@ e2e-test:deb:
 e2e-test:linux:
   allow_failure: True
   needs:
-  - deploy:dev
-  - bdist:linux
+    - deploy:dev
+    - bdist:linux
   image: buildpack-deps:buster
   script:
     - apt update && apt install -y cron openssh-client
@@ -348,48 +359,48 @@ e2e-test:linux:
 e2e-test:macos:
   allow_failure: True
   needs:
-  - deploy:dev
-  - bdist:macos
+    - deploy:dev
+    - bdist:macos
   before_script:
-  - rm -Rf /Applications/Minarca.app
-  - rm -Rf $HOME/Library/Preferences/Minarca
+    - rm -Rf /Applications/Minarca.app
+    - rm -Rf $HOME/Library/Preferences/Minarca
   script:
-  - "[ ! -e /Volumes/Minarca ] || hdiutil detach /Volumes/Minarca"
-  - hdiutil attach minarca-client/dist/minarca-client_*.dmg 
-  - cp -r /Volumes/Minarca/Minarca.app /Applications/
-  - /Applications/Minarca.app/Contents/MacOS/minarca --version
-  - /Applications/Minarca.app/Contents/MacOS/minarcaw --version
-  - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
-  - /Applications/Minarca.app/Contents/MacOS/minarca -d include "$HOME/Documents"
-  - /Applications/Minarca.app/Contents/MacOS/minarca -d status
-  - /Applications/Minarca.app/Contents/MacOS/minarca -d backup --force
+    - "[ ! -e /Volumes/Minarca ] || hdiutil detach /Volumes/Minarca"
+    - hdiutil attach minarca-client/dist/minarca-client_*.dmg
+    - cp -r /Volumes/Minarca/Minarca.app /Applications/
+    - /Applications/Minarca.app/Contents/MacOS/minarca --version
+    - /Applications/Minarca.app/Contents/MacOS/minarcaw --version
+    - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
+    - /Applications/Minarca.app/Contents/MacOS/minarca -d include "$HOME/Documents"
+    - /Applications/Minarca.app/Contents/MacOS/minarca -d status
+    - /Applications/Minarca.app/Contents/MacOS/minarca -d backup --force
   stage: e2e-test
   tags:
-  - macos
+    - macos
   variables:
     LC_ALL: "en_US.UTF-8"
 
 e2e-test:win32:
   allow_failure: True
   needs:
-  - deploy:dev
-  - bdist:win32
+    - deploy:dev
+    - bdist:win32
   script:
-  - $file=Get-ChildItem minarca-client/dist/minarca-client_*.exe
-  - Start-Process -wait "$file" /S
-  - dir "C:\Program Files\Minarca"
-  - $Env:path += ";C:\Program Files\Minarca"
-  - $Env:path
-  - minarca.exe --version
-  - minarcaw.exe --version
-  - minarca.exe -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
-  - minarca.exe -d include /etc /var /home
-  - minarca.exe -d status
-  - minarca.exe -d backup --force
+    - $file=Get-ChildItem minarca-client/dist/minarca-client_*.exe
+    - Start-Process -wait "$file" /S
+    - dir "C:\Program Files\Minarca"
+    - $Env:path += ";C:\Program Files\Minarca"
+    - $Env:path
+    - minarca.exe --version
+    - minarcaw.exe --version
+    - minarca.exe -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
+    - minarca.exe -d include /etc /var /home
+    - minarca.exe -d status
+    - minarca.exe -d backup --force
   stage: e2e-test
   tags:
-  - shared-windows
-  - windows
-  - windows-1809
+    - shared-windows
+    - windows
+    - windows-1809
   variables:
     GIT_STRATEGY: none
