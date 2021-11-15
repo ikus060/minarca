@@ -95,7 +95,7 @@ test:macos-shared:
     - pip3 install tox
   script:
     - cd minarca-client
-    - tox
+    - python3 -m tox
   stage: test
   tags:
     - shared-macos-amd64
@@ -175,7 +175,7 @@ bdist:macos-shared:
     - pip3 install tox
   script:
     - cd minarca-client
-    - tox -e pyinstaller
+    - python3 -m tox -e pyinstaller
   needs: []
   tags:
     - shared-macos-amd64
