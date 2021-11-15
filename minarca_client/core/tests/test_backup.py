@@ -198,6 +198,11 @@ class TestBackup(unittest.TestCase):
     @mock.patch('rdiff_backup.Main.Main')
     @mock.patch("minarca_client.core.Rdiffweb")
     def test_link(self, mock_rdiffweb, mock_rdiff_backup, mock_scheduler):
+        # Define a status
+        with open(self.backup.status_file, 'w') as f:
+            f.write('lastresult=SUCCESS\n')
+        self.assertEqual('SUCCESS', self.backup.get_status('lastresult'))
+
         # Mock some https stuff
         mock_rdiffweb.return_value.get_current_user_info = mock.MagicMock(
             return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []})
@@ -216,6 +221,9 @@ class TestBackup(unittest.TestCase):
         # Check if default patterns are created
         patterns = self.backup.get_patterns()
         self.assertTrue(len(patterns) > 0)
+
+        # Check if default status is set.
+        self.assertEqual('UNKNOWN', self.backup.get_status('lastresult'))
 
     @mock.patch('minarca_client.core.Scheduler')
     @mock.patch('rdiff_backup.Main.Main')
