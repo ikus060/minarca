@@ -93,6 +93,7 @@ test:macos-shared:
   before_script:
     - python3 --version
     - pip3 install tox
+    - brew install rdiff-backup
   script:
     - cd minarca-client
     - python3 -m tox
@@ -173,6 +174,7 @@ bdist:macos-shared:
   before_script:
     - python3 --version 
     - pip3 install tox
+    - brew install rdiff-backup
   script:
     - cd minarca-client
     - python3 -m tox -e pyinstaller
