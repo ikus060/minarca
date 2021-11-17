@@ -69,7 +69,7 @@ add_apt_repo() {
 
   echo "$PUBLIC_KEY" | gpg --dearmor > "$KEYRING_PATH"
   echo "$PREAMBLE" > "$APT_SOURCESDIR/minarca.list"
-  echo "deb [signed-by=$KEYRING_PATH] https://nexus.ikus-soft.com/repository/apt-$CHANNEL-$(lsb_release -sc)/ $(lsb_release -sc) main" >> "$APT_SOURCESDIR/minarca.list"
+  echo "deb [arch=amd64 signed-by=$KEYRING_PATH] https://nexus.ikus-soft.com/repository/apt-$CHANNEL-$(lsb_release -sc)/ $(lsb_release -sc) main" >> "$APT_SOURCESDIR/minarca.list"
 }
 
 case "$1" in
