@@ -54,12 +54,12 @@ You may access the web interface at http://localhost:8080 using:
 
 On a Debian Linux server:
 
-    sudo apt-get update
-    sudo apt-get install apt-transport-https ca-certificates gnupg
-    curl -L https://www.ikus-soft.com/archive/minarca/public.key | sudo apt-key add -
-    echo "deb https://nexus.ikus-soft.com/repository/apt-release-buster/ buster main" | sudo tee /etc/apt/sources.list.d/minarca.list
-    apt-get update
-    apt-get install minarca-server
+    apt update
+    apt install apt-transport-https ca-certificates lsb-release gpg
+    curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
+    apt update
+    apt install minarca-server
 
 ## Setup Storage
 
