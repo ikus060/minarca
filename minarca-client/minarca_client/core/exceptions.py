@@ -138,7 +138,7 @@ class SshConnectionError(RdiffBackupError):
     Raised when rdiff-backup fail to establish SSH connection with remove host.
     """
     message = _('Connection to remote backup server trough password - less SSH failed. '
-                'The problem may originate from remote server. If thje problem persist, '
+                'The problem may originate from remote server. If the problem persist, '
                 'contact your system administrator to verify the configuration of the SSH '
                 'server and the password less settings of the server.')
 
