@@ -26,4 +26,4 @@ Update an existing translation:
 
 Compile catalog:
 
-    python setup.py compile_catalog --directory minarca_client/locales
+    python setup.py compile_catalog
