@@ -161,7 +161,7 @@ def _unlink():
 
 def _parse_args(args):
     parser = ArgumentParser(
-        description="Minarca manage your combuter backups by linking your computer with a centralized server and running backups on a given schedule.",
+        description=_("Minarca manage your combuter backups by linking your computer with a centralized server and running backups on a given schedule."),
         add_help=True)
     # Check if the application should default to GUI mode.
     is_ui = parser.prog in ['minarcaw', 'minarcaw.exe']
