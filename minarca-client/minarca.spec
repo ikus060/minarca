@@ -128,6 +128,12 @@ else:
 #
 if platform.system() == "Darwin":
 
+    if os.environ.get('AUTHENTICODE_CERT'):
+        # Add certificate to login keychain
+        keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
+        subprocess.check_call(
+            ['security', 'import', pfx_file, '-k', keychain, '-P', passphrase])
+
     # Create app bundle
     app = BUNDLE(
         coll,
@@ -135,25 +141,13 @@ if platform.system() == "Darwin":
         icon=macos_icon,
         bundle_identifier='com.ikus-soft.minarca',
         version=version,
+        codesign_identity=cert_cn
     )
     app_file = os.path.abspath('dist/Minarca.app')
 
     # Binary smoke test
     subprocess.check_call(
         ['dist/minarca.app/Contents/MacOS/minarca', '--version'])
-
-    # Sign Application Bundle
-    if os.environ.get('AUTHENTICODE_CERT'):
-        # Add certificate to loging keychain
-        keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
-        subprocess.check_call(
-            ['security', 'import', pfx_file, '-k', keychain, '-P', passphrase])
-        # Sign MacOS X App bundle
-        # --deep to sign subcomponents
-        # --keychain to limit keychain lookup
-        # See https://www.unix.com/man-page/osx/1/codesign/
-        subprocess.check_call(
-            ['codesign', '--deep', '--keychain', keychain, '--sign', cert_cn, app_file])
 
     # Generate dmg image
     dmg_file = os.path.abspath('dist/minarca-client_%s.dmg' % version)
@@ -167,6 +161,8 @@ if platform.system() == "Darwin":
 elif platform.system() == "Windows":
 
     def sign_exe(path):
+        if not os.path.isfile(path):
+            raise Exception('fail to sign executable: file not found: %s' % path)
         if not os.environ.get('AUTHENTICODE_CERT'):
             return
         # Sign executable.
@@ -193,6 +189,8 @@ elif platform.system() == "Windows":
             unsigned,
             '-out',
             path])
+        if not os.path.isfile(path):
+            raise Exception('fail to sign executable: output file found: %s' % path)
 
     # Sign executable
     sign_exe('dist/minarca/minarca.exe')
