@@ -17,6 +17,18 @@
             }
         },
         {
+            "name": "Python: Minarca Client CLI",
+            "type": "python",
+            "request": "launch",
+            "module": "minarca_client.main",
+            "args": ["--help"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "LANGUAGE": "fr",
+            }
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

@@ -316,8 +316,12 @@ e2e-test:deb:
   script:
     - apt update
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
+    # Smoke test
     - minarca --version
     - /opt/minarca/bin/minarcaw --version
+    # Check translation
+    - LANGUAGE="fr" minarca --help | grep 'démarrer une sauvegarde'
+    # Check backup
     - minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
     - minarca -d status
     - minarca -d include /etc /var /home
@@ -335,8 +339,14 @@ e2e-test:linux:
   script:
     - apt update && apt install -y cron openssh-client
     - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
+    # Smoke test
     - ./minarca --version
     - ./minarcaw --version
+    # Check translation
+    # Until we upgrade to pyinstaller 4.6 This is not working
+    # See https://github.com/pyinstaller/pyinstaller/issues/6065
+    #- LANGUAGE="fr" ./minarca --help | grep 'démarrer une sauvegarde'
+    # Check backup
     - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
     - ./minarca -d include /etc /var /home
     - ./minarca -d status
@@ -344,6 +354,7 @@ e2e-test:linux:
   stage: e2e-test
   variables:
     GIT_STRATEGY: none
+    LANG: "en_US.UTF-8"
 
 e2e-test:macos:
   allow_failure: True
@@ -357,8 +368,14 @@ e2e-test:macos:
   - "[ ! -e /Volumes/Minarca ] || hdiutil detach /Volumes/Minarca"
   - hdiutil attach minarca-client/dist/minarca-client_*.dmg 
   - cp -r /Volumes/Minarca/Minarca.app /Applications/
+  # Smoke test
   - /Applications/Minarca.app/Contents/MacOS/minarca --version
   - /Applications/Minarca.app/Contents/MacOS/minarcaw --version
+  # Check translation
+  - defaults write -g AppleLocale fr_CA
+  - /Applications/Minarca.app/Contents/MacOS/minarca --help | grep 'démarrer une sauvegarde'
+  - defaults write -g AppleLocale en_CA
+  # Check backup
   - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
   - /Applications/Minarca.app/Contents/MacOS/minarca -d include "$HOME/Documents"
   - /Applications/Minarca.app/Contents/MacOS/minarca -d status
@@ -375,13 +392,19 @@ e2e-test:win32:
   - deploy:dev
   - bdist:win32
   script:
+  # Install minarca
   - $file=Get-ChildItem minarca-client/dist/minarca-client_*.exe
   - Start-Process -wait "$file" /S
   - dir "C:\Program Files\Minarca"
   - $Env:path += ";C:\Program Files\Minarca"
   - $Env:path
+  # Smoke test
   - minarca.exe --version
   - minarcaw.exe --version
+  # Check translation
+  - $Env:LANGUAGE="fr"; if (!(minarca.exe --help | Select-String -quiet 'sauvegarde')){ exit 1 }
+  - $Env:LANGUAGE="en"
+  # Check backup
   - minarca.exe -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
   - minarca.exe -d include /etc /var /home
   - minarca.exe -d status
