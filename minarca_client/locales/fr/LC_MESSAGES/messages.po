@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-11-01 10:46-0400\n"
+"POT-Creation-Date: 2021-11-17 12:00-0500\n"
 "PO-Revision-Date: 2021-08-30 10:07-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -19,149 +19,159 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: minarca_client/main.py:59
+#: minarca_client/main.py:44
+#, python-format
+msgid "new version %s available"
+msgstr "nouvelle version % s disponible"
+
+#: minarca_client/main.py:46
+msgid "fail to check for latest version"
+msgstr "impossible de vérifier pour la dernière version"
+
+#: minarca_client/main.py:67
 msgid "minarca is already linked, execute `minarca unlink`"
 msgstr "minarca est déjà lié, exécutez `minarca unlink`"
 
-#: minarca_client/main.py:63
+#: minarca_client/main.py:71
 msgid "password: "
 msgstr "mot de passe : "
 
-#: minarca_client/main.py:66
+#: minarca_client/main.py:73
 msgid "a password is required"
 msgstr "un mot de passe est requis"
 
-#: minarca_client/main.py:103
+#: minarca_client/main.py:110
 msgid "backup not running"
 msgstr "la sauvegarde ne s'exécute pas"
 
-#: minarca_client/main.py:122
+#: minarca_client/main.py:129
 #, python-format
 msgid "Remote server:          %s"
 msgstr "Serveur distant :       %s"
 
-#: minarca_client/main.py:124
+#: minarca_client/main.py:131
 #, python-format
 msgid "Connectivity status:    %s"
 msgstr "État de la connectivité : %s"
 
-#: minarca_client/main.py:125
+#: minarca_client/main.py:132
 #, python-format
 msgid "Last successful backup: %s"
 msgstr "Dernière sauvegarde réussie : %s"
 
-#: minarca_client/main.py:126 minarca_client/main.py:127
-#: minarca_client/main.py:129
+#: minarca_client/main.py:133 minarca_client/main.py:134
+#: minarca_client/main.py:136
 msgid "Never"
 msgstr "Jamais"
 
-#: minarca_client/main.py:127
+#: minarca_client/main.py:134
 #, python-format
 msgid "Last backup date:       %s"
 msgstr "Date de la dernière sauvegarde : %s"
 
-#: minarca_client/main.py:128
+#: minarca_client/main.py:135
 #, python-format
 msgid "Last backup status:     %s"
 msgstr "État de la dernière sauvegarde : %s"
 
-#: minarca_client/main.py:130
+#: minarca_client/main.py:137
 #, python-format
 msgid "Details:                %s"
 msgstr "Détails:                %s"
 
-#: minarca_client/main.py:180
+#: minarca_client/main.py:187
 msgid "start a backup"
 msgstr "démarrer une sauvegarde"
 
-#: minarca_client/main.py:184
+#: minarca_client/main.py:191
 msgid "force execution of a backup even if it's not time to run"
 msgstr ""
 "forcer l'exécution d'une sauvegarde même s'il n'est pas temps de "
 "l'exécuter"
 
-#: minarca_client/main.py:190
+#: minarca_client/main.py:197
 msgid "exclude files to be backup"
 msgstr "exclure les fichiers à sauvegarder"
 
-#: minarca_client/main.py:194 minarca_client/main.py:205
+#: minarca_client/main.py:201 minarca_client/main.py:212
 msgid "file pattern to be exclude. may contains `*` or `?` wildcard"
 msgstr ""
 "modèle de fichier à exclure. peut contenir un caractère générique `*` ou "
 "`?`"
 
-#: minarca_client/main.py:201
+#: minarca_client/main.py:208
 msgid "include files to be backup"
 msgstr "inclure les fichiers à sauvegarder"
 
-#: minarca_client/main.py:212
+#: minarca_client/main.py:219
 msgid "link this minarca backup with a minarca server"
 msgstr "lier cette sauvegarde minarca avec un serveur minarca"
 
-#: minarca_client/main.py:216
+#: minarca_client/main.py:223
 msgid "URL to the remote minarca server. e.g.: http://example.com:8080/"
 msgstr "URL vers le serveur minarca distant. p.e.: http://example.com:8080/"
 
-#: minarca_client/main.py:220
+#: minarca_client/main.py:227
 msgid "user name to be used for authentication"
 msgstr "nom d'utilisateur à utiliser pour l'authentification"
 
-#: minarca_client/main.py:223
+#: minarca_client/main.py:230
 msgid "password to use for authentication. Will prompt if not provided"
 msgstr ""
 "mot de passe à utiliser pour l'authentification. Il serait demandé s'il "
 "n'est pas fourni"
 
-#: minarca_client/main.py:227
+#: minarca_client/main.py:234
 msgid "repository name to be used"
 msgstr "nom du dépôt à utiliser"
 
-#: minarca_client/main.py:231
+#: minarca_client/main.py:238
 msgid "link to remote server even if the repository name already exists"
 msgstr "lier avec le serveur distant même si le nom du référentiel existe déjà"
 
-#: minarca_client/main.py:237
+#: minarca_client/main.py:244
 msgid "list the includes / excludes patterns"
 msgstr "liste les modèles d'inclusion/exclusion"
 
-#: minarca_client/main.py:243
+#: minarca_client/main.py:250
 msgid "stop the backup"
 msgstr "arrêter la sauvegarde"
 
-#: minarca_client/main.py:247
+#: minarca_client/main.py:254
 msgid "doesn't fail if the backup is not running"
 msgstr "n'échoue pas si la sauvegarde n'est pas en cours d'exécution"
 
-#: minarca_client/main.py:253
+#: minarca_client/main.py:260
 msgid "create required schedule task in crontab or Windows Task Scheduler"
 msgstr ""
 "créer la tâche de planification requise dans crontab ou le planificateur "
 "de tâches Windows"
 
-#: minarca_client/main.py:259
+#: minarca_client/main.py:266
 msgid "schedule backup to run hourly"
 msgstr "planifier la sauvegarde pour qu'elle s'exécute toutes les heures"
 
-#: minarca_client/main.py:265
+#: minarca_client/main.py:272
 msgid "schedule backup to run daily"
 msgstr "planifier la sauvegarde pour qu'elle s'exécute quotidiennement"
 
-#: minarca_client/main.py:271
+#: minarca_client/main.py:278
 msgid "schedule backup to run weekly"
 msgstr "planifier la sauvegarde pour qu'elle s'exécute chaque semaine"
 
-#: minarca_client/main.py:277
+#: minarca_client/main.py:284
 msgid "return the current minarca status"
 msgstr "retourner l'état actuel de la minarca"
 
-#: minarca_client/main.py:283
+#: minarca_client/main.py:290
 msgid "unlink this minarca client from server"
 msgstr "dissocier ce client minarca du serveur"
 
-#: minarca_client/main.py:289
-#, fuzzy
+#: minarca_client/main.py:296
 msgid "open graphical user interface (default when calling minarcaw)"
-msgstr "ouvrir l'interface utilisateur graphique (par défaut si aucun argument)"
+msgstr ""
+"ouvrir l'interface utilisateur graphique (par défaut avec l'execution de "
+"minarcaw)"
 
 #: minarca_client/core/__init__.py:343
 #, python-format
@@ -180,7 +190,7 @@ msgstr "générer l'identité"
 msgid "exchanging identity with minarca server"
 msgstr "échange d'identité avec le serveur Minarca"
 
-#: minarca_client/core/__init__.py:438
+#: minarca_client/core/__init__.py:443
 #, python-format
 msgid "executing command: %s"
 msgstr "exécution de la commande : %s"
@@ -199,78 +209,84 @@ msgid ""
 "this task and select 'Run whether user is logged on or not' to make sure "
 "the backup is running even when nobody is using the server."
 msgstr ""
-"Maintient l'execution de votre logiciel de sauvegarde Minarca. Si cette "
-"tâche est désactivée o"
+"Maintient le fonctionnement de votre logiciel de sauvegarde Minarca. Si "
+"cette tâche est désactivée ou arrêté, votre sauvegarde Minarca cessera de"
+" fonctionner. Cette tâche est créée lors de la liaison de Minarca avec un"
+" serveur de sauvegarde central. Lors de l'installation Minarca sur un "
+"serveur Windows, il est préférable de modifier les paramètres de cette "
+"tâche et sélectionnez « Exécuter que l'utilisateur soit connecté ou non »"
+" pour vous assurer la sauvegarde s'exécute même lorsque personne "
+"n'utilise le serveur."
 
-#: minarca_client/core/config.py:183
+#: minarca_client/core/config.py:185
 msgid "User's Documents"
 msgstr "Documents de l'utilisateur"
 
-#: minarca_client/core/config.py:188
+#: minarca_client/core/config.py:190
 msgid "Thumbnails cache"
 msgstr "Cache de vignettes"
 
-#: minarca_client/core/config.py:189
+#: minarca_client/core/config.py:191
 msgid "Swap file"
 msgstr "Fichier de pagination"
 
-#: minarca_client/core/config.py:190
+#: minarca_client/core/config.py:192
 msgid "System Recovery"
 msgstr "Récupération système"
 
-#: minarca_client/core/config.py:191
+#: minarca_client/core/config.py:193
 msgid "Recycle bin"
 msgstr "Corbeille"
 
-#: minarca_client/core/config.py:192 minarca_client/core/config.py:204
+#: minarca_client/core/config.py:194 minarca_client/core/config.py:206
 msgid "Temporary Folder"
 msgstr "Dossier temporaire"
 
-#: minarca_client/core/config.py:193
+#: minarca_client/core/config.py:195
 msgid "AutoCAD backup files"
 msgstr "Fichiers de sauvegarde AutoCAD"
 
-#: minarca_client/core/config.py:194
+#: minarca_client/core/config.py:196
 msgid "Office temporary files"
 msgstr "Fichiers temporaires Office"
 
-#: minarca_client/core/config.py:201
+#: minarca_client/core/config.py:203
 msgid "dev filesystem"
 msgstr "système de fichiers /dev"
 
-#: minarca_client/core/config.py:202
+#: minarca_client/core/config.py:204
 msgid "proc filesystem"
 msgstr "système de fichiers /proc"
 
-#: minarca_client/core/config.py:203
+#: minarca_client/core/config.py:205
 msgid "sys filesystem"
 msgstr "système de fichiers /sys"
 
-#: minarca_client/core/config.py:205
+#: minarca_client/core/config.py:207
 msgid "Volatile program files"
 msgstr "Fichiers volatile /run"
 
-#: minarca_client/core/config.py:206
+#: minarca_client/core/config.py:208
 msgid "Mounted filesystems"
 msgstr "Systèmes de fichiers montés /mnt"
 
-#: minarca_client/core/config.py:207
+#: minarca_client/core/config.py:209
 msgid "External media"
 msgstr "Médias externes /media"
 
-#: minarca_client/core/config.py:208
+#: minarca_client/core/config.py:210
 msgid "Ext4 Lost and Found"
 msgstr "Ext4 perdu et trouvé"
 
-#: minarca_client/core/config.py:209
+#: minarca_client/core/config.py:211
 msgid "Hidden temporary files"
 msgstr "Fichiers temporaires cachés"
 
-#: minarca_client/core/config.py:210
+#: minarca_client/core/config.py:212
 msgid "Vim Temporary files"
 msgstr "Fichiers temporaires Vim"
 
-#: minarca_client/core/exceptions.py:36
+#: minarca_client/core/exceptions.py:52
 #, python-format
 msgid ""
 "your file specification [%s] doesn't matches any of the base directory of"
@@ -279,47 +295,44 @@ msgstr ""
 "votre spécification de fichier [%s] ne correspond à aucun des répertoires"
 " de base de votre système"
 
-#: minarca_client/core/exceptions.py:47
-#, python-format
-msgid ""
-"backup process returned non-zero exit status %s, check logs for more "
-"details"
+#: minarca_client/core/exceptions.py:60
+msgid "backup process returned non-zero exit status, check logs for more details"
 msgstr ""
-"le processus de sauvegarde a renvoyé un état de sortie non nul %s, "
-"consultez les journaux pour plus de détails"
+"le processus de sauvegarde a renvoyé un état de sortie non nul, consultez"
+" les journaux pour plus de détails"
 
-#: minarca_client/core/exceptions.py:55
+#: minarca_client/core/exceptions.py:70
 msgid "include patterns are missing"
 msgstr "les modèles à inclure sont manquants"
 
-#: minarca_client/core/exceptions.py:62
+#: minarca_client/core/exceptions.py:77
 msgid "cannot stop backup when it's not running"
 msgstr ""
 "impossible d'arrêter la sauvegarde lorsqu'elle n'est pas en cours "
 "d'exécution"
 
-#: minarca_client/core/exceptions.py:69
+#: minarca_client/core/exceptions.py:84
 msgid "cannot start backup when it's already running"
 msgstr ""
 "impossible de démarrer la sauvegarde alors qu'elle est déjà en cours "
 "d'exécution"
 
-#: minarca_client/core/exceptions.py:76
+#: minarca_client/core/exceptions.py:91
 msgid "not configured, use `minarca link` to configure remote host"
 msgstr "non configuré, utilisez `minarca link` pour configurer l'hôte distant"
 
-#: minarca_client/core/exceptions.py:83
+#: minarca_client/core/exceptions.py:98
 msgid "backup not yet scheduled to run, you may force execution using `--force`"
 msgstr ""
 "sauvegarde n'est pas encore planifiée pour s'exécuter, vous pouvez forcer"
 " l'exécution en utilisant `--force`"
 
-#: minarca_client/core/exceptions.py:93
+#: minarca_client/core/exceptions.py:108
 #, python-format
 msgid "cannot establish connection to `%s`, verify if the URL is valid"
 msgstr "impossible d'établir la connexion à `%s`, vérifiez si l'URL est valide"
 
-#: minarca_client/core/exceptions.py:103
+#: minarca_client/core/exceptions.py:118
 #, python-format
 msgid ""
 "the given URL `%s` is not properly formated, verify if the URL is valid. "
@@ -328,13 +341,13 @@ msgstr ""
 "l'URL donnée `%s` n'est pas correctement formatée, vérifiez si l'URL est "
 "valide. Il doit commencer par https:// ou http://"
 
-#: minarca_client/core/exceptions.py:111
+#: minarca_client/core/exceptions.py:126
 msgid "authentication refused, verify your username and password"
 msgstr ""
 "authentification refusée, vérifiez votre nom d'utilisateur et votre mot "
 "de passe"
 
-#: minarca_client/core/exceptions.py:118
+#: minarca_client/core/exceptions.py:133
 msgid ""
 "remote server return an error, check remote server log with your "
 "administrator"
@@ -342,11 +355,72 @@ msgstr ""
 "le serveur distant renvoie une erreur, vérifiez le journal du serveur "
 "distant avec votre administrateur"
 
-#: minarca_client/ui/connect.py:85 minarca_client/ui/connect.py:86
+#: minarca_client/core/exceptions.py:140
+msgid ""
+"Connection to remote backup server trough password - less SSH failed. The"
+" problem may originate from remote server. If the problem persist, "
+"contact your system administrator to verify the configuration of the SSH "
+"server and the password less settings of the server."
+msgstr ""
+
+#: minarca_client/core/latest.py:30
+msgid "https://www.ikus-soft.com/en/minarca/download/"
+msgstr "https://www.ikus-soft.com/fr/minarca/telecharger/"
+
+#: minarca_client/ui/patterns.py:26
+msgid "Included"
+msgstr "Inclus"
+
+#: minarca_client/ui/patterns.py:26
+msgid "Excluded"
+msgstr "Exclu"
+
+#: minarca_client/ui/patterns.py:78
+#, fuzzy
+msgid "Add Folder Pattern"
+msgstr "Ajouter modèle"
+
+#: minarca_client/ui/patterns.py:91
+#, fuzzy
+msgid "Add custom pattern"
+msgstr "Ajouter modèle"
+
+#: minarca_client/ui/patterns.py:92
+msgid ""
+"You may provide a custom pattern to include or exclude file.\n"
+"Custom pattern may include wildcard `*` or `?`."
+msgstr ""
+"Vous pouvez fournir un modèle personnalisé pour inclure ou exclure le "
+"fichier.\n"
+"Le modèle personnalisé peut inclure le caractère générique `*` ou `?`."
+
+#: minarca_client/ui/settings.py:53
+msgid "New version available"
+msgstr "Nouvelle version disponible"
+
+#: minarca_client/ui/settings.py:54
+#, python-format
+msgid ""
+"A new version of Minarca (%s) is available from IKUS Software. Do you "
+"want to upgrade your copy ?"
+msgstr ""
+"Une nouvelle version de Minarca (%s) est disponible chez IKUS Software. "
+"Voulez-vous mettre à jour votre copie ?"
+
+#: minarca_client/ui/settings.py:55
+msgid ""
+"Minarca automatically checks for new updates. You can change how Minarca "
+"checks for updates in Minarca's settings."
+msgstr ""
+"Minarca recherche automatiquement les nouvelles mises à jour. Vous pouvez"
+" modifier la façon dont Minarca vérifie les mises à jour dans les "
+"paramètres de Minarca."
+
+#: minarca_client/ui/setup.py:81 minarca_client/ui/setup.py:82
 msgid "Invalid connection information !"
 msgstr "Informations de connexion invalides !"
 
-#: minarca_client/ui/connect.py:87
+#: minarca_client/ui/setup.py:83
 #, python-format
 msgid ""
 "The information you have entered for the connection to Minarca are "
@@ -359,11 +433,11 @@ msgstr ""
 "\n"
 " %s"
 
-#: minarca_client/ui/connect.py:91 minarca_client/ui/connect.py:92
+#: minarca_client/ui/setup.py:87 minarca_client/ui/setup.py:88
 msgid "Failed to connect to remote server"
 msgstr "Échec de la connexion au serveur distant"
 
-#: minarca_client/ui/connect.py:94
+#: minarca_client/ui/setup.py:90
 #, python-format
 msgid ""
 "An error occurred during the connection to Minarca server.\n"
@@ -374,15 +448,15 @@ msgstr ""
 "\n"
 "Détails : %s"
 
-#: minarca_client/ui/connect.py:107
+#: minarca_client/ui/setup.py:103
 msgid "Repository name already exists"
 msgstr "Le nom du dépôt existe déjà"
 
-#: minarca_client/ui/connect.py:108
+#: minarca_client/ui/setup.py:104
 msgid "Do you want to replace the existing repository ?"
 msgstr "Vous souhaitez remplacer le référentiel existant ?"
 
-#: minarca_client/ui/connect.py:109
+#: minarca_client/ui/setup.py:105
 msgid ""
 "The repository name you have entered already exists on the remote server."
 " If you continue with this repository, you will replace it's content "
@@ -393,42 +467,42 @@ msgstr ""
 "Si vous continuez avec ce nom, vous remplacerez son contenu avec celui de"
 " cet ordinateur. Sinon, vous devez entrer un autre nom de dépôt."
 
-#: minarca_client/ui/home.py:82
+#: minarca_client/ui/status.py:61
 msgid "Backup is healthy"
 msgstr "Sauvegarde saine"
 
-#: minarca_client/ui/home.py:84
+#: minarca_client/ui/status.py:63
 msgid "Backup failed"
 msgstr "Échec de la sauvegarde"
 
-#: minarca_client/ui/home.py:86
+#: minarca_client/ui/status.py:65
 msgid "Backup in progress"
 msgstr "Sauvegarde en cours"
 
-#: minarca_client/ui/home.py:88
+#: minarca_client/ui/status.py:67
 msgid "Backup is stale"
 msgstr "Sauvegarde obsolète"
 
-#: minarca_client/ui/home.py:90
+#: minarca_client/ui/status.py:69
 msgid "Backup was interrupted"
 msgstr "Sauvegarde interrompue"
 
-#: minarca_client/ui/home.py:92
+#: minarca_client/ui/status.py:71
 msgid "No backup yet"
 msgstr "Pas encore de sauvegarde"
 
-#: minarca_client/ui/home.py:94
+#: minarca_client/ui/status.py:73
 msgid "Backup is not healthy"
 msgstr "Sauvegarde mal en point"
 
-#: minarca_client/ui/home.py:112
+#: minarca_client/ui/status.py:103
 #, python-format
 msgid "Complete successfully on %s. No background jobs using system resources."
 msgstr ""
 "Terminé avec succès le %s. Aucune tâche en arrière-plan utilisant les "
 "ressources système."
 
-#: minarca_client/ui/home.py:114
+#: minarca_client/ui/status.py:105
 #, python-format
 msgid ""
 "Last backup failed on %s for the following reason: %s\n"
@@ -437,13 +511,13 @@ msgstr ""
 "La dernière sauvegarde effectué le %s a échoué pour la raison suivante : "
 "%s\\"
 
-#: minarca_client/ui/home.py:116
+#: minarca_client/ui/status.py:107
 msgid "Backup is currently running in background and using system resources."
 msgstr ""
 "La sauvegarde s'exécute actuellement en arrière-plan et utilise les "
 "ressources système."
 
-#: minarca_client/ui/home.py:118
+#: minarca_client/ui/status.py:109
 #, python-format
 msgid ""
 "Was started in background on %s, but is currently stale an may use system"
@@ -452,7 +526,7 @@ msgstr ""
 "Une sauvegarde a été démarré en arrière-plan le %s, mais elle est "
 "actuellement obsolète et peut utiliser des ressources système."
 
-#: minarca_client/ui/home.py:120
+#: minarca_client/ui/status.py:111
 #, python-format
 msgid ""
 "Was interrupted on %s. May be caused by loss of connection, computer "
@@ -464,7 +538,7 @@ msgstr ""
 "manuelle.\n"
 "Aucune tâche en arrière-plan utilisant les ressources système."
 
-#: minarca_client/ui/home.py:122
+#: minarca_client/ui/status.py:113
 msgid ""
 "Initial backup need to be started. You may take time to configure your "
 "parameters and start your initial backup manually.\n"
@@ -475,23 +549,23 @@ msgstr ""
 "manuellement.\n"
 "Aucune tâche en arrière-plan utilisant les ressources système."
 
-#: minarca_client/ui/home.py:137
+#: minarca_client/ui/status.py:128
 msgid "Stop backup"
 msgstr "Arrêter la sauvegarde"
 
-#: minarca_client/ui/home.py:138
+#: minarca_client/ui/status.py:129
 msgid "Start backup"
 msgstr "Démarrer la sauvegarde"
 
-#: minarca_client/ui/home.py:146
+#: minarca_client/ui/status.py:137
 msgid "Are you sure ?"
 msgstr "Êtes-vous sûr ?"
 
-#: minarca_client/ui/home.py:147
+#: minarca_client/ui/status.py:138
 msgid "Are you sure you want to disconnect this Minarca agent ?"
 msgstr "Êtes-vous sûr de vouloir déconnecter cet agent Minarca ?"
 
-#: minarca_client/ui/home.py:148
+#: minarca_client/ui/status.py:139
 msgid ""
 "If you disconnect this computer, this Minarca agent will erase its "
 "identity and will no longer run backup on schedule."
@@ -499,11 +573,11 @@ msgstr ""
 "Si vous déconnectez cet ordinateur, cet agent Minarca effacera son "
 "identité et n'exécutera plus la sauvegarde."
 
-#: minarca_client/ui/home.py:183 minarca_client/ui/home.py:184
+#: minarca_client/ui/status.py:174 minarca_client/ui/status.py:175
 msgid "Fail to start backup !"
 msgstr "Échec du démarrage de la sauvegarde !"
 
-#: minarca_client/ui/home.py:185
+#: minarca_client/ui/status.py:176
 msgid ""
 "A fatal error occurred when trying to start the backup process. This "
 "usually indicate a problem with the installation. Try re-installing "
@@ -513,48 +587,33 @@ msgstr ""
 "processus de sauvegarde. Cela indique généralement un problème avec "
 "l'installation. Essayez de réinstaller Minarca Backup."
 
-#: minarca_client/ui/home.py:213
-msgid "Included"
-msgstr "Inclus"
-
-#: minarca_client/ui/home.py:213
-msgid "Excluded"
-msgstr "Exclu"
-
-#: minarca_client/ui/home.py:265
+#: minarca_client/ui/templates/home.html:5
 #, fuzzy
-msgid "Add Folder Pattern"
-msgstr "Ajouter modèle"
+msgid "Minarca backup"
+msgstr "Minarca Backup"
 
-#: minarca_client/ui/home.py:277
-#, fuzzy
-msgid "Add custom pattern"
-msgstr "Ajouter modèle"
+#: minarca_client/ui/templates/home.html:8
+msgid "Help"
+msgstr "Aide"
 
-#: minarca_client/ui/home.py:278
-msgid ""
-"You may provide a custom pattern to include or exclude file.\n"
-"Custom pattern may include wildcard `*` or `?`."
-msgstr "Vous pouvez fournir un modèle personnalisé pour inclure ou exclure le fichier.\n"
-"Le modèle personnalisé peut inclure le caractère générique `*` ou `?`."
-
-#: minarca_client/ui/templates/home.html:4
+#: minarca_client/ui/templates/home.html:12
 msgid "Status"
 msgstr "État"
 
-#: minarca_client/ui/templates/home.html:7
+#: minarca_client/ui/templates/home.html:15
 #: minarca_client/ui/templates/patterns.html:3
 msgid "Select files"
 msgstr "Sélection de fichiers"
 
-#: minarca_client/ui/templates/home.html:11
+#: minarca_client/ui/templates/home.html:19
 #: minarca_client/ui/templates/schedule.html:3
 msgid "Schedule"
 msgstr "Fréquence"
 
-#: minarca_client/ui/templates/home.html:16
-msgid "Support?"
-msgstr "Soutien?"
+#: minarca_client/ui/templates/home.html:23
+#: minarca_client/ui/templates/settings.html:3
+msgid "Settings"
+msgstr "Paramètres"
 
 #: minarca_client/ui/templates/patterns.html:6
 msgid "Select file and folder to include or exclude from backups."
@@ -573,10 +632,6 @@ msgstr "Ajouter dossier"
 #: minarca_client/ui/templates/patterns.html:11
 msgid "Add ..."
 msgstr "Ajouter ..."
-
-#: minarca_client/ui/templates/patterns.html:18
-msgid "🗑"
-msgstr "🗑"
 
 #: minarca_client/ui/templates/schedule.html:6
 msgid "Select how often you want your backup to be performed."
@@ -604,6 +659,34 @@ msgstr "Hebdomadaire"
 msgid "Monthly"
 msgstr "Mensuelle"
 
+#: minarca_client/ui/templates/settings.html:7
+msgid "Updates"
+msgstr ""
+
+#: minarca_client/ui/templates/settings.html:9
+msgid "Check now"
+msgstr "Vérifier maintenant"
+
+#: minarca_client/ui/templates/settings.html:11
+msgid "Check for update at startup"
+msgstr "Vérifier les mise à jour au démarrage"
+
+#: minarca_client/ui/templates/settings.html:14
+msgid "Checking for updates..."
+msgstr "Recherche de mises à jour..."
+
+#: minarca_client/ui/templates/settings.html:16
+msgid "Current version is up-to-date"
+msgstr "La version actuelle est à jour"
+
+#: minarca_client/ui/templates/settings.html:18
+msgid "Update available"
+msgstr "Mise à jour disponible"
+
+#: minarca_client/ui/templates/settings.html:20
+msgid "Cannot check for updates. Try again later."
+msgstr "Impossible de rechercher des mises à jour. Réessayez plus tard."
+
 #: minarca_client/ui/templates/setup.html:8
 msgid "Welcome to Minarca !"
 msgstr "Bienvenue à Minarca !"
@@ -619,7 +702,6 @@ msgstr ""
 "votre administrateur système."
 
 #: minarca_client/ui/templates/setup.html:16
-#, fuzzy
 msgid "Connectivity information"
 msgstr "Informations de connectivité"
 
@@ -628,9 +710,8 @@ msgid "Remote Minarca server"
 msgstr "Serveur Minarca distant"
 
 #: minarca_client/ui/templates/setup.html:20
-#, fuzzy
 msgid "e.g.: https://www.servername.com"
-msgstr "p.e.: https://www.minarca.net/"
+msgstr "p.e.: https://www.servername.com/"
 
 #: minarca_client/ui/templates/setup.html:24
 msgid "Username"
@@ -653,12 +734,10 @@ msgid "Submit"
 msgstr "Soumettre"
 
 #: minarca_client/ui/templates/setup.html:42
-#, fuzzy
 msgid "Connecting..."
 msgstr "Liaison..."
 
 #: minarca_client/ui/templates/status.html:9
-#, fuzzy
 msgid "Last Backup"
 msgstr "Dernier état"
 
@@ -669,3 +748,4 @@ msgstr "Serveur Distant"
 #: minarca_client/ui/templates/status.html:18
 msgid "Disconnect"
 msgstr "Déconnecter"
+
