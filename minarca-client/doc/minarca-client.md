@@ -28,6 +28,13 @@ On a Windows workstation, download the appropriate installer.
 
 Then launch the execution of the installer and follow the instructions.
 
+### For Windows 7 and 8
+
+With an outdated Windows 7, you may need to upgrade your system to let Minarca Backup run properly without error.
+
+If you get the error message `The procedure entry point ucrtbase.terminate could not be located in the dynamic link library api-ms-win-crt-runtime-l1-1-0.dll` when trying to start Minarca Backup,
+try installing [Update for Universal C Runtime](https://support.microsoft.com/en-us/topic/update-for-universal-c-runtime-in-windows-c0514201-7fe6-95a3-b0a5-287930f3560c) for your system.
+
 ## Installation on MacOS
 
 On a Windows workstation, download the appropriate installer.
