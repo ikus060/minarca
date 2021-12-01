@@ -80,14 +80,14 @@ class SetupDialog(tkvue.Component):
             self._event_generate_show_warning(
                 title=_('Invalid connection information !'),
                 message=_('Invalid connection information !'),
-                detail=_("The information you have entered for the connection to Minarca are invalid.\n\n%s" % str(e)))
+                detail=_("The information you have entered for the connection to Minarca are invalid.\n\n%s") % str(e))
         except Exception as e:
             logger.exception('fail to connect')
             self._event_generate_show_warning(
                 title=_('Failed to connect to remote server'),
                 message=_('Failed to connect to remote server'),
                 detail=_("An error occurred during the connection to Minarca "
-                         "server.\n\nDetails: %s" % str(e)))
+                         "server.\n\nDetails: %s") % str(e))
 
     def close(self, event=None):
         """

@@ -37,6 +37,7 @@ from minarca_client.core.exceptions import (BackupError,
 from minarca_client.locale import _
 from psutil import NoSuchProcess
 from rdiff_backup.connection import ConnectionReadError, ConnectionWriteError
+from requests.compat import urljoin
 from requests.exceptions import (ConnectionError, HTTPError, InvalidSchema,
                                  MissingSchema)
 
@@ -533,15 +534,17 @@ class Rdiffweb():
         # Create HTTP Session using authentication
         assert username
         assert password
-        self.remote_url = remote_url
         self.username = username
         self.session = requests.Session()
         self.session.auth = (username, password)
         # Check if connection is working and get redirection if needed
-        response = self.session.get(self.remote_url)
+        response = self.session.get(urljoin(remote_url + '/', "api/"))
         response.raise_for_status()
-        # Replace redirect
-        self.remote_url = response.url
+        # Replace remote_URL by using response URL to support redirection.
+        if not response.url.endswith('/api/'):
+            raise ConnectionError()
+        # Trim /api/
+        self.remote_url = response.url[0:-4]
 
     def add_ssh_key(self, title, public_key):
         response = self.session.post(
