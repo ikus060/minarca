@@ -210,7 +210,7 @@ class MinarcaUserSetup(IUserChangeListener):
                 "fail to update authorized_keys files on startup", exc_info=1)
 
     @cherrypy.expose
-    @cherrypy.config(**{'tools.authform.on': False, 'tools.i18n.on': False, 'tools.authbasic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
+    @cherrypy.config(**{'tools.auth_form.on': False, 'tools.i18n.on': False, 'tools.auth_basic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
     def get_help(self):
         raise cherrypy.HTTPRedirect(self._redirect_help)
 

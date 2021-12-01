@@ -22,8 +22,9 @@ class TestRdiffweb(unittest.TestCase):
 
     @responses.activate
     def setUp(self):
-        responses.add(responses.GET, "http://localhost/")
-        self.rdiffweb = Rdiffweb('http://localhost', 'admin', 'admin123')
+        responses.add(responses.GET, "http://localhost/", status=303, headers={'Location': '/login/?redirect=%2F'})
+        responses.add(responses.GET, "http://localhost/api/")
+        self.rdiffweb = Rdiffweb('http://localhost/', 'admin', 'admin123')
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
         os.chdir(self.tmp.name)
