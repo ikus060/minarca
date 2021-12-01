@@ -152,7 +152,7 @@ class TestBackup(unittest.TestCase):
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     def test_link_with_http_authentication_error_401(self, *unused):
         # Mock authentication fail
-        responses.add(responses.GET, "http://localhost/")
+        responses.add(responses.GET, "http://localhost/api/")
         responses.add(
             responses.GET,
             "http://localhost/api/currentuser/",
@@ -168,7 +168,7 @@ class TestBackup(unittest.TestCase):
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     def test_link_with_http_authentication_error_403(self, *unused):
         # Mock authentication fail
-        responses.add(responses.GET, "http://localhost/")
+        responses.add(responses.GET, "http://localhost/api/")
         responses.add(responses.GET,
                       "http://localhost/api/currentuser/",
                       status=403)
@@ -183,7 +183,7 @@ class TestBackup(unittest.TestCase):
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     def test_link_with_http_authentication_error_503(self, *unused):
         # Mock authentication fail
-        responses.add(responses.GET, "http://localhost/")
+        responses.add(responses.GET, "http://localhost/api/")
         responses.add(
             responses.GET,
             "http://localhost/api/currentuser/",
