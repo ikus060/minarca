@@ -69,7 +69,7 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
-## 4.1.0 (2021-12-08)
+## 4.1.0 (2022-01-05)
 
 * Server: Upgrade to Rdiffweb v2.3.9
   * Fix `Chart.js` loading on Debian bullseye rdiffweb#164
