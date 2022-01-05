@@ -201,8 +201,10 @@ upload:deb:
   - bdist:deb
   parallel:
     matrix:
+    # impish could not be push because nexus server doesn't support zstd compression yet.
+    # See https://issues.sonatype.org/browse/NEXUS-28889
     - TARGET: minarca-client
-      DIST: [buster, bullseye, hirsute, impish]
+      DIST: [buster, bullseye, hirsute]
     - TARGET: minarca-server
       DIST: [buster, bullseye]
       DEPENDS: python3
