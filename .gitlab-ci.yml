@@ -95,15 +95,15 @@ bdist:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy, hirsute]
+      DIST: [buster, bullseye, hirsute, impish]
       DEPENDS: python3 cron librsync-dev libacl1-dev
     - TARGET: minarca-server
-      DIST: [buster, bullseye, groovy]
+      DIST: [buster, bullseye]
       DEPENDS: python3
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, groovy]
+      DIST: [buster, bullseye]
       DEPENDS: python3
   script:
   - apt update && apt -y --no-install-recommends install devscripts $DEPENDS
@@ -201,13 +201,15 @@ upload:deb:
   - bdist:deb
   parallel:
     matrix:
+    # impish could not be push because nexus server doesn't support zstd compression yet.
+    # See https://issues.sonatype.org/browse/NEXUS-28889
     - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy, hirsute]
+      DIST: [buster, bullseye, hirsute]
     - TARGET: minarca-server
-      DIST: [buster, bullseye, groovy]
+      DIST: [buster, bullseye]
       DEPENDS: python3
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, groovy]
+      DIST: [buster, bullseye]
   script: |
     set -e
     set -x
@@ -312,7 +314,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, groovy, hirsute]
+      DIST: [buster, bullseye, hirsute, impish]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
