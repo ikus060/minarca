@@ -69,6 +69,28 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## 4.1.0 (2021-12-08)
+
+* Server: Upgrade to Rdiffweb v2.3.8
+  * Fix `Chart.js` loading on Debian bullseye #164
+  * Improve LDAP authentication to lookup entire directory
+  * Fix usage of `--ldap-add-user-default-userroot` to avoid error related to wrong encoding
+  * Improve authentication mechanics
+  * Avoid raising an HTTP error 500 when login form receive invalid payload
+  * Mitigate open redirect vulnerability in login form
+* Fix Windows application startup cause by stdout redirection #161
+* Upgrade OpenSSH to v8 to mitigate SSH error message #69 #65
+* Add a help button to redirect user to custom help form #145
+* Avoid printing `password:` twice during linking process with cli #162
+* Update user interface to enhance user experience #163
+* Check if a newer version is available on the startup #43
+* Adding Debian APT repository when installing from `.deb` package to automate upgrade #159
+* Avoid launching Minarca client from installers for Windows to mitigate permission issues while deleting Schedule Tasks #167
+* Improve `rdiff-backup` error handling to provide more guidance when SSH connection fail #158
+* Clear previous backup status when linking Minarca to a new server to better reflect the real status #168
+* Fix translation loading on MacOS and Windows #171
+* Upgrade pyinstaller to 4.7 to improve operating system integration #174
+
 ## v4.0.6
 
 * Make output log quiet when minarca is launch within a cronjob to avoid receiving email for successful execution
