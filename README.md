@@ -71,13 +71,20 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 ## 4.1.0 (2021-12-08)
 
-* Server: Upgrade to Rdiffweb v2.3.8
-  * Fix `Chart.js` loading on Debian bullseye #164
+* Server: Upgrade to Rdiffweb v2.3.9
+  * Fix `Chart.js` loading on Debian bullseye rdiffweb#164
   * Improve LDAP authentication to lookup entire directory
   * Fix usage of `--ldap-add-user-default-userroot` to avoid error related to wrong encoding
   * Improve authentication mechanics
   * Avoid raising an HTTP error 500 when login form receive invalid payload
   * Mitigate open redirect vulnerability in login form
+  * Improve date parsing for `backup.log` to avoid printing exception in logs #170
+  * Return HTTP error 403 for invalid symlink to avoid returning a misleading HTTP 500 Server Error #168
+  * Show a user friendly error message when trying to create a new user with an existing username #169
+  * Handle repository without last-backup date during the notification process to ensure notifications are sent #171
+  * Replace CherryPy `storage_type` by `storage_class` to avoid warning in logs
+  * Update code to avoid deprecation warning where applicable
+  * Add Flake8 validation to improve code quality
 * Fix Windows application startup cause by stdout redirection #161
 * Upgrade OpenSSH to v8 to mitigate SSH error message #69 #65
 * Add a help button to redirect user to custom help form #145
@@ -90,6 +97,7 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 * Clear previous backup status when linking Minarca to a new server to better reflect the real status #168
 * Fix translation loading on MacOS and Windows #171
 * Upgrade pyinstaller to 4.7 to improve operating system integration #174
+* Remove Ubuntu Groovy support
 
 ## v4.0.6
 
