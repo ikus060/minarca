@@ -37,7 +37,7 @@ setuptools.setup(
         "setuptools_scm>=5.0.1",
     ],
     install_requires=[
-        "rdiffweb==2.3.9a1",
+        "rdiffweb==2.3.9a2",
         "cherrypy>=16.0.0",
         "requests",
         "tzlocal~=2.0",
