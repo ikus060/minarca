@@ -49,10 +49,10 @@ test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, hirsute, impish]
+      DIST: [buster, bullseye]
       DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
     - TARGET: minarca-server
-      DIST: [buster, bullseye, hirsute, impish]
+      DIST: [buster, bullseye]
       DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye]
@@ -206,7 +206,7 @@ upload:deb:
     - TARGET: minarca-client
       DIST: [buster, bullseye, hirsute]
     - TARGET: minarca-server
-      DIST: [buster, bullseye,hirsute]
+      DIST: [buster, bullseye, hirsute]
       DEPENDS: python3
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye]
