@@ -347,9 +347,7 @@ e2e-test:linux:
     - ./minarca --version
     - ./minarcaw --version
     # Check translation
-    # Until we upgrade to pyinstaller 4.6 This is not working
-    # See https://github.com/pyinstaller/pyinstaller/issues/6065
-    #- LANGUAGE="fr" ./minarca --help | grep 'démarrer une sauvegarde'
+    - LANGUAGE=fr_CA:fr LANG=fr_CA.UTF-8 minarca --help ./minarca --help | grep 'démarrer une sauvegarde'
     # Check backup
     - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
     - ./minarca -d include /etc /var /home
