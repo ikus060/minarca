@@ -76,7 +76,10 @@ add_apt_repo() {
 
 case "$1" in
   configure)
-    add_apt_repo
+    # Add APT repository if not configured
+    if [ -e "$APT_SOURCESDIR/minarca.list" ]; then
+      add_apt_repo
+    fi
     ;;
 esac
 
