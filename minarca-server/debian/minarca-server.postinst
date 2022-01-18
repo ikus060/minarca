@@ -65,7 +65,7 @@ add_apt_repo() {
   eval $("$APT_CONFIG" shell APT_SOURCESDIR 'Dir::Etc::sourceparts/d')
 
 
-  NEW_VERSION=$(zcat /usr/share/doc/minarca-client/changelog.gz | dpkg-parsechangelog -l- -SVersion)
+  NEW_VERSION=$(zcat /usr/share/doc/minarca-server/changelog.gz | dpkg-parsechangelog -l- -SVersion)
   case $NEW_VERSION in
   *dev*)
     CHANNEL=dev;;
@@ -96,8 +96,10 @@ case "$1" in
         chmod 0750 "$MINARCA_HOME"
         # Enable user namespace (Disable debian hardening)
         echo 1 > /proc/sys/kernel/unprivileged_userns_clone
-        # Add APT repository
-        add_apt_repo
+        # Add APT repository if not configured
+        if [ -e "$APT_SOURCESDIR/minarca.list" ]; then
+          add_apt_repo
+        fi
     ;;
 esac
 
