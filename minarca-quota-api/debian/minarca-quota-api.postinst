@@ -57,7 +57,7 @@ add_apt_repo() {
   eval $("$APT_CONFIG" shell APT_SOURCESDIR 'Dir::Etc::sourceparts/d')
 
 
-  NEW_VERSION=$(zcat /usr/share/doc/minarca-client/changelog.gz | dpkg-parsechangelog -l- -SVersion)
+  NEW_VERSION=$(zcat /usr/share/doc/minarca-quota-api/changelog.gz | dpkg-parsechangelog -l- -SVersion)
   case $NEW_VERSION in
   *dev*)
     CHANNEL=dev;;
