@@ -98,7 +98,7 @@ bdist:deb:
       DIST: [buster, bullseye, hirsute, impish]
       DEPENDS: python3 cron librsync-dev libacl1-dev
     - TARGET: minarca-server
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, hirsute, impish]
       DEPENDS: python3
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
@@ -206,7 +206,7 @@ upload:deb:
     - TARGET: minarca-client
       DIST: [buster, bullseye, hirsute]
     - TARGET: minarca-server
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, hirsute]
       DEPENDS: python3
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye]
