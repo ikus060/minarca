@@ -69,6 +69,10 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## Next release
+
+* Create apt configuration file only when file doesn't exists to avoid overwriting user's config
+
 ## 4.1.0 (2022-01-05)
 
 * Server: Upgrade to Rdiffweb v2.3.9
