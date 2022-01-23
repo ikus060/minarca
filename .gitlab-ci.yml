@@ -221,6 +221,8 @@ upload:deb:
     # Minarca Server
     export FILE=$(ls -1 ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb)
     curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$FILE" "$APT_URL"
+    sleep 2
+    curl --fail ${APT_URL}/dists/buster/main/binary-amd64/Packages | grep "$(basename $FILE)"
   stage: upload
 
 .upload-file: &upload-file
