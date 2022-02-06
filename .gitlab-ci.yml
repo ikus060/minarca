@@ -341,15 +341,13 @@ e2e-test:linux:
   - bdist:linux
   image: buildpack-deps:buster
   script:
-    - apt update && apt install -y cron openssh-client
+    - apt update && apt install -y cron openssh-client locales locales-all
     - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
     # Smoke test
     - ./minarca --version
     - ./minarcaw --version
     # Check translation
-    # Until we upgrade to pyinstaller 4.6 This is not working
-    # See https://github.com/pyinstaller/pyinstaller/issues/6065
-    #- LANGUAGE="fr" ./minarca --help | grep 'démarrer une sauvegarde'
+    - LANGUAGE=fr_CA:fr LANG=fr_CA.UTF-8 ./minarca --help | grep 'démarrer une sauvegarde'
     # Check backup
     - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
     - ./minarca -d include /etc /var /home

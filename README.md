@@ -71,9 +71,13 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 ## Next release
 
+* Upgrade pyinstaller to 4.8 to improve commandline usage and fixing issues with UTF8 #175
+
+## 4.1.1 (2021-01-26)
+
 * Create apt configuration file only when file doesn't exists to avoid overwriting user's config
 
-## 4.1.0 (2022-01-05)
+## 4.1.0 (2022-01-18)
 
 * Server: Upgrade to Rdiffweb v2.3.9
   * Fix `Chart.js` loading on Debian bullseye rdiffweb#164
