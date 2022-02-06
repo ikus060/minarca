@@ -341,7 +341,7 @@ e2e-test:linux:
   - bdist:linux
   image: buildpack-deps:buster
   script:
-    - apt update && apt install -y cron openssh-client
+    - apt update && apt install -y cron openssh-client locales locales-all
     - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
     # Smoke test
     - ./minarca --version
