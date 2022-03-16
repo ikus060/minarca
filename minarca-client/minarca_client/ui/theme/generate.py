@@ -3,7 +3,7 @@
 # Use is subject to license terms.
 import os
 import tkinter
-from ttkbootstrap import Style
+from ttkbootstrap import Style, ThemeDefinition, Colors
 import subprocess
 
 IMAGES = [
@@ -89,8 +89,6 @@ def main():
     Create TTK Theme for minarca.
     """
 
-    themes_file = os.path.join(basedir, 'src', 'themes.json')
-    assert os.path.isfile(themes_file)
     theme_name = 'minarca'
 
     # Create output directory
@@ -98,16 +96,37 @@ def main():
 
     # Open our theme
     root = tkinter.Tk()
-    s = Style(theme_name, themes_file=themes_file, master=root)
+    s = Style(master=root)
+    s.register_theme(
+        ThemeDefinition(
+            name=theme_name,
+            themetype='light',
+            font='Lato -16',
+            colors=Colors(**{
+                "primary": "#1c4c72",
+                "secondary": "#d3d5d7",
+                "success": "#43ac6a",
+                "info": "#5bc0de",
+                "warning": "#E99002",
+                "danger": "#d02b27",
+                "bg": "#ffffff",
+                "fg": "#212529",
+                "selectbg": "#95a5a6",
+                "selectfg": "#ffffff",
+                "border": "#ced4da",
+                "inputfg": "#212529",
+                "inputbg": "#ecf0f1"
+            })))
+    s.theme_use(theme_name)
 
     # Export settings
     settings = s._theme_objects[theme_name].settings
     # Add few fixes.
     for i in ['primary', 'secondary', 'success', 'info', 'warning', 'danger']:
-        settings[f'H1.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-24", "bold"]}}
-        settings[f'navbar.{i}.Inverse.TLabel'] = {'configure': {'font': ["Helvetica", "-20"]}}
-        settings[f'small.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-10"]}}
-        settings[f'strong.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-14", "bold"]}}
+        settings[f'H1.{i}.TLabel'] = {'configure': {'font': ["Lato", "-24", "bold"]}}
+        settings[f'navbar.{i}.Inverse.TLabel'] = {'configure': {'Lato': ["Lato", "-20"]}}
+        settings[f'small.{i}.TLabel'] = {'configure': {'font': ["Lato", "-10"]}}
+        settings[f'strong.{i}.TLabel'] = {'configure': {'font': ["Lato", "-14", "bold"]}}
         # Fix button focus
         settings[f'{i}.TButton']['configure']['focuscolor'] = settings[f'{i}.TButton']['configure']['foreground']
 

@@ -32,146 +32,286 @@ image create photo spinner-24_04 -file [file join [file dirname [info script]] s
 image create photo spinner-24_05 -file [file join [file dirname [info script]] spinner-24_05.png]
 image create photo spinner-24_06 -file [file join [file dirname [info script]] spinner-24_06.png]
 image create photo spinner-24_07 -file [file join [file dirname [info script]] spinner-24_07.png]
-image create photo minarca_pyimage112 -file [file join [file dirname [info script]] pyimage112.png]
-image create photo minarca_pyimage48 -file [file join [file dirname [info script]] pyimage48.png]
-image create photo minarca_pyimage113 -file [file join [file dirname [info script]] pyimage113.png]
-image create photo minarca_pyimage50 -file [file join [file dirname [info script]] pyimage50.png]
-image create photo minarca_pyimage49 -file [file join [file dirname [info script]] pyimage49.png]
-image create photo minarca_pyimage114 -file [file join [file dirname [info script]] pyimage114.png]
-image create photo minarca_pyimage51 -file [file join [file dirname [info script]] pyimage51.png]
-image create photo minarca_pyimage115 -file [file join [file dirname [info script]] pyimage115.png]
-image create photo minarca_pyimage52 -file [file join [file dirname [info script]] pyimage52.png]
-image create photo minarca_pyimage116 -file [file join [file dirname [info script]] pyimage116.png]
-image create photo minarca_pyimage53 -file [file join [file dirname [info script]] pyimage53.png]
-image create photo minarca_pyimage117 -file [file join [file dirname [info script]] pyimage117.png]
-image create photo minarca_pyimage54 -file [file join [file dirname [info script]] pyimage54.png]
+image create photo minarca_pyimage183 -file [file join [file dirname [info script]] pyimage183.png]
+image create photo minarca_pyimage184 -file [file join [file dirname [info script]] pyimage184.png]
+image create photo minarca_pyimage185 -file [file join [file dirname [info script]] pyimage185.png]
+image create photo minarca_pyimage186 -file [file join [file dirname [info script]] pyimage186.png]
+image create photo minarca_pyimage187 -file [file join [file dirname [info script]] pyimage187.png]
+image create photo minarca_pyimage188 -file [file join [file dirname [info script]] pyimage188.png]
+image create photo minarca_pyimage200 -file [file join [file dirname [info script]] pyimage200.png]
+image create photo minarca_pyimage190 -file [file join [file dirname [info script]] pyimage190.png]
+image create photo minarca_pyimage189 -file [file join [file dirname [info script]] pyimage189.png]
+image create photo minarca_pyimage201 -file [file join [file dirname [info script]] pyimage201.png]
+image create photo minarca_pyimage191 -file [file join [file dirname [info script]] pyimage191.png]
+image create photo minarca_pyimage202 -file [file join [file dirname [info script]] pyimage202.png]
+image create photo minarca_pyimage192 -file [file join [file dirname [info script]] pyimage192.png]
+image create photo minarca_pyimage203 -file [file join [file dirname [info script]] pyimage203.png]
+image create photo minarca_pyimage193 -file [file join [file dirname [info script]] pyimage193.png]
+image create photo minarca_pyimage204 -file [file join [file dirname [info script]] pyimage204.png]
+image create photo minarca_pyimage194 -file [file join [file dirname [info script]] pyimage194.png]
+image create photo minarca_pyimage205 -file [file join [file dirname [info script]] pyimage205.png]
+image create photo minarca_pyimage195 -file [file join [file dirname [info script]] pyimage195.png]
+image create photo minarca_pyimage206 -file [file join [file dirname [info script]] pyimage206.png]
+image create photo minarca_pyimage196 -file [file join [file dirname [info script]] pyimage196.png]
+image create photo minarca_pyimage207 -file [file join [file dirname [info script]] pyimage207.png]
+image create photo minarca_pyimage197 -file [file join [file dirname [info script]] pyimage197.png]
+image create photo minarca_pyimage208 -file [file join [file dirname [info script]] pyimage208.png]
+image create photo minarca_pyimage198 -file [file join [file dirname [info script]] pyimage198.png]
+image create photo minarca_pyimage210 -file [file join [file dirname [info script]] pyimage210.png]
+image create photo minarca_pyimage209 -file [file join [file dirname [info script]] pyimage209.png]
+image create photo minarca_pyimage199 -file [file join [file dirname [info script]] pyimage199.png]
+image create photo minarca_pyimage211 -file [file join [file dirname [info script]] pyimage211.png]
+image create photo minarca_pyimage212 -file [file join [file dirname [info script]] pyimage212.png]
+image create photo minarca_pyimage213 -file [file join [file dirname [info script]] pyimage213.png]
+image create photo minarca_pyimage214 -file [file join [file dirname [info script]] pyimage214.png]
+image create photo minarca_pyimage215 -file [file join [file dirname [info script]] pyimage215.png]
+image create photo minarca_pyimage216 -file [file join [file dirname [info script]] pyimage216.png]
+image create photo minarca_pyimage217 -file [file join [file dirname [info script]] pyimage217.png]
+image create photo minarca_pyimage218 -file [file join [file dirname [info script]] pyimage218.png]
+image create photo minarca_pyimage220 -file [file join [file dirname [info script]] pyimage220.png]
+image create photo minarca_pyimage219 -file [file join [file dirname [info script]] pyimage219.png]
+image create photo minarca_pyimage221 -file [file join [file dirname [info script]] pyimage221.png]
+image create photo minarca_pyimage222 -file [file join [file dirname [info script]] pyimage222.png]
+image create photo minarca_pyimage223 -file [file join [file dirname [info script]] pyimage223.png]
+image create photo minarca_pyimage224 -file [file join [file dirname [info script]] pyimage224.png]
+image create photo minarca_pyimage225 -file [file join [file dirname [info script]] pyimage225.png]
+image create photo minarca_pyimage226 -file [file join [file dirname [info script]] pyimage226.png]
+image create photo minarca_pyimage227 -file [file join [file dirname [info script]] pyimage227.png]
+image create photo minarca_pyimage228 -file [file join [file dirname [info script]] pyimage228.png]
+image create photo minarca_pyimage230 -file [file join [file dirname [info script]] pyimage230.png]
+image create photo minarca_pyimage229 -file [file join [file dirname [info script]] pyimage229.png]
+image create photo minarca_pyimage231 -file [file join [file dirname [info script]] pyimage231.png]
+image create photo minarca_pyimage232 -file [file join [file dirname [info script]] pyimage232.png]
+image create photo minarca_pyimage233 -file [file join [file dirname [info script]] pyimage233.png]
+image create photo minarca_pyimage234 -file [file join [file dirname [info script]] pyimage234.png]
+image create photo minarca_pyimage235 -file [file join [file dirname [info script]] pyimage235.png]
+image create photo minarca_pyimage236 -file [file join [file dirname [info script]] pyimage236.png]
+image create photo minarca_pyimage237 -file [file join [file dirname [info script]] pyimage237.png]
+image create photo minarca_pyimage238 -file [file join [file dirname [info script]] pyimage238.png]
+image create photo minarca_pyimage240 -file [file join [file dirname [info script]] pyimage240.png]
+image create photo minarca_pyimage239 -file [file join [file dirname [info script]] pyimage239.png]
+image create photo minarca_pyimage241 -file [file join [file dirname [info script]] pyimage241.png]
+image create photo minarca_pyimage242 -file [file join [file dirname [info script]] pyimage242.png]
+image create photo minarca_pyimage243 -file [file join [file dirname [info script]] pyimage243.png]
+image create photo minarca_pyimage244 -file [file join [file dirname [info script]] pyimage244.png]
+image create photo minarca_pyimage245 -file [file join [file dirname [info script]] pyimage245.png]
+image create photo minarca_pyimage246 -file [file join [file dirname [info script]] pyimage246.png]
+image create photo minarca_pyimage247 -file [file join [file dirname [info script]] pyimage247.png]
+image create photo minarca_pyimage248 -file [file join [file dirname [info script]] pyimage248.png]
+image create photo minarca_pyimage250 -file [file join [file dirname [info script]] pyimage250.png]
+image create photo minarca_pyimage249 -file [file join [file dirname [info script]] pyimage249.png]
+image create photo minarca_pyimage251 -file [file join [file dirname [info script]] pyimage251.png]
+image create photo minarca_pyimage252 -file [file join [file dirname [info script]] pyimage252.png]
+image create photo minarca_pyimage253 -file [file join [file dirname [info script]] pyimage253.png]
+image create photo minarca_pyimage254 -file [file join [file dirname [info script]] pyimage254.png]
+image create photo minarca_pyimage255 -file [file join [file dirname [info script]] pyimage255.png]
+image create photo minarca_pyimage256 -file [file join [file dirname [info script]] pyimage256.png]
+image create photo minarca_pyimage257 -file [file join [file dirname [info script]] pyimage257.png]
+image create photo minarca_pyimage258 -file [file join [file dirname [info script]] pyimage258.png]
+image create photo minarca_pyimage260 -file [file join [file dirname [info script]] pyimage260.png]
+image create photo minarca_pyimage259 -file [file join [file dirname [info script]] pyimage259.png]
+image create photo minarca_pyimage261 -file [file join [file dirname [info script]] pyimage261.png]
+image create photo minarca_pyimage262 -file [file join [file dirname [info script]] pyimage262.png]
+image create photo minarca_pyimage263 -file [file join [file dirname [info script]] pyimage263.png]
+image create photo minarca_pyimage264 -file [file join [file dirname [info script]] pyimage264.png]
+image create photo minarca_pyimage265 -file [file join [file dirname [info script]] pyimage265.png]
+image create photo minarca_pyimage266 -file [file join [file dirname [info script]] pyimage266.png]
+image create photo minarca_pyimage267 -file [file join [file dirname [info script]] pyimage267.png]
+image create photo minarca_pyimage268 -file [file join [file dirname [info script]] pyimage268.png]
+image create photo minarca_pyimage270 -file [file join [file dirname [info script]] pyimage270.png]
+image create photo minarca_pyimage269 -file [file join [file dirname [info script]] pyimage269.png]
 image create photo minarca_pyimage1 -file [file join [file dirname [info script]] pyimage1.png]
-image create photo minarca_pyimage118 -file [file join [file dirname [info script]] pyimage118.png]
-image create photo minarca_pyimage55 -file [file join [file dirname [info script]] pyimage55.png]
+image create photo minarca_pyimage271 -file [file join [file dirname [info script]] pyimage271.png]
 image create photo minarca_pyimage2 -file [file join [file dirname [info script]] pyimage2.png]
-image create photo minarca_pyimage120 -file [file join [file dirname [info script]] pyimage120.png]
-image create photo minarca_pyimage119 -file [file join [file dirname [info script]] pyimage119.png]
-image create photo minarca_pyimage56 -file [file join [file dirname [info script]] pyimage56.png]
+image create photo minarca_pyimage272 -file [file join [file dirname [info script]] pyimage272.png]
 image create photo minarca_pyimage3 -file [file join [file dirname [info script]] pyimage3.png]
-image create photo minarca_pyimage121 -file [file join [file dirname [info script]] pyimage121.png]
-image create photo minarca_pyimage57 -file [file join [file dirname [info script]] pyimage57.png]
+image create photo minarca_pyimage273 -file [file join [file dirname [info script]] pyimage273.png]
 image create photo minarca_pyimage4 -file [file join [file dirname [info script]] pyimage4.png]
-image create photo minarca_pyimage122 -file [file join [file dirname [info script]] pyimage122.png]
-image create photo minarca_pyimage58 -file [file join [file dirname [info script]] pyimage58.png]
+image create photo minarca_pyimage274 -file [file join [file dirname [info script]] pyimage274.png]
 image create photo minarca_pyimage5 -file [file join [file dirname [info script]] pyimage5.png]
-image create photo minarca_pyimage123 -file [file join [file dirname [info script]] pyimage123.png]
-image create photo minarca_pyimage60 -file [file join [file dirname [info script]] pyimage60.png]
-image create photo minarca_pyimage59 -file [file join [file dirname [info script]] pyimage59.png]
+image create photo minarca_pyimage275 -file [file join [file dirname [info script]] pyimage275.png]
 image create photo minarca_pyimage6 -file [file join [file dirname [info script]] pyimage6.png]
-image create photo minarca_pyimage124 -file [file join [file dirname [info script]] pyimage124.png]
-image create photo minarca_pyimage61 -file [file join [file dirname [info script]] pyimage61.png]
+image create photo minarca_pyimage276 -file [file join [file dirname [info script]] pyimage276.png]
 image create photo minarca_pyimage7 -file [file join [file dirname [info script]] pyimage7.png]
-image create photo minarca_pyimage125 -file [file join [file dirname [info script]] pyimage125.png]
-image create photo minarca_pyimage62 -file [file join [file dirname [info script]] pyimage62.png]
+image create photo minarca_pyimage277 -file [file join [file dirname [info script]] pyimage277.png]
 image create photo minarca_pyimage8 -file [file join [file dirname [info script]] pyimage8.png]
-image create photo minarca_pyimage126 -file [file join [file dirname [info script]] pyimage126.png]
-image create photo minarca_pyimage63 -file [file join [file dirname [info script]] pyimage63.png]
+image create photo minarca_pyimage278 -file [file join [file dirname [info script]] pyimage278.png]
 image create photo minarca_pyimage9 -file [file join [file dirname [info script]] pyimage9.png]
-image create photo minarca_pyimage127 -file [file join [file dirname [info script]] pyimage127.png]
-image create photo minarca_pyimage64 -file [file join [file dirname [info script]] pyimage64.png]
-image create photo minarca_pyimage128 -file [file join [file dirname [info script]] pyimage128.png]
-image create photo minarca_pyimage65 -file [file join [file dirname [info script]] pyimage65.png]
-image create photo minarca_pyimage130 -file [file join [file dirname [info script]] pyimage130.png]
-image create photo minarca_pyimage129 -file [file join [file dirname [info script]] pyimage129.png]
-image create photo minarca_pyimage66 -file [file join [file dirname [info script]] pyimage66.png]
-image create photo minarca_pyimage131 -file [file join [file dirname [info script]] pyimage131.png]
-image create photo minarca_pyimage67 -file [file join [file dirname [info script]] pyimage67.png]
-image create photo minarca_pyimage132 -file [file join [file dirname [info script]] pyimage132.png]
-image create photo minarca_pyimage68 -file [file join [file dirname [info script]] pyimage68.png]
-image create photo minarca_pyimage133 -file [file join [file dirname [info script]] pyimage133.png]
-image create photo minarca_pyimage70 -file [file join [file dirname [info script]] pyimage70.png]
-image create photo minarca_pyimage69 -file [file join [file dirname [info script]] pyimage69.png]
-image create photo minarca_pyimage134 -file [file join [file dirname [info script]] pyimage134.png]
-image create photo minarca_pyimage71 -file [file join [file dirname [info script]] pyimage71.png]
-image create photo minarca_pyimage135 -file [file join [file dirname [info script]] pyimage135.png]
-image create photo minarca_pyimage72 -file [file join [file dirname [info script]] pyimage72.png]
-image create photo minarca_pyimage136 -file [file join [file dirname [info script]] pyimage136.png]
-image create photo minarca_pyimage73 -file [file join [file dirname [info script]] pyimage73.png]
-image create photo minarca_pyimage137 -file [file join [file dirname [info script]] pyimage137.png]
-image create photo minarca_pyimage74 -file [file join [file dirname [info script]] pyimage74.png]
-image create photo minarca_pyimage138 -file [file join [file dirname [info script]] pyimage138.png]
-image create photo minarca_pyimage75 -file [file join [file dirname [info script]] pyimage75.png]
-image create photo minarca_pyimage140 -file [file join [file dirname [info script]] pyimage140.png]
-image create photo minarca_pyimage139 -file [file join [file dirname [info script]] pyimage139.png]
-image create photo minarca_pyimage76 -file [file join [file dirname [info script]] pyimage76.png]
-image create photo minarca_pyimage77 -file [file join [file dirname [info script]] pyimage77.png]
-image create photo minarca_pyimage78 -file [file join [file dirname [info script]] pyimage78.png]
-image create photo minarca_pyimage80 -file [file join [file dirname [info script]] pyimage80.png]
-image create photo minarca_pyimage79 -file [file join [file dirname [info script]] pyimage79.png]
-image create photo minarca_pyimage81 -file [file join [file dirname [info script]] pyimage81.png]
+image create photo minarca_pyimage280 -file [file join [file dirname [info script]] pyimage280.png]
+image create photo minarca_pyimage279 -file [file join [file dirname [info script]] pyimage279.png]
 image create photo minarca_pyimage10 -file [file join [file dirname [info script]] pyimage10.png]
-image create photo minarca_pyimage82 -file [file join [file dirname [info script]] pyimage82.png]
 image create photo minarca_pyimage11 -file [file join [file dirname [info script]] pyimage11.png]
-image create photo minarca_pyimage83 -file [file join [file dirname [info script]] pyimage83.png]
 image create photo minarca_pyimage12 -file [file join [file dirname [info script]] pyimage12.png]
-image create photo minarca_pyimage84 -file [file join [file dirname [info script]] pyimage84.png]
 image create photo minarca_pyimage13 -file [file join [file dirname [info script]] pyimage13.png]
-image create photo minarca_pyimage85 -file [file join [file dirname [info script]] pyimage85.png]
 image create photo minarca_pyimage14 -file [file join [file dirname [info script]] pyimage14.png]
-image create photo minarca_pyimage86 -file [file join [file dirname [info script]] pyimage86.png]
 image create photo minarca_pyimage15 -file [file join [file dirname [info script]] pyimage15.png]
-image create photo minarca_pyimage87 -file [file join [file dirname [info script]] pyimage87.png]
 image create photo minarca_pyimage16 -file [file join [file dirname [info script]] pyimage16.png]
-image create photo minarca_pyimage88 -file [file join [file dirname [info script]] pyimage88.png]
 image create photo minarca_pyimage17 -file [file join [file dirname [info script]] pyimage17.png]
-image create photo minarca_pyimage90 -file [file join [file dirname [info script]] pyimage90.png]
-image create photo minarca_pyimage89 -file [file join [file dirname [info script]] pyimage89.png]
 image create photo minarca_pyimage18 -file [file join [file dirname [info script]] pyimage18.png]
-image create photo minarca_pyimage91 -file [file join [file dirname [info script]] pyimage91.png]
-image create photo minarca_pyimage19 -file [file join [file dirname [info script]] pyimage19.png]
 image create photo minarca_pyimage20 -file [file join [file dirname [info script]] pyimage20.png]
-image create photo minarca_pyimage92 -file [file join [file dirname [info script]] pyimage92.png]
+image create photo minarca_pyimage19 -file [file join [file dirname [info script]] pyimage19.png]
 image create photo minarca_pyimage21 -file [file join [file dirname [info script]] pyimage21.png]
-image create photo minarca_pyimage93 -file [file join [file dirname [info script]] pyimage93.png]
 image create photo minarca_pyimage22 -file [file join [file dirname [info script]] pyimage22.png]
-image create photo minarca_pyimage94 -file [file join [file dirname [info script]] pyimage94.png]
 image create photo minarca_pyimage23 -file [file join [file dirname [info script]] pyimage23.png]
-image create photo minarca_pyimage95 -file [file join [file dirname [info script]] pyimage95.png]
 image create photo minarca_pyimage24 -file [file join [file dirname [info script]] pyimage24.png]
-image create photo minarca_pyimage96 -file [file join [file dirname [info script]] pyimage96.png]
 image create photo minarca_pyimage25 -file [file join [file dirname [info script]] pyimage25.png]
-image create photo minarca_pyimage97 -file [file join [file dirname [info script]] pyimage97.png]
 image create photo minarca_pyimage26 -file [file join [file dirname [info script]] pyimage26.png]
-image create photo minarca_pyimage98 -file [file join [file dirname [info script]] pyimage98.png]
 image create photo minarca_pyimage27 -file [file join [file dirname [info script]] pyimage27.png]
-image create photo minarca_pyimage99 -file [file join [file dirname [info script]] pyimage99.png]
 image create photo minarca_pyimage28 -file [file join [file dirname [info script]] pyimage28.png]
-image create photo minarca_pyimage29 -file [file join [file dirname [info script]] pyimage29.png]
 image create photo minarca_pyimage30 -file [file join [file dirname [info script]] pyimage30.png]
+image create photo minarca_pyimage29 -file [file join [file dirname [info script]] pyimage29.png]
 image create photo minarca_pyimage31 -file [file join [file dirname [info script]] pyimage31.png]
 image create photo minarca_pyimage32 -file [file join [file dirname [info script]] pyimage32.png]
 image create photo minarca_pyimage33 -file [file join [file dirname [info script]] pyimage33.png]
 image create photo minarca_pyimage34 -file [file join [file dirname [info script]] pyimage34.png]
 image create photo minarca_pyimage35 -file [file join [file dirname [info script]] pyimage35.png]
-image create photo minarca_pyimage100 -file [file join [file dirname [info script]] pyimage100.png]
 image create photo minarca_pyimage36 -file [file join [file dirname [info script]] pyimage36.png]
-image create photo minarca_pyimage101 -file [file join [file dirname [info script]] pyimage101.png]
+image create photo minarca_pyimage100 -file [file join [file dirname [info script]] pyimage100.png]
 image create photo minarca_pyimage37 -file [file join [file dirname [info script]] pyimage37.png]
-image create photo minarca_pyimage102 -file [file join [file dirname [info script]] pyimage102.png]
+image create photo minarca_pyimage101 -file [file join [file dirname [info script]] pyimage101.png]
 image create photo minarca_pyimage38 -file [file join [file dirname [info script]] pyimage38.png]
-image create photo minarca_pyimage103 -file [file join [file dirname [info script]] pyimage103.png]
-image create photo minarca_pyimage39 -file [file join [file dirname [info script]] pyimage39.png]
+image create photo minarca_pyimage102 -file [file join [file dirname [info script]] pyimage102.png]
 image create photo minarca_pyimage40 -file [file join [file dirname [info script]] pyimage40.png]
-image create photo minarca_pyimage104 -file [file join [file dirname [info script]] pyimage104.png]
+image create photo minarca_pyimage39 -file [file join [file dirname [info script]] pyimage39.png]
+image create photo minarca_pyimage103 -file [file join [file dirname [info script]] pyimage103.png]
 image create photo minarca_pyimage41 -file [file join [file dirname [info script]] pyimage41.png]
-image create photo minarca_pyimage105 -file [file join [file dirname [info script]] pyimage105.png]
+image create photo minarca_pyimage104 -file [file join [file dirname [info script]] pyimage104.png]
 image create photo minarca_pyimage42 -file [file join [file dirname [info script]] pyimage42.png]
-image create photo minarca_pyimage106 -file [file join [file dirname [info script]] pyimage106.png]
+image create photo minarca_pyimage105 -file [file join [file dirname [info script]] pyimage105.png]
 image create photo minarca_pyimage43 -file [file join [file dirname [info script]] pyimage43.png]
-image create photo minarca_pyimage107 -file [file join [file dirname [info script]] pyimage107.png]
+image create photo minarca_pyimage106 -file [file join [file dirname [info script]] pyimage106.png]
 image create photo minarca_pyimage44 -file [file join [file dirname [info script]] pyimage44.png]
-image create photo minarca_pyimage108 -file [file join [file dirname [info script]] pyimage108.png]
+image create photo minarca_pyimage107 -file [file join [file dirname [info script]] pyimage107.png]
 image create photo minarca_pyimage45 -file [file join [file dirname [info script]] pyimage45.png]
-image create photo minarca_pyimage110 -file [file join [file dirname [info script]] pyimage110.png]
-image create photo minarca_pyimage109 -file [file join [file dirname [info script]] pyimage109.png]
+image create photo minarca_pyimage108 -file [file join [file dirname [info script]] pyimage108.png]
 image create photo minarca_pyimage46 -file [file join [file dirname [info script]] pyimage46.png]
-image create photo minarca_pyimage111 -file [file join [file dirname [info script]] pyimage111.png]
+image create photo minarca_pyimage109 -file [file join [file dirname [info script]] pyimage109.png]
+image create photo minarca_pyimage110 -file [file join [file dirname [info script]] pyimage110.png]
 image create photo minarca_pyimage47 -file [file join [file dirname [info script]] pyimage47.png]
+image create photo minarca_pyimage111 -file [file join [file dirname [info script]] pyimage111.png]
+image create photo minarca_pyimage48 -file [file join [file dirname [info script]] pyimage48.png]
+image create photo minarca_pyimage112 -file [file join [file dirname [info script]] pyimage112.png]
+image create photo minarca_pyimage49 -file [file join [file dirname [info script]] pyimage49.png]
+image create photo minarca_pyimage50 -file [file join [file dirname [info script]] pyimage50.png]
+image create photo minarca_pyimage113 -file [file join [file dirname [info script]] pyimage113.png]
+image create photo minarca_pyimage51 -file [file join [file dirname [info script]] pyimage51.png]
+image create photo minarca_pyimage114 -file [file join [file dirname [info script]] pyimage114.png]
+image create photo minarca_pyimage52 -file [file join [file dirname [info script]] pyimage52.png]
+image create photo minarca_pyimage115 -file [file join [file dirname [info script]] pyimage115.png]
+image create photo minarca_pyimage53 -file [file join [file dirname [info script]] pyimage53.png]
+image create photo minarca_pyimage116 -file [file join [file dirname [info script]] pyimage116.png]
+image create photo minarca_pyimage54 -file [file join [file dirname [info script]] pyimage54.png]
+image create photo minarca_pyimage117 -file [file join [file dirname [info script]] pyimage117.png]
+image create photo minarca_pyimage55 -file [file join [file dirname [info script]] pyimage55.png]
+image create photo minarca_pyimage118 -file [file join [file dirname [info script]] pyimage118.png]
+image create photo minarca_pyimage56 -file [file join [file dirname [info script]] pyimage56.png]
+image create photo minarca_pyimage119 -file [file join [file dirname [info script]] pyimage119.png]
+image create photo minarca_pyimage120 -file [file join [file dirname [info script]] pyimage120.png]
+image create photo minarca_pyimage57 -file [file join [file dirname [info script]] pyimage57.png]
+image create photo minarca_pyimage121 -file [file join [file dirname [info script]] pyimage121.png]
+image create photo minarca_pyimage58 -file [file join [file dirname [info script]] pyimage58.png]
+image create photo minarca_pyimage122 -file [file join [file dirname [info script]] pyimage122.png]
+image create photo minarca_pyimage59 -file [file join [file dirname [info script]] pyimage59.png]
+image create photo minarca_pyimage60 -file [file join [file dirname [info script]] pyimage60.png]
+image create photo minarca_pyimage123 -file [file join [file dirname [info script]] pyimage123.png]
+image create photo minarca_pyimage61 -file [file join [file dirname [info script]] pyimage61.png]
+image create photo minarca_pyimage124 -file [file join [file dirname [info script]] pyimage124.png]
+image create photo minarca_pyimage62 -file [file join [file dirname [info script]] pyimage62.png]
+image create photo minarca_pyimage125 -file [file join [file dirname [info script]] pyimage125.png]
+image create photo minarca_pyimage63 -file [file join [file dirname [info script]] pyimage63.png]
+image create photo minarca_pyimage126 -file [file join [file dirname [info script]] pyimage126.png]
+image create photo minarca_pyimage64 -file [file join [file dirname [info script]] pyimage64.png]
+image create photo minarca_pyimage127 -file [file join [file dirname [info script]] pyimage127.png]
+image create photo minarca_pyimage65 -file [file join [file dirname [info script]] pyimage65.png]
+image create photo minarca_pyimage128 -file [file join [file dirname [info script]] pyimage128.png]
+image create photo minarca_pyimage66 -file [file join [file dirname [info script]] pyimage66.png]
+image create photo minarca_pyimage129 -file [file join [file dirname [info script]] pyimage129.png]
+image create photo minarca_pyimage130 -file [file join [file dirname [info script]] pyimage130.png]
+image create photo minarca_pyimage67 -file [file join [file dirname [info script]] pyimage67.png]
+image create photo minarca_pyimage131 -file [file join [file dirname [info script]] pyimage131.png]
+image create photo minarca_pyimage68 -file [file join [file dirname [info script]] pyimage68.png]
+image create photo minarca_pyimage132 -file [file join [file dirname [info script]] pyimage132.png]
+image create photo minarca_pyimage69 -file [file join [file dirname [info script]] pyimage69.png]
+image create photo minarca_pyimage70 -file [file join [file dirname [info script]] pyimage70.png]
+image create photo minarca_pyimage133 -file [file join [file dirname [info script]] pyimage133.png]
+image create photo minarca_pyimage71 -file [file join [file dirname [info script]] pyimage71.png]
+image create photo minarca_pyimage134 -file [file join [file dirname [info script]] pyimage134.png]
+image create photo minarca_pyimage72 -file [file join [file dirname [info script]] pyimage72.png]
+image create photo minarca_pyimage135 -file [file join [file dirname [info script]] pyimage135.png]
+image create photo minarca_pyimage73 -file [file join [file dirname [info script]] pyimage73.png]
+image create photo minarca_pyimage136 -file [file join [file dirname [info script]] pyimage136.png]
+image create photo minarca_pyimage74 -file [file join [file dirname [info script]] pyimage74.png]
+image create photo minarca_pyimage137 -file [file join [file dirname [info script]] pyimage137.png]
+image create photo minarca_pyimage75 -file [file join [file dirname [info script]] pyimage75.png]
+image create photo minarca_pyimage138 -file [file join [file dirname [info script]] pyimage138.png]
+image create photo minarca_pyimage76 -file [file join [file dirname [info script]] pyimage76.png]
+image create photo minarca_pyimage139 -file [file join [file dirname [info script]] pyimage139.png]
+image create photo minarca_pyimage140 -file [file join [file dirname [info script]] pyimage140.png]
+image create photo minarca_pyimage77 -file [file join [file dirname [info script]] pyimage77.png]
+image create photo minarca_pyimage141 -file [file join [file dirname [info script]] pyimage141.png]
+image create photo minarca_pyimage78 -file [file join [file dirname [info script]] pyimage78.png]
+image create photo minarca_pyimage142 -file [file join [file dirname [info script]] pyimage142.png]
+image create photo minarca_pyimage79 -file [file join [file dirname [info script]] pyimage79.png]
+image create photo minarca_pyimage80 -file [file join [file dirname [info script]] pyimage80.png]
+image create photo minarca_pyimage143 -file [file join [file dirname [info script]] pyimage143.png]
+image create photo minarca_pyimage81 -file [file join [file dirname [info script]] pyimage81.png]
+image create photo minarca_pyimage144 -file [file join [file dirname [info script]] pyimage144.png]
+image create photo minarca_pyimage82 -file [file join [file dirname [info script]] pyimage82.png]
+image create photo minarca_pyimage145 -file [file join [file dirname [info script]] pyimage145.png]
+image create photo minarca_pyimage83 -file [file join [file dirname [info script]] pyimage83.png]
+image create photo minarca_pyimage146 -file [file join [file dirname [info script]] pyimage146.png]
+image create photo minarca_pyimage84 -file [file join [file dirname [info script]] pyimage84.png]
+image create photo minarca_pyimage147 -file [file join [file dirname [info script]] pyimage147.png]
+image create photo minarca_pyimage85 -file [file join [file dirname [info script]] pyimage85.png]
+image create photo minarca_pyimage148 -file [file join [file dirname [info script]] pyimage148.png]
+image create photo minarca_pyimage86 -file [file join [file dirname [info script]] pyimage86.png]
+image create photo minarca_pyimage149 -file [file join [file dirname [info script]] pyimage149.png]
+image create photo minarca_pyimage150 -file [file join [file dirname [info script]] pyimage150.png]
+image create photo minarca_pyimage87 -file [file join [file dirname [info script]] pyimage87.png]
+image create photo minarca_pyimage151 -file [file join [file dirname [info script]] pyimage151.png]
+image create photo minarca_pyimage88 -file [file join [file dirname [info script]] pyimage88.png]
+image create photo minarca_pyimage152 -file [file join [file dirname [info script]] pyimage152.png]
+image create photo minarca_pyimage89 -file [file join [file dirname [info script]] pyimage89.png]
+image create photo minarca_pyimage90 -file [file join [file dirname [info script]] pyimage90.png]
+image create photo minarca_pyimage153 -file [file join [file dirname [info script]] pyimage153.png]
+image create photo minarca_pyimage91 -file [file join [file dirname [info script]] pyimage91.png]
+image create photo minarca_pyimage154 -file [file join [file dirname [info script]] pyimage154.png]
+image create photo minarca_pyimage92 -file [file join [file dirname [info script]] pyimage92.png]
+image create photo minarca_pyimage155 -file [file join [file dirname [info script]] pyimage155.png]
+image create photo minarca_pyimage93 -file [file join [file dirname [info script]] pyimage93.png]
+image create photo minarca_pyimage156 -file [file join [file dirname [info script]] pyimage156.png]
+image create photo minarca_pyimage94 -file [file join [file dirname [info script]] pyimage94.png]
+image create photo minarca_pyimage157 -file [file join [file dirname [info script]] pyimage157.png]
+image create photo minarca_pyimage95 -file [file join [file dirname [info script]] pyimage95.png]
+image create photo minarca_pyimage158 -file [file join [file dirname [info script]] pyimage158.png]
+image create photo minarca_pyimage96 -file [file join [file dirname [info script]] pyimage96.png]
+image create photo minarca_pyimage159 -file [file join [file dirname [info script]] pyimage159.png]
+image create photo minarca_pyimage160 -file [file join [file dirname [info script]] pyimage160.png]
+image create photo minarca_pyimage97 -file [file join [file dirname [info script]] pyimage97.png]
+image create photo minarca_pyimage161 -file [file join [file dirname [info script]] pyimage161.png]
+image create photo minarca_pyimage98 -file [file join [file dirname [info script]] pyimage98.png]
+image create photo minarca_pyimage162 -file [file join [file dirname [info script]] pyimage162.png]
+image create photo minarca_pyimage99 -file [file join [file dirname [info script]] pyimage99.png]
+image create photo minarca_pyimage163 -file [file join [file dirname [info script]] pyimage163.png]
+image create photo minarca_pyimage164 -file [file join [file dirname [info script]] pyimage164.png]
+image create photo minarca_pyimage165 -file [file join [file dirname [info script]] pyimage165.png]
+image create photo minarca_pyimage166 -file [file join [file dirname [info script]] pyimage166.png]
+image create photo minarca_pyimage167 -file [file join [file dirname [info script]] pyimage167.png]
+image create photo minarca_pyimage168 -file [file join [file dirname [info script]] pyimage168.png]
+image create photo minarca_pyimage169 -file [file join [file dirname [info script]] pyimage169.png]
+image create photo minarca_pyimage170 -file [file join [file dirname [info script]] pyimage170.png]
+image create photo minarca_pyimage171 -file [file join [file dirname [info script]] pyimage171.png]
+image create photo minarca_pyimage172 -file [file join [file dirname [info script]] pyimage172.png]
+image create photo minarca_pyimage173 -file [file join [file dirname [info script]] pyimage173.png]
+image create photo minarca_pyimage174 -file [file join [file dirname [info script]] pyimage174.png]
+image create photo minarca_pyimage175 -file [file join [file dirname [info script]] pyimage175.png]
+image create photo minarca_pyimage176 -file [file join [file dirname [info script]] pyimage176.png]
+image create photo minarca_pyimage177 -file [file join [file dirname [info script]] pyimage177.png]
+image create photo minarca_pyimage178 -file [file join [file dirname [info script]] pyimage178.png]
+image create photo minarca_pyimage179 -file [file join [file dirname [info script]] pyimage179.png]
+image create photo minarca_pyimage180 -file [file join [file dirname [info script]] pyimage180.png]
+image create photo minarca_pyimage181 -file [file join [file dirname [info script]] pyimage181.png]
+image create photo minarca_pyimage182 -file [file join [file dirname [info script]] pyimage182.png]
 ttk::style theme create minarca -parent clam -settings {ttk::style element create Labelframe.Label from {clam} 
 ttk::style element create Label.fill from {clam} 
 ttk::style element create Label.text from {clam} 
@@ -230,9 +370,9 @@ Scale.focus -expand 1 -sticky nswe -children {
   Vertical.Scale.slider -side top -sticky {}
 }
 }
-ttk::style element create Horizontal.Scale.track image {minarca_pyimage5 } 
-ttk::style element create Vertical.Scale.track image {minarca_pyimage6 } 
-ttk::style element create Scale.slider image {minarca_pyimage2 disabled minarca_pyimage1 {pressed !disabled} minarca_pyimage3 {hover !disabled} minarca_pyimage4} 
+ttk::style element create Horizontal.Scale.track image {minarca_pyimage145 } 
+ttk::style element create Vertical.Scale.track image {minarca_pyimage146 } 
+ttk::style element create Scale.slider image {minarca_pyimage142 disabled minarca_pyimage141 {pressed !disabled} minarca_pyimage143 {hover !disabled} minarca_pyimage144} 
 ttk::style layout primary.Horizontal.TScale {
 Scale.focus -expand 1 -sticky nswe -children {
   Horizontal.Scale.track -sticky we
@@ -245,7 +385,7 @@ primary.Scale.focus -expand 1 -sticky nswe -children {
   primary.Scale.slider -side top -sticky {}
 }
 }
-ttk::style element create primary.Scale.slider image {minarca_pyimage7 disabled minarca_pyimage1 pressed minarca_pyimage8 hover minarca_pyimage9} 
+ttk::style element create primary.Scale.slider image {minarca_pyimage147 disabled minarca_pyimage141 pressed minarca_pyimage148 hover minarca_pyimage149} 
 ttk::style layout secondary.Horizontal.TScale {
 Scale.focus -expand 1 -sticky nswe -children {
   Horizontal.Scale.track -sticky we
@@ -258,7 +398,7 @@ secondary.Scale.focus -expand 1 -sticky nswe -children {
   secondary.Scale.slider -side top -sticky {}
 }
 }
-ttk::style element create secondary.Scale.slider image {minarca_pyimage10 disabled minarca_pyimage1 pressed minarca_pyimage11 hover minarca_pyimage12} 
+ttk::style element create secondary.Scale.slider image {minarca_pyimage150 disabled minarca_pyimage141 pressed minarca_pyimage151 hover minarca_pyimage152} 
 ttk::style layout success.Horizontal.TScale {
 Scale.focus -expand 1 -sticky nswe -children {
   Horizontal.Scale.track -sticky we
@@ -271,7 +411,7 @@ success.Scale.focus -expand 1 -sticky nswe -children {
   success.Scale.slider -side top -sticky {}
 }
 }
-ttk::style element create success.Scale.slider image {minarca_pyimage13 disabled minarca_pyimage1 pressed minarca_pyimage14 hover minarca_pyimage15} 
+ttk::style element create success.Scale.slider image {minarca_pyimage153 disabled minarca_pyimage141 pressed minarca_pyimage154 hover minarca_pyimage155} 
 ttk::style layout info.Horizontal.TScale {
 Scale.focus -expand 1 -sticky nswe -children {
   Horizontal.Scale.track -sticky we
@@ -284,7 +424,7 @@ info.Scale.focus -expand 1 -sticky nswe -children {
   info.Scale.slider -side top -sticky {}
 }
 }
-ttk::style element create info.Scale.slider image {minarca_pyimage16 disabled minarca_pyimage1 pressed minarca_pyimage17 hover minarca_pyimage18} 
+ttk::style element create info.Scale.slider image {minarca_pyimage156 disabled minarca_pyimage141 pressed minarca_pyimage157 hover minarca_pyimage158} 
 ttk::style layout warning.Horizontal.TScale {
 Scale.focus -expand 1 -sticky nswe -children {
   Horizontal.Scale.track -sticky we
@@ -297,7 +437,7 @@ warning.Scale.focus -expand 1 -sticky nswe -children {
   warning.Scale.slider -side top -sticky {}
 }
 }
-ttk::style element create warning.Scale.slider image {minarca_pyimage19 disabled minarca_pyimage1 pressed minarca_pyimage20 hover minarca_pyimage21} 
+ttk::style element create warning.Scale.slider image {minarca_pyimage159 disabled minarca_pyimage141 pressed minarca_pyimage160 hover minarca_pyimage161} 
 ttk::style layout danger.Horizontal.TScale {
 Scale.focus -expand 1 -sticky nswe -children {
   Horizontal.Scale.track -sticky we
@@ -310,15 +450,15 @@ danger.Scale.focus -expand 1 -sticky nswe -children {
   danger.Scale.slider -side top -sticky {}
 }
 }
-ttk::style element create danger.Scale.slider image {minarca_pyimage22 disabled minarca_pyimage1 pressed minarca_pyimage23 hover minarca_pyimage24} 
+ttk::style element create danger.Scale.slider image {minarca_pyimage162 disabled minarca_pyimage141 pressed minarca_pyimage163 hover minarca_pyimage164} 
 ttk::style element create Vertical.Scrollbar.trough from {alt} 
 ttk::style element create Vertical.Scrollbar.thumb from {alt} 
-ttk::style element create Vertical.Scrollbar.uparrow image {minarca_pyimage25 } 
-ttk::style element create Vertical.Scrollbar.downarrow image {minarca_pyimage26 } 
+ttk::style element create Vertical.Scrollbar.uparrow image {minarca_pyimage165 } 
+ttk::style element create Vertical.Scrollbar.downarrow image {minarca_pyimage166 } 
 ttk::style element create Horizontal.Scrollbar.trough from {alt} 
 ttk::style element create Horizontal.Scrollbar.thumb from {alt} 
-ttk::style element create Horizontal.Scrollbar.leftarrow image {minarca_pyimage27 } 
-ttk::style element create Horizontal.Scrollbar.rightarrow image {minarca_pyimage28 } 
+ttk::style element create Horizontal.Scrollbar.leftarrow image {minarca_pyimage167 } 
+ttk::style element create Horizontal.Scrollbar.rightarrow image {minarca_pyimage168 } 
 ttk::style configure TScrollbar -troughrelief flat -relief flat -troughborderwidth 2 -troughcolor #f2f2f2 -background #d8d8d8 -width 16;
 ttk::style map TScrollbar -background {pressed #a5a5a5 active #bfbfbf};
 ttk::style element create Combobox.downarrow from {default} 
@@ -361,7 +501,7 @@ ttk::style configure success.TFrame -background #43ac6a;
 ttk::style configure info.TFrame -background #5bc0de;
 ttk::style configure warning.TFrame -background #E99002;
 ttk::style configure danger.TFrame -background #d02b27;
-ttk::style configure TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -borderwidth 1 -anchor center -padding {10 5};
+ttk::style configure TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -borderwidth 1 -anchor center -padding {10 5};
 ttk::style map TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72};
 ttk::style layout TCalendar {
 Toolbutton.border -sticky nswe -children {
@@ -389,7 +529,7 @@ ttk::style configure chevron.warning.TButton -font {helvetica 14};
 ttk::style configure danger.TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
 ttk::style map danger.TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -darkcolor {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -lightcolor {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27};
 ttk::style configure chevron.danger.TButton -font {helvetica 14};
-ttk::style element create Checkbutton.indicator image {minarca_pyimage30 disabled minarca_pyimage31 !selected minarca_pyimage29} -width 20 -border 4 -sticky w
+ttk::style element create Checkbutton.indicator image {minarca_pyimage170 disabled minarca_pyimage171 !selected minarca_pyimage169} -width 20 -border 4 -sticky w
 ttk::style configure TCheckbutton -foreground #212529 -background #ffffff -focuscolor {};
 ttk::style map TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #1c4c72};
 ttk::style layout TCheckbutton {
@@ -400,7 +540,7 @@ Checkbutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create primary.Checkbutton.indicator image {minarca_pyimage33 disabled minarca_pyimage34 !selected minarca_pyimage32} -width 20 -border 4 -sticky w
+ttk::style element create primary.Checkbutton.indicator image {minarca_pyimage173 disabled minarca_pyimage174 !selected minarca_pyimage172} -width 20 -border 4 -sticky w
 ttk::style map primary.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #163d5b};
 ttk::style layout primary.TCheckbutton {
 Checkbutton.padding -sticky nswe -children {
@@ -410,7 +550,7 @@ Checkbutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create secondary.Checkbutton.indicator image {minarca_pyimage36 disabled minarca_pyimage37 !selected minarca_pyimage35} -width 20 -border 4 -sticky w
+ttk::style element create secondary.Checkbutton.indicator image {minarca_pyimage176 disabled minarca_pyimage177 !selected minarca_pyimage175} -width 20 -border 4 -sticky w
 ttk::style map secondary.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #a9abab};
 ttk::style layout secondary.TCheckbutton {
 Checkbutton.padding -sticky nswe -children {
@@ -420,7 +560,7 @@ Checkbutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create success.Checkbutton.indicator image {minarca_pyimage39 disabled minarca_pyimage40 !selected minarca_pyimage38} -width 20 -border 4 -sticky w
+ttk::style element create success.Checkbutton.indicator image {minarca_pyimage179 disabled minarca_pyimage180 !selected minarca_pyimage178} -width 20 -border 4 -sticky w
 ttk::style map success.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #358855};
 ttk::style layout success.TCheckbutton {
 Checkbutton.padding -sticky nswe -children {
@@ -430,7 +570,7 @@ Checkbutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create info.Checkbutton.indicator image {minarca_pyimage42 disabled minarca_pyimage43 !selected minarca_pyimage41} -width 20 -border 4 -sticky w
+ttk::style element create info.Checkbutton.indicator image {minarca_pyimage182 disabled minarca_pyimage183 !selected minarca_pyimage181} -width 20 -border 4 -sticky w
 ttk::style map info.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #4999b1};
 ttk::style layout info.TCheckbutton {
 Checkbutton.padding -sticky nswe -children {
@@ -440,7 +580,7 @@ Checkbutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create warning.Checkbutton.indicator image {minarca_pyimage45 disabled minarca_pyimage46 !selected minarca_pyimage44} -width 20 -border 4 -sticky w
+ttk::style element create warning.Checkbutton.indicator image {minarca_pyimage185 disabled minarca_pyimage186 !selected minarca_pyimage184} -width 20 -border 4 -sticky w
 ttk::style map warning.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #b97202};
 ttk::style layout warning.TCheckbutton {
 Checkbutton.padding -sticky nswe -children {
@@ -450,7 +590,7 @@ Checkbutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create danger.Checkbutton.indicator image {minarca_pyimage48 disabled minarca_pyimage49 !selected minarca_pyimage47} -width 20 -border 4 -sticky w
+ttk::style element create danger.Checkbutton.indicator image {minarca_pyimage188 disabled minarca_pyimage189 !selected minarca_pyimage187} -width 20 -border 4 -sticky w
 ttk::style map danger.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #a7221e};
 ttk::style layout danger.TCheckbutton {
 Checkbutton.padding -sticky nswe -children {
@@ -505,7 +645,7 @@ ttk::style configure danger.TMeter -foreground #d02b27;
 ttk::style configure TNotebook -bordercolor #ced4da -lightcolor #ffffff -darkcolor #ffffff -borderwidth 1;
 ttk::style configure TNotebook.Tab -bordercolor #ced4da -lightcolor #ffffff -foreground #212529 -padding {10 5};
 ttk::style map TNotebook.Tab -background {!selected #ecf0f1} -lightcolor {!selected #ecf0f1} -darkcolor {!selected #ecf0f1} -bordercolor {!selected #ced4da} -foreground {!selected #212529};
-ttk::style configure Outline.TButton -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure Outline.TButton -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72};
 ttk::style configure primary.Outline.TButton -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map primary.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72};
@@ -519,7 +659,7 @@ ttk::style configure warning.Outline.TButton -foreground #E99002 -background #ff
 ttk::style map warning.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #d08002 {hover !disabled} #E99002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #d08002 {hover !disabled} #E99002} -darkcolor {{pressed !disabled} #d08002 {hover !disabled} #E99002} -lightcolor {{pressed !disabled} #d08002 {hover !disabled} #E99002};
 ttk::style configure danger.Outline.TButton -foreground #d02b27 -background #ffffff -bordercolor #d02b27 -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map danger.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bc2722 {hover !disabled} #d02b27} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bc2722 {hover !disabled} #d02b27} -darkcolor {{pressed !disabled} #bc2722 {hover !disabled} #d02b27} -lightcolor {{pressed !disabled} #bc2722 {hover !disabled} #d02b27};
-ttk::style configure Outline.TMenubutton -font {Helvetica -16} -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #1c4c72 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure Outline.TMenubutton -font {Lato -16} -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #1c4c72 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
 ttk::style configure primary.Outline.TMenubutton -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #1c4c72 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map primary.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
@@ -533,7 +673,7 @@ ttk::style configure warning.Outline.TMenubutton -foreground #E99002 -background
 ttk::style map warning.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #b97202 {hover !disabled} #d08002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -darkcolor {{pressed !disabled} #b97202 {hover !disabled} #d08002} -lightcolor {{pressed !disabled} #b97202 {hover !disabled} #d08002} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
 ttk::style configure danger.Outline.TMenubutton -foreground #d02b27 -background #ffffff -bordercolor #d02b27 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #d02b27 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map danger.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #a7221e {hover !disabled} #bc2722} -bordercolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -darkcolor {{pressed !disabled} #a7221e {hover !disabled} #bc2722} -lightcolor {{pressed !disabled} #a7221e {hover !disabled} #bc2722} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure Outline.Toolbutton -foreground #1c4c72 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
+ttk::style configure Outline.Toolbutton -foreground #1c4c72 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
 ttk::style map Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72};
 ttk::style configure primary.Outline.Toolbutton -foreground #1c4c72 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
 ttk::style map primary.Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72};
@@ -562,49 +702,49 @@ ttk::style configure warning.Horizontal.TProgressbar -background #E99002;
 ttk::style configure warning.Vertical.TProgressbar -background #E99002;
 ttk::style configure danger.Horizontal.TProgressbar -background #d02b27;
 ttk::style configure danger.Vertical.TProgressbar -background #d02b27;
-ttk::style element create Striped.Horizontal.Progressbar.pbar image {minarca_pyimage50 } -width 20 -sticky ew
+ttk::style element create Striped.Horizontal.Progressbar.pbar image {minarca_pyimage190 } -width 20 -sticky ew
 ttk::style configure Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
 ttk::style layout Striped.Horizontal.TProgressbar {
 Horizontal.Progressbar.trough -sticky nswe -children {
   Striped.Horizontal.Progressbar.pbar -side left -sticky ns
 }
 }
-ttk::style element create primary.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage51 } -width 20 -sticky ew
+ttk::style element create primary.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage191 } -width 20 -sticky ew
 ttk::style configure primary.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
 ttk::style layout primary.Striped.Horizontal.TProgressbar {
 Horizontal.Progressbar.trough -sticky nswe -children {
   primary.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
 }
 }
-ttk::style element create secondary.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage52 } -width 20 -sticky ew
+ttk::style element create secondary.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage192 } -width 20 -sticky ew
 ttk::style configure secondary.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
 ttk::style layout secondary.Striped.Horizontal.TProgressbar {
 Horizontal.Progressbar.trough -sticky nswe -children {
   secondary.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
 }
 }
-ttk::style element create success.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage53 } -width 20 -sticky ew
+ttk::style element create success.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage193 } -width 20 -sticky ew
 ttk::style configure success.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
 ttk::style layout success.Striped.Horizontal.TProgressbar {
 Horizontal.Progressbar.trough -sticky nswe -children {
   success.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
 }
 }
-ttk::style element create info.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage54 } -width 20 -sticky ew
+ttk::style element create info.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage194 } -width 20 -sticky ew
 ttk::style configure info.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
 ttk::style layout info.Striped.Horizontal.TProgressbar {
 Horizontal.Progressbar.trough -sticky nswe -children {
   info.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
 }
 }
-ttk::style element create warning.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage55 } -width 20 -sticky ew
+ttk::style element create warning.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage195 } -width 20 -sticky ew
 ttk::style configure warning.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
 ttk::style layout warning.Striped.Horizontal.TProgressbar {
 Horizontal.Progressbar.trough -sticky nswe -children {
   warning.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
 }
 }
-ttk::style element create danger.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage56 } -width 20 -sticky ew
+ttk::style element create danger.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage196 } -width 20 -sticky ew
 ttk::style configure danger.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
 ttk::style layout danger.Striped.Horizontal.TProgressbar {
 Horizontal.Progressbar.trough -sticky nswe -children {
@@ -639,8 +779,8 @@ ttk::style configure warning.Horizontal.TFloodgauge -thickness 50 -borderwidth 1
 ttk::style configure warning.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #E99002 -lightcolor #E99002 -pbarrelief flat -troughcolor #f2b14a -background #E99002 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
 ttk::style configure danger.Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #d02b27 -lightcolor #d02b27 -pbarrelief flat -troughcolor #f26b67 -background #d02b27 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
 ttk::style configure danger.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #d02b27 -lightcolor #d02b27 -pbarrelief flat -troughcolor #f26b67 -background #d02b27 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style element create Radiobutton.indicator image {minarca_pyimage58 disabled minarca_pyimage59 !selected minarca_pyimage57} -width 20 -border 4 -sticky w
-ttk::style configure TRadiobutton -font {Helvetica -16};
+ttk::style element create Radiobutton.indicator image {minarca_pyimage198 disabled minarca_pyimage199 !selected minarca_pyimage197} -width 20 -border 4 -sticky w
+ttk::style configure TRadiobutton -font {Lato -16};
 ttk::style map TRadiobutton -foreground {disabled #bdbfc1 active #1c4c72} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #1c4c72};
 ttk::style layout TRadiobutton {
 Radiobutton.padding -sticky nswe -children {
@@ -650,8 +790,8 @@ Radiobutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create primary.Radiobutton.indicator image {minarca_pyimage61 disabled minarca_pyimage62 !selected minarca_pyimage60} -width 20 -border 4 -sticky w
-ttk::style configure primary.TRadiobutton -font {Helvetica -16};
+ttk::style element create primary.Radiobutton.indicator image {minarca_pyimage201 disabled minarca_pyimage202 !selected minarca_pyimage200} -width 20 -border 4 -sticky w
+ttk::style configure primary.TRadiobutton -font {Lato -16};
 ttk::style map primary.TRadiobutton -foreground {disabled #bdbfc1 active #163d5b} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #163d5b};
 ttk::style layout primary.TRadiobutton {
 Radiobutton.padding -sticky nswe -children {
@@ -661,8 +801,8 @@ Radiobutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create secondary.Radiobutton.indicator image {minarca_pyimage64 disabled minarca_pyimage65 !selected minarca_pyimage63} -width 20 -border 4 -sticky w
-ttk::style configure secondary.TRadiobutton -font {Helvetica -16};
+ttk::style element create secondary.Radiobutton.indicator image {minarca_pyimage204 disabled minarca_pyimage205 !selected minarca_pyimage203} -width 20 -border 4 -sticky w
+ttk::style configure secondary.TRadiobutton -font {Lato -16};
 ttk::style map secondary.TRadiobutton -foreground {disabled #bdbfc1 active #a9abab} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #a9abab};
 ttk::style layout secondary.TRadiobutton {
 Radiobutton.padding -sticky nswe -children {
@@ -672,8 +812,8 @@ Radiobutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create success.Radiobutton.indicator image {minarca_pyimage67 disabled minarca_pyimage68 !selected minarca_pyimage66} -width 20 -border 4 -sticky w
-ttk::style configure success.TRadiobutton -font {Helvetica -16};
+ttk::style element create success.Radiobutton.indicator image {minarca_pyimage207 disabled minarca_pyimage208 !selected minarca_pyimage206} -width 20 -border 4 -sticky w
+ttk::style configure success.TRadiobutton -font {Lato -16};
 ttk::style map success.TRadiobutton -foreground {disabled #bdbfc1 active #358855} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #358855};
 ttk::style layout success.TRadiobutton {
 Radiobutton.padding -sticky nswe -children {
@@ -683,8 +823,8 @@ Radiobutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create info.Radiobutton.indicator image {minarca_pyimage70 disabled minarca_pyimage71 !selected minarca_pyimage69} -width 20 -border 4 -sticky w
-ttk::style configure info.TRadiobutton -font {Helvetica -16};
+ttk::style element create info.Radiobutton.indicator image {minarca_pyimage210 disabled minarca_pyimage211 !selected minarca_pyimage209} -width 20 -border 4 -sticky w
+ttk::style configure info.TRadiobutton -font {Lato -16};
 ttk::style map info.TRadiobutton -foreground {disabled #bdbfc1 active #4999b1} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #4999b1};
 ttk::style layout info.TRadiobutton {
 Radiobutton.padding -sticky nswe -children {
@@ -694,8 +834,8 @@ Radiobutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create warning.Radiobutton.indicator image {minarca_pyimage73 disabled minarca_pyimage74 !selected minarca_pyimage72} -width 20 -border 4 -sticky w
-ttk::style configure warning.TRadiobutton -font {Helvetica -16};
+ttk::style element create warning.Radiobutton.indicator image {minarca_pyimage213 disabled minarca_pyimage214 !selected minarca_pyimage212} -width 20 -border 4 -sticky w
+ttk::style configure warning.TRadiobutton -font {Lato -16};
 ttk::style map warning.TRadiobutton -foreground {disabled #bdbfc1 active #b97202} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #b97202};
 ttk::style layout warning.TRadiobutton {
 Radiobutton.padding -sticky nswe -children {
@@ -705,8 +845,8 @@ Radiobutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style element create danger.Radiobutton.indicator image {minarca_pyimage76 disabled minarca_pyimage77 !selected minarca_pyimage75} -width 20 -border 4 -sticky w
-ttk::style configure danger.TRadiobutton -font {Helvetica -16};
+ttk::style element create danger.Radiobutton.indicator image {minarca_pyimage216 disabled minarca_pyimage217 !selected minarca_pyimage215} -width 20 -border 4 -sticky w
+ttk::style configure danger.TRadiobutton -font {Lato -16};
 ttk::style map danger.TRadiobutton -foreground {disabled #bdbfc1 active #a7221e} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #a7221e};
 ttk::style layout danger.TRadiobutton {
 Radiobutton.padding -sticky nswe -children {
@@ -716,7 +856,7 @@ Radiobutton.padding -sticky nswe -children {
   }
 }
 }
-ttk::style configure TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -font {Helvetica -16} -anchor center -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -font {Lato -16} -anchor center -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
 ttk::style configure primary.TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map primary.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
@@ -730,19 +870,19 @@ ttk::style configure warning.TButton -foreground #ffffff -background #E99002 -bo
 ttk::style map warning.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -bordercolor {disabled #bdbfc1 {hover !disabled} #d08002} -darkcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -lightcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002};
 ttk::style configure danger.TButton -foreground #ffffff -background #d02b27 -bordercolor #d02b27 -darkcolor #d02b27 -lightcolor #d02b27 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
 ttk::style map danger.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -bordercolor {disabled #bdbfc1 {hover !disabled} #bc2722} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722};
-ttk::style configure Link.TButton -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure Link.TButton -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure primary.Link.TButton -foreground #1c4c72 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure primary.Link.TButton -foreground #1c4c72 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map primary.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure secondary.Link.TButton -foreground #d3d5d7 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure secondary.Link.TButton -foreground #d3d5d7 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map secondary.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure success.Link.TButton -foreground #43ac6a -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure success.Link.TButton -foreground #43ac6a -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map success.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure info.Link.TButton -foreground #5bc0de -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure info.Link.TButton -foreground #5bc0de -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map info.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure warning.Link.TButton -foreground #E99002 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure warning.Link.TButton -foreground #E99002 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map warning.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure danger.Link.TButton -foreground #d02b27 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure danger.Link.TButton -foreground #d02b27 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Lato -16} -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map danger.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
 ttk::style configure TMenubutton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
@@ -758,7 +898,7 @@ ttk::style configure warning.TMenubutton -foreground #ffffff -background #E99002
 ttk::style map warning.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -darkcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -lightcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002};
 ttk::style configure danger.TMenubutton -foreground #ffffff -background #d02b27 -bordercolor #d02b27 -darkcolor #d02b27 -lightcolor #d02b27 -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map danger.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -bordercolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722};
-ttk::style configure Toolbutton -foreground #ffffff -background #4e697e -bordercolor #4e697e -darkcolor #4e697e -lightcolor #4e697e -font {Helvetica -16} -anchor center -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
+ttk::style configure Toolbutton -foreground #ffffff -background #4e697e -bordercolor #4e697e -darkcolor #4e697e -lightcolor #4e697e -font {Lato -16} -anchor center -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {selected !disabled} #1c4c72 {pressed !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -lightcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72};
 ttk::style configure primary.Toolbutton -foreground #ffffff -background #4e697e -bordercolor #4e697e -darkcolor #4e697e -lightcolor #4e697e -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
 ttk::style map primary.Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -lightcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72};
@@ -795,65 +935,65 @@ ttk::style configure warning.Treeview.Heading -background #E99002;
 ttk::style map warning.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #E99002};
 ttk::style configure danger.Treeview.Heading -background #d02b27;
 ttk::style map danger.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d02b27};
-ttk::style element create Horizontal.Separator.separator image {minarca_pyimage78 } 
+ttk::style element create Horizontal.Separator.separator image {minarca_pyimage218 } 
 ttk::style layout Horizontal.TSeparator {
 Horizontal.Separator.separator -sticky ew
 }
-ttk::style element create primary.Horizontal.Separator.separator image {minarca_pyimage79 } 
+ttk::style element create primary.Horizontal.Separator.separator image {minarca_pyimage219 } 
 ttk::style layout primary.Horizontal.TSeparator {
 primary.Horizontal.Separator.separator -sticky ew
 }
-ttk::style element create secondary.Horizontal.Separator.separator image {minarca_pyimage80 } 
+ttk::style element create secondary.Horizontal.Separator.separator image {minarca_pyimage220 } 
 ttk::style layout secondary.Horizontal.TSeparator {
 secondary.Horizontal.Separator.separator -sticky ew
 }
-ttk::style element create success.Horizontal.Separator.separator image {minarca_pyimage81 } 
+ttk::style element create success.Horizontal.Separator.separator image {minarca_pyimage221 } 
 ttk::style layout success.Horizontal.TSeparator {
 success.Horizontal.Separator.separator -sticky ew
 }
-ttk::style element create info.Horizontal.Separator.separator image {minarca_pyimage82 } 
+ttk::style element create info.Horizontal.Separator.separator image {minarca_pyimage222 } 
 ttk::style layout info.Horizontal.TSeparator {
 info.Horizontal.Separator.separator -sticky ew
 }
-ttk::style element create warning.Horizontal.Separator.separator image {minarca_pyimage83 } 
+ttk::style element create warning.Horizontal.Separator.separator image {minarca_pyimage223 } 
 ttk::style layout warning.Horizontal.TSeparator {
 warning.Horizontal.Separator.separator -sticky ew
 }
-ttk::style element create danger.Horizontal.Separator.separator image {minarca_pyimage84 } 
+ttk::style element create danger.Horizontal.Separator.separator image {minarca_pyimage224 } 
 ttk::style layout danger.Horizontal.TSeparator {
 danger.Horizontal.Separator.separator -sticky ew
 }
-ttk::style element create Vertical.Separator.separator image {minarca_pyimage85 } 
+ttk::style element create Vertical.Separator.separator image {minarca_pyimage225 } 
 ttk::style layout Vertical.TSeparator {
 Vertical.Separator.separator -sticky ns
 }
-ttk::style element create primary.Vertical.Separator.separator image {minarca_pyimage86 } 
+ttk::style element create primary.Vertical.Separator.separator image {minarca_pyimage226 } 
 ttk::style layout primary.Vertical.TSeparator {
 primary.Vertical.Separator.separator -sticky ns
 }
-ttk::style element create secondary.Vertical.Separator.separator image {minarca_pyimage87 } 
+ttk::style element create secondary.Vertical.Separator.separator image {minarca_pyimage227 } 
 ttk::style layout secondary.Vertical.TSeparator {
 secondary.Vertical.Separator.separator -sticky ns
 }
-ttk::style element create success.Vertical.Separator.separator image {minarca_pyimage88 } 
+ttk::style element create success.Vertical.Separator.separator image {minarca_pyimage228 } 
 ttk::style layout success.Vertical.TSeparator {
 success.Vertical.Separator.separator -sticky ns
 }
-ttk::style element create info.Vertical.Separator.separator image {minarca_pyimage89 } 
+ttk::style element create info.Vertical.Separator.separator image {minarca_pyimage229 } 
 ttk::style layout info.Vertical.TSeparator {
 info.Vertical.Separator.separator -sticky ns
 }
-ttk::style element create warning.Vertical.Separator.separator image {minarca_pyimage90 } 
+ttk::style element create warning.Vertical.Separator.separator image {minarca_pyimage230 } 
 ttk::style layout warning.Vertical.TSeparator {
 warning.Vertical.Separator.separator -sticky ns
 }
-ttk::style element create danger.Vertical.Separator.separator image {minarca_pyimage91 } 
+ttk::style element create danger.Vertical.Separator.separator image {minarca_pyimage231 } 
 ttk::style layout danger.Vertical.TSeparator {
 danger.Vertical.Separator.separator -sticky ns
 }
 ttk::style configure TPanedwindow -background #ffffff;
 ttk::style configure Sash -bordercolor #ffffff -lightcolor #ffffff -sashthickness 8 -sashpad 0 -gripcount 0;
-ttk::style element create Roundtoggle.Toolbutton.indicator image {minarca_pyimage92 disabled minarca_pyimage94 !selected minarca_pyimage93} -width 28 -border 4 -sticky w
+ttk::style element create Roundtoggle.Toolbutton.indicator image {minarca_pyimage232 disabled minarca_pyimage234 !selected minarca_pyimage233} -width 28 -border 4 -sticky w
 ttk::style configure Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
 ttk::style layout Roundtoggle.Toolbutton {
@@ -864,7 +1004,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create primary.Roundtoggle.Toolbutton.indicator image {minarca_pyimage95 disabled minarca_pyimage97 !selected minarca_pyimage96} -width 28 -border 4 -sticky w
+ttk::style element create primary.Roundtoggle.Toolbutton.indicator image {minarca_pyimage235 disabled minarca_pyimage237 !selected minarca_pyimage236} -width 28 -border 4 -sticky w
 ttk::style configure primary.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map primary.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
 ttk::style layout primary.Roundtoggle.Toolbutton {
@@ -875,7 +1015,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create secondary.Roundtoggle.Toolbutton.indicator image {minarca_pyimage98 disabled minarca_pyimage100 !selected minarca_pyimage99} -width 28 -border 4 -sticky w
+ttk::style element create secondary.Roundtoggle.Toolbutton.indicator image {minarca_pyimage238 disabled minarca_pyimage240 !selected minarca_pyimage239} -width 28 -border 4 -sticky w
 ttk::style configure secondary.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map secondary.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d3d5d7} -background {selected #ffffff !selected #ffffff};
 ttk::style layout secondary.Roundtoggle.Toolbutton {
@@ -886,7 +1026,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create success.Roundtoggle.Toolbutton.indicator image {minarca_pyimage101 disabled minarca_pyimage103 !selected minarca_pyimage102} -width 28 -border 4 -sticky w
+ttk::style element create success.Roundtoggle.Toolbutton.indicator image {minarca_pyimage241 disabled minarca_pyimage243 !selected minarca_pyimage242} -width 28 -border 4 -sticky w
 ttk::style configure success.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map success.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #43ac6a} -background {selected #ffffff !selected #ffffff};
 ttk::style layout success.Roundtoggle.Toolbutton {
@@ -897,7 +1037,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create info.Roundtoggle.Toolbutton.indicator image {minarca_pyimage104 disabled minarca_pyimage106 !selected minarca_pyimage105} -width 28 -border 4 -sticky w
+ttk::style element create info.Roundtoggle.Toolbutton.indicator image {minarca_pyimage244 disabled minarca_pyimage246 !selected minarca_pyimage245} -width 28 -border 4 -sticky w
 ttk::style configure info.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map info.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #5bc0de} -background {selected #ffffff !selected #ffffff};
 ttk::style layout info.Roundtoggle.Toolbutton {
@@ -908,7 +1048,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create warning.Roundtoggle.Toolbutton.indicator image {minarca_pyimage107 disabled minarca_pyimage109 !selected minarca_pyimage108} -width 28 -border 4 -sticky w
+ttk::style element create warning.Roundtoggle.Toolbutton.indicator image {minarca_pyimage247 disabled minarca_pyimage249 !selected minarca_pyimage248} -width 28 -border 4 -sticky w
 ttk::style configure warning.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map warning.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #E99002} -background {selected #ffffff !selected #ffffff};
 ttk::style layout warning.Roundtoggle.Toolbutton {
@@ -919,7 +1059,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create danger.Roundtoggle.Toolbutton.indicator image {minarca_pyimage110 disabled minarca_pyimage112 !selected minarca_pyimage111} -width 28 -border 4 -sticky w
+ttk::style element create danger.Roundtoggle.Toolbutton.indicator image {minarca_pyimage250 disabled minarca_pyimage252 !selected minarca_pyimage251} -width 28 -border 4 -sticky w
 ttk::style configure danger.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map danger.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d02b27} -background {selected #ffffff !selected #ffffff};
 ttk::style layout danger.Roundtoggle.Toolbutton {
@@ -930,7 +1070,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create Squaretoggle.Toolbutton.indicator image {minarca_pyimage113 disabled minarca_pyimage115 !selected minarca_pyimage114} -width 28 -border 4 -sticky w
+ttk::style element create Squaretoggle.Toolbutton.indicator image {minarca_pyimage253 disabled minarca_pyimage255 !selected minarca_pyimage254} -width 28 -border 4 -sticky w
 ttk::style configure Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
 ttk::style layout Squaretoggle.Toolbutton {
@@ -941,7 +1081,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create primary.Squaretoggle.Toolbutton.indicator image {minarca_pyimage116 disabled minarca_pyimage118 !selected minarca_pyimage117} -width 28 -border 4 -sticky w
+ttk::style element create primary.Squaretoggle.Toolbutton.indicator image {minarca_pyimage256 disabled minarca_pyimage258 !selected minarca_pyimage257} -width 28 -border 4 -sticky w
 ttk::style configure primary.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map primary.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
 ttk::style layout primary.Squaretoggle.Toolbutton {
@@ -952,7 +1092,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create secondary.Squaretoggle.Toolbutton.indicator image {minarca_pyimage119 disabled minarca_pyimage121 !selected minarca_pyimage120} -width 28 -border 4 -sticky w
+ttk::style element create secondary.Squaretoggle.Toolbutton.indicator image {minarca_pyimage259 disabled minarca_pyimage261 !selected minarca_pyimage260} -width 28 -border 4 -sticky w
 ttk::style configure secondary.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map secondary.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d3d5d7} -background {selected #ffffff !selected #ffffff};
 ttk::style layout secondary.Squaretoggle.Toolbutton {
@@ -963,7 +1103,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create success.Squaretoggle.Toolbutton.indicator image {minarca_pyimage122 disabled minarca_pyimage124 !selected minarca_pyimage123} -width 28 -border 4 -sticky w
+ttk::style element create success.Squaretoggle.Toolbutton.indicator image {minarca_pyimage262 disabled minarca_pyimage264 !selected minarca_pyimage263} -width 28 -border 4 -sticky w
 ttk::style configure success.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map success.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #43ac6a} -background {selected #ffffff !selected #ffffff};
 ttk::style layout success.Squaretoggle.Toolbutton {
@@ -974,7 +1114,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create info.Squaretoggle.Toolbutton.indicator image {minarca_pyimage125 disabled minarca_pyimage127 !selected minarca_pyimage126} -width 28 -border 4 -sticky w
+ttk::style element create info.Squaretoggle.Toolbutton.indicator image {minarca_pyimage265 disabled minarca_pyimage267 !selected minarca_pyimage266} -width 28 -border 4 -sticky w
 ttk::style configure info.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map info.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #5bc0de} -background {selected #ffffff !selected #ffffff};
 ttk::style layout info.Squaretoggle.Toolbutton {
@@ -985,7 +1125,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create warning.Squaretoggle.Toolbutton.indicator image {minarca_pyimage128 disabled minarca_pyimage130 !selected minarca_pyimage129} -width 28 -border 4 -sticky w
+ttk::style element create warning.Squaretoggle.Toolbutton.indicator image {minarca_pyimage268 disabled minarca_pyimage270 !selected minarca_pyimage269} -width 28 -border 4 -sticky w
 ttk::style configure warning.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map warning.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #E99002} -background {selected #ffffff !selected #ffffff};
 ttk::style layout warning.Squaretoggle.Toolbutton {
@@ -996,7 +1136,7 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create danger.Squaretoggle.Toolbutton.indicator image {minarca_pyimage131 disabled minarca_pyimage133 !selected minarca_pyimage132} -width 28 -border 4 -sticky w
+ttk::style element create danger.Squaretoggle.Toolbutton.indicator image {minarca_pyimage271 disabled minarca_pyimage273 !selected minarca_pyimage272} -width 28 -border 4 -sticky w
 ttk::style configure danger.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
 ttk::style map danger.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d02b27} -background {selected #ffffff !selected #ffffff};
 ttk::style layout danger.Squaretoggle.Toolbutton {
@@ -1007,57 +1147,57 @@ Toolbutton.border -sticky nswe -children {
   }
 }
 }
-ttk::style element create Sizegrip.sizegrip image {minarca_pyimage134 } 
+ttk::style element create Sizegrip.sizegrip image {minarca_pyimage274 } 
 ttk::style layout TSizegrip {
 Sizegrip.sizegrip -side bottom -sticky se
 }
-ttk::style element create primary.Sizegrip.sizegrip image {minarca_pyimage135 } 
+ttk::style element create primary.Sizegrip.sizegrip image {minarca_pyimage275 } 
 ttk::style layout primary.TSizegrip {
 primary.Sizegrip.sizegrip -side bottom -sticky se
 }
-ttk::style element create secondary.Sizegrip.sizegrip image {minarca_pyimage136 } 
+ttk::style element create secondary.Sizegrip.sizegrip image {minarca_pyimage276 } 
 ttk::style layout secondary.TSizegrip {
 secondary.Sizegrip.sizegrip -side bottom -sticky se
 }
-ttk::style element create success.Sizegrip.sizegrip image {minarca_pyimage137 } 
+ttk::style element create success.Sizegrip.sizegrip image {minarca_pyimage277 } 
 ttk::style layout success.TSizegrip {
 success.Sizegrip.sizegrip -side bottom -sticky se
 }
-ttk::style element create info.Sizegrip.sizegrip image {minarca_pyimage138 } 
+ttk::style element create info.Sizegrip.sizegrip image {minarca_pyimage278 } 
 ttk::style layout info.TSizegrip {
 info.Sizegrip.sizegrip -side bottom -sticky se
 }
-ttk::style element create warning.Sizegrip.sizegrip image {minarca_pyimage139 } 
+ttk::style element create warning.Sizegrip.sizegrip image {minarca_pyimage279 } 
 ttk::style layout warning.TSizegrip {
 warning.Sizegrip.sizegrip -side bottom -sticky se
 }
-ttk::style element create danger.Sizegrip.sizegrip image {minarca_pyimage140 } 
+ttk::style element create danger.Sizegrip.sizegrip image {minarca_pyimage280 } 
 ttk::style layout danger.TSizegrip {
 danger.Sizegrip.sizegrip -side bottom -sticky se
 }
-ttk::style configure . -background #ffffff -darkcolor #ced4da -foreground #212529 -troughcolor #ffffff -selectbg #95a5a6 -selectfg #ffffff -selectforeground #ffffff -selectbackground #95a5a6 -fieldbg white -font {Helvetica -16} -borderwidth 1 -focuscolor {};
-ttk::style configure H1.primary.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.primary.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.primary.TLabel -font {Helvetica -10};
-ttk::style configure strong.primary.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.secondary.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.secondary.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.secondary.TLabel -font {Helvetica -10};
-ttk::style configure strong.secondary.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.success.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.success.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.success.TLabel -font {Helvetica -10};
-ttk::style configure strong.success.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.info.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.info.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.info.TLabel -font {Helvetica -10};
-ttk::style configure strong.info.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.warning.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.warning.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.warning.TLabel -font {Helvetica -10};
-ttk::style configure strong.warning.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.danger.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.danger.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.danger.TLabel -font {Helvetica -10};
-ttk::style configure strong.danger.TLabel -font {Helvetica -14 bold};
+ttk::style configure . -background #ffffff -darkcolor #ced4da -foreground #212529 -troughcolor #ffffff -selectbg #95a5a6 -selectfg #ffffff -selectforeground #ffffff -selectbackground #95a5a6 -fieldbg white -font {Lato -16} -borderwidth 1 -focuscolor {};
+ttk::style configure H1.primary.TLabel -font {Lato -24 bold};
+ttk::style configure navbar.primary.Inverse.TLabel -Lato {Lato -20};
+ttk::style configure small.primary.TLabel -font {Lato -10};
+ttk::style configure strong.primary.TLabel -font {Lato -14 bold};
+ttk::style configure H1.secondary.TLabel -font {Lato -24 bold};
+ttk::style configure navbar.secondary.Inverse.TLabel -Lato {Lato -20};
+ttk::style configure small.secondary.TLabel -font {Lato -10};
+ttk::style configure strong.secondary.TLabel -font {Lato -14 bold};
+ttk::style configure H1.success.TLabel -font {Lato -24 bold};
+ttk::style configure navbar.success.Inverse.TLabel -Lato {Lato -20};
+ttk::style configure small.success.TLabel -font {Lato -10};
+ttk::style configure strong.success.TLabel -font {Lato -14 bold};
+ttk::style configure H1.info.TLabel -font {Lato -24 bold};
+ttk::style configure navbar.info.Inverse.TLabel -Lato {Lato -20};
+ttk::style configure small.info.TLabel -font {Lato -10};
+ttk::style configure strong.info.TLabel -font {Lato -14 bold};
+ttk::style configure H1.warning.TLabel -font {Lato -24 bold};
+ttk::style configure navbar.warning.Inverse.TLabel -Lato {Lato -20};
+ttk::style configure small.warning.TLabel -font {Lato -10};
+ttk::style configure strong.warning.TLabel -font {Lato -14 bold};
+ttk::style configure H1.danger.TLabel -font {Lato -24 bold};
+ttk::style configure navbar.danger.Inverse.TLabel -Lato {Lato -20};
+ttk::style configure small.danger.TLabel -font {Lato -10};
+ttk::style configure strong.danger.TLabel -font {Lato -14 bold};
 ttk::style configure tooltip.TLabel -background #ffffe0;}
