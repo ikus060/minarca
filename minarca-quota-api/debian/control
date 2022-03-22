@@ -3,8 +3,7 @@ Section: python
 Priority: extra
 Maintainer: IKUS Software inc. <support@ikus-soft.com>
 Build-Depends: debhelper-compat (= 11), python3, dh-virtualenv (>= 1.1),
-    python3-setuptools, python3-pip, python3-dev, libffi-dev,
-    libldap2-dev, libsasl2-dev
+    python3-setuptools, python3-pip, python3-dev, libffi-dev
 Standards-Version: 3.9.5
 
 Package: minarca-quota-api

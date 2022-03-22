@@ -25,7 +25,7 @@ test:flake8:
     - TARGET: minarca-client
       DEPENDS: cron librsync-dev python3-tk libacl1-dev
     - TARGET: minarca-server
-      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+      DEPENDS: rdiff-backup
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
     - TARGET: minarca-quota-api
       DEPENDS: bash
@@ -53,7 +53,7 @@ test:deb:
       DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
     - TARGET: minarca-server
       DIST: [buster, bullseye]
-      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+      DEPENDS: rdiff-backup
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye]
       DEPENDS: bash

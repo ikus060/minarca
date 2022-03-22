@@ -9,9 +9,7 @@ Created on Sep. 25, 2020
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-
-from distutils import spawn
-from functools import reduce
+import argparse
 import logging
 import operator
 import os
@@ -19,13 +17,16 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import argparse
+from distutils import spawn
+from functools import reduce
 
-from rdiffweb.core.config import parse_args
+import configargparse
 from snakeoil.contexts import SplitExec
-from snakeoil.osutils.mount import mount, MS_BIND, MS_REC, MS_RDONLY
+from snakeoil.osutils.mount import MS_BIND, MS_RDONLY, MS_REC, mount
 from snakeoil.process import namespaces
 from tzlocal import get_localzone
+
+from minarca_server.config import get_parser
 
 try:
     import pkg_resources
@@ -122,13 +123,27 @@ def _find_rdiff_backup(version=2):
     return spawn.find_executable(executable, path)
 
 
+def _parse_config():
+    """
+    Use the default configuration parser to retrieve the configuration from environment variable or
+    config file. But to avoid any parsing error, keep only the values we are interested in.
+    """
+    server_parser = get_parser()
+    parser = configargparse.ArgumentParser(
+        default_config_files=server_parser._default_config_files,
+        auto_env_var_prefix=server_parser._auto_env_var_prefix)
+    parser.add_argument('--log-file', '--logfile', default=server_parser._defaults['log_file'])
+    parser.add_argument('--minarca-rdiff-backup-extra-args', '--rdiffbackup-args')
+    return parser.parse_known_args(args=[])[0]
+
+
 def main(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
     parser.parse_args(args)
 
-    # Read the configuration and setup logging
-    cfg = parse_args(args=[])
+    # Try to configure logging system using minarca-server config.
+    cfg = _parse_config()
     _setup_logging(cfg)
 
     # Parse arguments
