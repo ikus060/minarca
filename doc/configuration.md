@@ -124,11 +124,9 @@ This integration works with most LDAP-compliant servers, including:
 | ldap-add-missing-user | `True` to create users from LDAP when the credential is valid. | True |
 | ldap-add-user-default-role | Role to be used when creating a new user from LDAP. Default: user | maintainer |
 | ldap-add-user-default-userroot | Userroot to be used when creating a new user from LDAP. Default: empty | /backups/{cn[0]} |
-| ldap-allow-password-change | `true` to allow LDAP users to update their password using Minarca web interface. This option should only be enabled if the LDAP if confiugred to allow the user to change their own password. Default to `false`. | true |
 | ldap-base-dn | The DN of the branch of the directory where all searches should start from. | dc=my,dc=domain |
 | ldap-bind-dn | An optional DN used to bind to the server when searching for entries. If not provided, will use an anonymous bind. | cn=manager,dc=my,dc=domain |
 | ldap-bind-password | A bind password to use in conjunction with `LdapBindDn`. Note that the bind password is probably sensitive data,and should be properly protected. You should only use the LdapBindDn and LdapBindPassword if you absolutely need them to search the directory. | mypassword |
-| ldap-check-shadow-expire | enable validation of shadow expired when validating user's credential. User will not be allowed to login if the account expired. | true |
 | ldap-encoding | encoding used by your LDAP server. Default to utf-8 | cp1252 |
 | ldap-filter | A valid LDAP search filter. If not provided, defaults to `(objectClass=*)`, which will search for all objects in the tree. | (objectClass=*) |
 | ldap-group-attribute-is-dn | True if the content of the attribute ldap-group-attribute is a DN. | true |
@@ -233,7 +231,7 @@ but provide enough guidance to help you.
    `quotaon -Pv -F vfsv1 /`
 3. Check if the quota is working  
    `repquota -Ps /`
-4. Add `+P` attribute on directory you which to control quota  
+4. Add `+P` attribute on directories to enabled project quotas  
    `chattr -R +P /backups/admin`
 5. Then set the project id on directories  
    `chattr -R -p 1 /backups/admin` where `1` is the Minarca user's id
@@ -260,7 +258,7 @@ as the dataset to store Minarca backups.
    `zpool upgrade tank`
    `zfs upgrade tank/backups`
 
-2. Add `+P` attribute on directory you which to control quota  
+2. Add `+P` attribute on directories to enabled project quotas  
    `chattr -R +P /backups/admin`
    `chattr -R -p 1 /backups/admin`
    OR
