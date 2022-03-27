@@ -275,6 +275,7 @@ upload:doc:
     FILENAME: doc
 
 upload:sonar:
+  allow_failure: true
   stage: upload
   needs:
   - test:deb
@@ -286,7 +287,7 @@ upload:sonar:
   variables:
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
   script:
-  - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
+  - sonar-scanner -X -Dsonar.qualitygate.wait=True -Dsonar.python.coverage.reportPaths=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
 
 
 deploy:dev:
