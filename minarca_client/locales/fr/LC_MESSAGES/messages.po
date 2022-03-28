@@ -376,12 +376,10 @@ msgid "Excluded"
 msgstr "Exclu"
 
 #: minarca_client/ui/patterns.py:78
-#, fuzzy
 msgid "Add Folder Pattern"
 msgstr "Ajouter modèle"
 
 #: minarca_client/ui/patterns.py:91
-#, fuzzy
 msgid "Add custom pattern"
 msgstr "Ajouter modèle"
 
@@ -588,9 +586,8 @@ msgstr ""
 "l'installation. Essayez de réinstaller Minarca Backup."
 
 #: minarca_client/ui/templates/home.html:5
-#, fuzzy
-msgid "Minarca backup"
-msgstr "Minarca Backup"
+msgid "Minarca Backup"
+msgstr "Sauvegarde Minarca"
 
 #: minarca_client/ui/templates/home.html:8
 msgid "Help"
