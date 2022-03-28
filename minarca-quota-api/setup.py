@@ -12,27 +12,24 @@ import setuptools
 setuptools.setup(
     name="minarca_quota_api",
     use_scm_version={"root": "..", "relative_to": __file__},
-    description='Minarca Quota API',
-    long_description='Provide utilities to setup Quota management for rdiffweb / minarca-server.',
-    author='IKUS Software inc.',
-    url='https://www.ikus-soft.com/en/minarca/',
-    packages=['minarca_quota_api'],
+    description="Minarca Quota API",
+    long_description="Provide utilities to setup Quota management for rdiffweb / minarca-server.",
+    author="IKUS Software inc.",
+    url="https://www.ikus-soft.com/en/minarca/",
+    packages=["minarca_quota_api"],
     include_package_data=True,
-    python_requires='>=3.5',
+    python_requires=">=3.5",
     setup_requires=[
         "setuptools_scm>=5.0.1",
     ],
-    install_requires=[
-        'cherrypy',
-        'ConfigArgParse'
-    ],
+    install_requires=["cherrypy", "ConfigArgParse"],
     # requirement for testing
-    extras_require={'test': [
-        "pytest",
-    ]},
+    extras_require={
+        "test": [
+            "pytest",
+        ]
+    },
     entry_points={
-        "console_scripts": [
-            "minarca-quota-api = minarca_quota_api:run"
-        ],
+        "console_scripts": ["minarca-quota-api = minarca_quota_api:run"],
     },
 )

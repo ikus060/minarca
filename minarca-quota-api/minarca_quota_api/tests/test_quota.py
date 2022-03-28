@@ -13,18 +13,17 @@ Created on Mar 7, 2018
 """
 
 from base64 import b64encode
+from unittest.mock import MagicMock
 from urllib.parse import urlencode
 
 import cherrypy
 from cherrypy.test import helper
-from unittest.mock import MagicMock
 
 import minarca_quota_api
 from minarca_quota_api.zfs_quota import ZFSQuotaException
 
 
 class TestQuota(helper.CPWebCase):  # @UndefinedVariable
-
     def setup_server():
         cherrypy.tree.mount(minarca_quota_api.Root(pool='rpool/minarca'))
 

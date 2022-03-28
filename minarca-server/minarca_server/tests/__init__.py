@@ -14,6 +14,7 @@ import unittest
 
 import rdiffweb
 import rdiffweb.test
+
 from minarca_server.app import MinarcaApplication
 
 
@@ -27,8 +28,7 @@ class AbstractMinarcaTest(rdiffweb.test.WebCase):
     @classmethod
     def setup_class(cls):
         if cls is AbstractMinarcaTest:
-            raise unittest.SkipTest(
-                "%s is an abstract base class" % cls.__name__)
+            raise unittest.SkipTest("%s is an abstract base class" % cls.__name__)
         cls.base_dir = tempfile.mkdtemp(prefix='minarca_tests_')
         if not os.path.isdir(cls.base_dir):
             os.mkdir(cls.base_dir)
@@ -37,10 +37,8 @@ class AbstractMinarcaTest(rdiffweb.test.WebCase):
         cls.default_config['logfile'] = os.path.join(cls.base_dir, 'server.log')
         tempfile.tempdir = cls.base_dir
         # Use current user for owner and group
-        cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[
-            0]
-        cls.default_config['MinarcaUserDirGroup'] = pwd.getpwuid(os.getuid())[
-            0]
+        cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[0]
+        cls.default_config['MinarcaUserDirGroup'] = pwd.getpwuid(os.getuid())[0]
         super(AbstractMinarcaTest, cls).setup_class()
 
     @classmethod

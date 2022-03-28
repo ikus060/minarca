@@ -16,7 +16,6 @@ NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class SetupTest(unittest.TestCase):
-
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()

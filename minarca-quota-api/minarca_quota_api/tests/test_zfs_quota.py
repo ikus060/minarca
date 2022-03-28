@@ -6,12 +6,11 @@ Created on Dec. 8, 2020
 import unittest
 from unittest.mock import patch
 
-from minarca_quota_api.zfs_quota import set_quota, get_quota
+from minarca_quota_api.zfs_quota import get_quota, set_quota
 
 
 @patch('minarca_quota_api.zfs_quota.subprocess.check_output')
 class ZFSQuotaTest(unittest.TestCase):
-
     def test_set_quota(self, check_output_mock):
         set_quota('tank', quota=54321, projectid=1)
 

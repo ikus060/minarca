@@ -11,11 +11,11 @@ import unittest
 from unittest.mock import MagicMock
 
 import responses
+
 from minarca_client.core.latest import LATEST_VERSION_URL, LatestCheck, LatestCheckFailed
 
 
 class LatestCheckTest(unittest.TestCase):
-
     @responses.activate
     def test_get_version_info(self):
         # Given a web server with the latest information

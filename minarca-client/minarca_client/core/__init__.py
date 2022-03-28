@@ -21,25 +21,29 @@ import psutil
 import rdiff_backup.Main
 import rdiff_backup.robust
 import requests
-from minarca_client.core import compat
-from minarca_client.core.compat import (IS_WINDOWS, Scheduler, get_minarca_exe,
-                                        redirect_ouput, ssh_keygen)
-from minarca_client.core.config import Datetime, Patterns, Settings, Status
-from minarca_client.core.exceptions import (BackupError,
-                                            HttpAuthenticationError,
-                                            HttpConnectionError,
-                                            HttpInvalidUrlError,
-                                            HttpServerError, NoPatternsError,
-                                            NotConfiguredError,
-                                            NotRunningError, NotScheduleError,
-                                            RepositoryNameExistsError,
-                                            RunningError, raise_exception)
-from minarca_client.locale import _
 from psutil import NoSuchProcess
 from rdiff_backup.connection import ConnectionReadError, ConnectionWriteError
 from requests.compat import urljoin
-from requests.exceptions import (ConnectionError, HTTPError, InvalidSchema,
-                                 MissingSchema)
+from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
+
+from minarca_client.core import compat
+from minarca_client.core.compat import IS_WINDOWS, Scheduler, get_minarca_exe, redirect_ouput, ssh_keygen
+from minarca_client.core.config import Datetime, Patterns, Settings, Status
+from minarca_client.core.exceptions import (
+    BackupError,
+    HttpAuthenticationError,
+    HttpConnectionError,
+    HttpInvalidUrlError,
+    HttpServerError,
+    NoPatternsError,
+    NotConfiguredError,
+    NotRunningError,
+    NotScheduleError,
+    RepositoryNameExistsError,
+    RunningError,
+    raise_exception,
+)
+from minarca_client.locale import _
 
 _REPOSITORY_NAME_PATTERN = "^[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*$"
 
@@ -73,6 +77,7 @@ def _escape_remote_shema(path):
         return path
     if IS_WINDOWS:
         import win32api
+
         return win32api.GetShortPathName(path)
     else:
         return path.replace(' ', '\\ ')
@@ -92,6 +97,7 @@ class _UpdateStatus(threading.Thread):
         try:
             if IS_WINDOWS:
                 from wakepy import set_keepawake
+
                 set_keepawake(keep_screen_awake=False)
         except Exception:
             pass
@@ -111,9 +117,7 @@ class _UpdateStatus(threading.Thread):
             self.status['lastdate'] = self.status['lastsuccess']
             self.status['details'] = ''
             self.status.save()
-        elif (exc_type is KeyboardInterrupt
-              or exc_type is ConnectionWriteError
-              or exc_type is ConnectionReadError):
+        elif exc_type is KeyboardInterrupt or exc_type is ConnectionWriteError or exc_type is ConnectionReadError:
             # Capture special exception raised when user cancel the operation
             # or when the SSH connection is interrupted.
             logger.exception("backup INTERRUPT")
@@ -133,6 +137,7 @@ class _UpdateStatus(threading.Thread):
         try:
             if IS_WINDOWS:
                 from wakepy import unset_keepawake
+
                 unset_keepawake(keep_screen_awake=False)
         except Exception:
             pass
@@ -156,24 +161,18 @@ class _UpdateStatus(threading.Thread):
         self.status.save()
 
 
-class Backup():
-
+class Backup:
     def __init__(self):
         """
         Create a new minarca backup backup.
         """
         # Get file location.
-        self.public_key_file = os.path.join(
-            compat.get_config_home(), "id_rsa.pub")
-        self.private_key_file = os.path.join(
-            compat.get_config_home(), "id_rsa")
-        self.known_hosts = os.path.join(
-            compat.get_config_home(), "known_hosts")
-        self.config_file = os.path.join(
-            compat.get_config_home(), "minarca.properties")
+        self.public_key_file = os.path.join(compat.get_config_home(), "id_rsa.pub")
+        self.private_key_file = os.path.join(compat.get_config_home(), "id_rsa")
+        self.known_hosts = os.path.join(compat.get_config_home(), "known_hosts")
+        self.config_file = os.path.join(compat.get_config_home(), "minarca.properties")
         self.patterns_file = os.path.join(compat.get_config_home(), "patterns")
-        self.status_file = os.path.join(
-            compat.get_data_home(), 'status.properties')
+        self.status_file = os.path.join(compat.get_data_home(), 'status.properties')
 
     def start(self, force=False, force_patterns=None, fork=False):
         """
@@ -190,10 +189,13 @@ class Backup():
 
         # Fork process if required.
         if fork:
-            creationflags = subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP if IS_WINDOWS else 0
+            creationflags = (
+                subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
+                if IS_WINDOWS
+                else 0
+            )
             p = subprocess.Popen(
-                [get_minarca_exe(), 'backup',
-                 '--force'],
+                [get_minarca_exe(), 'backup', '--force'],
                 stdin=None,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
@@ -206,8 +208,7 @@ class Backup():
         status = Status(self.status_file)
         with _UpdateStatus(status=status):
             # Pick the right patterns
-            patterns = force_patterns if force_patterns is not None else Patterns(
-                self.patterns_file)
+            patterns = force_patterns if force_patterns is not None else Patterns(self.patterns_file)
             if not patterns:
                 raise NoPatternsError()
 
@@ -250,7 +251,12 @@ class Backup():
             roots = list(self.get_patterns().group_by_roots())
             if roots:
                 drive_letter = roots[0][0][0]
-                return "%s/browse/%s/%s/%s" % (settings['remoteurl'], settings['username'], settings['repositoryname'], drive_letter)
+                return "%s/browse/%s/%s/%s" % (
+                    settings['remoteurl'],
+                    settings['username'],
+                    settings['repositoryname'],
+                    drive_letter,
+                )
             else:
                 return settings['remoteurl']
         return "%s/browse/%s/%s" % (settings['remoteurl'], settings['username'], settings['repositoryname'])
@@ -284,9 +290,7 @@ class Backup():
         if status['lastresult'] == 'RUNNING':
             # Get pid and checkif process is running.
             try:
-                is_running = (
-                    status['pid']
-                    and psutil.Process(int(status['pid'])).is_running())
+                is_running = status['pid'] and psutil.Process(int(status['pid'])).is_running()
             except (ValueError, NoSuchProcess):
                 is_running = False
             if not is_running:
@@ -311,8 +315,7 @@ class Backup():
         lastsuccess = self.get_status('lastsuccess')
         if lastsuccess is None:
             return True
-        delta = datetime.timedelta(
-            hours=self.get_settings('schedule') * 98.0 / 100)
+        delta = datetime.timedelta(hours=self.get_settings('schedule') * 98.0 / 100)
         return delta < Datetime() - lastsuccess
 
     def is_running(self):
@@ -329,19 +332,22 @@ class Backup():
         """
         # Validate the repository name
         if not repository_name or not re.match(_REPOSITORY_NAME_PATTERN, repository_name):
-            raise ValueError(
-                "repository must only contains letters, numbers, dash (-) and dot (.)")
+            raise ValueError("repository must only contains letters, numbers, dash (-) and dot (.)")
 
         try:
 
             # Check if the repository already exists for the guven user.
             rdiffweb = Rdiffweb(remoteurl, username, password)
             current_user = rdiffweb.get_current_user_info()
-            exists = any(repository_name == r.get('name') or r.get('name').startswith(
-                repository_name + '/') for r in current_user.get('repos', []))
+            exists = any(
+                repository_name == r.get('name') or r.get('name').startswith(repository_name + '/')
+                for r in current_user.get('repos', [])
+            )
             if not force and exists:
                 logger.warning(
-                    _('fail to link because repository with name `%s` already exists on remote server') % repository_name)
+                    _('fail to link because repository with name `%s` already exists on remote server')
+                    % repository_name
+                )
                 raise RepositoryNameExistsError(repository_name)
 
             # Check if ssh keys exists
@@ -431,14 +437,15 @@ class Backup():
         if source:
             args.append(source)
         if IS_WINDOWS and source:
-            args.append("minarca@{remote_host}::{repositoryname}/{drive}".format(
-                remote_host=remote_host,
-                repositoryname=repositoryname,
-                drive=source[0]))
+            args.append(
+                "minarca@{remote_host}::{repositoryname}/{drive}".format(
+                    remote_host=remote_host, repositoryname=repositoryname, drive=source[0]
+                )
+            )
         else:
-            args.append("minarca@{remote_host}::{repositoryname}".format(
-                remote_host=remote_host,
-                repositoryname=repositoryname))
+            args.append(
+                "minarca@{remote_host}::{repositoryname}".format(remote_host=remote_host, repositoryname=repositoryname)
+            )
 
         # Execute the command line.
         logging.debug(_('executing command: %s') % _sh_quote(args))
@@ -528,8 +535,7 @@ class Backup():
         Scheduler().delete()
 
 
-class Rdiffweb():
-
+class Rdiffweb:
     def __init__(self, remote_url, username, password):
         # Create HTTP Session using authentication
         assert username
@@ -548,7 +554,8 @@ class Rdiffweb():
 
     def add_ssh_key(self, title, public_key):
         response = self.session.post(
-            self.remote_url + 'prefs/sshkeys/', data={'action': 'add', 'title': title, 'key': public_key})
+            self.remote_url + 'prefs/sshkeys/', data={'action': 'add', 'title': title, 'key': public_key}
+        )
         response.raise_for_status()
 
     def get_current_user_info(self):

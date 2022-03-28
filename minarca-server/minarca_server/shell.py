@@ -30,6 +30,7 @@ from minarca_server.config import get_parser
 
 try:
     import pkg_resources
+
     __version__ = pkg_resources.get_distribution("minarca-server").version
 except Exception:
     __version__ = 'DEV'
@@ -71,7 +72,9 @@ class Jail(SplitExec):
                 continue
             dest = os.path.join(self.root, mountpoint[1:])
             os.mkdir(dest)
-            mount(source=mountpoint, target=dest, fstype=None, flags=reduce(operator.or_, [MS_BIND, MS_REC, MS_RDONLY], 0))
+            mount(
+                source=mountpoint, target=dest, fstype=None, flags=reduce(operator.or_, [MS_BIND, MS_REC, MS_RDONLY], 0)
+            )
         # Create custom mount point
         if self.path:
             dest = os.path.join(self.root, self.path[1:])
@@ -95,10 +98,7 @@ def _setup_logging(cfg):
     if cfg.log_file:
         shell_logfile = os.path.join(os.path.dirname(cfg.log_file), 'shell.log')
         fmt = "[%(asctime)s][%(levelname)-7s][%(ip)s][%(user)s][%(threadName)s][%(name)s] %(message)s"
-        logging.basicConfig(
-            filename=shell_logfile,
-            level=logging.DEBUG,
-            format=fmt)
+        logging.basicConfig(filename=shell_logfile, level=logging.DEBUG, format=fmt)
 
 
 def _jail(userroot, args):
@@ -130,8 +130,8 @@ def _parse_config():
     """
     server_parser = get_parser()
     parser = configargparse.ArgumentParser(
-        default_config_files=server_parser._default_config_files,
-        auto_env_var_prefix=server_parser._auto_env_var_prefix)
+        default_config_files=server_parser._default_config_files, auto_env_var_prefix=server_parser._auto_env_var_prefix
+    )
     parser.add_argument('--log-file', '--logfile', default=server_parser._defaults['log_file'])
     parser.add_argument('--minarca-rdiff-backup-extra-args', '--rdiffbackup-args')
     return parser.parse_known_args(args=[])[0]
@@ -178,10 +178,17 @@ def main(args=None):
     # or we get called by minarca client which replace the command by the name of the repository.
     if ssh_original_command in ["echo -n 1", "echo -n host is alive"]:
         # Used by backup-ninja to verify connectivity
-        subprocess.check_call(ssh_original_command.split(' '), env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
+        subprocess.check_call(
+            ssh_original_command.split(' '),
+            env={'LANG': 'en_US.utf-8'},
+            stdout=sys.stdout.fileno(),
+            stderr=sys.stderr.fileno(),
+        )
     elif ssh_original_command in ["/usr/bin/rdiff-backup -V"]:
         rdiff_backup = _find_rdiff_backup()
-        subprocess.check_call([rdiff_backup, '-V'], env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno())
+        subprocess.check_call(
+            [rdiff_backup, '-V'], env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno()
+        )
     else:
         if ssh_original_command in ["rdiff-backup --server"]:
             # When called directly by rdiff-backup.
@@ -208,7 +215,10 @@ def main(args=None):
         try:
             _jail(userroot, cmd)
         except OSError:
-            logger.error("Fail to create rdiff-backup jail. If you are running minarca-shell in Docker, make sure you started the container with `--privileged`. If you are on Debian, make sure to disable userns hardening `echo 1 > /proc/sys/kernel/unprivileged_userns_clone`.", exc_info=1)
+            logger.error(
+                "Fail to create rdiff-backup jail. If you are running minarca-shell in Docker, make sure you started the container with `--privileged`. If you are on Debian, make sure to disable userns hardening `echo 1 > /proc/sys/kernel/unprivileged_userns_clone`.",
+                exc_info=1,
+            )
 
 
 if __name__ == '__main__':
