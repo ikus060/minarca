@@ -28,6 +28,7 @@ def home_dialog():
     def pump_events():
         while dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
             pass
+
     dlg = HomeDialog()
     dlg.pump_events = pump_events
     dlg.set_active_view('patterns')
@@ -43,13 +44,14 @@ def home_dialog():
 
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class PatternsViewTest(unittest.TestCase):
-
     def test_open_patterns(self):
         # Given a home dialog with default patterns
         with home_dialog() as dlg:
             # When showing the patterns view.
             # Then it contains the list of existing patterns.
-            self.assertEqual(len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children()))
+            self.assertEqual(
+                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+            )
 
     @unittest.mock.patch('tkinter.filedialog.askopenfilenames', return_value=['/home/this_is_a_file'])
     def test_add_file_pattern(self, mock_askopenfilenames):
@@ -61,7 +63,9 @@ class PatternsViewTest(unittest.TestCase):
             dlg.pump_events()
             # Then the pattern is added in the widget.
             self.assertEqual(1, len(dlg.backup.get_patterns()))
-            self.assertEqual(len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children()))
+            self.assertEqual(
+                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+            )
 
     @unittest.mock.patch('tkinter.filedialog.askdirectory', return_value=['/home/'])
     def test_add_folder_pattern(self, mock_askdirectory):
@@ -73,7 +77,9 @@ class PatternsViewTest(unittest.TestCase):
             dlg.pump_events()
             # Then the pattern is added in the widget.
             self.assertEqual(1, len(dlg.backup.get_patterns()))
-            self.assertEqual(len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children()))
+            self.assertEqual(
+                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+            )
 
     @unittest.mock.patch('tkinter.simpledialog.askstring', return_value=['new-pattern'])
     def test_add_custom_pattern(self, mock_askdirectory):
@@ -85,7 +91,9 @@ class PatternsViewTest(unittest.TestCase):
             dlg.pump_events()
             # Then the pattern is added in the widget.
             self.assertEqual(1, len(dlg.backup.get_patterns()))
-            self.assertEqual(len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children()))
+            self.assertEqual(
+                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+            )
 
     def test_remove_pattern(self):
         # Given a home dialog with default patterns
@@ -99,7 +107,9 @@ class PatternsViewTest(unittest.TestCase):
             dlg.pump_events()
             # Then the pattern is added in the widget.
             self.assertEqual(0, len(dlg.backup.get_patterns()))
-            self.assertEqual(len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children()))
+            self.assertEqual(
+                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+            )
 
     def test_toggle_pattern(self):
         # Given a home dialog with default patterns

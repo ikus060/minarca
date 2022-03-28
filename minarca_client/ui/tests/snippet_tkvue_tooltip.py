@@ -19,9 +19,7 @@ class RootDialog(tkvue.Component):
     </Frame>
 </TopLevel>
     """
-    data = tkvue.Context({
-        'tooltip_value': 'Tooltip value to be displayed'
-    })
+    data = tkvue.Context({'tooltip_value': 'Tooltip value to be displayed'})
 
 
 if __name__ == "__main__":

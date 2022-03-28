@@ -6,13 +6,10 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from distutils import spawn
-from minarca_client.locale import _
 import datetime
 import distutils.spawn
 import os
 import pathlib
-import pkg_resources
 import platform
 import shutil
 import subprocess
@@ -20,7 +17,11 @@ import sys
 import tempfile
 import threading
 from contextlib import contextmanager
+from distutils import spawn
 
+import pkg_resources
+
+from minarca_client.locale import _
 
 IS_WINDOWS = os.name == 'nt'
 IS_LINUX = sys.platform in ['linux', 'linux2']
@@ -32,6 +33,7 @@ def makedirs(func, mode=0o750):
     """
     Function decorator to create the directory if missing.
     """
+
     def _wrap_func(*args, **kwargs):
         name = func(*args, **kwargs)
         try:
@@ -41,6 +43,7 @@ def makedirs(func, mode=0o750):
             # The process will later fail to read or write file to the folder.
             pass
         return name
+
     return _wrap_func
 
 
@@ -116,19 +119,19 @@ def get_data_home(is_admin=IS_ADMIN):
     if is_admin:
         return "/var/lib/minarca"
     else:
-        return os.path.join(os.environ.get("XDG_DATA_HOME", os.path.join(get_home(is_admin), ".local/share/")), "minarca")
+        return os.path.join(
+            os.environ.get("XDG_DATA_HOME", os.path.join(get_home(is_admin), ".local/share/")), "minarca"
+        )
 
 
 def _get_path():
     """
     Return PATH lookup
     """
-    path = os.environ.get(
-        'PATH', 'C:\\Windows\\system32' if IS_WINDOWS else '/usr/bin')
+    path = os.environ.get('PATH', 'C:\\Windows\\system32' if IS_WINDOWS else '/usr/bin')
     path = os.path.dirname(sys.executable) + os.pathsep + path
     if IS_WINDOWS:
-        ssh_path = pkg_resources.resource_filename(
-            __name__, 'openssh\\win_%s' % platform.machine().lower())
+        ssh_path = pkg_resources.resource_filename(__name__, 'openssh\\win_%s' % platform.machine().lower())
         path = ssh_path + os.pathsep + path
     return path
 
@@ -176,12 +179,13 @@ def get_temp():
 
 def get_user_agent():
     from minarca_client.main import __version__
+
     return "minarca/{minarca_version} rdiff-backup/{rdiff_backup_version} ({os_name} {os_version} {os_arch})".format(
         minarca_version=__version__,
         rdiff_backup_version=get_rdiff_backup_version(),
         os_name=platform.system(),
         os_version=platform.release(),
-        os_arch=platform.machine()
+        os_arch=platform.machine(),
     )
 
 
@@ -206,16 +210,19 @@ def ssh_keygen(public_key, private_key, length=2048):
     # On Windows, pychrypto is not available. For this reason we are using
     # ssh-keygen directly to generate RSA key.
     tmp = tempfile.TemporaryDirectory()
-    subprocess.run([
-        get_ssh_keygen(), '-b', str(length), '-t', 'rsa', '-f',
-        os.path.join(tmp.name, 'id_rsa'), '-q', '-N', ''],
-        stdout=subprocess.PIPE, check=True, cwd=tmp.name, env={})
+    subprocess.run(
+        [get_ssh_keygen(), '-b', str(length), '-t', 'rsa', '-f', os.path.join(tmp.name, 'id_rsa'), '-q', '-N', ''],
+        stdout=subprocess.PIPE,
+        check=True,
+        cwd=tmp.name,
+        env={},
+    )
     shutil.move(os.path.join(tmp.name, 'id_rsa'), private_key)
     shutil.move(os.path.join(tmp.name, 'id_rsa.pub'), public_key)
     tmp.cleanup()
 
 
-class _RedirectOutput():
+class _RedirectOutput:
     """
     Used to redirect std to logging.
     """
@@ -261,6 +268,7 @@ def redirect_ouput(logger):
     if IS_WINDOWS and (sys.stderr is None or sys.stderr.__class__.__name__ == 'NullWriter'):
         # With PyInstaller, stderr is undefined.
         import win32api
+
         r_fd, w_fd = os.pipe()
         win32api.SetStdHandle(win32api.STD_ERROR_HANDLE, w_fd)
         stderr_copy = None
@@ -272,7 +280,7 @@ def redirect_ouput(logger):
         r_fd, w_fd = os.pipe()
         os.dup2(w_fd, _old_stderr_fd)
     # Start a thread to read the pipe.
-    t = threading.Thread(target=_reader_thread, args=(r_fd, ))
+    t = threading.Thread(target=_reader_thread, args=(r_fd,))
     t.daemon = True
     t.start()
     try:
@@ -304,7 +312,7 @@ if IS_WINDOWS:
     import win32api  # @UnresolvedImport
     import win32com.client  # @UnresolvedImport
 
-    class WindowsScheduler():
+    class WindowsScheduler:
 
         NAME = _('Minarca Backup')
 
@@ -359,7 +367,8 @@ if IS_WINDOWS:
                 "installing Minarca on a Windows Server, it's preferable to change "
                 "the settings of this task and select 'Run whether user is logged "
                 "on or not' to make sure the backup is running even when nobody is "
-                "using the server.")
+                "using the server."
+            )
             task_def.Settings.Enabled = True
             task_def.Settings.StopIfGoingOnBatteries = False
 
@@ -373,7 +382,8 @@ if IS_WINDOWS:
                 TASK_CREATE_OR_UPDATE,
                 '',  # No user
                 '',  # No password
-                TASK_LOGON_NONE)
+                TASK_LOGON_NONE,
+            )
 
         def delete(self):
             """
@@ -395,12 +405,10 @@ if IS_WINDOWS:
                 # command line.
                 winerror = e.excepinfo[5]
                 if winerror == -2147024891:  # Access denied.
-                    retcode = subprocess.call(
-                        ['SCHTASKS.exe', '/Delete', '/TN', 'Minarca Backup', '/F'])
+                    retcode = subprocess.call(['SCHTASKS.exe', '/Delete', '/TN', 'Minarca Backup', '/F'])
                     if retcode == 0:
                         return
-                    raise OSError(None, win32api.FormatMessage(
-                        winerror), None, winerror)
+                    raise OSError(None, win32api.FormatMessage(winerror), None, winerror)
 
     Scheduler = WindowsScheduler
 
@@ -408,8 +416,7 @@ if IS_MAC:
 
     import launchd  # @UnresolvedImport
 
-    class MacScheduler():
-
+    class MacScheduler:
         def __init__(self):
             self.plist = {
                 "Label": "org.minarca.minarca-client.plist",
@@ -427,8 +434,7 @@ if IS_MAC:
                     # Task already exists. leave.
                     return
             # Create missing directory.
-            fname = launchd.plist.compute_filename(
-                self.label, scope=launchd.plist.USER)
+            fname = launchd.plist.compute_filename(self.label, scope=launchd.plist.USER)
             if not os.path.exists(os.path.dirname(fname)):
                 os.mkdir(os.path.dirname(fname))
             # Dump plist file
@@ -451,8 +457,7 @@ if IS_LINUX:
 
     from crontab import CronTab
 
-    class CrontabScheduler():
-
+    class CrontabScheduler:
         def __init__(self):
             self.cron = CronTab(user=True)
             minarca = get_minarca_exe()
