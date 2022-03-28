@@ -2,4 +2,4 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-recursive-include minarca_plugins *.ico *.png
+recursive-include minarca_server *.ico *.png

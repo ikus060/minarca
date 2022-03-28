@@ -20,5 +20,5 @@ override_dh_installsystemd:
 execute_after_dh_builddeb:
 	# Run test after creation of debian packages to avoid poluting the binary with test dependencies.
 	# Run test with pytest
-	$(DH_VENV_DIR)/bin/python -m pip install responses httpretty pytest
+	$(DH_VENV_DIR)/bin/python -m pip install responses responses pytest
 	$(DH_VENV_DIR)/bin/python -m pytest

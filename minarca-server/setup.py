@@ -32,29 +32,27 @@ setuptools.setup(
     url='https://www.ikus-soft.com/en/minarca/',
     include_package_data=True,
     python_requires='>=3.5',
-    packages=['minarca_plugins'],
+    packages=['minarca_server', 'minarca_server.plugins'],
     setup_requires=[
         "setuptools_scm>=5.0.1",
     ],
     install_requires=[
-        "rdiffweb==2.4.0a2",
-        "cherrypy>=16.0.0",
+        "rdiffweb==2.4.0a3",
+        "cherrypy>=18.0.0",
         "requests",
         "tzlocal~=2.0",
         snakeoil_ver,
     ],
     # required packages for build process
     extras_require={'test': [
-        "httpretty",
+        "responses",
         "pytest",
     ]},
     # Declare entry point
     entry_points={
-        'rdiffweb.IUserChangeListener': ['MinarcaUserSetup = minarca_plugins:MinarcaUserSetup'],
-        'rdiffweb.IUserQuota': ['MinarcaUserSetup = minarca_plugins:MinarcaQuota'],
         "console_scripts": [
-            "minarca-server = rdiffweb.main:main",
-            "minarca-shell = minarca_plugins.shell:main",
+            "minarca-server = minarca_server.main:main",
+            "minarca-shell = minarca_server.shell:main",
         ]
     },
 )

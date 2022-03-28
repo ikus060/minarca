@@ -25,7 +25,7 @@ test:flake8:
     - TARGET: minarca-client
       DEPENDS: cron librsync-dev python3-tk libacl1-dev
     - TARGET: minarca-server
-      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+      DEPENDS: rdiff-backup
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
     - TARGET: minarca-quota-api
       DEPENDS: bash
@@ -53,7 +53,7 @@ test:deb:
       DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
     - TARGET: minarca-server
       DIST: [buster, bullseye]
-      DEPENDS: libldap2-dev libsasl2-dev rdiff-backup
+      DEPENDS: rdiff-backup
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye]
       DEPENDS: bash
@@ -275,6 +275,7 @@ upload:doc:
     FILENAME: doc
 
 upload:sonar:
+  allow_failure: true
   stage: upload
   needs:
   - test:deb
@@ -286,7 +287,7 @@ upload:sonar:
   variables:
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
   script:
-  - sonar-scanner -X -Dsonar.python.coverage.reportPath=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
+  - sonar-scanner -X -Dsonar.qualitygate.wait=True -Dsonar.python.coverage.reportPaths=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
 
 
 deploy:dev:

@@ -9,7 +9,9 @@
             "type": "python",
             "request": "launch",
             "module": "minarca_client.main",
-            "args": ["ui"],
+            "args": [
+                "ui"
+            ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
@@ -21,7 +23,9 @@
             "type": "python",
             "request": "launch",
             "module": "minarca_client.main",
-            "args": ["--help"],
+            "args": [
+                "--help"
+            ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
@@ -29,12 +33,26 @@
             }
         },
         {
-            "name": "Python: Current File",
+            "name": "Python: Minarca WebServer",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "module": "minarca_server.main",
+            "args": [
+                "--log-file",
+                "",
+                "--log-access-file",
+                "",
+                "--database-uri",
+                "/home/ikus060/workspace/PDSL/rdiffweb.git/rdw.db",
+                "--minarca-user-base-dir",
+                "/tmp",
+                "--minarca-user-dir-owner",
+                "ikus060",
+                "--minarca-user-dir-group",
+                "ikus060"
+            ],
             "console": "integratedTerminal",
             "justMyCode": false,
-        }
+        },
     ]
 }

@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+#
+# Minarca server
+#
+# Copyright (C) 2020 IKUS Software inc. All rights reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
 '''
 Created on Sep. 25, 2020
 
@@ -15,8 +22,8 @@ import unittest
 
 from tzlocal import get_localzone
 
-from minarca_plugins import shell
-from minarca_plugins.shell import Jail
+from minarca_server import shell
+from minarca_server.shell import Jail
 
 
 USERNAME = 'joe'
@@ -71,8 +78,8 @@ class Test(unittest.TestCase):
             value = f.read()
             self.assertEqual(b'1', value, "output of `echo -n 1` should be 1")
 
-    @mock.patch('minarca_plugins.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
-    @mock.patch('minarca_plugins.shell._jail')
+    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
+    @mock.patch('minarca_server.shell._jail')
     def test_main_with_rdiff_backup_server(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
         os.environ['MINARCA_USERNAME'] = USERNAME
         os.environ['MINARCA_USER_ROOT'] = USERROOT
@@ -86,8 +93,8 @@ class Test(unittest.TestCase):
         rdiff_backup_jail_mock.assert_called_once_with(
             '/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
 
-    @mock.patch('minarca_plugins.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
-    @mock.patch('minarca_plugins.shell._jail')
+    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
+    @mock.patch('minarca_server.shell._jail')
     def test_main_with_minarca_legacy(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
         # First minarca version send only the repository name as the command
         # line without anymore information.
@@ -104,8 +111,8 @@ class Test(unittest.TestCase):
             '/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
         find_rdiff_backup_mock.assert_called_once_with(version=1)
 
-    @mock.patch('minarca_plugins.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
-    @mock.patch('minarca_plugins.shell._jail')
+    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
+    @mock.patch('minarca_server.shell._jail')
     def test_main_with_minarca_with_128(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
         # Minarca is sending a user agent string containing the rdiff-backup
         # version.
@@ -122,8 +129,8 @@ class Test(unittest.TestCase):
             '/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
         find_rdiff_backup_mock.assert_called_once_with(version=1)
 
-    @mock.patch('minarca_plugins.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
-    @mock.patch('minarca_plugins.shell._jail')
+    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
+    @mock.patch('minarca_server.shell._jail')
     def test_main_with_minarca_with_205(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
         # Minarca is sending a user agent string containing the rdiff-backup
         # version.
