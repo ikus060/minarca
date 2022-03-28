@@ -43,8 +43,7 @@ elif sys.platform == "darwin":
 else:
     extra_options = {
         # On Linux we use Crontab for scheduling
-        "install_requires": install_requires
-        + ["python-crontab", "pylibacl", "pyxattr"],
+        "install_requires": install_requires + ["python-crontab", "pylibacl", "pyxattr"],
         # Python 3.6 and more are supported
         "python_requires": "~=3.7",
     }
