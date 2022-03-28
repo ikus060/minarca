@@ -2,6 +2,7 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import pkg_resources
+
 from minarca_client.ui import tkvue
 
 # Configure TK with our theme.
@@ -13,4 +14,5 @@ tkvue.configure_tk(
     # Provide 16px for Windows
     icon=['minarca-256', 'minarca-128', 'minarca-32', 'minarca-16'],
     theme='minarca',
-    theme_source=theme_file)
+    theme_source=theme_file,
+)

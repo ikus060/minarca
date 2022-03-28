@@ -6,21 +6,20 @@ Created on Jun. 9, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from minarca_client import main
-from minarca_client.core.config import Pattern, Patterns, Settings
-from minarca_client.main import (
-    _backup, _schedule, _status, _stop, _unlink, _pattern)
-from unittest import mock
 import contextlib
 import io
+import logging
 import os
 import tempfile
 import unittest
-import logging
+from unittest import mock
+
+from minarca_client import main
+from minarca_client.core.config import Pattern, Patterns, Settings
+from minarca_client.main import _backup, _pattern, _schedule, _status, _stop, _unlink
 
 
 class TestMainParseArgs(unittest.TestCase):
-
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
@@ -50,8 +49,7 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._pattern')
     def test_args_exclude_multiple(self, mock_pattern):
         main.main(['exclude', '*.bak', '$~*', '/proc'])
-        mock_pattern.assert_called_once_with(
-            include=False, pattern=['*.bak', '$~*', '/proc'])
+        mock_pattern.assert_called_once_with(include=False, pattern=['*.bak', '$~*', '/proc'])
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_include(self, mock_pattern):
@@ -61,15 +59,16 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._pattern')
     def test_args_include_multiple(self, mock_pattern):
         main.main(['include', '*.bak', '$~*', '/proc'])
-        mock_pattern.assert_called_once_with(
-            include=True, pattern=['*.bak', '$~*', '/proc'])
+        mock_pattern.assert_called_once_with(include=True, pattern=['*.bak', '$~*', '/proc'])
 
     @mock.patch('minarca_client.main._link')
     def test_args_link(self, mock_link):
-        main.main(['link', '--remoteurl', 'https://localhost',
-                   '--username', 'foo', '--password', 'bar', '--name', 'repo'])
+        main.main(
+            ['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar', '--name', 'repo']
+        )
         mock_link.assert_called_once_with(
-            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=False)
+            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=False
+        )
 
     @mock.patch('minarca_client.main.Backup')
     def test_args_debug(self, mock_backup):
@@ -102,28 +101,22 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main.Backup')
     def test_link(self, mock_backup):
         mock_backup.return_value.is_linked.return_value = False
-        main.main(['link', '--remoteurl', 'https://localhost',
-                   '--username', 'foo', '--password', 'bar', '--name', 'repo'])
+        main.main(
+            ['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar', '--name', 'repo']
+        )
         mock_backup.return_value.link.assert_called_once_with(
-            remoteurl='https://localhost',
-            username='foo',
-            password='bar',
-            repository_name='repo',
-            force=False)
+            remoteurl='https://localhost', username='foo', password='bar', repository_name='repo', force=False
+        )
 
     @mock.patch('getpass.getpass')
     @mock.patch('minarca_client.main.Backup')
     def test_link_prompt_password(self, mock_backup, mock_getpass):
         mock_backup.return_value.is_linked.return_value = False
         mock_getpass.return_value = 'bar'
-        main.main(['link', '--remoteurl', 'https://localhost',
-                   '--username', 'foo', '--name', 'repo'])
+        main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
         mock_backup.return_value.link.assert_called_once_with(
-            remoteurl='https://localhost',
-            username='foo',
-            password='bar',
-            repository_name='repo',
-            force=False)
+            remoteurl='https://localhost', username='foo', password='bar', repository_name='repo', force=False
+        )
 
     @mock.patch('getpass.getpass')
     @mock.patch('minarca_client.main.Backup')
@@ -131,21 +124,32 @@ class TestMainParseArgs(unittest.TestCase):
         mock_backup.return_value.is_linked.return_value = False
         mock_getpass.return_value = ''
         with self.assertRaises(SystemExit):
-            main.main(['link', '--remoteurl', 'https://localhost',
-                       '--username', 'foo', '--name', 'repo'])
+            main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
 
     @mock.patch('minarca_client.main._link')
     def test_args_link_force(self, mock_link):
-        main.main(['link', '--remoteurl', 'https://localhost',
-                   '--username', 'foo', '--password', 'bar', '--name', 'repo', '--force'])
+        main.main(
+            [
+                'link',
+                '--remoteurl',
+                'https://localhost',
+                '--username',
+                'foo',
+                '--password',
+                'bar',
+                '--name',
+                'repo',
+                '--force',
+            ]
+        )
         mock_link.assert_called_once_with(
-            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=True)
+            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=True
+        )
 
     @mock.patch('minarca_client.main._link')
     def test_args_link_arg_missing(self, unused_mock_link):
         with self.assertRaises(SystemExit):
-            main.main(['link', '--remoteurl', 'https://localhost',
-                       '--username', 'foo', '--password', 'bar'])
+            main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar'])
 
     @mock.patch('minarca_client.main._patterns')
     def test_args_patterns(self, mock_patterns):
@@ -246,14 +250,12 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main.Backup')
     def test_schedule(self, mock_backup):
         _schedule()
-        mock_backup.return_value.schedule.assert_called_once_with(
-            schedule=None)
+        mock_backup.return_value.schedule.assert_called_once_with(schedule=None)
 
     @mock.patch('minarca_client.main.Backup')
     def test_schedule_hourly(self, mock_backup):
         _schedule(schedule=Settings.HOURLY)
-        mock_backup.return_value.schedule.assert_called_once_with(
-            schedule=Settings.HOURLY)
+        mock_backup.return_value.schedule.assert_called_once_with(schedule=Settings.HOURLY)
 
     @mock.patch('minarca_client.main.Backup')
     def test_status(self, mock_backup):

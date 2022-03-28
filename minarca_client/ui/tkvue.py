@@ -1,4 +1,3 @@
-
 # Copyright (C) 2021 IKUS Software inc. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
@@ -99,7 +98,6 @@ def extract_tkvue(fileobj, keywords, comment_tags, options):
     encoding = options.pop('encoding', 'utf-8')
 
     class ExtractorParser(HTMLParser):
-
         def __init__(self):
             self.messages = []
             super().__init__()
@@ -116,7 +114,6 @@ def extract_tkvue(fileobj, keywords, comment_tags, options):
 
 
 class Context(collections.abc.MutableMapping):
-
     def __init__(self, initial_data={}, parent=None):
         'Create a new root context'
         for key, value in initial_data.items():
@@ -352,7 +349,9 @@ class ToolTip(ttk.Frame):
             print('* Error performing wm_overrideredirect in showtip *', e)
         self.tipwindow.wm_geometry("+%d+%d" % (x, y))
         self.tipwindow.wm_attributes("-topmost", 1)
-        label = ttk.Label(self.tipwindow, text=self.text, justify=tkinter.LEFT, padding=5, style='tooltip.TLabel', width=self.width)
+        label = ttk.Label(
+            self.tipwindow, text=self.text, justify=tkinter.LEFT, padding=5, style='tooltip.TLabel', width=self.width
+        )
         if self.width:
             label.bind('<Configure>', lambda e: label.configure(wraplen=label.winfo_width()), add='+')
         label.pack()
@@ -397,7 +396,7 @@ class ToolTip(ttk.Frame):
         self.widget.event_generate(*args, **kwargs)
 
 
-class Loop():
+class Loop:
     """
     Pseudo widget used to handle for loops.
     """
@@ -494,8 +493,7 @@ class ScrolledFrame(ttk.Frame):
         # create a canvas object and a vertical scrollbar for scrolling it
         vscrollbar = ttk.Scrollbar(self, orient=tkinter.VERTICAL)
         vscrollbar.pack(fill=tkinter.Y, side=tkinter.RIGHT, expand=tkinter.FALSE)
-        canvas = tkinter.Canvas(self, bd=0, highlightthickness=0,
-                                yscrollcommand=vscrollbar.set)
+        canvas = tkinter.Canvas(self, bd=0, highlightthickness=0, yscrollcommand=vscrollbar.set)
         canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.TRUE)
         vscrollbar.config(command=canvas.yview)
 
@@ -505,8 +503,7 @@ class ScrolledFrame(ttk.Frame):
 
         # create a frame inside the canvas which will be scrolled with it
         self.interior = interior = ttk.Frame(canvas)
-        interior_id = canvas.create_window(0, 0, window=interior,
-                                           anchor=tkinter.NW)
+        interior_id = canvas.create_window(0, 0, window=interior, anchor=tkinter.NW)
 
         interior.bind('<Configure>', _configure_interior)
         canvas.bind('<Configure>', _configure_canvas)
@@ -536,6 +533,7 @@ class Element(object):
     """
     HTML element
     """
+
     __slots__ = ['tag', 'attrs', 'children', 'parent']
 
     def __init__(self, tag='', attrs={}, parent=None):
@@ -573,8 +571,7 @@ class Parser(HTMLParser):
         self.node = self.node.parent
 
 
-class TkVue():
-
+class TkVue:
     def __init__(self, component, master):
         assert component
         assert hasattr(component, 'template'), 'component %s must define a template' % component.__class__.__name__
@@ -701,8 +698,10 @@ class TkVue():
         funcs = {k: getattr(self.component, k) for k in dir(self.component) if callable(getattr(self.component, k))}
         # May need to adjust this to detect expression.
         if '(' in value or '=' in value:
+
             def func():
                 return context.eval(value, **funcs)
+
         else:
             func = funcs.get(value, None)
             assert func and hasattr(func, '__call__'), 'command attribute value should define a function name'
@@ -723,7 +722,9 @@ class TkVue():
             # Create the widget with required attributes.
             widget = self._bind_attrs(master, tree.tag, attrs, context)
         except Exception as e:
-            raise Exception(str(e) + ' for tag <%s %s>' % (tree.tag, ' '.join(['%s="%s"' % (k, v) for k, v in tree.attrs.items()])))
+            raise Exception(
+                str(e) + ' for tag <%s %s>' % (tree.tag, ' '.join(['%s="%s"' % (k, v) for k, v in tree.attrs.items()]))
+            )
         # Support ScrolledFrame with `interior`
         interior = getattr(widget, 'interior', widget)
         # Create child widgets.
@@ -732,7 +733,7 @@ class TkVue():
         return widget
 
 
-class Component():
+class Component:
     template = """<Label text="default template" />"""
 
     def __init_subclass__(cls, **kwargs):

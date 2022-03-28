@@ -5,9 +5,9 @@ Created on Jul. 20, 2021
 '''
 import os
 import tempfile
+import time
 import tkinter
 import unittest
-import time
 from unittest.mock import MagicMock
 
 from minarca_client.core.compat import IS_LINUX
@@ -18,7 +18,6 @@ NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class SettingsTest(unittest.TestCase):
-
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()

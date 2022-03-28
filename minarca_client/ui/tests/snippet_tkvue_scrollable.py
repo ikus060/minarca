@@ -1,5 +1,3 @@
-
-
 from minarca_client.ui import tkvue
 
 
@@ -19,8 +17,7 @@ class RootDialog(tkvue.Component):
 
 
     """
-    data = tkvue.Context({
-    })
+    data = tkvue.Context({})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
