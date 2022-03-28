@@ -19,7 +19,10 @@ class ZFSQuotaException(Exception):
 
 
 def _parse_args(args):
-    parser = argparse.ArgumentParser(prog='minarca-zfs-quota', description='Minarca utilities to get and set ZFS quota. If VALUE is define, sets the given quota')
+    parser = argparse.ArgumentParser(
+        prog='minarca-zfs-quota',
+        description='Minarca utilities to get and set ZFS quota. If VALUE is define, sets the given quota',
+    )
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-P', '--project', help="Set project quotas for named project.")
     group.add_argument('-u', '--user', help="Set user quotas for named user. This is the default.")
@@ -47,7 +50,16 @@ def get_quota(pool, projectid=None):
     """Get user disk quota and space."""
     assert pool
     assert projectid and isinstance(projectid, int), "projectid must be a number " + projectid
-    args = ['/sbin/zfs', 'get', '-p', '-H', '-o', 'value', 'projectused@%s,projectquota@%s' % (projectid, projectid), pool]
+    args = [
+        '/sbin/zfs',
+        'get',
+        '-p',
+        '-H',
+        '-o',
+        'value',
+        'projectused@%s,projectquota@%s' % (projectid, projectid),
+        pool,
+    ]
 
     # Get value using zfs (as exact value).
     try:
@@ -89,10 +101,7 @@ def main(args=None):
     try:
         if args.quota is None:
             values = get_quota(projectid=args.project, user=args.user, group=args.group, pool=args.pool[0])
-            print("%s\t%s\t%s" % (
-                args.project or args.user or args.group,
-                values['used'],
-                values['quota']))
+            print("%s\t%s\t%s" % (args.project or args.user or args.group, values['used'], values['quota']))
         else:
             set_quota(projectid=args.project, user=args.user, group=args.group, pool=args.pool[0], quota=args.quota)
     except Exception as e:

@@ -5,10 +5,10 @@
 
 __all__ = ['_', 'gettext', 'ngettext']
 
-import sys
 import gettext as _gt
 import locale
 import os
+import sys
 
 import pkg_resources
 
@@ -18,6 +18,7 @@ languages = None
 if sys.platform == 'darwin':
     try:
         import Foundation
+
         sud = Foundation.NSUserDefaults.standardUserDefaults()  # @UndefinedVariable
         languages = [str(sud.stringForKey_('AppleLocale'))]
     except ImportError:
@@ -25,6 +26,7 @@ if sys.platform == 'darwin':
 elif sys.platform == 'win32':
     try:
         import ctypes
+
         windll = ctypes.windll.kernel32
         languages = [locale.windows_locale[windll.GetUserDefaultUILanguage()]]
         # For testing we support environment variable too

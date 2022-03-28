@@ -6,22 +6,31 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from minarca_client.core import (Backup, BackupError, HttpAuthenticationError,
-                                 HttpConnectionError, HttpInvalidUrlError, NoPatternsError, NotScheduleError,
-                                 RepositoryNameExistsError)
-from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
-from minarca_client.tests.test import MATCH
-from unittest import mock
-from unittest.case import skipIf, skipUnless
-from unittest.mock import MagicMock
 import os
-import responses
 import subprocess
 import tempfile
 import threading
 import unittest
-from minarca_client.core.exceptions import NotConfiguredError, HttpServerError, SshConnectionError
+from unittest import mock
+from unittest.case import skipIf, skipUnless
+from unittest.mock import MagicMock
+
+import responses
+
+from minarca_client.core import (
+    Backup,
+    BackupError,
+    HttpAuthenticationError,
+    HttpConnectionError,
+    HttpInvalidUrlError,
+    NoPatternsError,
+    NotScheduleError,
+    RepositoryNameExistsError,
+)
+from minarca_client.core.compat import IS_WINDOWS
+from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
+from minarca_client.core.exceptions import HttpServerError, NotConfiguredError, SshConnectionError
+from minarca_client.tests.test import MATCH
 
 IDENTITY = """[test.minarca.net]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK/Qng4S5d75rtYxklVdIkPiz4paf2pdnCEshUoailQO root@sestican
 [test.minarca.net]:2222 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCi0uz4rVsLpVl8b6ozYzL+t1Lh9P98a0tY7KqAtzFupjtZivdIYxh6jXPeonYo7egY+mFgMX22Tlrth8woRa2M= root@sestican
@@ -31,10 +40,8 @@ IDENTITY = """[test.minarca.net]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK/Qng
 _original_subprocess_popen = subprocess.Popen
 
 # A couple of variable to make stuff cross-platform
-_echo_foo_cmd = ['cmd.exe', '/c',
-                 'echo foo'] if IS_WINDOWS else ['echo', 'foo']
-_exit_1_cmd = ['cmd.exe', '/c',
-               'exit 1'] if IS_WINDOWS else ['sh', '-c', 'exit 1']
+_echo_foo_cmd = ['cmd.exe', '/c', 'echo foo'] if IS_WINDOWS else ['echo', 'foo']
+_exit_1_cmd = ['cmd.exe', '/c', 'exit 1'] if IS_WINDOWS else ['sh', '-c', 'exit 1']
 _ssh = 'ssh.exe' if IS_WINDOWS else '/usr/bin/ssh'
 _home = 'C:/Users' if IS_WINDOWS else '/home'
 _root = 'C:/' if IS_WINDOWS else '/'
@@ -47,7 +54,6 @@ def mock_subprocess_link(*args, **kwargs):
 
 
 def mock_subprocess_popen(replace_cmd):
-
     def mock_call(*args, **kwargs):
         return _original_subprocess_popen(replace_cmd, **kwargs)
 
@@ -55,7 +61,6 @@ def mock_subprocess_popen(replace_cmd):
 
 
 class TestBackup(unittest.TestCase):
-
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
@@ -76,20 +81,21 @@ class TestBackup(unittest.TestCase):
 
     def test_link_with_invalid_repository_name(self):
         with self.assertRaises(ValueError):
-            self.backup.link("http://localhost", "admin",
-                             "admin", "invalid!?%$/")
+            self.backup.link("http://localhost", "admin", "admin", "invalid!?%$/")
 
     @mock.patch("minarca_client.core.Rdiffweb")
     def test_link_with_existing_repository_name(self, mock_rdiffweb):
         # Check with identical repo name
         mock_rdiffweb.return_value.get_current_user_info = mock.MagicMock(
-            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': [{'name': 'coucou'}]})
+            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': [{'name': 'coucou'}]}
+        )
         with self.assertRaises(RepositoryNameExistsError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
         # Check with sub folders
         mock_rdiffweb.return_value.get_current_user_info = mock.MagicMock(
-            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': [{'name': 'coucou/C'}]})
+            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': [{'name': 'coucou/C'}]}
+        )
         with self.assertRaises(RepositoryNameExistsError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
@@ -104,9 +110,11 @@ class TestBackup(unittest.TestCase):
 
         # Mock some https stuff
         mock_rdiffweb.return_value.get_current_user_info = mock.MagicMock(
-            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []})
+            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []}
+        )
         mock_rdiffweb.return_value.get_minarca_info = mock.MagicMock(
-            return_value={'remotehost': 'remote', 'version': '3.9.0', 'identity': IDENTITY})
+            return_value={'remotehost': 'remote', 'version': '3.9.0', 'identity': IDENTITY}
+        )
 
         # Link
         self.backup.link("http://localhost", "admin", "admin", "coucou")
@@ -128,24 +136,21 @@ class TestBackup(unittest.TestCase):
     def test_link_with_http_invalid_url_error(self, *unused):
         # Link
         with self.assertRaises(HttpInvalidUrlError):
-            self.backup.link("not_http_url",
-                             "admin", "admin", "coucou")
+            self.backup.link("not_http_url", "admin", "admin", "coucou")
 
     @mock.patch('minarca_client.core.Scheduler')
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     def test_link_with_http_invalid_url_error_2(self, *unused):
         # Link
         with self.assertRaises(HttpInvalidUrlError):
-            self.backup.link("ssh://localhost",
-                             "admin", "admin", "coucou")
+            self.backup.link("ssh://localhost", "admin", "admin", "coucou")
 
     @mock.patch('minarca_client.core.Scheduler')
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     def test_link_with_http_connection_error(self, *unused):
         # Link
         with self.assertRaises(HttpConnectionError):
-            self.backup.link("http://invalid_host_name",
-                             "admin", "admin", "coucou")
+            self.backup.link("http://invalid_host_name", "admin", "admin", "coucou")
 
     @responses.activate
     @mock.patch('minarca_client.core.Scheduler')
@@ -153,15 +158,11 @@ class TestBackup(unittest.TestCase):
     def test_link_with_http_authentication_error_401(self, *unused):
         # Mock authentication fail
         responses.add(responses.GET, "http://localhost/api/")
-        responses.add(
-            responses.GET,
-            "http://localhost/api/currentuser/",
-            status=401)
+        responses.add(responses.GET, "http://localhost/api/currentuser/", status=401)
 
         # Link
         with self.assertRaises(HttpAuthenticationError):
-            self.backup.link("http://localhost",
-                             "admin", "admin", "coucou")
+            self.backup.link("http://localhost", "admin", "admin", "coucou")
 
     @responses.activate
     @mock.patch('minarca_client.core.Scheduler')
@@ -169,14 +170,11 @@ class TestBackup(unittest.TestCase):
     def test_link_with_http_authentication_error_403(self, *unused):
         # Mock authentication fail
         responses.add(responses.GET, "http://localhost/api/")
-        responses.add(responses.GET,
-                      "http://localhost/api/currentuser/",
-                      status=403)
+        responses.add(responses.GET, "http://localhost/api/currentuser/", status=403)
 
         # Link
         with self.assertRaises(HttpAuthenticationError):
-            self.backup.link("http://localhost",
-                             "admin", "admin", "coucou")
+            self.backup.link("http://localhost", "admin", "admin", "coucou")
 
     @responses.activate
     @mock.patch('minarca_client.core.Scheduler')
@@ -184,15 +182,11 @@ class TestBackup(unittest.TestCase):
     def test_link_with_http_authentication_error_503(self, *unused):
         # Mock authentication fail
         responses.add(responses.GET, "http://localhost/api/")
-        responses.add(
-            responses.GET,
-            "http://localhost/api/currentuser/",
-            status=503)
+        responses.add(responses.GET, "http://localhost/api/currentuser/", status=503)
 
         # Link
         with self.assertRaises(HttpServerError):
-            self.backup.link("http://localhost",
-                             "admin", "admin", "coucou")
+            self.backup.link("http://localhost", "admin", "admin", "coucou")
 
     @mock.patch('minarca_client.core.Scheduler')
     @mock.patch('rdiff_backup.Main.Main')
@@ -205,9 +199,11 @@ class TestBackup(unittest.TestCase):
 
         # Mock some https stuff
         mock_rdiffweb.return_value.get_current_user_info = mock.MagicMock(
-            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []})
+            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []}
+        )
         mock_rdiffweb.return_value.get_minarca_info = mock.MagicMock(
-            return_value={'remotehost': 'remote', 'version': '3.9.0', 'identity': IDENTITY})
+            return_value={'remotehost': 'remote', 'version': '3.9.0', 'identity': IDENTITY}
+        )
 
         # Link
         self.backup.link("http://localhost", "admin", "admin", "coucou")
@@ -231,17 +227,18 @@ class TestBackup(unittest.TestCase):
     def test_link_threading(self, mock_rdiffweb, mock_rdiff_backup, mock_scheduler):
         # Mock some https stuff
         mock_rdiffweb.return_value.get_current_user_info = mock.MagicMock(
-            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []})
+            return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []}
+        )
         mock_rdiffweb.return_value.get_minarca_info = mock.MagicMock(
-            return_value={'remotehost': 'remote', 'version': '3.9.0', 'identity': IDENTITY})
+            return_value={'remotehost': 'remote', 'version': '3.9.0', 'identity': IDENTITY}
+        )
 
         # Link
         self.error = None
 
         def _start_link():
             try:
-                self.backup.link("http://localhost",
-                                 "admin", "admin", "coucou")
+                self.backup.link("http://localhost", "admin", "admin", "coucou")
             except Exception as e:
                 self.error = e
 
@@ -262,8 +259,7 @@ class TestBackup(unittest.TestCase):
         config['username'] = 'username'
         config.save()
         # Get value
-        self.assertEqual('http://remotehost/browse/username/test-repo',
-                         self.backup.get_remote_url())
+        self.assertEqual('http://remotehost/browse/username/test-repo', self.backup.get_remote_url())
 
     @skipUnless(IS_WINDOWS, 'windows specific test')
     def test_get_remote_url_windows(self):
@@ -277,8 +273,7 @@ class TestBackup(unittest.TestCase):
         patterns.defaults()
         patterns.save()
         # Get value
-        self.assertEqual('http://remotehost/browse/username/test-repo/C',
-                         self.backup.get_remote_url())
+        self.assertEqual('http://remotehost/browse/username/test-repo/C', self.backup.get_remote_url())
 
     def test_get_help_url(self):
         config = Settings(self.backup.config_file)
@@ -288,8 +283,7 @@ class TestBackup(unittest.TestCase):
         config['username'] = 'username'
         config.save()
         # Get value
-        self.assertEqual('http://remotehost/help',
-                         self.backup.get_help_url())
+        self.assertEqual('http://remotehost/help', self.backup.get_help_url())
 
     def test_get_status(self):
         status = self.backup.get_status()
@@ -374,18 +368,23 @@ class TestBackup(unittest.TestCase):
         config['repositoryname'] = 'test-repo'
         config.save()
         # Make the call
-        self.backup._rdiff_backup(
-            extra_args=['--include', _home], source=_root)
+        self.backup._rdiff_backup(extra_args=['--include', _home], source=_root)
         # Validate
-        mock_rdiff_backup.assert_called_once_with([
-            '-v',
-            '4',
-            '--remote-schema',
-            MATCH(_ssh + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"),
-            '--include',
-            _home,
-            _root,
-            'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo'])
+        mock_rdiff_backup.assert_called_once_with(
+            [
+                '-v',
+                '4',
+                '--remote-schema',
+                MATCH(
+                    _ssh
+                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
+                ),
+                '--include',
+                _home,
+                _root,
+                'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo',
+            ]
+        )
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_exit_1_cmd))
@@ -399,7 +398,9 @@ class TestBackup(unittest.TestCase):
         # Then an exception is raised.
         with self.assertRaises(BackupError):
             self.backup._rdiff_backup(
-                extra_args=['--include', '/home'], source='/',)
+                extra_args=['--include', '/home'],
+                source='/',
+            )
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
@@ -410,18 +411,23 @@ class TestBackup(unittest.TestCase):
         config['repositoryname'] = 'test-repo'
         config.save()
         # Make the call
-        self.backup._rdiff_backup(
-            extra_args=['--include', _home], source=_root)
+        self.backup._rdiff_backup(extra_args=['--include', _home], source=_root)
         # Validate port numner
-        mock_rdiff_backup.assert_called_once_with([
-            '-v',
-            '4',
-            '--remote-schema',
-            MATCH(_ssh + " -oBatchMode=yes -oPreferredAuthentications=publickey -p 2222 -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"),
-            '--include',
-            _home,
-            _root,
-            'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo'])
+        mock_rdiff_backup.assert_called_once_with(
+            [
+                '-v',
+                '4',
+                '--remote-schema',
+                MATCH(
+                    _ssh
+                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -p 2222 -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
+                ),
+                '--include',
+                _home,
+                _root,
+                'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo',
+            ]
+        )
 
     def test_rdiff_backup_threading(self):
 
@@ -429,8 +435,7 @@ class TestBackup(unittest.TestCase):
 
         def _start_backup():
             try:
-                self.backup._rdiff_backup(
-                    extra_args=['--include', _home], source=_root)
+                self.backup._rdiff_backup(extra_args=['--include', _home], source=_root)
             except Exception as e:
                 self.error = e
 
@@ -456,7 +461,9 @@ class TestBackup(unittest.TestCase):
         # Make the call
         with self.assertRaises(NotConfiguredError):
             self.backup._rdiff_backup(
-                extra_args=['--include', '/home'], source='/',)
+                extra_args=['--include', '/home'],
+                source='/',
+            )
 
     def test_rdiff_backup_not_configured_repositoryname(self):
         config = Settings(self.backup.config_file)
@@ -466,7 +473,9 @@ class TestBackup(unittest.TestCase):
         # Make the call
         with self.assertRaises(NotConfiguredError):
             self.backup._rdiff_backup(
-                extra_args=['--include', '/home'], source='/',)
+                extra_args=['--include', '/home'],
+                source='/',
+            )
 
     @mock.patch('minarca_client.core.compat.get_minarca_exe', return_value='minarca.exe' if IS_WINDOWS else 'minarca')
     def test_schedule(self, *unused):
@@ -492,20 +501,22 @@ class TestBackup(unittest.TestCase):
         # Check if rdiff-backup is called.
         if IS_WINDOWS:
             self.backup._rdiff_backup.assert_called_once_with(
-                ['--no-hard-links',
-                 '--exclude-symbolic-links',
-                 '--create-full-path',
-                 '--no-compression',
-                 '--include', _home,
-                 '--exclude', 'C:/**'],
-                source='C:/')
+                [
+                    '--no-hard-links',
+                    '--exclude-symbolic-links',
+                    '--create-full-path',
+                    '--no-compression',
+                    '--include',
+                    _home,
+                    '--exclude',
+                    'C:/**',
+                ],
+                source='C:/',
+            )
         else:
             self.backup._rdiff_backup.assert_called_once_with(
-                ['--exclude-sockets',
-                 '--no-compression',
-                 '--include', _home,
-                 '--exclude', '/**'],
-                source='/')
+                ['--exclude-sockets', '--no-compression', '--include', _home, '--exclude', '/**'], source='/'
+            )
         # Check status
         status = self.backup.get_status()
         self.assertTrue(status['lastsuccess'] > start_time)
@@ -546,13 +557,19 @@ class TestBackup(unittest.TestCase):
         config.save()
         self.backup.test_server()
         # Validate
-        mock_rdiff_backup.assert_called_once_with([
-            '-v',
-            '4',
-            '--remote-schema',
-            MATCH(_ssh + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/* rdiff-backup/2.0.0 (*)'"),
-            '--test-server',
-            'minarca@remotehost::test-repo'])
+        mock_rdiff_backup.assert_called_once_with(
+            [
+                '-v',
+                '4',
+                '--remote-schema',
+                MATCH(
+                    _ssh
+                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/* rdiff-backup/2.0.0 (*)'"
+                ),
+                '--test-server',
+                'minarca@remotehost::test-repo',
+            ]
+        )
 
     @mock.patch('minarca_client.core.Scheduler')
     def test_unlink(self, mock_scheduler):

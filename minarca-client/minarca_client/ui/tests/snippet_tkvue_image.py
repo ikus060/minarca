@@ -1,6 +1,5 @@
-
-
 import pkg_resources
+
 from minarca_client.ui import tkvue
 
 
@@ -13,9 +12,7 @@ class RootDialog(tkvue.Component):
     </Frame>
 </TopLevel>
     """
-    data = tkvue.Context({
-        'icon_path': pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca-22.png')
-    })
+    data = tkvue.Context({'icon_path': pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca-22.png')})
 
 
 if __name__ == "__main__":

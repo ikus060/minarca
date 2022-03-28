@@ -2,9 +2,10 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import os
-import tkinter
-from ttkbootstrap import Style
 import subprocess
+import tkinter
+
+from ttkbootstrap import Style
 
 IMAGES = [
     # 24px
@@ -47,7 +48,19 @@ def create_image(name, svgfile, size=16, glyph=False, color='white'):
     # TODO Convert those image magic command line into Pillow.
     if glyph:
         cmd = CONVERT + [
-            svgfile, '-alpha', 'off', '-fill', color, '-opaque', 'black', '-alpha', 'on', '-resize', f'{size}x{size}', f'{name}.png']
+            svgfile,
+            '-alpha',
+            'off',
+            '-fill',
+            color,
+            '-opaque',
+            'black',
+            '-alpha',
+            'on',
+            '-resize',
+            f'{size}x{size}',
+            f'{name}.png',
+        ]
     else:
         cmd = CONVERT + [svgfile, '-resize', f'{size}x{size}', f'{name}.png']
     subprocess.check_call(cmd, cwd=basedir)
@@ -64,8 +77,28 @@ def create_spinner(name, svgfile, size, color):
     i = 0
     for r in range(0, 360, 45):
         cmd = CONVERT + [
-            '-gravity', 'center', '-resize', f'{size}x{size}', '-extent', f'{size+2}x{size+2}', svgfile, '-alpha', 'off',
-            '-fill', color, '-opaque', 'black', '-alpha', 'on', '-distort', 'SRT', str(r), '-resize', f'{size}x{size}', f'{name}_{i:02d}.png']
+            '-gravity',
+            'center',
+            '-resize',
+            f'{size}x{size}',
+            '-extent',
+            f'{size+2}x{size+2}',
+            svgfile,
+            '-alpha',
+            'off',
+            '-fill',
+            color,
+            '-opaque',
+            'black',
+            '-alpha',
+            'on',
+            '-distort',
+            'SRT',
+            str(r),
+            '-resize',
+            f'{size}x{size}',
+            f'{name}_{i:02d}.png',
+        ]
         subprocess.check_call(cmd, cwd=basedir)
         yield f'{name}_{i:02d}', f'{name}_{i:02d}.png'
         i = i + 1
@@ -132,7 +165,9 @@ def main():
         for image in tkinter.image_names():
             if image.startswith("pyimage"):
                 root.call(image, 'write', f'{basedir}/{image}.png')
-                f.write(f'image create photo {theme_name}_{image} -file [file join [file dirname [info script]] {image}.png]\n')
+                f.write(
+                    f'image create photo {theme_name}_{image} -file [file join [file dirname [info script]] {image}.png]\n'
+                )
 
         # Write theme script.
         f.write(f'ttk::style theme create {theme_name} -parent clam -settings {{')

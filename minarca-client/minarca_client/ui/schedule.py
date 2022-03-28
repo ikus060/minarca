@@ -4,6 +4,7 @@
 import logging
 
 import pkg_resources
+
 from minarca_client.core import Backup
 from minarca_client.ui import tkvue
 
@@ -15,9 +16,7 @@ class ScheduleView(tkvue.Component):
 
     def __init__(self, *args, **kwargs):
         self.backup = Backup()
-        self.data = tkvue.Context({
-            'schedule': self.backup.get_settings('schedule')
-        })
+        self.data = tkvue.Context({'schedule': self.backup.get_settings('schedule')})
         super().__init__(*args, **kwargs)
         self.data.watch('schedule', self.update_schedule)
 

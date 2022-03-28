@@ -27,6 +27,7 @@ class RepositoryNameExistsError(Exception):
     This exception is raised during the linking process when the repository
     name already exists on the remote server.
     """
+
     pass
 
 
@@ -34,6 +35,7 @@ class BackupError(Exception):
     """
     This exception is raised when the backup process failed.
     """
+
     message = None  # should be updated by subclasses.
 
     def __str__(self):
@@ -49,14 +51,16 @@ class InvalidFileSpecificationError(BackupError):
         assert file_spec
         # Try to remove 'b'pattern''
         file_spec = file_spec.strip().strip("'").strip("b").strip("'")
-        self.message = _(
-            "your file specification [%s] doesn't matches any of the base directory of your system") % file_spec
+        self.message = (
+            _("your file specification [%s] doesn't matches any of the base directory of your system") % file_spec
+        )
 
 
 class RdiffBackupError(BackupError):
     """
     This exception is raised when rdiff-backup process return an error.
     """
+
     message = _('backup process returned non-zero exit status, check logs for more details')
 
     def _matches(exception):
@@ -67,6 +71,7 @@ class NoPatternsError(BackupError):
     """
     This exception is raised when a backup is started without any valid patterns.
     """
+
     message = _('include patterns are missing')
 
 
@@ -74,6 +79,7 @@ class NotRunningError(Exception):
     """
     Raised when trying to stop a backup when it's not running.
     """
+
     message = _("cannot stop backup when it's not running")
 
 
@@ -81,6 +87,7 @@ class RunningError(BackupError):
     """
     Raised when a backup is already running.
     """
+
     message = _("cannot start backup when it's already running")
 
 
@@ -88,6 +95,7 @@ class NotConfiguredError(BackupError):
     """
     Raised when the backup is not configured
     """
+
     message = _('not configured, use `minarca link` to configure remote host')
 
 
@@ -95,8 +103,8 @@ class NotScheduleError(BackupError):
     """
     Raised when it's not time to run a backup.
     """
-    message = _(
-        "backup not yet scheduled to run, you may force execution using `--force`")
+
+    message = _("backup not yet scheduled to run, you may force execution using `--force`")
 
 
 class HttpConnectionError(BackupError):
@@ -105,8 +113,7 @@ class HttpConnectionError(BackupError):
     """
 
     def __init__(self, url):
-        self.message = _(
-            'cannot establish connection to `%s`, verify if the URL is valid') % url
+        self.message = _('cannot establish connection to `%s`, verify if the URL is valid') % url
 
 
 class HttpInvalidUrlError(BackupError):
@@ -115,14 +122,19 @@ class HttpInvalidUrlError(BackupError):
     """
 
     def __init__(self, url):
-        self.message = _(
-            'the given URL `%s` is not properly formated, verify if the URL is valid. It must start with either https:// or http://') % url
+        self.message = (
+            _(
+                'the given URL `%s` is not properly formated, verify if the URL is valid. It must start with either https:// or http://'
+            )
+            % url
+        )
 
 
 class HttpAuthenticationError(BackupError):
     """
     Raised for HTTP status code 401 or 403.
     """
+
     message = _('authentication refused, verify your username and password')
 
 
@@ -130,6 +142,7 @@ class HttpServerError(BackupError):
     """
     Raised for HTTP status code 5xx.
     """
+
     message = _('remote server return an error, check remote server log with your administrator')
 
 
@@ -137,12 +150,20 @@ class SshConnectionError(RdiffBackupError):
     """
     Raised when rdiff-backup fail to establish SSH connection with remove host.
     """
-    message = _('Connection to remote backup server trough password - less SSH failed. '
-                'The problem may originate from remote server. If the problem persist, '
-                'contact your system administrator to verify the configuration of the SSH '
-                'server and the password less settings of the server.')
+
+    message = _(
+        'Connection to remote backup server trough password - less SSH failed. '
+        'The problem may originate from remote server. If the problem persist, '
+        'contact your system administrator to verify the configuration of the SSH '
+        'server and the password less settings of the server.'
+    )
 
     @staticmethod
     def _matches(exception):
         # When truncated error occuren it's moslty an SSH issue.
-        return exception and exception.__context__ and exception.__context__.args and exception.__context__.args == ('Truncated header string (problem probably originated remotely)',)
+        return (
+            exception
+            and exception.__context__
+            and exception.__context__.args
+            and exception.__context__.args == ('Truncated header string (problem probably originated remotely)',)
+        )

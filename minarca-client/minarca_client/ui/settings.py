@@ -7,11 +7,11 @@ import tkinter.messagebox
 import webbrowser
 
 import pkg_resources
+
 from minarca_client.core import Backup
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
-
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +22,14 @@ class SettingsView(tkvue.Component):
     def __init__(self, *args, **kwargs):
         self.backup = Backup()
         self.latest_check = LatestCheck()
-        self.data = tkvue.Context({
-            'check_latest_version': self.backup.get_settings('check_latest_version'),
-            'checking_for_update': False,  # True when background thread is running.
-            'is_latest': None,
-            'check_latest_version_error': None
-        })
+        self.data = tkvue.Context(
+            {
+                'check_latest_version': self.backup.get_settings('check_latest_version'),
+                'checking_for_update': False,  # True when background thread is running.
+                'is_latest': None,
+                'check_latest_version_error': None,
+            }
+        )
         super().__init__(*args, **kwargs)
         self.data.watch('check_latest_version', self.update_check_latest_version)
         self.root.bind('<<prompt_latest_version>>', self._prompt_latest_version)
@@ -51,8 +53,14 @@ class SettingsView(tkvue.Component):
         ret = tkinter.messagebox.askquestion(
             master=self.root,
             title=_("New version available"),
-            message=_("A new version of Minarca (%s) is available from IKUS Software. Do you want to upgrade your copy ?") % latest_version,
-            detail=_("Minarca automatically checks for new updates. You can change how Minarca checks for updates in Minarca's settings."))
+            message=_(
+                "A new version of Minarca (%s) is available from IKUS Software. Do you want to upgrade your copy ?"
+            )
+            % latest_version,
+            detail=_(
+                "Minarca automatically checks for new updates. You can change how Minarca checks for updates in Minarca's settings."
+            ),
+        )
         if ret == 'no':
             # Operation cancel by user
             return

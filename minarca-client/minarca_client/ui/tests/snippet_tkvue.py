@@ -1,5 +1,3 @@
-
-
 from minarca_client.ui import tkvue
 
 
@@ -83,15 +81,17 @@ class RootDialog(tkvue.Component):
 
 
     """
-    data = tkvue.Context({
-        'active_view': 'list',
-        'new_people_name': '',
-        'text_entry': 'value',
-        'text_password': 'password',
-        'people': ['patrik', 'annik', 'michel'],
-        'style_variable': 'primary',
-        'on_off_variable': 'on',
-    })
+    data = tkvue.Context(
+        {
+            'active_view': 'list',
+            'new_people_name': '',
+            'text_entry': 'value',
+            'text_password': 'password',
+            'people': ['patrik', 'annik', 'michel'],
+            'style_variable': 'primary',
+            'on_off_variable': 'on',
+        }
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

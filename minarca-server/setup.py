@@ -9,8 +9,9 @@
 
 from __future__ import print_function
 
-import setuptools
 import sys
+
+import setuptools
 
 # snakeoil package drop support for py35, py36, and py37
 PY_VERSION = (sys.version_info.major, sys.version_info.minor)
@@ -23,16 +24,16 @@ if PY_VERSION < (3, 6):
 setuptools.setup(
     name="minarca_server",
     use_scm_version={"root": "..", "relative_to": __file__},
-    description='Minarca Web Server',
-    long_description='Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage.',
-    author='IKUS Software inc.',
-    author_email='support@ikus-soft.com',
-    maintainer='IKUS Software inc.',
-    maintainer_email='support@ikus-soft.com',
-    url='https://www.ikus-soft.com/en/minarca/',
+    description="Minarca Web Server",
+    long_description="Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage.",
+    author="IKUS Software inc.",
+    author_email="support@ikus-soft.com",
+    maintainer="IKUS Software inc.",
+    maintainer_email="support@ikus-soft.com",
+    url="https://www.ikus-soft.com/en/minarca/",
     include_package_data=True,
-    python_requires='>=3.5',
-    packages=['minarca_server', 'minarca_server.plugins'],
+    python_requires=">=3.5",
+    packages=["minarca_server", "minarca_server.plugins"],
     setup_requires=[
         "setuptools_scm>=5.0.1",
     ],
@@ -44,10 +45,12 @@ setuptools.setup(
         snakeoil_ver,
     ],
     # required packages for build process
-    extras_require={'test': [
-        "responses",
-        "pytest",
-    ]},
+    extras_require={
+        "test": [
+            "responses",
+            "pytest",
+        ]
+    },
     # Declare entry point
     entry_points={
         "console_scripts": [

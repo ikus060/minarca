@@ -7,6 +7,7 @@ import tkinter.filedialog
 import tkinter.simpledialog
 
 import pkg_resources
+
 from minarca_client.core import Backup
 from minarca_client.core.compat import get_home
 from minarca_client.core.config import Pattern
@@ -21,10 +22,12 @@ class PatternsView(tkvue.Component):
 
     def __init__(self, *args, **kwargs):
         self.backup = Backup()
-        self.data = tkvue.Context({
-            'patterns': self.backup.get_patterns(),
-            'check_button_text': lambda item: _('Included') if item.include else _('Excluded'),
-        })
+        self.data = tkvue.Context(
+            {
+                'patterns': self.backup.get_patterns(),
+                'check_button_text': lambda item: _('Included') if item.include else _('Excluded'),
+            }
+        )
         super().__init__(*args, **kwargs)
 
     def remove_pattern(self, item):
@@ -43,8 +46,7 @@ class PatternsView(tkvue.Component):
         """
         self.patterns = self.backup.get_patterns()
         if item in self.patterns:
-            new_pattern = Pattern(not item.include,
-                                  item.pattern, item.comment)
+            new_pattern = Pattern(not item.include, item.pattern, item.comment)
             idx = self.patterns.index(item)
             self.patterns[idx] = new_pattern
             self.backup.set_patterns(self.patterns)
@@ -89,7 +91,10 @@ class PatternsView(tkvue.Component):
             pattern = tkinter.simpledialog.askstring(
                 parent=self.root.winfo_toplevel(),
                 title=_("Add custom pattern"),
-                prompt=_("You may provide a custom pattern to include or exclude file.\nCustom pattern may include wildcard `*` or `?`."))
+                prompt=_(
+                    "You may provide a custom pattern to include or exclude file.\nCustom pattern may include wildcard `*` or `?`."
+                ),
+            )
             # TODO Add more validation here.
             if not pattern:
                 # Operation cancel by user

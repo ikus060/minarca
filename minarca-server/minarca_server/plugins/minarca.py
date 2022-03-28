@@ -25,7 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 class TimeoutHTTPAdapter(requests.adapters.HTTPAdapter):
-
     def send(self, *args, **kwargs):
         # Enforce a timeout value if not defined.
         kwargs['timeout'] = kwargs.get('timeout', None)
@@ -107,11 +106,15 @@ class MinarcaPlugin(SimplePlugin):
         Patched version of _get_log_files
         """
         # Add minarca-shell to logfile view.
-        minarca_shell_logfile = os.path.join(os.path.dirname(self._log_file or '/var/log/minarca/server.log'), 'shell.log')
+        minarca_shell_logfile = os.path.join(
+            os.path.dirname(self._log_file or '/var/log/minarca/server.log'), 'shell.log'
+        )
         logfiles = self._orig_get_log_files()
         logfiles.append(minarca_shell_logfile)
         # Add minarca-quota-api to logfile view.
-        minarca_quota_logfile = os.path.join(os.path.dirname(self._log_file or '/var/log/minarca/server.log'), 'quota-api.log')
+        minarca_quota_logfile = os.path.join(
+            os.path.dirname(self._log_file or '/var/log/minarca/server.log'), 'quota-api.log'
+        )
         if os.path.isfile(minarca_quota_logfile):
             logfiles.append(minarca_quota_logfile)
         return logfiles
@@ -124,8 +127,7 @@ class MinarcaPlugin(SimplePlugin):
         try:
             self._update_user_root(userobj)
         except Exception:
-            logger.warning(
-                'fail to update user [%s] root', userobj.username, exc_info=1)
+            logger.warning('fail to update user [%s] root', userobj.username, exc_info=1)
 
     def user_attr_changed(self, userobj, attrs={}):
         """
@@ -139,8 +141,7 @@ class MinarcaPlugin(SimplePlugin):
             try:
                 self._update_authorized_keys()
             except Exception:
-                logger.error(
-                    "fail to update authorized_keys files on user_attr_changed", exc_info=1)
+                logger.error("fail to update authorized_keys files on user_attr_changed", exc_info=1)
 
     def user_deleted(self, username):
         """
@@ -149,8 +150,7 @@ class MinarcaPlugin(SimplePlugin):
         try:
             self._update_authorized_keys()
         except Exception:
-            logger.error(
-                "fail to update authorized_keys files on user_deleted", exc_info=1)
+            logger.error("fail to update authorized_keys files on user_deleted", exc_info=1)
 
     def _update_user_root(self, userobj):
         """
@@ -163,8 +163,7 @@ class MinarcaPlugin(SimplePlugin):
         user_root = os.path.abspath(user_root)
         # Verify if the user_root is inside base dir.
         if self.restricted_to_base_dir and not user_root.startswith(self.user_base_dir):
-            logger.warning(
-                'restrict user [%s] to base dir [%s]', userobj.username, self.user_base_dir)
+            logger.warning('restrict user [%s] to base dir [%s]', userobj.username, self.user_base_dir)
             user_root = os.path.join(self.user_base_dir, userobj.username)
         # Persist the value if different then original
         if userobj.user_root != user_root:
@@ -172,8 +171,7 @@ class MinarcaPlugin(SimplePlugin):
 
         # Create folder if inside our base dir and missing.
         if user_root.startswith(self.user_base_dir) and not os.path.exists(user_root):
-            logger.info(
-                'creating user [%s] root dir [%s]', userobj.username, user_root)
+            logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
             try:
                 os.mkdir(user_root)
                 # Change mode
@@ -181,8 +179,7 @@ class MinarcaPlugin(SimplePlugin):
                 # Change owner
                 os.chown(user_root, self.user_dir_owner_id, self.user_dir_group_id)
             except Exception:
-                logger.warning(
-                    'fail to create user [%s] root dir [%s]', userobj.username, user_root)
+                logger.warning('fail to create user [%s] root dir [%s]', userobj.username, user_root)
 
     def _update_authorized_keys(self):
         """
@@ -226,10 +223,10 @@ class MinarcaPlugin(SimplePlugin):
                     minarca_shell=self.shell,
                     username=userobj.username,
                     user_root=userobj.user_root,
-                    auth_options=self.auth_options)
+                    auth_options=self.auth_options,
+                )
 
-                key = AuthorizedKey(
-                    options=options, keytype=key.keytype, key=key.key, comment=key.comment)
+                key = AuthorizedKey(options=options, keytype=key.keytype, key=key.key, comment=key.comment)
 
                 # Write the new key
                 authorizedkeys.add(new_data, key)
@@ -252,8 +249,7 @@ class MinarcaPlugin(SimplePlugin):
             diskspace = r.json()
             return diskspace['used']
         except Exception:
-            logger.warning(
-                'fail to get user quota [%s]', userobj.username, exc_info=1)
+            logger.warning('fail to get user quota [%s]', userobj.username, exc_info=1)
             return 0
 
     def get_disk_quota(self, userobj):
@@ -268,8 +264,7 @@ class MinarcaPlugin(SimplePlugin):
             diskspace = r.json()
             return diskspace['size']
         except Exception:
-            logger.warning(
-                'fail to get user quota [%s]', userobj.username, exc_info=1)
+            logger.warning('fail to get user quota [%s]', userobj.username, exc_info=1)
             return 0
 
     def set_disk_quota(self, userobj, quota):
@@ -279,8 +274,7 @@ class MinarcaPlugin(SimplePlugin):
         # Always update unless quota not define
         try:
             logger.info('set user [%s] quota [%s]', userobj.username, quota)
-            url = os.path.join(self.quota_api_url,
-                               'quota', str(userobj.userid))
+            url = os.path.join(self.quota_api_url, 'quota', str(userobj.userid))
             r = self.session.post(url, data={'size': quota}, timeout=1)
             r.raise_for_status()
         except Exception:
@@ -290,11 +284,11 @@ class MinarcaPlugin(SimplePlugin):
         # Update user root attribute
         try:
             # Add +P attribute to user's home directory
-            subprocess.check_output(
-                ["/usr/bin/chattr", "-R", "+P", userobj.user_root], stderr=subprocess.STDOUT)
+            subprocess.check_output(["/usr/bin/chattr", "-R", "+P", userobj.user_root], stderr=subprocess.STDOUT)
             # Force project id on directory
-            subprocess.check_output(["/usr/bin/chattr", "-R", "-p", str(
-                userobj.userid), userobj.user_root], stderr=subprocess.STDOUT)
+            subprocess.check_output(
+                ["/usr/bin/chattr", "-R", "-p", str(userobj.userid), userobj.user_root], stderr=subprocess.STDOUT
+            )
         except Exception:
             logger.warning("fail to update user root quota", exc_info=1)
             return False
