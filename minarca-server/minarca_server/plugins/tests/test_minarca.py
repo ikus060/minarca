@@ -14,16 +14,17 @@ Created on Jan 23, 2016
 import grp
 import os
 import pwd
-from io import open
 import unittest
+from io import open
 from unittest.mock import ANY
 
 import cherrypy
-import minarca_server
-import minarca_server.tests
 import pkg_resources
 import responses
 from rdiffweb.core.store import ADMIN_ROLE
+
+import minarca_server
+import minarca_server.tests
 
 
 class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
@@ -71,8 +72,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertEqual("Minarca", self.app.cfg.footer_name)
         self.assertEqual("Minarca", self.app.cfg.header_name)
         self.assertIn("minarca_22.png", self.app.cfg.header_logo)
-        self.assertEqual("/var/log/minarca/access.log",
-                         self.app.cfg.log_access_file)
+        self.assertEqual("/var/log/minarca/access.log", self.app.cfg.log_access_file)
         # log_file get overriden by testcase. So dont validate it.
         self.assertIsNotNone(self.app.cfg.log_file)
         self.assertIn('minarca', self.app.cfg.welcome_msg[''])
@@ -95,7 +95,8 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         headers = [
             ('X-Forwarded-For', '10.255.1.106'),
             ('X-Forwarded-Host', 'sestican.patrikdufresne.com'),
-            ('X-Forwarded-Server', '10.255.1.106')]
+            ('X-Forwarded-Server', '10.255.1.106'),
+        ]
 
         self.getPage("/api/minarca", headers=headers)
         self.assertInBody('remotehost')
@@ -150,10 +151,8 @@ class MinarcaAdminLogView(minarca_server.tests.AbstractMinarcaTest):
         self.getPage('/admin/logs')
         self.assertStatus(200)
         self.assertInBody('server.log', 'server log should be in admin view')
-        self.assertInBody(
-            'shell.log', 'minarca-shell log should be in admin view')
-        self.assertInBody(
-            'quota-api.log', 'minarca-quota-api log should be in admin view')
+        self.assertInBody('shell.log', 'minarca-shell log should be in admin view')
+        self.assertInBody('quota-api.log', 'minarca-quota-api log should be in admin view')
         self.assertNotInBody('Error getting file content')
 
 
@@ -169,8 +168,11 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         # Given a valid use from database
         userobj = self.app.store.add_user('bob')
         # Given a mock quota-api
-        responses.add(responses.POST, "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid),
-                      json={"avail": 2147483648, "used": 0, "size": 2147483648})
+        responses.add(
+            responses.POST,
+            "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid),
+            json={"avail": 2147483648, "used": 0, "size": 2147483648},
+        )
         # When setting a new user quota
         quota = cherrypy.engine.publish('set_disk_quota', userobj, quota=1234567)
         self.assertEqual([1234567], quota)
@@ -185,8 +187,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
     def test_update_userquota_401(self):
         userobj = self.app.store.add_user('bob')
         # Checks if exception is raised when authentication is failing.
-        responses.add(responses.POST, "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid),
-                      status=401)
+        responses.add(responses.POST, "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid), status=401)
         # Make sure an exception is raised.
         quota = cherrypy.engine.publish('set_disk_quota', userobj, quota=1234567)
         self.assertEqual([0], quota)
@@ -199,8 +200,11 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         # Make sure an exception is raised.
         userobj = self.app.store.add_user('bob')
         # Checks if exception is raised when authentication is failing.
-        responses.add(responses.GET, "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid),
-                      body='{"used": 1234, "size": 2147483648}')
+        responses.add(
+            responses.GET,
+            "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid),
+            body='{"used": 1234, "size": 2147483648}',
+        )
         # When querying the disk quota
         quota = cherrypy.engine.publish('get_disk_quota', userobj)
         # Then the quota is returned
@@ -214,8 +218,11 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         # Make sure an exception is raised.
         userobj = self.app.store.add_user('bob')
         # Checks if exception is raised when authentication is failing.
-        responses.add(responses.GET, "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid),
-                      body='{"used": 1234, "size": 2147483648}')
+        responses.add(
+            responses.GET,
+            "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid),
+            body='{"used": 1234, "size": 2147483648}',
+        )
         # When querying the disk quota
         quota = cherrypy.engine.publish('get_disk_usage', userobj)
         # Then the quota is returned
@@ -251,7 +258,9 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
 
         # Validate
         self.assertAuthorizedKeys(
-            '''command="export MINARCA_USERNAME='testuser' MINARCA_USER_ROOT='%s';/opt/minarca-server/bin/minarca-shell",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
+            '''command="export MINARCA_USERNAME='testuser' MINARCA_USER_ROOT='%s';/opt/minarca-server/bin/minarca-shell",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n'''
+            % user_root
+        )
 
         # Update user's home
         user_root = os.path.join(self.base_dir, 'testing')
@@ -259,7 +268,9 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
 
         # Validate
         self.assertAuthorizedKeys(
-            '''command="export MINARCA_USERNAME='testuser' MINARCA_USER_ROOT='%s';/opt/minarca-server/bin/minarca-shell",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n''' % user_root)
+            '''command="export MINARCA_USERNAME='testuser' MINARCA_USER_ROOT='%s';/opt/minarca-server/bin/minarca-shell",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz ikus060@ikus060-t530\n'''
+            % user_root
+        )
 
         # Deleting the user should delete it's keys
         userobj.delete()

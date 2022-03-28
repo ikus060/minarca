@@ -6,20 +6,19 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.config import (Datetime, Pattern, Patterns, Settings,
-                                        Status)
-from unittest import mock
-from unittest.case import skipIf
 import os
 import tempfile
 import unittest
+from unittest import mock
+from unittest.case import skipIf
+
+from minarca_client.core.compat import IS_WINDOWS
+from minarca_client.core.config import Datetime, Pattern, Patterns, Settings, Status
 
 _home = 'C:/Users' if IS_WINDOWS else '/home'
 
 
 class PatternTest(unittest.TestCase):
-
     def test_is_wildcard(self):
         self.assertTrue(Pattern(True, '*.bak', None).is_wildcard())
         self.assertTrue(Pattern(True, '**/temp', None).is_wildcard())
@@ -29,7 +28,6 @@ class PatternTest(unittest.TestCase):
 
 
 class PatternsTest(unittest.TestCase):
-
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
@@ -52,10 +50,8 @@ class PatternsTest(unittest.TestCase):
             f.write("# AutoCad Backup file\n")
             f.write("-*.bak\n")
         patterns = Patterns('patterns')
-        self.assertEqual(
-            Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
-        self.assertEqual(
-            Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
+        self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
+        self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
 
     def test_load_with_missing_file(self):
         patterns = Patterns('invalid')
@@ -70,8 +66,7 @@ class PatternsTest(unittest.TestCase):
         patterns.save()
         with open('patterns', 'r') as f:
             data = f.read()
-        self.assertEqual(
-            "# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
+        self.assertEqual("# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
 
     @skipIf(IS_WINDOWS, 'only or unix')
     def test_group_by_roots_unix(self, *unused):
@@ -93,19 +88,28 @@ class PatternsTest(unittest.TestCase):
         p.append(Pattern(True, '$~*', None))
         p.append(Pattern(True, 'D:\\bar', None))
         groups = list(p.group_by_roots())
-        self.assertEqual([
-            ('C:/', [
-                Pattern(True, 'C:/foo', None),
-                Pattern(True, '*.bak', None),
-                Pattern(True, 'C:/bar', None),
-                Pattern(True, '$~*', None),
-            ]),
-            ('D:/', [
-                Pattern(True, '*.bak', None),
-                Pattern(True, '$~*', None),
-                Pattern(True, 'D:/bar', None),
-            ]),
-        ], groups)
+        self.assertEqual(
+            [
+                (
+                    'C:/',
+                    [
+                        Pattern(True, 'C:/foo', None),
+                        Pattern(True, '*.bak', None),
+                        Pattern(True, 'C:/bar', None),
+                        Pattern(True, '$~*', None),
+                    ],
+                ),
+                (
+                    'D:/',
+                    [
+                        Pattern(True, '*.bak', None),
+                        Pattern(True, '$~*', None),
+                        Pattern(True, 'D:/bar', None),
+                    ],
+                ),
+            ],
+            groups,
+        )
 
     @skipIf(not IS_WINDOWS, 'only for windows')
     @mock.patch('minarca_client.core.config.IS_WINDOWS', return_value=True)
@@ -117,18 +121,23 @@ class PatternsTest(unittest.TestCase):
         p.append(Pattern(True, '$~*', None))
         p.append(Pattern(False, 'D:\\bar', None))
         groups = list(p.group_by_roots())
-        self.assertEqual([
-            ('C:/', [
-                Pattern(True, 'C:/foo', None),
-                Pattern(True, '*.bak', None),
-                Pattern(True, 'C:/bar', None),
-                Pattern(True, '$~*', None),
-            ]),
-        ], groups)
+        self.assertEqual(
+            [
+                (
+                    'C:/',
+                    [
+                        Pattern(True, 'C:/foo', None),
+                        Pattern(True, '*.bak', None),
+                        Pattern(True, 'C:/bar', None),
+                        Pattern(True, '$~*', None),
+                    ],
+                ),
+            ],
+            groups,
+        )
 
 
 class SettingsTest(unittest.TestCase):
-
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
@@ -203,7 +212,6 @@ class SettingsTest(unittest.TestCase):
 
 
 class StatusTest(unittest.TestCase):
-
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
@@ -215,19 +223,15 @@ class StatusTest(unittest.TestCase):
 
     def test_load(self):
         with open('status.properties', 'w') as f:
-            f.write(
-                "details=nothing to backup, make sure you have at least one valid include patterns\n")
+            f.write("details=nothing to backup, make sure you have at least one valid include patterns\n")
             f.write("lastdate=1623094810348\n")
             f.write("lastresult=FAILURE\n")
             f.write("lastsuccess=1622832320569\n")
         status = Status('status.properties')
-        self.assertEqual(
-            'nothing to backup, make sure you have at least one valid include patterns', status['details'])
-        self.assertEqual(Datetime(1623094810348),
-                         status['lastdate'])
+        self.assertEqual('nothing to backup, make sure you have at least one valid include patterns', status['details'])
+        self.assertEqual(Datetime(1623094810348), status['lastdate'])
         self.assertEqual('FAILURE', status['lastresult'])
-        self.assertEqual(Datetime(1622832320569),
-                         status['lastsuccess'])
+        self.assertEqual(Datetime(1622832320569), status['lastsuccess'])
 
     def test_load_with_missing_file(self):
         status = Status('invalid.properties')

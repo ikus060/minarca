@@ -1,10 +1,10 @@
-
 import os
 import tkinter
 import unittest
 from contextlib import contextmanager
 
 import pkg_resources
+
 from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS
 from minarca_client.ui import tkvue
 
@@ -16,6 +16,7 @@ def new_dialog(cls):
     def pump_events():
         while dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
             pass
+
     dlg = cls()
     dlg.pump_events = pump_events
     try:
@@ -26,7 +27,6 @@ def new_dialog(cls):
 
 
 class DataTest(unittest.TestCase):
-
     def setUp(self):
         self.last_value = None
         return super().setUp()
@@ -42,11 +42,7 @@ class DataTest(unittest.TestCase):
         self.assertEqual(data.var1, 'rat')
 
     def test_get_computed(self):
-        data = tkvue.Context({
-            'var1': 1,
-            'var2': 2,
-            'sum': tkvue.computed(lambda store: store.var1 + store.var2)
-        })
+        data = tkvue.Context({'var1': 1, 'var2': 2, 'sum': tkvue.computed(lambda store: store.var1 + store.var2)})
         self.assertEqual(data.sum, 3)
 
     def test_watch_with_variable(self):
@@ -56,11 +52,7 @@ class DataTest(unittest.TestCase):
         self.assertEqual(self.last_value, 'bar')
 
     def test_watch_with_computed(self):
-        data = tkvue.Context({
-            'var1': 1,
-            'var2': 2,
-            'sum': tkvue.computed(lambda store: store.var1 + store.var2)
-        })
+        data = tkvue.Context({'var1': 1, 'var2': 2, 'sum': tkvue.computed(lambda store: store.var1 + store.var2)})
         data.watch('sum', self.callback)
         data.var1 = 4
         self.assertEqual(self.last_value, 6)
@@ -198,13 +190,15 @@ class Dialog(tkvue.Component):
     """
 
     def __init__(self, master=None):
-        self.data = tkvue.Context({
-            'text_value': 'foo',
-            'button_visible': True,
-            'names': ['patrik', 'annik', 'michel', 'denise'],
-            'selected_color': 'blue',
-            'checkbutton_selected': True,
-        })
+        self.data = tkvue.Context(
+            {
+                'text_value': 'foo',
+                'button_visible': True,
+                'names': ['patrik', 'annik', 'michel', 'denise'],
+                'selected_color': 'blue',
+                'checkbutton_selected': True,
+            }
+        )
         super().__init__(master=master)
 
     def checkbutton_invoke(self):
@@ -220,9 +214,7 @@ class DialogWithImage(tkvue.Component):
     """
 
     def __init__(self, master=None):
-        self.data = tkvue.Context({
-            'image_path': None
-        })
+        self.data = tkvue.Context({'image_path': None})
         super().__init__(master=master)
 
 
@@ -252,9 +244,7 @@ class DialogWithLoop(tkvue.Component):
     """
 
     def __init__(self, master=None):
-        self.data = tkvue.Context({
-            'items': []
-        })
+        self.data = tkvue.Context({'items': []})
         super().__init__(master=master)
 
 
@@ -270,7 +260,6 @@ class DialogWithScrolledFrame(tkvue.Component):
 
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class ComponentTest(unittest.TestCase):
-
     def test_open_close(self):
         with new_dialog(Dialog) as dlg:
             dlg.pump_events()

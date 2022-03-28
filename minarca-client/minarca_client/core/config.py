@@ -6,20 +6,21 @@ Created on Jun. 8, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-from collections import namedtuple
-from functools import total_ordering
-from minarca_client.locale import _
-from minarca_client.core.compat import (IS_LINUX, IS_MAC, IS_WINDOWS, get_home,
-                                        get_temp)
 import datetime
-import javaproperties
 import os
 import re
 import time
+from collections import namedtuple
+from functools import total_ordering
+
+import javaproperties
+
+from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, get_home, get_temp
+from minarca_client.locale import _
 
 
 @total_ordering
-class Datetime():
+class Datetime:
     """
     Friendly class to manipulate date in configuration file.
     """
@@ -52,15 +53,9 @@ class Status(dict):
     """
     Used to persists backup status.
     """
-    LAST_RESULTS = ['SUCCESS', 'FAILURE',
-                    'UNKNOWN', 'RUNNING', 'STALE', 'INTERRUPT']
-    _DEFAULT = {
-        'details': None,
-        'lastdate': None,
-        'lastresult': 'UNKNOWN',
-        'lastsuccess': None,
-        'pid': None
-    }
+
+    LAST_RESULTS = ['SUCCESS', 'FAILURE', 'UNKNOWN', 'RUNNING', 'STALE', 'INTERRUPT']
+    _DEFAULT = {'details': None, 'lastdate': None, 'lastresult': 'UNKNOWN', 'lastsuccess': None, 'pid': None}
 
     def __init__(self, filename):
         assert filename
@@ -68,9 +63,9 @@ class Status(dict):
         self._load()
 
     def save(self):
-        values = {k: str(int(v)) if k in ['lastdate', 'lastsuccess'] else str(v)
-                  for k, v in self.items()
-                  if v is not None}
+        values = {
+            k: str(int(v)) if k in ['lastdate', 'lastsuccess'] else str(v) for k, v in self.items() if v is not None
+        }
         with open(self.filename, 'w', encoding='latin-1') as f:
             return javaproperties.dump(values, f)
 
@@ -108,7 +103,7 @@ class Settings(dict):
         'schedule': DAILY,
         'configured': False,
         # Load default value from environment variable to ease unittest
-        'check_latest_version': os.environ.get('MINARCA_CHECK_LATEST_VERSION', 'True') in [True, 'true', 'True', '1']
+        'check_latest_version': os.environ.get('MINARCA_CHECK_LATEST_VERSION', 'True') in [True, 'true', 'True', '1'],
     }
 
     def __init__(self, filename):
@@ -144,6 +139,7 @@ class InvalidPatternError(Exception):
     """
     Raised when a pattern file contains an invalid line.
     """
+
     pass
 
 
@@ -152,7 +148,6 @@ Pattern.is_wildcard = lambda self: '*' in self.pattern or '?' in self.pattern
 
 
 class Patterns(list):
-
     def __init__(self, filename):
         assert filename
         self.filename = filename
@@ -181,36 +176,41 @@ class Patterns(list):
         Restore defaults patterns.
         """
         self.clear()
-        self.extend([
-            Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")),
-        ])
+        self.extend(
+            [
+                Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")),
+            ]
+        )
 
         if IS_WINDOWS:
-            self.extend([
-                Pattern(False, "**/Thumbs.db", _("Thumbnails cache")),
-                Pattern(False, "C:/pagefile.sys", _("Swap file")),
-                Pattern(False, "C:/Recovery/", _("System Recovery")),
-                Pattern(False, "C:/$Recycle.Bin/", _("Recycle bin")),
-                Pattern(False, get_temp(), _("Temporary Folder")),
-                Pattern(False, "**/*.bak", _("AutoCAD backup files")),
-                Pattern(False, "**/~$*", _("Office temporary files")),
-            ])
+            self.extend(
+                [
+                    Pattern(False, "**/Thumbs.db", _("Thumbnails cache")),
+                    Pattern(False, "C:/pagefile.sys", _("Swap file")),
+                    Pattern(False, "C:/Recovery/", _("System Recovery")),
+                    Pattern(False, "C:/$Recycle.Bin/", _("Recycle bin")),
+                    Pattern(False, get_temp(), _("Temporary Folder")),
+                    Pattern(False, "**/*.bak", _("AutoCAD backup files")),
+                    Pattern(False, "**/~$*", _("Office temporary files")),
+                ]
+            )
         if IS_MAC:
-            self.extend([
-            ])
+            self.extend([])
         if IS_LINUX:
-            self.extend([
-                Pattern(False, "/dev", _("dev filesystem")),
-                Pattern(False, "/proc", _("proc filesystem")),
-                Pattern(False, "/sys", _("sys filesystem")),
-                Pattern(False, "/tmp", _("Temporary Folder")),
-                Pattern(False, "/run", _("Volatile program files")),
-                Pattern(False, "/mnt", _("Mounted filesystems")),
-                Pattern(False, "/media", _("External media")),
-                Pattern(False, "**/lost+found", _("Ext4 Lost and Found")),
-                Pattern(False, "**/.~*", _("Hidden temporary files")),
-                Pattern(False, "**/*~", _("Vim Temporary files")),
-            ])
+            self.extend(
+                [
+                    Pattern(False, "/dev", _("dev filesystem")),
+                    Pattern(False, "/proc", _("proc filesystem")),
+                    Pattern(False, "/sys", _("sys filesystem")),
+                    Pattern(False, "/tmp", _("Temporary Folder")),
+                    Pattern(False, "/run", _("Volatile program files")),
+                    Pattern(False, "/mnt", _("Mounted filesystems")),
+                    Pattern(False, "/media", _("External media")),
+                    Pattern(False, "**/lost+found", _("Ext4 Lost and Found")),
+                    Pattern(False, "**/.~*", _("Hidden temporary files")),
+                    Pattern(False, "**/*~", _("Vim Temporary files")),
+                ]
+            )
 
     def save(self):
         with open(self.filename, 'w', encoding='utf-8') as f:
@@ -224,8 +224,7 @@ class Patterns(list):
             if pattern.comment:
                 f.write("# %s\n" % pattern.comment.strip())
             # Write patterns
-            f.write(('+%s\n' if pattern.include else '-%s\n') %
-                    pattern.pattern)
+            f.write(('+%s\n' if pattern.include else '-%s\n') % pattern.pattern)
 
     def group_by_roots(self):
         """
@@ -247,8 +246,7 @@ class Patterns(list):
                     m = re.match('^[A-Z]:(\\\\|/)', p.pattern)
                     if m and not p.pattern.replace('\\', '/').startswith(drive):
                         continue
-                    sublist.append(
-                        Pattern(p.include, p.pattern.replace('\\', '/'), None))
+                    sublist.append(Pattern(p.include, p.pattern.replace('\\', '/'), None))
                 yield (drive, sublist)
         elif len(self) > 0:
             yield ('/', self)

@@ -29,6 +29,7 @@ def home_dialog():
     def pump_events():
         while dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
             pass
+
     dlg = HomeDialog()
     dlg.pump_events = pump_events
     dlg.set_active_view('settings')
@@ -44,7 +45,6 @@ def home_dialog():
 
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
 class StatusViewTest(unittest.TestCase):
-
     def test_last_backup_text(self):
         with home_dialog() as dlg:
             # Check value for each available status.

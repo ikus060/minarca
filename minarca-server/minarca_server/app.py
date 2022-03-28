@@ -23,25 +23,26 @@ logger = logging.getLogger(__name__)
 
 
 class MinarcaApplication(RdiffwebApp):
-
     @classmethod
     def parse_args(cls, args=None, config_file_contents=None):
         return parse_args(args, config_file_contents)
 
     def __init__(self, cfg):
-        cherrypy.config.update({
-            'minarca.auth_options': cfg.minarca_auth_options,
-            'minarca.help_url': cfg.minarca_help_url,
-            'minarca.quota_api_url': cfg.minarca_quota_api_url,
-            'minarca.remote_host': cfg.minarca_remote_host,
-            'minarca.remote_host_identity': cfg.minarca_remote_host_identity,
-            'minarca.restricted_to_base_dir': cfg.minarca_restricted_to_base_dir,
-            'minarca.shell': cfg.minarca_shell,
-            'minarca.user_base_dir': cfg.minarca_user_base_dir,
-            'minarca.user_dir_group_id': cfg.minarca_user_dir_group,
-            'minarca.user_dir_mode': cfg.minarca_user_dir_mode,
-            'minarca.user_dir_owner_id': cfg.minarca_user_dir_owner,
-        })
+        cherrypy.config.update(
+            {
+                'minarca.auth_options': cfg.minarca_auth_options,
+                'minarca.help_url': cfg.minarca_help_url,
+                'minarca.quota_api_url': cfg.minarca_quota_api_url,
+                'minarca.remote_host': cfg.minarca_remote_host,
+                'minarca.remote_host_identity': cfg.minarca_remote_host_identity,
+                'minarca.restricted_to_base_dir': cfg.minarca_restricted_to_base_dir,
+                'minarca.shell': cfg.minarca_shell,
+                'minarca.user_base_dir': cfg.minarca_user_base_dir,
+                'minarca.user_dir_group_id': cfg.minarca_user_dir_group,
+                'minarca.user_dir_mode': cfg.minarca_user_dir_mode,
+                'minarca.user_dir_owner_id': cfg.minarca_user_dir_owner,
+            }
+        )
         super().__init__(cfg)
         # Add few pages.
         self.root.api.minarca = self.get_minarca
@@ -58,8 +59,12 @@ class MinarcaApplication(RdiffwebApp):
 
         # Identity known_hosts
         identity = ""
-        files = [f for f in os.listdir(self.cfg.minarca_remote_host_identity) if f.startswith(
-            'ssh_host') if f.endswith('.pub')]
+        files = [
+            f
+            for f in os.listdir(self.cfg.minarca_remote_host_identity)
+            if f.startswith('ssh_host')
+            if f.endswith('.pub')
+        ]
         for fn in files:
             with open(os.path.join(self.cfg.minarca_remote_host_identity, fn)) as fh:
                 if ':' in remotehost:
@@ -76,7 +81,15 @@ class MinarcaApplication(RdiffwebApp):
         }
 
     @cherrypy.expose
-    @cherrypy.config(**{'tools.auth_form.on': False, 'tools.i18n.on': False, 'tools.auth_basic.on': False, 'tools.sessions.on': False, 'error_page.default': False})
+    @cherrypy.config(
+        **{
+            'tools.auth_form.on': False,
+            'tools.i18n.on': False,
+            'tools.auth_basic.on': False,
+            'tools.sessions.on': False,
+            'error_page.default': False,
+        }
+    )
     def get_help(self):
         raise cherrypy.HTTPRedirect(self.cfg.minarca_help_url)
 

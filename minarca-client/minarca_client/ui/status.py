@@ -9,6 +9,7 @@ import tkinter.simpledialog
 import webbrowser
 
 import pkg_resources
+
 from minarca_client.core import Backup, RunningError
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
@@ -21,22 +22,24 @@ class StatusView(tkvue.Component):
 
     def __init__(self, *args, **kwargs):
         self.backup = Backup()
-        self.data = tkvue.Context({
-            'lastresult': self.backup.get_status('lastresult'),
-            'lastdate': self.backup.get_status('lastdate'),
-            'details': self.backup.get_status('details'),
-            'remoteurl': self.backup.get_settings('remoteurl'),
-            'username': self.backup.get_settings('username'),
-            'remotehost': self.backup.get_settings('remotehost'),
-            'repositoryname': self.backup.get_settings('repositoryname'),
-            # Computed variables
-            'header_text': self.header_text,
-            'header_text_style': self.header_text_style,
-            'header_image_path': self.header_image_path,
-            'start_stop_text': self.start_stop_text,
-            'last_backup_text': self.last_backup_text,
-            'remote_text_tooltip': self.remote_text_tooltip,
-        })
+        self.data = tkvue.Context(
+            {
+                'lastresult': self.backup.get_status('lastresult'),
+                'lastdate': self.backup.get_status('lastdate'),
+                'details': self.backup.get_status('details'),
+                'remoteurl': self.backup.get_settings('remoteurl'),
+                'username': self.backup.get_settings('username'),
+                'remotehost': self.backup.get_settings('remotehost'),
+                'repositoryname': self.backup.get_settings('repositoryname'),
+                # Computed variables
+                'header_text': self.header_text,
+                'header_text_style': self.header_text_style,
+                'header_image_path': self.header_image_path,
+                'start_stop_text': self.start_stop_text,
+                'last_backup_text': self.last_backup_text,
+                'remote_text_tooltip': self.remote_text_tooltip,
+            }
+        )
         super().__init__(*args, **kwargs)
         # Start a background thread to update the status.
         self._stop_event = threading.Event()
@@ -102,15 +105,24 @@ class StatusView(tkvue.Component):
         if lastresult == 'SUCCESS':
             return _('Complete successfully on %s. No background jobs using system resources.') % lastdate
         elif lastresult == 'FAILURE':
-            return _('Last backup failed on %s for the following reason: %s\nNo background jobs using system resources.') % (lastdate, details)
+            return _(
+                'Last backup failed on %s for the following reason: %s\nNo background jobs using system resources.'
+            ) % (lastdate, details)
         elif lastresult == 'RUNNING':
             return _('Backup is currently running in background and using system resources.')
         elif lastresult == 'STALE':
             return _('Was started in background on %s, but is currently stale an may use system resources.') % lastdate
         elif lastresult == 'INTERRUPT':
-            return _('Was interrupted on %s. May be caused by loss of connection, computer standby or manual interruption.\nNo background jobs using system resources.') % lastdate
+            return (
+                _(
+                    'Was interrupted on %s. May be caused by loss of connection, computer standby or manual interruption.\nNo background jobs using system resources.'
+                )
+                % lastdate
+            )
         elif lastresult == 'UNKNOWN':
-            return _('Initial backup need to be started. You may take time to configure your parameters and start your initial backup manually.\nNo background jobs using system resources.')
+            return _(
+                'Initial backup need to be started. You may take time to configure your parameters and start your initial backup manually.\nNo background jobs using system resources.'
+            )
         else:
             'unknown'
 
@@ -136,7 +148,10 @@ class StatusView(tkvue.Component):
             parent=self.root,
             title=_('Are you sure ?'),
             message=_('Are you sure you want to disconnect this Minarca agent ?'),
-            detail=_('If you disconnect this computer, this Minarca agent will erase its identity and will no longer run backup on schedule.'))
+            detail=_(
+                'If you disconnect this computer, this Minarca agent will erase its identity and will no longer run backup on schedule.'
+            ),
+        )
         if not return_code:
             # Operation cancel by user.
             return
@@ -155,7 +170,7 @@ class StatusView(tkvue.Component):
         Used to watch the status file and trigger an update whenever the status changes.
         """
         last_status = self.backup.get_status()
-        while not self._stop_event.wait(timeout=.5):
+        while not self._stop_event.wait(timeout=0.5):
             status = self.backup.get_status()
             if last_status != status:
                 self.data['lastresult'] = status['lastresult']
@@ -173,4 +188,7 @@ class StatusView(tkvue.Component):
                 parent=self.root,
                 title=_("Fail to start backup !"),
                 message=_("Fail to start backup !"),
-                detail=_("A fatal error occurred when trying to start the backup process. This usually indicate a problem with the installation. Try re-installing Minarca Backup."))
+                detail=_(
+                    "A fatal error occurred when trying to start the backup process. This usually indicate a problem with the installation. Try re-installing Minarca Backup."
+                ),
+            )

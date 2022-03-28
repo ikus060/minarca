@@ -19,11 +19,11 @@ import sys
 import cherrypy
 import configargparse
 
-from minarca_quota_api.zfs_quota import set_quota, get_quota, \
-    is_project_quota_enabled
+from minarca_quota_api.zfs_quota import get_quota, is_project_quota_enabled, set_quota
 
 try:
     import pkg_resources
+
     __version__ = pkg_resources.get_distribution("minarca-quota-api").version
 except Exception:
     __version__ = 'DEV'
@@ -37,14 +37,22 @@ def _parse_args(args):
         prog='minarca-quota-api',
         description='Web server to manage user quota.',
         default_config_files=['/etc/minarca/minarca-quota-api.conf', '/etc/minarca/minarca-quota-api.conf.d/*.conf'],
-        add_env_var_help=True, auto_env_var_prefix='MINARCA_QUOTA_')
+        add_env_var_help=True,
+        auto_env_var_prefix='MINARCA_QUOTA_',
+    )
     parser.add('-f', '--config', is_config_file=True, help='configuration file path')
     parser.add('-v', '--version', action='version', version='minarca-quota-api ' + __version__)
     parser.add('--serverhost', metavar='IP', help='Define the IP address to listen to.', default='127.0.0.1')
     parser.add('--serverport', metavar='PORT', help='Define the port to listen to.', default='8081', type=int)
     parser.add('--logfile', metavar='FILE', help='Define the location of the log file.', default='')
     parser.add('--logaccessfile', metavar='FILE', help='Define the location of the access log file.', default='')
-    parser.add('--pool', '--zfs-pool', metavar='POOL', help="Define the ZFS pool to be updated with user's quota.", default='rpool/minarca')
+    parser.add(
+        '--pool',
+        '--zfs-pool',
+        metavar='POOL',
+        help="Define the ZFS pool to be updated with user's quota.",
+        default='rpool/minarca',
+    )
     parser.add('--secret', metavar='SECRET', help="Secret to be used to authenticate to the service.", default='secret')
     return parser.parse_args(args)
 
@@ -99,7 +107,9 @@ def _setup_logging(log_file, log_access_file, level):
     default_handler.addFilter(remove_cherrypy_date)
     default_handler.addFilter(add_ip)
     default_handler.addFilter(add_username)
-    default_handler.setFormatter(logging.Formatter("[%(asctime)s][%(levelname)-7s][%(ip)s][%(user)s][%(threadName)s][%(name)s] %(message)s"))
+    default_handler.setFormatter(
+        logging.Formatter("[%(asctime)s][%(levelname)-7s][%(ip)s][%(user)s][%(threadName)s][%(name)s] %(message)s")
+    )
     logger.addHandler(default_handler)
 
     # Configure cherrypy access logger
@@ -116,7 +126,6 @@ def _setup_logging(log_file, log_access_file, level):
 
 
 class Root(object):
-
     def __init__(self, pool):
         self.pool = pool
 
@@ -165,16 +174,20 @@ def run(args=None):
     app_config = {'/': basic_auth}
 
     # configure web server
-    cherrypy.config.update({
-        'server.socket_host': args.serverhost,
-        'server.socket_port': args.serverport,
-        'error_page.default': _error_page,
-        'environment': 'production',
-    })
+    cherrypy.config.update(
+        {
+            'server.socket_host': args.serverhost,
+            'server.socket_port': args.serverport,
+            'error_page.default': _error_page,
+            'environment': 'production',
+        }
+    )
 
     # Check if ZFS project quota is enabled.
     if not is_project_quota_enabled(pool=args.pool):
-        cherrypy.log("ZFS project quota is not enabled for the pool %s. pool and or dataset must be upgraded" % args.pool)
+        cherrypy.log(
+            "ZFS project quota is not enabled for the pool %s. pool and or dataset must be upgraded" % args.pool
+        )
 
     # start app
     cherrypy.quickstart(Root(pool=args.pool), '/', config=app_config)

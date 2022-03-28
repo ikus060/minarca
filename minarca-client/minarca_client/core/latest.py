@@ -7,9 +7,10 @@ Created on Oct. 22, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 import requests
+from packaging import version
+
 from minarca_client.core import compat
 from minarca_client.locale import _
-from packaging import version
 
 LATEST_VERSION_URL = 'https://www.ikus-soft.com/archive/minarca/latest_version'
 
@@ -18,7 +19,7 @@ class LatestCheckFailed(Exception):
     pass
 
 
-class LatestCheck():
+class LatestCheck:
     """
     Responsible to check if current version is up-to-date.
     """
@@ -29,7 +30,7 @@ class LatestCheck():
         """
         return _("https://www.ikus-soft.com/en/minarca/download/")
 
-    def get_latest_version(self, timeout=.5):
+    def get_latest_version(self, timeout=0.5):
         """
         Query the latest version of minarca.
         """
@@ -49,6 +50,7 @@ class LatestCheck():
 
     def get_current_version(self):
         import minarca_client
+
         return minarca_client.__version__
 
     def is_latest(self):
