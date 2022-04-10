@@ -47,7 +47,7 @@ class StatusView(tkvue.Component):
         self._thread.start()
         self.root.bind('<Destroy>', self.finalize)
 
-    def finalize(self, event):
+    def finalize(self, unused):
         """
         Called when window get destroyed.
         """

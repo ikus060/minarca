@@ -1,6 +1,7 @@
 import webbrowser
 
 import pkg_resources
+import tkvue
 
 import minarca_client
 import minarca_client.ui.patterns  # noqa
@@ -8,7 +9,6 @@ import minarca_client.ui.schedule  # noqa
 import minarca_client.ui.settings  # noqa
 import minarca_client.ui.status  # noqa
 from minarca_client.core import Backup
-from minarca_client.ui import tkvue
 
 
 class HomeDialog(tkvue.Component):

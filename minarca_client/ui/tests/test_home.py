@@ -5,14 +5,31 @@ Created on Jul. 20, 2021
 '''
 import os
 import tempfile
+import tkinter
 import unittest
+from contextlib import contextmanager
 from unittest import mock
 
 from minarca_client.core.compat import IS_LINUX, IS_WINDOWS
 from minarca_client.ui.home import HomeDialog
-from minarca_client.ui.tests.test_tkvue import new_dialog
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
+
+
+@contextmanager
+def new_dialog(cls):
+    def pump_events():
+        while dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
+            pass
+
+    dlg = cls()
+    dlg.pump_events = pump_events
+    try:
+        yield dlg
+    finally:
+        dlg.pump_events()
+        dlg.destroy()
+        dlg.pump_events()
 
 
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
