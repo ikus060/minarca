@@ -2,8 +2,7 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import pkg_resources
-
-from minarca_client.ui import tkvue
+import tkvue
 
 # Configure TK with our theme.
 theme_file = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca.tcl')

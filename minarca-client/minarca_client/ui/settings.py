@@ -39,6 +39,19 @@ class SettingsView(tkvue.Component):
             # Start background thread for latest version.
             self.root.after(3000, self._check_latest_version)
 
+        # Start a background thread to update the status.
+        self._stop_event = threading.Event()
+        self._thread = threading.Thread(target=self._check_latest_version_blocking, daemon=True)
+        self.root.bind('<Destroy>', self.finalize)
+
+    def finalize(self, unused):
+        """
+        Called when windows get destroyed.
+        """
+        self._stop_event.set()
+        if self._thread and self._thread.is_alive():
+            self._thread.join()
+
     def update_check_latest_version(self, value):
         """
         Called to update the frequency.
@@ -72,7 +85,6 @@ class SettingsView(tkvue.Component):
         self.data['checking_for_update'] = True
         self.data['is_latest'] = None
         self.data['check_latest_version_error'] = None
-        self._thread = threading.Thread(target=self._check_latest_version_blocking, daemon=True)
         self._thread.start()
 
     def _check_latest_version_blocking(self):
