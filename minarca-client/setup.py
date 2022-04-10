@@ -20,6 +20,7 @@ install_requires = [
     "psutil",
     "rdiff-backup==2.0.5",
     "requests>=2.25.1",
+    "tkvue==1.0.0",
     "wakepy",
 ]
 
@@ -73,7 +74,6 @@ setuptools.setup(
     entry_points={
         "console_scripts": ["minarca = minarca_client.main:main"],
         "gui_scripts": ["minarcaw = minarca_client.main:main"],
-        "babel.extractors": ["tkvue = minarca_client.ui.tkvue:extract_tkvue"],
     },
     **extra_options
 )
