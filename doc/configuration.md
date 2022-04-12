@@ -319,7 +319,7 @@ When defining the UserRoot value for a user, Minarca will scan the content of th
 | --- | --- | --- |
 | --max-depth | Define the maximum folder depthness to search into the user's root directory to find repositories. This is commonly used if your repositories are organised with multiple sub-folders. Default: 5 | 10 |
 
-### Configure Minarca's help
+## Configure Minarca's help
 
 It's also possible to customized how the users are reaching your company by
 defining a custom web page. By defining this option, users needing your help
