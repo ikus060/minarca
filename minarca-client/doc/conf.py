@@ -20,8 +20,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Minarca'
-copyright = 'Copyright (C) 2020 IKUS Software inc.'
+project = 'Minarca’s documentation'
+copyright = 'Copyright (C) 2022 IKUS Software'
 author = 'Patrik Dufresne'
 
 # -- General configuration ---------------------------------------------------
@@ -55,16 +55,26 @@ html_theme = 'alabaster'
 # Ref: https://alabaster.readthedocs.io/en/latest/customization.html#theme-options
 html_theme_options = {
     'analytics_id': 'UA-19546856-5',
-    'description': 'Minarca documentation',
-    'fixed_sidebar': True,
-    'caption_font_family': 'Lato,Helvetica,Arial,Verdana,sans-serif',
-    'link': '#1c4c72',
-    'narrow_sidebar_bg': '#1c4c72',
+    'description': 'Minarca, the data backup solution adapted to the reality of SMEs and service providers!',
+    'fixed_sidebar': False,
+    'font_size': '18px',
+    'head_font_family': 'Lato,Arial,sans-serif',
+    'link': '#1C4062',
+    'narrow_sidebar_bg': '#1C4062',
     'narrow_sidebar_fg': '#fff',
     'narrow_sidebar_link': '#fff',
-    'sidebar_header': '#1c4c72',
+    'sidebar_header': '#1C4062',
     'show_powered_by': False,
     'page_width': '1170px',
+    'body_text': '#0E2933',
+    'extra_nav_links' : {
+        'Home': 'https://minarca.org/',
+        'About': 'https://minarca.org/en_CA/about-minarca',
+        'Our Service': 'https://minarca.org/en_CA/our-services',
+        'Blog': 'https://minarca.org/en_CA/blog',
+        'Contact Us': 'https://minarca.org/en_CA/contactus',
+        'Download': 'https://minarca.org/en_CA/download',
+    }
 }
 html_show_sourcelink = False
 
@@ -73,3 +83,4 @@ html_show_sourcelink = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_favicon = '../minarca_client/ui/theme/minarca.ico'
