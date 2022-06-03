@@ -42,17 +42,27 @@ Then open Minarca Application !
 If you get the following, you might need to right click on Minarca Application and
 click "Open" to skip the certificate validation.
 
-![Minarca can't be open because Appel cannot check it for malicious software.](macos-installation-issue.png)
+![Minarca can't be open because Apple cannot check it for malicious software.](macos-installation-issue.png)
 
 ## Installation on Ubuntu or Debian
 
 On a Ubuntu or Debian workstation, download the appropriate installer.
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.deb"><img alt="Minarca Client for Debian" src="https://img.shields.io/badge/download-Minarca-blue?&logo=debian&style=for-the-badge"></a>
+*Ubuntu*
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-hirsute-latest.deb"><img alt="Minarca Client for Ubuntu Hirsute" src="https://img.shields.io/badge/Ubuntu-Hirsute-blue?&logo=debian&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-impish-latest.deb"><img alt="Minarca Client for Ubuntu Impish" src="https://img.shields.io/badge/Ubuntu-Impish-blue?&logo=debian&style=for-the-badge"></a>
+
+*Debian*
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-buster-latest.deb"><img alt="Minarca Client for Debian Buster" src="https://img.shields.io/badge/Debian-Buster-blue?&logo=debian&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-bullseye-latest.deb"><img alt="Minarca Client for Debian Bullseye" src="https://img.shields.io/badge/Debian-Bullseye-blue?&logo=debian&style=for-the-badge"></a>
 
 On Debian workstation, it's preferable to install the packages using Gdebi.
 
-Once installed, a shortcut to Minarca should be available on your desktop or start menu. Use it to start Minarca.
+Once installed, a shortcut to Minarca should be available on your desktop or start menu. Use it to start and configure Minarca.
 
 ## Installation on Linux
 
@@ -75,7 +85,7 @@ Pre-requisite: You need to have a functional Mianrca Server deployed. You may us
 
 **From Command line:**
 
-    minarca link --force --remoteurl {{minarca_client_remote_url}} --username {{minarca_client_user}} --password {{minarca_client_pass}} --name {{ansible_hostname}}
+    minarca link -r REMOTEURL -u USERNAME [-p PASSWORD] -n NAME
 
 ## Troubleshooting
 
@@ -85,10 +95,12 @@ The user interface and the command line interface are generating logs in the sam
 
 *On Windows*
 
-    %TEMP%\minarca.log
-    or
-    C:\Users\vmtest\AppData\Local\Temp\minarca.log
+    %LOCALAPPDATA%\minarca\
 
 *On Linux*
 
     ~/.local/share/minarca/
+
+*On MacOs*
+
+    ~/Library/Logs/Minarca/
