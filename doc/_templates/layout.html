@@ -1,0 +1,60 @@
+{% extends "!layout.html" %}
+
+{%- block content %}
+<style>
+    header {
+        font-family: 'Oxanium';
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    header a {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        text-decoration: none;
+    }
+
+    header a.secondary-nav-link {
+        color: #B6DDE2;
+        text-decoration: none;
+    }
+
+    header a.nav-link {
+        color: #0E2933;
+        text-decoration: none;
+    }
+    @media screen and (max-width: 875px) {
+        header {
+            display: none;
+        }
+    }
+</style>
+<header style="box-shadow: 0px 0px 5px #888888">
+    <div style="background-color: #0E2933;padding: 15px;text-align: right; display: flex;">
+        <div style="width: 1170px; margin: auto">
+            <a href="https://www.ikus-soft.com/archive/minarca/doc/" class="secondary-nav-link">Documentation</a>
+            &nbsp;
+            <a href="https://minarca.org/en_CA/download" class="secondary-nav-link">Download</a>
+        </div>
+    </div>
+    <div style="padding: 25px; display: flex;align-items: center;">
+        <div style="width: 1170px; margin: auto; display: flex; align-items: center;">
+            <div style="margin-right: 16px;">
+                <img src="{{ pathto('_static/minarca-logo.png', 1) }}" alt="Minarca Logo" height="65">
+            </div>
+            <div>
+                <a href="https://minarca.org/" class="nav-link">Home</a>
+                &nbsp;
+                <a href="https://minarca.org/en_CA/about-minarca" class="nav-link">About</a>
+                &nbsp;
+                <a href="https://minarca.org/en_CA/our-services" class="nav-link">Service Providers</a>
+                &nbsp;
+                <a href="https://minarca.org/en_CA/blog" class="nav-link">Blog</a>
+                &nbsp;
+                <a href="https://minarca.org/en_CA/contactus" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </div>
+</header>
+{{ super() }}
+{% endblock %}
