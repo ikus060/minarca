@@ -74,9 +74,7 @@ test:win32:
   - tox.exe
   stage: test
   tags:
-  - shared-windows
   - windows
-  - windows-1809
 
 test:macos:
   script:
@@ -178,9 +176,7 @@ bdist:win32:
   - tox.exe -e pyinstaller
   stage: bdist
   tags:
-  - shared-windows
   - windows
-  - windows-1809
 
 doc:
   artifacts:
@@ -412,8 +408,6 @@ e2e-test:win32:
   - minarca.exe -d backup --force
   stage: e2e-test
   tags:
-  - shared-windows
   - windows
-  - windows-1809
   variables:
     GIT_STRATEGY: none
