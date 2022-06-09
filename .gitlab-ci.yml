@@ -290,7 +290,7 @@ deploy:dev:
     name: dev
     url: https://dev.minarca.net
   needs: 
-  - bdist:deb
+  - upload:deb
   image: registry.gitlab.com/finestructure/pipeline-trigger
   script:
     - apk update && apk add git
