@@ -193,6 +193,7 @@ doc:
   stage: doc
 
 upload:deb:
+  image: python:3
   needs:
   - bdist:deb
   parallel:
