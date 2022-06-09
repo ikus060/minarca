@@ -162,7 +162,7 @@ bdist:win32:
   - choco install openssl -y --source "'https://nexus.ikus-soft.com/repository/choco/'"
   - choco install nsis -y --source "'https://nexus.ikus-soft.com/repository/choco/'"
   - wget.exe https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
-  - 7z x osslsigncode_2.2_windows.zip -oC:\osslsigncode
+  - 7z x osslsigncode_2.2_windows.zip -aoa -oC:\osslsigncode
   - $Env:path += ";C:\osslsigncode;C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
   - $Env:path
   # Sanity check
