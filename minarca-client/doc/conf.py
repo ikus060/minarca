@@ -54,7 +54,6 @@ exclude_patterns = []
 html_theme = 'alabaster'
 # Ref: https://alabaster.readthedocs.io/en/latest/customization.html#theme-options
 html_theme_options = {
-    'analytics_id': 'UA-19546856-5',
     'description': 'Minarca, the data backup solution adapted to the reality of SMEs and service providers!',
     'fixed_sidebar': False,
     'font_size': '18px',
