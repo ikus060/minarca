@@ -13,6 +13,7 @@ Build-Depends:
  python3-packaging,
  python3-pip,
  python3-setuptools,
+ python3-setuptools-scm,
  python3-tk,
 Standards-Version: 3.9.5
 
