@@ -68,7 +68,7 @@ def _link(remoteurl, username, name, force, password=None):
     # TODO Support username and password in remoteurl
     backup = Backup()
     # If the backup is already linked, return an error.
-    if backup.is_linked():
+    if backup.is_linked() and not force:
         print(_('minarca is already linked, execute `minarca unlink`'))
         sys.exit(_EXIT_ALREADY_LINKED)
     # Prompt for password if missing.
