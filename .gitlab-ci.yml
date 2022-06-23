@@ -403,7 +403,7 @@ e2e-test:win32:
   - $Env:LANGUAGE="fr"; if (!(minarca.exe --help | Select-String -quiet 'sauvegarde')){ exit 1 }
   - $Env:LANGUAGE="en"
   # Check backup
-  - minarca.exe -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
+  - minarca.exe -d link --force --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
   - minarca.exe -d include /etc /var /home
   - minarca.exe -d status
   - minarca.exe -d backup --force
