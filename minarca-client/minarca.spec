@@ -205,7 +205,7 @@ elif platform.system() == "Windows":
         '.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
     nsi_file = os.path.abspath('minarca.nsi')
     setup_file = os.path.abspath('dist/minarca-client_%s.exe' % version)
-    subprocess.check_call([
+    subprocess.check_output([
         'makensis',
         '-NOCD',
         '-INPUTCHARSET',
