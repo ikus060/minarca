@@ -69,9 +69,15 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
-## Next release
+## 4.2.0 (2022-07-05)
 
-* Upgrade pyinstaller to 4.8 to improve commandline usage and fixing issues with UTF8 #175
+* Upgrade Rdiffweb to [v2.4.0](https://rdiffweb.org/blog/rdiffweb-s-blog-6/new-security-features-and-continuous-improvement-53)
+* Add support for Ubuntu Impish
+* Upgrade pyinstaller to 4.8 to improve command line usage and fixing issues with UTF8 #175
+* Allow usage of `--force` to force link event if client is already linked
+* Update French translation #178
+* Update Minarca documentation
+* Improve code quality with `black` and `isort`
 
 ## 4.1.1 (2021-01-26)
 
