@@ -69,6 +69,10 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## Next Release
+
+* Add Ubuntu Jammy support
+
 ## 4.2.0 (2022-07-05)
 
 * Upgrade Rdiffweb to [v2.4.0](https://rdiffweb.org/blog/rdiffweb-s-blog-6/new-security-features-and-continuous-improvement-53)
