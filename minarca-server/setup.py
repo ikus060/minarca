@@ -7,19 +7,8 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-from __future__ import print_function
-
-import sys
 
 import setuptools
-
-# snakeoil package drop support for py35, py36, and py37
-PY_VERSION = (sys.version_info.major, sys.version_info.minor)
-snakeoil_ver = "snakeoil"
-if PY_VERSION < (3, 8):
-    snakeoil_ver = "snakeoil<0.9.0"
-if PY_VERSION < (3, 6):
-    snakeoil_ver = "snakeoil<0.8.0"
 
 setuptools.setup(
     name="minarca_server",
@@ -33,7 +22,7 @@ setuptools.setup(
     url="https://www.ikus-soft.com/en/minarca/",
     include_package_data=True,
     python_requires=">=3.5",
-    packages=["minarca_server", "minarca_server.plugins"],
+    packages=["minarca_server", "minarca_server.plugins", "minarca_server.core"],
     setup_requires=[
         "setuptools_scm>=5.0.1",
     ],
@@ -42,7 +31,6 @@ setuptools.setup(
         "cherrypy>=18.0.0",
         "requests",
         "tzlocal~=2.0",
-        snakeoil_ver,
     ],
     # required packages for build process
     extras_require={

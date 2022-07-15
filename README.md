@@ -72,6 +72,9 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 ## Next Release
 
 * Add Ubuntu Jammy support
+* Add Debian Bookworm support
+* Adjust `librsync` dependencies for release upgrade
+* Remove dependencies to unmaintained `snakeoil` library
 
 ## 4.2.0 (2022-07-05)
 
