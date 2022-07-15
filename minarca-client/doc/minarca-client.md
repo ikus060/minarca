@@ -11,8 +11,10 @@ restriction. You are limited to the following operating system.
   * MacOS BigSur (Intel)
   * Debian Buster (64bit)
   * Debian Bullseye (64bit)
+  * Debian Bookworm (64bit)
   * Ubuntu Hirsute (64bit)
   * Ubuntu Impish (64bit)
+  * Ubuntu Jammy (64bit)
   * Linux (64bit)
 
 ## Installation Steps
@@ -50,15 +52,19 @@ On a Ubuntu or Debian workstation, download the appropriate installer.
 
 *Ubuntu*
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-hirsute-latest.deb"><img alt="Minarca Client for Ubuntu Hirsute" src="https://img.shields.io/badge/Ubuntu-Hirsute-blue?&logo=debian&style=for-the-badge"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-hirsute-latest.deb"><img alt="Minarca Client for Ubuntu Hirsute" src="https://img.shields.io/badge/Ubuntu-Hirsute-blue?&logo=ubuntu&style=for-the-badge"></a>
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-impish-latest.deb"><img alt="Minarca Client for Ubuntu Impish" src="https://img.shields.io/badge/Ubuntu-Impish-blue?&logo=debian&style=for-the-badge"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-impish-latest.deb"><img alt="Minarca Client for Ubuntu Impish" src="https://img.shields.io/badge/Ubuntu-Impish-blue?&logo=ubuntu&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-jammy-latest.deb"><img alt="Minarca Client for Ubuntu Jammy" src="https://img.shields.io/badge/Ubuntu-Jammy-blue?&logo=ubuntu&style=for-the-badge"></a>
 
 *Debian*
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-buster-latest.deb"><img alt="Minarca Client for Debian Buster" src="https://img.shields.io/badge/Debian-Buster-blue?&logo=debian&style=for-the-badge"></a>
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-bullseye-latest.deb"><img alt="Minarca Client for Debian Bullseye" src="https://img.shields.io/badge/Debian-Bullseye-blue?&logo=debian&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-bookworm-latest.deb"><img alt="Minarca Client for Debian Bookworm" src="https://img.shields.io/badge/Debian-Bookworm-blue?&logo=debian&style=for-the-badge"></a>
 
 On Debian workstation, it's preferable to install the packages using Gdebi.
 
