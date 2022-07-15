@@ -168,6 +168,8 @@ bdist:win32:
   # Sanity check
   - python.exe -VV
   - osslsigncode.exe --version
+  - openssl.exe version
+  - makensis.exe /version
   # Install tox
   - pip.exe install tox
   needs: []  
