@@ -27,7 +27,7 @@ Pre-Depends:
  ${misc:Pre-Depends}
 Depends:
  cron,
- librsync1 | librsync2,
+ librsync-dev,
  openssh-client,
  python3-distutils,
  python3-packaging,
