@@ -17,8 +17,7 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 * Supported Operating System:
   * Debian Buster
   * Debian Bullseye
-  * Ubuntu Groovy
-  * Ubuntu Hirsute
+  * Ubuntu Jammy 22.04 LTS
 * Cpu: 64bit x86-64 or amd64, 4 core
 * Memory: minimum 4 GiB
 * Storage: consider the storage according to your backup needs. A couple of terabytes should be considered for the long term. Ideally, you should consider hardware or ZFS raid for your storage. If you plan to support user quota, make sure that your file system supports it. E.g. ext4 and ZFS. Other file systems might not be well supported.
