@@ -93,10 +93,10 @@ bdist:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, hirsute, impish, jammy]
+      DIST: [buster, bullseye, jammy]
       DEPENDS: python3 cron librsync-dev libacl1-dev
     - TARGET: minarca-server
-      DIST: [buster, bullseye, hirsute, impish, jammy]
+      DIST: [buster, bullseye, jammy]
       DEPENDS: python3
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
@@ -201,9 +201,9 @@ upload:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, hirsute, impish, jammy]
+      DIST: [buster, bullseye, jammy]
     - TARGET: minarca-server
-      DIST: [buster, bullseye, hirsute, impish, jammy]
+      DIST: [buster, bullseye, jammy]
       DEPENDS: python3
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye]
@@ -315,7 +315,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, hirsute, impish, jammy]
+      DIST: [buster, bullseye, jammy]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
