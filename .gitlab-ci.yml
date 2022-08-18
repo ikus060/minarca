@@ -184,6 +184,29 @@ bdist:win32:
   tags:
   - windows
 
+test-bdist:deb:
+  stage: bdist
+  image: buildpack-deps:$DIST
+  needs: ["bdist:deb"]
+  parallel:
+    matrix:
+    - TARGET: minarca-server
+      DIST: [buster, bullseye]
+    # Ubuntu tzdata is broken https://githubmate.com/repo/regebro/tzlocal/issues/101
+    # So we need to make it explicit using environment variable
+    - TARGET: minarca-server
+      DIST: [jammy]
+      TZ: UTC
+  script:
+  - apt update && apt install -y apt-transport-https ca-certificates lsb-release gpg
+  - curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
+  - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
+  - apt update && apt install -y ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb
+  - /opt/minarca-server/bin/minarca-server --version
+  - (/opt/minarca-server/bin/minarca-server &)
+  - apt install -y curl
+  - curl http://localhost:8080
+
 doc:
   artifacts:
     paths:
