@@ -71,7 +71,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertIn("minarca.ico", self.app.cfg.favicon)
         self.assertEqual("Minarca", self.app.cfg.footer_name)
         self.assertEqual("Minarca", self.app.cfg.header_name)
-        self.assertIn("minarca_22.png", self.app.cfg.header_logo)
+        self.assertIn("minarca_logo.svg", self.app.cfg.header_logo)
         self.assertEqual("/var/log/minarca/access.log", self.app.cfg.log_access_file)
         # log_file get overriden by testcase. So dont validate it.
         self.assertIsNotNone(self.app.cfg.log_file)
