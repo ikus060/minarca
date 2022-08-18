@@ -75,6 +75,7 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 * Add Debian Bookworm support
 * Adjust `librsync` dependencies for release upgrade
 * Remove dependencies to unmaintained `snakeoil` library
+* Drop Ubuntu Hirsute & Impish (End-of-life)
 
 ## 4.2.0 (2022-07-05)
 
