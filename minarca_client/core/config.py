@@ -186,6 +186,7 @@ class Patterns(list):
             self.extend(
                 [
                     Pattern(False, "**/Thumbs.db", _("Thumbnails cache")),
+                    Pattern(False, "**/desktop.ini", _("Arrangement of a Windows folder")),
                     Pattern(False, "C:/pagefile.sys", _("Swap file")),
                     Pattern(False, "C:/Recovery/", _("System Recovery")),
                     Pattern(False, "C:/$Recycle.Bin/", _("Recycle bin")),
@@ -195,7 +196,11 @@ class Patterns(list):
                 ]
             )
         if IS_MAC:
-            self.extend([])
+            self.extend(
+                [
+                    Pattern(False, "**/.DS_Store", _("Desktop Services Store")),
+                ]
+            )
         if IS_LINUX:
             self.extend(
                 [
