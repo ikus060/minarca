@@ -88,6 +88,7 @@ bdist:deb:
   artifacts:
     paths:
     - "*/dist/*/*_amd64.deb"
+    expire_in: 1 day
   image: buildpack-deps:$DIST
   needs: []
   parallel:
@@ -124,6 +125,7 @@ bdist:linux:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.tar.gz"
+    expire_in: 1 day
   before_script:
   - apt update && apt -y --no-install-recommends install librsync-dev libacl1-dev git
   - pip3 install tox
@@ -138,6 +140,7 @@ bdist:macos:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.dmg"
+    expire_in: 1 day
   before_script:
     - pip3 install tox
   needs: []  
@@ -152,6 +155,7 @@ bdist:win32:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.exe"
+    expire_in: 1 day
   before_script:
   # Install required dependencies for building on Windows
   # python is used for building
@@ -184,6 +188,7 @@ doc:
   artifacts:
     paths:
     - ./minarca-client/.tox/doc/tmp
+    expire_in: 1 day
   before_script:
     - apt update && apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
     - pip install tox
