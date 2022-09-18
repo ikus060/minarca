@@ -69,7 +69,20 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
-## Next Release
+## 4.2.2 (2022-09-16)
+
+This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
+
+* Upgrade Rdiffweb to 2.4.5
+  * Mitigate CSRF on repository deletion and user deletion. [CVE-2022-3232](https://nvd.nist.gov/vuln/detail/CVE-2022-3232)
+  * Use `X-Real-IP` to identify client IP address to mitigate Brute-Force attack
+  * Mitigate CSRF in profile's SSH Keys [CVE-2022-3221](https://nvd.nist.gov/vuln/detail/CVE-2022-3221)
+  * Use 'Secure' Attribute with Sensitive Cookie in HTTPS Session. [CVE-2022-3174](https://nvd.nist.gov/vuln/detail/CVE-2022-3174)
+  * Avoid leakage of the stack trace in the default error page. [CVE-2022-3175](https://nvd.nist.gov/vuln/detail/CVE-2022-3175)
+  * Enforce minimum and maximum password length [CVE-2022-3175](https://nvd.nist.gov/vuln/detail/CVE-2022-3179)
+  * Add Clickjacking Defense [CVE-2022-3167](https://nvd.nist.gov/vuln/detail/CVE-2022-3167)
+
+## 4.2.1 (2022-07-15)
 
 * Add Ubuntu Jammy support
 * Add Debian Bookworm support
