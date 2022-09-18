@@ -169,7 +169,7 @@ def get_parser():
         footer_name='Minarca',
         footer_url='https://www.ikus-soft.com/en/minarca/',
         header_name='Minarca',
-        header_logo=pkg_resources.resource_filename(__name__, 'minarca_22.png'),  # @UndefinedVariable
+        header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.svg'),  # @UndefinedVariable
         log_access_file='/var/log/minarca/access.log',
         log_file='/var/log/minarca/server.log',
         welcome_msg={
