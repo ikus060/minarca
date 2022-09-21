@@ -69,7 +69,24 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
-## 4.2.2 (2022-09-16)
+## 4.2.3 (2022-09-21)
+
+This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
+
+* Upgrade Rdiffweb to 2.4.8
+  * Clean-up invalid path on error page
+  * Limit username field length [CVE-2022-3290](https://nvd.nist.gov/vuln/detail/CVE-2022-3290)
+  * Limit user's email field length [CVE-2022-3272](https://nvd.nist.gov/vuln/detail/CVE-2022-3272)
+  * Limit user's root directory field length [CVE-2022-3295](https://nvd.nist.gov/vuln/detail/CVE-2022-3295)
+  * Limit SSH Key title field length [CVE-2022-3298](https://nvd.nist.gov/vuln/detail/CVE-2022-3298)
+  * Generate a new session on login and 2FA #220 [CVE-2022-3269](https://nvd.nist.gov/vuln/detail/CVE-2022-3269)
+  * Mitigate CSRF on user's settings #221 [CVE-2022-3274](https://nvd.nist.gov/vuln/detail/CVE-2022-3274)
+  * Support MarkupSafe<3 for Debian bookworm
+  * Mitigate CSRF on user's notification settings #216 [CVE-2022-3233](https://nvd.nist.gov/vuln/detail/CVE-2022-3233)
+  * Mitigate CSRF on repository settings #217 [CVE-2022-3267](https://nvd.nist.gov/vuln/detail/CVE-2022-3267)
+  * Use 'Secure' Attribute with Sensitive Cookie in HTTPS Session on HTTP Error #218 [CVE-2022-3174](https://nvd.nist.gov/vuln/detail/CVE-2022-3174)
+
+## 4.2.2 (2022-09-19)
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
 
