@@ -69,6 +69,14 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## 4.2.4 (2022-09-29)
+
+This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
+
+* Upgrade Rdiffweb to 2.4.9
+  * Add `Cache-Control` and other security headers [CVE-2022-3292](https://nvd.nist.gov/vuln/detail/CVE-2022-3292)
+  * Enforce password policy using `password-score` based on [zxcvbn](https://github.com/dropbox/zxcvbn) [CVE-2022-3326](https://nvd.nist.gov/vuln/detail/CVE-2022-3326)
+
 ## 4.2.3 (2022-09-21)
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
