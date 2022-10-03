@@ -69,6 +69,13 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## 4.2.5 (2002-10-03)
+
+This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
+
+* Upgrade Rdiffweb to 2.4.10
+  * Mitigate path traversal vulnerability [CVE-2022-3389](https://nvd.nist.gov/vuln/detail/CVE-2022-3389)
+
 ## 4.2.4 (2022-09-29)
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
