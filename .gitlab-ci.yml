@@ -49,13 +49,13 @@ test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, bookworm]
       DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
     - TARGET: minarca-server
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, bookworm]
       DEPENDS: rdiff-backup
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, bookworm]
       DEPENDS: bash
   script:
   - cd $TARGET
@@ -94,15 +94,15 @@ bdist:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, jammy]
+      DIST: [buster, bullseye, bookworm, jammy]
       DEPENDS: python3 cron librsync-dev libacl1-dev
     - TARGET: minarca-server
-      DIST: [buster, bullseye, jammy]
+      DIST: [buster, bullseye, bookworm, jammy]
       DEPENDS: python3
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, bookworm]
       DEPENDS: python3
   script:
   - apt update && apt -y --no-install-recommends install devscripts $DEPENDS
@@ -120,7 +120,7 @@ bdist:deb:
    GIT_DEPTH: "0"
 
 # For Linux, we need to build on a oldest glibc version possible.
-# For us, this is Debian stretch. 2.24
+# For us, this is Debian buster.
 bdist:linux:
   artifacts:
     paths:
@@ -191,7 +191,7 @@ test-bdist:deb:
   parallel:
     matrix:
     - TARGET: minarca-server
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, bookworm]
     # Ubuntu tzdata is broken https://githubmate.com/repo/regebro/tzlocal/issues/101
     # So we need to make it explicit using environment variable
     - TARGET: minarca-server
@@ -229,12 +229,12 @@ upload:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, jammy]
+      DIST: [buster, bullseye, bookworm, jammy]
     - TARGET: minarca-server
-      DIST: [buster, bullseye, jammy]
+      DIST: [buster, bullseye, bookworm, jammy]
       DEPENDS: python3
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye]
+      DIST: [buster, bullseye, bookworm]
   script: |
     set -e
     set -x
@@ -343,7 +343,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, jammy]
+      DIST: [buster, bullseye, bookworm, jammy]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
