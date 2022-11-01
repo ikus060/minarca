@@ -43,9 +43,9 @@ test:deb:
     - ./*/xunit.xml
     expire_in: 1 day
   before_script:
-  - apt update && apt -y --no-install-recommends install $DEPENDS
-  - pip install tox
-  image: python:3-$DIST
+  - apt update && apt -y --no-install-recommends install python3-pip python3-setuptools $DEPENDS
+  - pip3 install tox
+  image: buildpack-deps:$DIST
   parallel:
     matrix:
     - TARGET: minarca-client
