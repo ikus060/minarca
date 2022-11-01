@@ -215,7 +215,7 @@ doc:
   before_script:
     - apt update && apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
     - pip install tox
-  image: python:3
+  image: python:3.10
   needs: []
   script:
   - cd minarca-client
