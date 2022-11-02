@@ -16,5 +16,5 @@ Standards-Version: 3.9.5
 Package: minarca-quota-api
 Architecture: any
 Pre-Depends: dpkg (>= 1.16.1), python3 (>= 3.5), ${misc:Pre-Depends}
-Depends: ${python3:Depends}, ${misc:Depends}, python3-distutils | libpython3.5-stdlib
+Depends: ${python3:Depends}, ${misc:Depends}
 Description: Minarca Quota API Server

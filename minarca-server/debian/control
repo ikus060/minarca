@@ -28,5 +28,4 @@ Depends:
  ${python3:Depends},
  ${misc:Depends},
  coreutils,
- python3-distutils | libpython3.5-stdlib,
 Description: Minarca Web Server

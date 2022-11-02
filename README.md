@@ -120,6 +120,7 @@ This releases include a security fix. If you are using an earlier version, you s
 * Add Debian Bookworm support
 * Adjust `librsync` dependencies for release upgrade
 * Remove dependencies to unmaintained `snakeoil` library
+* Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()`
 * Drop Ubuntu Hirsute & Impish (End-of-life)
 
 ## 4.2.0 (2022-07-05)
