@@ -542,6 +542,7 @@ class Rdiffweb:
         assert password
         self.username = username
         self.session = requests.Session()
+        self.session.headers['User-Agent'] = compat.get_user_agent()
         self.session.auth = (username, password)
         # Check if connection is working and get redirection if needed
         response = self.session.get(urljoin(remote_url + '/', "api/"))
