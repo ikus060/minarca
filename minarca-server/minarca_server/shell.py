@@ -59,10 +59,7 @@ def _find_rdiff_backup(version=2):
         executable = 'rdiff-backup-1.2'
     else:
         executable = 'rdiff-backup-2.0'
-    path = os.path.dirname(sys.executable)
-    if 'PATH' in os.environ:
-        path += os.pathsep + os.environ['PATH']
-    return shutil.which(executable, path=path)
+    return shutil.which(executable)
 
 
 def _parse_config():

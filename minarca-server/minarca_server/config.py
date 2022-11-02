@@ -164,12 +164,15 @@ def get_parser():
     # Override a couple of arguments with Minarca.
     parser.set_defaults(
         database_uri='/etc/minarca/rdw.db',
-        default_theme='blue',
         favicon=pkg_resources.resource_filename(__name__, 'minarca.ico'),  # @UndefinedVariable
         footer_name='Minarca',
         footer_url='https://www.ikus-soft.com/en/minarca/',
         header_name='Minarca',
         header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.svg'),  # @UndefinedVariable
+        logo=pkg_resources.resource_filename(__name__, 'logo.svg'),  # @UndefinedVariable
+        link_color='#009FB9',
+        navbar_color='#0E2933',
+        font_family="Lato",
         log_access_file='/var/log/minarca/access.log',
         log_file='/var/log/minarca/server.log',
         welcome_msg={

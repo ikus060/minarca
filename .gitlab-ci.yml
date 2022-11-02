@@ -204,8 +204,7 @@ test-bdist:deb:
   - apt update && apt install -y ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb
   - /opt/minarca-server/bin/minarca-server --version
   - (/opt/minarca-server/bin/minarca-server &)
-  - sleep 2
-  - curl --fail http://localhost:8080
+  - timeout 60 bash -c 'until curl --silent http://localhost:8080; do sleep 1; done'
 
 doc:
   artifacts:

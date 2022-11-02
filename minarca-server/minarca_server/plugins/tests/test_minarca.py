@@ -22,7 +22,7 @@ from unittest.mock import ANY
 import cherrypy
 import pkg_resources
 import responses
-from rdiffweb.core.model import UserObject
+from rdiffweb.core.model import SshKey, UserObject
 
 import minarca_server
 import minarca_server.tests
@@ -54,6 +54,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertIsNotNone(self.app.cfg.minarca_user_base_dir)
         # When adding a new user without specific user_root
         self._add_user("mtest1", None, "pr3j5Dwi", None, False)
+        self.assertStatus(200)
         self.assertInBody("User added successfully.")
         # Then user root directory is defined within the base dir
         user = UserObject.get_user('mtest1')
@@ -64,17 +65,19 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertIsNotNone(self.app.cfg.minarca_user_base_dir)
         # When adding a new user with a specific user_root
         self._add_user("mtest2", None, "pr3j5Dwi", "/home/mtest2", False)
+        self.assertStatus(200)
         self.assertInBody("User added successfully.")
         # Then user root is updated to be within the base dir
         user = UserObject.get_user('mtest2')
         self.assertEqual(os.path.join(self.base_dir, 'mtest2'), user.user_root)
 
     def test_default_config(self):
-        self.assertEqual("blue", self.app.cfg.default_theme)
+        self.assertEqual("default", self.app.cfg.default_theme)
         self.assertIn("minarca.ico", self.app.cfg.favicon)
         self.assertEqual("Minarca", self.app.cfg.footer_name)
         self.assertEqual("Minarca", self.app.cfg.header_name)
         self.assertIn("minarca_logo.svg", self.app.cfg.header_logo)
+        self.assertIn("logo.svg", self.app.cfg.logo)
         self.assertEqual("/var/log/minarca/access.log", self.app.cfg.log_access_file)
         # log_file get overriden by testcase. So dont validate it.
         self.assertIsNotNone(self.app.cfg.log_file)
@@ -120,6 +123,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         # Given an empty minarca_quota_api_url
         # When disk usage get requested
         userobj = UserObject.add_user('bob')
+        userobj.commit()
         # Then the disk usage is repported using the default behaviour.
         self.assertIsNotNone(userobj.disk_quota)
         self.assertIsNotNone(userobj.disk_usage)
@@ -130,6 +134,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         userobj = UserObject.add_user('bob')
         # Then setting disk_quota does nothing
         userobj.disk_quota = 12345
+        userobj.commit()
 
 
 class MinarcaAdminLogView(minarca_server.tests.AbstractMinarcaTest):
@@ -170,6 +175,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
     def test_set_disk_quota(self, mock_check_output):
         # Given a valid use from database
         userobj = UserObject.add_user('bob')
+        userobj.commit()
         # Given a mock quota-api
         responses.add(
             responses.POST,
@@ -189,6 +195,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
     @responses.activate
     def test_update_userquota_401(self):
         userobj = UserObject.add_user('bob')
+        userobj.commit()
         # Checks if exception is raised when authentication is failing.
         responses.add(responses.POST, "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid), status=401)
         # Make sure an exception is raised.
@@ -202,6 +209,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         """
         # Make sure an exception is raised.
         userobj = UserObject.add_user('bob')
+        userobj.commit()
         # Checks if exception is raised when authentication is failing.
         responses.add(
             responses.GET,
@@ -220,6 +228,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         """
         # Make sure an exception is raised.
         userobj = UserObject.add_user('bob')
+        userobj.commit()
         # Checks if exception is raised when authentication is failing.
         responses.add(
             responses.GET,
@@ -249,6 +258,10 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
         cherrypy.minarca._update_authorized_keys()
 
     def test_add_key(self):
+        # Given all the keys are drop
+        SshKey.query.delete()
+        SshKey.session.commit()
+
         # Read the key from a file
         filename = pkg_resources.resource_filename(__name__, 'test_publickey_ssh_rsa.pub')
         with open(filename, 'r', encoding='utf8') as f:
@@ -256,7 +269,9 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
 
         # Add the key to the user.
         userobj = UserObject.add_user('testuser')
+        userobj.commit()
         userobj.add_authorizedkey(key)
+        userobj.commit()
         user_root = userobj.user_root
 
         # Validate
@@ -268,6 +283,7 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
         # Update user's home
         user_root = os.path.join(self.base_dir, 'testing')
         userobj.user_root = user_root
+        userobj.commit()
 
         # Validate
         self.assertAuthorizedKeys(
@@ -277,6 +293,7 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
 
         # Deleting the user should delete it's keys
         userobj.delete()
+        userobj.commit()
 
         # Validate
         self.assertAuthorizedKeys('')
