@@ -21,7 +21,7 @@ from unittest.mock import ANY
 import cherrypy
 import pkg_resources
 import responses
-from rdiffweb.core.store import ADMIN_ROLE
+from rdiffweb.core.model import UserObject
 
 import minarca_server
 import minarca_server.tests
@@ -43,7 +43,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         if user_root is not None:
             b['user_root'] = user_root
         if is_admin is not None:
-            b['role'] = str(ADMIN_ROLE)
+            b['role'] = str(UserObject.ADMIN_ROLE)
         self.getPage("/admin/users/", method='POST', body=b)
 
     def test_add_user_without_user_root(self):
@@ -53,7 +53,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self._add_user("mtest1", None, "pr3j5Dwi", None, False)
         self.assertInBody("User added successfully.")
         # Then user root directory is defined within the base dir
-        user = self.app.store.get_user('mtest1')
+        user = UserObject.get_user('mtest1')
         self.assertEqual(os.path.join(self.base_dir, 'mtest1'), user.user_root)
 
     def test_add_user_with_user_root(self):
@@ -63,7 +63,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self._add_user("mtest2", None, "pr3j5Dwi", "/home/mtest2", False)
         self.assertInBody("User added successfully.")
         # Then user root is updated to be within the base dir
-        user = self.app.store.get_user('mtest2')
+        user = UserObject.get_user('mtest2')
         self.assertEqual(os.path.join(self.base_dir, 'mtest2'), user.user_root)
 
     def test_default_config(self):
@@ -116,7 +116,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
     def test_get_disk_usage(self):
         # Given an empty minarca_quota_api_url
         # When disk usage get requested
-        userobj = self.app.store.add_user('bob')
+        userobj = UserObject.add_user('bob')
         # Then the disk usage is repported using the default behaviour.
         self.assertIsNotNone(userobj.disk_quota)
         self.assertIsNotNone(userobj.disk_usage)
@@ -124,7 +124,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
     def test_set_disk_quota(self):
         # Given an empty minarca_quota_api_url
         # When trying to set disk quota
-        userobj = self.app.store.add_user('bob')
+        userobj = UserObject.add_user('bob')
         # Then setting disk_quota does nothing
         userobj.disk_quota = 12345
 
@@ -166,7 +166,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
     @unittest.mock.patch('minarca_server.plugins.minarca.subprocess.check_output')
     def test_set_disk_quota(self, mock_check_output):
         # Given a valid use from database
-        userobj = self.app.store.add_user('bob')
+        userobj = UserObject.add_user('bob')
         # Given a mock quota-api
         responses.add(
             responses.POST,
@@ -185,7 +185,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
 
     @responses.activate
     def test_update_userquota_401(self):
-        userobj = self.app.store.add_user('bob')
+        userobj = UserObject.add_user('bob')
         # Checks if exception is raised when authentication is failing.
         responses.add(responses.POST, "http://minarca:secret@localhost:8081/quota/" + str(userobj.userid), status=401)
         # Make sure an exception is raised.
@@ -198,7 +198,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         Check if value is available.
         """
         # Make sure an exception is raised.
-        userobj = self.app.store.add_user('bob')
+        userobj = UserObject.add_user('bob')
         # Checks if exception is raised when authentication is failing.
         responses.add(
             responses.GET,
@@ -216,7 +216,7 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         Check if value is available.
         """
         # Make sure an exception is raised.
-        userobj = self.app.store.add_user('bob')
+        userobj = UserObject.add_user('bob')
         # Checks if exception is raised when authentication is failing.
         responses.add(
             responses.GET,
@@ -252,7 +252,7 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
             key = f.readline()
 
         # Add the key to the user.
-        userobj = self.app.store.add_user('testuser')
+        userobj = UserObject.add_user('testuser')
         userobj.add_authorizedkey(key)
         user_root = userobj.user_root
 

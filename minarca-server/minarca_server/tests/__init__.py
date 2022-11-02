@@ -35,7 +35,6 @@ class AbstractMinarcaTest(rdiffweb.test.WebCase):
         # Use temporary folder for base dir
         cls.default_config['MinarcaUserBaseDir'] = cls.base_dir
         cls.default_config['logfile'] = os.path.join(cls.base_dir, 'server.log')
-        tempfile.tempdir = cls.base_dir
         # Use current user for owner and group
         cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[0]
         cls.default_config['MinarcaUserDirGroup'] = pwd.getpwuid(os.getuid())[0]
@@ -44,5 +43,4 @@ class AbstractMinarcaTest(rdiffweb.test.WebCase):
     @classmethod
     def teardown_class(cls):
         super(AbstractMinarcaTest, cls).teardown_class()
-        tempfile.tempdir = None
         shutil.rmtree(cls.base_dir, ignore_errors=True)

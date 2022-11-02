@@ -102,7 +102,7 @@ Change your password in the *User Profile* (Top-Right corner in the web applicat
 * with at least 8 characters
 * containing letters (a-z) and numbers (0-9)
 
-![Minarca Web Interfaces - User settings to change your password.](15usersettings.png)
+![Minarca Web Interfaces - User profile to change your password.](15usersettings.png)
 
 ## I forgot my password. What should I do?
 
@@ -134,7 +134,7 @@ If your operating system is in French, Minarca will be installed in French.
 
 ## I backed up a device, and it does not appear in the "Repository" section
 
-If you back up a device for the first time and it does not appear in the **Repository** section, you can refresh your repository in [**User Settings **](https://www.minarca.net/prefs/) by clicking **Refresh Repository** at the bottom of the page.
+If you back up a device for the first time and it does not appear in the **Repository** section, you can refresh your repository in [**User profile**](https://www.minarca.net/prefs/) by clicking **Refresh Repository** at the bottom of the page.
 
 ## I cannot link my computer when installing Minarca
 

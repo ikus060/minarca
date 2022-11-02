@@ -18,7 +18,7 @@ from cherrypy.process.plugins import SimplePlugin
 from rdiffweb.core import authorizedkeys
 from rdiffweb.core.authorizedkeys import AuthorizedKey
 from rdiffweb.core.config import Option
-from rdiffweb.core.store import UserObject
+from rdiffweb.core.model import UserObject
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
@@ -77,8 +77,8 @@ class MinarcaPlugin(SimplePlugin):
             cherrypy.quota.start()
 
         # Monkey patch get_log_file
-        self._orig_get_log_files = self.app.root.admin._get_log_files
-        self.app.root.admin._get_log_files = self._get_log_files
+        self._orig_get_log_files = self.app.root.admin.logs._get_log_files
+        self.app.root.admin.logs._get_log_files = self._get_log_files
         # On startup Upgrade the authorized_keys in case the configuration
         # changed.
         try:
@@ -99,7 +99,7 @@ class MinarcaPlugin(SimplePlugin):
             cherrypy.quota.stop()
 
         # Remove get_log_file
-        self.app.root.admin._get_log_files = self._orig_get_log_files
+        self.app.root.admin.logs._get_log_files = self._orig_get_log_files
 
     def _get_log_files(self):
         """
@@ -125,7 +125,9 @@ class MinarcaPlugin(SimplePlugin):
         """
         assert isinstance(userobj, UserObject)
         try:
-            self._update_user_root(userobj)
+            userobj.user_root = self._get_user_root(userobj)
+            self._create_user_root(userobj)
+            userobj.refresh_repos(delete=True)
         except Exception:
             logger.warning('fail to update user [%s] root', userobj.username, exc_info=1)
 
@@ -134,7 +136,9 @@ class MinarcaPlugin(SimplePlugin):
         Listen to users attributes change to update the minarca authorized_keys.
         """
         if 'user_root' in attrs:
-            self._update_user_root(userobj)
+            user_root = self._get_user_root(userobj)
+            if attrs['user_root'][1] != user_root:
+                userobj.user_root = user_root
 
         # Update minarca's authorized_keys when users update their ssh keys.
         if 'authorizedkeys' in attrs or 'user_root' in attrs:
@@ -152,7 +156,7 @@ class MinarcaPlugin(SimplePlugin):
         except Exception:
             logger.error("fail to update authorized_keys files on user_deleted", exc_info=1)
 
-    def _update_user_root(self, userobj):
+    def _get_user_root(self, userobj):
         """
         Called to update the user's home directory. Either to define it with
         default value or restrict it to base dir.
@@ -165,11 +169,14 @@ class MinarcaPlugin(SimplePlugin):
         if self.restricted_to_base_dir and not user_root.startswith(self.user_base_dir):
             logger.warning('restrict user [%s] to base dir [%s]', userobj.username, self.user_base_dir)
             user_root = os.path.join(self.user_base_dir, userobj.username)
-        # Persist the value if different then original
-        if userobj.user_root != user_root:
-            userobj.user_root = user_root
+        return user_root
 
+    def _create_user_root(self, userobj):
+        """
+        Called to create the user_root folder.
+        """
         # Create folder if inside our base dir and missing.
+        user_root = userobj.user_root
         if user_root.startswith(self.user_base_dir) and not os.path.exists(user_root):
             logger.info('creating user [%s] root dir [%s]', userobj.username, user_root)
             try:
@@ -209,7 +216,7 @@ class MinarcaPlugin(SimplePlugin):
         # Get list of keys
         seen = set()
         new_data = StringIO()
-        for userobj in self.app.store.users():
+        for userobj in UserObject.query.all():
             for key in userobj.authorizedkeys:
 
                 if key.fingerprint in seen:
