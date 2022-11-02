@@ -555,7 +555,7 @@ class Rdiffweb:
 
     def add_ssh_key(self, title, public_key):
         response = self.session.post(
-            self.remote_url + 'prefs/sshkeys/', data={'action': 'add', 'title': title, 'key': public_key}
+            self.remote_url + 'api/currentuser/sshkeys', data={'title': title, 'key': public_key}
         )
         response.raise_for_status()
 
