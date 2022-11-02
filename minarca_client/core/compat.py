@@ -7,7 +7,6 @@ Created on Jun. 7, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 import datetime
-import distutils.spawn
 import os
 import pathlib
 import platform
@@ -17,7 +16,6 @@ import sys
 import tempfile
 import threading
 from contextlib import contextmanager
-from distutils import spawn
 
 import pkg_resources
 
@@ -154,7 +152,7 @@ def get_ssh():
         return os.environ.get('MINARCA_SSH')
     name = 'ssh.exe' if IS_WINDOWS else 'ssh'
     path = _get_path()
-    ssh = spawn.find_executable(name, path)
+    ssh = shutil.which(name, path=path)
     if not ssh:
         raise FileNotFoundError(name)
     return ssh
@@ -167,7 +165,7 @@ def get_ssh_keygen():
     if os.environ.get('MINARCA_SSH_KEYGEN'):
         return os.environ.get('MINARCA_SSH_KEYGEN')
     name = 'ssh-keygen.exe' if IS_WINDOWS else 'ssh-keygen'
-    ssh_keygen = spawn.find_executable(name, _get_path())
+    ssh_keygen = shutil.which(name, path=_get_path())
     if not ssh_keygen:
         raise FileNotFoundError(name)
     return ssh_keygen
@@ -197,7 +195,7 @@ def get_minarca_exe():
     window to be created.
     """
     name = 'minarcaw.exe' if IS_WINDOWS else 'minarca'
-    path = distutils.spawn.find_executable(name, _get_path())
+    path = shutil.which(name, path=_get_path())
     if not path:
         raise FileNotFoundError(name)
     return os.path.abspath(path)
