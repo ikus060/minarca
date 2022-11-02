@@ -69,6 +69,38 @@ The Minarca website is https://www.ikus-soft.com/en/minarca/.
 
 # Changelog
 
+## Next Release
+
+This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
+
+* Upgrade Rdiffweb to 2.5.0
+  * Store User's session information into database
+  * Update ldap plugin to load additional attributes from LDAP server
+  * Improve `/status` page error handling when `session_statistics` cannot be read
+  * Add support for Ubuntu Jammy
+  * Upgrade from Bootstrap v3 to v4 #204
+  * Replace Fontello by Font-Awesome v4
+  * Use CSS variables `var()` to customize themes
+  * Remove usage of Jquery.validate
+  * Replace custom timsort by jquery DataTables #205
+  * Add Active Session managements #203
+    * Active session should be visible in user's profiles
+    * Active session may be revoked by user
+    * Active session should be visible in administration view
+    * Action session may be revoke by administrator
+    * Show number of active users within the last 24 hours in dashboard
+  * Handle migration of older Rdiffweb database by adding the missing `repos.Encoding`, `repos.keepdays` and `users.role` columns #185
+  * Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()` #208
+  * Add two-factor authentication with email verification #201
+  * Generate a new session on login and 2FA #220
+  * Enforce permission on /etc/rdiffweb configuration folder
+
+  Breaking changes:
+
+  * Drop Ubuntu Hirsute & Impish (End-of-life)
+  * `session-dir` is deprecated and should be replace by `rate-limit-dir`. User's session are stored in database.
+  * previous `.css` customization are not barkward compatible
+
 ## 4.2.5 (2002-10-03)
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
@@ -122,6 +154,10 @@ This releases include a security fix. If you are using an earlier version, you s
 * Remove dependencies to unmaintained `snakeoil` library
 * Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()`
 * Drop Ubuntu Hirsute & Impish (End-of-life)
+
+Breaking changes:
+
+* Minarca Client >=4.3.0 required Minarca Server >=4.3.0. Older version won't be allowed to link new computer. Existing installation are not affected. This breaking change was required to improve the security arround the authentication mechanism.
 
 ## 4.2.0 (2022-07-05)
 

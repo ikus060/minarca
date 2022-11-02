@@ -81,15 +81,10 @@ class MinarcaApplication(RdiffwebApp):
         }
 
     @cherrypy.expose
-    @cherrypy.config(
-        **{
-            'tools.auth_form.on': False,
-            'tools.i18n.on': False,
-            'tools.auth_basic.on': False,
-            'tools.sessions.on': False,
-            'error_page.default': False,
-        }
-    )
+    @cherrypy.tools.i18n(on=False)
+    @cherrypy.tools.sessions(on=False)
+    @cherrypy.tools.auth_mfa(on=False)
+    @cherrypy.tools.auth_form(on=False)
     def get_help(self):
         raise cherrypy.HTTPRedirect(self.cfg.minarca_help_url)
 

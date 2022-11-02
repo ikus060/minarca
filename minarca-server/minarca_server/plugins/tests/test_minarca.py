@@ -15,6 +15,7 @@ import grp
 import os
 import pwd
 import unittest
+from base64 import b64encode
 from io import open
 from unittest.mock import ANY
 
@@ -28,6 +29,8 @@ import minarca_server.tests
 
 
 class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
+
+    basic_headers = [("Authorization", "Basic " + b64encode(b"admin:admin123").decode('ascii'))]
 
     login = True
 
@@ -79,7 +82,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertIn('minarca', self.app.cfg.welcome_msg['fr'])
 
     def test_get_api_minarca(self):
-        self.getPage("/api/minarca")
+        self.getPage("/api/minarca", headers=self.basic_headers)
         # Check version
         self.assertInBody('version')
         # Check remoteHost
@@ -98,7 +101,7 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
             ('X-Forwarded-Server', '10.255.1.106'),
         ]
 
-        self.getPage("/api/minarca", headers=headers)
+        self.getPage("/api/minarca", headers=self.basic_headers + headers)
         self.assertInBody('remotehost')
         self.assertInBody('sestican.patrikdufresne.com')
 
