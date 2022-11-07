@@ -10,6 +10,8 @@ DH_VENV_DIR=debian/minarca-server/opt/minarca-server
 
 override_dh_virtualenv:
 	dh_virtualenv --install-suffix minarca-server --python python3 --extra-pip-arg "--quiet"
+	# Replace shebang to include PATH environment variable
+	sed -i 's/#!.*python/#!\/usr\/bin\/env -S PATH=\/opt\/minarca-server\/bin:$${PATH} python3/' $(DH_VENV_DIR)/bin/*
 	# Smoke test
 	$(DH_VENV_DIR)/bin/python $(DH_VENV_DIR)/bin/minarca-server --version
 	$(DH_VENV_DIR)/bin/python $(DH_VENV_DIR)/bin/minarca-shell --version

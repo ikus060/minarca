@@ -5,6 +5,8 @@
 # Copyright (C) 2020 IKUS Software inc. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
+from base64 import b64encode
+
 import pkg_resources
 
 import minarca_server.tests
@@ -23,7 +25,7 @@ class MinarcaApplicationTestWithHelpUrl(minarca_server.tests.AbstractMinarcaTest
 
 class MinarcaApplicationTestWithRemoteIdentity(minarca_server.tests.AbstractMinarcaTest):
 
-    login = True
+    basic_headers = [("Authorization", "Basic " + b64encode(b"admin:admin123").decode('ascii'))]
 
     default_config = {
         'minarca-remote-host': "test.examples:2222",
@@ -31,5 +33,5 @@ class MinarcaApplicationTestWithRemoteIdentity(minarca_server.tests.AbstractMina
     }
 
     def test_get_api_minarca_identity(self):
-        data = self.getJson("/api/minarca/")
+        data = self.getJson("/api/minarca/", headers=self.basic_headers)
         self.assertIn("[test.examples]:2222", data['identity'])

@@ -542,6 +542,7 @@ class Rdiffweb:
         assert password
         self.username = username
         self.session = requests.Session()
+        self.session.headers['User-Agent'] = compat.get_user_agent()
         self.session.auth = (username, password)
         # Check if connection is working and get redirection if needed
         response = self.session.get(urljoin(remote_url + '/', "api/"))
@@ -554,13 +555,15 @@ class Rdiffweb:
 
     def add_ssh_key(self, title, public_key):
         response = self.session.post(
-            self.remote_url + 'prefs/sshkeys/', data={'action': 'add', 'title': title, 'key': public_key}
+            self.remote_url + 'api/currentuser/sshkeys',
+            data={'title': title, 'key': public_key},
+            allow_redirects=False,
         )
-        response.raise_for_status()
+        self.raise_for_status(response)
 
     def get_current_user_info(self):
         response = self.session.get(self.remote_url + 'api/currentuser/')
-        response.raise_for_status()
+        self.raise_for_status(response)
         return response.json()
 
     def get_minarca_info(self):
@@ -568,5 +571,36 @@ class Rdiffweb:
         Return a dict with `version`, `remotehost`, `identity`
         """
         response = self.session.get(self.remote_url + 'api/minarca/')
-        response.raise_for_status()
+        self.raise_for_status(response)
         return response.json()
+
+    def raise_for_status(self, response):
+        """Raises :class:`HTTPError`, if one occurred."""
+
+        http_error_msg = ""
+        if isinstance(response.reason, bytes):
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = response.reason.decode("utf-8")
+            except UnicodeDecodeError:
+                reason = response.reason.decode("iso-8859-1")
+        else:
+            reason = response.reason
+
+        if 100 <= response.status_code < 200:
+            http_error_msg = f"{response.status_code} Informational response: {reason} for url: {response.url}"
+
+        if 300 <= response.status_code < 400:
+            http_error_msg = f"{response.status_code} Redirection: {reason} for url: {response.url}"
+
+        if 400 <= response.status_code < 500:
+            http_error_msg = f"{response.status_code} Client Error: {reason} for url: {response.url}"
+
+        elif 500 <= response.status_code < 600:
+            http_error_msg = f"{response.status_code} Server Error: {reason} for url: {response.url}"
+
+        if http_error_msg:
+            raise HTTPError(http_error_msg, response=response)

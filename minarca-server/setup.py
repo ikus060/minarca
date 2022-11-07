@@ -19,7 +19,7 @@ setuptools.setup(
     author_email="support@ikus-soft.com",
     maintainer="IKUS Software inc.",
     maintainer_email="support@ikus-soft.com",
-    url="https://www.ikus-soft.com/en/minarca/",
+    url="https://minarca.org/",
     include_package_data=True,
     python_requires=">=3.5",
     packages=["minarca_server", "minarca_server.plugins", "minarca_server.core"],
@@ -27,7 +27,7 @@ setuptools.setup(
         "setuptools_scm>=5.0.1",
     ],
     install_requires=[
-        "rdiffweb==2.4.10",
+        "rdiffweb==2.5.0a9",
         "cherrypy>=18.0.0",
         "requests",
         "tzlocal~=2.0",

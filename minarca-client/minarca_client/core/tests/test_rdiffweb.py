@@ -48,13 +48,13 @@ class TestRdiffweb(unittest.TestCase):
 
     @responses.activate
     def test_add_ssh_key(self):
-        responses.add(responses.POST, "http://localhost/prefs/sshkeys/")
+        responses.add(responses.POST, "http://localhost/api/currentuser/sshkeys")
         self.rdiffweb.add_ssh_key(
             'coucou',
             'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCpGT3vU6FBQ6fsd4Ph/Bs9UtCqJS2OgR2s53Ud1YSsPSGU6hbowh/KJT5RtN7XIoXT4JI28sHH/HodkaG1g6G3320YPD6KNJPoFxEhl5tCFCqrORD98nBO9bJBTtldHAtNTrQXPFx04PeHMrm58We9tCe6xaSt4udLxQScv+r6F1iSgEfGTuYS7/XT/1n4KMHciPeFADWpN5Vd8aj+c//xJY+DvAoyGGu5VhSqg2QBsr/D56h9Xxwtau/zrFlTnEe1yx9ar2udMGgOjUmh4Um/EOLyBWpqQERnbdENATeUtiGssmsxDoC8JBMhAz+mP8bMTm23ZS2VXysT3Qz/mUEt',
         )
         self.assertEqual(
-            'action=add&title=coucou&key=ssh-rsa+AAAAB3NzaC1yc2EAAAADAQABAAABAQCpGT3vU6FBQ6fsd4Ph%2FBs9UtCqJS2OgR2s53Ud1YSsPSGU6hbowh%2FKJT5RtN7XIoXT4JI28sHH%2FHodkaG1g6G3320YPD6KNJPoFxEhl5tCFCqrORD98nBO9bJBTtldHAtNTrQXPFx04PeHMrm58We9tCe6xaSt4udLxQScv%2Br6F1iSgEfGTuYS7%2FXT%2F1n4KMHciPeFADWpN5Vd8aj%2Bc%2F%2FxJY%2BDvAoyGGu5VhSqg2QBsr%2FD56h9Xxwtau%2FzrFlTnEe1yx9ar2udMGgOjUmh4Um%2FEOLyBWpqQERnbdENATeUtiGssmsxDoC8JBMhAz%2BmP8bMTm23ZS2VXysT3Qz%2FmUEt',
+            'title=coucou&key=ssh-rsa+AAAAB3NzaC1yc2EAAAADAQABAAABAQCpGT3vU6FBQ6fsd4Ph%2FBs9UtCqJS2OgR2s53Ud1YSsPSGU6hbowh%2FKJT5RtN7XIoXT4JI28sHH%2FHodkaG1g6G3320YPD6KNJPoFxEhl5tCFCqrORD98nBO9bJBTtldHAtNTrQXPFx04PeHMrm58We9tCe6xaSt4udLxQScv%2Br6F1iSgEfGTuYS7%2FXT%2F1n4KMHciPeFADWpN5Vd8aj%2Bc%2F%2FxJY%2BDvAoyGGu5VhSqg2QBsr%2FD56h9Xxwtau%2FzrFlTnEe1yx9ar2udMGgOjUmh4Um%2FEOLyBWpqQERnbdENATeUtiGssmsxDoC8JBMhAz%2BmP8bMTm23ZS2VXysT3Qz%2FmUEt',
             responses.calls[0].request.body,
         )
 

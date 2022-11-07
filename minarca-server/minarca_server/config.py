@@ -164,17 +164,20 @@ def get_parser():
     # Override a couple of arguments with Minarca.
     parser.set_defaults(
         database_uri='/etc/minarca/rdw.db',
-        default_theme='blue',
         favicon=pkg_resources.resource_filename(__name__, 'minarca.ico'),  # @UndefinedVariable
         footer_name='Minarca',
-        footer_url='https://www.ikus-soft.com/en/minarca/',
+        footer_url='https://minarca.org/',
         header_name='Minarca',
         header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.svg'),  # @UndefinedVariable
+        logo=pkg_resources.resource_filename(__name__, 'logo.svg'),  # @UndefinedVariable
+        link_color='#009FB9',
+        navbar_color='#0E2933',
+        font_family="Lato",
         log_access_file='/var/log/minarca/access.log',
         log_file='/var/log/minarca/server.log',
         welcome_msg={
-            '': 'A <b>free and open-source</b> backup software providing end-to-end integration to put you in control of your backup strategy.<br/><br/><a href="https://www.ikus-soft.com/en/minarca/">website</a> • <a href="https://www.ikus-soft.com/en/minarca/doc/">docs</a> • <a href="https://groups.google.com/d/forum/minarca">community</a>',
-            'fr': 'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://www.ikus-soft.com/fr/minarca/">site web</a> • <a href="https://www.ikus-soft.com/fr/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>',
+            '': 'A <b>free and open-source</b> backup software providing end-to-end integration to put you in control of your backup strategy.<br/><br/><a href="https://minarca.org/">website</a> • <a href="https://www.ikus-soft.com/en/minarca/doc/">docs</a> • <a href="https://groups.google.com/d/forum/minarca">community</a>',
+            'fr': 'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://minarca.org/">site web</a> • <a href="https://www.ikus-soft.com/fr/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>',
         },
     )
     return parser

@@ -364,8 +364,8 @@ msgid ""
 msgstr ""
 
 #: minarca_client/core/latest.py:30
-msgid "https://www.ikus-soft.com/en/minarca/download/"
-msgstr "https://www.ikus-soft.com/fr/minarca/telecharger/"
+msgid "https://minarca.org/download/"
+msgstr "https://minarca.org/download/"
 
 #: minarca_client/ui/patterns.py:26
 msgid "Included"
