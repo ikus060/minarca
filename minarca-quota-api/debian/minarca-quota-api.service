@@ -1,6 +1,6 @@
 [Unit]
 Description=Minarca Quota API Server
-Documentation=https://www.ikus-soft.com/en/minarca/
+Documentation=https://minarca.org/
 
 [Service]
 ExecStart=/opt/minarca-quota-api/bin/minarca-quota-api

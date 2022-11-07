@@ -28,7 +28,7 @@ class LatestCheck:
         """
         Return Minarca download page.
         """
-        return _("https://www.ikus-soft.com/en/minarca/download/")
+        return _("https://minarca.org/download/")
 
     def get_latest_version(self, timeout=0.5):
         """

@@ -15,7 +15,7 @@ setuptools.setup(
     description="Minarca Quota API",
     long_description="Provide utilities to setup Quota management for rdiffweb / minarca-server.",
     author="IKUS Software inc.",
-    url="https://www.ikus-soft.com/en/minarca/",
+    url="https://minarca.org/",
     packages=["minarca_quota_api"],
     include_package_data=True,
     python_requires=">=3.5",

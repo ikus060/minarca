@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>
-    <a href="https://www.ikus-soft.com/en/minarca/">website</a>
+    <a href="https://minarca.org">website</a>
     •
     <a href="https://www.ikus-soft.com/en/minarca/doc">docs</a>
     •
@@ -37,7 +37,7 @@ Then start a backup in few minutes by installing minarca client for [Windows](ht
 
 ## Download & Install
 
-[Minarca Download Page](https://www.ikus-soft.com/en/minarca/download/)
+[Minarca Download Page](https://minarca.org/download)
 
 [Minarca Server Installation steps](https://www.ikus-soft.com/archive/minarca/doc/installation.html)
 
@@ -51,7 +51,7 @@ Bug reports should be reported on the Minarca development web site at https://gi
 
 ## Professional support
 
-Professional support for Minarca is available by contacting [IKUS Software inc.](https://www.ikus-soft.com/en/support/#form).
+Professional support for Minarca is available by contacting [IKUS Software inc.](https://minarca.org/contactus).
 
 # About Minarca
 
@@ -65,7 +65,7 @@ since April 2015.
 The Minarca Server source code is hosted on [Gitlab](https://gitlab.com/ikus-soft/minarca)
 and mirrored to [Github](https://github.com/ikus060/minarca).
 
-The Minarca website is https://www.ikus-soft.com/en/minarca/.
+The Minarca website is https://minarca.org/.
 
 # Changelog
 

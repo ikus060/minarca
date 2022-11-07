@@ -1,6 +1,6 @@
 [Unit]
 Description=Minarca Web Server
-Documentation=https://www.ikus-soft.com/en/minarca/
+Documentation=https://minarca.org/
 
 [Service]
 ExecStart=/opt/minarca-server/bin/minarca-server
