@@ -58,7 +58,7 @@ setuptools.setup(
     author_email="support@ikus-soft.com",
     maintainer="IKUS Software inc.",
     maintainer_email="support@ikus-soft.com",
-    url="https://www.ikus-soft.com/en/minarca/",
+    url="https://minarca.org/",
     include_package_data=True,
     packages=setuptools.find_packages("."),
     setup_requires=[
