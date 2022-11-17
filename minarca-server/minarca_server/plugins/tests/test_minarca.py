@@ -14,6 +14,7 @@ Created on Jan 23, 2016
 import grp
 import os
 import pwd
+import time
 import unittest
 from base64 import b64encode
 from io import open
@@ -187,10 +188,11 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
         self.assertEqual([1234567], quota)
         # Then webservice was called
         self.assertEqual(1, len(responses.calls))
+        # Then wait for the task to be scheduled
+        time.sleep(2)
         # Then subprocess get called twice
-        self.assertEqual(2, mock_check_output.call_count, "subprocess.check_output should be called")
-        mock_check_output.assert_any_call(['/usr/bin/chattr', '-R', '+P', ANY], stderr=-2)
-        mock_check_output.assert_any_call(['/usr/bin/chattr', '-R', '-p', str(userobj.userid), ANY], stderr=-2)
+        self.assertEqual(1, mock_check_output.call_count, "subprocess.check_output should be called")
+        mock_check_output.assert_any_call(['/usr/bin/chattr', '-R', '+P', '-p', str(userobj.userid), ANY], stderr=-2)
 
     @responses.activate
     def test_update_userquota_401(self):
