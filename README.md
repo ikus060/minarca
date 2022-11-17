@@ -94,6 +94,7 @@ This releases include a security fix. If you are using an earlier version, you s
   * Add two-factor authentication with email verification #201
   * Generate a new session on login and 2FA #220
   * Enforce permission on /etc/rdiffweb configuration folder
+  * Run user's quota update in background task #186
 
   Breaking changes:
 

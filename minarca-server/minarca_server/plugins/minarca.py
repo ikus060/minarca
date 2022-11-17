@@ -288,18 +288,20 @@ class MinarcaPlugin(SimplePlugin):
             logger.warning("fail to update user root quota", exc_info=1)
             return False
 
+        # Schedule update attribute task in background
+        cherrypy.engine.publish('schedule_task', self._update_attr_task, userobj.user_root, userobj.userid)
+
+        return quota
+
+    def _update_attr_task(self, user_root, project_id):
         # Update user root attribute
         try:
             # Add +P attribute to user's home directory
-            subprocess.check_output(["/usr/bin/chattr", "-R", "+P", userobj.user_root], stderr=subprocess.STDOUT)
-            # Force project id on directory
             subprocess.check_output(
-                ["/usr/bin/chattr", "-R", "-p", str(userobj.userid), userobj.user_root], stderr=subprocess.STDOUT
+                ["/usr/bin/chattr", "-R", "+P", "-p", str(project_id), user_root], stderr=subprocess.STDOUT
             )
         except Exception:
-            logger.warning("fail to update user root quota", exc_info=1)
-            return False
-        return quota
+            logger.warning("fail to update user quota", exc_info=1)
 
 
 cherrypy.minarca = MinarcaPlugin(cherrypy.engine)
