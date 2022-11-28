@@ -73,34 +73,41 @@ The Minarca website is https://minarca.org/.
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
 
-* Upgrade Rdiffweb to 2.5.0
+* Upgrade Rdiffweb to 2.5.2
   * Store User's session information into database
   * Update ldap plugin to load additional attributes from LDAP server
   * Improve `/status` page error handling when `session_statistics` cannot be read
-  * Add support for Ubuntu Jammy
-  * Upgrade from Bootstrap v3 to v4 #204
+  * Upgrade from Bootstrap v3 to v4
   * Replace Fontello by Font-Awesome v4
   * Use CSS variables `var()` to customize themes
   * Remove usage of Jquery.validate
-  * Replace custom timsort by jquery DataTables #205
-  * Add Active Session managements #203
+  * Replace custom timsort by jquery DataTables
+  * Add Active Session managements
     * Active session should be visible in user's profiles
     * Active session may be revoked by user
     * Active session should be visible in administration view
     * Action session may be revoke by administrator
     * Show number of active users within the last 24 hours in dashboard
-  * Handle migration of older Rdiffweb database by adding the missing `repos.Encoding`, `repos.keepdays` and `users.role` columns #185
-  * Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()` #208
-  * Add two-factor authentication with email verification #201
-  * Generate a new session on login and 2FA #220
+  * Handle migration of older Rdiffweb database by adding the missing `repos.Encoding`, `repos.keepdays` and `users.role` columns
+  * Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()`
+  * Add two-factor authentication with email verification
+  * Generate a new session on login and 2FA
   * Enforce permission on /etc/rdiffweb configuration folder
-  * Run user's quota update in background task #186
+  * Run user's quota update in background task
+  * Block repository access when user_root directory is empty or a relative path
+  * Replace admin password only when `--admin-password` option is provided
+  * Invalidate browser cache for logo, headerlogo and favicon on restart
+  * Disable filesize for deleted files to improve page loading
+* Add support for Debian Bookworm
+* Add support for Ubuntu Jammy
+* Add support for Ubuntu Kinetic
+* Run user quota operation in background to avoid blocking user interface #186
 
-  Breaking changes:
+Breaking changes:
 
-  * Drop Ubuntu Hirsute & Impish (End-of-life)
-  * `session-dir` is deprecated and should be replace by `rate-limit-dir`. User's session are stored in database.
-  * previous `.css` customization are not barkward compatible
+* Drop Ubuntu Hirsute & Impish (End-of-life)
+* `session-dir` is deprecated and should be replace by `rate-limit-dir`. User's session are stored in database.
+* previous `.css` customization are not barkward compatible
 
 ## 4.2.5 (2002-10-03)
 
