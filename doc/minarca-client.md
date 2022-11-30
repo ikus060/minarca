@@ -11,7 +11,9 @@ restriction. You are limited to the following operating system.
   * MacOS BigSur (Intel)
   * Debian Buster (64bit)
   * Debian Bullseye (64bit)
+  * Debian Bookworm (64bit)
   * Ubuntu Jammy (64bit)
+  * Ubuntu Kinetic (64bit)
   * Linux (64bit)
 
 ## Installation Steps
@@ -50,6 +52,8 @@ On a Ubuntu or Debian workstation, download the appropriate installer.
 *Ubuntu*
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-jammy-latest.deb"><img alt="Minarca Client for Ubuntu Jammy" src="https://img.shields.io/badge/Ubuntu-Jammy-blue?&logo=ubuntu&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-kinetic-latest.deb"><img alt="Minarca Client for Ubuntu Kinetic" src="https://img.shields.io/badge/Ubuntu-Kinetic-blue?&logo=ubuntu&style=for-the-badge"></a>
 
 *Debian*
 

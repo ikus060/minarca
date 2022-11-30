@@ -71,7 +71,7 @@ Minarca can be configured to send logs to specific location. By default, logs ar
 
 In addition, `minarca-shell` and `minarca-quota-api` are also configure to sent log to the same folder.
 
-**Enable Debugging log**
+### Enable Debugging
 
 A specific option is also available if you want to enable the debugging log. We do not recommend to enable this option in production as it may leak information to the user whenever an exception is raised.
 
@@ -162,6 +162,16 @@ Here is an example of how you may limit Minarca access to members of *Admin_Back
     ldap-required-group=cn=Admin_Backup,ou=Groups,dc=nodomain
     ldap-group-attribute=memberUid
     ldap-group-attribute-is-dn=false
+
+## Configure User Session
+
+A user session is a sequence of request and response transactions associated with a single user. The user session is the means to track each authenticated user.
+
+| Option | Description | Example |
+| --- | --- | --- |
+| session-idle-timeout | This timeout defines the amount of time a session will remain active in case there is no activity in the session. User Session will be revoke after this period of inactivity, unless the user selected "remember me". Default 10 minutes. | 5 |
+| session-absolute-timeout | This timeout defines the maximum amount of time a session can be active. After this period, user is forced to (re)authenticate, unless the user selected "remember me". Default 20 minutes. | 30 |
+| session-persistent-timeout | This timeout defines the maximum amount of time to remember and trust a user device. This timeout is used when user select "remember me". Default 30 days | 43200 |
 
 ## Configure email notifications
 
@@ -267,29 +277,46 @@ as the dataset to store Minarca backups.
 
 Take note, it's better to enable project quota attributes when the repositories are empty.
 
-## Configure user's session persistence.
+## Configure Rate-Limit
 
-Minarca could be configured to persist the user's session information either in
-memory or on disk. When the user's session persists in memory, all user's
-session get reset if the web server restart. If you want to persist the user's
-session even if the web server gets restarted, you may persist them on disk with
-`session-dir` option.
+Minarca could be configured to rate-limit access to anonymous to avoid bruteforce
+attacks and authenticated users to avoid Denial Of Service attack.
 
 | Option | Description | Example |
 | --- | --- | --- |
-| session-dir | location where to store user session information. When undefined, the user sessions are kept in memory. | /var/lib/minarca/session |
+| rate-limit | maximum number of requests per hour that can be made on sensitive endpoints. When this limit is reached, an HTTP 429 message is returned to the user or the user is logged out. This security measure is used to limit brute force attacks on the login page and the RESTful API. | 20 |
+| rate-limit-dir | location where to store rate-limit information. When undefined, data is kept in memory. | /var/lib/minarca/session |
 
-## Configure Minarca appearance
+## Custom user's password length limits
+
+By default, Minarca supports passwords with the following lengths:
+
+* Minimum: 8 characters
+* Maximum: 128 characters
+
+Changing the minimum or maximum length does not affect existing users' passwords. Existing users are not prompted to reset their passwords to meet the new limits. The new limit only applies when an existing user changes their password.
+
+| Option | Description | Example |
+| --- | --- | --- |
+| password-min-length | Minimum length of the user's password | 8 |
+| password-max-length | Maximum length of the user's password | 128 |
+| password-score      | Minimum zxcvbn's score for password. Value from 0 to 4. Default value 1. | 4 |
+
+You may want to read more about [zxcvbn](https://github.com/dropbox/zxcvbn) score value.
+
+## Configure Minarca Branding
 
 A number of options are available to customize the appearance of Minarca to your
 need. Most likely, you will want to make it closer to your business brand.
 
 | Option | Description | Example |
 | --- | --- | --- |
-| header-name | Define the application name displayed in the title bar and header menu. | My Backup |
-| default-theme | Define the theme. Either: `default`, `blue` or `orange`. | orange |
 | welcome-msg | Replace the headline displayed in the login page. It may contains HTML. | Custom message displayed on login page.|
-| favicon | Define the FavIcon to be displayed in the browser title | /etc/minarca/my-fav.ico |
+| brand-header-name | Define the application name displayed in the title bar and header menu. | My Backup |
+| brand-default-theme | Define the theme. Either: `default`, `blue` or `orange`. Define the css file to be loaded in the web interface. | orange |
+| brand-favicon | Define the FavIcon to be displayed in the browser title | /etc/minarca/my-fav.ico |
+| brand-logo | location of an image (preferably a .png) to be used as a replacement for the rdiffweb logo displayed in Login page. | /etc/minarca/logo2.png |
+| brand-header-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca header logo displayed in navigation bar. | /etc/minarca/logo1.png |
 
 ## Configure repositories clean-up job
 
@@ -311,7 +338,7 @@ If you want to enforce a different location for the temporary directory, you may
 | --- | --- | --- |
 | tempdir | alternate temporary folder to be used when restoring files. Might be useful if the default location has limited disk space| /tmp/minarca/ |
 
-## Configure repository lookup depthness.
+## Configure repository lookup depthness
 
 When defining the UserRoot value for a user, Minarca will scan the content of this directory recursively to lookups for rdiff-backup repositories. For performance reason, Minarca limits the recursiveness to 3 subdirectories. This default value should suit most use cases. If you have a particular use case, it's possible to allow Minarca to scan for more subdirectories by defining a greater value for the option `max-depth`. Make sure to pick a reasonable value for your use case as it may impact the performance.
 
