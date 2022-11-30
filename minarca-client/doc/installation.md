@@ -17,7 +17,9 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 * Supported Operating System:
   * Debian Buster
   * Debian Bullseye
+  * Debian Bookworm
   * Ubuntu Jammy 22.04 LTS
+  * Ubuntu Kinetic 22.10
 * Cpu: 64bit x86-64 or amd64, 4 core
 * Memory: minimum 4 GiB
 * Storage: consider the storage according to your backup needs. A couple of terabytes should be considered for the long term. Ideally, you should consider hardware or ZFS raid for your storage. If you plan to support user quota, make sure that your file system supports it. E.g. ext4 and ZFS. Other file systems might not be well supported.
@@ -98,7 +100,7 @@ Minarca-Shell, the component responsible to handle SSH connection and isolate
 each user's connection, is using a Kernel feature
 called [user namespaces](https://man7.org/linux/man-pages/man7/user_namespaces.7.html).
 This feature is used by Minarca-Shell to create a chroot jail to completely
-isolate each user SSH connection. That same feature is used by many applications[^1] [^2]
+isolate each user SSH connection. That same feature is used by many applications
 for improved hardening. Without this feature, Minarca-Shell will refuse any incoming
 SSH connection and throw errors.
 
