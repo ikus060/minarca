@@ -69,7 +69,7 @@ The Minarca website is https://minarca.org/.
 
 # Changelog
 
-## Next Release
+## 4.3.0 (2022-11-30)
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
 
@@ -92,7 +92,6 @@ This releases include a security fix. If you are using an earlier version, you s
   * Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()`
   * Add two-factor authentication with email verification
   * Generate a new session on login and 2FA
-  * Enforce permission on /etc/rdiffweb configuration folder
   * Run user's quota update in background task
   * Block repository access when user_root directory is empty or a relative path
   * Replace admin password only when `--admin-password` option is provided
