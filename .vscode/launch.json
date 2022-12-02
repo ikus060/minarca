@@ -16,6 +16,7 @@
             "justMyCode": false,
             "env": {
                 "LANGUAGE": "fr",
+                "MINARCA_CONFIG_HOME": "/tmp",
             }
         },
         {
@@ -30,6 +31,7 @@
             "justMyCode": false,
             "env": {
                 "LANGUAGE": "fr",
+                "MINARCA_CONFIG_HOME": "/tmp",
             }
         },
         {
