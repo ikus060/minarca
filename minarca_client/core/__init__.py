@@ -542,22 +542,23 @@ class Rdiffweb:
         assert password
         self.username = username
         self.session = requests.Session()
+        self.session.allow_redirects = False
         self.session.headers['User-Agent'] = compat.get_user_agent()
-        self.session.auth = (username, password)
         # Check if connection is working and get redirection if needed
-        response = self.session.get(urljoin(remote_url + '/', "api/"))
-        response.raise_for_status()
+        response = self.session.get(urljoin(remote_url + '/', '/api/'), allow_redirects=True)
         # Replace remote_URL by using response URL to support redirection.
         if not response.url.endswith('/api/'):
             raise ConnectionError()
-        # Trim /api/
         self.remote_url = response.url[0:-4]
+        # Configure authentication
+        self.session.auth = (username, password)
+        response = self.session.get(urljoin(self.remote_url + '/', "api/"))
+        self.raise_for_status(response)
 
     def add_ssh_key(self, title, public_key):
         response = self.session.post(
             self.remote_url + 'api/currentuser/sshkeys',
             data={'title': title, 'key': public_key},
-            allow_redirects=False,
         )
         self.raise_for_status(response)
 
