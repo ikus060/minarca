@@ -12,7 +12,7 @@ how to translate Minarca. It's not a complete instruction set, it's merely a rem
 Extract the strings to be translated:
 
     cd minarca-client
-    python setup.py extract_messages --output-file minarca_client/locales/messages.pot
+    python setup.py extract_messages
 
 Create a new translation:
 
