@@ -350,15 +350,8 @@ class Backup:
                 )
                 raise RepositoryNameExistsError(repository_name)
 
-            # Check if ssh keys exists
-            if not os.path.exists(self.public_key_file) and not os.path.exists(self.private_key_file):
-                logger.debug(_('generating identity'))
-                ssh_keygen(self.public_key_file, self.private_key_file)
-
-            # Push SSH Keys
-            with open(self.public_key_file) as f:
-                logger.debug(_('exchanging identity with minarca server'))
-                rdiffweb.add_ssh_key(repository_name, f.read())
+            # Generate SSH Keys
+            self._push_identity(rdiffweb, repository_name)
 
             # Store minarca identity
             minarca_info = rdiffweb.get_minarca_info()
@@ -405,6 +398,26 @@ class Backup:
             raise HttpServerError(e)
 
         # TODO Update encoding
+
+    def _push_identity(self, rdiffweb, name):
+        # Check if ssh keys exists, if not generate new keys.
+        if not os.path.exists(self.public_key_file) and not os.path.exists(self.private_key_file):
+            logger.debug(_('generating identity'))
+            ssh_keygen(self.public_key_file, self.private_key_file)
+
+        # Push SSH Keys to Minarca server
+        try:
+            with open(self.public_key_file) as f:
+                logger.debug(_('exchanging identity with minarca server'))
+                rdiffweb.add_ssh_key(name, f.read())
+        except Exception:
+            # Probably a duplicate SSH Key, let generate new identity
+            logger.debug(_('generating new identity'))
+            ssh_keygen(self.public_key_file, self.private_key_file)
+            # Publish new identify
+            with open(self.public_key_file) as f:
+                logger.debug(_('exchanging new identity with minarca server'))
+                rdiffweb.add_ssh_key(name, f.read())
 
     def _rdiff_backup(self, extra_args, source=None):
         """
