@@ -3,9 +3,9 @@ Created on Jul. 20, 2021
 
 @author: ikus060
 '''
+import asyncio
 import os
 import tempfile
-import time
 import tkinter
 import unittest
 from unittest.mock import MagicMock
@@ -34,8 +34,18 @@ class SettingsTest(unittest.TestCase):
         self.dlg.destroy()
 
     def pump_events(self):
+        asyncio.run(self.pump_events_async())
+
+    async def pump_events_async(self):
         while self.dlg.root.dooneevent(tkinter._tkinter.ALL_EVENTS | tkinter._tkinter.DONT_WAIT):
-            pass
+            # Ignore `_watch_status_task`
+            tasks = [
+                t
+                for t in asyncio.all_tasks()
+                if 'StatusView._watch_status_task' not in str(t)
+                if t != asyncio.current_task()
+            ]
+            await asyncio.gather(*tasks)
 
     def test_toggle_check_latest_version(self):
         # Given a Settings dialog
@@ -60,8 +70,7 @@ class SettingsTest(unittest.TestCase):
         # Given a Settings dialog
         self.pump_events()
         # When user click on "Check for update"
-        self.dlg.settings_view.check_latest_version_button.invoke()
+        self.dlg.root.after(0, lambda: self.dlg.settings_view.check_latest_version_button.invoke())
         self.pump_events()
         # Then
-        time.sleep(1)
         self.dlg.settings_view.latest_check.is_latest.assert_called_once()

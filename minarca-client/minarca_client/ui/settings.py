@@ -2,7 +2,6 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import logging
-import threading
 import tkinter.messagebox
 import webbrowser
 
@@ -36,21 +35,8 @@ class SettingsView(tkvue.Component):
 
         # Initialise stuff for latest version.
         if self.data['check_latest_version']:
-            # Start background thread for latest version.
-            self.root.after(3000, self._check_latest_version)
-
-        # Start a background thread to update the status.
-        self._stop_event = threading.Event()
-        self._thread = threading.Thread(target=self._check_latest_version_blocking, daemon=True)
-        self.root.bind('<Destroy>', self.finalize)
-
-    def finalize(self, unused):
-        """
-        Called when windows get destroyed.
-        """
-        self._stop_event.set()
-        if self._thread and self._thread.is_alive():
-            self._thread.join()
+            # After 5 secs, check for update.
+            self.root.after(5000, self._check_latest_version)
 
     def update_check_latest_version(self, value):
         """
@@ -60,7 +46,7 @@ class SettingsView(tkvue.Component):
         settings['check_latest_version'] = value
         settings.save()
 
-    def _prompt_latest_version(self, event):
+    def _prompt_latest_version(self):
         self.data['checking_for_update'] = False
         latest_version = self.latest_check.get_latest_version()
         ret = tkinter.messagebox.askquestion(
@@ -82,19 +68,23 @@ class SettingsView(tkvue.Component):
         webbrowser.open(url)
 
     def _check_latest_version(self):
+        self.get_event_loop().create_task(self._check_latest_version_task())
+
+    async def _check_latest_version_task(self):
         self.data['checking_for_update'] = True
         self.data['is_latest'] = None
         self.data['check_latest_version_error'] = None
-        self._thread.start()
 
-    def _check_latest_version_blocking(self):
         # Query latest version.
         try:
-            is_latest = self.latest_check.is_latest()
+            is_latest = await self.get_event_loop().run_in_executor(None, self.latest_check.is_latest)
             self.data['is_latest'] = is_latest
             if not is_latest:
                 # Show dialog
-                self.root.event_generate('<<prompt_latest_version>>')
+                self._prompt_latest_version()
+        except tkinter.TclError:
+            # Swallow exception raised when application get destroyed.
+            pass
         except LatestCheckFailed as e:
             self.data['check_latest_version_error'] = str(e)
         finally:

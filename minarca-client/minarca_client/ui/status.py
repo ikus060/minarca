@@ -1,8 +1,8 @@
 # Copyright (C) 2021 IKUS Software inc. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
+import asyncio
 import logging
-import threading
 import tkinter
 import tkinter.filedialog
 import tkinter.simpledialog
@@ -41,18 +41,7 @@ class StatusView(tkvue.Component):
             }
         )
         super().__init__(*args, **kwargs)
-        # Start a background thread to update the status.
-        self._stop_event = threading.Event()
-        self._thread = threading.Thread(target=self._watch_status, daemon=True)
-        self._thread.start()
-        self.root.bind('<Destroy>', self.finalize)
-
-    def finalize(self, unused):
-        """
-        Called when window get destroyed.
-        """
-        self._stop_event.set()
-        self._thread.join()
+        self.after(1, self._watch_status)
 
     @tkvue.computed
     def header_text(self, context):
@@ -166,16 +155,25 @@ class StatusView(tkvue.Component):
         webbrowser.open(remote_url)
 
     def _watch_status(self):
+        self._task = self.get_event_loop().create_task(self._watch_status_task())
+
+    async def _watch_status_task(self):
         """
         Used to watch the status file and trigger an update whenever the status changes.
         """
-        last_status = self.backup.get_status()
-        while not self._stop_event.wait(timeout=0.5):
-            status = self.backup.get_status()
-            if last_status != status:
-                self.data['lastresult'] = status['lastresult']
-                self.data['lastdate'] = status['lastdate']
-                self.data['details'] = status['details']
+        last_status = None
+        try:
+            while self.root.winfo_exists():
+                status = self.backup.get_status()
+                if last_status != status:
+                    self.data['lastresult'] = status['lastresult']
+                    self.data['lastdate'] = status['lastdate']
+                    self.data['details'] = status['details']
+                # Sleep 500ms
+                await asyncio.sleep(0.5)
+        except tkinter.TclError:
+            # Swallow exception raised when application get destroyed.
+            pass
 
     def start_stop_backup(self):
         try:
