@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-11-10 09:05-0500\n"
+"POT-Creation-Date: 2022-12-02 14:31-0500\n"
 "PO-Revision-Date: 2021-08-30 10:07-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -207,7 +207,7 @@ msgstr "exécution de la commande : %s"
 #: minarca_client/core/compat.py:315 minarca_client/ui/templates/home.html:1
 #: minarca_client/ui/templates/setup.html:1
 msgid "Minarca Backup"
-msgstr "Minarca Backup"
+msgstr "Sauvegarde Minarca"
 
 #: minarca_client/core/compat.py:361
 msgid ""
@@ -735,19 +735,27 @@ msgstr "Nom d'utilisateur"
 msgid "Password"
 msgstr "Mot de passe"
 
-#: minarca_client/ui/templates/setup.html:32
+#: minarca_client/ui/templates/setup.html:31
+msgid ""
+"If two-factor authentication is enabled on your account, use an Access "
+"Token."
+msgstr ""
+"Si l'authentification à deux facteurs est activée sur votre compte, "
+"utilisez un jeton d'accès."
+
+#: minarca_client/ui/templates/setup.html:33
 msgid "Repository name"
 msgstr "Nom du dépôt"
 
-#: minarca_client/ui/templates/setup.html:37
+#: minarca_client/ui/templates/setup.html:38
 msgid "Close"
 msgstr "Ferme"
 
-#: minarca_client/ui/templates/setup.html:39
+#: minarca_client/ui/templates/setup.html:40
 msgid "Submit"
 msgstr "Soumettre"
 
-#: minarca_client/ui/templates/setup.html:42
+#: minarca_client/ui/templates/setup.html:43
 msgid "Connecting..."
 msgstr "Liaison..."
 

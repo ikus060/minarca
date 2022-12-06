@@ -4,6 +4,11 @@
 import pkg_resources
 import tkvue
 
+from minarca_client.locale import gettext
+
+# Configure translation
+tkvue.gettext = gettext
+
 # Configure TK with our theme.
 theme_file = pkg_resources.resource_filename('minarca_client.ui', 'theme/minarca.tcl')
 tkvue.configure_tk(
