@@ -1,5 +1,5 @@
+import functools
 import logging
-import threading
 import tkinter.messagebox
 
 import pkg_resources
@@ -58,44 +58,44 @@ class SetupDialog(tkvue.Component):
             }
         )
         super().__init__(master=master)
-        # Bind a couple of event form multi thread processing.
-        self.root.bind('<<prompt_link_force>>', self._prompt_link_force)
-        cmd = self.root.register(self._show_warning)
-        self.root.bind('<<show_warning>>', cmd + " %d")
-        self.root.bind('<<close>>', self.close)
 
     def link(self, force=False):
-        self.data.linking = True
-        # Start background thread.
-        self._thread = threading.Thread(target=self._link, daemon=True, kwargs={'force': force}).start()
+        self.get_event_loop().create_task(self._link_task(force=force))
 
-    def _link(self, force):
-        """
-        This function should be called in a separate thread to avoid blocking the UI.
-        """
+    async def _link_task(self, force):
+        self.data.linking = True
         try:
-            self.backup.link(
+            # Asynchronously link to Minarca Server
+            call = functools.partial(
+                self.backup.link,
                 remoteurl=self.data.remoteurl,
                 username=self.data.username,
                 password=self.data.password,
                 repository_name=self.data.repository_name,
                 force=force,
             )
+            await self.get_event_loop().run_in_executor(None, call)
             # Link completed - Close Window.
-            self.root.event_generate('<<close>>')
+            self.close()
         except RepositoryNameExistsError:
             logger.info('repository name `%s` already exists' % self.data.repository_name)
-            self.root.event_generate('<<prompt_link_force>>')
+            self._prompt_link_force()
         except (HttpAuthenticationError) as e:
+            self.data.linking = False
             logger.exception('authentication failed')
-            self._event_generate_show_warning(
+            tkinter.messagebox.showwarning(
+                master=self.root,
+                icon='warning',
                 title=_('Invalid connection information !'),
                 message=_('Invalid connection information !'),
                 detail=_("The information you have entered for the connection to Minarca are invalid.\n\n%s") % str(e),
             )
         except Exception as e:
+            self.data.linking = False
             logger.exception('fail to connect')
-            self._event_generate_show_warning(
+            tkinter.messagebox.showwarning(
+                master=self.root,
+                icon='warning',
                 title=_('Failed to connect to remote server'),
                 message=_('Failed to connect to remote server'),
                 detail=_("An error occurred during the connection to Minarca " "server.\n\nDetails: %s") % str(e),
@@ -108,7 +108,7 @@ class SetupDialog(tkvue.Component):
         self.data.linking = False
         self.root.destroy()
 
-    def _prompt_link_force(self, event):
+    def _prompt_link_force(self):
         button_idx = tkinter.messagebox.askyesno(
             master=self.root,
             icon='question',
@@ -125,12 +125,4 @@ class SetupDialog(tkvue.Component):
             # Operation cancel by user
             self.data.linking = False
             return
-        self._link(force=True)
-
-    def _event_generate_show_warning(self, title, message, detail):
-        self.root.event_generate('<<show_warning>>', data={'title': title, 'message': message, 'detail': detail})
-
-    def _show_warning(self, event_data):
-        self.data.linking = False
-        event_data = eval(event_data)
-        tkinter.messagebox.showwarning(master=self.root, icon='warning', **event_data)
+        self.link(force=True)
