@@ -7,6 +7,7 @@ import webbrowser
 
 import pkg_resources
 
+import minarca_client
 from minarca_client.core import Backup
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
@@ -27,6 +28,7 @@ class SettingsView(tkvue.Component):
                 'checking_for_update': False,  # True when background thread is running.
                 'is_latest': None,
                 'check_latest_version_error': None,
+                'version': 'v' + minarca_client.__version__,
             }
         )
         super().__init__(*args, **kwargs)
@@ -89,3 +91,21 @@ class SettingsView(tkvue.Component):
             self.data['check_latest_version_error'] = str(e)
         finally:
             self.data['checking_for_update'] = False
+
+    def unlink(self):
+        """
+        Called to un register this agent from minarca server.
+        """
+        return_code = tkinter.messagebox.askyesno(
+            parent=self.root,
+            title=_('Are you sure ?'),
+            message=_('Are you sure you want to disconnect this Minarca agent ?'),
+            detail=_(
+                'If you disconnect this computer, this Minarca agent will erase its identity and will no longer run backup on schedule.'
+            ),
+        )
+        if not return_code:
+            # Operation cancel by user.
+            return
+        self.backup.unlink()
+        self.root.winfo_toplevel().destroy()

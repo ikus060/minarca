@@ -1,26 +1,43 @@
-<Frame>
-    <Frame pack-fill="x">
-        <Label text="Settings" pack-side="left" style="H1.primary.TLabel" pack-pady="10" />
-    </Frame>
-    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
-    <Frame pack-fill="x">
-        <Label style="strong.primary.TLabel" text="Updates" width="15" pack-side="left" />
-        <Frame pack-fill="x">
+<Frame style="default.TFrame">
+    
+    <!-- Title -->
+    <Label pack-side="top" text="Settings" style="H1.dark.default.TLabel" pack-fill="x" />
+
+    <!-- Update -->
+    <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+        <Frame style="light.TFrame" pack-fill="x">
+            <Label style="H3.dark.light.TLabel" text="Updates" pack-side="left" />
             <Button id="check_latest_version_button" text="Check now" command="_check_latest_version" pack-side="right"
-                pack-pady="5" />
-            <Checkbutton id="check_latest_version_toggle_button" text="Check for update at startup"
-                variable="{{check_latest_version}}" style="Roundtoggle.Toolbutton" pack-side="right" />
+                style="primary.TButton"/>
         </Frame>
-        <Label text="Checking for updates..." image="spinner-16" compound="left" visible="{{checking_for_update}}"
-            anchor="e" pack-fill="x" />
-        <Label text="Current version is up-to-date" style="success.TLabel" image="success-16" compound="left"
-            visible="{{is_latest is True}}" anchor="e" pack-fill="x" />
-        <Label text="Update available" style="info.TLabel" image="info-16" compound="left"
-            visible="{{is_latest is False}}" anchor="e" pack-fill="x" />
-        <Label text="Cannot check for updates. Try again later." style="danger.TLabel" image="error-16" compound="left"
-            visible="{{check_latest_version_error is not None}}" anchor="e" pack-fill="x">
-            <Tooltip text="{{check_latest_version_error}}" width="50" />
-        </Label>
+
+        <Checkbutton id="check_latest_version_toggle_button" text="Check for update at startup"
+            variable="{{check_latest_version}}" style="dark.light.Roundtoggle.TCheckbutton" pack-fill="x" />
+
+        <Frame style="light.TFrame" pack-fill="x">
+            <Label text="Checking for updates..." compound="left" visible="{{checking_for_update}}"
+                pack-fill="x" style="info.light.TLabel" />
+            <Label text="Current version is up-to-date" style="success.light.TLabel" compound="left"
+                visible="{{is_latest is True}}" pack-fill="x" />
+            <Label text="Update available" style="info.light.TLabel" compound="left"
+                visible="{{is_latest is False}}"  pack-fill="x" />
+            <Label text="Cannot check for updates. Try again later." style="danger.light.TLabel" compound="left"
+                visible="{{check_latest_version_error is not None}}"  pack-fill="x">
+                <Tooltip text="{{check_latest_version_error}}" width="50" />
+            </Label>
+        </Frame>
+        
+        <Label text="{{version}}" style="small.dark.light.TLabel" pack-fill="x" anchor="e"/>
+
     </Frame>
-    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
+
+    <!-- Link -->
+    <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+        <Frame style="light.TFrame" pack-fill="x">
+            <Label style="H3.dark.light.TLabel" text="Disconnect the backup" pack-side="left" />
+            <Button style="primary.TButton" text="Disconnect" command="unlink" cursor="hand2" pack-side="right" />
+        </Frame>
+        <Label style="dark.light.TLabel" text="When you disconnect this computer, the backup process will no longer work." pack-fill="x" wrap="1" />
+    </Frame>
+
 </Frame>
