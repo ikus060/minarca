@@ -7,6 +7,7 @@ import os
 import tempfile
 import tkinter
 import unittest
+import unittest.mock
 from contextlib import contextmanager
 
 from minarca_client.core.compat import IS_LINUX
@@ -50,7 +51,8 @@ class PatternsViewTest(unittest.TestCase):
             # When showing the patterns view.
             # Then it contains the list of existing patterns.
             self.assertEqual(
-                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+                len(dlg.backup.get_patterns()),
+                len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
     @unittest.mock.patch('tkinter.filedialog.askopenfilenames', return_value=['/home/this_is_a_file'])
@@ -64,7 +66,8 @@ class PatternsViewTest(unittest.TestCase):
             # Then the pattern is added in the widget.
             self.assertEqual(1, len(dlg.backup.get_patterns()))
             self.assertEqual(
-                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+                len(dlg.backup.get_patterns()),
+                len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
     @unittest.mock.patch('tkinter.filedialog.askdirectory', return_value=['/home/'])
@@ -78,7 +81,8 @@ class PatternsViewTest(unittest.TestCase):
             # Then the pattern is added in the widget.
             self.assertEqual(1, len(dlg.backup.get_patterns()))
             self.assertEqual(
-                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+                len(dlg.backup.get_patterns()),
+                len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
     @unittest.mock.patch('tkinter.simpledialog.askstring', return_value=['new-pattern'])
@@ -92,23 +96,28 @@ class PatternsViewTest(unittest.TestCase):
             # Then the pattern is added in the widget.
             self.assertEqual(1, len(dlg.backup.get_patterns()))
             self.assertEqual(
-                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+                len(dlg.backup.get_patterns()),
+                len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
     def test_remove_pattern(self):
         # Given a home dialog with default patterns
         with home_dialog() as dlg:
-            item = Pattern(True, 'new-pattern', None)
-            dlg.backup.set_patterns([item])
+            item1 = Pattern(True, 'new-pattern1', None)
+            item2 = Pattern(True, 'new-pattern2', None)
+            item3 = Pattern(True, 'new-pattern3', None)
+            item4 = Pattern(True, 'new-pattern4', None)
+            dlg.backup.set_patterns([item1, item2, item3, item4])
             dlg.patterns_view.data['patterns'] = dlg.backup.get_patterns()
-            self.assertEqual(1, len(dlg.backup.get_patterns()))
+            self.assertEqual(4, len(dlg.backup.get_patterns()))
             # When removing a pattern
-            dlg.patterns_view.remove_pattern(item)
+            dlg.patterns_view.remove_pattern(item1)
             dlg.pump_events()
             # Then the pattern is added in the widget.
-            self.assertEqual(0, len(dlg.backup.get_patterns()))
+            self.assertEqual(3, len(dlg.backup.get_patterns()))
             self.assertEqual(
-                len(dlg.backup.get_patterns()), len(dlg.patterns_view.scrolled_frame.interior.winfo_children())
+                len(dlg.backup.get_patterns()),
+                len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
     def test_toggle_pattern(self):

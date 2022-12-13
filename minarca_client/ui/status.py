@@ -33,10 +33,11 @@ class StatusView(tkvue.Component):
                 'repositoryname': self.backup.get_settings('repositoryname'),
                 # Computed variables
                 'header_text': self.header_text,
-                'header_text_style': self.header_text_style,
-                'header_image_path': self.header_image_path,
+                'status_text': self.status_text,
+                'status_text_style': self.status_text_style,
                 'start_stop_text': self.start_stop_text,
                 'last_backup_text': self.last_backup_text,
+                'last_backup_description': self.last_backup_description,
                 'remote_text_tooltip': self.remote_text_tooltip,
             }
         )
@@ -45,6 +46,16 @@ class StatusView(tkvue.Component):
 
     @tkvue.computed
     def header_text(self, context):
+        """
+        Return a welcome message
+        """
+        name = self.backup.get_settings('username')
+        if name:
+            name = name.capitalize()
+        return _('Welcome %s') % name
+
+    @tkvue.computed
+    def status_text(self, context):
         """
         Return a human description of backup health base on configuration and last result.
         """
@@ -65,29 +76,30 @@ class StatusView(tkvue.Component):
             return _('Backup is not healthy')
 
     @tkvue.computed
-    def header_text_style(self, context):
+    def status_text_style(self, context):
         lastresult = context.lastresult
         if lastresult in ['SUCCESS', 'RUNNING']:
-            return 'H1.success.TLabel'
-        elif lastresult in ['UNKNOWN', 'INTERRUPT']:
-            return 'H1.info.TLabel'
-        # Default
-        return 'H1.danger.TLabel'
-
-    @tkvue.computed
-    def header_image_path(self, context):
-        lastresult = context.lastresult
-        if lastresult == 'SUCCESS':
-            return 'success-24'
-        elif lastresult == 'RUNNING':
-            return 'spinner-24'
-        elif lastresult in ['UNKNOWN', 'INTERRUPT']:
-            return 'info-24'
-        # Default
-        return 'error-24'
+            return 'success'
+        return 'danger'
 
     @tkvue.computed
     def last_backup_text(self, context):
+        lastresult = context['lastresult']
+        lastdate = context['lastdate']
+        if lastresult == 'SUCCESS':
+            return str(lastdate)
+        elif lastresult == 'FAILURE':
+            return _('Last backup failed')
+        elif lastresult == 'RUNNING':
+            return _('Currently running')
+        elif lastresult == 'STALE':
+            return _('Stale')
+        elif lastresult == 'INTERRUPT':
+            return _('Interrupted')
+        return _('Unknown')
+
+    @tkvue.computed
+    def last_backup_description(self, context):
         lastresult = context['lastresult']
         lastdate = context['lastdate']
         details = context['details']
@@ -128,24 +140,6 @@ class StatusView(tkvue.Component):
         if lastresult in ['RUNNING', 'STALE']:
             return _('Stop backup')
         return _('Start backup')
-
-    def unlink(self):
-        """
-        Called to un register this agent from minarca server.
-        """
-        return_code = tkinter.messagebox.askyesno(
-            parent=self.root,
-            title=_('Are you sure ?'),
-            message=_('Are you sure you want to disconnect this Minarca agent ?'),
-            detail=_(
-                'If you disconnect this computer, this Minarca agent will erase its identity and will no longer run backup on schedule.'
-            ),
-        )
-        if not return_code:
-            # Operation cancel by user.
-            return
-        self.backup.unlink()
-        self.root.winfo_toplevel().destroy()
 
     def browse_remote(self):
         """

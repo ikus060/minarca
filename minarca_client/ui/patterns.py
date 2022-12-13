@@ -25,7 +25,7 @@ class PatternsView(tkvue.Component):
         self.data = tkvue.Context(
             {
                 'patterns': self.backup.get_patterns(),
-                'check_button_text': lambda item: _('Included') if item.include else _('Excluded'),
+                'check_button_text': lambda item: ' ' + (_('Included') if item.include else _('Excluded')),
             }
         )
         super().__init__(*args, **kwargs)

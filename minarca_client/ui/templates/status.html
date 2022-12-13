@@ -1,21 +1,41 @@
-<Frame>
-    <Frame pack-fill="x" pack-pady="10">
-        <Label pack-side="left" text="{{header_text}}" style="{{header_text_style}}" image="{{header_image_path}}" compound="left" />
-        <Button id="start_stop_button" command="start_stop_backup" text="{{start_stop_text}}" pack-side="right"
-            style="success.TButton" cursor="hand2" />
-    </Frame>
-    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
-    <Frame pack-fill="x">
-        <Label style="strong.primary.TLabel" text="Last Backup" width="15" pack-side="left" />
-        <Label pack-expand="true" pack-side="left" pack-fill="x" wrap="true" text="{{last_backup_text}}" />
-    </Frame>
-    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
-    <Frame pack-fill="x">
-        <Label style="strong.primary.TLabel" text="Remote" width="15" pack-side="left" />
-        <Button style="Link.TButton" text="{{remoteurl}}" cursor="hand2" pack-side="left" command="browse_remote">
-            <ToolTip text="{{remote_text_tooltip}}" />
+<Frame style="default.TFrame">
+    <!-- Title -->
+    <Label pack-side="top" text="{{ header_text }}" style="H1.dark.default.TLabel" pack-fill="x" />
+
+    <!-- Link to minarca server -->
+    <Frame style="default.TFrame" pack-fill="x">
+        <Button style="Link.TButton" text="View my account online" cursor="hand2" pack-side="left" command="browse_remote">
+            <ToolTip text="{{ remote_text_tooltip }}" />
         </Button>
-        <Button style="secondary.TButton" text="Disconnect" command="unlink" cursor="hand2" pack-side="right" />
     </Frame>
-    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
+
+    <!-- Spacer -->
+    <Frame style="default.TFrame" pack-fill="x" pack-expand="1" />
+
+    <Frame style="light.TFrame" pack-fill="x" padding="0 15">
+        <!-- Current status -->
+        <Frame style="light.TFrame" pack-side="left" pack-fill="both" pack-expand="1" padding="25">
+            <Label style="H4.dark.light.TLabel" wrap="true" text="Backup Status: " pack-expand="1" pack-fill="x" width="15" anchor="s" />
+            <Label style="{{ f'H5.{status_text_style}.light.TLabel' }}" pack-expand="1" pack-fill="x" wrap="true" text="{{ status_text }}" compound="left" width="20" anchor="s" pack-pady="25 0" />
+        </Frame>
+
+        <Separator orient="vertical" pack-side="left" pack-fill="y" />
+
+        <!-- Last back-->
+        <Frame style="light.TFrame" pack-side="left" pack-fill="both" pack-expand="1" padding="25">
+            <Label style="H4.dark.light.TLabel" pack-expand="1" pack-fill="x" wrap="true" text="Last Backup: " width="15" anchor="s" />
+            <Label style="H5.info.light.TLabel" justify="center" pack-expand="1" pack-fill="x" wrap="true" text="{{ last_backup_text }}" width="20" anchor="s" pack-pady="25 0">
+                <ToolTip text="{{ last_backup_description }}" width="50" />
+            </Label>
+        </Frame>
+    </Frame>
+
+    <!-- Start/Stop backup -->
+    <Frame style="default.TFrame" pack-fill="x" pack-expand="1" />
+    <Frame style="default.TFrame">
+        <Button id="start_stop_button" command="start_stop_backup" text="{{start_stop_text}}" pack-side="top"
+            style="H4.success.TButton" cursor="hand2" />
+    </Frame>
+    <Frame style="default.TFrame" pack-fill="x" pack-expand="1" />
+        
 </Frame>
