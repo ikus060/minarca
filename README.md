@@ -69,11 +69,11 @@ The Minarca website is https://minarca.org/.
 
 # Changelog
 
-## 4.3.0 (2022-11-30)
+## Next Release - 4.3.0
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
 
-* Upgrade Rdiffweb to 2.5.2
+* Upgrade Rdiffweb to 2.5.3
   * Store User's session information into database
   * Update ldap plugin to load additional attributes from LDAP server
   * Improve `/status` page error handling when `session_statistics` cannot be read
@@ -97,10 +97,16 @@ This releases include a security fix. If you are using an earlier version, you s
   * Replace admin password only when `--admin-password` option is provided
   * Invalidate browser cache for logo, headerlogo and favicon on restart
   * Disable filesize for deleted files to improve page loading
-* Add support for Debian Bookworm
+  * Add support for WTForms v3 to support Debian Bookworm
+  * Fix strange behavior in access token management #247
 * Add support for Ubuntu Jammy
 * Add support for Ubuntu Kinetic
 * Run user quota operation in background to avoid blocking user interface #186
+* Redesign the user interface for better usability
+* Support URL Redirection to prevent error during the setup process
+* Fix translation loading on some platform
+* Re-generate a new identity if it's already exists on the server to prevent error during the setup process
+* Replace usage of Threading by Asyncio to make the unser interface more stable
 
 Breaking changes:
 
