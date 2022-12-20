@@ -142,7 +142,7 @@ def get_parser():
         '--minarcahelpurl',
         metavar='URL',
         help="""custom URL where to redirect user clicking on help button""",
-        default="https://www.ikus-soft.com/en/support/#form",
+        default="https://minarca.org/contactus",
     )
 
     parser.add(
@@ -162,6 +162,16 @@ def get_parser():
     parser._default_config_files = ['/etc/minarca/minarca-server.conf', '/etc/minarca/conf.d/*.conf']
 
     # Override a couple of arguments with Minarca.
+    welcome_style = '''
+        <style>
+          body { color: white; background-color: rgb(14,41,51); background-image: url(/static/bg.jpg); background-size: cover; }
+          .form-login { border: 2px solid var(--btn-bg-color); padding-top: 1rem; }
+          h1 { text-transform: uppercase; font-weight: bold; }
+          h2 { text-align: center; }
+          a, a:hover, .btn-link { color: var(--btn-bg-color); }
+          .text-secondary { color: #fff!important; }
+        </style>
+        '''
     parser.set_defaults(
         database_uri='/etc/minarca/rdw.db',
         favicon=pkg_resources.resource_filename(__name__, 'minarca.ico'),  # @UndefinedVariable
@@ -170,14 +180,19 @@ def get_parser():
         header_name='Minarca',
         header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.svg'),  # @UndefinedVariable
         logo=pkg_resources.resource_filename(__name__, 'logo.svg'),  # @UndefinedVariable
-        link_color='#009FB9',
-        navbar_color='#0E2933',
+        link_color='1C4062',
+        navbar_color='0E2933',
+        btn_fg_color='0E2933',
+        btn_bg_color='B6DDE2',
+        btn_rounded=0,
         font_family="Lato",
         log_access_file='/var/log/minarca/access.log',
         log_file='/var/log/minarca/server.log',
         welcome_msg={
-            '': 'A <b>free and open-source</b> backup software providing end-to-end integration to put you in control of your backup strategy.<br/><br/><a href="https://minarca.org/">website</a> • <a href="https://www.ikus-soft.com/en/minarca/doc/">docs</a> • <a href="https://groups.google.com/d/forum/minarca">community</a>',
-            'fr': 'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://minarca.org/">site web</a> • <a href="https://www.ikus-soft.com/fr/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>',
+            '': 'A <b>free and open-source</b> backup software providing end-to-end integration to put you in control of your backup strategy.<br/><br/><a href="https://minarca.org/">website</a> • <a href="https://www.ikus-soft.com/en/minarca/doc/">docs</a> • <a href="https://groups.google.com/d/forum/minarca">community</a>'
+            + welcome_style,
+            'fr': 'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://minarca.org/">site web</a> • <a href="https://www.ikus-soft.com/fr/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>'
+            + welcome_style,
         },
     )
     return parser

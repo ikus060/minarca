@@ -100,8 +100,9 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         # When behind an apache reverse proxy, minarca server should make use
         # of the Header to determine the public hostname provided.
         headers = [
+            ('Host', 'sestican.patrikdufresne.com'),
             ('X-Forwarded-For', '10.255.1.106'),
-            ('X-Forwarded-Host', 'sestican.patrikdufresne.com'),
+            ('X-Forwarded-Host', 'junk.patrikdufresne.com'),
             ('X-Forwarded-Server', '10.255.1.106'),
         ]
 
