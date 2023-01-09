@@ -113,6 +113,7 @@ class HttpConnectionError(BackupError):
     """
 
     def __init__(self, url):
+        super().__init__(url)
         self.message = _('cannot establish connection to `%s`, verify if the URL is valid') % url
 
 
@@ -122,6 +123,7 @@ class HttpInvalidUrlError(BackupError):
     """
 
     def __init__(self, url):
+        super().__init__(url)
         self.message = (
             _(
                 'the given URL `%s` is not properly formated, verify if the URL is valid. It must start with either https:// or http://'
@@ -152,10 +154,7 @@ class SshConnectionError(RdiffBackupError):
     """
 
     message = _(
-        'Connection to remote backup server trough password - less SSH failed. '
-        'The problem may originate from remote server. If the problem persist, '
-        'contact your system administrator to verify the configuration of the SSH '
-        'server and the password less settings of the server.'
+        'Unable to connect to the remote server using SSH without password. The problem may be with the remote server. If the problem persists, contact your system administrator to check the SSH server configuration and a possible firewall blocking the connection.'
     )
 
     @staticmethod

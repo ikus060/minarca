@@ -4,8 +4,14 @@ import tkinter.messagebox
 
 import pkg_resources
 
-from minarca_client.core import Backup, RepositoryNameExistsError
-from minarca_client.core.exceptions import HttpAuthenticationError
+from minarca_client.core import Backup
+from minarca_client.core.exceptions import (
+    HttpAuthenticationError,
+    HttpConnectionError,
+    HttpInvalidUrlError,
+    RepositoryNameExistsError,
+    SshConnectionError,
+)
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
 
@@ -35,10 +41,7 @@ class SetupDialog(tkvue.Component):
         self.data = tkvue.Context(
             {
                 'remoteurl': self.backup.get_settings('remoteurl') or '',
-                'remoteurl_valid': tkvue.computed(
-                    lambda context: context.remoteurl
-                    and (context.remoteurl.startswith('http://') or context.remoteurl.startswith('https://'))
-                ),
+                'remoteurl_valid': tkvue.computed(lambda context: context.remoteurl and 0 < len(context.remoteurl)),
                 'username': self.backup.get_settings('username') or '',
                 'username_valid': tkvue.computed(lambda context: context.username and 0 < len(context.username)),
                 'password': '',
@@ -66,9 +69,12 @@ class SetupDialog(tkvue.Component):
         self.data.linking = True
         try:
             # Asynchronously link to Minarca Server
+            remoteurl = (
+                self.data.remoteurl if self.data.remoteurl.startswith('http') else 'https://' + self.data.remoteurl
+            )
             call = functools.partial(
                 self.backup.link,
-                remoteurl=self.data.remoteurl,
+                remoteurl=remoteurl,
                 username=self.data.username,
                 password=self.data.password,
                 repository_name=self.data.repository_name,
@@ -80,15 +86,54 @@ class SetupDialog(tkvue.Component):
         except RepositoryNameExistsError:
             logger.info('repository name `%s` already exists' % self.data.repository_name)
             self._prompt_link_force()
-        except (HttpAuthenticationError) as e:
+        except HttpInvalidUrlError:
             self.data.linking = False
-            logger.exception('authentication failed')
             tkinter.messagebox.showwarning(
                 master=self.root,
                 icon='warning',
-                title=_('Invalid connection information !'),
-                message=_('Invalid connection information !'),
-                detail=_("The information you have entered for the connection to Minarca are invalid.\n\n%s") % str(e),
+                title=_('Invalid remote server URL !'),
+                message=_('Invalid remote server URL !'),
+                detail=_(
+                    "The remote server URL you entered for the connection is not valid. Check that you have entered the correct value. The URL must begin with `http://` or `https://` followed by a domain name."
+                ),
+            )
+        except HttpConnectionError as e:
+            self.data.linking = False
+            logger.exception('http connection error')
+            tkinter.messagebox.showwarning(
+                master=self.root,
+                icon='info',
+                title=_('Failed to connect to remote server'),
+                message=_('Failed to connect to remote server'),
+                detail=_(
+                    "Your computer cannot establish a connection to the remote server. Make sure your Internet connection is working and that the following URL is accessible with a Web browser: %s"
+                )
+                % (e.args and e.args[0]),
+            )
+        except HttpAuthenticationError as e:
+            self.data.linking = False
+            logger.warning('authentication failed')
+            tkinter.messagebox.showwarning(
+                master=self.root,
+                icon='warning',
+                title=_('Invalid username or password'),
+                message=_('Invalid username or password'),
+                detail=_(
+                    "The username or password you entered to connect to the remote server is not valid.\n\nDetails: %s"
+                )
+                % str(e),
+            )
+        except SshConnectionError as e:
+            self.data.linking = False
+            logger.exception('ssh connection error')
+            remotehost = self.backup.get_settings().get('remotehost', '')
+            tkinter.messagebox.showwarning(
+                master=self.root,
+                icon='warning',
+                title=_('Failed to connect to remote server'),
+                message=_('Failed to connect to remote server'),
+                detail=_("Your computer cannot establish a connection to the remote server: %s\n\n%s")
+                % (remotehost, str(e)),
             )
         except Exception as e:
             self.data.linking = False
@@ -96,9 +141,9 @@ class SetupDialog(tkvue.Component):
             tkinter.messagebox.showwarning(
                 master=self.root,
                 icon='warning',
-                title=_('Failed to connect to remote server'),
-                message=_('Failed to connect to remote server'),
-                detail=_("An error occurred during the connection to Minarca " "server.\n\nDetails: %s") % str(e),
+                title=_('Unknown problem when connecting to the remote server'),
+                message=_('Unknown problem when connecting to the remote server'),
+                detail=_("An error occurred during the connection to Minarca server.\n\nDetails: %s") % str(e),
             )
 
     def close(self, event=None):
