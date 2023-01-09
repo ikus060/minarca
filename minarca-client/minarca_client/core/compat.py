@@ -297,10 +297,10 @@ def redirect_ouput(logger):
         if stderr_copy:
             os.dup2(stderr_copy.fileno(), _old_stderr_fd)
             stderr_copy.close()
-        # Clsoe pipe
+        # Close pipe
         os.close(w_fd)
-        # Stop thread
-        t.join()
+        # Stop thread (wait maximum 5 sec)
+        t.join(timeout=5)
 
 
 if IS_WINDOWS:

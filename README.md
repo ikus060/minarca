@@ -108,6 +108,7 @@ This releases include a security fix. If you are using an earlier version, you s
 * Re-generate a new identity if it's already exists on the server to prevent error during the setup process
 * Replace usage of Threading by Asyncio to make the unser interface more stable
 * Improve error message when Agent cannot connect to remote server #188
+* Add new more default exclusion pattern for Windows OS #187 #189
 
 Breaking changes:
 
