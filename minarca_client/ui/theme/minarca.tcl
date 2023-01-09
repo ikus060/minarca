@@ -1,1063 +1,1911 @@
-image create photo error-24 -file [file join [file dirname [info script]] error-24.png]
-image create photo info-24 -file [file join [file dirname [info script]] info-24.png]
-image create photo success-24 -file [file join [file dirname [info script]] success-24.png]
-image create photo error-16 -file [file join [file dirname [info script]] error-16.png]
-image create photo help-16 -file [file join [file dirname [info script]] help-16.png]
-image create photo info-16 -file [file join [file dirname [info script]] info-16.png]
-image create photo patterns-16 -file [file join [file dirname [info script]] patterns-16.png]
-image create photo schedule-16 -file [file join [file dirname [info script]] schedule-16.png]
-image create photo settings-16 -file [file join [file dirname [info script]] settings-16.png]
-image create photo status-16 -file [file join [file dirname [info script]] status-16.png]
-image create photo success-16 -file [file join [file dirname [info script]] success-16.png]
-image create photo trash-16 -file [file join [file dirname [info script]] trash-16.png]
-image create photo minarca-16 -file [file join [file dirname [info script]] minarca-16.png]
-image create photo minarca-22 -file [file join [file dirname [info script]] minarca-22.png]
-image create photo minarca-32 -file [file join [file dirname [info script]] minarca-32.png]
-image create photo minarca-48 -file [file join [file dirname [info script]] minarca-48.png]
-image create photo minarca-128 -file [file join [file dirname [info script]] minarca-128.png]
-image create photo minarca-256 -file [file join [file dirname [info script]] minarca-256.png]
-image create photo spinner-16_00 -file [file join [file dirname [info script]] spinner-16_00.png]
-image create photo spinner-16_01 -file [file join [file dirname [info script]] spinner-16_01.png]
-image create photo spinner-16_02 -file [file join [file dirname [info script]] spinner-16_02.png]
-image create photo spinner-16_03 -file [file join [file dirname [info script]] spinner-16_03.png]
-image create photo spinner-16_04 -file [file join [file dirname [info script]] spinner-16_04.png]
-image create photo spinner-16_05 -file [file join [file dirname [info script]] spinner-16_05.png]
-image create photo spinner-16_06 -file [file join [file dirname [info script]] spinner-16_06.png]
-image create photo spinner-16_07 -file [file join [file dirname [info script]] spinner-16_07.png]
-image create photo spinner-24_00 -file [file join [file dirname [info script]] spinner-24_00.png]
-image create photo spinner-24_01 -file [file join [file dirname [info script]] spinner-24_01.png]
-image create photo spinner-24_02 -file [file join [file dirname [info script]] spinner-24_02.png]
-image create photo spinner-24_03 -file [file join [file dirname [info script]] spinner-24_03.png]
-image create photo spinner-24_04 -file [file join [file dirname [info script]] spinner-24_04.png]
-image create photo spinner-24_05 -file [file join [file dirname [info script]] spinner-24_05.png]
-image create photo spinner-24_06 -file [file join [file dirname [info script]] spinner-24_06.png]
-image create photo spinner-24_07 -file [file join [file dirname [info script]] spinner-24_07.png]
-image create photo minarca_pyimage112 -file [file join [file dirname [info script]] pyimage112.png]
-image create photo minarca_pyimage48 -file [file join [file dirname [info script]] pyimage48.png]
-image create photo minarca_pyimage113 -file [file join [file dirname [info script]] pyimage113.png]
-image create photo minarca_pyimage50 -file [file join [file dirname [info script]] pyimage50.png]
-image create photo minarca_pyimage49 -file [file join [file dirname [info script]] pyimage49.png]
-image create photo minarca_pyimage114 -file [file join [file dirname [info script]] pyimage114.png]
-image create photo minarca_pyimage51 -file [file join [file dirname [info script]] pyimage51.png]
-image create photo minarca_pyimage115 -file [file join [file dirname [info script]] pyimage115.png]
-image create photo minarca_pyimage52 -file [file join [file dirname [info script]] pyimage52.png]
-image create photo minarca_pyimage116 -file [file join [file dirname [info script]] pyimage116.png]
-image create photo minarca_pyimage53 -file [file join [file dirname [info script]] pyimage53.png]
-image create photo minarca_pyimage117 -file [file join [file dirname [info script]] pyimage117.png]
-image create photo minarca_pyimage54 -file [file join [file dirname [info script]] pyimage54.png]
-image create photo minarca_pyimage1 -file [file join [file dirname [info script]] pyimage1.png]
-image create photo minarca_pyimage118 -file [file join [file dirname [info script]] pyimage118.png]
-image create photo minarca_pyimage55 -file [file join [file dirname [info script]] pyimage55.png]
-image create photo minarca_pyimage2 -file [file join [file dirname [info script]] pyimage2.png]
-image create photo minarca_pyimage120 -file [file join [file dirname [info script]] pyimage120.png]
-image create photo minarca_pyimage119 -file [file join [file dirname [info script]] pyimage119.png]
-image create photo minarca_pyimage56 -file [file join [file dirname [info script]] pyimage56.png]
-image create photo minarca_pyimage3 -file [file join [file dirname [info script]] pyimage3.png]
-image create photo minarca_pyimage121 -file [file join [file dirname [info script]] pyimage121.png]
-image create photo minarca_pyimage57 -file [file join [file dirname [info script]] pyimage57.png]
-image create photo minarca_pyimage4 -file [file join [file dirname [info script]] pyimage4.png]
-image create photo minarca_pyimage122 -file [file join [file dirname [info script]] pyimage122.png]
-image create photo minarca_pyimage58 -file [file join [file dirname [info script]] pyimage58.png]
-image create photo minarca_pyimage5 -file [file join [file dirname [info script]] pyimage5.png]
-image create photo minarca_pyimage123 -file [file join [file dirname [info script]] pyimage123.png]
-image create photo minarca_pyimage60 -file [file join [file dirname [info script]] pyimage60.png]
-image create photo minarca_pyimage59 -file [file join [file dirname [info script]] pyimage59.png]
-image create photo minarca_pyimage6 -file [file join [file dirname [info script]] pyimage6.png]
-image create photo minarca_pyimage124 -file [file join [file dirname [info script]] pyimage124.png]
-image create photo minarca_pyimage61 -file [file join [file dirname [info script]] pyimage61.png]
-image create photo minarca_pyimage7 -file [file join [file dirname [info script]] pyimage7.png]
-image create photo minarca_pyimage125 -file [file join [file dirname [info script]] pyimage125.png]
-image create photo minarca_pyimage62 -file [file join [file dirname [info script]] pyimage62.png]
-image create photo minarca_pyimage8 -file [file join [file dirname [info script]] pyimage8.png]
-image create photo minarca_pyimage126 -file [file join [file dirname [info script]] pyimage126.png]
-image create photo minarca_pyimage63 -file [file join [file dirname [info script]] pyimage63.png]
-image create photo minarca_pyimage9 -file [file join [file dirname [info script]] pyimage9.png]
-image create photo minarca_pyimage127 -file [file join [file dirname [info script]] pyimage127.png]
-image create photo minarca_pyimage64 -file [file join [file dirname [info script]] pyimage64.png]
-image create photo minarca_pyimage128 -file [file join [file dirname [info script]] pyimage128.png]
-image create photo minarca_pyimage65 -file [file join [file dirname [info script]] pyimage65.png]
-image create photo minarca_pyimage130 -file [file join [file dirname [info script]] pyimage130.png]
-image create photo minarca_pyimage129 -file [file join [file dirname [info script]] pyimage129.png]
-image create photo minarca_pyimage66 -file [file join [file dirname [info script]] pyimage66.png]
-image create photo minarca_pyimage131 -file [file join [file dirname [info script]] pyimage131.png]
-image create photo minarca_pyimage67 -file [file join [file dirname [info script]] pyimage67.png]
-image create photo minarca_pyimage132 -file [file join [file dirname [info script]] pyimage132.png]
-image create photo minarca_pyimage68 -file [file join [file dirname [info script]] pyimage68.png]
-image create photo minarca_pyimage133 -file [file join [file dirname [info script]] pyimage133.png]
-image create photo minarca_pyimage70 -file [file join [file dirname [info script]] pyimage70.png]
-image create photo minarca_pyimage69 -file [file join [file dirname [info script]] pyimage69.png]
-image create photo minarca_pyimage134 -file [file join [file dirname [info script]] pyimage134.png]
-image create photo minarca_pyimage71 -file [file join [file dirname [info script]] pyimage71.png]
-image create photo minarca_pyimage135 -file [file join [file dirname [info script]] pyimage135.png]
-image create photo minarca_pyimage72 -file [file join [file dirname [info script]] pyimage72.png]
-image create photo minarca_pyimage136 -file [file join [file dirname [info script]] pyimage136.png]
-image create photo minarca_pyimage73 -file [file join [file dirname [info script]] pyimage73.png]
-image create photo minarca_pyimage137 -file [file join [file dirname [info script]] pyimage137.png]
-image create photo minarca_pyimage74 -file [file join [file dirname [info script]] pyimage74.png]
-image create photo minarca_pyimage138 -file [file join [file dirname [info script]] pyimage138.png]
-image create photo minarca_pyimage75 -file [file join [file dirname [info script]] pyimage75.png]
-image create photo minarca_pyimage140 -file [file join [file dirname [info script]] pyimage140.png]
-image create photo minarca_pyimage139 -file [file join [file dirname [info script]] pyimage139.png]
-image create photo minarca_pyimage76 -file [file join [file dirname [info script]] pyimage76.png]
-image create photo minarca_pyimage77 -file [file join [file dirname [info script]] pyimage77.png]
-image create photo minarca_pyimage78 -file [file join [file dirname [info script]] pyimage78.png]
-image create photo minarca_pyimage80 -file [file join [file dirname [info script]] pyimage80.png]
-image create photo minarca_pyimage79 -file [file join [file dirname [info script]] pyimage79.png]
-image create photo minarca_pyimage81 -file [file join [file dirname [info script]] pyimage81.png]
-image create photo minarca_pyimage10 -file [file join [file dirname [info script]] pyimage10.png]
-image create photo minarca_pyimage82 -file [file join [file dirname [info script]] pyimage82.png]
-image create photo minarca_pyimage11 -file [file join [file dirname [info script]] pyimage11.png]
-image create photo minarca_pyimage83 -file [file join [file dirname [info script]] pyimage83.png]
-image create photo minarca_pyimage12 -file [file join [file dirname [info script]] pyimage12.png]
-image create photo minarca_pyimage84 -file [file join [file dirname [info script]] pyimage84.png]
-image create photo minarca_pyimage13 -file [file join [file dirname [info script]] pyimage13.png]
-image create photo minarca_pyimage85 -file [file join [file dirname [info script]] pyimage85.png]
-image create photo minarca_pyimage14 -file [file join [file dirname [info script]] pyimage14.png]
-image create photo minarca_pyimage86 -file [file join [file dirname [info script]] pyimage86.png]
-image create photo minarca_pyimage15 -file [file join [file dirname [info script]] pyimage15.png]
-image create photo minarca_pyimage87 -file [file join [file dirname [info script]] pyimage87.png]
-image create photo minarca_pyimage16 -file [file join [file dirname [info script]] pyimage16.png]
-image create photo minarca_pyimage88 -file [file join [file dirname [info script]] pyimage88.png]
-image create photo minarca_pyimage17 -file [file join [file dirname [info script]] pyimage17.png]
-image create photo minarca_pyimage90 -file [file join [file dirname [info script]] pyimage90.png]
-image create photo minarca_pyimage89 -file [file join [file dirname [info script]] pyimage89.png]
-image create photo minarca_pyimage18 -file [file join [file dirname [info script]] pyimage18.png]
-image create photo minarca_pyimage91 -file [file join [file dirname [info script]] pyimage91.png]
-image create photo minarca_pyimage19 -file [file join [file dirname [info script]] pyimage19.png]
-image create photo minarca_pyimage20 -file [file join [file dirname [info script]] pyimage20.png]
-image create photo minarca_pyimage92 -file [file join [file dirname [info script]] pyimage92.png]
-image create photo minarca_pyimage21 -file [file join [file dirname [info script]] pyimage21.png]
-image create photo minarca_pyimage93 -file [file join [file dirname [info script]] pyimage93.png]
-image create photo minarca_pyimage22 -file [file join [file dirname [info script]] pyimage22.png]
-image create photo minarca_pyimage94 -file [file join [file dirname [info script]] pyimage94.png]
-image create photo minarca_pyimage23 -file [file join [file dirname [info script]] pyimage23.png]
-image create photo minarca_pyimage95 -file [file join [file dirname [info script]] pyimage95.png]
-image create photo minarca_pyimage24 -file [file join [file dirname [info script]] pyimage24.png]
-image create photo minarca_pyimage96 -file [file join [file dirname [info script]] pyimage96.png]
-image create photo minarca_pyimage25 -file [file join [file dirname [info script]] pyimage25.png]
-image create photo minarca_pyimage97 -file [file join [file dirname [info script]] pyimage97.png]
-image create photo minarca_pyimage26 -file [file join [file dirname [info script]] pyimage26.png]
-image create photo minarca_pyimage98 -file [file join [file dirname [info script]] pyimage98.png]
-image create photo minarca_pyimage27 -file [file join [file dirname [info script]] pyimage27.png]
-image create photo minarca_pyimage99 -file [file join [file dirname [info script]] pyimage99.png]
-image create photo minarca_pyimage28 -file [file join [file dirname [info script]] pyimage28.png]
-image create photo minarca_pyimage29 -file [file join [file dirname [info script]] pyimage29.png]
-image create photo minarca_pyimage30 -file [file join [file dirname [info script]] pyimage30.png]
-image create photo minarca_pyimage31 -file [file join [file dirname [info script]] pyimage31.png]
-image create photo minarca_pyimage32 -file [file join [file dirname [info script]] pyimage32.png]
-image create photo minarca_pyimage33 -file [file join [file dirname [info script]] pyimage33.png]
-image create photo minarca_pyimage34 -file [file join [file dirname [info script]] pyimage34.png]
-image create photo minarca_pyimage35 -file [file join [file dirname [info script]] pyimage35.png]
-image create photo minarca_pyimage100 -file [file join [file dirname [info script]] pyimage100.png]
-image create photo minarca_pyimage36 -file [file join [file dirname [info script]] pyimage36.png]
-image create photo minarca_pyimage101 -file [file join [file dirname [info script]] pyimage101.png]
-image create photo minarca_pyimage37 -file [file join [file dirname [info script]] pyimage37.png]
-image create photo minarca_pyimage102 -file [file join [file dirname [info script]] pyimage102.png]
-image create photo minarca_pyimage38 -file [file join [file dirname [info script]] pyimage38.png]
-image create photo minarca_pyimage103 -file [file join [file dirname [info script]] pyimage103.png]
-image create photo minarca_pyimage39 -file [file join [file dirname [info script]] pyimage39.png]
-image create photo minarca_pyimage40 -file [file join [file dirname [info script]] pyimage40.png]
-image create photo minarca_pyimage104 -file [file join [file dirname [info script]] pyimage104.png]
-image create photo minarca_pyimage41 -file [file join [file dirname [info script]] pyimage41.png]
-image create photo minarca_pyimage105 -file [file join [file dirname [info script]] pyimage105.png]
-image create photo minarca_pyimage42 -file [file join [file dirname [info script]] pyimage42.png]
-image create photo minarca_pyimage106 -file [file join [file dirname [info script]] pyimage106.png]
-image create photo minarca_pyimage43 -file [file join [file dirname [info script]] pyimage43.png]
-image create photo minarca_pyimage107 -file [file join [file dirname [info script]] pyimage107.png]
-image create photo minarca_pyimage44 -file [file join [file dirname [info script]] pyimage44.png]
-image create photo minarca_pyimage108 -file [file join [file dirname [info script]] pyimage108.png]
-image create photo minarca_pyimage45 -file [file join [file dirname [info script]] pyimage45.png]
-image create photo minarca_pyimage110 -file [file join [file dirname [info script]] pyimage110.png]
-image create photo minarca_pyimage109 -file [file join [file dirname [info script]] pyimage109.png]
-image create photo minarca_pyimage46 -file [file join [file dirname [info script]] pyimage46.png]
-image create photo minarca_pyimage111 -file [file join [file dirname [info script]] pyimage111.png]
-image create photo minarca_pyimage47 -file [file join [file dirname [info script]] pyimage47.png]
-ttk::style theme create minarca -parent clam -settings {ttk::style element create Labelframe.Label from {clam} 
-ttk::style element create Label.fill from {clam} 
-ttk::style element create Label.text from {clam} 
-ttk::style configure TLabelframe.Label -foreground #212529;
-ttk::style layout TLabelframe.Label {
-Label.fill -sticky nswe -children {
-  Label.text -sticky nswe
+
+
+
+
+
+
+
+
+
+image create photo trash-16-primary -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAABBklEQVQoz+XSPUpDURDF8d+LDyxE0cJCiOIWXIDwOjuJhYrpTKOthRArF+AGtImlom7ASncguABJMBKCCn6gEPQlFt7gCwZi74Ep5tzzH+7ARILySQlGcYA1vTrCBl7rlxUwlIFgFVs4wRkucIdF3OB6bHbOS/VKlE9KOxhGjBVM4RD3Ydgk1tEIAz/RivJJqYppvOEJHeQQBbCDdujHMYLbGMXwrVPshUCnuwbSjLeNZRRzaIbHZ9QxgwIeQxWCVw+ZFM2c31pAGROhysHrUT/wT/oPYNzHe0ANH6GvBW8gWMFxJryE935gihYS7Pq5ku4a7YyXhGwa+z7ec2xifsBqbeyj8QXmBkVjuhaP0gAAAABJRU5ErkJggg=="
+
+
+
+image create photo trash-16-secondary -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAA/ElEQVQoz+XSsUqCYRTG8Z/2QUMEdQG5CHUVgVvgZENBQnNBc2BDdAHNQS0tDQU1NH3QrQRCfgkiFBRRIKW2HOmTBNt74MB7/u/zHDhwCkJpM4N5nGHLuC6xg7dquQQKuRBs4wS3uA+2jBr2cAHVckmSNrMDzCLBZgx7GQ3NvQ+xgq+0mfUKaTN7wBLewzREMRccYhD9AubwmKCOG1zjOAxDzESwn2P72EC9iG58vqKNUuz0HFUL1g5PH92i31pDA4tRjWBjmhT8k/5DMJnAntDCZ/StYFOD57jKmdfxMSnYRw8VHPm5ktEagxyrhLefoIM77GJ1ymoDnKLzDapiR6Zap+SlAAAAAElFTkSuQmCC"
+
+
+
+image create photo trash-16-success -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAA/ElEQVQoz+XSMUuCYRTF8d9rLzREUENDQ419i8Ct9Q0sSEhoKmgObOoDNAe1FNhQlINrX6UpSRCpoIgCKbWhKykJtnfgDvf/nAPPgZsIZZUCTOMEG4Z1gW281kpVkAyEYBNHqOE22BIy7OIcaqWqJKsU9jGJFOuYxxkeIjiHLTRxhU+0k6xSuMMC3vCMHnL938TejX0GU7hPUUQV1zgMQw8TEewMsD2soZhDKx5f0MBidHqKyYI1wtNBK+e3VlDGbEw52JBGBf+k/xBMR7BH1PERez3Y2OApLgfMq3gfFeygjTwO/FxJv0Z3gOXD20l9H+8NdrA8ploXx2h+AVgcQ/MnXkMqAAAAAElFTkSuQmCC"
+
+
+
+image create photo trash-16-info -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAA9klEQVQoz+XSsUoDURCF4S9xwUIEfQAt9SmEdGljoWDAIpWCtRCL4ANYC9q4hYWCFrb7KlYGAyGgoIhC0E1sJmaDgdh7YODOf88ZGJiSkdIMFnGOHZO6wh7eNKqgVAjBLk5xh/tga6jhAJegUZVIsyPMI8F2DHv5GTp+t7COL2nWL0mzB6zgPUxDlAvBIQbRL2EBjwnquMUNTsIwxFwE8wI7xBbqZfTi8xUdrMZOz1G1YJ3w5OiV/VYVTSxHNYNNaFrwT/oPwWQKe0Ibn9G3g80MXuC6YN7Ex7Rgjj4qODa+ktEagwKrhDdP0EWGfWzMWG2AM3S/AduZQk/WUp4AAAAAAElFTkSuQmCC"
+
+
+
+image create photo trash-16-warning -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAA/klEQVQoz+XSMUvCYRTF4UcTGiKooaGhxvBLBE622lCQ0NBU0GpgUx8g16CWGhqKamjNTyJNSYJIBUUUSP21oSspCbZ34A73954D74GbEqpV8jCJI6wZ1Bk28ZotVUGqLwTrOMA1boMtoIBtnEK2VJWqVfK7GEcGq5jFCR4iOIMNNHGBT7RTtUr+DnN4wzO6SPd+E3sn9ilM4D6DIq5wif0wdDEWwaSP7WAFxTRa8fiCBuaj01NMIVgjPAlaab+1hDKmY8rBBjQs+Cf9h2BmCHtEHR+x14ONDB7jvM+8jPdhwQRt5LDn50p6NTp9LBfeJOP7eG+whcUR1To4RPML02JEu72vh1QAAAAASUVORK5CYII="
+
+
+
+image create photo trash-16-danger -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAA/klEQVQoz+XSMUpDURCF4S/xgYUIugAtdQdCIEI621goGLBWsBZiIS7AWtDGxkJBC1v7QOAtwcpgIAQUFFEI+hKbCb5gIPYeGLjz33MGBqYglJbKMIszbBnVJXbwttJsgEIuBNs4wS3ugy2hij1cwEqzIUlL5QNMI8FmDHsZDs29D7GMr7RU7hXSUvkBC3gP0wDFXHCAfvRzmMFjghpucI3jMAwwFcEsx/axgVoR3fh8RRuLsdNzVDVYOzwZukW/tYY65qPqwUY0Lvgn/YdgMoY9oYXP6FvBJgbPcZUzr+NjXDBDDxUc+bmS4Rr9HKuEN0vQwR12sTphtT5O0fkGeaFEBAYFHnwAAAAASUVORK5CYII="
+
+
+
+image create photo trash-16-light -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAQAAACMnYaxAAAAzElEQVQY08XNMUoDUQCE4e+tCxYaMAcwpd5BENKlsVhBPYMXEGIhHiAXsLIJBEEv4FWsDAZCIIENPIVFd5+NMaD2/tMM8xcDotiKo5i+MoqtCHIiFI4MPWFPoTCMtuXx0qbcmaAUUAqu7PuIVYjPdr0qJZmApBHs2PIS4oEH9waCZAO1ILlw6iQzU1ua6CgsLBQ6JpZqs8yKnr62tr7ealrLP/gPmX+3ubF3jM1/y1t35jj2tpa1Ste1IMnQCJKuSp2benTu8Mdd48b0Ewr3S1C7m2RhAAAAAElFTkSuQmCC"
+
+
+
+image create photo trash-16-dark -data "iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAABA0lEQVQoz+XSPUoDURTF8V/iQApx0MJG0FamnlpIZyexUDEb0DaFEAtxAW5AG1tF3YCVK7CxsRODkRCI4AcKQSexecEJBmLvgcu797zzh3fhFQTFSQpTOMKmYZ1gC2+vt9dgIgfBBmo4wwWu8IgV3OGmNDun22mJ4iTdRQkR1lHAczjl+j0s4itO0m4hTtJ7zOM9hPoo5sA+emGexiQeIlTDs85xEAL9wRrIct4O1lAtoh0uX9DEAip4ClUJXjNkMrSLfmsZdcyEqgdvSKPAP+k/gNEIr4MGPsPcCN5Y8BinufAqPkaBGbooY9/PLxms0ct55ZDNIrRwiW0sjVmth0O0vgGxYkOz5+M/mwAAAABJRU5ErkJggg=="
+
+
+
+
+
+image create photo minarca-16 -data "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACKElEQVQ4y5WTzWqTURCGn5lzcpKYtjaNaWt/FlawIELFrQv1ArwJ70wvwoUrEURciIh/KFWrjZa0paZtmnzf+fmOi6pUcWEHZjMwDw/MvDJx90G51Go4EeE0lXOmd1R4u9x0zpLZHZX8LyNnONd0LDeds5ISu6PA1qg4lQFVol2vYTs1QwqRrRAxfylkIJMxIogIqco/5xkTE2oUu1h3hNIjISCiJ5YzTpWV6QlmGg4Anyo+DIbsFQGpR8QoVlJCYgIfyT8FBKipcm3+LIc+8L4/xBklZ1jrTPFqZwD+BIAQubnQ4cpcm1hlNvePeLc7oBiXGODOlRW6rQYPN7Z49m2XS+1JegcjJERUYoQQWJ1ucWt5jhtLXdY6U3Rqhr2DIdcXOqxOtyjGBbcvLuJSBT7SyhkJEashIj4gMSFVddwpoT4gpUdCpK7KGWPQlFDv0eAQ71FjsBIjJkbWv25TrypSVdEbHDIYHNJtOJ6+/8K0VWYnz3D/xSfSuMC06pSjMY1GHSshYkLk8bvPPHn76fcVaka5ujzPoffce/QcZw05w+X5GV73tqlbg6gcG2gIGO8xqn/8wMsPm1zotlmdmQIgxMibjz2+HxUstifRYLD97T0O9ocY79G/HqkC1jfGqAoqQqwqAGwGLT1qDXZ/b8BoOEbHBf8KlJyA/fLLOSNNdwzQ0jPbdJiJJv+byJwznaYjliW2/7Xvz3fbbsbZ02VpNKa/893/AHypCt1ue8HmAAAAAElFTkSuQmCC"
+image create photo minarca-22 -data "iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAADU0lEQVQ4y62UX2scZRTGf+edd3aSSbomKckmpgsJIhJpsVbwplWkiCAK+g38GCJ+Ab+El14IonhjL6q2eNHWf6BRU2xIUmhsops1MbszOzPvPy9mE1MkRUwPnLv3POd5n3OeI7x/pdeM9fiojngUMbCOfWP7uqnV+Euzk+yV5pEATyQx17e64zoVYW9Q8tVWF5ATwgZenDtNKoLGewgevEfJyYB9CEgI4D06DoFUBHH+vxEOEAgACPJAjYQAziHOoVoNzTNTTZRziH14BmNJBeaSBo+PNBgTwNgH33mPOIeOgicREGuP1TgQSKKI51pTtMYSssoCkMaablHx3XaXgXUIIG4ILM7XXawjACEcQRRQQBIpXm5P08kKPvv1j8P+IQTOTU/ySnuGqxtb5LaWQaxHi3PgA2Id882UNNYoEYzzBAIbu30uzE6x08tZ6ezRHhvlUnsGHwI3Njvc6eyCczzfmuT63e1/Mw7W8tbZRc7PniaNNdv9AYV1vPP5t8yNJlxZvcd8c4z3Ll8giSIQeOPJNm9f/Yaf7+/w2lNtmpGqh2cdSqwF7xFjGZSGflHRKyqysiIrKppKGBQlYiyX5qcZUYoPf7jDpz+tMaojLp6ZJnKOLC+YiBRYh1iLFusQ51HG1Pr4eqfrnzjkYOrGItaiQqDZ0CRRhAoeZSxizHAr7GFqsfYQIFWK8YYmjWMGcYUGsmxAqgRlDTfXNnl9aYE3lxYA6JUVN9c2oTKc0hG9XoZ6bAwxRxhH1vLBjWU+acQoRT28EMj7OZ3dfc63pli5v8O7H1/j4hPz+AC31n+j08s415pib79P1s9rcxwwxnuUtWzt7NaeCv+stBLhx/VNLi8t8vTMBMv3fuejnV0I4IGz89OcOZXyxe27KGtRQ9m0Otg9Y1DHuNhUcG15lWcX5nh1aWFokEDaiPmzn/Pl8iplZVEw1NigvakwlUEZe+x5EMBay9e3N0gbMc3RBBFhf1CSlxUighoaRpxDGYvudv/il/VNpKofPCwUUBpLJ8sPW0ZHSkIINWNj0b4oKfMCqcyjOZvGooxBK2PqLmV14jsvodZYGYMu+zmTScwLS4uHd/Z/AyM0k5iyn6Oz/V7/1vcr4yNJ42R0h1GUFdmg6P8NcuH2Zdb7JFEAAAAASUVORK5CYII="
+image create photo minarca-32 -data "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"
+image create photo minarca-48 -data "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"
+image create photo minarca-128 -data "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"
+image create photo minarca-256 -data "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"
+
+
+
+image create photo minarca-logo -data "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"
+
+
+image create photo minarca-header-logo -data "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"
+
+
+image create photo minarca-line -data "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"
+
+
+array set colors {
+	-disabledfg		"#999999"
+	-frame  		"#e1dedb"
+	-window  		"#ffffff"
+	-dark			"#cfcdc8"
+	-darker 		"#bab5ab"
+	-darkest		"#9e9a91"
+	-lighter		"#eeebe7"
+	-lightest 		"#ffffff"
+	-selectbg		"#4a6984"
+	-selectfg		"#ffffff"
+	-altindicator		"#5895bc"
+	-disabledaltindicator	"#a0a0a0"
+}
+ttk::style theme create minarca -parent clam -settings {
+
+	ttk::style configure "." \
+	    -background $colors(-frame) \
+	    -foreground black \
+	    -bordercolor $colors(-darkest) \
+	    -darkcolor $colors(-dark) \
+	    -lightcolor $colors(-lighter) \
+	    -troughcolor $colors(-darker) \
+	    -selectbackground $colors(-selectbg) \
+	    -selectforeground $colors(-selectfg) \
+	    -selectborderwidth 0 \
+	    -font TkDefaultFont \
+	    ;
+
+	ttk::style map "." \
+	    -background [list disabled $colors(-frame) \
+			     active $colors(-lighter)] \
+	    -foreground [list disabled $colors(-disabledfg)] \
+	    -selectbackground [list  !focus $colors(-darkest)] \
+	    -selectforeground [list  !focus white] \
+	    ;
+	# -selectbackground [list  !focus "#847d73"]
+
+	ttk::style configure TButton \
+	    -anchor center -width -11 -padding 5 -relief raised
+	ttk::style map TButton \
+	    -background [list \
+			     disabled $colors(-frame) \
+			     pressed $colors(-darker) \
+			     active $colors(-lighter)] \
+	    -lightcolor [list pressed $colors(-darker)] \
+	    -darkcolor [list pressed $colors(-darker)] \
+	    -bordercolor [list alternate "#000000"] \
+	    ;
+
+	ttk::style configure Toolbutton \
+	    -anchor center -padding 2 -relief flat
+	ttk::style map Toolbutton \
+	    -relief [list \
+		    disabled flat \
+		    selected sunken \
+		    pressed sunken \
+		    active raised] \
+	    -background [list \
+		    disabled $colors(-frame) \
+		    pressed $colors(-darker) \
+		    active $colors(-lighter)] \
+	    -lightcolor [list pressed $colors(-darker)] \
+	    -darkcolor [list pressed $colors(-darker)] \
+	    ;
+
+	ttk::style configure TCheckbutton \
+	    -indicatorbackground "#ffffff" \
+	    -indicatormargin {1 1 4 1} \
+	    -padding 2 ;
+	ttk::style configure TRadiobutton \
+	    -indicatorbackground "#ffffff" \
+	    -indicatormargin {1 1 4 1} \
+	    -padding 2 ;
+	ttk::style map TCheckbutton -indicatorbackground \
+	    [list  pressed $colors(-frame) \
+			{!disabled alternate} $colors(-altindicator) \
+			{disabled alternate} $colors(-disabledaltindicator) \
+			disabled $colors(-frame)]
+	ttk::style map TRadiobutton -indicatorbackground \
+	    [list  pressed $colors(-frame) \
+			{!disabled alternate} $colors(-altindicator) \
+			{disabled alternate} $colors(-disabledaltindicator) \
+			disabled $colors(-frame)]
+
+	ttk::style configure TMenubutton \
+	    -width -11 -padding 5 -relief raised
+
+	ttk::style configure TEntry -padding 1 -insertwidth 1
+	ttk::style map TEntry \
+	    -background [list  readonly $colors(-frame)] \
+	    -bordercolor [list  focus $colors(-selectbg)] \
+	    -lightcolor [list  focus "#6f9dc6"] \
+	    -darkcolor [list  focus "#6f9dc6"] \
+	    ;
+
+	ttk::style configure TCombobox -padding 1 -insertwidth 1
+	ttk::style map TCombobox \
+	    -background [list active $colors(-lighter) \
+			     pressed $colors(-lighter)] \
+	    -fieldbackground [list {readonly focus} $colors(-selectbg) \
+				  readonly $colors(-frame)] \
+	    -foreground [list {readonly focus} $colors(-selectfg)] \
+	    -arrowcolor [list disabled $colors(-disabledfg)]
+	ttk::style configure ComboboxPopdownFrame \
+	    -relief solid -borderwidth 1
+
+	ttk::style configure TSpinbox -arrowsize 10 -padding {2 0 10 0}
+	ttk::style map TSpinbox \
+	    -background [list  readonly $colors(-frame)] \
+            -arrowcolor [list disabled $colors(-disabledfg)]
+
+	ttk::style configure TNotebook.Tab -padding {6 2 6 2}
+	ttk::style map TNotebook.Tab \
+	    -padding [list selected {6 4 6 2}] \
+	    -background [list selected $colors(-frame) {} $colors(-darker)] \
+	    -lightcolor [list selected $colors(-lighter) {} $colors(-dark)] \
+	    ;
+
+	# Treeview:
+	ttk::style configure Heading \
+	    -font TkHeadingFont -relief raised -padding {3}
+	ttk::style configure Treeview -background $colors(-window)
+	ttk::style map Treeview \
+	    -background [list disabled $colors(-frame)\
+				selected $colors(-selectbg)] \
+	    -foreground [list disabled $colors(-disabledfg) \
+				selected $colors(-selectfg)]
+
+    	ttk::style configure TLabelframe \
+	    -labeloutside true -labelmargins {0 0 0 4} \
+	    -borderwidth 2 -relief raised
+
+	ttk::style configure TProgressbar -background $colors(-frame)
+
+	ttk::style configure Sash -sashthickness 6 -gripcount 10
+
+	
+	ttk::style configure tooltip.TLabel -background #ffffe0;
+
+	
+		ttk::style configure "." \
+	    -font { Lato -16 };
+
+    
+    
+    
+    ttk::style configure primary.TButton \
+      -foreground #f4f4f4 \
+      -background #1C4062 \
+      -bordercolor #1A3C5D \
+      -darkcolor #1C4062 \
+      -lightcolor #1C4062 \
+      -focuscolor #f4f4f4;
+    
+    ttk::style map primary.TButton \
+      -background {disabled #BAC5CF {hover !disabled} #173653 {pressed !disabled} #153049 }  \
+      -lightcolor {disabled #8D9FB0 {hover !disabled} #173653 {pressed !disabled} #153049 }  \
+      -darkcolor {disabled #8D9FB0 {hover !disabled} #173653 {pressed !disabled} #153049 }  \
+      -bordercolor {disabled #8D9FB0 {hover !disabled} #173653 {pressed !disabled} #153049 }  \
+      -foreground {disabled #F9F9F9 };
+
+	
+	ttk::style configure H1.primary.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.primary.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.primary.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.primary.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.primary.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+    
+    ttk::style configure secondary.TButton \
+      -foreground #0E2933 \
+      -background #B6DDE2 \
+      -bordercolor #ACD1D6 \
+      -darkcolor #B6DDE2 \
+      -lightcolor #B6DDE2 \
+      -focuscolor #0E2933;
+    
+    ttk::style map secondary.TButton \
+      -background {disabled #E9F4F6 {hover !disabled} #9ABBC0 {pressed !disabled} #88A5A9 }  \
+      -lightcolor {disabled #DAEEF0 {hover !disabled} #9ABBC0 {pressed !disabled} #88A5A9 }  \
+      -darkcolor {disabled #DAEEF0 {hover !disabled} #9ABBC0 {pressed !disabled} #88A5A9 }  \
+      -bordercolor {disabled #DAEEF0 {hover !disabled} #9ABBC0 {pressed !disabled} #88A5A9 }  \
+      -foreground {disabled #869499 };
+
+	
+	ttk::style configure H1.secondary.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.secondary.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.secondary.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.secondary.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.secondary.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+    
+    ttk::style configure success.TButton \
+      -foreground #f4f4f4 \
+      -background #50A254 \
+      -bordercolor #4C994F \
+      -darkcolor #50A254 \
+      -lightcolor #50A254 \
+      -focuscolor #f4f4f4;
+    
+    ttk::style map success.TButton \
+      -background {disabled #CAE3CB {hover !disabled} #448947 {pressed !disabled} #3C793F }  \
+      -lightcolor {disabled #A7D0A9 {hover !disabled} #448947 {pressed !disabled} #3C793F }  \
+      -darkcolor {disabled #A7D0A9 {hover !disabled} #448947 {pressed !disabled} #3C793F }  \
+      -bordercolor {disabled #A7D0A9 {hover !disabled} #448947 {pressed !disabled} #3C793F }  \
+      -foreground {disabled #F9F9F9 };
+
+	
+	ttk::style configure H1.success.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.success.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.success.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.success.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.success.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+    
+    ttk::style configure info.TButton \
+      -foreground #f4f4f4 \
+      -background #009FB9 \
+      -bordercolor #0097AF \
+      -darkcolor #009FB9 \
+      -lightcolor #009FB9 \
+      -focuscolor #f4f4f4;
+    
+    ttk::style map info.TButton \
+      -background {disabled #B2E2EA {hover !disabled} #00879D {pressed !disabled} #00778A }  \
+      -lightcolor {disabled #7FCFDC {hover !disabled} #00879D {pressed !disabled} #00778A }  \
+      -darkcolor {disabled #7FCFDC {hover !disabled} #00879D {pressed !disabled} #00778A }  \
+      -bordercolor {disabled #7FCFDC {hover !disabled} #00879D {pressed !disabled} #00778A }  \
+      -foreground {disabled #F9F9F9 };
+
+	
+	ttk::style configure H1.info.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.info.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.info.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.info.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.info.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+    
+    ttk::style configure warning.TButton \
+      -foreground #f4f4f4 \
+      -background #D88C46 \
+      -bordercolor #CD8542 \
+      -darkcolor #D88C46 \
+      -lightcolor #D88C46 \
+      -focuscolor #f4f4f4;
+    
+    ttk::style map warning.TButton \
+      -background {disabled #F3DCC7 {hover !disabled} #B7773B {pressed !disabled} #A26934 }  \
+      -lightcolor {disabled #EBC5A2 {hover !disabled} #B7773B {pressed !disabled} #A26934 }  \
+      -darkcolor {disabled #EBC5A2 {hover !disabled} #B7773B {pressed !disabled} #A26934 }  \
+      -bordercolor {disabled #EBC5A2 {hover !disabled} #B7773B {pressed !disabled} #A26934 }  \
+      -foreground {disabled #F9F9F9 };
+
+	
+	ttk::style configure H1.warning.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.warning.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.warning.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.warning.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.warning.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+    
+    ttk::style configure danger.TButton \
+      -foreground #f4f4f4 \
+      -background #CA393C \
+      -bordercolor #BF3639 \
+      -darkcolor #CA393C \
+      -lightcolor #CA393C \
+      -focuscolor #f4f4f4;
+    
+    ttk::style map danger.TButton \
+      -background {disabled #EFC3C4 {hover !disabled} #AB3033 {pressed !disabled} #972A2D }  \
+      -lightcolor {disabled #E49C9D {hover !disabled} #AB3033 {pressed !disabled} #972A2D }  \
+      -darkcolor {disabled #E49C9D {hover !disabled} #AB3033 {pressed !disabled} #972A2D }  \
+      -bordercolor {disabled #E49C9D {hover !disabled} #AB3033 {pressed !disabled} #972A2D }  \
+      -foreground {disabled #F9F9F9 };
+
+	
+	ttk::style configure H1.danger.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.danger.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.danger.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.danger.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.danger.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+    
+    ttk::style configure light.TButton \
+      -foreground #0E2933 \
+      -background #f4f4f4 \
+      -bordercolor #E7E7E7 \
+      -darkcolor #f4f4f4 \
+      -lightcolor #f4f4f4 \
+      -focuscolor #0E2933;
+    
+    ttk::style map light.TButton \
+      -background {disabled #FBFBFB {hover !disabled} #CFCFCF {pressed !disabled} #B7B7B7 }  \
+      -lightcolor {disabled #F9F9F9 {hover !disabled} #CFCFCF {pressed !disabled} #B7B7B7 }  \
+      -darkcolor {disabled #F9F9F9 {hover !disabled} #CFCFCF {pressed !disabled} #B7B7B7 }  \
+      -bordercolor {disabled #F9F9F9 {hover !disabled} #CFCFCF {pressed !disabled} #B7B7B7 }  \
+      -foreground {disabled #869499 };
+
+	
+	ttk::style configure H1.light.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.light.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.light.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.light.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.light.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+    
+    ttk::style configure dark.TButton \
+      -foreground #f4f4f4 \
+      -background #0E2933 \
+      -bordercolor #0D2630 \
+      -darkcolor #0E2933 \
+      -lightcolor #0E2933 \
+      -focuscolor #f4f4f4;
+    
+    ttk::style map dark.TButton \
+      -background {disabled #B6BEC1 {hover !disabled} #0B222B {pressed !disabled} #0A1E26 }  \
+      -lightcolor {disabled #869499 {hover !disabled} #0B222B {pressed !disabled} #0A1E26 }  \
+      -darkcolor {disabled #869499 {hover !disabled} #0B222B {pressed !disabled} #0A1E26 }  \
+      -bordercolor {disabled #869499 {hover !disabled} #0B222B {pressed !disabled} #0A1E26 }  \
+      -foreground {disabled #F9F9F9 };
+
+	
+	ttk::style configure H1.dark.TButton \
+	  -padding { 48 24 } \
+	  -font { Lato -60 };
+    
+	ttk::style configure H2.dark.TButton \
+	  -padding { 32 16 } \
+	  -font { Lato -40 };
+    
+	ttk::style configure H3.dark.TButton \
+	  -padding { 25 12 } \
+	  -font { Lato -32 };
+    
+	ttk::style configure H4.dark.TButton \
+	  -padding { 20 10 } \
+	  -font { Lato -26 };
+    
+	ttk::style configure small.dark.TButton \
+	  -padding { 8 4 } \
+	  -font { Lato -10 };
+    
+
+    
+
+	
+	ttk::style map dark.TButton \
+	  -foreground { selected #B6DDE2 };
+
+    
+    ttk::style configure Link.TButton \
+      -foreground #000000 \
+      -background #ffffff \
+      -padding 0 \
+      -border 0 \
+      -relief flat \
+	  -anchor left;
+    ttk::style map Link.TButton \
+      -background {} \
+      -font {disabled { Lato -16 } {hover !disabled} { Lato -16 underline } {pressed !disabled} { Lato -16 underline } };
+	
+	
+    
+	ttk::style configure primary.default.Link.TButton -foreground #1C4062 -background #ffffff;
+	
+    
+    
+	ttk::style configure primary.light.Link.TButton -foreground #1C4062 -background #f4f4f4;
+	
+    
+    
+	ttk::style configure primary.dark.Link.TButton -foreground #1C4062 -background #0E2933;
+	
+    
+	
+	
+    
+	ttk::style configure secondary.default.Link.TButton -foreground #B6DDE2 -background #ffffff;
+	
+    
+    
+	ttk::style configure secondary.light.Link.TButton -foreground #B6DDE2 -background #f4f4f4;
+	
+    
+    
+	ttk::style configure secondary.dark.Link.TButton -foreground #B6DDE2 -background #0E2933;
+	
+    
+	
+	
+    
+	ttk::style configure success.default.Link.TButton -foreground #50A254 -background #ffffff;
+	
+    
+    
+	ttk::style configure success.light.Link.TButton -foreground #50A254 -background #f4f4f4;
+	
+    
+    
+	ttk::style configure success.dark.Link.TButton -foreground #50A254 -background #0E2933;
+	
+    
+	
+	
+    
+	ttk::style configure info.default.Link.TButton -foreground #009FB9 -background #ffffff;
+	
+    
+    
+	ttk::style configure info.light.Link.TButton -foreground #009FB9 -background #f4f4f4;
+	
+    
+    
+	ttk::style configure info.dark.Link.TButton -foreground #009FB9 -background #0E2933;
+	
+    
+	
+	
+    
+	ttk::style configure warning.default.Link.TButton -foreground #D88C46 -background #ffffff;
+	
+    
+    
+	ttk::style configure warning.light.Link.TButton -foreground #D88C46 -background #f4f4f4;
+	
+    
+    
+	ttk::style configure warning.dark.Link.TButton -foreground #D88C46 -background #0E2933;
+	
+    
+	
+	
+    
+	ttk::style configure danger.default.Link.TButton -foreground #CA393C -background #ffffff;
+	
+    
+    
+	ttk::style configure danger.light.Link.TButton -foreground #CA393C -background #f4f4f4;
+	
+    
+    
+	ttk::style configure danger.dark.Link.TButton -foreground #CA393C -background #0E2933;
+	
+    
+	
+	
+    
+	ttk::style configure light.default.Link.TButton -foreground #f4f4f4 -background #ffffff;
+	
+    
+    
+    
+    
+	ttk::style configure light.dark.Link.TButton -foreground #f4f4f4 -background #0E2933;
+	
+    
+	
+	
+    
+	ttk::style configure dark.default.Link.TButton -foreground #0E2933 -background #ffffff;
+	
+    
+    
+	ttk::style configure dark.light.Link.TButton -foreground #0E2933 -background #f4f4f4;
+	
+    
+    
+    
+	
+
+    
+	
+	
+    ttk::style configure primary.default.TLabel -foreground #1C4062 -background #ffffff;
+    
+	
+	ttk::style configure H1.primary.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.primary.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.primary.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.primary.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.primary.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.primary.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.primary.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure primary.light.TLabel -foreground #1C4062 -background #f4f4f4;
+    
+	
+	ttk::style configure H1.primary.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.primary.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.primary.light.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.primary.light.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.primary.light.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.primary.light.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.primary.light.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure primary.dark.TLabel -foreground #1C4062 -background #0E2933;
+    
+	
+	ttk::style configure H1.primary.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.primary.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.primary.dark.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.primary.dark.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.primary.dark.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.primary.dark.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.primary.dark.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure secondary.default.TLabel -foreground #B6DDE2 -background #ffffff;
+    
+	
+	ttk::style configure H1.secondary.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.secondary.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.secondary.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.secondary.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.secondary.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.secondary.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.secondary.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure secondary.light.TLabel -foreground #B6DDE2 -background #f4f4f4;
+    
+	
+	ttk::style configure H1.secondary.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.secondary.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.secondary.light.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.secondary.light.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.secondary.light.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.secondary.light.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.secondary.light.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure secondary.dark.TLabel -foreground #B6DDE2 -background #0E2933;
+    
+	
+	ttk::style configure H1.secondary.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.secondary.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.secondary.dark.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.secondary.dark.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.secondary.dark.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.secondary.dark.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.secondary.dark.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure success.default.TLabel -foreground #50A254 -background #ffffff;
+    
+	
+	ttk::style configure H1.success.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.success.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.success.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.success.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.success.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.success.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.success.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure success.light.TLabel -foreground #50A254 -background #f4f4f4;
+    
+	
+	ttk::style configure H1.success.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.success.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.success.light.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.success.light.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.success.light.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.success.light.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.success.light.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure success.dark.TLabel -foreground #50A254 -background #0E2933;
+    
+	
+	ttk::style configure H1.success.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.success.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.success.dark.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.success.dark.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.success.dark.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.success.dark.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.success.dark.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure info.default.TLabel -foreground #009FB9 -background #ffffff;
+    
+	
+	ttk::style configure H1.info.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.info.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.info.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.info.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.info.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.info.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.info.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure info.light.TLabel -foreground #009FB9 -background #f4f4f4;
+    
+	
+	ttk::style configure H1.info.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.info.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.info.light.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.info.light.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.info.light.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.info.light.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.info.light.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure info.dark.TLabel -foreground #009FB9 -background #0E2933;
+    
+	
+	ttk::style configure H1.info.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.info.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.info.dark.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.info.dark.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.info.dark.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.info.dark.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.info.dark.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure warning.default.TLabel -foreground #D88C46 -background #ffffff;
+    
+	
+	ttk::style configure H1.warning.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.warning.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.warning.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.warning.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.warning.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.warning.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.warning.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure warning.light.TLabel -foreground #D88C46 -background #f4f4f4;
+    
+	
+	ttk::style configure H1.warning.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.warning.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.warning.light.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.warning.light.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.warning.light.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.warning.light.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.warning.light.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure warning.dark.TLabel -foreground #D88C46 -background #0E2933;
+    
+	
+	ttk::style configure H1.warning.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.warning.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.warning.dark.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.warning.dark.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.warning.dark.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.warning.dark.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.warning.dark.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure danger.default.TLabel -foreground #CA393C -background #ffffff;
+    
+	
+	ttk::style configure H1.danger.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.danger.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.danger.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.danger.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.danger.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.danger.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.danger.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure danger.light.TLabel -foreground #CA393C -background #f4f4f4;
+    
+	
+	ttk::style configure H1.danger.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.danger.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.danger.light.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.danger.light.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.danger.light.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.danger.light.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.danger.light.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure danger.dark.TLabel -foreground #CA393C -background #0E2933;
+    
+	
+	ttk::style configure H1.danger.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.danger.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.danger.dark.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.danger.dark.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.danger.dark.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.danger.dark.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.danger.dark.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure light.default.TLabel -foreground #f4f4f4 -background #ffffff;
+    
+	
+	ttk::style configure H1.light.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.light.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.light.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.light.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.light.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.light.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.light.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure light.dark.TLabel -foreground #f4f4f4 -background #0E2933;
+    
+	
+	ttk::style configure H1.light.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.light.dark.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.light.dark.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.light.dark.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.light.dark.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.light.dark.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.light.dark.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+    ttk::style configure dark.default.TLabel -foreground #0E2933 -background #ffffff;
+    
+	
+	ttk::style configure H1.dark.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.dark.default.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.dark.default.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.dark.default.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.dark.default.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.dark.default.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.dark.default.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+    ttk::style configure dark.light.TLabel -foreground #0E2933 -background #f4f4f4;
+    
+	
+	ttk::style configure H1.dark.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H1.dark.light.TLabel -font { Lato -60 };
+    
+	ttk::style configure H2.dark.light.TLabel -font { Lato -40 };
+    
+	ttk::style configure H3.dark.light.TLabel -font { Lato -32 };
+    
+	ttk::style configure H4.dark.light.TLabel -font { Lato -26 };
+    
+	ttk::style configure small.dark.light.TLabel -font { Lato -10 };
+    
+	ttk::style configure strong.dark.light.TLabel -font { Lato -14 bold };
+    
+	
+	
+	
+	
+	
+
+    
+    
+    ttk::style configure default.TFrame -background #ffffff;
+    
+    ttk::style configure light.TFrame -background #f4f4f4;
+    
+    ttk::style configure dark.TFrame -background #0E2933;
+    
+
+    
+	
+	
+	
+	image create photo switch-on-primary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABjElEQVRIx+3UMWsUcRAF8N/umQgiV1roBq4JCCpy2BmRRZBEP4ClxX4FbUQQUbDSr7Bgay0YsVkL014isZJANKtIwCYIYs5zLfwfxrALtzHp8rqdeftm/m+Y4RB7RZJmUZJm0f/yorofMIWjdfkGVPiBYVnkVW2BIDyLa5jDyVBoEgzxGW/wAu/HhaIgPo0buIVz6LRws9rRaIW3eIxnZZFvj/27iUeh60mxidcY4BfO4ApO4Qvu4OkRXMDtluIruIdXZZF/3+HCHB7gUtBc7XR7/bu4bvKBfg1WPi+LfHsc3FofjLq9/geshZfMYhRjoYU4LIXOR7sTYbBLeBlC8zFmWohXWC2L/FsToSzyYbAQZuIW4ntCjI0W/AhnkzQ73kRI0mwK58PnRozF8PRJcRFXkzTr1IhHIT8fQoudbq+/GYInJixwDKfxqdvrf9xaH/wM4tO4jIf+LOs73N+PRVvGSMOiHcSpWMET41Oxy7+DOXY1g9r/c91QSFnkVZJmtZyyyP/htbD1EH/xG6bajMkvHn/UAAAAAElFTkSuQmCC"
+	image create photo switch-off-primary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSUlEQVRIx+3ULUtDcRQG8N+uE0zComGYFGbxBQRZsMiCIBhEBD+ASRA/gfoJLAY/gFjEIIhDbYZpEKdBFkyyIFisyvAl7D+4E5R7xWHxSefc/+V5OC/P4R9/jUw8qVRrrTCLHkQJed7wggYURwvtAoE4g37MYhJ96Eoo8IoHnOEA93gvjhZkAnkX5rCGwufKUuAdNWxgH6/Z8LCALeTwiGPcBOFxTIW3JC0fwnZo824Ww1gPBJdYxXkoG7pRwiYGE1aSC5y3WSxhIPRwBZX4oCrVWgNHoZod9CYUGcBShOnw4RAXcfJP8WkYYhpMR8iH5Epz3b7CM65TCuST7vmPEaEe4jHfG6sHIyn56xHKIZnBBG2OjsclTQOmQTlTqdaGsac59d9aU7jDfMvJi9qNdqI50LRGa+EJy9jt+Kno/LGL/9WJc/2Pv8cH0ARkJWLvdFkAAAAASUVORK5CYII="
+	image create photo switch-disabled-primary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create primary.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-primary-default \
+        disabled switch-disabled-primary-default \
+        !selected  switch-off-primary-default };
+    ttk::style layout primary.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			primary.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure primary.default.Roundtoggle.TCheckbutton \
+	  -foreground #1C4062 \
+	  -background #ffffff;
+	ttk::style map primary.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	image create photo switch-on-primary-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABjElEQVRIx+3UMWsUcRAF8N/umQgiV1roBq4JCCpy2BmRRZBEP4ClxX4FbUQQUbDSr7Bgay0YsVkL014isZJANKtIwCYIYs5zLfwfxrALtzHp8rqdeftm/m+Y4RB7RZJmUZJm0f/yorofMIWjdfkGVPiBYVnkVW2BIDyLa5jDyVBoEgzxGW/wAu/HhaIgPo0buIVz6LRws9rRaIW3eIxnZZFvj/27iUeh60mxidcY4BfO4ApO4Qvu4OkRXMDtluIruIdXZZF/3+HCHB7gUtBc7XR7/bu4bvKBfg1WPi+LfHsc3FofjLq9/geshZfMYhRjoYU4LIXOR7sTYbBLeBlC8zFmWohXWC2L/FsToSzyYbAQZuIW4ntCjI0W/AhnkzQ73kRI0mwK58PnRozF8PRJcRFXkzTr1IhHIT8fQoudbq+/GYInJixwDKfxqdvrf9xaH/wM4tO4jIf+LOs73N+PRVvGSMOiHcSpWMET41Oxy7+DOXY1g9r/c91QSFnkVZJmtZyyyP/htbD1EH/xG6bajMkvHn/UAAAAAElFTkSuQmCC"
+	image create photo switch-off-primary-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABVElEQVRIx+3Uv0pbcRQH8E9ubsFJyNghOEWoi0Yq1KVDioNQ6FBK3yBr8QmMT+DSoQ8gLtKhUCq2kMHBdBBTB+nQSRwKLq6WEHW4R7gKLfcWQ5Z8p3Pu7/L9cv58DxOMG5V80u31b8MUU0gK8lzhDwbQWm7eFQjiCmbwCs/xGNWCAkP8xj4+4RTXreWmSpBX8RrreHK/shK4xk9s4COGaTy8xXvUcI49HIfwEl7EW5GWz+FDtHk7xTw6QXCINfSibHiEFWxitmAlteA8SdFGI3r4Dgf5QXV7/QG+RDVbmC4o0kA7wWp8+IzvefJ78bcYYhmsJqhHciRbt7/hEj9KCtSL7vl/I8FZxIv+bawpLJTkP0uwG8lLPOOOo/PxisyAZbBb6fb689iRTf2h1hR+4U0qM1RHZrSnMgd+lQ20rNFucRGcxyM/FaM/dvm/RnGuJxg/bgDA6mKQ7VMHkgAAAABJRU5ErkJggg=="
+	image create photo switch-disabled-primary-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97b4MlYdEgpgladIJgkBVZUASDiOAHWBLETyB2QQSDmMUiBkEUtS2oQXwzGZbEMLBYFdk0bEOU98BFPeFe+HMP93/uOfx9BO0WQ0ZOmDDT8uadYpcQExg0r6RflEBoaqg69uijKIiJLFg33N2WiA8PNhxpZrBkR96zc/ciE6blE74+YlfGQRCPOlRwa821JrLKtgwl7qlbzKgoaFh11ZYVvzsV2deXQCiohGZw4qZ7hSJcqqZomQkN4E7r2/OrWgphINQjQk8Y/2FYzljK/FPoDHMmO263a1kphXAW2lPXb9uUKBaTNWsz8UbU7QUxyx3jLtRSjYMXKw56jkbv4fMl9Vfx/g/4BPE1T+PVYNvrAAAAAElFTkSuQmCC"
+
+    ttk::style element create primary.light.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-primary-light \
+        disabled switch-disabled-primary-light \
+        !selected  switch-off-primary-light };
+    ttk::style layout primary.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			primary.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure primary.light.Roundtoggle.TCheckbutton \
+	  -foreground #1C4062 \
+	  -background #f4f4f4;
+	ttk::style map primary.light.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	image create photo switch-on-primary-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABjElEQVRIx+3UMWsUcRAF8N/umQgiV1roBq4JCCpy2BmRRZBEP4ClxX4FbUQQUbDSr7Bgay0YsVkL014isZJANKtIwCYIYs5zLfwfxrALtzHp8rqdeftm/m+Y4RB7RZJmUZJm0f/yorofMIWjdfkGVPiBYVnkVW2BIDyLa5jDyVBoEgzxGW/wAu/HhaIgPo0buIVz6LRws9rRaIW3eIxnZZFvj/27iUeh60mxidcY4BfO4ApO4Qvu4OkRXMDtluIruIdXZZF/3+HCHB7gUtBc7XR7/bu4bvKBfg1WPi+LfHsc3FofjLq9/geshZfMYhRjoYU4LIXOR7sTYbBLeBlC8zFmWohXWC2L/FsToSzyYbAQZuIW4ntCjI0W/AhnkzQ73kRI0mwK58PnRozF8PRJcRFXkzTr1IhHIT8fQoudbq+/GYInJixwDKfxqdvrf9xaH/wM4tO4jIf+LOs73N+PRVvGSMOiHcSpWMET41Oxy7+DOXY1g9r/c91QSFnkVZJmtZyyyP/htbD1EH/xG6bajMkvHn/UAAAAAElFTkSuQmCC"
+	image create photo switch-off-primary-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABZklEQVRIx+3UsUtbURQG8F9eIvWNweFhIbxN0MEWodApiwgJLTg4CB2dXdycbPsP1MWhf0E2B6EgbbdAaYdSaqA4OAUJpV2yKmLS4d1AUqi8Vwgu+aZz7r18h3Pu9x1muG+UxpPqan0UVjCPKCfPANe4gX6nPVkgEJeQYhN1LKKcs8AtfqKNE3Qx7HfaSoG8jC28xPLfnRXAEOd4jWPcVsLFNo5QxW+8x1ko/ATr4S7PyFfwNoy5VcEjvAoEX7GHz6FtmMMGDrGUs5Nq4PxRjpP0AI0wwx18Gs3v6ldXnKQDXIS5PsODnEUWMIjQDAfv8IVJFYzFH8MnFkEzQi0k32Ry+xeu8L1ggVpenf83IlyGeM3dxprH44L8lxFOQ/IcT5lw9Hi8ITNgEZyW4yTtyXSeyiR7jl6cpMM4Sclk2sAbPCxAfoH9kZNfmDTaB9mHFjXaCH3sojX1VTH9ZTf+ahrreob7xx+t7mIPCyUYTwAAAABJRU5ErkJggg=="
+	image create photo switch-disabled-primary-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3UMUscURQF4G9ndRSsBmEgggiCQrRQBMEqTRAUBQsRIaW1TTorxT+QNCn8BTZiIQiS2AnBFEG0EAtBEBFBCyvBIO5azFvYFZSZwGLjqe5973EP975zLu94a5Tqk47ewVrYgnZEOetU8A8PcHd23EgQCpfQgxl8wgeUcxI84gp72MI5qndnx0qheBmzWMHH550VQBUnWMUmHlvCxTx+IME1fuIoEI/ic7jLM/IBrIUxr5c6egeHsIE+/MVX7Ie2oRXj+I7+At2cYq4cJ+kyJsIMF/C7Nr+H2xtxklbC43NMoS0nQScqESbDwTb+0KiCung3fGIRTEboDsmBTG4v4R6HBQm68+r8vxHhIsQjXjdWO4YL1r+IsBOSaYzR4Oj6eFxmwCLYKcdJeinTeQ+GZEa5jJO0GicpmUwn8A1dBYqfYqnm5C8ajfZL9qFFjVbDLRYFo9HEVdH8ZVf/qhnr+h1vjycoYWHciKX1ZAAAAABJRU5ErkJggg=="
+
+    ttk::style element create primary.dark.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-primary-dark \
+        disabled switch-disabled-primary-dark \
+        !selected  switch-off-primary-dark };
+    ttk::style layout primary.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			primary.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure primary.dark.Roundtoggle.TCheckbutton \
+	  -foreground #1C4062 \
+	  -background #0E2933;
+	ttk::style map primary.dark.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+	image create photo switch-on-secondary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABdUlEQVRIx+3UMWvWUBgF4CeprQjd3JTeJThVcXCzDiJINd0dBfsX6iKIUimd6m8oru7GiosOdrUt7VSypCAiuAnFftS43A+/lgSS2m49W+577jlvzr335RwnRVFWSVFWyf/ykqYNGMfFpnoLavzGIM9C3WgQha/hIWZwJRp1wQDf8AXvsTs0SqL4BB5hATcw1iPNeqTRGltYwds8CwfD/B5jOXbdFT/wGV/xB9O4h6v4jmd4cwG38LSn+CZe4GOehf2RFGbwCnei5naKJ9G9K35iEe+G4pBn4QCf8BxV1JxP8UD32wLrsfPD44V4sOv4EJdmU0z1EK+xnWfhVxshz8IgRghTaQ/xEyHFXg9+gutFWU22EYqyGsfN+LmXYi3+elfcxv2irMYaxJNYn41LaylWsdPD4DJeYq4oq0sj4hO4iyWEqLl6Gg9tA4daHtpZjIpNvDYcFcfyO5th13BQpz+uW4zkWaiLsmrk5Fk4wusR6zn+4S9TU5DpCiLhygAAAABJRU5ErkJggg=="
+	image create photo switch-off-secondary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABVUlEQVRIx+3UvyuFYRQH8M9971XcQSmLQSaKhZQyyCIDKYOk/AF3UvIXyK6kDDLLIoMSYTNgkJgMJhmUbtnuJfkx3OfWexW9r7pZfKdznufp++0853wP//hrZOJJsVSuhjk0IkrI844XvEJrvqlWIBBn0IFJDKMN2YQCb3jACXZxh4/WfJNMIM9iCovo/lpZCnzgBkvYwVsuXMxgDS14xCGug/AARsJdki/vwXr45q1MsVTuxTY6cYEFnIWyoQGjWEFXimpuMZ1DIZA/YB6n8UYVS+VX7IdqNtGcUKAThQhj4WAP53HyL/FxaGIajEVoD8mlyrh9h2dcpRRoTzrnv0aE+xD3+9lYjehLyX8f4SAkExikxtHxeFTFgGlwEGFDZaTasIohZIulcpW8AeNYlnyCBM6NqpNn1RrtSKWhaY1WxRPmBKNRx1VR/2UXf1WPdf2Pv8cnkIdqH1b8rEYAAAAASUVORK5CYII="
+	image create photo switch-disabled-secondary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create secondary.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-secondary-default \
+        disabled switch-disabled-secondary-default \
+        !selected  switch-off-secondary-default };
+    ttk::style layout secondary.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			secondary.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure secondary.default.Roundtoggle.TCheckbutton \
+	  -foreground #B6DDE2 \
+	  -background #ffffff;
+	ttk::style map secondary.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	image create photo switch-on-secondary-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABdUlEQVRIx+3UMWvWUBgF4CeprQjd3JTeJThVcXCzDiJINd0dBfsX6iKIUimd6m8oru7GiosOdrUt7VSypCAiuAnFftS43A+/lgSS2m49W+577jlvzr335RwnRVFWSVFWyf/ykqYNGMfFpnoLavzGIM9C3WgQha/hIWZwJRp1wQDf8AXvsTs0SqL4BB5hATcw1iPNeqTRGltYwds8CwfD/B5jOXbdFT/wGV/xB9O4h6v4jmd4cwG38LSn+CZe4GOehf2RFGbwCnei5naKJ9G9K35iEe+G4pBn4QCf8BxV1JxP8UD32wLrsfPD44V4sOv4EJdmU0z1EK+xnWfhVxshz8IgRghTaQ/xEyHFXg9+gutFWU22EYqyGsfN+LmXYi3+elfcxv2irMYaxJNYn41LaylWsdPD4DJeYq4oq0sj4hO4iyWEqLl6Gg9tA4daHtpZjIpNvDYcFcfyO5th13BQpz+uW4zkWaiLsmrk5Fk4wusR6zn+4S9TU5DpCiLhygAAAABJRU5ErkJggg=="
+	image create photo switch-off-secondary-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABQElEQVRIx+3UsUpDQRAF0JNnhFRC7ISIVQRtFEGwspEUAcFCRPADrATxC8QvsLHwA8RGLARR1M5CLUS0srCSBASLpFUkxiIbeBGU94Rgk1vN7C73Mjtzhx7+G5l4Uq3V22EWOUQJeT7xjg8oDOY7BQJxBiNYwCyG0JdQoIEXXOIIz2gWBvMygbwPi9jE2PfKUqCJR2zhEI1suFjGDvJ4xRkegvA05sJdki8fx2745v1MtVafwAGKuMUGrkPZ0I8StjGaoponLGWxGshfsI6reKOqtfoHTkI1exhIKFDEaoRyODjGTZz8W3wRmpgG5QjDIbnTGref8Ib7lALDSef8z4hQCfGU342Vw2RK/kqE05DMY4YOR8fjkpYB0+C062PadvKKTqOdazU0rdHaqGNNMBpdXBXdX3bxV91Y1z38P74AYR9oQDdFQCwAAAAASUVORK5CYII="
+	image create photo switch-disabled-secondary-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97b4MlYdEgpgladIJgkBVZUASDiOAHWBLETyB2QQSDmMUiBkEUtS2oQXwzGZbEMLBYFdk0bEOU98BFPeFe+HMP93/uOfx9BO0WQ0ZOmDDT8uadYpcQExg0r6RflEBoaqg69uijKIiJLFg33N2WiA8PNhxpZrBkR96zc/ciE6blE74+YlfGQRCPOlRwa821JrLKtgwl7qlbzKgoaFh11ZYVvzsV2deXQCiohGZw4qZ7hSJcqqZomQkN4E7r2/OrWgphINQjQk8Y/2FYzljK/FPoDHMmO263a1kphXAW2lPXb9uUKBaTNWsz8UbU7QUxyx3jLtRSjYMXKw56jkbv4fMl9Vfx/g/4BPE1T+PVYNvrAAAAAElFTkSuQmCC"
+
+    ttk::style element create secondary.light.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-secondary-light \
+        disabled switch-disabled-secondary-light \
+        !selected  switch-off-secondary-light };
+    ttk::style layout secondary.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			secondary.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure secondary.light.Roundtoggle.TCheckbutton \
+	  -foreground #B6DDE2 \
+	  -background #f4f4f4;
+	ttk::style map secondary.light.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	image create photo switch-on-secondary-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABdUlEQVRIx+3UMWvWUBgF4CeprQjd3JTeJThVcXCzDiJINd0dBfsX6iKIUimd6m8oru7GiosOdrUt7VSypCAiuAnFftS43A+/lgSS2m49W+577jlvzr335RwnRVFWSVFWyf/ykqYNGMfFpnoLavzGIM9C3WgQha/hIWZwJRp1wQDf8AXvsTs0SqL4BB5hATcw1iPNeqTRGltYwds8CwfD/B5jOXbdFT/wGV/xB9O4h6v4jmd4cwG38LSn+CZe4GOehf2RFGbwCnei5naKJ9G9K35iEe+G4pBn4QCf8BxV1JxP8UD32wLrsfPD44V4sOv4EJdmU0z1EK+xnWfhVxshz8IgRghTaQ/xEyHFXg9+gutFWU22EYqyGsfN+LmXYi3+elfcxv2irMYaxJNYn41LaylWsdPD4DJeYq4oq0sj4hO4iyWEqLl6Gg9tA4daHtpZjIpNvDYcFcfyO5th13BQpz+uW4zkWaiLsmrk5Fk4wusR6zn+4S9TU5DpCiLhygAAAABJRU5ErkJggg=="
+	image create photo switch-off-secondary-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABcElEQVRIx+3Uv0uVYRQH8M997ys4BY7FFSeDusMNSbhTiwgJQUNgSzi6ilub+g/o0tAsESQ0BKJYW0PeISKHcGgKEcGlNVG7Ds+59HqheF8hXfzCA+c8z8P3cH58D9e4atSKTnt6pmfmGERWkuc3jnAMnbXV8wGCuIYRPMYD3ES9ZIBTHOAj3uEHup21VbUgr+MJFnCnP7MK6GIXS3iL0zwenuIFhnCILexE4HFMxFuZkt/Fyyjz6xwtLAbBZ8xjO9KGAUxiBbdLZjIUnN9yzGI0ajiHT8VGtadnjrER2bzCjZJBRjGbYSou1tEpkvfZH6KJVTCVYTicL9K4/Q2/8LVigOGyc35hZNgLe8y/hTWIexX59zJshvMIbc4pumhPSgKsgs16o9nal+Z8RBrZXew3mq1uo9kijelDLONWBfLveJ5LglqUhHZfUuB7qaFVhdbDz+Dc6Sn5DU78WRXP4lRF/6q4hGVX/PU/1vU1rh5nPhBfOmnAS4YAAAAASUVORK5CYII="
+	image create photo switch-disabled-secondary-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3UMUscURQF4G9ndRSsBmEgggiCQrRQBMEqTRAUBQsRIaW1TTorxT+QNCn8BTZiIQiS2AnBFEG0EAtBEBFBCyvBIO5azFvYFZSZwGLjqe5973EP975zLu94a5Tqk47ewVrYgnZEOetU8A8PcHd23EgQCpfQgxl8wgeUcxI84gp72MI5qndnx0qheBmzWMHH550VQBUnWMUmHlvCxTx+IME1fuIoEI/ic7jLM/IBrIUxr5c6egeHsIE+/MVX7Ie2oRXj+I7+At2cYq4cJ+kyJsIMF/C7Nr+H2xtxklbC43NMoS0nQScqESbDwTb+0KiCung3fGIRTEboDsmBTG4v4R6HBQm68+r8vxHhIsQjXjdWO4YL1r+IsBOSaYzR4Oj6eFxmwCLYKcdJeinTeQ+GZEa5jJO0GicpmUwn8A1dBYqfYqnm5C8ajfZL9qFFjVbDLRYFo9HEVdH8ZVf/qhnr+h1vjycoYWHciKX1ZAAAAABJRU5ErkJggg=="
+
+    ttk::style element create secondary.dark.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-secondary-dark \
+        disabled switch-disabled-secondary-dark \
+        !selected  switch-off-secondary-dark };
+    ttk::style layout secondary.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			secondary.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure secondary.dark.Roundtoggle.TCheckbutton \
+	  -foreground #B6DDE2 \
+	  -background #0E2933;
+	ttk::style map secondary.dark.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+	image create photo switch-on-success-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABeElEQVRIx+3UP2vWUBgF8F/SPyJ066bUzUmlQzfrIIJUcckQOl6wX0EXQSwVcaqfoZhRMmQRKy462FUr7eRmQYrgJoh9aeNyX/paEkhqu/Vsuc+55zw5996HMxwXWZEnWZEn/8tLmjZgAuea6i2o8QeDKpR1o0EUvoy7mMeFaNQFA3zHR7zB16FREsUnsYgHuIaxHmnWI43W+IJVvKpCuTfML+B57LorfuADPuEAV3ALF7GLR3g5jjk87Cm+iSd4V4Xy90gK83iKG1FzK8X96N4VP7GC10NxqEK5h/d4jG9RcynFHd1vC2zEzvePFuLBbuBtXFpIMdNDvMZWFcpfbYQqlIMYIcykPcSPhRQ7PfgJrmZFPtVGyIp8ArPxcyfFevz1rriO21mRjzWIJ7G+EJfWU6xhu4fBNJZxLyvy8yPik7iJZ7gUNddO4qF9xr6Wh3Yao2ITLwxHxZH8TmfYNRzUyY/rFiNVKOusyBs5VSj/4fWI9QyH+AvQHInPR4gOXwAAAABJRU5ErkJggg=="
+	image create photo switch-off-success-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSUlEQVRIx+3UvyuEcRwH8Nc9TpnUjTdcJoqIlDJZdINSBkn5A0xK/gL8BRaDP0AWGZQImwGDRHcymGS4sljp8mO479VzV/Q8clnuPX0+z/fp/e7z4/2hjf9GJp6UKuV6mEUXooQ8H3hDFYbyg40CgTiDHsxgAnl0JBR4RwVn2McjPofygzKBvAOzWEV/c2Up8Il7rGMP79nwMI9N5PCMY9wG4TFMhrckLR/AVmjzThbDWAsEV1jBRSgbOlHEBvoSVpILnHdZLKI39HAZ5/FBlSrlKg5DNdvoTijSi8UIU+HDAS7j5E3xaRhiGkxFKITkWm3dvsMrblIKFJLu+a8R4SnEo342VhdGUvI/RTgKyTTGaXB0PC6qGTANjjKlSnkYu2pT/6s1hQfM1Z28oNFoJ2oDTWu0Ol6whJ2Wn4rWH7v4X6041238P74ArsZkrTxSwsAAAAAASUVORK5CYII="
+	image create photo switch-disabled-success-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create success.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-success-default \
+        disabled switch-disabled-success-default \
+        !selected  switch-off-success-default };
+    ttk::style layout success.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			success.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure success.default.Roundtoggle.TCheckbutton \
+	  -foreground #50A254 \
+	  -background #ffffff;
+	ttk::style map success.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	image create photo switch-on-success-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABeElEQVRIx+3UP2vWUBgF8F/SPyJ066bUzUmlQzfrIIJUcckQOl6wX0EXQSwVcaqfoZhRMmQRKy462FUr7eRmQYrgJoh9aeNyX/paEkhqu/Vsuc+55zw5996HMxwXWZEnWZEn/8tLmjZgAuea6i2o8QeDKpR1o0EUvoy7mMeFaNQFA3zHR7zB16FREsUnsYgHuIaxHmnWI43W+IJVvKpCuTfML+B57LorfuADPuEAV3ALF7GLR3g5jjk87Cm+iSd4V4Xy90gK83iKG1FzK8X96N4VP7GC10NxqEK5h/d4jG9RcynFHd1vC2zEzvePFuLBbuBtXFpIMdNDvMZWFcpfbYQqlIMYIcykPcSPhRQ7PfgJrmZFPtVGyIp8ArPxcyfFevz1rriO21mRjzWIJ7G+EJfWU6xhu4fBNJZxLyvy8yPik7iJZ7gUNddO4qF9xr6Wh3Yao2ITLwxHxZH8TmfYNRzUyY/rFiNVKOusyBs5VSj/4fWI9QyH+AvQHInPR4gOXwAAAABJRU5ErkJggg=="
+	image create photo switch-off-success-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSUlEQVRIx+3UvyuEcRwH8Nc9d8qkjIZLBoqF5MpkkUEpg6T8ASYlfwH+AovBHyCLDEqEzYC6SwwyGC4ZlMVKOgz3vXruip5HrlvuPX0+z/fp/e7z4/2hjVYjE0+K5VItzKETUUKeT7zjAwp9Y/UCgTiDXsxiAj3IJhSo4BnnOMAjvgp9YzKBPIs5rGGwsbIU+MI9NrCPSi48LGAL3XjBCW6DcAGT4S1Jy4ewHdq8m8Mw1gNBCau4DGVDB6awiYGElXQHzrscltAferiCi/igiuXSB45CNTvoSijSj6UI0+HDIa7i5A3xWRhiGkxHyIfkWnXdfsIbblIK5JPu+Z8R4SnEo343VidGUvI/RTgOyQzGqXN0PJ5SNWAaHGeK5dIw9lSn/l9rCg+Yrzl5Ub3RTlUHmtZoNbxiGbtNPxXNP3bxv5pxrttoPb4BXQdkTbFN1KcAAAAASUVORK5CYII="
+	image create photo switch-disabled-success-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97b4MlYdEgpgladIJgkBVZUASDiOAHWBLETyB2QQSDmMUiBkEUtS2oQXwzGZbEMLBYFdk0bEOU98BFPeFe+HMP93/uOfx9BO0WQ0ZOmDDT8uadYpcQExg0r6RflEBoaqg69uijKIiJLFg33N2WiA8PNhxpZrBkR96zc/ciE6blE74+YlfGQRCPOlRwa821JrLKtgwl7qlbzKgoaFh11ZYVvzsV2deXQCiohGZw4qZ7hSJcqqZomQkN4E7r2/OrWgphINQjQk8Y/2FYzljK/FPoDHMmO263a1kphXAW2lPXb9uUKBaTNWsz8UbU7QUxyx3jLtRSjYMXKw56jkbv4fMl9Vfx/g/4BPE1T+PVYNvrAAAAAElFTkSuQmCC"
+
+    ttk::style element create success.light.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-success-light \
+        disabled switch-disabled-success-light \
+        !selected  switch-off-success-light };
+    ttk::style layout success.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			success.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure success.light.Roundtoggle.TCheckbutton \
+	  -foreground #50A254 \
+	  -background #f4f4f4;
+	ttk::style map success.light.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	image create photo switch-on-success-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABeElEQVRIx+3UP2vWUBgF8F/SPyJ066bUzUmlQzfrIIJUcckQOl6wX0EXQSwVcaqfoZhRMmQRKy462FUr7eRmQYrgJoh9aeNyX/paEkhqu/Vsuc+55zw5996HMxwXWZEnWZEn/8tLmjZgAuea6i2o8QeDKpR1o0EUvoy7mMeFaNQFA3zHR7zB16FREsUnsYgHuIaxHmnWI43W+IJVvKpCuTfML+B57LorfuADPuEAV3ALF7GLR3g5jjk87Cm+iSd4V4Xy90gK83iKG1FzK8X96N4VP7GC10NxqEK5h/d4jG9RcynFHd1vC2zEzvePFuLBbuBtXFpIMdNDvMZWFcpfbYQqlIMYIcykPcSPhRQ7PfgJrmZFPtVGyIp8ArPxcyfFevz1rriO21mRjzWIJ7G+EJfWU6xhu4fBNJZxLyvy8yPik7iJZ7gUNddO4qF9xr6Wh3Yao2ITLwxHxZH8TmfYNRzUyY/rFiNVKOusyBs5VSj/4fWI9QyH+AvQHInPR4gOXwAAAABJRU5ErkJggg=="
+	image create photo switch-off-success-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaklEQVRIx+3UMWtUURAF4G/frpjuEawU8tI8AtoYgoIQSBOCCQYsLOz9B3ZWGv9AbCz8BXYWghDWdIElKUIwhaQIFskSBJtgp0h2U9xZ2BUi7wlLmpxq5t7LGWbuOcMVLhuN4aR4OD8IW5hAVpGnh9/4A8ftzmiBIG5gGo+xgJtoVixwhu/YwkccoX/c7mgEeRNP8Aq3/+6sBvo4wGt8wFkrLp7iLSbxA23sR+H7WIy7KiO/g3cx5vct3MVaEOziObajbbiGJbzBTMVOJoPzazMvi5dYjhk+Q2cwv5/fuvKy6OEw5voI1ysWuYFehpU4+IQdRlUwFG/GJ9bBSoapSPYkuV2EX/hSs8BUVZ3/NzJ0I57zb2NNYLYmfzfDRiSreMCIo4fjJcmAdbDRzMviRNL5tCTZA5zkZdHPy4Ik02Ws41YN8kO8aEmGWpOMdk9y4GfpQ+sabYDT4Nwf+6oY/7IbfjWOdX2Fy8c56hljHedjrjoAAAAASUVORK5CYII="
+	image create photo switch-disabled-success-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3UMUscURQF4G9ndRSsBmEgggiCQrRQBMEqTRAUBQsRIaW1TTorxT+QNCn8BTZiIQiS2AnBFEG0EAtBEBFBCyvBIO5azFvYFZSZwGLjqe5973EP975zLu94a5Tqk47ewVrYgnZEOetU8A8PcHd23EgQCpfQgxl8wgeUcxI84gp72MI5qndnx0qheBmzWMHH550VQBUnWMUmHlvCxTx+IME1fuIoEI/ic7jLM/IBrIUxr5c6egeHsIE+/MVX7Ie2oRXj+I7+At2cYq4cJ+kyJsIMF/C7Nr+H2xtxklbC43NMoS0nQScqESbDwTb+0KiCung3fGIRTEboDsmBTG4v4R6HBQm68+r8vxHhIsQjXjdWO4YL1r+IsBOSaYzR4Oj6eFxmwCLYKcdJeinTeQ+GZEa5jJO0GicpmUwn8A1dBYqfYqnm5C8ajfZL9qFFjVbDLRYFo9HEVdH8ZVf/qhnr+h1vjycoYWHciKX1ZAAAAABJRU5ErkJggg=="
+
+    ttk::style element create success.dark.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-success-dark \
+        disabled switch-disabled-success-dark \
+        !selected  switch-off-success-dark };
+    ttk::style layout success.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			success.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure success.dark.Roundtoggle.TCheckbutton \
+	  -foreground #50A254 \
+	  -background #0E2933;
+	ttk::style map success.dark.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+	image create photo switch-on-info-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaElEQVRIx+3UsU8UQRgF8N+ugjGhs5NgRyXGwg4sjAkZjb0lyfIvSENiIBpChX/DxNbeyMYGCmkBg5WdJMaQ0JEYuOBa3ECO3F6ye3odr9uZt+9982a+j2sMjVhmYpn9Ky+r/YEx3Krdr0eFU3QUoao36ApP4znmcDcZNUEHP/EFn/D9wihL4uN4iVd4gBstwqx6Cq3wFRv4oAhnF/ktYD1V3RRH2MYu/uA+nmISv7CM9zfxCEstxfexgs+K8LsnhTm8xeOkeZCjSO5NcYw3+HgpDkU4wxZe40fSXMzxTPPXAjup8vO+ne7F7qBMKyHHVAvxCgeKcDKQUYROihCm8hbiQyHHYQt+hhmxnBjIiOUYHqavwxyb6ehNMYt5sezvle6Tn0VIK5s5Ir61MLiDVbwQy9s94uN4gjXcS5rxfzTaHs4NaLRRjIp9vHM5Kq7mN6Jh139RIxjX9Ubd7oxlPacIV3nXGAZ/Ac3wejt6RAeWAAAAAElFTkSuQmCC"
+	image create photo switch-off-info-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSUlEQVRIx+3UvyuEcRwH8Nc9d8qkZLpBJoqFlDKpSwalDJLyB5iU/AX4CywGf4AsMigRhisDBolBBpMMV+qykg7Dfa+eu6LnkeuWe0+fz/N9er/7/Hh/aKPVyMSTYqlcC3PoRJSQ5xPv+IBCvqdeIBBn0IdZTCCPbEKBCko4xwGe8FXI98gE8izmsIbBxspS4AsP2MA+KrnwsIAtdOMFJ7gLwmOYDG9JWj6E7dDm3RyGsR4IrrGKy1A2dGAKmxhIWEl34LzPYQn9oYcruIgPqlgqf+AoVLODroQi/ViKMB0+HOIqTt4Qn4UhpsF0hN6Q3Kiu2094w21Kgd6ke/5nRHgO8ajfjdWJkZT8zxGOQzKDceocHY+nVA2YBseZYqk8jD3Vqf/XmsIj5mtOXlRvtFPVgaY1Wg2vWMZu009F849d/K9mnOs2Wo9v9Gxkwev3qJ4AAAAASUVORK5CYII="
+	image create photo switch-disabled-info-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create info.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-info-default \
+        disabled switch-disabled-info-default \
+        !selected  switch-off-info-default };
+    ttk::style layout info.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			info.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure info.default.Roundtoggle.TCheckbutton \
+	  -foreground #009FB9 \
+	  -background #ffffff;
+	ttk::style map info.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	image create photo switch-on-info-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaElEQVRIx+3UsU8UQRgF8N+ugjGhs5NgRyXGwg4sjAkZjb0lyfIvSENiIBpChX/DxNbeyMYGCmkBg5WdJMaQ0JEYuOBa3ECO3F6ye3odr9uZt+9982a+j2sMjVhmYpn9Ky+r/YEx3Krdr0eFU3QUoao36ApP4znmcDcZNUEHP/EFn/D9wihL4uN4iVd4gBstwqx6Cq3wFRv4oAhnF/ktYD1V3RRH2MYu/uA+nmISv7CM9zfxCEstxfexgs+K8LsnhTm8xeOkeZCjSO5NcYw3+HgpDkU4wxZe40fSXMzxTPPXAjup8vO+ne7F7qBMKyHHVAvxCgeKcDKQUYROihCm8hbiQyHHYQt+hhmxnBjIiOUYHqavwxyb6ehNMYt5sezvle6Tn0VIK5s5Ir61MLiDVbwQy9s94uN4gjXcS5rxfzTaHs4NaLRRjIp9vHM5Kq7mN6Jh139RIxjX9Ubd7oxlPacIV3nXGAZ/Ac3wejt6RAeWAAAAAElFTkSuQmCC"
+	image create photo switch-off-info-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSElEQVRIx+3UwSqEYRQG4Gf+GTUrZSlJqVFsSCkrG81iSllIygVYKbkCXIGNhQuQjSyU/GFngYXEQhZqSpqUjS2JsZhvamaK/l8mG+/qnO+r93TOe97DP/4amcYkLlfqYQ55RAl5PvCKNyj19zQXCMQZ9GEaE+hGNmGBdzziBHu4R7XU3yMTyLOYwQoGWztLgSpusYZdvOfCxxw20IUnHOI6FB7DZPhLMvIhbIYxb+cwjNVAcIFlnIW2oQNFrGMgYSddgfMmhwUUwgyXcNooVFyuvOEgdLOFzoRFCliIUAoP+zhvJG+Jj4OIaVCK0BuSS7V1+wovuEpZoDfpnv8YER5CPOp7Y+UxkpL/IUIckimM0+ToxrioZsA0iDNxuTKMHTXVf2tN4Q6zdSfPazbakZqgaY1WxzMWsd32U9H+Y9ekSBvO9T/+Hp+Um2Rd8kO3fAAAAABJRU5ErkJggg=="
+	image create photo switch-disabled-info-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97b4MlYdEgpgladIJgkBVZUASDiOAHWBLETyB2QQSDmMUiBkEUtS2oQXwzGZbEMLBYFdk0bEOU98BFPeFe+HMP93/uOfx9BO0WQ0ZOmDDT8uadYpcQExg0r6RflEBoaqg69uijKIiJLFg33N2WiA8PNhxpZrBkR96zc/ciE6blE74+YlfGQRCPOlRwa821JrLKtgwl7qlbzKgoaFh11ZYVvzsV2deXQCiohGZw4qZ7hSJcqqZomQkN4E7r2/OrWgphINQjQk8Y/2FYzljK/FPoDHMmO263a1kphXAW2lPXb9uUKBaTNWsz8UbU7QUxyx3jLtRSjYMXKw56jkbv4fMl9Vfx/g/4BPE1T+PVYNvrAAAAAElFTkSuQmCC"
+
+    ttk::style element create info.light.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-info-light \
+        disabled switch-disabled-info-light \
+        !selected  switch-off-info-light };
+    ttk::style layout info.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			info.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure info.light.Roundtoggle.TCheckbutton \
+	  -foreground #009FB9 \
+	  -background #f4f4f4;
+	ttk::style map info.light.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	image create photo switch-on-info-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaElEQVRIx+3UsU8UQRgF8N+ugjGhs5NgRyXGwg4sjAkZjb0lyfIvSENiIBpChX/DxNbeyMYGCmkBg5WdJMaQ0JEYuOBa3ECO3F6ye3odr9uZt+9982a+j2sMjVhmYpn9Ky+r/YEx3Krdr0eFU3QUoao36ApP4znmcDcZNUEHP/EFn/D9wihL4uN4iVd4gBstwqx6Cq3wFRv4oAhnF/ktYD1V3RRH2MYu/uA+nmISv7CM9zfxCEstxfexgs+K8LsnhTm8xeOkeZCjSO5NcYw3+HgpDkU4wxZe40fSXMzxTPPXAjup8vO+ne7F7qBMKyHHVAvxCgeKcDKQUYROihCm8hbiQyHHYQt+hhmxnBjIiOUYHqavwxyb6ehNMYt5sezvle6Tn0VIK5s5Ir61MLiDVbwQy9s94uN4gjXcS5rxfzTaHs4NaLRRjIp9vHM5Kq7mN6Jh139RIxjX9Ubd7oxlPacIV3nXGAZ/Ac3wejt6RAeWAAAAAElFTkSuQmCC"
+	image create photo switch-off-info-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaklEQVRIx+3UsUuVYRQG8N/97v1Q3KSpQBw+CPwWJQqaWsJQFBoM3PsP3JrS/oFaGvoLmmwQAum2BVFDiA7qIA0iIri0SSHe6/CeC/cKxfcFFxef6Zz3fXkO57zPc7jBdaPRn4w9edYLWxhFVpGngz84h7P2+mCBIG5gEk/xCLfRrFjgAif4gg0convWXtcI8iaWsIqpq53VQBf7eIUPuGjFxTLeYhyn+ISdKPwAj+OuyshLvIsxv29hGmtB8AMr+BZtQ45ZvMHdip2MB+duMy/Kl5iLGT7H1978zn/uyYuyg4OY6wJGKha5hU6G+Tj4iO8MqqAv/hyfWAfzGSYi2ZLk9jf8xnbNAhNVdf7fyHAU8T3/NtYoZmryH2XYjGQRDxlwdH88KxmwDjabeVEeSzqflCS7j+O8KLt5UZJkOofXuFOD/AAvWpKh1iSj3Zcc2JY+tK7RevgVnDtDXxXDX3b9r4axrm9w/bgE9n1jI3KQ37sAAAAASUVORK5CYII="
+	image create photo switch-disabled-info-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3UMUscURQF4G9ndRSsBmEgggiCQrRQBMEqTRAUBQsRIaW1TTorxT+QNCn8BTZiIQiS2AnBFEG0EAtBEBFBCyvBIO5azFvYFZSZwGLjqe5973EP975zLu94a5Tqk47ewVrYgnZEOetU8A8PcHd23EgQCpfQgxl8wgeUcxI84gp72MI5qndnx0qheBmzWMHH550VQBUnWMUmHlvCxTx+IME1fuIoEI/ic7jLM/IBrIUxr5c6egeHsIE+/MVX7Ie2oRXj+I7+At2cYq4cJ+kyJsIMF/C7Nr+H2xtxklbC43NMoS0nQScqESbDwTb+0KiCung3fGIRTEboDsmBTG4v4R6HBQm68+r8vxHhIsQjXjdWO4YL1r+IsBOSaYzR4Oj6eFxmwCLYKcdJeinTeQ+GZEa5jJO0GicpmUwn8A1dBYqfYqnm5C8ajfZL9qFFjVbDLRYFo9HEVdH8ZVf/qhnr+h1vjycoYWHciKX1ZAAAAABJRU5ErkJggg=="
+
+    ttk::style element create info.dark.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-info-dark \
+        disabled switch-disabled-info-dark \
+        !selected  switch-off-info-dark };
+    ttk::style layout info.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			info.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure info.dark.Roundtoggle.TCheckbutton \
+	  -foreground #009FB9 \
+	  -background #0E2933;
+	ttk::style map info.dark.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+	image create photo switch-on-warning-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABdUlEQVRIx+3UMWvWUBgF4CeprQjduil1KwSqdHBrHUQwVbo7CvYveBehKJXSKf6G4uou1rjoYFdbqRBwsyAiuAliP9q43I9+lgSS2m49W+577jlvzr335RwnRVXkSVXkyf/ykqYNGMfFpnoLavzBIAtl3WgQhWdwDwu4HI26YIBv+IDX+DI0SqL4BO7jEa5jrEea9UijNT6hwMsslPvD/B5gPXbdFT/wHh9xiFncxhV8x2O8uIAbCD3Fd/AEb7NQ/h5JYQHPcDNq7qZ4GN274idW8WooDlko9/EOK/gaNZdT3NX9tsBW7PzgeCEe7BbexKXFFNM9xGvsZqH81UbIQjmIEcJ02kP8REix14Of4FpV5JNthKrIxzEXP/dSbMZf74p53KmKfKxBPIn1xbi0mWIDn3sYTOEplqoivzQiPoFbWMPVqLlxGg9tGwdaHtpZjIodPDccFcfyO5th13BQpz+uW4xkoayrIm/kZKH8h9cj1nMc4S/eR4wn7nkjywAAAABJRU5ErkJggg=="
+	image create photo switch-off-warning-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABQUlEQVRIx+3UvUpDQRAF4C83EQIBwdLCWCloYxAEKxtJIQgWIoIPkEoQn0B8AhsLH0BsxEIQRe0s1EIkVhZWJkXAxiqgiD9FNnAjKPcKwSanmtldzmF25gw9/Dcy8aRZq7bDHPKIEvJ84BVvUCiWOgUCcQbDWMAMBpFNKPCOBi5wiEd8FoolmUCexSI2MPa9shT4xD02cYD3XLhYxjYG8IRT3AXhKcyGuyRfPo6d8M17mWatOoF9jOAG67gKZUMfytjCaIpqHrCUQyWQN7CGy3ijmrXqG45DNbvoTygwgkqEuXBwhOs4+bf4PDQxDeYiDIXkVmvcfsILqikFhpLO+Z8RoR7iSb8bK49SSv56hJOQzGOaDkfH47KWAdPgpOtj2nbyik6jnWk1NK3R2njGqmA0urgqur/s4q+6sa57+H98AVaxZ77bHuX9AAAAAElFTkSuQmCC"
+	image create photo switch-disabled-warning-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create warning.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-warning-default \
+        disabled switch-disabled-warning-default \
+        !selected  switch-off-warning-default };
+    ttk::style layout warning.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			warning.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure warning.default.Roundtoggle.TCheckbutton \
+	  -foreground #D88C46 \
+	  -background #ffffff;
+	ttk::style map warning.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	image create photo switch-on-warning-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABdUlEQVRIx+3UMWvWUBgF4CeprQjduil1KwSqdHBrHUQwVbo7CvYveBehKJXSKf6G4uou1rjoYFdbqRBwsyAiuAliP9q43I9+lgSS2m49W+577jlvzr335RwnRVXkSVXkyf/ykqYNGMfFpnoLavzBIAtl3WgQhWdwDwu4HI26YIBv+IDX+DI0SqL4BO7jEa5jrEea9UijNT6hwMsslPvD/B5gPXbdFT/wHh9xiFncxhV8x2O8uIAbCD3Fd/AEb7NQ/h5JYQHPcDNq7qZ4GN274idW8WooDlko9/EOK/gaNZdT3NX9tsBW7PzgeCEe7BbexKXFFNM9xGvsZqH81UbIQjmIEcJ02kP8REix14Of4FpV5JNthKrIxzEXP/dSbMZf74p53KmKfKxBPIn1xbi0mWIDn3sYTOEplqoivzQiPoFbWMPVqLlxGg9tGwdaHtpZjIodPDccFcfyO5th13BQpz+uW4xkoayrIm/kZKH8h9cj1nMc4S/eR4wn7nkjywAAAABJRU5ErkJggg=="
+	image create photo switch-off-warning-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSUlEQVRIx+3UvyuEcRwH8Nc9TpmUTIbL5IrlpNRNFhmulEFS/gCTkr8Af4HF4A+QRQYlwmbgBolB6kwyKHVZ6fJjuO/Vc1f0PHJZ7j19Ps/36f3u8+P9oYP/RiaeVCvlRphFD6KEPB94Qw3688VmgUCcwSBmMIEBdCUUeMcTzrCPB3z254sygbwLs1jFcGtlKfCJO6xjD+/Z8DCPTfThGce4CcLjmAxvSVo+gq3Q5p0sClgLBJdYwUUoG7oxhQ3kE1bSFzhvs1jEUOjhMs7jg6pWyjUchmq20ZtQZAiLEUrhwwHKcfKW+DQMMQ1KEXIhuVJft+/wiuuUArmke/5rRHgM8ZifjdWD0ZT8jxGOQjKNIk2OjsdT6gZMg6NMtVIuYFd96n+1pnCPuYaTFzQb7UR9oGmN1sALlrDT9lPR/mMX/6sd57qD/8cXvXBksX1ZL9YAAAAASUVORK5CYII="
+	image create photo switch-disabled-warning-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97b4MlYdEgpgladIJgkBVZUASDiOAHWBLETyB2QQSDmMUiBkEUtS2oQXwzGZbEMLBYFdk0bEOU98BFPeFe+HMP93/uOfx9BO0WQ0ZOmDDT8uadYpcQExg0r6RflEBoaqg69uijKIiJLFg33N2WiA8PNhxpZrBkR96zc/ciE6blE74+YlfGQRCPOlRwa821JrLKtgwl7qlbzKgoaFh11ZYVvzsV2deXQCiohGZw4qZ7hSJcqqZomQkN4E7r2/OrWgphINQjQk8Y/2FYzljK/FPoDHMmO263a1kphXAW2lPXb9uUKBaTNWsz8UbU7QUxyx3jLtRSjYMXKw56jkbv4fMl9Vfx/g/4BPE1T+PVYNvrAAAAAElFTkSuQmCC"
+
+    ttk::style element create warning.light.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-warning-light \
+        disabled switch-disabled-warning-light \
+        !selected  switch-off-warning-light };
+    ttk::style layout warning.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			warning.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure warning.light.Roundtoggle.TCheckbutton \
+	  -foreground #D88C46 \
+	  -background #f4f4f4;
+	ttk::style map warning.light.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	image create photo switch-on-warning-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABdUlEQVRIx+3UMWvWUBgF4CeprQjduil1KwSqdHBrHUQwVbo7CvYveBehKJXSKf6G4uou1rjoYFdbqRBwsyAiuAliP9q43I9+lgSS2m49W+577jlvzr335RwnRVXkSVXkyf/ykqYNGMfFpnoLavzBIAtl3WgQhWdwDwu4HI26YIBv+IDX+DI0SqL4BO7jEa5jrEea9UijNT6hwMsslPvD/B5gPXbdFT/wHh9xiFncxhV8x2O8uIAbCD3Fd/AEb7NQ/h5JYQHPcDNq7qZ4GN274idW8WooDlko9/EOK/gaNZdT3NX9tsBW7PzgeCEe7BbexKXFFNM9xGvsZqH81UbIQjmIEcJ02kP8REix14Of4FpV5JNthKrIxzEXP/dSbMZf74p53KmKfKxBPIn1xbi0mWIDn3sYTOEplqoivzQiPoFbWMPVqLlxGg9tGwdaHtpZjIodPDccFcfyO5th13BQpz+uW4xkoayrIm/kZKH8h9cj1nMc4S/eR4wn7nkjywAAAABJRU5ErkJggg=="
+	image create photo switch-off-warning-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaklEQVRIx+3UMWtUURAF4G/frpg2WBleyHtNQBtFDFoFRQIJCaSwSO8/sLPS+Ae0sfAX2FkIQtAUCYKYhRCSIqRIkxCWgE1aRbJrcWdhV1DeE5Y0OdXMvZczzNxzhktcNBqDyYOH9/phC2PIKvJ08RO/YHOjPVwgiBuYwjJmcR3NigXOcYov+IBj9DY32hpB3sRjvMCNPzurgR4O8BLvcd6KixW8wTi+4xP2ovAMHsVdlZHfxNsY87sWbmE1CLbxFN+ibbiCObzGdMVOxoNzv1mU+XPMxwyf4Gt/fkdHHUWZd3EYc13E1YpFrqGbYSEOPmKLYRUMxOvxiXWwkGEykh1Jbn/DD+zWLDBZVef/jQwnEd/xb2ON4XZN/pMMa5Es4T5Djh6M5yQD1sFasyjzjqTzKUmyB+gUZd4rypwk03m8wkQN8kM8a0mGWpWMdldy4GfpQ+sarY+z4Nwb+aoY/bIbfDWKdX2Ji8dv2NJjZQNxF+MAAAAASUVORK5CYII="
+	image create photo switch-disabled-warning-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3UMUscURQF4G9ndRSsBmEgggiCQrRQBMEqTRAUBQsRIaW1TTorxT+QNCn8BTZiIQiS2AnBFEG0EAtBEBFBCyvBIO5azFvYFZSZwGLjqe5973EP975zLu94a5Tqk47ewVrYgnZEOetU8A8PcHd23EgQCpfQgxl8wgeUcxI84gp72MI5qndnx0qheBmzWMHH550VQBUnWMUmHlvCxTx+IME1fuIoEI/ic7jLM/IBrIUxr5c6egeHsIE+/MVX7Ie2oRXj+I7+At2cYq4cJ+kyJsIMF/C7Nr+H2xtxklbC43NMoS0nQScqESbDwTb+0KiCung3fGIRTEboDsmBTG4v4R6HBQm68+r8vxHhIsQjXjdWO4YL1r+IsBOSaYzR4Oj6eFxmwCLYKcdJeinTeQ+GZEa5jJO0GicpmUwn8A1dBYqfYqnm5C8ajfZL9qFFjVbDLRYFo9HEVdH8ZVf/qhnr+h1vjycoYWHciKX1ZAAAAABJRU5ErkJggg=="
+
+    ttk::style element create warning.dark.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-warning-dark \
+        disabled switch-disabled-warning-dark \
+        !selected  switch-off-warning-dark };
+    ttk::style layout warning.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			warning.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure warning.dark.Roundtoggle.TCheckbutton \
+	  -foreground #D88C46 \
+	  -background #0E2933;
+	ttk::style map warning.dark.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+	image create photo switch-on-danger-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABd0lEQVRIx+3UT0sWURgF8N+MfyJo566wXasMF8HA5CwiCIv2LYP8CrkRRDHElX4Gads+MtoUTA7MpgxbtUuIENwFoi86bu6LbzIDM6Y7z27uc+45z5x778MVzosyzaIyzaL/5UV1GzCCa3X1BlQ4QC8p8qrWIAjfwVNM4WYwaoMefuML3uNn3ygK4qN4jle4h6EOaVYDjVb4jlW8TYr8sJ/fC6yErttiF5/xFce4i0e4hT+Yw5th3MdsR/EtLOBjUuT7AylM4TWyoLkd42Vwb4s9LOFdXxySIj/EJ8zjV9CcifFE+9sCm6Hzo7OFcLCb+BCWpmOMdxCvsJ0U+d8mQlLkvRAhjMcdxM+FGDsd+BEmyjS70UQo02wEk+FzJ8ZG+PW2eIDHZZoN1YhHoT4dljZirONHB4MxLOJZmWbXB8RH8RDLuB001y/ioX3DkYaHdhmjYgtr+qPiTH6XM+xqDurix3WDkaTIqzLNajlJkf/D6xDrFU5xAunSiaU0pJ2KAAAAAElFTkSuQmCC"
+	image create photo switch-off-danger-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSElEQVRIx+3UvyuEcRwH8Nc9d8pENxpkoljopEwWGZQySMofYFLyF+AvsBj8AbLIoETYDBjcxSCDSQZl0W2kw3Dfq+eu6HnkuuXe0+fzfJ/e7z4/3h/aaDUy8aRcLNXCHDoRJeT5xDs+oHu0UC8QiDPowywm0INsQoEKnnGOAzziq3u0IBPIs5jDGgYbK0uBL9xjA/uo5MLDAraQxwtOcBuExzAZ3pK0fAjboc27OQxjPRBcYxWXoWzowBQ2MZCwknzgvMthCf2hhyu4iA+qXCx94ChUs4OuhCL9WIowHT4c4ipO3hCfhSGmwXSE3pCUVNftJ7zhJqVAb9I9/zMiPIW44HdjdWIkJf9ThOOQzGCcOkfH4ylVA6bBcaZcLA1jT3Xq/7Wm8ID5mpMX1RvtVHWgaY1WwyuWsdv0U9H8Yxf/qxnnuo3W4xuTMmSlk8SiNAAAAABJRU5ErkJggg=="
+	image create photo switch-disabled-danger-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create danger.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-danger-default \
+        disabled switch-disabled-danger-default \
+        !selected  switch-off-danger-default };
+    ttk::style layout danger.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			danger.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure danger.default.Roundtoggle.TCheckbutton \
+	  -foreground #CA393C \
+	  -background #ffffff;
+	ttk::style map danger.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	image create photo switch-on-danger-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABd0lEQVRIx+3UT0sWURgF8N+MfyJo566wXasMF8HA5CwiCIv2LYP8CrkRRDHElX4Gads+MtoUTA7MpgxbtUuIENwFoi86bu6LbzIDM6Y7z27uc+45z5x778MVzosyzaIyzaL/5UV1GzCCa3X1BlQ4QC8p8qrWIAjfwVNM4WYwaoMefuML3uNn3ygK4qN4jle4h6EOaVYDjVb4jlW8TYr8sJ/fC6yErttiF5/xFce4i0e4hT+Yw5th3MdsR/EtLOBjUuT7AylM4TWyoLkd42Vwb4s9LOFdXxySIj/EJ8zjV9CcifFE+9sCm6Hzo7OFcLCb+BCWpmOMdxCvsJ0U+d8mQlLkvRAhjMcdxM+FGDsd+BEmyjS70UQo02wEk+FzJ8ZG+PW2eIDHZZoN1YhHoT4dljZirONHB4MxLOJZmWbXB8RH8RDLuB001y/ioX3DkYaHdhmjYgtr+qPiTH6XM+xqDurix3WDkaTIqzLNajlJkf/D6xDrFU5xAunSiaU0pJ2KAAAAAElFTkSuQmCC"
+	image create photo switch-off-danger-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSElEQVRIx+3UvyuEcRwH8Nc9d8qkbpJBJoqFlNJdWWRQyiApf4BJyV+Av8Bi8AfIIoMSYVN3DBKDDCYZdBYr6TDc9+o5Rc8jl+Xe0+fzfJ/e7z4/3h9a+G9k4kmlVK6HObQjSsjzjle8QWex0CgQiDPowTTG0IVsQoEqHnGKPdzjo7NYkAnkWcxgBf1fK0uBD9xiDbuo5sLDHDaQxxOOcB2ERzAe3pK0fACboc3bOQxiNRBcYBlnoWxowwTW0ZewknzgvMlhAb2hh0soxwdVKZXfcBCq2UJHQpFeLESYDB/2cR4n/xKfhCGmwWSE7pBcqq3bd3jBVUqB7qR7/mtEeAjxsJ+N1Y6hlPwPEQ5DMoVRGhwdjyfUDJgGh5lKqTyIHbWp/9Wawh1m606e12i0Y7WBpjVaHc9YxHbTT0Xzj138r2ac6xb+H59Bc2RFbT+w/AAAAABJRU5ErkJggg=="
+	image create photo switch-disabled-danger-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97b4MlYdEgpgladIJgkBVZUASDiOAHWBLETyB2QQSDmMUiBkEUtS2oQXwzGZbEMLBYFdk0bEOU98BFPeFe+HMP93/uOfx9BO0WQ0ZOmDDT8uadYpcQExg0r6RflEBoaqg69uijKIiJLFg33N2WiA8PNhxpZrBkR96zc/ciE6blE74+YlfGQRCPOlRwa821JrLKtgwl7qlbzKgoaFh11ZYVvzsV2deXQCiohGZw4qZ7hSJcqqZomQkN4E7r2/OrWgphINQjQk8Y/2FYzljK/FPoDHMmO263a1kphXAW2lPXb9uUKBaTNWsz8UbU7QUxyx3jLtRSjYMXKw56jkbv4fMl9Vfx/g/4BPE1T+PVYNvrAAAAAElFTkSuQmCC"
+
+    ttk::style element create danger.light.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-danger-light \
+        disabled switch-disabled-danger-light \
+        !selected  switch-off-danger-light };
+    ttk::style layout danger.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			danger.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure danger.light.Roundtoggle.TCheckbutton \
+	  -foreground #CA393C \
+	  -background #f4f4f4;
+	ttk::style map danger.light.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	image create photo switch-on-danger-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABd0lEQVRIx+3UT0sWURgF8N+MfyJo566wXasMF8HA5CwiCIv2LYP8CrkRRDHElX4Gads+MtoUTA7MpgxbtUuIENwFoi86bu6LbzIDM6Y7z27uc+45z5x778MVzosyzaIyzaL/5UV1GzCCa3X1BlQ4QC8p8qrWIAjfwVNM4WYwaoMefuML3uNn3ygK4qN4jle4h6EOaVYDjVb4jlW8TYr8sJ/fC6yErttiF5/xFce4i0e4hT+Yw5th3MdsR/EtLOBjUuT7AylM4TWyoLkd42Vwb4s9LOFdXxySIj/EJ8zjV9CcifFE+9sCm6Hzo7OFcLCb+BCWpmOMdxCvsJ0U+d8mQlLkvRAhjMcdxM+FGDsd+BEmyjS70UQo02wEk+FzJ8ZG+PW2eIDHZZoN1YhHoT4dljZirONHB4MxLOJZmWbXB8RH8RDLuB001y/ioX3DkYaHdhmjYgtr+qPiTH6XM+xqDurix3WDkaTIqzLNajlJkf/D6xDrFU5xAunSiaU0pJ2KAAAAAElFTkSuQmCC"
+	image create photo switch-off-danger-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3Uv0uVYRQH8M9975VcxeElX+TdggJRQsGllhAUhYYG9/4DtyZ//AO2NPQXtDkEgVhbEgVGJCIOTiYauLQa4b0Nz7lwb1C8b3Bx8Tud8zwP38M5z/d7uMF1o9GbPJiY6YYtDCOryNPGT/yC3YO9/gJB3ECJx3iI22hWLHCF73iP1zhBZ/dgTyPIm3iCNdz9s7Ma6OAIG9jCVSsulvECI7jADvaj8AwexV2Vkd/DyxjzqxYmsR4En7GCj9E2DGEOz3GnYicjwXnYLPNiFfMxw6f40J3ft4tzZV60cRxzXcStikVG0c6wEAdv8Il+FfTE7+IT62Ahw3gkXyS5/Q2X+FqzwHhVnf83MpxGfN+/jTWMqZr8pxm2I1nCLH2O7o3nJAPWwXazzIszSeelJNkjnJV50SnzgiTTeWxirAb5MZ61JEOtS0ablhz4VvrQukbr4kdw7g98VQx+2fW+GsS6vsH14zfuBGMdhPIt4AAAAABJRU5ErkJggg=="
+	image create photo switch-disabled-danger-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3UMUscURQF4G9ndRSsBmEgggiCQrRQBMEqTRAUBQsRIaW1TTorxT+QNCn8BTZiIQiS2AnBFEG0EAtBEBFBCyvBIO5azFvYFZSZwGLjqe5973EP975zLu94a5Tqk47ewVrYgnZEOetU8A8PcHd23EgQCpfQgxl8wgeUcxI84gp72MI5qndnx0qheBmzWMHH550VQBUnWMUmHlvCxTx+IME1fuIoEI/ic7jLM/IBrIUxr5c6egeHsIE+/MVX7Ie2oRXj+I7+At2cYq4cJ+kyJsIMF/C7Nr+H2xtxklbC43NMoS0nQScqESbDwTb+0KiCung3fGIRTEboDsmBTG4v4R6HBQm68+r8vxHhIsQjXjdWO4YL1r+IsBOSaYzR4Oj6eFxmwCLYKcdJeinTeQ+GZEa5jJO0GicpmUwn8A1dBYqfYqnm5C8ajfZL9qFFjVbDLRYFo9HEVdH8ZVf/qhnr+h1vjycoYWHciKX1ZAAAAABJRU5ErkJggg=="
+
+    ttk::style element create danger.dark.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-danger-dark \
+        disabled switch-disabled-danger-dark \
+        !selected  switch-off-danger-dark };
+    ttk::style layout danger.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			danger.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure danger.dark.Roundtoggle.TCheckbutton \
+	  -foreground #CA393C \
+	  -background #0E2933;
+	ttk::style map danger.dark.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+	image create photo switch-on-light-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABEUlEQVQ4y82SsUqDQRCEvz35I8I9QSSllYpNqliIgkQbwcbSl0jlC1hpqb1tXsCIlYhpTTSdlQRExHIa85OcjcYTTpLfQtyrbm7n2NkZ+N8lk03C7OuBjFks8U/gjdyHiCBjgW1WKZMlCDlP3HDOgw9goBJ7NFhmJjlnwIDAHUc0/cBk7HNIOdn8whW3jFhkg3meOeAMVXWvkDwd7WgOQCWt61pBPVXRiUbJ9lftajykTGt6VNCpYyu5GWhz6YefFx9ocwHUHZUfpPa8YsDndIGKK2quo5/EjSX5b45nrAB9R4uQpNTYjEVTow60Cq91snEdhrFx00ejyzFNP/hN+Maypo93RMKH2C//gRV160/rHY7Av7izb6YXAAAAAElFTkSuQmCC"
+	image create photo switch-off-light-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAA7klEQVQ4y92SvUoDQRhFz86ssG1Ki+AjRARBRNKIjSh2KXwGH8c0PoC9WAQtbQWJRQpTBCSgYCN2isddi2BQ2RG31DvFNN/h+7kX/r6y2SdATkGoqSl54RXyD0DIWGKPLovEGuCNey444ZYqBzHac2Rp9cMrHdkzSibsc0iLB864JrLKJq3a8R854Bg7jq28dMMo4oLb3iT6jO1g38o7150tjoi7PiWQPk6sPDI47ywWniaASaANXFF+mfaZYcKGdqChAlNg5ZthBcuJ+mlgAOywxnxpYItuAhg0Putn484Z/sa4ptFoGr7G8f4Pegd/TBnikLFeowAAAABJRU5ErkJggg=="
+	image create photo switch-disabled-light-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create light.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-light-default \
+        disabled switch-disabled-light-default \
+        !selected  switch-off-light-default };
+    ttk::style layout light.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			light.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure light.default.Roundtoggle.TCheckbutton \
+	  -foreground #f4f4f4 \
+	  -background #ffffff;
+	ttk::style map light.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	
+	
+	image create photo switch-on-light-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABEUlEQVQ4y82SsUqDQRCEvz35I8I9QSSllYpNqliIgkQbwcbSl0jlC1hpqb1tXsCIlYhpTTSdlQRExHIa85OcjcYTTpLfQtyrbm7n2NkZ+N8lk03C7OuBjFks8U/gjdyHiCBjgW1WKZMlCDlP3HDOgw9goBJ7NFhmJjlnwIDAHUc0/cBk7HNIOdn8whW3jFhkg3meOeAMVXWvkDwd7WgOQCWt61pBPVXRiUbJ9lftajykTGt6VNCpYyu5GWhz6YefFx9ocwHUHZUfpPa8YsDndIGKK2quo5/EjSX5b45nrAB9R4uQpNTYjEVTow60Cq91snEdhrFx00ejyzFNP/hN+Maypo93RMKH2C//gRV160/rHY7Av7izb6YXAAAAAElFTkSuQmCC"
+	image create photo switch-off-light-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABX0lEQVRIx+3UP0tcURAF8N8+n2AVsLSQVAZio4iClY3IIggpQrBYu4Vtg59A8wlsLGzsVBBJIYTIapciSRFEC7GwEotAmrSR1WjxZvG5oLwnJjYeuDBz7+UM8+cMz3hqVPJOtVZvmyl6kBTk+YtztKC5vno7QBBX8BJvMIE+dBUMcImf+IJtnOKqub6qEuRdeIsFvO7MrASucIwP+IjLNB5msYxe/EIThxF4DJPxVqTkg1iJMm+kGMJiEPzAPL5F2tCNKSzhVcFMeoPzKEUDA1HD9/iab1S1Vm/hc2SzhhcFgwygkWA6Lj7he568w96LJpbBdIL+cPZl43YX/uCgZID+onP+YCQ4C3vE/cLqwXBJ/rMEO+HMYJxbis7bUzIBlsFOpVqrD2FL1vXHGlM4wbtUJqhFmdBGZQrclTW0rNDa+B2ch20lb+LCzaqYi1MWnaviPyy7/K9/sa6f8fS4Bp8mXqphYNcQAAAAAElFTkSuQmCC"
+	image create photo switch-disabled-light-dark -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABaUlEQVRIx+3UMUscURQF4G9ndRSsBmEgggiCQrRQBMEqTRAUBQsRIaW1TTorxT+QNCn8BTZiIQiS2AnBFEG0EAtBEBFBCyvBIO5azFvYFZSZwGLjqe5973EP975zLu94a5Tqk47ewVrYgnZEOetU8A8PcHd23EgQCpfQgxl8wgeUcxI84gp72MI5qndnx0qheBmzWMHH550VQBUnWMUmHlvCxTx+IME1fuIoEI/ic7jLM/IBrIUxr5c6egeHsIE+/MVX7Ie2oRXj+I7+At2cYq4cJ+kyJsIMF/C7Nr+H2xtxklbC43NMoS0nQScqESbDwTb+0KiCung3fGIRTEboDsmBTG4v4R6HBQm68+r8vxHhIsQjXjdWO4YL1r+IsBOSaYzR4Oj6eFxmwCLYKcdJeinTeQ+GZEa5jJO0GicpmUwn8A1dBYqfYqnm5C8ajfZL9qFFjVbDLRYFo9HEVdH8ZVf/qhnr+h1vjycoYWHciKX1ZAAAAABJRU5ErkJggg=="
+
+    ttk::style element create light.dark.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-light-dark \
+        disabled switch-disabled-light-dark \
+        !selected  switch-off-light-dark };
+    ttk::style layout light.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			light.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure light.dark.Roundtoggle.TCheckbutton \
+	  -foreground #f4f4f4 \
+	  -background #0E2933;
+	ttk::style map light.dark.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+	image create photo switch-on-dark-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABiUlEQVRIx+3UMWsUcRAF8N/emSyIbHcWKykDLioW2xmxECSaD2Dpl9BGBBEFK/0QttaCESsL0y0aiWwhFiZoJMRmEeRynmvh/zCGPdiNSZfX7czbN/N/wwxH2C+SLI+SLI/+lxc1/YAZxE35KagxxKgqi7qxQBCexzUsIA2F2mCEL3iN5/gwKRQF8Vlcx02cQ7+Dm/WuRmu8wyM8rcpiZ+LfDTwMXbfFFl7hDX7hDC7jFL7iNp4cQ45bHcVXcRcvq7L4scuFBdzHxaC51o8H6R0saT/Qb8HKZ1VZ7EyCw+3NcTxIP+FjeMk8xj1c7SAOK6Hz8d5EGOwKXoTQYg9zHcRrrFVl8X0aoSqLUbAQ5nodxPeFHjY68COcTbL8xDRCkuUzOB8+N3pYDk9viwu4kmR5v0E8CvnFEFrux4N0KwRPtixwHKfxOR6k68PtzZ9BfBaX8MCfZX2PewexaG8xNmXRDuNUrOKxyanY49/hHLuGQR38uZ5SSFUWdZLljZyqLP7hdbD1CH/xG5UDioPKHmDKAAAAAElFTkSuQmCC"
+	image create photo switch-off-dark-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABTElEQVRIx+3Ur0pkcRQH8M9cr2ASJhrEpKBFkRFNU8QgCBtEfAPr4hOoT2Ax+ABiEYMgyq5tgjowiIZlg0kMgmWrIqOGe4SroNy7OFj8pnPu7/L9cv58D9/4alTySaPZeglT9CApyPOIezxAfbL2WiCIKxjAD9TRh66CAm3coIE9XOGpPllTCfIuzGMFw28rK4En/MUadtFO42ERG6jiFr9wEcITmI63Ii0fwWa0eTvFKFaDoIVlnETZ0I0ZrGOoYCXV4PyTYgmD0cOfOM4PqtFsPeAgqtlCb0GRQSwlmI0P+zjNk7+Jj2KIZTCboD+SM9m6vYc7nJcU6C+65/+NBNcRj/vYWD0YK8l/neAwkjlM8crR+XhGZsAyOKw0mq1R7Mim/llrCpdYSGWGWpUZrSZz4G/ZQMsa7QX/gvOi46ei88cu/1cnzvU3vh7P4iNimThSH08AAAAASUVORK5CYII="
+	image create photo switch-disabled-dark-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"
+
+    ttk::style element create dark.default.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-dark-default \
+        disabled switch-disabled-dark-default \
+        !selected  switch-off-dark-default };
+    ttk::style layout dark.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			dark.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure dark.default.Roundtoggle.TCheckbutton \
+	  -foreground #0E2933 \
+	  -background #ffffff;
+	ttk::style map dark.default.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	image create photo switch-on-dark-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABiUlEQVRIx+3UMWsUcRAF8N/emSyIbHcWKykDLioW2xmxECSaD2Dpl9BGBBEFK/0QttaCESsL0y0aiWwhFiZoJMRmEeRynmvh/zCGPdiNSZfX7czbN/N/wwxH2C+SLI+SLI/+lxc1/YAZxE35KagxxKgqi7qxQBCexzUsIA2F2mCEL3iN5/gwKRQF8Vlcx02cQ7+Dm/WuRmu8wyM8rcpiZ+LfDTwMXbfFFl7hDX7hDC7jFL7iNp4cQ45bHcVXcRcvq7L4scuFBdzHxaC51o8H6R0saT/Qb8HKZ1VZ7EyCw+3NcTxIP+FjeMk8xj1c7SAOK6Hz8d5EGOwKXoTQYg9zHcRrrFVl8X0aoSqLUbAQ5nodxPeFHjY68COcTbL8xDRCkuUzOB8+N3pYDk9viwu4kmR5v0E8CvnFEFrux4N0KwRPtixwHKfxOR6k68PtzZ9BfBaX8MCfZX2PewexaG8xNmXRDuNUrOKxyanY49/hHLuGQR38uZ5SSFUWdZLljZyqLP7hdbD1CH/xG5UDioPKHmDKAAAAAElFTkSuQmCC"
+	image create photo switch-off-dark-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABX0lEQVRIx+3UvUpcURQF4G+uV5gqYGkhVgaSxiAKNmohCkIghQSb1LYhT6A+gY2FDyCCiIUgimM1DiQpgjhFSGEVLAI2tgnGn+LuweuAcq+YTOOCA3ufc1ib/bM2z+g0KnmnVm+0zBRVJAV5rvAHFzA9MXY3QBBX0I93GEcvugoGuMQvHGIbP3E9PTGmEuRdmMUCXrVnVgLX+IElbOEyjYc5rKAHZ9hHMwKPYDLeipT8NVajzOspBrEYBN/wCV8ibejGFJbxsmAmPcH5PcU8BqKGH/E536havXGB3chmDS8KBhnAfIKZuNjB1zx5m30QTSyDmQR94RzJxu0+/MZxyQB9Ref80UhwGvaQh4VVxZuS/KcJ9sJ5i1HuKDpvT8kEWAZ7lVq9MYhNWdefakzhBO9TmaAWZUIblimwJmtoWaG1cB6czZaSN/DX7ar4EKcs2lfFf1h2+V//Yl0/o/O4AeXRYRw8iRwUAAAAAElFTkSuQmCC"
+	image create photo switch-disabled-dark-light -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97b4MlYdEgpgladIJgkBVZUASDiOAHWBLETyB2QQSDmMUiBkEUtS2oQXwzGZbEMLBYFdk0bEOU98BFPeFe+HMP93/uOfx9BO0WQ0ZOmDDT8uadYpcQExg0r6RflEBoaqg69uijKIiJLFg33N2WiA8PNhxpZrBkR96zc/ciE6blE74+YlfGQRCPOlRwa821JrLKtgwl7qlbzKgoaFh11ZYVvzsV2deXQCiohGZw4qZ7hSJcqqZomQkN4E7r2/OrWgphINQjQk8Y/2FYzljK/FPoDHMmO263a1kphXAW2lPXb9uUKBaTNWsz8UbU7QUxyx3jLtRSjYMXKw56jkbv4fMl9Vfx/g/4BPE1T+PVYNvrAAAAAElFTkSuQmCC"
+
+    ttk::style element create dark.light.Roundtoggle.TCheckbutton.indicator image { \
+        switch-on-dark-light \
+        disabled switch-disabled-dark-light \
+        !selected  switch-off-dark-light };
+    ttk::style layout dark.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side left -children {
+			dark.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
+            Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style configure dark.light.Roundtoggle.TCheckbutton \
+	  -foreground #0E2933 \
+	  -background #f4f4f4;
+	ttk::style map dark.light.Roundtoggle.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	
+	
+
+	
+    
+	
+	
+    ttk::style configure primary.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #1C4062 \
+	  -foreground #1C4062 \
+	  -background #ffffff;
+	ttk::style map primary.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure primary.light.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #1C4062 \
+	  -foreground #1C4062 \
+	  -background #f4f4f4;
+	ttk::style map primary.light.TRadiobutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure primary.dark.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #1C4062 \
+	  -foreground #1C4062 \
+	  -background #0E2933;
+	ttk::style map primary.dark.TRadiobutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure secondary.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #B6DDE2 \
+	  -foreground #B6DDE2 \
+	  -background #ffffff;
+	ttk::style map secondary.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure secondary.light.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #B6DDE2 \
+	  -foreground #B6DDE2 \
+	  -background #f4f4f4;
+	ttk::style map secondary.light.TRadiobutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure secondary.dark.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #B6DDE2 \
+	  -foreground #B6DDE2 \
+	  -background #0E2933;
+	ttk::style map secondary.dark.TRadiobutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure success.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #50A254 \
+	  -foreground #50A254 \
+	  -background #ffffff;
+	ttk::style map success.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure success.light.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #50A254 \
+	  -foreground #50A254 \
+	  -background #f4f4f4;
+	ttk::style map success.light.TRadiobutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure success.dark.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #50A254 \
+	  -foreground #50A254 \
+	  -background #0E2933;
+	ttk::style map success.dark.TRadiobutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure info.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #009FB9 \
+	  -foreground #009FB9 \
+	  -background #ffffff;
+	ttk::style map info.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure info.light.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #009FB9 \
+	  -foreground #009FB9 \
+	  -background #f4f4f4;
+	ttk::style map info.light.TRadiobutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure info.dark.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #009FB9 \
+	  -foreground #009FB9 \
+	  -background #0E2933;
+	ttk::style map info.dark.TRadiobutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure warning.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #D88C46 \
+	  -foreground #D88C46 \
+	  -background #ffffff;
+	ttk::style map warning.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure warning.light.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #D88C46 \
+	  -foreground #D88C46 \
+	  -background #f4f4f4;
+	ttk::style map warning.light.TRadiobutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure warning.dark.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #D88C46 \
+	  -foreground #D88C46 \
+	  -background #0E2933;
+	ttk::style map warning.dark.TRadiobutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure danger.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #CA393C \
+	  -foreground #CA393C \
+	  -background #ffffff;
+	ttk::style map danger.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure danger.light.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #CA393C \
+	  -foreground #CA393C \
+	  -background #f4f4f4;
+	ttk::style map danger.light.TRadiobutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure danger.dark.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #CA393C \
+	  -foreground #CA393C \
+	  -background #0E2933;
+	ttk::style map danger.dark.TRadiobutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure light.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #f4f4f4 \
+	  -foreground #f4f4f4 \
+	  -background #ffffff;
+	ttk::style map light.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	
+	
+    ttk::style configure light.dark.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #f4f4f4 \
+	  -foreground #f4f4f4 \
+	  -background #0E2933;
+	ttk::style map light.dark.TRadiobutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure dark.default.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #0E2933 \
+	  -foreground #0E2933 \
+	  -background #ffffff;
+	ttk::style map dark.default.TRadiobutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure dark.light.TRadiobutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #0E2933 \
+	  -foreground #0E2933 \
+	  -background #f4f4f4;
+	ttk::style map dark.light.TRadiobutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	
+	
+
 }
-}
-ttk::style configure TLabelframe -relief raised -borderwidth 1 -bordercolor #ced4da -lightcolor #ffffff -darkcolor #ffffff;
-ttk::style layout TLabelframe {
-Labelframe.border -sticky nswe
-}
-ttk::style configure primary.TLabelframe -background #1c4c72 -lightcolor #1c4c72 -darkcolor #1c4c72;
-ttk::style configure primary.TLabelframe.Label -foreground #ffffff -background #1c4c72 -lightcolor #1c4c72 -darkcolor #1c4c72;
-ttk::style configure secondary.TLabelframe -background #d3d5d7 -lightcolor #d3d5d7 -darkcolor #d3d5d7;
-ttk::style configure secondary.TLabelframe.Label -foreground #ffffff -background #d3d5d7 -lightcolor #d3d5d7 -darkcolor #d3d5d7;
-ttk::style configure success.TLabelframe -background #43ac6a -lightcolor #43ac6a -darkcolor #43ac6a;
-ttk::style configure success.TLabelframe.Label -foreground #ffffff -background #43ac6a -lightcolor #43ac6a -darkcolor #43ac6a;
-ttk::style configure info.TLabelframe -background #5bc0de -lightcolor #5bc0de -darkcolor #5bc0de;
-ttk::style configure info.TLabelframe.Label -foreground #ffffff -background #5bc0de -lightcolor #5bc0de -darkcolor #5bc0de;
-ttk::style configure warning.TLabelframe -background #E99002 -lightcolor #E99002 -darkcolor #E99002;
-ttk::style configure warning.TLabelframe.Label -foreground #ffffff -background #E99002 -lightcolor #E99002 -darkcolor #E99002;
-ttk::style configure danger.TLabelframe -background #d02b27 -lightcolor #d02b27 -darkcolor #d02b27;
-ttk::style configure danger.TLabelframe.Label -foreground #ffffff -background #d02b27 -lightcolor #d02b27 -darkcolor #d02b27;
-ttk::style element create Spinbox.uparrow from {default} 
-ttk::style element create Spinbox.downarrow from {default} 
-ttk::style configure TSpinbox -bordercolor #ced4da -darkcolor #ecf0f1 -lightcolor #ecf0f1 -fieldbackground #ecf0f1 -foreground #212529 -borderwidth 0 -background #ecf0f1 -relief flat -arrowcolor #212529 -arrowsize 14 -padding {10 5};
-ttk::style map TSpinbox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #1c4c72 {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -arrowcolor {{disabled !disabled} #bdbfc1 {pressed !disabled} #1c4c72 {focus !disabled} #212529 {hover !disabled} #212529};
-ttk::style layout TSpinbox {
-custom.Spinbox.field -side top -sticky we -children {
-  null -side right -sticky {} -children {
-    Spinbox.uparrow -side top -sticky e
-    Spinbox.downarrow -side bottom -sticky e
-  }
-  Spinbox.padding -sticky nswe -children {
-    Spinbox.textarea -sticky nswe
-  }
-}
-}
-ttk::style map primary.TSpinbox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -arrowcolor {{disabled !disabled} #bdbfc1 {pressed !disabled} #1c4c72 {hover !disabled} #212529} -lightcolor {{focus !disabled} #1c4c72} -darkcolor {{focus !disabled} #1c4c72};
-ttk::style map secondary.TSpinbox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d3d5d7 {hover !disabled} #d3d5d7} -arrowcolor {{disabled !disabled} #bdbfc1 {pressed !disabled} #d3d5d7 {hover !disabled} #212529} -lightcolor {{focus !disabled} #d3d5d7} -darkcolor {{focus !disabled} #d3d5d7};
-ttk::style map success.TSpinbox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #43ac6a {hover !disabled} #43ac6a} -arrowcolor {{disabled !disabled} #bdbfc1 {pressed !disabled} #43ac6a {hover !disabled} #212529} -lightcolor {{focus !disabled} #43ac6a} -darkcolor {{focus !disabled} #43ac6a};
-ttk::style map info.TSpinbox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #5bc0de {hover !disabled} #5bc0de} -arrowcolor {{disabled !disabled} #bdbfc1 {pressed !disabled} #5bc0de {hover !disabled} #212529} -lightcolor {{focus !disabled} #5bc0de} -darkcolor {{focus !disabled} #5bc0de};
-ttk::style map warning.TSpinbox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #E99002 {hover !disabled} #E99002} -arrowcolor {{disabled !disabled} #bdbfc1 {pressed !disabled} #E99002 {hover !disabled} #212529} -lightcolor {{focus !disabled} #E99002} -darkcolor {{focus !disabled} #E99002};
-ttk::style map danger.TSpinbox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d02b27 {hover !disabled} #d02b27} -arrowcolor {{disabled !disabled} #bdbfc1 {pressed !disabled} #d02b27 {hover !disabled} #212529} -lightcolor {{focus !disabled} #d02b27} -darkcolor {{focus !disabled} #d02b27};
-ttk::style layout Horizontal.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Horizontal.Scale.track -sticky we
-  Horizontal.Scale.slider -side left -sticky {}
-}
-}
-ttk::style layout Vertical.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Vertical.Scale.track -sticky ns
-  Vertical.Scale.slider -side top -sticky {}
-}
-}
-ttk::style element create Horizontal.Scale.track image {minarca_pyimage5 } 
-ttk::style element create Vertical.Scale.track image {minarca_pyimage6 } 
-ttk::style element create Scale.slider image {minarca_pyimage2 disabled minarca_pyimage1 {pressed !disabled} minarca_pyimage3 {hover !disabled} minarca_pyimage4} 
-ttk::style layout primary.Horizontal.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Horizontal.Scale.track -sticky we
-  primary.Scale.slider -side left -sticky {}
-}
-}
-ttk::style layout primary.Vertical.TScale {
-primary.Scale.focus -expand 1 -sticky nswe -children {
-  Vertical.Scale.track -sticky ns
-  primary.Scale.slider -side top -sticky {}
-}
-}
-ttk::style element create primary.Scale.slider image {minarca_pyimage7 disabled minarca_pyimage1 pressed minarca_pyimage8 hover minarca_pyimage9} 
-ttk::style layout secondary.Horizontal.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Horizontal.Scale.track -sticky we
-  secondary.Scale.slider -side left -sticky {}
-}
-}
-ttk::style layout secondary.Vertical.TScale {
-secondary.Scale.focus -expand 1 -sticky nswe -children {
-  Vertical.Scale.track -sticky ns
-  secondary.Scale.slider -side top -sticky {}
-}
-}
-ttk::style element create secondary.Scale.slider image {minarca_pyimage10 disabled minarca_pyimage1 pressed minarca_pyimage11 hover minarca_pyimage12} 
-ttk::style layout success.Horizontal.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Horizontal.Scale.track -sticky we
-  success.Scale.slider -side left -sticky {}
-}
-}
-ttk::style layout success.Vertical.TScale {
-success.Scale.focus -expand 1 -sticky nswe -children {
-  Vertical.Scale.track -sticky ns
-  success.Scale.slider -side top -sticky {}
-}
-}
-ttk::style element create success.Scale.slider image {minarca_pyimage13 disabled minarca_pyimage1 pressed minarca_pyimage14 hover minarca_pyimage15} 
-ttk::style layout info.Horizontal.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Horizontal.Scale.track -sticky we
-  info.Scale.slider -side left -sticky {}
-}
-}
-ttk::style layout info.Vertical.TScale {
-info.Scale.focus -expand 1 -sticky nswe -children {
-  Vertical.Scale.track -sticky ns
-  info.Scale.slider -side top -sticky {}
-}
-}
-ttk::style element create info.Scale.slider image {minarca_pyimage16 disabled minarca_pyimage1 pressed minarca_pyimage17 hover minarca_pyimage18} 
-ttk::style layout warning.Horizontal.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Horizontal.Scale.track -sticky we
-  warning.Scale.slider -side left -sticky {}
-}
-}
-ttk::style layout warning.Vertical.TScale {
-warning.Scale.focus -expand 1 -sticky nswe -children {
-  Vertical.Scale.track -sticky ns
-  warning.Scale.slider -side top -sticky {}
-}
-}
-ttk::style element create warning.Scale.slider image {minarca_pyimage19 disabled minarca_pyimage1 pressed minarca_pyimage20 hover minarca_pyimage21} 
-ttk::style layout danger.Horizontal.TScale {
-Scale.focus -expand 1 -sticky nswe -children {
-  Horizontal.Scale.track -sticky we
-  danger.Scale.slider -side left -sticky {}
-}
-}
-ttk::style layout danger.Vertical.TScale {
-danger.Scale.focus -expand 1 -sticky nswe -children {
-  Vertical.Scale.track -sticky ns
-  danger.Scale.slider -side top -sticky {}
-}
-}
-ttk::style element create danger.Scale.slider image {minarca_pyimage22 disabled minarca_pyimage1 pressed minarca_pyimage23 hover minarca_pyimage24} 
-ttk::style element create Vertical.Scrollbar.trough from {alt} 
-ttk::style element create Vertical.Scrollbar.thumb from {alt} 
-ttk::style element create Vertical.Scrollbar.uparrow image {minarca_pyimage25 } 
-ttk::style element create Vertical.Scrollbar.downarrow image {minarca_pyimage26 } 
-ttk::style element create Horizontal.Scrollbar.trough from {alt} 
-ttk::style element create Horizontal.Scrollbar.thumb from {alt} 
-ttk::style element create Horizontal.Scrollbar.leftarrow image {minarca_pyimage27 } 
-ttk::style element create Horizontal.Scrollbar.rightarrow image {minarca_pyimage28 } 
-ttk::style configure TScrollbar -troughrelief flat -relief flat -troughborderwidth 2 -troughcolor #f2f2f2 -background #d8d8d8 -width 16;
-ttk::style map TScrollbar -background {pressed #a5a5a5 active #bfbfbf};
-ttk::style element create Combobox.downarrow from {default} 
-ttk::style element create Combobox.padding from {clam} 
-ttk::style element create Combobox.textarea from {clam} 
-ttk::style configure TCombobox -bordercolor #ced4da -darkcolor #ecf0f1 -lightcolor #ecf0f1 -arrowcolor #212529 -foreground #212529 -fieldbackground  #ecf0f1 -background  #ecf0f1 -relief flat -borderwidth  0 -padding 5 -arrowsize  14;
-ttk::style map TCombobox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #1c4c72 {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ecf0f1 {focus !disabled} #212529 {hover !disabled} #1c4c72};
-ttk::style layout TCombobox {
-combo.Spinbox.field -side top -sticky we -children {
-  Combobox.downarrow -side right -sticky ns
-  Combobox.padding -expand 1 -sticky nswe -children {
-    Combobox.textarea -sticky nswe
-  }
-}
-}
-ttk::style map primary.TCombobox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -lightcolor {{focus !disabled} #1c4c72 {pressed !disabled} #1c4c72} -darkcolor {{focus !disabled} #1c4c72 {pressed !disabled} #1c4c72} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ecf0f1 {focus !disabled} #212529 {hover !disabled} #1c4c72};
-ttk::style map secondary.TCombobox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d3d5d7 {hover !disabled} #d3d5d7} -lightcolor {{focus !disabled} #d3d5d7 {pressed !disabled} #d3d5d7} -darkcolor {{focus !disabled} #d3d5d7 {pressed !disabled} #d3d5d7} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ecf0f1 {focus !disabled} #212529 {hover !disabled} #1c4c72};
-ttk::style map success.TCombobox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #43ac6a {hover !disabled} #43ac6a} -lightcolor {{focus !disabled} #43ac6a {pressed !disabled} #43ac6a} -darkcolor {{focus !disabled} #43ac6a {pressed !disabled} #43ac6a} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ecf0f1 {focus !disabled} #212529 {hover !disabled} #1c4c72};
-ttk::style map info.TCombobox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #5bc0de {hover !disabled} #5bc0de} -lightcolor {{focus !disabled} #5bc0de {pressed !disabled} #5bc0de} -darkcolor {{focus !disabled} #5bc0de {pressed !disabled} #5bc0de} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ecf0f1 {focus !disabled} #212529 {hover !disabled} #1c4c72};
-ttk::style map warning.TCombobox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #E99002 {hover !disabled} #E99002} -lightcolor {{focus !disabled} #E99002 {pressed !disabled} #E99002} -darkcolor {{focus !disabled} #E99002 {pressed !disabled} #E99002} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ecf0f1 {focus !disabled} #212529 {hover !disabled} #1c4c72};
-ttk::style map danger.TCombobox -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d02b27 {hover !disabled} #d02b27} -lightcolor {{focus !disabled} #d02b27 {pressed !disabled} #d02b27} -darkcolor {{focus !disabled} #d02b27 {pressed !disabled} #d02b27} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ecf0f1 {focus !disabled} #212529 {hover !disabled} #1c4c72};
-ttk::style configure exit.TButton -relief flat -font {helvetica 12};
-ttk::style map exit.TButton -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #d02b27};
-ttk::style configure exit.primary.TButton -relief flat -font {helvetica 12};
-ttk::style map exit.primary.TButton -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #d02b27};
-ttk::style configure exit.secondary.TButton -relief flat -font {helvetica 12};
-ttk::style map exit.secondary.TButton -background {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #d02b27};
-ttk::style configure exit.success.TButton -relief flat -font {helvetica 12};
-ttk::style map exit.success.TButton -background {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #d02b27};
-ttk::style configure exit.info.TButton -relief flat -font {helvetica 12};
-ttk::style map exit.info.TButton -background {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #d02b27};
-ttk::style configure exit.warning.TButton -relief flat -font {helvetica 12};
-ttk::style map exit.warning.TButton -background {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d02b27};
-ttk::style configure exit.danger.TButton -relief flat -font {helvetica 12};
-ttk::style map exit.danger.TButton -background {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #d02b27};
-ttk::style configure TFrame -background #ffffff;
-ttk::style configure primary.TFrame -background #1c4c72;
-ttk::style configure secondary.TFrame -background #d3d5d7;
-ttk::style configure success.TFrame -background #43ac6a;
-ttk::style configure info.TFrame -background #5bc0de;
-ttk::style configure warning.TFrame -background #E99002;
-ttk::style configure danger.TFrame -background #d02b27;
-ttk::style configure TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -borderwidth 1 -anchor center -padding {10 5};
-ttk::style map TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72};
-ttk::style layout TCalendar {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    Toolbutton.label -sticky nswe
-  }
-}
-}
-ttk::style configure chevron.TButton -font {helvetica 14};
-ttk::style configure primary.TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map primary.TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72};
-ttk::style configure chevron.primary.TButton -font {helvetica 14};
-ttk::style configure secondary.TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map secondary.TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7} -darkcolor {{pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7} -lightcolor {{pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7};
-ttk::style configure chevron.secondary.TButton -font {helvetica 14};
-ttk::style configure success.TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map success.TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a} -bordercolor {disabled #bdbfc1 {pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a} -darkcolor {{pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a} -lightcolor {{pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a};
-ttk::style configure chevron.success.TButton -font {helvetica 14};
-ttk::style configure info.TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map info.TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de} -bordercolor {disabled #bdbfc1 {pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de} -darkcolor {{pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de} -lightcolor {{pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de};
-ttk::style configure chevron.info.TButton -font {helvetica 14};
-ttk::style configure warning.TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map warning.TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002} -darkcolor {{pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002} -lightcolor {{pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002};
-ttk::style configure chevron.warning.TButton -font {helvetica 14};
-ttk::style configure danger.TCalendar -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map danger.TCalendar -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -darkcolor {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -lightcolor {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27};
-ttk::style configure chevron.danger.TButton -font {helvetica 14};
-ttk::style element create Checkbutton.indicator image {minarca_pyimage30 disabled minarca_pyimage31 !selected minarca_pyimage29} -width 20 -border 4 -sticky w
-ttk::style configure TCheckbutton -foreground #212529 -background #ffffff -focuscolor {};
-ttk::style map TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #1c4c72};
-ttk::style layout TCheckbutton {
-Checkbutton.padding -sticky nswe -children {
-  primary.Checkbutton.indicator -side left -sticky {}
-  Checkbutton.focus -side left -sticky {} -children {
-    Checkbutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create primary.Checkbutton.indicator image {minarca_pyimage33 disabled minarca_pyimage34 !selected minarca_pyimage32} -width 20 -border 4 -sticky w
-ttk::style map primary.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #163d5b};
-ttk::style layout primary.TCheckbutton {
-Checkbutton.padding -sticky nswe -children {
-  primary.Checkbutton.indicator -side left -sticky {}
-  Checkbutton.focus -side left -sticky {} -children {
-    Checkbutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create secondary.Checkbutton.indicator image {minarca_pyimage36 disabled minarca_pyimage37 !selected minarca_pyimage35} -width 20 -border 4 -sticky w
-ttk::style map secondary.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #a9abab};
-ttk::style layout secondary.TCheckbutton {
-Checkbutton.padding -sticky nswe -children {
-  secondary.Checkbutton.indicator -side left -sticky {}
-  Checkbutton.focus -side left -sticky {} -children {
-    Checkbutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create success.Checkbutton.indicator image {minarca_pyimage39 disabled minarca_pyimage40 !selected minarca_pyimage38} -width 20 -border 4 -sticky w
-ttk::style map success.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #358855};
-ttk::style layout success.TCheckbutton {
-Checkbutton.padding -sticky nswe -children {
-  success.Checkbutton.indicator -side left -sticky {}
-  Checkbutton.focus -side left -sticky {} -children {
-    Checkbutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create info.Checkbutton.indicator image {minarca_pyimage42 disabled minarca_pyimage43 !selected minarca_pyimage41} -width 20 -border 4 -sticky w
-ttk::style map info.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #4999b1};
-ttk::style layout info.TCheckbutton {
-Checkbutton.padding -sticky nswe -children {
-  info.Checkbutton.indicator -side left -sticky {}
-  Checkbutton.focus -side left -sticky {} -children {
-    Checkbutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create warning.Checkbutton.indicator image {minarca_pyimage45 disabled minarca_pyimage46 !selected minarca_pyimage44} -width 20 -border 4 -sticky w
-ttk::style map warning.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #b97202};
-ttk::style layout warning.TCheckbutton {
-Checkbutton.padding -sticky nswe -children {
-  warning.Checkbutton.indicator -side left -sticky {}
-  Checkbutton.focus -side left -sticky {} -children {
-    Checkbutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create danger.Checkbutton.indicator image {minarca_pyimage48 disabled minarca_pyimage49 !selected minarca_pyimage47} -width 20 -border 4 -sticky w
-ttk::style map danger.TCheckbutton -foreground {disabled #bdbfc1 {active !disabled} #a7221e};
-ttk::style layout danger.TCheckbutton {
-Checkbutton.padding -sticky nswe -children {
-  danger.Checkbutton.indicator -side left -sticky {}
-  Checkbutton.focus -side left -sticky {} -children {
-    Checkbutton.label -sticky nswe
-  }
-}
-}
-ttk::style configure TEntry -bordercolor #ced4da -darkcolor #ecf0f1 -lightcolor #ecf0f1 -fieldbackground #ecf0f1 -foreground #212529 -borderwidth 0 -padding 5;
-ttk::style map TEntry -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #1c4c72 {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72};
-ttk::style map primary.TEntry -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #1c4c72 {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {{focus !disabled} #1c4c72 {hover !disabled} #1c4c72};
-ttk::style map secondary.TEntry -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d3d5d7 {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #d3d5d7 {hover !disabled} #d3d5d7} -darkcolor {{focus !disabled} #d3d5d7 {hover !disabled} #d3d5d7};
-ttk::style map success.TEntry -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #43ac6a {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #43ac6a {hover !disabled} #43ac6a} -darkcolor {{focus !disabled} #43ac6a {hover !disabled} #43ac6a};
-ttk::style map info.TEntry -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #5bc0de {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #5bc0de {hover !disabled} #5bc0de} -darkcolor {{focus !disabled} #5bc0de {hover !disabled} #5bc0de};
-ttk::style map warning.TEntry -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #E99002 {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #E99002 {hover !disabled} #E99002} -darkcolor {{focus !disabled} #E99002 {hover !disabled} #E99002};
-ttk::style map danger.TEntry -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d02b27 {hover !disabled} #ffffff} -lightcolor {{focus !disabled} #d02b27 {hover !disabled} #d02b27} -darkcolor {{focus !disabled} #d02b27 {hover !disabled} #d02b27};
-ttk::style configure TLabel -foreground #212529 -background #ffffff;
-ttk::style configure Inverse.TLabel -foreground #ffffff -background #212529;
-ttk::style configure primary.TLabel -foreground #1c4c72;
-ttk::style configure primary.Inverse.TLabel -foreground #ffffff -background #1c4c72;
-ttk::style configure primary.Invert.TLabel -foreground #ffffff -background #1c4c72;
-ttk::style configure secondary.TLabel -foreground #d3d5d7;
-ttk::style configure secondary.Inverse.TLabel -foreground #ffffff -background #d3d5d7;
-ttk::style configure secondary.Invert.TLabel -foreground #ffffff -background #d3d5d7;
-ttk::style configure success.TLabel -foreground #43ac6a;
-ttk::style configure success.Inverse.TLabel -foreground #ffffff -background #43ac6a;
-ttk::style configure success.Invert.TLabel -foreground #ffffff -background #43ac6a;
-ttk::style configure info.TLabel -foreground #5bc0de;
-ttk::style configure info.Inverse.TLabel -foreground #ffffff -background #5bc0de;
-ttk::style configure info.Invert.TLabel -foreground #ffffff -background #5bc0de;
-ttk::style configure warning.TLabel -foreground #E99002;
-ttk::style configure warning.Inverse.TLabel -foreground #ffffff -background #E99002;
-ttk::style configure warning.Invert.TLabel -foreground #ffffff -background #E99002;
-ttk::style configure danger.TLabel -foreground #d02b27;
-ttk::style configure danger.Inverse.TLabel -foreground #ffffff -background #d02b27;
-ttk::style configure danger.Invert.TLabel -foreground #ffffff -background #d02b27;
-ttk::style configure TMeter -foreground #212529 -background #ffffff;
-ttk::style layout TMeter {
-Label.border -sticky nswe -border 1 -children {
-  Label.padding -sticky nswe -border 1 -children {
-    Label.label -sticky nswe
-  }
-}
-}
-ttk::style configure primary.TMeter -foreground #1c4c72;
-ttk::style configure secondary.TMeter -foreground #d3d5d7;
-ttk::style configure success.TMeter -foreground #43ac6a;
-ttk::style configure info.TMeter -foreground #5bc0de;
-ttk::style configure warning.TMeter -foreground #E99002;
-ttk::style configure danger.TMeter -foreground #d02b27;
-ttk::style configure TNotebook -bordercolor #ced4da -lightcolor #ffffff -darkcolor #ffffff -borderwidth 1;
-ttk::style configure TNotebook.Tab -bordercolor #ced4da -lightcolor #ffffff -foreground #212529 -padding {10 5};
-ttk::style map TNotebook.Tab -background {!selected #ecf0f1} -lightcolor {!selected #ecf0f1} -darkcolor {!selected #ecf0f1} -bordercolor {!selected #ced4da} -foreground {!selected #212529};
-ttk::style configure Outline.TButton -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72};
-ttk::style configure primary.Outline.TButton -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map primary.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {hover !disabled} #1c4c72};
-ttk::style configure secondary.Outline.TButton -foreground #d3d5d7 -background #ffffff -bordercolor #d3d5d7 -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map secondary.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bec0c0 {hover !disabled} #d3d5d7} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bec0c0 {hover !disabled} #d3d5d7} -darkcolor {{pressed !disabled} #bec0c0 {hover !disabled} #d3d5d7} -lightcolor {{pressed !disabled} #bec0c0 {hover !disabled} #d3d5d7};
-ttk::style configure success.Outline.TButton -foreground #43ac6a -background #ffffff -bordercolor #43ac6a -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map success.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #3b9960 {hover !disabled} #43ac6a} -bordercolor {disabled #bdbfc1 {pressed !disabled} #3b9960 {hover !disabled} #43ac6a} -darkcolor {{pressed !disabled} #3b9960 {hover !disabled} #43ac6a} -lightcolor {{pressed !disabled} #3b9960 {hover !disabled} #43ac6a};
-ttk::style configure info.Outline.TButton -foreground #5bc0de -background #ffffff -bordercolor #5bc0de -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map info.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #52acc7 {hover !disabled} #5bc0de} -bordercolor {disabled #bdbfc1 {pressed !disabled} #52acc7 {hover !disabled} #5bc0de} -darkcolor {{pressed !disabled} #52acc7 {hover !disabled} #5bc0de} -lightcolor {{pressed !disabled} #52acc7 {hover !disabled} #5bc0de};
-ttk::style configure warning.Outline.TButton -foreground #E99002 -background #ffffff -bordercolor #E99002 -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map warning.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #d08002 {hover !disabled} #E99002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #d08002 {hover !disabled} #E99002} -darkcolor {{pressed !disabled} #d08002 {hover !disabled} #E99002} -lightcolor {{pressed !disabled} #d08002 {hover !disabled} #E99002};
-ttk::style configure danger.Outline.TButton -foreground #d02b27 -background #ffffff -bordercolor #d02b27 -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map danger.Outline.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bc2722 {hover !disabled} #d02b27} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bc2722 {hover !disabled} #d02b27} -darkcolor {{pressed !disabled} #bc2722 {hover !disabled} #d02b27} -lightcolor {{pressed !disabled} #bc2722 {hover !disabled} #d02b27};
-ttk::style configure Outline.TMenubutton -font {Helvetica -16} -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #1c4c72 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure primary.Outline.TMenubutton -foreground #1c4c72 -background #ffffff -bordercolor #1c4c72 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #1c4c72 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map primary.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {{pressed !disabled} #163d5b {hover !disabled} #194467} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure secondary.Outline.TMenubutton -foreground #d3d5d7 -background #ffffff -bordercolor #d3d5d7 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #d3d5d7 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map secondary.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #a9abab {hover !disabled} #bec0c0} -bordercolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -darkcolor {{pressed !disabled} #a9abab {hover !disabled} #bec0c0} -lightcolor {{pressed !disabled} #a9abab {hover !disabled} #bec0c0} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure success.Outline.TMenubutton -foreground #43ac6a -background #ffffff -bordercolor #43ac6a -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #43ac6a -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map success.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #358855 {hover !disabled} #3b9960} -bordercolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -darkcolor {{pressed !disabled} #358855 {hover !disabled} #3b9960} -lightcolor {{pressed !disabled} #358855 {hover !disabled} #3b9960} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure info.Outline.TMenubutton -foreground #5bc0de -background #ffffff -bordercolor #5bc0de -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #5bc0de -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map info.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #4999b1 {hover !disabled} #52acc7} -bordercolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -darkcolor {{pressed !disabled} #4999b1 {hover !disabled} #52acc7} -lightcolor {{pressed !disabled} #4999b1 {hover !disabled} #52acc7} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure warning.Outline.TMenubutton -foreground #E99002 -background #ffffff -bordercolor #E99002 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #E99002 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map warning.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #b97202 {hover !disabled} #d08002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -darkcolor {{pressed !disabled} #b97202 {hover !disabled} #d08002} -lightcolor {{pressed !disabled} #b97202 {hover !disabled} #d08002} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure danger.Outline.TMenubutton -foreground #d02b27 -background #ffffff -bordercolor #d02b27 -darkcolor #ffffff -lightcolor #ffffff -arrowcolor #d02b27 -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map danger.Outline.TMenubutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #a7221e {hover !disabled} #bc2722} -bordercolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -darkcolor {{pressed !disabled} #a7221e {hover !disabled} #bc2722} -lightcolor {{pressed !disabled} #a7221e {hover !disabled} #bc2722} -arrowcolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure Outline.Toolbutton -foreground #1c4c72 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72};
-ttk::style configure primary.Outline.Toolbutton -foreground #1c4c72 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map primary.Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -darkcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72} -lightcolor {{pressed !disabled} #194467 {selected !disabled} #194467 {hover !disabled} #1c4c72};
-ttk::style configure secondary.Outline.Toolbutton -foreground #d3d5d7 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map secondary.Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7} -darkcolor {{pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7} -lightcolor {{pressed !disabled} #bec0c0 {selected !disabled} #bec0c0 {hover !disabled} #d3d5d7};
-ttk::style configure success.Outline.Toolbutton -foreground #43ac6a -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map success.Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a} -bordercolor {disabled #bdbfc1 {pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a} -darkcolor {{pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a} -lightcolor {{pressed !disabled} #3b9960 {selected !disabled} #3b9960 {hover !disabled} #43ac6a};
-ttk::style configure info.Outline.Toolbutton -foreground #5bc0de -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map info.Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de} -bordercolor {disabled #bdbfc1 {pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de} -darkcolor {{pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de} -lightcolor {{pressed !disabled} #52acc7 {selected !disabled} #52acc7 {hover !disabled} #5bc0de};
-ttk::style configure warning.Outline.Toolbutton -foreground #E99002 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map warning.Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002} -darkcolor {{pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002} -lightcolor {{pressed !disabled} #d08002 {selected !disabled} #d08002 {hover !disabled} #E99002};
-ttk::style configure danger.Outline.Toolbutton -foreground #d02b27 -background #ffffff -bordercolor #ced4da -darkcolor #ffffff -lightcolor #ffffff -relief raised -focusthickness 0 -focuscolor {} -borderwidth 1 -padding {10 5};
-ttk::style map danger.Outline.Toolbutton -foreground {disabled #bdbfc1 {pressed !disabled} #ffffff {selected !disabled} #ffffff {hover !disabled} #ffffff} -background {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -bordercolor {disabled #bdbfc1 {pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -darkcolor {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27} -lightcolor {{pressed !disabled} #bc2722 {selected !disabled} #bc2722 {hover !disabled} #d02b27};
-ttk::style element create Progressbar.trough from {clam} 
-ttk::style element create Progressbar.pbar from {default} 
-ttk::style configure TProgressbar -thickness 20 -borderwidth 1 -bordercolor #ced4da -lightcolor #ced4da -pbarrelief flat -troughcolor #ecf0f1 -background #1c4c72;
-ttk::style configure primary.Horizontal.TProgressbar -background #1c4c72;
-ttk::style configure primary.Vertical.TProgressbar -background #1c4c72;
-ttk::style configure secondary.Horizontal.TProgressbar -background #d3d5d7;
-ttk::style configure secondary.Vertical.TProgressbar -background #d3d5d7;
-ttk::style configure success.Horizontal.TProgressbar -background #43ac6a;
-ttk::style configure success.Vertical.TProgressbar -background #43ac6a;
-ttk::style configure info.Horizontal.TProgressbar -background #5bc0de;
-ttk::style configure info.Vertical.TProgressbar -background #5bc0de;
-ttk::style configure warning.Horizontal.TProgressbar -background #E99002;
-ttk::style configure warning.Vertical.TProgressbar -background #E99002;
-ttk::style configure danger.Horizontal.TProgressbar -background #d02b27;
-ttk::style configure danger.Vertical.TProgressbar -background #d02b27;
-ttk::style element create Striped.Horizontal.Progressbar.pbar image {minarca_pyimage50 } -width 20 -sticky ew
-ttk::style configure Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
-ttk::style layout Striped.Horizontal.TProgressbar {
-Horizontal.Progressbar.trough -sticky nswe -children {
-  Striped.Horizontal.Progressbar.pbar -side left -sticky ns
-}
-}
-ttk::style element create primary.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage51 } -width 20 -sticky ew
-ttk::style configure primary.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
-ttk::style layout primary.Striped.Horizontal.TProgressbar {
-Horizontal.Progressbar.trough -sticky nswe -children {
-  primary.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
-}
-}
-ttk::style element create secondary.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage52 } -width 20 -sticky ew
-ttk::style configure secondary.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
-ttk::style layout secondary.Striped.Horizontal.TProgressbar {
-Horizontal.Progressbar.trough -sticky nswe -children {
-  secondary.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
-}
-}
-ttk::style element create success.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage53 } -width 20 -sticky ew
-ttk::style configure success.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
-ttk::style layout success.Striped.Horizontal.TProgressbar {
-Horizontal.Progressbar.trough -sticky nswe -children {
-  success.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
-}
-}
-ttk::style element create info.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage54 } -width 20 -sticky ew
-ttk::style configure info.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
-ttk::style layout info.Striped.Horizontal.TProgressbar {
-Horizontal.Progressbar.trough -sticky nswe -children {
-  info.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
-}
-}
-ttk::style element create warning.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage55 } -width 20 -sticky ew
-ttk::style configure warning.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
-ttk::style layout warning.Striped.Horizontal.TProgressbar {
-Horizontal.Progressbar.trough -sticky nswe -children {
-  warning.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
-}
-}
-ttk::style element create danger.Striped.Horizontal.Progressbar.pbar image {minarca_pyimage56 } -width 20 -sticky ew
-ttk::style configure danger.Striped.Horizontal.TProgressbar -troughcolor #ecf0f1 -thickness 20 -borderwidth 1 -lightcolor #ced4da;
-ttk::style layout danger.Striped.Horizontal.TProgressbar {
-Horizontal.Progressbar.trough -sticky nswe -children {
-  danger.Striped.Horizontal.Progressbar.pbar -side left -sticky ns
-}
-}
-ttk::style element create Floodgauge.trough from {clam} 
-ttk::style element create Floodgauge.pbar from {default} 
-ttk::style configure Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #1c4c72 -lightcolor #1c4c72 -pbarrelief flat -troughcolor #619ece -background #1c4c72 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style layout Horizontal.TFloodgauge {
-Floodgauge.trough -sticky nswe -children {
-  Floodgauge.pbar -sticky ns
-  Floodgauge.label -sticky {}
-}
-}
-ttk::style configure Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #1c4c72 -lightcolor #1c4c72 -pbarrelief flat -troughcolor #619ece -background #1c4c72 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style layout Vertical.TFloodgauge {
-Floodgauge.trough -sticky nswe -children {
-  Floodgauge.pbar -sticky we
-  Floodgauge.label -sticky {}
-}
-}
-ttk::style configure primary.Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #1c4c72 -lightcolor #1c4c72 -pbarrelief flat -troughcolor #619ece -background #1c4c72 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure primary.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #1c4c72 -lightcolor #1c4c72 -pbarrelief flat -troughcolor #619ece -background #1c4c72 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure secondary.Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #d3d5d7 -lightcolor #d3d5d7 -pbarrelief flat -troughcolor #f0f2f2 -background #d3d5d7 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure secondary.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #d3d5d7 -lightcolor #d3d5d7 -pbarrelief flat -troughcolor #f0f2f2 -background #d3d5d7 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure success.Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #43ac6a -lightcolor #43ac6a -pbarrelief flat -troughcolor #8af2b2 -background #43ac6a -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure success.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #43ac6a -lightcolor #43ac6a -pbarrelief flat -troughcolor #8af2b2 -background #43ac6a -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure info.Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #5bc0de -lightcolor #5bc0de -pbarrelief flat -troughcolor #8edaf2 -background #5bc0de -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure info.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #5bc0de -lightcolor #5bc0de -pbarrelief flat -troughcolor #8edaf2 -background #5bc0de -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure warning.Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #E99002 -lightcolor #E99002 -pbarrelief flat -troughcolor #f2b14a -background #E99002 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure warning.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #E99002 -lightcolor #E99002 -pbarrelief flat -troughcolor #f2b14a -background #E99002 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure danger.Horizontal.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #d02b27 -lightcolor #d02b27 -pbarrelief flat -troughcolor #f26b67 -background #d02b27 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style configure danger.Vertical.TFloodgauge -thickness 50 -borderwidth 1 -bordercolor #d02b27 -lightcolor #d02b27 -pbarrelief flat -troughcolor #f26b67 -background #d02b27 -foreground #ffffff -justify center -anchor center -font {helvetica 14};
-ttk::style element create Radiobutton.indicator image {minarca_pyimage58 disabled minarca_pyimage59 !selected minarca_pyimage57} -width 20 -border 4 -sticky w
-ttk::style configure TRadiobutton -font {Helvetica -16};
-ttk::style map TRadiobutton -foreground {disabled #bdbfc1 active #1c4c72} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #1c4c72};
-ttk::style layout TRadiobutton {
-Radiobutton.padding -sticky nswe -children {
-  Radiobutton.indicator -side left -sticky {}
-  Radiobutton.focus -side left -sticky {} -children {
-    Radiobutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create primary.Radiobutton.indicator image {minarca_pyimage61 disabled minarca_pyimage62 !selected minarca_pyimage60} -width 20 -border 4 -sticky w
-ttk::style configure primary.TRadiobutton -font {Helvetica -16};
-ttk::style map primary.TRadiobutton -foreground {disabled #bdbfc1 active #163d5b} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #163d5b};
-ttk::style layout primary.TRadiobutton {
-Radiobutton.padding -sticky nswe -children {
-  primary.Radiobutton.indicator -side left -sticky {}
-  Radiobutton.focus -side left -sticky {} -children {
-    Radiobutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create secondary.Radiobutton.indicator image {minarca_pyimage64 disabled minarca_pyimage65 !selected minarca_pyimage63} -width 20 -border 4 -sticky w
-ttk::style configure secondary.TRadiobutton -font {Helvetica -16};
-ttk::style map secondary.TRadiobutton -foreground {disabled #bdbfc1 active #a9abab} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #a9abab};
-ttk::style layout secondary.TRadiobutton {
-Radiobutton.padding -sticky nswe -children {
-  secondary.Radiobutton.indicator -side left -sticky {}
-  Radiobutton.focus -side left -sticky {} -children {
-    Radiobutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create success.Radiobutton.indicator image {minarca_pyimage67 disabled minarca_pyimage68 !selected minarca_pyimage66} -width 20 -border 4 -sticky w
-ttk::style configure success.TRadiobutton -font {Helvetica -16};
-ttk::style map success.TRadiobutton -foreground {disabled #bdbfc1 active #358855} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #358855};
-ttk::style layout success.TRadiobutton {
-Radiobutton.padding -sticky nswe -children {
-  success.Radiobutton.indicator -side left -sticky {}
-  Radiobutton.focus -side left -sticky {} -children {
-    Radiobutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create info.Radiobutton.indicator image {minarca_pyimage70 disabled minarca_pyimage71 !selected minarca_pyimage69} -width 20 -border 4 -sticky w
-ttk::style configure info.TRadiobutton -font {Helvetica -16};
-ttk::style map info.TRadiobutton -foreground {disabled #bdbfc1 active #4999b1} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #4999b1};
-ttk::style layout info.TRadiobutton {
-Radiobutton.padding -sticky nswe -children {
-  info.Radiobutton.indicator -side left -sticky {}
-  Radiobutton.focus -side left -sticky {} -children {
-    Radiobutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create warning.Radiobutton.indicator image {minarca_pyimage73 disabled minarca_pyimage74 !selected minarca_pyimage72} -width 20 -border 4 -sticky w
-ttk::style configure warning.TRadiobutton -font {Helvetica -16};
-ttk::style map warning.TRadiobutton -foreground {disabled #bdbfc1 active #b97202} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #b97202};
-ttk::style layout warning.TRadiobutton {
-Radiobutton.padding -sticky nswe -children {
-  warning.Radiobutton.indicator -side left -sticky {}
-  Radiobutton.focus -side left -sticky {} -children {
-    Radiobutton.label -sticky nswe
-  }
-}
-}
-ttk::style element create danger.Radiobutton.indicator image {minarca_pyimage76 disabled minarca_pyimage77 !selected minarca_pyimage75} -width 20 -border 4 -sticky w
-ttk::style configure danger.TRadiobutton -font {Helvetica -16};
-ttk::style map danger.TRadiobutton -foreground {disabled #bdbfc1 active #a7221e} -indicatorforeground {disabled #bdbfc1 {active selected !disabled} #a7221e};
-ttk::style layout danger.TRadiobutton {
-Radiobutton.padding -sticky nswe -children {
-  danger.Radiobutton.indicator -side left -sticky {}
-  Radiobutton.focus -side left -sticky {} -children {
-    Radiobutton.label -sticky nswe
-  }
-}
-}
-ttk::style configure TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -font {Helvetica -16} -anchor center -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
-ttk::style configure primary.TButton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
-ttk::style map primary.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
-ttk::style configure secondary.TButton -foreground #ffffff -background #d3d5d7 -bordercolor #d3d5d7 -darkcolor #d3d5d7 -lightcolor #d3d5d7 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
-ttk::style map secondary.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -bordercolor {disabled #bdbfc1 {hover !disabled} #bec0c0} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0};
-ttk::style configure success.TButton -foreground #ffffff -background #43ac6a -bordercolor #43ac6a -darkcolor #43ac6a -lightcolor #43ac6a -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
-ttk::style map success.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -bordercolor {disabled #bdbfc1 {hover !disabled} #3b9960} -darkcolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -lightcolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960};
-ttk::style configure info.TButton -foreground #ffffff -background #5bc0de -bordercolor #5bc0de -darkcolor #5bc0de -lightcolor #5bc0de -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
-ttk::style map info.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -bordercolor {disabled #bdbfc1 {hover !disabled} #52acc7} -darkcolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -lightcolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7};
-ttk::style configure warning.TButton -foreground #ffffff -background #E99002 -bordercolor #E99002 -darkcolor #E99002 -lightcolor #E99002 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
-ttk::style map warning.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -bordercolor {disabled #bdbfc1 {hover !disabled} #d08002} -darkcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -lightcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002};
-ttk::style configure danger.TButton -foreground #ffffff -background #d02b27 -bordercolor #d02b27 -darkcolor #d02b27 -lightcolor #d02b27 -relief raised -focusthickness 0 -focuscolor #ffffff -padding {10 5};
-ttk::style map danger.TButton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -bordercolor {disabled #bdbfc1 {hover !disabled} #bc2722} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722};
-ttk::style configure Link.TButton -foreground #212529 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure primary.Link.TButton -foreground #1c4c72 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map primary.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure secondary.Link.TButton -foreground #d3d5d7 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map secondary.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure success.Link.TButton -foreground #43ac6a -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map success.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure info.Link.TButton -foreground #5bc0de -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map info.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure warning.Link.TButton -foreground #E99002 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map warning.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure danger.Link.TButton -foreground #d02b27 -background #ffffff -bordercolor #ffffff -darkcolor #ffffff -lightcolor #ffffff -relief raised -font {Helvetica -16} -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map danger.Link.TButton -foreground {disabled #bdbfc1 {pressed !disabled} #5bbfdd {hover !disabled} #5bbfdd} -shiftrelief {{pressed !disabled} -1} -background {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -bordercolor {disabled #bdbfc1 {pressed !disabled} #ffffff {hover !disabled} #ffffff} -darkcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff} -lightcolor {{pressed !disabled} #ffffff {hover !disabled} #ffffff};
-ttk::style configure TMenubutton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
-ttk::style configure primary.TMenubutton -foreground #ffffff -background #1c4c72 -bordercolor #1c4c72 -darkcolor #1c4c72 -lightcolor #1c4c72 -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map primary.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -bordercolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -darkcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467} -lightcolor {disabled #bdbfc1 {pressed !disabled} #163d5b {hover !disabled} #194467};
-ttk::style configure secondary.TMenubutton -foreground #ffffff -background #d3d5d7 -bordercolor #d3d5d7 -darkcolor #d3d5d7 -lightcolor #d3d5d7 -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map secondary.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -bordercolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a9abab {hover !disabled} #bec0c0};
-ttk::style configure success.TMenubutton -foreground #ffffff -background #43ac6a -bordercolor #43ac6a -darkcolor #43ac6a -lightcolor #43ac6a -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map success.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -bordercolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -darkcolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960} -lightcolor {disabled #bdbfc1 {pressed !disabled} #358855 {hover !disabled} #3b9960};
-ttk::style configure info.TMenubutton -foreground #ffffff -background #5bc0de -bordercolor #5bc0de -darkcolor #5bc0de -lightcolor #5bc0de -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map info.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -bordercolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -darkcolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7} -lightcolor {disabled #bdbfc1 {pressed !disabled} #4999b1 {hover !disabled} #52acc7};
-ttk::style configure warning.TMenubutton -foreground #ffffff -background #E99002 -bordercolor #E99002 -darkcolor #E99002 -lightcolor #E99002 -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map warning.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -darkcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002} -lightcolor {disabled #bdbfc1 {pressed !disabled} #b97202 {hover !disabled} #d08002};
-ttk::style configure danger.TMenubutton -foreground #ffffff -background #d02b27 -bordercolor #d02b27 -darkcolor #d02b27 -lightcolor #d02b27 -arrowsize 4 -arrowcolor #ffffff -arrowpadding {0 0 15 0} -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map danger.TMenubutton -arrowcolor {disabled #212529} -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -bordercolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -darkcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722} -lightcolor {disabled #bdbfc1 {pressed !disabled} #a7221e {hover !disabled} #bc2722};
-ttk::style configure Toolbutton -foreground #ffffff -background #4e697e -bordercolor #4e697e -darkcolor #4e697e -lightcolor #4e697e -font {Helvetica -16} -anchor center -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {selected !disabled} #1c4c72 {pressed !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -lightcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72};
-ttk::style configure primary.Toolbutton -foreground #ffffff -background #4e697e -bordercolor #4e697e -darkcolor #4e697e -lightcolor #4e697e -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map primary.Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -bordercolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -darkcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72} -lightcolor {disabled #bdbfc1 {pressed !disabled} #1c4c72 {selected !disabled} #1c4c72 {hover !disabled} #1c4c72};
-ttk::style configure secondary.Toolbutton -foreground #ffffff -background #eaebeb -bordercolor #eaebeb -darkcolor #eaebeb -lightcolor #eaebeb -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map secondary.Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #d3d5d7 {selected !disabled} #d3d5d7 {hover !disabled} #d3d5d7} -bordercolor {disabled #bdbfc1 {pressed !disabled} #d3d5d7 {selected !disabled} #d3d5d7 {hover !disabled} #d3d5d7} -darkcolor {disabled #bdbfc1 {pressed !disabled} #d3d5d7 {selected !disabled} #d3d5d7 {hover !disabled} #d3d5d7} -lightcolor {disabled #bdbfc1 {pressed !disabled} #d3d5d7 {selected !disabled} #d3d5d7 {hover !disabled} #d3d5d7};
-ttk::style configure success.Toolbutton -foreground #ffffff -background #82bb98 -bordercolor #82bb98 -darkcolor #82bb98 -lightcolor #82bb98 -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map success.Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #43ac6a {selected !disabled} #43ac6a {hover !disabled} #43ac6a} -bordercolor {disabled #bdbfc1 {pressed !disabled} #43ac6a {selected !disabled} #43ac6a {hover !disabled} #43ac6a} -darkcolor {disabled #bdbfc1 {pressed !disabled} #43ac6a {selected !disabled} #43ac6a {hover !disabled} #43ac6a} -lightcolor {disabled #bdbfc1 {pressed !disabled} #43ac6a {selected !disabled} #43ac6a {hover !disabled} #43ac6a};
-ttk::style configure info.Toolbutton -foreground #ffffff -background #ace3f4 -bordercolor #ace3f4 -darkcolor #ace3f4 -lightcolor #ace3f4 -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map info.Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #5bc0de {selected !disabled} #5bc0de {hover !disabled} #5bc0de} -bordercolor {disabled #bdbfc1 {pressed !disabled} #5bc0de {selected !disabled} #5bc0de {hover !disabled} #5bc0de} -darkcolor {disabled #bdbfc1 {pressed !disabled} #5bc0de {selected !disabled} #5bc0de {hover !disabled} #5bc0de} -lightcolor {disabled #bdbfc1 {pressed !disabled} #5bc0de {selected !disabled} #5bc0de {hover !disabled} #5bc0de};
-ttk::style configure warning.Toolbutton -foreground #ffffff -background #f2c37a -bordercolor #f2c37a -darkcolor #f2c37a -lightcolor #f2c37a -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map warning.Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #E99002 {selected !disabled} #E99002 {hover !disabled} #E99002} -bordercolor {disabled #bdbfc1 {pressed !disabled} #E99002 {selected !disabled} #E99002 {hover !disabled} #E99002} -darkcolor {disabled #bdbfc1 {pressed !disabled} #E99002 {selected !disabled} #E99002 {hover !disabled} #E99002} -lightcolor {disabled #bdbfc1 {pressed !disabled} #E99002 {selected !disabled} #E99002 {hover !disabled} #E99002};
-ttk::style configure danger.Toolbutton -foreground #ffffff -background #e68a88 -bordercolor #e68a88 -darkcolor #e68a88 -lightcolor #e68a88 -relief raised -focusthickness 0 -focuscolor {} -padding {10 5};
-ttk::style map danger.Toolbutton -foreground {disabled #212529} -background {disabled #bdbfc1 {pressed !disabled} #d02b27 {selected !disabled} #d02b27 {hover !disabled} #d02b27} -bordercolor {disabled #bdbfc1 {pressed !disabled} #d02b27 {selected !disabled} #d02b27 {hover !disabled} #d02b27} -darkcolor {disabled #bdbfc1 {pressed !disabled} #d02b27 {selected !disabled} #d02b27 {hover !disabled} #d02b27} -lightcolor {disabled #bdbfc1 {pressed !disabled} #d02b27 {selected !disabled} #d02b27 {hover !disabled} #d02b27};
-ttk::style configure Treeview -background #ecf0f1 -foreground #212529 -bordercolor #ffffff -lightcolor #ced4da -darkcolor #ced4da -relief raised -padding 0;
-ttk::style map Treeview -background {selected #95a5a6} -foreground {disabled #bdbfc1 selected #ffffff};
-ttk::style layout Treeview {
-Button.border -sticky nswe -border 1 -children {
-  Treeview.padding -sticky nswe -children {
-    Treeview.treearea -sticky nswe
-  }
-}
-}
-ttk::style configure Treeview.Heading -background #1c4c72 -foreground #ffffff -relief flat -padding 5;
-ttk::style element create Treeitem.indicator from {alt} 
-ttk::style configure primary.Treeview.Heading -background #1c4c72;
-ttk::style map primary.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #1c4c72};
-ttk::style configure secondary.Treeview.Heading -background #d3d5d7;
-ttk::style map secondary.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d3d5d7};
-ttk::style configure success.Treeview.Heading -background #43ac6a;
-ttk::style map success.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #43ac6a};
-ttk::style configure info.Treeview.Heading -background #5bc0de;
-ttk::style map info.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #5bc0de};
-ttk::style configure warning.Treeview.Heading -background #E99002;
-ttk::style map warning.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #E99002};
-ttk::style configure danger.Treeview.Heading -background #d02b27;
-ttk::style map danger.Treeview.Heading -foreground {disabled #bdbfc1} -bordercolor {{focus !disabled} #d02b27};
-ttk::style element create Horizontal.Separator.separator image {minarca_pyimage78 } 
-ttk::style layout Horizontal.TSeparator {
-Horizontal.Separator.separator -sticky ew
-}
-ttk::style element create primary.Horizontal.Separator.separator image {minarca_pyimage79 } 
-ttk::style layout primary.Horizontal.TSeparator {
-primary.Horizontal.Separator.separator -sticky ew
-}
-ttk::style element create secondary.Horizontal.Separator.separator image {minarca_pyimage80 } 
-ttk::style layout secondary.Horizontal.TSeparator {
-secondary.Horizontal.Separator.separator -sticky ew
-}
-ttk::style element create success.Horizontal.Separator.separator image {minarca_pyimage81 } 
-ttk::style layout success.Horizontal.TSeparator {
-success.Horizontal.Separator.separator -sticky ew
-}
-ttk::style element create info.Horizontal.Separator.separator image {minarca_pyimage82 } 
-ttk::style layout info.Horizontal.TSeparator {
-info.Horizontal.Separator.separator -sticky ew
-}
-ttk::style element create warning.Horizontal.Separator.separator image {minarca_pyimage83 } 
-ttk::style layout warning.Horizontal.TSeparator {
-warning.Horizontal.Separator.separator -sticky ew
-}
-ttk::style element create danger.Horizontal.Separator.separator image {minarca_pyimage84 } 
-ttk::style layout danger.Horizontal.TSeparator {
-danger.Horizontal.Separator.separator -sticky ew
-}
-ttk::style element create Vertical.Separator.separator image {minarca_pyimage85 } 
-ttk::style layout Vertical.TSeparator {
-Vertical.Separator.separator -sticky ns
-}
-ttk::style element create primary.Vertical.Separator.separator image {minarca_pyimage86 } 
-ttk::style layout primary.Vertical.TSeparator {
-primary.Vertical.Separator.separator -sticky ns
-}
-ttk::style element create secondary.Vertical.Separator.separator image {minarca_pyimage87 } 
-ttk::style layout secondary.Vertical.TSeparator {
-secondary.Vertical.Separator.separator -sticky ns
-}
-ttk::style element create success.Vertical.Separator.separator image {minarca_pyimage88 } 
-ttk::style layout success.Vertical.TSeparator {
-success.Vertical.Separator.separator -sticky ns
-}
-ttk::style element create info.Vertical.Separator.separator image {minarca_pyimage89 } 
-ttk::style layout info.Vertical.TSeparator {
-info.Vertical.Separator.separator -sticky ns
-}
-ttk::style element create warning.Vertical.Separator.separator image {minarca_pyimage90 } 
-ttk::style layout warning.Vertical.TSeparator {
-warning.Vertical.Separator.separator -sticky ns
-}
-ttk::style element create danger.Vertical.Separator.separator image {minarca_pyimage91 } 
-ttk::style layout danger.Vertical.TSeparator {
-danger.Vertical.Separator.separator -sticky ns
-}
-ttk::style configure TPanedwindow -background #ffffff;
-ttk::style configure Sash -bordercolor #ffffff -lightcolor #ffffff -sashthickness 8 -sashpad 0 -gripcount 0;
-ttk::style element create Roundtoggle.Toolbutton.indicator image {minarca_pyimage92 disabled minarca_pyimage94 !selected minarca_pyimage93} -width 28 -border 4 -sticky w
-ttk::style configure Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
-ttk::style layout Roundtoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    Roundtoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create primary.Roundtoggle.Toolbutton.indicator image {minarca_pyimage95 disabled minarca_pyimage97 !selected minarca_pyimage96} -width 28 -border 4 -sticky w
-ttk::style configure primary.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map primary.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
-ttk::style layout primary.Roundtoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    primary.Roundtoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create secondary.Roundtoggle.Toolbutton.indicator image {minarca_pyimage98 disabled minarca_pyimage100 !selected minarca_pyimage99} -width 28 -border 4 -sticky w
-ttk::style configure secondary.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map secondary.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d3d5d7} -background {selected #ffffff !selected #ffffff};
-ttk::style layout secondary.Roundtoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    secondary.Roundtoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create success.Roundtoggle.Toolbutton.indicator image {minarca_pyimage101 disabled minarca_pyimage103 !selected minarca_pyimage102} -width 28 -border 4 -sticky w
-ttk::style configure success.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map success.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #43ac6a} -background {selected #ffffff !selected #ffffff};
-ttk::style layout success.Roundtoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    success.Roundtoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create info.Roundtoggle.Toolbutton.indicator image {minarca_pyimage104 disabled minarca_pyimage106 !selected minarca_pyimage105} -width 28 -border 4 -sticky w
-ttk::style configure info.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map info.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #5bc0de} -background {selected #ffffff !selected #ffffff};
-ttk::style layout info.Roundtoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    info.Roundtoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create warning.Roundtoggle.Toolbutton.indicator image {minarca_pyimage107 disabled minarca_pyimage109 !selected minarca_pyimage108} -width 28 -border 4 -sticky w
-ttk::style configure warning.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map warning.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #E99002} -background {selected #ffffff !selected #ffffff};
-ttk::style layout warning.Roundtoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    warning.Roundtoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create danger.Roundtoggle.Toolbutton.indicator image {minarca_pyimage110 disabled minarca_pyimage112 !selected minarca_pyimage111} -width 28 -border 4 -sticky w
-ttk::style configure danger.Roundtoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map danger.Roundtoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d02b27} -background {selected #ffffff !selected #ffffff};
-ttk::style layout danger.Roundtoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    danger.Roundtoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create Squaretoggle.Toolbutton.indicator image {minarca_pyimage113 disabled minarca_pyimage115 !selected minarca_pyimage114} -width 28 -border 4 -sticky w
-ttk::style configure Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
-ttk::style layout Squaretoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    Squaretoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create primary.Squaretoggle.Toolbutton.indicator image {minarca_pyimage116 disabled minarca_pyimage118 !selected minarca_pyimage117} -width 28 -border 4 -sticky w
-ttk::style configure primary.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map primary.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #1c4c72} -background {selected #ffffff !selected #ffffff};
-ttk::style layout primary.Squaretoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    primary.Squaretoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create secondary.Squaretoggle.Toolbutton.indicator image {minarca_pyimage119 disabled minarca_pyimage121 !selected minarca_pyimage120} -width 28 -border 4 -sticky w
-ttk::style configure secondary.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map secondary.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d3d5d7} -background {selected #ffffff !selected #ffffff};
-ttk::style layout secondary.Squaretoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    secondary.Squaretoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create success.Squaretoggle.Toolbutton.indicator image {minarca_pyimage122 disabled minarca_pyimage124 !selected minarca_pyimage123} -width 28 -border 4 -sticky w
-ttk::style configure success.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map success.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #43ac6a} -background {selected #ffffff !selected #ffffff};
-ttk::style layout success.Squaretoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    success.Squaretoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create info.Squaretoggle.Toolbutton.indicator image {minarca_pyimage125 disabled minarca_pyimage127 !selected minarca_pyimage126} -width 28 -border 4 -sticky w
-ttk::style configure info.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map info.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #5bc0de} -background {selected #ffffff !selected #ffffff};
-ttk::style layout info.Squaretoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    info.Squaretoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create warning.Squaretoggle.Toolbutton.indicator image {minarca_pyimage128 disabled minarca_pyimage130 !selected minarca_pyimage129} -width 28 -border 4 -sticky w
-ttk::style configure warning.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map warning.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #E99002} -background {selected #ffffff !selected #ffffff};
-ttk::style layout warning.Squaretoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    warning.Squaretoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create danger.Squaretoggle.Toolbutton.indicator image {minarca_pyimage131 disabled minarca_pyimage133 !selected minarca_pyimage132} -width 28 -border 4 -sticky w
-ttk::style configure danger.Squaretoggle.Toolbutton -relief flat -borderwidth 0 -foreground #212529;
-ttk::style map danger.Squaretoggle.Toolbutton -foreground {disabled #bdbfc1 hover #d02b27} -background {selected #ffffff !selected #ffffff};
-ttk::style layout danger.Squaretoggle.Toolbutton {
-Toolbutton.border -sticky nswe -children {
-  Toolbutton.padding -sticky nswe -children {
-    danger.Squaretoggle.Toolbutton.indicator -side left
-    Toolbutton.label -side left
-  }
-}
-}
-ttk::style element create Sizegrip.sizegrip image {minarca_pyimage134 } 
-ttk::style layout TSizegrip {
-Sizegrip.sizegrip -side bottom -sticky se
-}
-ttk::style element create primary.Sizegrip.sizegrip image {minarca_pyimage135 } 
-ttk::style layout primary.TSizegrip {
-primary.Sizegrip.sizegrip -side bottom -sticky se
-}
-ttk::style element create secondary.Sizegrip.sizegrip image {minarca_pyimage136 } 
-ttk::style layout secondary.TSizegrip {
-secondary.Sizegrip.sizegrip -side bottom -sticky se
-}
-ttk::style element create success.Sizegrip.sizegrip image {minarca_pyimage137 } 
-ttk::style layout success.TSizegrip {
-success.Sizegrip.sizegrip -side bottom -sticky se
-}
-ttk::style element create info.Sizegrip.sizegrip image {minarca_pyimage138 } 
-ttk::style layout info.TSizegrip {
-info.Sizegrip.sizegrip -side bottom -sticky se
-}
-ttk::style element create warning.Sizegrip.sizegrip image {minarca_pyimage139 } 
-ttk::style layout warning.TSizegrip {
-warning.Sizegrip.sizegrip -side bottom -sticky se
-}
-ttk::style element create danger.Sizegrip.sizegrip image {minarca_pyimage140 } 
-ttk::style layout danger.TSizegrip {
-danger.Sizegrip.sizegrip -side bottom -sticky se
-}
-ttk::style configure . -background #ffffff -darkcolor #ced4da -foreground #212529 -troughcolor #ffffff -selectbg #95a5a6 -selectfg #ffffff -selectforeground #ffffff -selectbackground #95a5a6 -fieldbg white -font {Helvetica -16} -borderwidth 1 -focuscolor {};
-ttk::style configure H1.primary.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.primary.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.primary.TLabel -font {Helvetica -10};
-ttk::style configure strong.primary.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.secondary.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.secondary.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.secondary.TLabel -font {Helvetica -10};
-ttk::style configure strong.secondary.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.success.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.success.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.success.TLabel -font {Helvetica -10};
-ttk::style configure strong.success.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.info.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.info.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.info.TLabel -font {Helvetica -10};
-ttk::style configure strong.info.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.warning.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.warning.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.warning.TLabel -font {Helvetica -10};
-ttk::style configure strong.warning.TLabel -font {Helvetica -14 bold};
-ttk::style configure H1.danger.TLabel -font {Helvetica -24 bold};
-ttk::style configure navbar.danger.Inverse.TLabel -font {Helvetica -20};
-ttk::style configure small.danger.TLabel -font {Helvetica -10};
-ttk::style configure strong.danger.TLabel -font {Helvetica -14 bold};
-ttk::style configure tooltip.TLabel -background #ffffe0;}

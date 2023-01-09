@@ -1,17 +1,17 @@
-<Frame>
-    <Frame pack-fill="x">
-        <Label text="Schedule" pack-side="left" style="H1.primary.TLabel" pack-pady="10" />
+<Frame style="default.TFrame">
+    
+    <!-- Title -->
+    <Label pack-side="top" text="Schedule backup" style="H1.dark.default.TLabel" pack-fill="x" />
+    
+    <!-- Subtitle -->
+    <Label text="Select how often you want your backup to be performed." style="dark.default.TLabel" pack-fill="x" wrap="1"/>
+
+    <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+        <Label style="H3.dark.light.TLabel" text="Frequency" pack-anchor="nw" pack-pady="0 15" width="15" />
+        <Radiobutton style="dark.light.TRadiobutton" value="1" text="Hourly" variable="{{schedule}}" pack-anchor="nw" pack-pady="0 5" width="22"/>
+        <Radiobutton style="dark.light.TRadiobutton" value="24" text="Daily" variable="{{schedule}}" pack-anchor="nw" pack-pady="0 5" width="22"/>
+        <Radiobutton style="dark.light.TRadiobutton" value="168" text="Weekly" variable="{{schedule}}" pack-anchor="nw" pack-pady="0 5" width="22"/>
+        <Radiobutton style="dark.light.TRadiobutton" value="720" text="Monthly" variable="{{schedule}}" pack-anchor="nw" pack-pady="0 5" width="22"/>
     </Frame>
-    <Frame pack-fill="x">
-        <Label text="Select how often you want your backup to be performed." pack-side="left" wrap="1"/>
-    </Frame>
-    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
-    <Frame pack-fill="x">
-        <Label style="strong.primary.TLabel" text="Frequency" width="15" pack-side="left" />
-        <Radiobutton value="1" text="Hourly" variable="{{schedule}}" pack-anchor="e" width="22"/>
-        <Radiobutton value="24" text="Daily" variable="{{schedule}}" pack-anchor="e" width="22"/>
-        <Radiobutton value="168" text="Weekly" variable="{{schedule}}" pack-anchor="e" width="22"/>
-        <Radiobutton value="720" text="Monthly" variable="{{schedule}}" pack-anchor="e" width="22"/>
-    </Frame>
-    <Separator orient="horizontal" pack-fill="x" pack-pady="25" />
+    
 </Frame>

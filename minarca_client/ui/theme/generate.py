@@ -1,106 +1,102 @@
 # Copyright (C) 2021 IKUS Software inc. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
+
+import base64
 import os
+import re
 import subprocess
 import tkinter
 
-from ttkbootstrap import Style
+import jinja2
 
-IMAGES = [
-    # 24px
-    ('error-24', 'error.svg', 24, True, '#d02b27'),
-    ('info-24', 'info.svg', 24, True, '#5bc0de'),
-    ('success-24', 'success.svg', 24, True, '#43ac6a'),
-    # 16px
-    ('error-16', 'error.svg', 16, True, '#d02b27'),
-    ('help-16', 'help.svg', 16, True, 'white'),
-    ('info-16', 'info.svg', 16, True, '#5bc0de'),
-    ('patterns-16', 'patterns.svg', 16, True, 'white'),
-    ('schedule-16', 'schedule.svg', 16, True, 'white'),
-    ('settings-16', 'settings.svg', 16, True, 'white'),
-    ('status-16', 'status.svg', 16, True, 'white'),
-    ('success-16', 'success.svg', 16, True, '#43ac6a'),
-    ('trash-16', 'trash.svg', 16, True, 'white'),
-    # icons
-    ('minarca-16', 'minarca.svg', 16, False),
-    ('minarca-22', 'minarca.svg', 22, False),
-    ('minarca-32', 'minarca.svg', 32, False),
-    ('minarca-48', 'minarca.svg', 48, False),
-    ('minarca-128', 'minarca.svg', 128, False),
-    ('minarca-256', 'minarca.svg', 256, False),
+basedir = os.path.normpath(os.path.join(__file__, "../"))
+
+
+CONVERT = [
+    "convert",
+    "-define",
+    "png:include-chunk=none",
+    "-background",
+    "none",
+    "-density",
+    "300",
 ]
 
-CONVERT = ['convert', '-define', 'png:include-chunk=none', '-background', 'none', '-density', '300']
 
-basedir = os.path.normpath(os.path.join(__file__, '../'))
-
-
-def create_image(name, svgfile, size=16, glyph=False, color='white'):
+def svg_to_base64(svgfile, size, color=None, rotate=None):
     """
     Create PNG image from a SVG file with the required size.
 
     This function apply a little trick to generate the image with
     a bottom margin to visually align the image with text if `glyph` is set.
     """
-    svgfile = os.path.join(basedir, 'src', svgfile)
-    assert os.path.isfile(svgfile), 'svgfile must be a file: %s' % svgfile
-    # TODO Convert those image magic command line into Pillow.
-    if glyph:
-        cmd = CONVERT + [
-            svgfile,
-            '-alpha',
-            'off',
-            '-fill',
+    assert os.path.isfile(svgfile), "svgfile must be a file: %s" % svgfile
+    cmd = CONVERT + [svgfile]
+    if color:
+        cmd += [
+            "-alpha",
+            "off",
+            "-fill",
             color,
-            '-opaque',
-            'black',
-            '-alpha',
-            'on',
-            '-resize',
-            f'{size}x{size}',
-            f'{name}.png',
+            "-opaque",
+            "black",
+            "-alpha",
+            "on",
         ]
-    else:
-        cmd = CONVERT + [svgfile, '-resize', f'{size}x{size}', f'{name}.png']
-    subprocess.check_call(cmd, cwd=basedir)
-    return name, f'{name}.png'
+    if rotate:
+        assert rotate >= 0
+        cmd += [
+            "-resize",
+            str(size),
+            "-distort",
+            "SRT",
+            str(rotate),
+        ]
+    cmd += [
+        "-resize",
+        str(size),
+        "PNG:-",
+    ]
+    # Execute the conversion.
+    data = subprocess.check_output(cmd, cwd=basedir)
+    return base64.b64encode(data).decode('ascii')
 
 
 def create_spinner(name, svgfile, size, color):
     """
     Create spinning wheel.
     """
-    svgfile = os.path.join(basedir, 'src', svgfile)
-    assert os.path.isfile(svgfile), 'svgfile must be a file: %s' % svgfile
+    svgfile = os.path.join(basedir, "src", svgfile)
+    assert os.path.isfile(svgfile), "svgfile must be a file: %s" % svgfile
 
     i = 0
     for r in range(0, 360, 45):
         cmd = CONVERT + [
-            '-gravity',
-            'center',
-            '-resize',
-            f'{size}x{size}',
-            '-extent',
-            f'{size+2}x{size+2}',
+            "-gravity",
+            "center",
+            "-resize",
+            f"{size}x{size}",
+            "-extent",
+            f"{size+2}x{size+2}",
             svgfile,
-            '-alpha',
-            'off',
-            '-fill',
+            "-alpha",
+            "off",
+            "-fill",
             color,
-            '-opaque',
-            'black',
-            '-alpha',
-            'on',
-            '-distort',
-            'SRT',
+            "-opaque",
+            "black",
+            "-alpha",
+            "on",
+            "-distort",
+            "SRT",
             str(r),
-            '-resize',
-            f'{size}x{size}',
-            f'{name}_{i:02d}.png',
+            "-resize",
+            f"{size}x{size}",
+            f"{name}_{i:02d}.png",
         ]
         subprocess.check_call(cmd, cwd=basedir)
-        yield f'{name}_{i:02d}', f'{name}_{i:02d}.png'
+        yield f"{name}_{i:02d}", f"{name}_{i:02d}.png"
         i = i + 1
 
 
@@ -108,81 +104,88 @@ def create_ico(name, images):
     """
     Create a compatible Windows icon
     """
-    cmd = ['icotool', '-c', '-o', f'{name}.ico'] + images
+    cmd = ["icotool", "-c", "-o", f"{name}.ico"] + images
     subprocess.check_call(cmd, cwd=basedir)
 
 
 def create_icns(name, images):
-    cmd = ['png2icns', f'{name}.icns'] + images
+    cmd = ["png2icns", f"{name}.icns"] + images
     subprocess.check_call(cmd, cwd=basedir)
 
 
-def main():
+def hex_to_rgb(value):
+    if not re.match('^#(?:[0-9a-fA-F]{3}){1,2}$', value):
+        raise ValueError(value)
+    return (int(value[1:3], 16), int(value[3:5], 16), int(value[5:7], 16))
+
+
+def rgb_to_hex(value):
+    assert len(value) == 3
+    return ('#{:02X}{:02X}{:02X}').format(value[0], value[1], value[2])
+
+
+def lightness(color):
     """
-    Create TTK Theme for minarca.
+    Return the lightness value
     """
+    color = hex_to_rgb(color)
+    return (0.212 * color[0] + 0.701 * color[1] + 0.087 * color[2]) / 255
 
-    themes_file = os.path.join(basedir, 'src', 'themes.json')
-    assert os.path.isfile(themes_file)
-    theme_name = 'minarca'
 
-    # Create output directory
-    fn = f'{basedir}/{theme_name}.tcl'
+def interpolate(color_a, color_b, t):
+    assert t >= 0.0 and t <= 1.0
+    color_a = hex_to_rgb(color_a)
+    color_b = hex_to_rgb(color_b)
+    new_color = tuple(int(a + (b - a) * t) for a, b in zip(color_a, color_b))
+    return rgb_to_hex(new_color)
 
-    # Open our theme
-    root = tkinter.Tk()
-    s = Style(theme_name, themes_file=themes_file, master=root)
 
-    # Export settings
-    settings = s._theme_objects[theme_name].settings
-    # Add few fixes.
-    for i in ['primary', 'secondary', 'success', 'info', 'warning', 'danger']:
-        settings[f'H1.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-24", "bold"]}}
-        settings[f'navbar.{i}.Inverse.TLabel'] = {'configure': {'font': ["Helvetica", "-20"]}}
-        settings[f'small.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-10"]}}
-        settings[f'strong.{i}.TLabel'] = {'configure': {'font': ["Helvetica", "-14", "bold"]}}
-        # Fix button focus
-        settings[f'{i}.TButton']['configure']['focuscolor'] = settings[f'{i}.TButton']['configure']['foreground']
+def darker(value, t=0.15):
+    return interpolate(value, '#000000', t)
 
-    settings['tooltip.TLabel'] = {'configure': {'background': "#ffffe0"}}
 
-    # Generate script.
-    script = tkinter.ttk._script_from_settings(settings)
-    with open(fn, 'w', encoding='utf-8') as f:
+def lighter(value, t=0.15):
+    return interpolate(value, '#ffffff', t)
 
-        # Create application image.
-        for args in IMAGES:
-            name, file = create_image(*args)
-            f.write(f'image create photo {name} -file [file join [file dirname [info script]] {file}]\n')
 
-        # Create spinner
-        for size in [16, 24]:
-            items = create_spinner(f'spinner-{size}', 'spinner.svg', size=size, color=s.colors.fg)
-            for name, file in items:
-                f.write(f'image create photo {name} -file [file join [file dirname [info script]] {file}]\n')
+def compile(input, output):
+    """
+    Generate theme using Jinja2 templating
+    """
+    searchpath = os.path.dirname(input)
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(searchpath),
+        autoescape=jinja2.select_autoescape(),
+    )
+    env.globals['svg_to_base64'] = lambda file, *args, **kwargs: svg_to_base64(
+        os.path.join(searchpath, file), *args, **kwargs
+    )
+    env.globals['lightness'] = lightness
+    env.globals['darker'] = darker
+    env.globals['lighter'] = lighter
+    env.globals['interpolate'] = interpolate
+    template = env.get_template(os.path.basename(input))
 
-        # Loop on image to export them.
-        for image in tkinter.image_names():
-            if image.startswith("pyimage"):
-                root.call(image, 'write', f'{basedir}/{image}.png')
-                f.write(
-                    f'image create photo {theme_name}_{image} -file [file join [file dirname [info script]] {image}.png]\n'
-                )
+    data = template.render(the="variables", go="here")
+    with open(output, 'w') as f:
+        f.write(data)
 
-        # Write theme script.
-        f.write(f'ttk::style theme create {theme_name} -parent clam -settings {{')
-        f.write(script.replace('pyimage', f'{theme_name}_pyimage'))
-        f.write('}')
 
-    # Create icons
-    create_ico('minarca', [f'minarca-{x}.png' for x in [16, 32, 48, 128, 256]])
-    create_icns('minarca', [f'minarca-{x}.png' for x in [16, 32, 48, 128, 256]])
-
+def test(theme_filename):
+    """
+    Verify the theme using tkinter.
+    """
     # Try loading the new theme for sanity check.
-    root.destroy()
     root = tkinter.Tk()
-    root.call('source', fn)
+    root.call("source", theme_filename)
 
 
-if __name__ == '__main__':
+def main():
+    input = f"{basedir}/src/theme.tcl.j2"
+    output = f"{basedir}/minarca.tcl"
+    compile(input, output)
+    test(output)
+
+
+if __name__ == "__main__":
     main()

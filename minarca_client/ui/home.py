@@ -3,7 +3,6 @@ import webbrowser
 import pkg_resources
 import tkvue
 
-import minarca_client
 import minarca_client.ui.patterns  # noqa
 import minarca_client.ui.schedule  # noqa
 import minarca_client.ui.settings  # noqa
@@ -18,7 +17,6 @@ class HomeDialog(tkvue.Component):
         self.data = tkvue.Context(
             {
                 'active_view': 'home',
-                'version': 'v' + minarca_client.__version__,
             }
         )
         self.backup = Backup()
