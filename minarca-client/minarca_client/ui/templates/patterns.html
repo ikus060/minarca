@@ -1,23 +1,24 @@
-<Frame pack-fill="both">
-    <Frame pack-fill="x">
-        <Label text="Select files" pack-side="left" style="H1.primary.TLabel" pack-pady="10" />
+<Frame pack-fill="both" style="default.TFrame">
+    <!-- Title -->
+    <Label pack-side="top" text="Select files" style="H1.dark.default.TLabel" pack-fill="x" />
+    <!-- Button-->
+    <Frame pack-fill="x" style="default.TFrame">
+        <Button text="Add file" command="add_file_pattern" pack-side="left" style="secondary.TButton" pack-padx="2" />
+        <Button text="Add folder" command="add_folder_pattern" pack-side="left" style="secondary.TButton" pack-padx="2" />
+        <Button text="Add ..." command="add_custom_pattern" pack-side="left" style="secondary.TButton" pack-padx="2" />
     </Frame>
-    <Frame pack-fill="x">
-        <Label text="Select file and folder to include or exclude from backups." pack-side="left" wrap="1" />
-    </Frame>
-    <Frame pack-fill="x">
-        <Button text="Add file" command="add_file_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
-        <Button text="Add folder" command="add_folder_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
-        <Button text="Add ..." command="add_custom_pattern" pack-side="left" style="Outline.TButton" pack-padx="2" />
-    </Frame>
-    <ScrolledFrame id="scrolled_frame" pack-fill="both" pack-expand="1">
-        <Frame for="item in patterns" pack-fill="x" pack-pady="3" pack-expand="1">
-            <Label text="{{item.comment or item.pattern}}" pack-side="left">
-                <ToolTip text="{{item.pattern}}" />
-            </Label>
-            <Button command="remove_pattern(item)" pack-side="right" image="trash-16" />
-            <Button pack-side="right" pack-padx="2" command="toggle_pattern(item)" text="{{check_button_text(item)}}"
-                style="Squaretoggle.Toolbutton" width="10" selected="{{item.include}}" />
+    <ScrolledFrame id="scrolled_frame" pack-fill="both" pack-expand="1" style="light.TFrame" pack-pady="25 0">
+        <Frame padding="25" pack-fill="x" pack-expand="1" style="light.TFrame">
+            <Frame for="item in patterns" pack-fill="x" pack-pady="3" pack-expand="1" style="light.TFrame">
+                <Button style="dark.light.Link.TButton" command="remove_pattern(item)" pack-side="left" image="trash-16-primary" >
+                    <ToolTip text="Remove pattern" />
+                </Button>
+                <Label text="{{item.comment or item.pattern}}" style="dark.light.TLabel" pack-side="left" pack-padx="15">
+                    <ToolTip text="{{item.pattern}}" />
+                </Label>
+                <Checkbutton pack-side="right" command="toggle_pattern(item)" text="{{check_button_text(item)}}"
+                    style="dark.light.Roundtoggle.TCheckbutton" width="10" selected="{{item.include}}" />
+            </Frame>
         </Frame>
     </ScrolledFrame>
 </Frame>

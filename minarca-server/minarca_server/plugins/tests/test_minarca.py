@@ -100,8 +100,9 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         # When behind an apache reverse proxy, minarca server should make use
         # of the Header to determine the public hostname provided.
         headers = [
+            ('Host', 'sestican.patrikdufresne.com'),
             ('X-Forwarded-For', '10.255.1.106'),
-            ('X-Forwarded-Host', 'sestican.patrikdufresne.com'),
+            ('X-Forwarded-Host', 'junk.patrikdufresne.com'),
             ('X-Forwarded-Server', '10.255.1.106'),
         ]
 
@@ -250,6 +251,11 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
         'MinarcaUserDirGroup': grp.getgrgid(os.getgid()).gr_name,
     }
 
+    def _read_ssh_key(self, filename):
+        filename = pkg_resources.resource_filename(__name__, filename)
+        with open(filename, 'r', encoding='utf8') as f:
+            return f.readline()
+
     def assertAuthorizedKeys(self, expected):
         filename = os.path.join(self.base_dir, '.ssh', 'authorized_keys')
         with open(filename, 'r', encoding='utf-8') as f:
@@ -265,9 +271,7 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
         SshKey.session.commit()
 
         # Read the key from a file
-        filename = pkg_resources.resource_filename(__name__, 'test_publickey_ssh_rsa.pub')
-        with open(filename, 'r', encoding='utf8') as f:
-            key = f.readline()
+        key = self._read_ssh_key('test_publickey_ssh_rsa.pub')
 
         # Add the key to the user.
         userobj = UserObject.add_user('testuser')
@@ -299,3 +303,19 @@ class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTes
 
         # Validate
         self.assertAuthorizedKeys('')
+
+    def test_add_key_with_rogue_name(self):
+        # Given an SSH Key
+        key = self._read_ssh_key('test_publickey_ssh_rsa.pub')
+
+        # When adding an SSH Key with a newline
+        userobj = UserObject.add_user('testuser')
+        userobj.commit()
+        userobj.add_authorizedkey(key, comment='comment\nrogue data')
+        userobj.commit()
+
+        # Then the new line get replace by space
+        self.assertAuthorizedKeys(
+            '''command="export MINARCA_USERNAME='testuser' MINARCA_USER_ROOT='%s';/opt/minarca-server/bin/minarca-shell",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDYeMPTCnRLFaLeSzsn++RD5jwuuez65GXrt9g7RYUqJka66cn7zHUhjDWx15fyEM3ikHGbmmWEP2csq11YCtvaTaz2GAnwcFNdt2NF0KGHMbE56Xq0eCkj1FCait/UyRBqkaFItYAoBdj4War9Xt+S5sV8qc5/TqTeku4Kg6ZBJRFCDHy6nR8Xf+tXiBrlfCnXvxamDI5kFP0B+npuBv+M4TjKFvwn5W8zYPPTEznilWnGvJFS71XwsOD/yHBGQb/Jz87aazNAeCznZRAJxfecJhgeChGZcGnXRAAdEeMbRyilYWaNquIpwrbNFElFlVf41EoDBk6woB8TeG0XFfz comment rogue data\n'''
+            % userobj.user_root
+        )

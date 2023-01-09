@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 
 import cherrypy
 import pkg_resources
+from rdiffweb.controller.dispatch import staticfile
 from rdiffweb.rdw_app import RdiffwebApp
 
 import minarca_server.plugins.minarca  # noqa
@@ -47,6 +48,8 @@ class MinarcaApplication(RdiffwebApp):
         # Add few pages.
         self.root.api.minarca = self.get_minarca
         self.root.help = self.get_help
+        # Add background
+        self.root.static.bg_jpg = staticfile(pkg_resources.resource_filename(__name__, 'bg.jpg'))
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

@@ -1,38 +1,31 @@
-<TopLevel geometry="970x500" title="Minarca Backup">
-    <Frame pack-side="top" style="primary.TFrame" pack-fill="x">
+<TopLevel geometry="900x560" title="Minarca Backup" background="#ffffff">
+    <Frame pack-side="top" style="dark.TFrame" pack-fill="x" padding="20 0 20 0">
         <!-- Header logo -->
-        <Label style="primary.Inverse.TLabel" pack-side="left" pack-padx="10 0" pack-pady="10" image="minarca-22" />
-        <Label style="navbar.primary.Inverse.TLabel" text="Minarca backup" pack-side="left" pack-anchor="w"
-            pack-pady="2 0" />
-        <!-- Help Button -->
-        <Button id="help_button" text="Help" pack-side="right" command="show_help" image="help-16" compound="left" />
+        <Label style="light.dark.TLabel" pack-side="left" pack-fill="x" pack-padx="10 0" pack-pady="10" image="minarca-header-logo" />
+        <!-- Navbar -->
+        <Frame pack-side="right" style="dark.TFrame">
+            <Button id="button_home" style="dark.TButton" selected="{{active_view == 'home'}}"
+                command="set_active_view('home')"  text="Home"
+                cursor="hand2" pack-side="left" width="0"/>
+            <Button id="button_patterns" selected="{{active_view == 'patterns'}}"
+                style="dark.TButton"
+                command="set_active_view('patterns')"
+                text="Select files" cursor="hand2" pack-side="left" width="0"/>
+            <Button id="button_schedule" selected="{{active_view == 'schedule'}}"
+                style="dark.TButton"
+                command="set_active_view('schedule')"
+                text="Schedule backup" cursor="hand2" pack-side="left" width="0"/>
+            <Button id="button_settings" selected="{{active_view == 'settings'}}"
+                style="dark.TButton"
+                command="set_active_view('settings')"
+                text="Settings" cursor="hand2" pack-side="left" width="0"/>
+            <Button style="dark.TButton" id="help_button" text="Help" pack-side="left" command="show_help" cursor="hand2" width="0"/>
+        </Frame>
     </Frame>
-    <Frame pack-fill="both" pack-expand="true" padding="5">
-        <Frame pack-fill="y" pack-side="left">
-            <Button id="button_home" style="{{'primary.TButton' if active_view == 'home' else 'secondary.TButton'}}"
-                command="set_active_view('home')" pack-fill="x" pack-padx="4" pack-pady="2" width="22" text="Status"
-                cursor="hand2" padding="10" image="status-16" compound="left" />
-            <Button id="button_patterns"
-                style="{{'primary.TButton' if active_view == 'patterns' else 'secondary.TButton'}}"
-                command="set_active_view('patterns')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
-                text="Select files" cursor="hand2" padding="10" image="patterns-16" compound="left" />
-            <Button id="button_schedule"
-                style="{{'primary.TButton' if active_view == 'schedule' else 'secondary.TButton'}}"
-                command="set_active_view('schedule')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
-                text="Schedule" cursor="hand2" padding="10" image="schedule-16" compound="left" />
-            <Button id="button_settings"
-                style="{{'primary.TButton' if active_view == 'settings' else 'secondary.TButton'}}"
-                command="set_active_view('settings')" pack-fill="x" pack-padx="4" pack-pady="2" width="22"
-                text="Settings" cursor="hand2" padding="10" image="settings-16" compound="left" />
-            <Frame pack-side="bottom" pack-fill="x">
-                <Label text="{{version}}" pack-side="left" style="small.secondary.TLabel" />
-            </Frame>
-        </Frame>
-        <Frame pack-fill="both" pack-side="right" pack-expand="1" pack-padx="3">
-            <StatusView id="status_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'home'}}" />
-            <PatternsView id="patterns_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'patterns'}}" />
-            <ScheduleView id="schedule_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'schedule'}}" />
-            <SettingsView id="settings_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'settings'}}" />
-        </Frame>
+    <Frame style="default.TFrame" pack-fill="both" pack-expand="true" padding="25">
+        <StatusView id="status_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'home'}}" />
+        <PatternsView id="patterns_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'patterns'}}" />
+        <ScheduleView id="schedule_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'schedule'}}" />
+        <SettingsView id="settings_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'settings'}}" />
     </Frame>
 </TopLevel>
