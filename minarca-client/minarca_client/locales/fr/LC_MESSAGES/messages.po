@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-12-14 12:47-0500\n"
+"POT-Creation-Date: 2023-01-09 15:50-0500\n"
 "PO-Revision-Date: 2021-08-30 10:07-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -248,66 +248,82 @@ msgid "Arrangement of a Windows folder"
 msgstr "Agencement d'un dossier Windows"
 
 #: minarca_client/core/config.py:190
-msgid "Swap file"
-msgstr "Fichier de pagination"
+msgid "Swap System File"
+msgstr "Fichier d'échange (Mémoire Virtuelle)"
 
 #: minarca_client/core/config.py:191
+msgid "Page System File"
+msgstr "Fichier de pagination"
+
+#: minarca_client/core/config.py:192
+msgid "Hibernation System File"
+msgstr "Fichier d'hibernation"
+
+#: minarca_client/core/config.py:193
+msgid "System Volume Information"
+msgstr "System Volume Information"
+
+#: minarca_client/core/config.py:194
 msgid "System Recovery"
 msgstr "Récupération système"
 
-#: minarca_client/core/config.py:192
+#: minarca_client/core/config.py:195
 msgid "Recycle bin"
 msgstr "Corbeille"
 
-#: minarca_client/core/config.py:193 minarca_client/core/config.py:210
+#: minarca_client/core/config.py:196 minarca_client/core/config.py:214
 msgid "Temporary Folder"
 msgstr "Dossier temporaire"
 
-#: minarca_client/core/config.py:194
+#: minarca_client/core/config.py:197
 msgid "AutoCAD backup files"
 msgstr "Fichiers de sauvegarde AutoCAD"
 
-#: minarca_client/core/config.py:195
+#: minarca_client/core/config.py:198
 msgid "Office temporary files"
 msgstr "Fichiers temporaires Office"
 
-#: minarca_client/core/config.py:201
+#: minarca_client/core/config.py:199
+msgid "Outlook temporary files"
+msgstr "Fichiers temporaires d'Outlook"
+
+#: minarca_client/core/config.py:205
 msgid "Desktop Services Store"
 msgstr "Desktop Services Store"
 
-#: minarca_client/core/config.py:207
+#: minarca_client/core/config.py:211
 msgid "dev filesystem"
 msgstr "système de fichiers /dev"
 
-#: minarca_client/core/config.py:208
+#: minarca_client/core/config.py:212
 msgid "proc filesystem"
 msgstr "système de fichiers /proc"
 
-#: minarca_client/core/config.py:209
+#: minarca_client/core/config.py:213
 msgid "sys filesystem"
 msgstr "système de fichiers /sys"
 
-#: minarca_client/core/config.py:211
+#: minarca_client/core/config.py:215
 msgid "Volatile program files"
 msgstr "Fichiers volatile /run"
 
-#: minarca_client/core/config.py:212
+#: minarca_client/core/config.py:216
 msgid "Mounted filesystems"
 msgstr "Systèmes de fichiers montés /mnt"
 
-#: minarca_client/core/config.py:213
+#: minarca_client/core/config.py:217
 msgid "External media"
 msgstr "Médias externes /media"
 
-#: minarca_client/core/config.py:214
+#: minarca_client/core/config.py:218
 msgid "Ext4 Lost and Found"
 msgstr "Ext4 perdu et trouvé"
 
-#: minarca_client/core/config.py:215
+#: minarca_client/core/config.py:219
 msgid "Hidden temporary files"
 msgstr "Fichiers temporaires cachés"
 
-#: minarca_client/core/config.py:216
+#: minarca_client/core/config.py:220
 msgid "Vim Temporary files"
 msgstr "Fichiers temporaires Vim"
 
@@ -352,12 +368,12 @@ msgstr ""
 "sauvegarde n'est pas encore planifiée pour s'exécuter, vous pouvez forcer"
 " l'exécution en utilisant `--force`"
 
-#: minarca_client/core/exceptions.py:116
+#: minarca_client/core/exceptions.py:117
 #, python-format
 msgid "cannot establish connection to `%s`, verify if the URL is valid"
 msgstr "impossible d'établir la connexion à `%s`, vérifiez si l'URL est valide"
 
-#: minarca_client/core/exceptions.py:126
+#: minarca_client/core/exceptions.py:128
 #, python-format
 msgid ""
 "the given URL `%s` is not properly formated, verify if the URL is valid. "
@@ -366,13 +382,13 @@ msgstr ""
 "l'URL donnée `%s` n'est pas correctement formatée, vérifiez si l'URL est "
 "valide. Il doit commencer par https:// ou http://"
 
-#: minarca_client/core/exceptions.py:138
+#: minarca_client/core/exceptions.py:140
 msgid "authentication refused, verify your username and password"
 msgstr ""
 "authentification refusée, vérifiez votre nom d'utilisateur et votre mot "
 "de passe"
 
-#: minarca_client/core/exceptions.py:146
+#: minarca_client/core/exceptions.py:148
 msgid ""
 "remote server return an error, check remote server log with your "
 "administrator"
@@ -380,13 +396,18 @@ msgstr ""
 "le serveur distant renvoie une erreur, vérifiez le journal du serveur "
 "distant avec votre administrateur"
 
-#: minarca_client/core/exceptions.py:154
+#: minarca_client/core/exceptions.py:156
 msgid ""
-"Connection to remote backup server trough password - less SSH failed. The"
-" problem may originate from remote server. If the problem persist, "
-"contact your system administrator to verify the configuration of the SSH "
-"server and the password less settings of the server."
+"Unable to connect to the remote server using SSH without password. The "
+"problem may be with the remote server. If the problem persists, contact "
+"your system administrator to check the SSH server configuration and a "
+"possible firewall blocking the connection."
 msgstr ""
+"Impossible de se connecter au serveur distant en utilisant SSH sans mot "
+"de passe. Le problème peut provenir du serveur distant. Si le problème "
+"persiste, contactez votre administrateur système pour vérifier la "
+"configuration du serveur SSH et un éventuel pare-feu bloquant la "
+"connexion."
 
 #: minarca_client/core/latest.py:31
 msgid "https://minarca.org/download/"
@@ -455,28 +476,70 @@ msgstr ""
 "Si vous déconnectez cet ordinateur, cet agent Minarca effacera son "
 "identité et n'exécutera plus la sauvegarde."
 
-#: minarca_client/ui/setup.py:89 minarca_client/ui/setup.py:90
-msgid "Invalid connection information !"
-msgstr "Informations de connexion invalides !"
+#: minarca_client/ui/setup.py:94 minarca_client/ui/setup.py:95
+msgid "Invalid remote server URL !"
+msgstr "URL du serveur distant non valide !"
 
-#: minarca_client/ui/setup.py:91
-#, python-format
+#: minarca_client/ui/setup.py:96
 msgid ""
-"The information you have entered for the connection to Minarca are "
-"invalid.\n"
-"\n"
-"%s"
+"The remote server URL you entered for the connection is not valid. Check "
+"that you have entered the correct value. The URL must begin with "
+"`http://` or `https://` followed by a domain name."
 msgstr ""
-"Les informations que vous avez saisies pour la connexion à Minarca son "
-"invalide.\n"
-"\n"
-" %s"
+"L'URL du serveur distant que vous avez saisi pour la connexion n'est pas "
+"valide. Vérifiez que vous avez saisi la bonne valeur. L'URL doit "
+"commencer par `http://` ou `https://` suivi d'un nom de domaine."
 
-#: minarca_client/ui/setup.py:99 minarca_client/ui/setup.py:100
+#: minarca_client/ui/setup.py:106 minarca_client/ui/setup.py:107
+#: minarca_client/ui/setup.py:133 minarca_client/ui/setup.py:134
 msgid "Failed to connect to remote server"
 msgstr "Échec de la connexion au serveur distant"
 
-#: minarca_client/ui/setup.py:101
+#: minarca_client/ui/setup.py:108
+#, python-format
+msgid ""
+"Your computer cannot establish a connection to the remote server. Make "
+"sure your Internet connection is working and that the following URL is "
+"accessible with a Web browser: %s"
+msgstr ""
+"Votre ordinateur ne parvient pas à établir une connexion avec le serveur "
+"distant. Assurez-vous que votre connexion Internet fonctionne et que "
+"l'URL suivante est accessible avec un navigateur Web : %s"
+
+#: minarca_client/ui/setup.py:119 minarca_client/ui/setup.py:120
+msgid "Invalid username or password"
+msgstr "Nom d'utilisateur ou mot de passe invalide"
+
+#: minarca_client/ui/setup.py:121
+#, python-format
+msgid ""
+"The username or password you entered to connect to the remote server is "
+"not valid.\n"
+"\n"
+"Details: %s"
+msgstr ""
+"Le nom d'utilisateur ou le mot de passe que vous avez saisi pour vous "
+"connecter au serveur distant n'est pas valide.\n"
+"\n"
+"Détails : %s"
+
+#: minarca_client/ui/setup.py:135
+#, python-format
+msgid ""
+"Your computer cannot establish a connection to the remote server: %s\n"
+"\n"
+"%s"
+msgstr ""
+"Votre ordinateur ne parvient pas à établir une connexion avec le serveur "
+"distant : %s\n"
+"\n"
+"%s"
+
+#: minarca_client/ui/setup.py:144 minarca_client/ui/setup.py:145
+msgid "Unknown problem when connecting to the remote server"
+msgstr "Problème inconnu lors de la connexion au serveur distant"
+
+#: minarca_client/ui/setup.py:146
 #, python-format
 msgid ""
 "An error occurred during the connection to Minarca server.\n"
@@ -487,15 +550,15 @@ msgstr ""
 "\n"
 "Détails : %s"
 
-#: minarca_client/ui/setup.py:115
+#: minarca_client/ui/setup.py:160
 msgid "Repository name already exists"
 msgstr "Le nom du dépôt existe déjà"
 
-#: minarca_client/ui/setup.py:116
+#: minarca_client/ui/setup.py:161
 msgid "Do you want to replace the existing repository ?"
 msgstr "Vous souhaitez remplacer le référentiel existant ?"
 
-#: minarca_client/ui/setup.py:117
+#: minarca_client/ui/setup.py:162
 msgid ""
 "The repository name you have entered already exists on the remote server."
 " If you continue with this repository, you will replace it's content "
@@ -774,19 +837,19 @@ msgstr ""
 "Si l'authentification à deux facteurs est activée sur votre compte, "
 "utilisez un jeton d'accès."
 
-#: minarca_client/ui/templates/setup.html:34
+#: minarca_client/ui/templates/setup.html:35
 msgid "Repository name"
 msgstr "Nom du dépôt"
 
-#: minarca_client/ui/templates/setup.html:40
+#: minarca_client/ui/templates/setup.html:41
 msgid "Sign in"
 msgstr "Se connecter"
 
-#: minarca_client/ui/templates/setup.html:43
+#: minarca_client/ui/templates/setup.html:44
 msgid "Connecting..."
 msgstr "Liaison..."
 
-#: minarca_client/ui/templates/setup.html:46
+#: minarca_client/ui/templates/setup.html:47
 msgid ""
 "To configure Minarca to backup your data, you must provide URL to Minarca"
 " server. This information should be provided by your system "

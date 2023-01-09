@@ -107,6 +107,7 @@ This releases include a security fix. If you are using an earlier version, you s
 * Fix translation loading on some platform
 * Re-generate a new identity if it's already exists on the server to prevent error during the setup process
 * Replace usage of Threading by Asyncio to make the unser interface more stable
+* Improve error message when Agent cannot connect to remote server #188
 
 Breaking changes:
 

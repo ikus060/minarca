@@ -22,7 +22,7 @@ Create a new translation:
 Update an existing translation:
 
     cd minarca-client
-    python setup.py update_catalog --local fr --input-file minarca_client/locales/messages.pot --output-dir minarca_client/locales
+    python setup.py update_catalog --local fr
 
 Compile catalog:
 
