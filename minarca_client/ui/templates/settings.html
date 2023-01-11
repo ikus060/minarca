@@ -19,16 +19,15 @@
                 pack-fill="x" style="info.light.TLabel" />
             <Label text="Current version is up-to-date" style="success.light.TLabel" compound="left"
                 visible="{{is_latest is True}}" pack-fill="x" />
-            <Label text="Update available" style="info.light.TLabel" compound="left"
+            <Label text="Your version may be upgraded" style="info.light.TLabel" compound="left"
                 visible="{{is_latest is False}}"  pack-fill="x" />
             <Label text="Cannot check for updates. Try again later." style="danger.light.TLabel" compound="left"
                 visible="{{check_latest_version_error is not None}}"  pack-fill="x">
                 <Tooltip text="{{check_latest_version_error}}" width="50" />
             </Label>
         </Frame>
-        
-        <Label text="{{version}}" style="small.dark.light.TLabel" pack-fill="x" anchor="e"/>
 
+        <Label text="{{ version }}" style="small.dark.light.TLabel" pack-fill="x" />
     </Frame>
 
     <!-- Link -->
