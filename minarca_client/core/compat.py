@@ -58,18 +58,20 @@ IS_ADMIN = get_is_admin()
 def get_home(is_admin=IS_ADMIN):
     if is_admin:
         if IS_WINDOWS:
-            return os.path.join(os.environ.get('WINDIR', 'C:/Windows'), 'System32/config/systemprofile')
+            return os.path.join(
+                os.path.abspath(os.environ.get('WINDIR', 'C:/Windows')), 'System32/config/systemprofile'
+            )
         else:
             return "/root"
     else:
-        return str(pathlib.Path.home())
+        return os.path.abspath(str(pathlib.Path.home()))
 
 
 def get_local_appdata(is_admin=IS_ADMIN):
     """
     Return Local App folder.
     """
-    return os.environ.get("LOCALAPPDATA", os.path.join(get_home(is_admin), "AppData", "Local"))
+    return os.path.abspath(os.environ.get("LOCALAPPDATA", os.path.join(get_home(is_admin), "AppData", "Local")))
 
 
 @makedirs
@@ -94,7 +96,7 @@ def get_log_file(is_admin=IS_ADMIN):
 @makedirs
 def get_config_home(is_admin=IS_ADMIN):
     if os.environ.get('MINARCA_CONFIG_HOME'):
-        return os.environ.get('MINARCA_CONFIG_HOME')
+        return os.path.abspath(os.environ.get('MINARCA_CONFIG_HOME'))
     if IS_WINDOWS:
         return os.path.join(get_local_appdata(is_admin), "minarca")
     elif IS_MAC:
@@ -102,13 +104,15 @@ def get_config_home(is_admin=IS_ADMIN):
     # IS_LINUX
     if is_admin:
         return "/etc/minarca"
-    return os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.join(get_home(is_admin), ".config/")), "minarca")
+    return os.path.abspath(
+        os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.join(get_home(is_admin), ".config/")), "minarca")
+    )
 
 
 @makedirs
 def get_data_home(is_admin=IS_ADMIN):
     if os.environ.get('MINARCA_DATA_HOME'):
-        return os.environ.get('MINARCA_DATA_HOME')
+        return os.path.abspath(os.environ.get('MINARCA_DATA_HOME'))
     if IS_WINDOWS:
         return os.path.join(get_local_appdata(is_admin), "minarca")
     elif IS_MAC:
@@ -117,8 +121,8 @@ def get_data_home(is_admin=IS_ADMIN):
     if is_admin:
         return "/var/lib/minarca"
     else:
-        return os.path.join(
-            os.environ.get("XDG_DATA_HOME", os.path.join(get_home(is_admin), ".local/share/")), "minarca"
+        return os.path.abspath(
+            os.path.join(os.environ.get("XDG_DATA_HOME", os.path.join(get_home(is_admin), ".local/share/")), "minarca")
         )
 
 
