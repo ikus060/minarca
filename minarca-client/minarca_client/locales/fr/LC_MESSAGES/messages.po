@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-09 15:50-0500\n"
+"POT-Creation-Date: 2023-01-11 15:51-0500\n"
 "PO-Revision-Date: 2021-08-30 10:07-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -271,7 +271,7 @@ msgstr "Récupération système"
 msgid "Recycle bin"
 msgstr "Corbeille"
 
-#: minarca_client/core/config.py:196 minarca_client/core/config.py:214
+#: minarca_client/core/config.py:196 minarca_client/core/config.py:215
 msgid "Temporary Folder"
 msgstr "Dossier temporaire"
 
@@ -284,46 +284,50 @@ msgid "Office temporary files"
 msgstr "Fichiers temporaires Office"
 
 #: minarca_client/core/config.py:199
-msgid "Outlook temporary files"
-msgstr "Fichiers temporaires d'Outlook"
+msgid "Outlook IMAP temporary files"
+msgstr "Fichiers temporaires d'Outlook IMAP"
 
-#: minarca_client/core/config.py:205
+#: minarca_client/core/config.py:200
+msgid "Outlook POP temporary files"
+msgstr "Fichiers temporaires d'Outlook POP"
+
+#: minarca_client/core/config.py:206
 msgid "Desktop Services Store"
 msgstr "Desktop Services Store"
 
-#: minarca_client/core/config.py:211
+#: minarca_client/core/config.py:212
 msgid "dev filesystem"
 msgstr "système de fichiers /dev"
 
-#: minarca_client/core/config.py:212
+#: minarca_client/core/config.py:213
 msgid "proc filesystem"
 msgstr "système de fichiers /proc"
 
-#: minarca_client/core/config.py:213
+#: minarca_client/core/config.py:214
 msgid "sys filesystem"
 msgstr "système de fichiers /sys"
 
-#: minarca_client/core/config.py:215
+#: minarca_client/core/config.py:216
 msgid "Volatile program files"
 msgstr "Fichiers volatile /run"
 
-#: minarca_client/core/config.py:216
+#: minarca_client/core/config.py:217
 msgid "Mounted filesystems"
 msgstr "Systèmes de fichiers montés /mnt"
 
-#: minarca_client/core/config.py:217
+#: minarca_client/core/config.py:218
 msgid "External media"
 msgstr "Médias externes /media"
 
-#: minarca_client/core/config.py:218
+#: minarca_client/core/config.py:219
 msgid "Ext4 Lost and Found"
 msgstr "Ext4 perdu et trouvé"
 
-#: minarca_client/core/config.py:219
+#: minarca_client/core/config.py:220
 msgid "Hidden temporary files"
 msgstr "Fichiers temporaires cachés"
 
-#: minarca_client/core/config.py:220
+#: minarca_client/core/config.py:221
 msgid "Vim Temporary files"
 msgstr "Fichiers temporaires Vim"
 
@@ -784,22 +788,22 @@ msgid "Current version is up-to-date"
 msgstr "La version actuelle est à jour"
 
 #: minarca_client/ui/templates/settings.html:22
-msgid "Update available"
+msgid "Your version may be upgraded"
 msgstr "Mise à jour disponible"
 
 #: minarca_client/ui/templates/settings.html:24
 msgid "Cannot check for updates. Try again later."
 msgstr "Impossible de rechercher des mises à jour. Réessayez plus tard."
 
-#: minarca_client/ui/templates/settings.html:37
+#: minarca_client/ui/templates/settings.html:35
 msgid "Disconnect the backup"
-msgstr "Débranchez la sauvegarde"
+msgstr "Arrêter la sauvegarde"
+
+#: minarca_client/ui/templates/settings.html:36
+msgid "Disconnect"
+msgstr "Arrêter"
 
 #: minarca_client/ui/templates/settings.html:38
-msgid "Disconnect"
-msgstr "Débranchez"
-
-#: minarca_client/ui/templates/settings.html:40
 msgid "When you disconnect this computer, the backup process will no longer work."
 msgstr ""
 "Lorsque vous débranchez cet ordinateur, le processus de sauvegarde ne "
@@ -813,23 +817,23 @@ msgstr "Sauvegarde de données"
 msgid "Log me in"
 msgstr "Me connecter"
 
-#: minarca_client/ui/templates/setup.html:17
+#: minarca_client/ui/templates/setup.html:18
 msgid "Remote Minarca server"
 msgstr "Serveur Minarca distant"
 
-#: minarca_client/ui/templates/setup.html:20
+#: minarca_client/ui/templates/setup.html:21
 msgid "e.g.: https://www.servername.com"
 msgstr "p.e.: https://www.servername.com/"
 
-#: minarca_client/ui/templates/setup.html:23
+#: minarca_client/ui/templates/setup.html:24
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: minarca_client/ui/templates/setup.html:28
+#: minarca_client/ui/templates/setup.html:29
 msgid "Password"
 msgstr "Mot de passe"
 
-#: minarca_client/ui/templates/setup.html:31
+#: minarca_client/ui/templates/setup.html:32
 msgid ""
 "If two-factor authentication is enabled on your account, use an Access "
 "Token."
@@ -837,19 +841,19 @@ msgstr ""
 "Si l'authentification à deux facteurs est activée sur votre compte, "
 "utilisez un jeton d'accès."
 
-#: minarca_client/ui/templates/setup.html:35
+#: minarca_client/ui/templates/setup.html:36
 msgid "Repository name"
 msgstr "Nom du dépôt"
 
-#: minarca_client/ui/templates/setup.html:41
+#: minarca_client/ui/templates/setup.html:42
 msgid "Sign in"
 msgstr "Se connecter"
 
-#: minarca_client/ui/templates/setup.html:44
+#: minarca_client/ui/templates/setup.html:45
 msgid "Connecting..."
 msgstr "Liaison..."
 
-#: minarca_client/ui/templates/setup.html:47
+#: minarca_client/ui/templates/setup.html:49
 msgid ""
 "To configure Minarca to backup your data, you must provide URL to Minarca"
 " server. This information should be provided by your system "

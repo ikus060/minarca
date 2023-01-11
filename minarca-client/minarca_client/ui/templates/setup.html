@@ -7,42 +7,44 @@
         <!-- Login form -->
         <Frame pack-fill="both" pack-expand="1" style="dark.TFrame"></Frame>
 
-        <Label style="H3.light.dark.TLabel" pack-fill="x" justify="center" text="Log me in" anchor="center"/>
+        <Label style="H3.light.dark.TLabel" pack-fill="x" justify="center" text="Log me in" anchor="center" pack-pady="0 5"/>
         <Label style="light.dark.TLabel" image="minarca-line" />
 
         <Frame pack-fill="both" pack-expand="1" style="dark.TFrame"></Frame>
 
-        <Frame pack-fill="x" padding="25" style="light.TFrame">
+        <Frame pack-fill="x" padding="1" style="light.TFrame">
+        <Frame pack-fill="x" padding="25" style="dark.TFrame">
             <!--Remote -->
-            <Label text="Remote Minarca server" style="strong.dark.light.TLabel" pack-fill="x" pack-pady="0 5"/>
+            <Label text="Remote Minarca server" style="strong.light.dark.TLabel" pack-fill="x" pack-pady="0 5"/>
             <Entry textvariable="{{remoteurl}}" pack-fill="x" 
                 state="{{'disabled' if linking else '!disabled'}}"/>
-            <Label text="e.g.: https://www.servername.com" style="small.dark.light.TLabel" pack-fill="x" pack-pady="0 10"/>
+            <Label text="e.g.: https://www.servername.com" style="small.light.dark.TLabel" pack-fill="x" pack-pady="0 10"/>
 
             <!-- Username -->
-            <Label text="Username" style="strong.dark.light.TLabel" pack-fill="x" pack-pady="0 5"/>
+            <Label text="Username" style="strong.light.dark.TLabel" pack-fill="x" pack-pady="0 5"/>
             <Entry textvariable="{{username}}" pack-fill="x" pack-pady="0 10"
                 state="{{'disabled' if linking else '!disabled'}}" />
 
             <!-- Password -->
-            <Label text="Password" style="strong.dark.light.TLabel" pack-fill="x" pack-pady="0 5" />
+            <Label text="Password" style="strong.light.dark.TLabel" pack-fill="x" pack-pady="0 5" />
             <Entry textvariable="{{password}}" show="•" pack-fill="x"
                 state="{{'disabled' if linking else '!disabled'}}" />
             <Label text="If two-factor authentication is enabled on your account, use an Access Token."
-                style="small.dark.light.TLabel" pack-fill="x" pack-pady="0 10"/>
+                style="small.light.dark.TLabel" pack-fill="x" pack-pady="0 10"/>
 
             <!--Repository name-->
-            <Label text="Repository name" style="strong.dark.light.TLabel" pack-fill="x" pack-pady="0 5" />
+            <Label text="Repository name" style="strong.light.dark.TLabel" pack-fill="x" pack-pady="0 5" />
             <Entry textvariable="{{repository_name}}" pack-fill="x" pack-pady="0 10"
                 state="{{'disabled' if linking else '!disabled'}}" />
 
             <!-- Buttons -->
-            <Frame pack-fill="x" style="light.TFrame">
+            <Frame pack-fill="x" style="dark.TFrame">
                 <Button id="submitbutton" text="Sign in" command="link" style="secondary.TButton"
                     state="{{'disabled' if not valid_form or linking else '!disabled'}}"
                     cursor="{{'hand2' if valid_form else ''}}" pack-side="left"/>
-                <Label style="info.light.TLabel" pack-fill="both" pack-side="left" text="Connecting..." visible="{{ linking }}" anchor="w"/>
+                <Label style="secondary.dark.TLabel" pack-fill="both" pack-side="left" text="Connecting..." visible="{{ linking }}" anchor="w"/>
             </Frame>
+        </Frame>
         </Frame>
         <Label wrap="1" justify="center" style="light.dark.TLabel" pack-padx="25" pack-pady="25 0"
                 text="To configure Minarca to backup your data, you must provide URL to Minarca server. This information should be provided by your system administrator." />

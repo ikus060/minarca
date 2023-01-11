@@ -529,10 +529,11 @@ ttk::style theme create minarca -parent clam -settings {
       -padding 0 \
       -border 0 \
       -relief flat \
-	  -anchor left;
+	  -anchor left \
+	  -font { Lato -16 underline };
     ttk::style map Link.TButton \
       -background {} \
-      -font {disabled { Lato -16 } {hover !disabled} { Lato -16 underline } {pressed !disabled} { Lato -16 underline } };
+      -font {disabled { Lato -16 } {hover !disabled} { Lato -16 } {pressed !disabled} { Lato -16 } };
 	
 	
     
