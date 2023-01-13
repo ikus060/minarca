@@ -22,6 +22,10 @@ install_requires = [
     "requests>=2.25.1",
     "tkvue==2.0.0",
     "wakepy",
+    # Charset Normalizer v3 cannot properly be froxen by PyInstaller. And this is a dependencies of Requests.
+    # Let make sure to load v2 until the problem get fixed.
+    # See https://github.com/pyinstaller/pyinstaller/issues/7372
+    "charset-normalizer<3",
 ]
 
 if os.name == "nt":

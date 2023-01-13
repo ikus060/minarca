@@ -144,7 +144,7 @@ class InvalidPatternError(Exception):
 
 
 Pattern = namedtuple('Pattern', ['include', 'pattern', 'comment'])
-Pattern.is_wildcard = lambda self: '*' in self.pattern or '?' in self.pattern
+Pattern.is_wildcard = lambda self: '*' in self.pattern or '?' in self.pattern or '[' in self.pattern
 
 
 class Patterns(list):
@@ -162,7 +162,7 @@ class Patterns(list):
             for line in f.readlines():
                 line = line.rstrip()
                 # Skip comment
-                if line.startswith("#"):
+                if line.startswith("#") or not line.strip():
                     comment = line[1:].strip()
                     continue
                 if line[0] not in ['+', '-']:
@@ -187,12 +187,17 @@ class Patterns(list):
                 [
                     Pattern(False, "**/Thumbs.db", _("Thumbnails cache")),
                     Pattern(False, "**/desktop.ini", _("Arrangement of a Windows folder")),
-                    Pattern(False, "C:/pagefile.sys", _("Swap file")),
+                    Pattern(False, "C:/swapfile.sys", _("Swap System File")),
+                    Pattern(False, "C:/pagefile.sys", _("Page System File")),
+                    Pattern(False, "C:/hiberfil.sys", _("Hibernation System File")),
+                    Pattern(False, "C:/System Volume Information", _("System Volume Information")),
                     Pattern(False, "C:/Recovery/", _("System Recovery")),
                     Pattern(False, "C:/$Recycle.Bin/", _("Recycle bin")),
                     Pattern(False, get_temp(), _("Temporary Folder")),
                     Pattern(False, "**/*.bak", _("AutoCAD backup files")),
                     Pattern(False, "**/~$*", _("Office temporary files")),
+                    Pattern(False, "**/*.ost.tmp", _("Outlook IMAP temporary files")),
+                    Pattern(False, "**/*.pst.tmp", _("Outlook POP temporary files")),
                 ]
             )
         if IS_MAC:
@@ -236,22 +241,36 @@ class Patterns(list):
         Return the list of patterns for each root. On linux, we have a single root. On Windows,
         we might have multiple if the computer has multiple disk, like C:, D:, etc.
         """
+        # Determine each prefix.
         if IS_WINDOWS:
-            # Find list of drives from patterns
-            drives = list()
+            # On Windows, Find list of drives from patterns
+            prefixes = list()
             for p in self:
                 m = re.match('^[A-Z]:(\\\\|/)', p.pattern)
                 if p.include and m:
                     drive = m.group(0).replace('\\', '/')
-                    if drive not in drives:
-                        drives.append(drive)
-            for drive in drives:
+                    if drive not in prefixes:
+                        prefixes.append(drive)
+        else:
+            # On Unix, simply use '/'
+            prefixes = ['/']
+
+        # Organize patterns
+        if len(self):
+            for prefix in prefixes:
                 sublist = []
                 for p in self:
-                    m = re.match('^[A-Z]:(\\\\|/)', p.pattern)
-                    if m and not p.pattern.replace('\\', '/').startswith(drive):
-                        continue
-                    sublist.append(Pattern(p.include, p.pattern.replace('\\', '/'), None))
-                yield (drive, sublist)
-        elif len(self) > 0:
-            yield ('/', self)
+                    pattern = p.pattern.replace('\\', '/') if IS_WINDOWS else p.pattern
+                    if pattern.startswith(prefix):
+                        sublist.append(Pattern(p.include, pattern, None))
+                    elif pattern.startswith('**') and not p.include:
+                        sublist.append(Pattern(p.include, pattern, None))
+                    elif p.is_wildcard() and not p.include:
+                        sublist.append(Pattern(p.include, '**/' + pattern, None))
+                # Then sort include / exclude from most precise to least precise
+                # absolute path first, then longuer path, then exclude value
+                sublist = sorted(
+                    sublist,
+                    key=lambda p: (p.pattern.startswith('**'), -len(p.pattern.split('/')), p.include, p.pattern),
+                )
+                yield (prefix, sublist)

@@ -228,10 +228,11 @@ ttk::style theme create {{ theme_name }} -parent clam -settings {
       -padding 0 \
       -border 0 \
       -relief flat \
-	  -anchor left;
+	  -anchor left \
+	  -font { {{font_family}} {{ font_size }} underline };
     ttk::style map Link.TButton \
       -background {} \
-      -font {disabled { {{font_family}} {{ font_size }} } {hover !disabled} { {{font_family}} {{ font_size }} underline } {pressed !disabled} { {{font_family}} {{ font_size }} underline } };
+      -font {disabled { {{font_family}} {{ font_size }} } {hover !disabled} { {{font_family}} {{ font_size }} } {pressed !disabled} { {{font_family}} {{ font_size }} } };
 	{% for fgname, fgcolor in fg_colors.items() %}
 	{% for bgname, bgcolor in bg_colors.items() %}
     {% if fgname != bgname %}

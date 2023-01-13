@@ -53,6 +53,17 @@ class PatternsTest(unittest.TestCase):
         self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
 
+    def test_load_with_empty_lines(self):
+        with open('patterns', 'w') as f:
+            f.write("# comments\n")
+            f.write("+somefilename.txt\n")
+            f.write("\n")
+            f.write("# AutoCad Backup file\n")
+            f.write("-*.bak\n")
+        patterns = Patterns('patterns')
+        self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
+        self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
+
     def test_load_with_missing_file(self):
         patterns = Patterns('invalid')
         self.assertEqual(0, len(patterns))
@@ -69,12 +80,34 @@ class PatternsTest(unittest.TestCase):
         self.assertEqual("# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
 
     @skipIf(IS_WINDOWS, 'only or unix')
-    def test_group_by_roots_unix(self, *unused):
+    def test_group_by_roots_unix_wildcard(self, *unused):
         with open('patterns', 'w') as f:
             f.write("")
         patterns = Patterns('patterns')
-        patterns.append(Pattern(True, '/home/', 'User files'))
-        self.assertEqual([('/', patterns)], list(patterns.group_by_roots()))
+        patterns.append(Pattern(True, '/home/', None))
+        patterns.append(Pattern(False, '**/*.bak', None))
+        patterns.append(Pattern(False, '*.tmp', None))
+        patterns.append(Pattern(False, '/home/*.tmp', None))
+        patterns.append(Pattern(True, '/srv/', None))
+        patterns.append(Pattern(False, '/srv/jellyfin/config/transcodes', None))
+        # should be ignored, because everything is included by default.
+        patterns.append(Pattern(True, '**/*.include', None))
+        self.assertEqual(
+            [
+                (
+                    '/',
+                    [
+                        Pattern(False, '/srv/jellyfin/config/transcodes', None),
+                        Pattern(False, '/home/*.tmp', None),
+                        Pattern(True, '/home/', None),
+                        Pattern(True, '/srv/', None),
+                        Pattern(False, '**/*.bak', None),
+                        Pattern(False, '**/*.tmp', None),
+                    ],
+                )
+            ],
+            list(patterns.group_by_roots()),
+        )
 
     @skipIf(not IS_WINDOWS, 'only for windows')
     @mock.patch('minarca_client.core.config.IS_WINDOWS', return_value=True)
@@ -83,28 +116,31 @@ class PatternsTest(unittest.TestCase):
             f.write("")
         p = Patterns('p')
         p.append(Pattern(True, 'C:/foo', None))
-        p.append(Pattern(True, '*.bak', None))
+        p.append(Pattern(False, '**/*.bak', None))
         p.append(Pattern(True, 'C:\\bar', None))
-        p.append(Pattern(True, '$~*', None))
+        p.append(Pattern(False, '**/$~*', None))
         p.append(Pattern(True, 'D:\\bar', None))
+        p.append(Pattern(False, '*.tmp', None))
         groups = list(p.group_by_roots())
         self.assertEqual(
             [
                 (
                     'C:/',
                     [
-                        Pattern(True, 'C:/foo', None),
-                        Pattern(True, '*.bak', None),
                         Pattern(True, 'C:/bar', None),
-                        Pattern(True, '$~*', None),
+                        Pattern(True, 'C:/foo', None),
+                        Pattern(False, '**/$~*', None),
+                        Pattern(False, '**/*.bak', None),
+                        Pattern(False, '**/*.tmp', None),
                     ],
                 ),
                 (
                     'D:/',
                     [
-                        Pattern(True, '*.bak', None),
-                        Pattern(True, '$~*', None),
                         Pattern(True, 'D:/bar', None),
+                        Pattern(False, '**/$~*', None),
+                        Pattern(False, '**/*.bak', None),
+                        Pattern(False, '**/*.tmp', None),
                     ],
                 ),
             ],
@@ -116,9 +152,11 @@ class PatternsTest(unittest.TestCase):
     def test_group_by_roots_win_exclude_other_root(self, *unused):
         p = Patterns('p')
         p.append(Pattern(True, 'C:/foo', None))
-        p.append(Pattern(True, '*.bak', None))
+        p.append(Pattern(False, '**/*.bak', None))
+        # should be ignored, because everything is included by default.
+        p.append(Pattern(True, '**/*.include', None))
         p.append(Pattern(True, 'C:\\bar', None))
-        p.append(Pattern(True, '$~*', None))
+        p.append(Pattern(False, '**/$~*', None))
         p.append(Pattern(False, 'D:\\bar', None))
         groups = list(p.group_by_roots())
         self.assertEqual(
@@ -126,10 +164,10 @@ class PatternsTest(unittest.TestCase):
                 (
                     'C:/',
                     [
-                        Pattern(True, 'C:/foo', None),
-                        Pattern(True, '*.bak', None),
                         Pattern(True, 'C:/bar', None),
-                        Pattern(True, '$~*', None),
+                        Pattern(True, 'C:/foo', None),
+                        Pattern(False, '**/$~*', None),
+                        Pattern(False, '**/*.bak', None),
                     ],
                 ),
             ],
