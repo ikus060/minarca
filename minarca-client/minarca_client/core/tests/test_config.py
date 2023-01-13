@@ -53,6 +53,17 @@ class PatternsTest(unittest.TestCase):
         self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
 
+    def test_load_with_empty_lines(self):
+        with open('patterns', 'w') as f:
+            f.write("# comments\n")
+            f.write("+somefilename.txt\n")
+            f.write("\n")
+            f.write("# AutoCad Backup file\n")
+            f.write("-*.bak\n")
+        patterns = Patterns('patterns')
+        self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
+        self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
+
     def test_load_with_missing_file(self):
         patterns = Patterns('invalid')
         self.assertEqual(0, len(patterns))

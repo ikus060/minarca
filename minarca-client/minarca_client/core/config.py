@@ -162,7 +162,7 @@ class Patterns(list):
             for line in f.readlines():
                 line = line.rstrip()
                 # Skip comment
-                if line.startswith("#"):
+                if line.startswith("#") or not line.strip():
                     comment = line[1:].strip()
                     continue
                 if line[0] not in ['+', '-']:
