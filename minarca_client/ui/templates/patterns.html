@@ -2,10 +2,10 @@
     <!-- Title -->
     <Label pack-side="top" text="Select files" style="H1.dark.default.TLabel" pack-fill="x" />
     <!-- Button-->
-    <Frame pack-fill="x" style="default.TFrame">
-        <Button text="Add file" command="add_file_pattern" pack-side="left" style="secondary.TButton" pack-padx="2" />
-        <Button text="Add folder" command="add_folder_pattern" pack-side="left" style="secondary.TButton" pack-padx="2" />
-        <Button text="Add ..." command="add_custom_pattern" pack-side="left" style="secondary.TButton" pack-padx="2" />
+    <Frame pack-fill="x" style="default.TFrame" pack-pady="5 0">
+        <Button text="Add file" command="add_file_pattern" pack-side="left" style="secondary.TButton" padding="10 5"/>
+        <Button text="Add folder" command="add_folder_pattern" pack-side="left" style="secondary.TButton" pack-padx="8" padding="10 5"/>
+        <Button text="Add ..." command="add_custom_pattern" pack-side="left" style="secondary.TButton" padding="10 5"/>
     </Frame>
     <ScrolledFrame id="scrolled_frame" pack-fill="both" pack-expand="1" style="light.TFrame" pack-pady="25 0">
         <Frame padding="25" pack-fill="x" pack-expand="1" style="light.TFrame">
