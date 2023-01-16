@@ -15,13 +15,13 @@
             variable="{{check_latest_version}}" style="dark.light.Roundtoggle.TCheckbutton" pack-fill="x" />
 
         <Frame style="light.TFrame" pack-fill="x">
-            <Label text="Checking for updates..." compound="left" visible="{{checking_for_update}}"
-                pack-fill="x" style="info.light.TLabel" />
-            <Label text="Current version is up-to-date" style="success.light.TLabel" compound="left"
+            <Label text="Checking for updates" visible="{{checking_for_update}}"
+                pack-fill="x" style="info.light.TLabel" compound="right" image="dots-16-info" />
+            <Label text="Current version is up-to-date" style="success.light.TLabel"
                 visible="{{is_latest is True}}" pack-fill="x" />
-            <Label text="Your version may be upgraded" style="info.light.TLabel" compound="left"
+            <Label text="Your version may be upgraded" style="info.light.TLabel"
                 visible="{{is_latest is False}}"  pack-fill="x" />
-            <Label text="Cannot check for updates. Try again later." style="danger.light.TLabel" compound="left"
+            <Label text="Cannot check for updates. Try again later." style="danger.light.TLabel"
                 visible="{{check_latest_version_error is not None}}"  pack-fill="x">
                 <Tooltip text="{{check_latest_version_error}}" width="50" />
             </Label>
