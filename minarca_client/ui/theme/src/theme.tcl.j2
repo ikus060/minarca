@@ -34,6 +34,15 @@ image create photo {{ glyph }}-{{ size }}-{{ name }} -data "{{ svg_to_base64(gly
 image create photo minarca-{{ size }} -data "{{ svg_to_base64( "minarca.svg", size|string + 'x' + size|string ) }}"
 {% endfor %}
 
+{# Create all variation of dots #}
+{% for name, color in fg_colors.items() %}
+{% for size in [16] %}
+{% for idx in range(0,4) %}
+image create photo dots-{{ size }}-{{ name }}_{{ "%02d" | format(idx) }} -data "{{ svg_to_base64('dots%s.svg' | format(idx),  'x%s' | format(size), color ) }}"
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
 {# Create Setup Logo #}
 image create photo minarca-logo -data "{{ svg_to_base64( "minarca-logo.svg", '256') }}"
 
