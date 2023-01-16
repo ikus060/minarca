@@ -58,7 +58,6 @@ In addition, you may also create other administrator users to manage Minarca.
 | admin-user | Define the name of the default admin user to be created | admin |
 | admin-password | administrator encrypted password as SSHA. Read online documentation to know more about how to encrypt your password into SSHA or use <http://projects.marsching.org/weave4j/util/genpassword.php> When defined, administrator password cannot be updated using the web interface. When undefined, default administrator password is `admin123` and it can be updated using the web interface. | modification |
 
-
 ## Configure logging
 
 Minarca can be configured to send logs to specific location. By default, logs are sent to `/var/log/minarca` folder.

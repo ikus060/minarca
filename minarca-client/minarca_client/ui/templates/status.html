@@ -16,7 +16,7 @@
         <!-- Current status -->
         <Frame style="light.TFrame" pack-side="left" pack-fill="both" pack-expand="1" padding="25">
             <Label style="H4.dark.light.TLabel" wrap="true" text="Backup Status: " pack-expand="1" pack-fill="x" width="15" anchor="s" />
-            <Label style="{{ f'H5.{status_text_style}.light.TLabel' }}" pack-expand="1" pack-fill="x" wrap="true" text="{{ status_text }}" compound="left" width="20" anchor="s" pack-pady="25 0" />
+            <Label style="{{ f'H5.{status_text_style}.light.TLabel' }}" pack-expand="1" pack-fill="x" wrap="true" text="{{ status_text }}" compound="right" width="20" anchor="s" pack-pady="25 0" image="{{ 'dots-16-success' if lastresult == 'RUNNING' else None }}"/>
         </Frame>
 
         <Separator orient="vertical" pack-side="left" pack-fill="y" />

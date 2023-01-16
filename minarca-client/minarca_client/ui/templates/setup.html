@@ -42,7 +42,7 @@
                 <Button id="submitbutton" text="Sign in" command="link" style="secondary.TButton"
                     state="{{'disabled' if not valid_form or linking else '!disabled'}}"
                     cursor="{{'hand2' if valid_form else ''}}" pack-side="left"/>
-                <Label style="secondary.dark.TLabel" pack-fill="both" pack-side="left" text="Connecting..." visible="{{ linking }}" anchor="w"/>
+                <Label style="secondary.dark.TLabel" pack-fill="both" pack-side="left" text="Connecting" compound="right" visible="{{ linking }}" anchor="w" image="dots-16-secondary" />
             </Frame>
         </Frame>
         </Frame>
