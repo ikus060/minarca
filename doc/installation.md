@@ -27,32 +27,6 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 
 ## Installation Steps
 
-Two different solutions are available to install Minarca Server. You should pick the right solution for your environment.
-
-### Option 1. Quick automated installation
-
-On a Debian Linux server:
-
-    curl -L https://www.ikus-soft.com/archive/minarca/get-minarca.sh | sh -
-
-This should install Minarca server and all required dependencies.
-
-The server should be running on http://127.0.0.1:8080 listening on all interfaces.
-
-You may stop or start the service using systemd:
-
-    sudo service minarca-server stop
-    sudo service minarca-server start
-
-Once installed, continue reading about how to configure minarca-server.
-
-You may access the web interface at http://localhost:8080 using:
-
-    * username: admin
-    * password: admin123 
-
-### Option 2. Step-by-Step installation
-
 On a Debian Linux server:
 
     apt update
@@ -61,6 +35,20 @@ On a Debian Linux server:
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
     apt update
     apt install minarca-server
+
+The server should be running on http://127.0.0.1:8080 listening on all interfaces. For a production deployment, it is strongly recommended to configure a reverse proxy with SSL termination like Nginx or Apache.
+
+You may stop or start the service using systemd:
+
+    sudo service minarca-server stop
+    sudo service minarca-server start
+
+Once installed, continue reading about how to configure minarca-server.
+
+You may access the web interface at http://127.0.0.1:8080 using:
+
+    * username: admin
+    * password: admin123 
 
 ## Setup Storage
 
@@ -168,7 +156,7 @@ Restart the service when you are done reviewing the configuration.
 
     sudo service minarca-server restart
 
-### 6. Change permissions 
+### 6. Change permissions
 
 Minarca web server is not running as root and required the data to be readable
 and writable by minarca user. If your backups are all located under `/backups/`

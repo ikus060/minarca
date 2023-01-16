@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-11 15:51-0500\n"
+"POT-Creation-Date: 2023-01-16 10:29-0500\n"
 "PO-Revision-Date: 2021-08-30 10:07-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -212,12 +212,12 @@ msgstr "échange de la nouvelle identité avec le serveur Minarca"
 msgid "executing command: %s"
 msgstr "exécution de la commande : %s"
 
-#: minarca_client/core/compat.py:315 minarca_client/ui/templates/home.html:1
+#: minarca_client/core/compat.py:319 minarca_client/ui/templates/home.html:1
 #: minarca_client/ui/templates/setup.html:1
 msgid "Minarca Backup"
 msgstr "Sauvegarde Minarca"
 
-#: minarca_client/core/compat.py:361
+#: minarca_client/core/compat.py:365
 msgid ""
 "Keeps your Minarca Backup Software running. If this task is disabled or "
 "stopped, your Minarca backup will stop working. This task gets created "
@@ -780,8 +780,8 @@ msgid "Check for update at startup"
 msgstr "Vérifier les mise à jour au démarrage"
 
 #: minarca_client/ui/templates/settings.html:18
-msgid "Checking for updates..."
-msgstr "Recherche de mises à jour..."
+msgid "Checking for updates"
+msgstr "Recherche de mises à jour"
 
 #: minarca_client/ui/templates/settings.html:20
 msgid "Current version is up-to-date"
@@ -795,15 +795,15 @@ msgstr "Mise à jour disponible"
 msgid "Cannot check for updates. Try again later."
 msgstr "Impossible de rechercher des mises à jour. Réessayez plus tard."
 
-#: minarca_client/ui/templates/settings.html:35
+#: minarca_client/ui/templates/settings.html:36
 msgid "Disconnect the backup"
 msgstr "Arrêter la sauvegarde"
 
-#: minarca_client/ui/templates/settings.html:36
+#: minarca_client/ui/templates/settings.html:37
 msgid "Disconnect"
 msgstr "Arrêter"
 
-#: minarca_client/ui/templates/settings.html:38
+#: minarca_client/ui/templates/settings.html:39
 msgid "When you disconnect this computer, the backup process will no longer work."
 msgstr ""
 "Lorsque vous débranchez cet ordinateur, le processus de sauvegarde ne "
@@ -850,8 +850,8 @@ msgid "Sign in"
 msgstr "Se connecter"
 
 #: minarca_client/ui/templates/setup.html:45
-msgid "Connecting..."
-msgstr "Liaison..."
+msgid "Connecting"
+msgstr "Connexion"
 
 #: minarca_client/ui/templates/setup.html:49
 msgid ""
