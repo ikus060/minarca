@@ -73,48 +73,74 @@ The Minarca website is https://minarca.org/.
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
 
-* Upgrade Rdiffweb to 2.5.3
+* Upgrade Rdiffweb to 2.5.6
   * Store User's session information into database
   * Update ldap plugin to load additional attributes from LDAP server
   * Improve `/status` page error handling when `session_statistics` cannot be read
-  * Upgrade from Bootstrap v3 to v4
+  * Add support for Ubuntu Jammy
+  * Upgrade from Bootstrap v3 to v4 #204
   * Replace Fontello by Font-Awesome v4
-  * Use CSS variables `var()` to customize themes
+  * Use CSS variables `var()` to customize themes using `--branding-X` options #239
   * Remove usage of Jquery.validate
-  * Replace custom timsort by jquery DataTables
-  * Add Active Session managements
+  * Replace custom timsort by jquery DataTables #205
+  * Add Active Session managements #203
     * Active session should be visible in user's profiles
     * Active session may be revoked by user
     * Active session should be visible in administration view
     * Action session may be revoke by administrator
     * Show number of active users within the last 24 hours in dashboard
-  * Handle migration of older Rdiffweb database by adding the missing `repos.Encoding`, `repos.keepdays` and `users.role` columns
-  * Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()`
-  * Add two-factor authentication with email verification
-  * Generate a new session on login and 2FA
-  * Run user's quota update in background task
-  * Block repository access when user_root directory is empty or a relative path
-  * Replace admin password only when `--admin-password` option is provided
-  * Invalidate browser cache for logo, headerlogo and favicon on restart
-  * Disable filesize for deleted files to improve page loading
+  * Handle migration of older Rdiffweb database by adding the missing `repos.Encoding`, `repos.keepdays` and `users.role` columns #185
+  * Replace deprecated references of `disutils.spawn.find_executable()` by `shutil.which()` #208
+  * Add two-factor authentication with email verification #201
+  * Generate a new session on login and 2FA #220
+  * Enforce permission on /etc/rdiffweb configuration folder
+  * Enforce validation on fullname, username and email
+  * Limit incorrect attempts to change the user's password to prevent brute force attacks #225 [CVE-2022-3273](https://nvd.nist.gov/vuln/detail/CVE-2022-3273) credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Enforce password policy new password cannot be set as new password [CVE-2022-3376](https://nvd.nist.gov/vuln/detail/CVE-2022-3376) credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Enforce better rate limit on login, mfa, password change and API [CVE-2022-3439](https://nvd.nist.gov/vuln/detail/CVE-2022-3439) [CVE-2022-3456](https://nvd.nist.gov/vuln/detail/CVE-2022-3456) credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Enforce 'Origin' validation [CVE-2022-3457](https://nvd.nist.gov/vuln/detail/CVE-2022-3457) credit to [Nithissh12](Nithissh12)
+  * Define idle and absolute session timeout with agressive default to protect usage on public computer [CVE-2022-3327](https://nvd.nist.gov/vuln/detail/CVE-2022-3327) credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Send email notification when enabling or disabling MFA [CVE-2022-3363](https://nvd.nist.gov/vuln/detail/CVE-2022-3363) credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Use Argon2id to store password hash #231
+  * Fixed plugin priorities to ensure that jobs are scheduled at each startup #232
+  * Revoke previous user's sessions on password change [CVE-2022-3362](https://nvd.nist.gov/vuln/detail/CVE-2022-3362) credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Add support for Ubuntu Kinetic #240
+  * Disable filesize for deleted files to improve page loading #241
+  * Block repository access when user_root directory is empty or relative path [CVE-2022-4314](https://nvd.nist.gov/vuln/detail/CVE-2022-4314) credit to [neverjunior](https://github.com/neverjunior)
+  * Replace admin password only when `--admin-password` option is provided #246
+  * Invalidate browser cache for `logo`, `headerlogo` and `favicon` on restart #245
   * Add support for WTForms v3 to support Debian Bookworm
   * Fix strange behavior in access token management #247
-* Add support for Ubuntu Jammy
-* Add support for Ubuntu Kinetic
+  * Discard `X-Forwarded-Host` headers credit to [Anishka Shukla](https://github.com/anishkashukla)
+  * Create proper symbolic link of `chartkick.js` on Ubuntu Jammy to fix loading of Charts in web interface
+  * Add CSRF verification on `/logout` credits to [reza.duty](https://rezaduty.me)
+  * Fix loading of Charts in Status page
+  * Ensure Gmail and other mail client doesn't create hyperlink automatically for any nodification sent by Rdiffweb to avoid phishing - credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Sent email notification to user when a new SSH Key get added - credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Ratelimit "Resend code to my email" in Two-Factor Authentication view - credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Username are not case-insensitive - credits to [raiders0786](https://www.linkedin.com/in/chirag-agrawal-770488144/)
+  * Make sure that all ssh keys are unique, regardless of the user - credit to [Nehal Pillai](https://www.linkedin.com/in/nehal-pillai-02a854172)
+  * Disable translation caching
+  * Fixed display of Hamburger menu on mobiles (minarca#192)
+  * Change wording for interupted backup
+* Add support for Ubuntu Jammy 22.04 LTS
+* Add support for Ubuntu Kinetic 22.10
 * Run user quota operation in background to avoid blocking user interface #186
 * Redesign the user interface for better usability
 * Support URL Redirection to prevent error during the setup process
 * Fix translation loading on some platform
 * Re-generate a new identity if it's already exists on the server to prevent error during the setup process
-* Replace usage of Threading by Asyncio to make the unser interface more stable
+* Replace usage of Threading by Asyncio to make the user interface more stable
 * Improve error message when Agent cannot connect to remote server #188
-* Add new more default exclusion pattern for Windows OS #187 #189
+* Add new default exclusion patterns for Windows #187 #189
+* Adding man page for minarca-server
 
 Breaking changes:
 
 * Drop Ubuntu Hirsute & Impish (End-of-life)
 * `session-dir` is deprecated and should be replace by `rate-limit-dir`. User's session are stored in database.
 * previous `.css` customization are not barkward compatible
+* Username with different cases (e.g.: admin vs Ammin) are not supported. If your database contains such username make sure to remove them before upgrading otherwise Rdiffweb will not start.
 
 ## 4.2.5 (2002-10-03)
 

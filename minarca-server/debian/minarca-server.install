@@ -1,4 +1,5 @@
 data/etc/sysctl.d/00-minarca-server-userns.conf   /etc/sysctl.d/
 data/etc/minarca/minarca-server.conf              /etc/minarca/
-minarca_server/minarca.ico                       /opt/minarca-server/share/
-minarca_server/minarca_logo.svg                  /opt/minarca-server/share/
+data/etc/minarca/conf.d/placeholder               /etc/minarca/conf.d/
+minarca_server/minarca.ico                        /opt/minarca-server/share/
+minarca_server/minarca_logo.svg                   /opt/minarca-server/share/
