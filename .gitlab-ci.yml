@@ -343,7 +343,7 @@ e2e-test:deb:
   allow_failure: True
   needs:
   - deploy:dev
-  - bdist:deb
+  - bdist:linux
   image: buildpack-deps:$DIST
   parallel:
     matrix:
