@@ -54,7 +54,6 @@ class MinarcaApplication(RdiffwebApp):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_minarca(self):
-
         # RemoteHost
         remotehost = self.cfg.minarca_remote_host
         if not remotehost:

@@ -30,7 +30,6 @@ import minarca_server.tests
 
 
 class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
-
     basic_headers = [("Authorization", "Basic " + b64encode(b"admin:admin123").decode('ascii'))]
 
     login = True
@@ -96,7 +95,6 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertInBody('identity')
 
     def test_get_api_minarca_with_reverse_proxy(self):
-
         # When behind an apache reverse proxy, minarca server should make use
         # of the Header to determine the public hostname provided.
         headers = [
@@ -140,7 +138,6 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
 
 
 class MinarcaAdminLogView(minarca_server.tests.AbstractMinarcaTest):
-
     default_config = {
         'minarca-quota-api-url': 'http://localhost:8081',
     }
@@ -167,7 +164,6 @@ class MinarcaAdminLogView(minarca_server.tests.AbstractMinarcaTest):
 
 
 class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
-
     default_config = {
         'minarca-quota-api-url': 'http://minarca:secret@localhost:8081/',
     }
@@ -245,7 +241,6 @@ class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):
 
 
 class MinarcaPluginTestWithOwnerAndGroup(minarca_server.tests.AbstractMinarcaTest):
-
     default_config = {
         'MinarcaUserDirOwner': pwd.getpwuid(os.getuid()).pw_name,
         'MinarcaUserDirGroup': grp.getgrgid(os.getgid()).gr_name,
