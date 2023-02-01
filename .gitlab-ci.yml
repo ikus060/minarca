@@ -93,9 +93,6 @@ bdist:deb:
   needs: []
   parallel:
     matrix:
-    - TARGET: minarca-client
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
-      DEPENDS: python3 cron librsync-dev libacl1-dev
     - TARGET: minarca-server
       DIST: [buster, bullseye, bookworm, jammy, kinetic]
       DEPENDS: python3
@@ -125,6 +122,7 @@ bdist:linux:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.tar.gz"
+    - "minarca-client/dist/minarca-client_*.deb"
     expire_in: 1 day
   before_script:
   - apt update && apt -y --no-install-recommends install librsync-dev libacl1-dev git
@@ -225,15 +223,19 @@ upload:deb:
   image: python:3
   needs:
   - bdist:deb
+  - bdist:linux
   parallel:
     matrix:
     - TARGET: minarca-client
       DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST_SPECIFIC: 0
     - TARGET: minarca-server
       DIST: [buster, bullseye, bookworm, jammy, kinetic]
       DEPENDS: python3
+      DIST_SPECIFIC: 1
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye, bookworm]
+      DIST_SPECIFIC: 1
   script: |
     set -e
     set -x
@@ -243,7 +245,11 @@ upload:deb:
       APT_URL="https://nexus.ikus-soft.com/repository/apt-dev-${DIST}/"
     fi
     # Minarca Server
-    export FILE=$(ls -1 ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb)
+    if [[ "$DIST_SPECIFIC" == 1 ]]; then
+      export FILE=$(ls -1 ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb)
+    else
+      export FILE=$(ls -1 ./${TARGET}/dist/${TARGET}_*_amd64.deb)
+    fi
     curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$FILE" "$APT_URL"
     sleep 2
     curl --fail ${APT_URL}/dists/$DIST/main/binary-amd64/Packages | grep "$(basename $FILE)"
@@ -348,7 +354,7 @@ e2e-test:deb:
     - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
     # Smoke test
     - minarca --version
-    - /opt/minarca/bin/minarcaw --version
+    - /opt/minarca/minarcaw --version
     # Check translation
     - LANGUAGE="fr" minarca --help | grep 'démarrer une sauvegarde'
     # Check backup
