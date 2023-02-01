@@ -49,13 +49,13 @@ test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, bookworm]
+      DIST: [buster, bullseye]
       DEPENDS: cron librsync-dev python3-tk libacl1-dev xvfb xauth
     - TARGET: minarca-server
-      DIST: [buster, bullseye, bookworm]
+      DIST: [buster, bullseye]
       DEPENDS: rdiff-backup
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, bookworm]
+      DIST: [buster, bullseye]
       DEPENDS: bash
   script:
   - cd $TARGET
@@ -94,12 +94,12 @@ bdist:deb:
   parallel:
     matrix:
     - TARGET: minarca-server
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST: [buster, bullseye, jammy, kinetic]
       DEPENDS: python3
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, bookworm]
+      DIST: [buster, bullseye]
       DEPENDS: python3
   script:
   - apt update && apt -y --no-install-recommends install devscripts $DEPENDS
@@ -189,7 +189,7 @@ test-bdist:deb:
   parallel:
     matrix:
     - TARGET: minarca-server
-      DIST: [buster, bullseye, bookworm]
+      DIST: [buster, bullseye]
     # Ubuntu tzdata is broken https://githubmate.com/repo/regebro/tzlocal/issues/101
     # So we need to make it explicit using environment variable
     - TARGET: minarca-server
@@ -230,11 +230,11 @@ upload:deb:
       DIST: [buster, bullseye, bookworm, jammy, kinetic]
       DIST_SPECIFIC: 0
     - TARGET: minarca-server
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST: [buster, bullseye, jammy, kinetic]
       DEPENDS: python3
       DIST_SPECIFIC: 1
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, bookworm]
+      DIST: [buster, bullseye]
       DIST_SPECIFIC: 1
   script: |
     set -e
@@ -351,7 +351,7 @@ e2e-test:deb:
       DIST: [buster, bullseye, bookworm, jammy, kinetic]
   script:
     - apt update
-    - apt install -y ./minarca-client/dist/$DIST/minarca-client_*_amd64.deb
+    - apt install -y ./minarca-client/dist/minarca-client_*_amd64.deb
     # Smoke test
     - minarca --version
     - /opt/minarca/minarcaw --version
