@@ -430,7 +430,6 @@ class TestBackup(unittest.TestCase):
         )
 
     def test_rdiff_backup_threading(self):
-
         self.error = None
 
         def _start_backup():

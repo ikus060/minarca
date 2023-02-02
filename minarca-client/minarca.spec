@@ -18,6 +18,7 @@ import subprocess
 import tempfile
 import pkg_resources
 import re
+from email import message_from_string
 from PyInstaller.utils.hooks import copy_metadata
 
 #
@@ -25,7 +26,12 @@ from PyInstaller.utils.hooks import copy_metadata
 #
 icon = 'minarca_client/ui/theme/minarca.ico'
 macos_icon = 'minarca_client/ui/theme/minarca.icns'
-version = pkg_resources.get_distribution("minarca_client").version
+# Read pacakage info
+pkg = pkg_resources.get_distribution("minarca_client")
+version = pkg.version
+_metadata = message_from_string(pkg.get_metadata('METADATA'))
+pkg_info = dict(_metadata.items())
+long_description = _metadata._payload
 block_cipher = None
 
 
@@ -39,7 +45,10 @@ a = Analysis(
     ['minarca_client/main.py'],
     pathex=[],
     binaries=[],
-    datas=copy_metadata('minarca_client') + copy_metadata('rdiff-backup') + openssh + [
+    datas=copy_metadata('minarca_client')
+    + copy_metadata('rdiff-backup')
+    + openssh
+    + [
         ('README.md', '.'),
         ('LICENSE', '.'),
         ('minarca_client/ui/templates', 'minarca_client/ui/templates'),
@@ -53,11 +62,10 @@ a = Analysis(
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
-    noarchive=False)
+    noarchive=False,
+)
 
-pyz = PYZ(
-    a.pure, a.zipped_data,
-    cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 # First executable for windowed mode.
 exe_w = EXE(
@@ -71,7 +79,8 @@ exe_w = EXE(
     strip=False,
     upx=False,
     icon=icon,
-    console=False)
+    console=False,
+)
 all_exe = [exe_w]
 
 # Another executable on for console mode.
@@ -86,18 +95,11 @@ exe_c = EXE(
     strip=False,
     upx=False,
     icon=icon,
-    console=True)
+    console=True,
+)
 all_exe += [exe_c]
 
-coll = COLLECT(
-    *all_exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=False,
-    upx_exclude=[],
-    name='minarca')
+coll = COLLECT(*all_exe, a.binaries, a.zipfiles, a.datas, strip=False, upx=False, upx_exclude=[], name='minarca')
 
 # Extract certificate from environment variable.
 cert_file = tempfile.mktemp(suffix='.key')
@@ -112,14 +114,28 @@ if os.environ.get('AUTHENTICODE_CERT'):
         f.write(os.environ['AUTHENTICODE_KEY'])
     # Get Common Name from certificate subject
     cert_subject = subprocess.check_output(
-        ['openssl', 'x509', '-noout', '-subject', '-in', cert_file],
-        text=True).strip()
+        ['openssl', 'x509', '-noout', '-subject', '-in', cert_file], text=True
+    ).strip()
     cert_cn = cert_subject.partition('/CN=')[2]
     # Code signing on Windows required pfx file.
     pfx_file = tempfile.mktemp(suffix='.pfx')
     subprocess.check_call(
-        ['openssl', 'pkcs12', '-inkey', key_file, '-in', cert_file, '-passin',
-         'pass:%s' % passphrase, '-passout', 'pass:%s' % passphrase, '-export', '-out', pfx_file])
+        [
+            'openssl',
+            'pkcs12',
+            '-inkey',
+            key_file,
+            '-in',
+            cert_file,
+            '-passin',
+            'pass:%s' % passphrase,
+            '-passout',
+            'pass:%s' % passphrase,
+            '-export',
+            '-out',
+            pfx_file,
+        ]
+    )
 else:
     print('AUTHENTICODE_CERT is missing, skip signing')
 
@@ -131,8 +147,7 @@ if platform.system() == "Darwin":
     if os.environ.get('AUTHENTICODE_CERT'):
         # Add certificate to login keychain
         keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
-        subprocess.check_call(
-            ['security', 'import', pfx_file, '-k', keychain, '-P', passphrase])
+        subprocess.check_call(['security', 'import', pfx_file, '-k', keychain, '-P', passphrase])
 
     # Create app bundle
     app = BUNDLE(
@@ -141,22 +156,16 @@ if platform.system() == "Darwin":
         icon=macos_icon,
         bundle_identifier='com.ikus-soft.minarca',
         version=version,
-        codesign_identity=cert_cn
+        codesign_identity=cert_cn,
     )
     app_file = os.path.abspath('dist/Minarca.app')
 
     # Binary smoke test
-    subprocess.check_call(
-        ['dist/minarca.app/Contents/MacOS/minarca', '--version'])
+    subprocess.check_call(['dist/minarca.app/Contents/MacOS/minarca', '--version'])
 
     # Generate dmg image
     dmg_file = os.path.abspath('dist/minarca-client_%s.dmg' % version)
-    subprocess.check_call([
-        'dmgbuild',
-        '-s', 'minarca.dmgbuild',
-        '-D', 'app=' + app_file,
-        'Minarca',
-        dmg_file])
+    subprocess.check_call(['dmgbuild', '-s', 'minarca.dmgbuild', '-D', 'app=' + app_file, 'Minarca', dmg_file])
 
 elif platform.system() == "Windows":
 
@@ -168,27 +177,30 @@ elif platform.system() == "Windows":
         # Sign executable.
         unsigned = tempfile.mktemp(suffix='.exe')
         os.rename(path, unsigned)
-        subprocess.check_call([
-            'osslsigncode.exe',
-            'sign',
-            '-certs',
-            cert_file,
-            '-key',
-            key_file,
-            '-pass',
-            passphrase,
-            '-n',
-            'Minarca',
-            '-i',
-            'https://minarca.org',
-            '-h',
-            'sha2',
-            '-t',
-            'http://timestamp.digicert.com',
-            '-in',
-            unsigned,
-            '-out',
-            path])
+        subprocess.check_call(
+            [
+                'osslsigncode.exe',
+                'sign',
+                '-certs',
+                cert_file,
+                '-key',
+                key_file,
+                '-pass',
+                passphrase,
+                '-n',
+                'Minarca',
+                '-i',
+                'https://minarca.org',
+                '-h',
+                'sha2',
+                '-t',
+                'http://timestamp.digicert.com',
+                '-in',
+                unsigned,
+                '-out',
+                path,
+            ]
+        )
         if not os.path.isfile(path):
             raise Exception('fail to sign executable: output file found: %s' % path)
 
@@ -201,19 +213,21 @@ elif platform.system() == "Windows":
             out.write(input.read())
 
     # Create installer using NSIS
-    exe_version = re.search(
-        '.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
+    exe_version = re.search('.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
     nsi_file = os.path.abspath('minarca.nsi')
     setup_file = os.path.abspath('dist/minarca-client_%s.exe' % version)
-    subprocess.check_call([
-        'makensis',
-        '-NOCD',
-        '-INPUTCHARSET',
-        'UTF8',
-        '-DAppVersion=' + exe_version,
-        '-DOutFile=' + setup_file,
-        nsi_file],
-        cwd='dist/minarca')
+    subprocess.check_call(
+        [
+            'makensis',
+            '-NOCD',
+            '-INPUTCHARSET',
+            'UTF8',
+            '-DAppVersion=' + exe_version,
+            '-DOutFile=' + setup_file,
+            nsi_file,
+        ],
+        cwd='dist/minarca',
+    )
 
     # Sign installer
     sign_exe(setup_file)
@@ -223,11 +237,32 @@ elif platform.system() == "Windows":
 
 else:
 
+    from debbuild import debbuild
+
     # For linux simply create a tar.gz with the folder
     targz_file = os.path.abspath('dist/minarca-client_%s.tar.gz' % version)
-    subprocess.check_call([
-        'tar',
-        '-zcvf',
-        targz_file,
-        'minarca'],
-        cwd=os.path.abspath('./dist'))
+    subprocess.check_call(['tar', '-zcvf', targz_file, 'minarca'], cwd=os.path.abspath('./dist'))
+
+    # Also create a Debian package
+    debbuild(
+        name='minarca-client',
+        version=version,
+        architecture='amd64',
+        data_src=[
+            ('/opt/minarca', './dist/minarca'),
+            ('/usr/share/applications/minarca-client.desktop', './minarca.desktop'),
+            ('/opt/minarca/minarca.svg', './minarca_client/ui/theme/minarca.svg'),
+            ('/usr/share/doc/minarca-client/copyright', './LICENSE'),
+        ],
+        description=pkg_info['Summary'],
+        long_description=long_description,
+        url=pkg_info['Home-page'],
+        maintainer="%s <%s>" % (pkg_info['Maintainer'], pkg_info['Maintainer-email']),
+        output='./dist',
+        postinst="./minarca.postinst",
+        symlink=[
+            ("/usr/bin/minarca", "/opt/minarca/minarca"),
+            ("/opt/minarca/bin/minarca", "../minarca"),
+        ],
+        depends=['libc6', 'cron'],
+    )

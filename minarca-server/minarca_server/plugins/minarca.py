@@ -218,7 +218,6 @@ class MinarcaPlugin(SimplePlugin):
         new_data = StringIO()
         for userobj in UserObject.query.all():
             for key in userobj.authorizedkeys:
-
                 if key.fingerprint in seen:
                     logger.warning("duplicates key %s, sshd will ignore it")
                 else:

@@ -16,3 +16,4 @@
 /debian/changelog
 /debian/debhelper-build-stamp
 /debian/minarca-client/
+.debbuild
