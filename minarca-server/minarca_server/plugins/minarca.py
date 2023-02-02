@@ -111,12 +111,6 @@ class MinarcaPlugin(SimplePlugin):
         )
         logfiles = self._orig_get_log_files()
         logfiles.append(minarca_shell_logfile)
-        # Add minarca-quota-api to logfile view.
-        minarca_quota_logfile = os.path.join(
-            os.path.dirname(self._log_file or '/var/log/minarca/server.log'), 'quota-api.log'
-        )
-        if os.path.isfile(minarca_quota_logfile):
-            logfiles.append(minarca_quota_logfile)
         return logfiles
 
     def user_added(self, userobj):
