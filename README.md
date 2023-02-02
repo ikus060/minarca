@@ -71,7 +71,8 @@ The Minarca website is https://minarca.org/.
 
 ## Next Release - 4.4.0
 
-* Generate Debian package using Pyinstaller and Debbuild to improve compatibility
+* Generate minarca-client Debian package using Pyinstaller and Debbuild to improve compatibility
+* Redistribute logos in PNG format for better compatibility
 
 ## 4.3.0 (2023-01-16)
 
