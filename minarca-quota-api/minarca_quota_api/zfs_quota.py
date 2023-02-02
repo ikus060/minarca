@@ -33,7 +33,6 @@ def _parse_args(args):
 
 
 def is_project_quota_enabled(pool):
-
     # Get value using zfs (as exact value).
     args = ['/sbin/zpool', 'get', '-p', '-H', '-o', 'value', 'feature@project_quota', pool]
     try:

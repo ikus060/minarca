@@ -1,5 +1,0 @@
-minarca-client (%VERSION%) unstable; urgency=low
-
-  * Debian package generated using dh_virtualenv.
-
- -- Patrik Dufresne <patrik@ikus-soft.com>  %DATE%

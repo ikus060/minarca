@@ -13,7 +13,6 @@ import minarca_server.tests
 
 
 class MinarcaApplicationTestWithHelpUrl(minarca_server.tests.AbstractMinarcaTest):
-
     default_config = {'minarca-help-url': 'https://example.com/help/'}
 
     def test_get_help(self):
@@ -24,7 +23,6 @@ class MinarcaApplicationTestWithHelpUrl(minarca_server.tests.AbstractMinarcaTest
 
 
 class MinarcaApplicationTestWithRemoteIdentity(minarca_server.tests.AbstractMinarcaTest):
-
     basic_headers = [("Authorization", "Basic " + b64encode(b"admin:admin123").decode('ascii'))]
 
     default_config = {
