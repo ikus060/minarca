@@ -69,6 +69,10 @@ The Minarca website is https://minarca.org/.
 
 # Changelog
 
+## Next Release - 4.4.0
+
+* Generate Debian package using Pyinstaller and Debbuild to improve compatibility
+
 ## 4.3.0 (2023-01-16)
 
 This releases include a security fix. If you are using an earlier version, you should upgrade to this release immediately.
