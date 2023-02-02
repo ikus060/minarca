@@ -576,7 +576,7 @@ msgstr ""
 #: minarca_client/ui/status.py:55
 #, python-format
 msgid "Welcome %s"
-msgstr "Bienvenu %s"
+msgstr "Bienvenue %s"
 
 #: minarca_client/ui/status.py:64
 msgid "Backup is healthy"

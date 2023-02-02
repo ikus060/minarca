@@ -1,6 +1,8 @@
+#!/bin/bash
 # Copyright (C) 2021 IKUS Software inc. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
+set -e 
 
 KEYRING_PATH=/usr/share/keyrings/minarca-keyring.gpg
 
@@ -82,7 +84,5 @@ case "$1" in
     fi
     ;;
 esac
-
-#DEBHELPER#
 
 exit 0

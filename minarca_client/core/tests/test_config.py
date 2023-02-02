@@ -219,7 +219,6 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(False, config['check_latest_version'])
 
     def test_configured(self):
-
         for text in ['true', 'True', '1']:
             with open('test.properties', 'w') as f:
                 f.write("configured=%s\n" % text)
