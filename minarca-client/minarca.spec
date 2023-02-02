@@ -264,5 +264,5 @@ else:
             ("/usr/bin/minarca", "/opt/minarca/minarca"),
             ("/opt/minarca/bin/minarca", "../minarca"),
         ],
-        depends=['libc6'],
+        depends=['libc6', 'cron'],
     )
