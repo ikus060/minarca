@@ -308,14 +308,12 @@ def redirect_ouput(logger):
 
 
 if IS_WINDOWS:
-
     import pythoncom  # @UnresolvedImport
     import pywintypes  # @UnresolvedImport
     import win32api  # @UnresolvedImport
     import win32com.client  # @UnresolvedImport
 
     class WindowsScheduler:
-
         NAME = _('Minarca Backup')
 
         def __init__(self):
@@ -415,7 +413,6 @@ if IS_WINDOWS:
     Scheduler = WindowsScheduler
 
 if IS_MAC:
-
     import launchd  # @UnresolvedImport
 
     class MacScheduler:
@@ -456,7 +453,6 @@ if IS_MAC:
     Scheduler = MacScheduler
 
 if IS_LINUX:
-
     from crontab import CronTab
 
     class CrontabScheduler:

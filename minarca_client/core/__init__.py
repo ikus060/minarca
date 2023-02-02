@@ -335,7 +335,6 @@ class Backup:
             raise ValueError("repository must only contains letters, numbers, dash (-) and dot (.)")
 
         try:
-
             # Check if the repository already exists for the guven user.
             rdiffweb = Rdiffweb(remoteurl, username, password)
             current_user = rdiffweb.get_current_user_info()
