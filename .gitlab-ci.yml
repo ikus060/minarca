@@ -26,11 +26,11 @@ bdist-server:deb:
   parallel:
     matrix:
     - TARGET: minarca-server
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST: [buster, bullseye, jammy, kinetic]
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
     - TARGET: minarca-quota-api
-      DIST: [buster, bullseye, bookworm]
+      DIST: [buster, bullseye]
   script:
   - apt update && apt -y --no-install-recommends install devscripts python3
   - cd $TARGET
