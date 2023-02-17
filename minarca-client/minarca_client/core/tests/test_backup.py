@@ -373,7 +373,7 @@ class TestBackup(unittest.TestCase):
         mock_rdiff_backup.assert_called_once_with(
             [
                 '-v',
-                '4',
+                '5',
                 '--remote-schema',
                 MATCH(
                     _ssh
@@ -416,7 +416,7 @@ class TestBackup(unittest.TestCase):
         mock_rdiff_backup.assert_called_once_with(
             [
                 '-v',
-                '4',
+                '5',
                 '--remote-schema',
                 MATCH(
                     _ssh
@@ -559,7 +559,7 @@ class TestBackup(unittest.TestCase):
         mock_rdiff_backup.assert_called_once_with(
             [
                 '-v',
-                '4',
+                '5',
                 '--remote-schema',
                 MATCH(
                     _ssh
