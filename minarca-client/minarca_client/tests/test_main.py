@@ -15,8 +15,9 @@ import unittest
 from unittest import mock
 
 from minarca_client import main
+from minarca_client.core import HttpAuthenticationError
 from minarca_client.core.config import Pattern, Patterns, Settings
-from minarca_client.main import _backup, _pattern, _schedule, _status, _stop, _unlink
+from minarca_client.main import _EXIT_WRONG_PASSWD, _backup, _pattern, _schedule, _status, _stop, _unlink
 
 
 class TestMainParseArgs(unittest.TestCase):
@@ -125,6 +126,20 @@ class TestMainParseArgs(unittest.TestCase):
         mock_getpass.return_value = ''
         with self.assertRaises(SystemExit):
             main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
+
+    @mock.patch('getpass.getpass')
+    @mock.patch('minarca_client.main.Backup')
+    def test_link_wrong_password(self, mock_backup, mock_getpass):
+        # Given a computer that is not configured
+        mock_backup.return_value.is_linked.return_value = False
+        # Given a wrong password
+        mock_getpass.return_value = 'invalid'
+        mock_backup.return_value.link.side_effect = HttpAuthenticationError
+        # When trying to link the computer with CLI
+        # Then an exception is raised
+        with self.assertRaises(SystemExit) as context:
+            main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
+        self.assertEqual(_EXIT_WRONG_PASSWD, context.exception.code)
 
     @mock.patch('minarca_client.main._link')
     def test_args_link_force(self, mock_link):

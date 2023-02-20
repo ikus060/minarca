@@ -88,6 +88,7 @@ The Minarca website is https://minarca.org/.
   * Improve System Logs view to identify "User Activity", "Threats" and "User Login"
 * Generate minarca-client Debian package using Pyinstaller and Debbuild to improve compatibility
 * Redistribute logos in PNG format for better compatibility
+* Handle wrong password exception in CLI #195
 
 ## 4.3.0 (2023-01-16)
 
