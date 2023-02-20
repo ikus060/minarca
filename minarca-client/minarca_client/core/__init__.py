@@ -432,7 +432,7 @@ class Backup:
             raise NotConfiguredError()
 
         # base command line
-        args = ['-v', '4', '--remote-schema']
+        args = ['-v', '5', '--remote-schema']
         remote_schema = _escape_remote_shema(compat.get_ssh())
         remote_schema += " -oBatchMode=yes -oPreferredAuthentications=publickey"
         if os.environ.get('MINARCA_ACCEPT_HOST_KEY', False) in ['true', '1', 'True']:
