@@ -76,8 +76,8 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertIn("minarca.ico", self.app.cfg.favicon)
         self.assertEqual("Minarca", self.app.cfg.footer_name)
         self.assertEqual("Minarca", self.app.cfg.header_name)
-        self.assertIn("minarca_logo.svg", self.app.cfg.header_logo)
-        self.assertIn("logo.svg", self.app.cfg.logo)
+        self.assertIn("minarca_logo.png", self.app.cfg.header_logo)
+        self.assertIn("logo.png", self.app.cfg.logo)
         self.assertEqual("/var/log/minarca/access.log", self.app.cfg.log_access_file)
         # log_file get overriden by testcase. So dont validate it.
         self.assertIsNotNone(self.app.cfg.log_file)
@@ -148,19 +148,44 @@ class MinarcaAdminLogView(minarca_server.tests.AbstractMinarcaTest):
     def setup_class(cls):
         super().setup_class()
         with open(os.path.join(cls.base_dir, 'server.log'), 'w') as f:
-            f.write('data')
+            f.write(
+                '[2022-11-15 04:58:41,056][INFO   ][112.4.177.132][admin][CP Server Thread-4][activity] adding new user [oro]\n'
+            )
         with open(os.path.join(cls.base_dir, 'shell.log'), 'w') as f:
-            f.write('data')
-        with open(os.path.join(cls.base_dir, 'quota-api.log'), 'w') as f:
-            f.write('data')
+            f.write(
+                '[2023-02-15 13:36:34,494][INFO   ][192.222.177.77][mike][MainThread][minarca_server.shell] running command [/usr/bin/rdiff-backup-2.0 --server] in jail [/backups/mike]\n'
+            )
 
-    def test_adminview(self):
-        self.getPage('/admin/logs')
+    def test_admin_logs(self):
+        # Given server, shell and quota logs file
+        # When querying the system logs
+        self.getPage('/admin/logs/')
+        # Then page return without error
         self.assertStatus(200)
-        self.assertInBody('server.log', 'server log should be in admin view')
-        self.assertInBody('shell.log', 'minarca-shell log should be in admin view')
-        self.assertInBody('quota-api.log', 'minarca-quota-api log should be in admin view')
-        self.assertNotInBody('Error getting file content')
+        # When querying system logs data
+        data = self.getJson('/admin/logs/data.json')
+        # Then is contains our logs.
+        self.assertEqual(
+            data['data'],
+            [
+                [
+                    'server.log',
+                    ANY,
+                    '112.4.177.132',
+                    'admin',
+                    'INFO adding new user [oro]',
+                    'activity',
+                ],
+                [
+                    'shell.log',
+                    ANY,
+                    '192.222.177.77',
+                    'mike',
+                    'INFO running command [/usr/bin/rdiff-backup-2.0 --server] in jail [/backups/mike]',
+                    None,
+                ],
+            ],
+        )
 
 
 class MinarcaPluginTestWithQuotaAPI(minarca_server.tests.AbstractMinarcaTest):

@@ -178,8 +178,8 @@ def get_parser():
         footer_name='Minarca',
         footer_url='https://minarca.org/',
         header_name='Minarca',
-        header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.svg'),  # @UndefinedVariable
-        logo=pkg_resources.resource_filename(__name__, 'logo.svg'),  # @UndefinedVariable
+        header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.png'),  # @UndefinedVariable
+        logo=pkg_resources.resource_filename(__name__, 'logo.png'),  # @UndefinedVariable
         link_color='1C4062',
         navbar_color='0E2933',
         btn_fg_color='0E2933',

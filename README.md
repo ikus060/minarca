@@ -71,7 +71,23 @@ The Minarca website is https://minarca.org/.
 
 ## Next Release - 4.4.0
 
-* Generate Debian package using Pyinstaller and Debbuild to improve compatibility
+* Upgrade Rdiffweb to v2.6.0
+  * Review the application layout to use Fluid container to use all the space available on the screen
+  * Rename Status view to Dashboard
+  * Display more useful data in Dashboard: Backups per days, Oldest backup, Storage Usage, Average duration, Least Active, Most active
+  * Fix deletion confirmation of repositories within a subdirectory #250
+  * Properly clean-up plain text email from HTML tags
+  * Send notification for inactive backup based on statistics
+  * Send notification using a new template following the web interface branding
+  * Send notification to user when repository get added or removed
+  * Send all notification to an optional "catch-all" email address configured using `--email-catch-all` option #258
+  * Redistribute logos in PNG format for better compatibility
+  * Disable error page logs for 4xx errors
+  * Add username and IP address to logs only for HTTP Request
+  * Fix LDAP integration to support non-list attributes - credit to [Shane Robinson](https://gitlab.com/shanesq)
+  * Improve System Logs view to identify "User Activity", "Threats" and "User Login"
+* Generate minarca-client Debian package using Pyinstaller and Debbuild to improve compatibility
+* Redistribute logos in PNG format for better compatibility
 
 ## 4.3.0 (2023-01-16)
 
