@@ -295,7 +295,7 @@ class Backup:
                 is_running = False
             if not is_running:
                 status['lastresult'] = 'INTERRUPT'
-            elif status['lastdate'] and now - status['lastdate'] > timedelta(seconds=_RUNNING_DELAY + 1):
+            elif status['lastdate'] and now - status['lastdate'] > timedelta(seconds=_RUNNING_DELAY * 2):
                 status['lastresult'] = 'STALE'
         if key:
             return status[key]
