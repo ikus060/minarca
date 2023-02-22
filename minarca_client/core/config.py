@@ -157,7 +157,7 @@ class Patterns(list):
         self.clear()
         if not os.path.exists(self.filename):
             return
-        with open(self.filename, 'r', encoding='utf-8') as f:
+        with open(self.filename, 'r', encoding='utf-8', errors='replace') as f:
             comment = None
             for line in f.readlines():
                 line = line.rstrip()
@@ -168,8 +168,29 @@ class Patterns(list):
                 if line[0] not in ['+', '-']:
                     raise InvalidPatternError(line)
                 include = line[0] == '+'
-                self.append(Pattern(include, line[1:], comment))
+                try:
+                    self.append(Pattern(include, line[1:], comment))
+                except ValueError:
+                    # Ignore duplicate pattern
+                    pass
                 comment = None
+
+    def append(self, p):
+        """
+        Check for duplicate pattern.
+        """
+        # Make sure to remove opposite pattern
+        for item in self:
+            if item.pattern == p.pattern:
+                self.remove(item)
+        super().append(p)
+
+    def extend(self, other_patterns):
+        """
+        Check for duplicate pattern.
+        """
+        for p in other_patterns:
+            self.append(p)
 
     def defaults(self):
         """

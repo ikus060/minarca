@@ -49,7 +49,9 @@ class PatternsTest(unittest.TestCase):
             f.write("+somefilename.txt\n")
             f.write("# AutoCad Backup file\n")
             f.write("-*.bak\n")
+        # When reading the pattern file
         patterns = Patterns('patterns')
+        # Then we have 2 patterns
         self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
 
@@ -67,6 +69,19 @@ class PatternsTest(unittest.TestCase):
     def test_load_with_missing_file(self):
         patterns = Patterns('invalid')
         self.assertEqual(0, len(patterns))
+
+    def test_load_wrong_encoding(self):
+        # Given a file with invalid encoding
+        with open('patterns', 'w', encoding='latin1') as f:
+            f.write("# comments\n")
+            f.write("+éric_file.txt\n")
+            f.write("# Ignore Backup file\n")
+            f.write("-*.bak\n")
+        # When reading the pattern file
+        patterns = Patterns('patterns')
+        # Then we have 2 patterns sorted
+        self.assertEqual(Pattern(include=True, pattern='�ric_file.txt', comment='comments'), patterns[0])
+        self.assertEqual(Pattern(False, '*.bak', 'Ignore Backup file'), patterns[1])
 
     def test_save(self):
         with open('patterns', 'w') as f:

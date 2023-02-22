@@ -15,7 +15,7 @@ import unittest
 from unittest import mock
 
 from minarca_client import main
-from minarca_client.core import HttpAuthenticationError
+from minarca_client.core import Backup, HttpAuthenticationError
 from minarca_client.core.config import Pattern, Patterns, Settings
 from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _schedule, _status, _stop, _unlink
 
@@ -236,6 +236,31 @@ class TestMainParseArgs(unittest.TestCase):
         main.main(['include', '*.bak'])
         mock_backup.return_value.set_patterns.assert_called_once_with(p)
         self.assertEqual([Pattern(True, '*.bak', None)], p)
+
+    def test_include_duplicate(self):
+        # When calling include multiple time with the same value
+        # Not using real path for the test since those get resolve differently on Linux and windows.
+        main.main(['include', '*.bak'])
+        main.main(['include', '*.bak'])
+        # Then we don't have duplicate pattern in config file.
+        backup = Backup()
+        self.assertEqual(
+            backup.get_patterns(),
+            [Pattern(include=True, pattern='*.bak', comment=None)],
+        )
+
+    def test_include_exclude(self):
+        # When galling include multiple time with the same value
+        # Not using real path for the test since those get resolve differently on Linux and windows.
+        main.main(['include', '*.bak'])
+        # Then an error is raised
+        main.main(['exclude', '*.bak'])
+        # Then we kept the include pattern.
+        backup = Backup()
+        self.assertEqual(
+            backup.get_patterns(),
+            [Pattern(include=False, pattern='*.bak', comment=None)],
+        )
 
     @mock.patch('minarca_client.main.Backup')
     def test_include_relative_path(self, mock_backup):

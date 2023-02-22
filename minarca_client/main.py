@@ -96,6 +96,7 @@ def _pattern(include, pattern):
             # Resolve relative path
             path = os.path.normpath(os.path.join(os.getcwd(), path))
             p = Pattern(include, path, None)
+        # Add new pattern
         new_patterns.append(p)
     backup.set_patterns(new_patterns)
 
