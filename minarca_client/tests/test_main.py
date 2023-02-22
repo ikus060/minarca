@@ -17,7 +17,7 @@ from unittest import mock
 from minarca_client import main
 from minarca_client.core import HttpAuthenticationError
 from minarca_client.core.config import Pattern, Patterns, Settings
-from minarca_client.main import _EXIT_WRONG_PASSWD, _backup, _pattern, _schedule, _status, _stop, _unlink
+from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _schedule, _status, _stop, _unlink
 
 
 class TestMainParseArgs(unittest.TestCase):
@@ -139,7 +139,7 @@ class TestMainParseArgs(unittest.TestCase):
         # Then an exception is raised
         with self.assertRaises(SystemExit) as context:
             main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
-        self.assertEqual(_EXIT_WRONG_PASSWD, context.exception.code)
+        self.assertEqual(_EXIT_LINK_ERROR, context.exception.code)
 
     @mock.patch('minarca_client.main._link')
     def test_args_link_force(self, mock_link):
