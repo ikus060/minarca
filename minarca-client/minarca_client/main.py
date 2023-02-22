@@ -15,7 +15,6 @@ from minarca_client import __version__
 from minarca_client.core import (
     Backup,
     BackupError,
-    HttpAuthenticationError,
     NotRunningError,
     NotScheduleError,
     RepositoryNameExistsError,
@@ -33,7 +32,7 @@ _EXIT_ALREADY_LINKED = 2
 _EXIT_MISSING_PASSWD = 3
 _EXIT_REPO_EXISTS = 4
 _EXIT_NOT_RUNNING = 5
-_EXIT_WRONG_PASSWD = 6
+_EXIT_LINK_ERROR = 6
 
 _ARGS_ALIAS = {
     '--backup': 'backup',
@@ -83,8 +82,9 @@ def _link(remoteurl, username, name, force, password=None):
         backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=force)
     except RepositoryNameExistsError:
         sys.exit(_EXIT_REPO_EXISTS)
-    except HttpAuthenticationError:
-        sys.exit(_EXIT_WRONG_PASSWD)
+    except BackupError as e:
+        print(e.message)
+        sys.exit(_EXIT_LINK_ERROR)
 
 
 def _pattern(include, pattern):
