@@ -493,6 +493,7 @@ class Backup:
         assert isinstance(patterns, list), 'patterns should be a list'
         p = Patterns(self.patterns_file)
         p.clear()
+        # Make sure patterns are uniq
         p.extend(patterns)
         p.save()
 
