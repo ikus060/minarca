@@ -313,6 +313,10 @@ if IS_WINDOWS:
     import win32api  # @UnresolvedImport
     import win32com.client  # @UnresolvedImport
 
+    TASK_CREATE_OR_UPDATE = 6
+    TASK_LOGON_NONE = 0
+    TASK_LOGON_PASSWORD = 1
+
     class WindowsScheduler:
         NAME = _('Minarca Backup')
 
@@ -330,17 +334,26 @@ if IS_WINDOWS:
             except pywintypes.com_error:  # @UndefinedVariable
                 return False
 
-        def create(self, force=False):
+        @property
+        def run_if_logged_out(self):
+            """
+            Return the current status of `run_if_logged_out`.
+            """
+            root_folder = self.scheduler.GetFolder('\\')
+            try:
+                task_def = root_folder.GetTask('\\' + self.NAME)
+                return task_def.Definition.Principal.LogonType == TASK_LOGON_PASSWORD
+            except pywintypes.com_error:  # @UndefinedVariable
+                return False
+
+        def create(self, run_if_logged_out=None):
             """
             Create entry in Windows Task Scheduler.
             """
             if self.exists():
-                if force:
-                    # Delete the task.
-                    self.delete()
-                else:
-                    # Task already exists. leave.
-                    return
+                # Task already exists. leave.
+                return
+
             root_folder = self.scheduler.GetFolder('\\')
             task_def = self.scheduler.NewTask(0)
 
@@ -371,19 +384,22 @@ if IS_WINDOWS:
             )
             task_def.Settings.Enabled = True
             task_def.Settings.StopIfGoingOnBatteries = False
+            task_def.Settings.ExecutionTimeLimit = "PT0S"  # enable the task to run indefinitely
 
             # Register task
             # If task already exists, it will be updated
-            TASK_CREATE_OR_UPDATE = 6
-            TASK_LOGON_NONE = 0
-            root_folder.RegisterTaskDefinition(
-                self.NAME,  # Task name
-                task_def,
-                TASK_CREATE_OR_UPDATE,
-                '',  # No user
-                '',  # No password
-                TASK_LOGON_NONE,
-            )
+            try:
+                root_folder.RegisterTaskDefinition(
+                    self.NAME,  # Task name
+                    task_def,
+                    TASK_CREATE_OR_UPDATE,
+                    run_if_logged_out[0] if run_if_logged_out else '',
+                    run_if_logged_out[1] if run_if_logged_out else '',
+                    TASK_LOGON_PASSWORD if run_if_logged_out else TASK_LOGON_NONE,
+                )
+            except pywintypes.com_error as e:
+                winerror = e.excepinfo[5]
+                raise OSError(None, win32api.FormatMessage(winerror), None, winerror)
 
         def delete(self):
             """
@@ -405,7 +421,7 @@ if IS_WINDOWS:
                 # command line.
                 winerror = e.excepinfo[5]
                 if winerror == -2147024891:  # Access denied.
-                    retcode = subprocess.call(['SCHTASKS.exe', '/Delete', '/TN', 'Minarca Backup', '/F'])
+                    retcode = subprocess.call(['SCHTASKS.exe', '/Delete', '/TN', self.NAME, '/F'])
                     if retcode == 0:
                         return
                     raise OSError(None, win32api.FormatMessage(winerror), None, winerror)
@@ -424,14 +440,10 @@ if IS_MAC:
             }
             self.label = self.plist['Label']
 
-        def create(self, force=False):
+        def create(self):
             if self.exists():
-                if force:
-                    # Delete the task.
-                    self.delete()
-                else:
-                    # Task already exists. leave.
-                    return
+                # Task already exists. leave.
+                return
             # Create missing directory.
             fname = launchd.plist.compute_filename(self.label, scope=launchd.plist.USER)
             if not os.path.exists(os.path.dirname(fname)):
@@ -466,14 +478,10 @@ if IS_LINUX:
             jobs = list(self.cron.find_command(self.command))
             return bool(jobs)
 
-        def create(self, force=False):
+        def create(self):
             if self.exists():
-                if force:
-                    # Delete the task.
-                    self.delete()
-                else:
-                    # Task already exists. leave.
-                    return
+                # Task already exists. leave.
+                return
             # Create the task.
             job = self.cron.new(command=self.command)
             now = datetime.datetime.now()
