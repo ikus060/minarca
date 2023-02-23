@@ -350,7 +350,7 @@ if IS_WINDOWS:
             trigger = task_def.Triggers.Create(TASK_TRIGGER_TIME)
             trigger.StartBoundary = start_time.isoformat()
             trigger.Repetition.Duration = ""
-            trigger.Repetition.Interval = "PT1H"
+            trigger.Repetition.Interval = "PT15M"  # 15 min interval
 
             # Create action
             TASK_ACTION_EXEC = 0
@@ -419,7 +419,7 @@ if IS_MAC:
         def __init__(self):
             self.plist = {
                 "Label": "org.minarca.minarca-client.plist",
-                "StartInterval": 3600,
+                "StartInterval": 900,  # 15 min interval
                 "ProgramArguments": [get_minarca_exe(), "backup"],
             }
             self.label = self.plist['Label']
@@ -477,7 +477,8 @@ if IS_LINUX:
             # Create the task.
             job = self.cron.new(command=self.command)
             now = datetime.datetime.now()
-            job.minute.on(now.minute)
+            start = now.minute % 15
+            job.minute.on(start, start + 15, start + 30, start + 45)
             self.cron.write()
 
         def delete(self):
