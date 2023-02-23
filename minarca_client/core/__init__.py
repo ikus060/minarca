@@ -173,6 +173,7 @@ class Backup:
         self.config_file = os.path.join(compat.get_config_home(), "minarca.properties")
         self.patterns_file = os.path.join(compat.get_config_home(), "patterns")
         self.status_file = os.path.join(compat.get_data_home(), 'status.properties')
+        self.scheduler = Scheduler()
 
     def start(self, force=False, force_patterns=None, fork=False):
         """
@@ -276,6 +277,14 @@ class Backup:
         if key:
             return config[key]
         return config
+
+    def set_settings(self, key, value):
+        """
+        Return configuration.
+        """
+        config = Settings(self.config_file)
+        config[key] = value
+        config.save()
 
     def get_status(self, key=None):
         """
@@ -381,7 +390,7 @@ class Backup:
             status.save()
 
             # etc.
-            self.schedule()
+            self.schedule_job()
             config['configured'] = True
             config.save()
 
@@ -479,15 +488,20 @@ class Backup:
             if ld_path:
                 os.environ['LD_LIBRARY_PATH'] = ld_path
 
-    def schedule(self, schedule=None):
+    def schedule_job(self, run_if_logged_out=None):
         """
-        Create the required schedule job in crontab or windows task scheduler.
+        Used to schedule the job in operating system task scheduler. e.g.: crontab.
+
+        On Windows, username and password are required if we want to run the task whenever the user is logged out.
+        `run_if_logged_out` should then containe a tuple with username and password.
         """
-        if schedule:
-            settings = self.get_settings()
-            settings['schedule'] = schedule
-            settings.save()
-        Scheduler().create(force=True)
+        # Also schedule task in Operating system scheduler.
+        if self.scheduler.exists():
+            self.scheduler.delete()
+        if IS_WINDOWS:
+            self.scheduler.create(run_if_logged_out=run_if_logged_out)
+        else:
+            self.scheduler.create()
 
     def set_patterns(self, patterns):
         assert isinstance(patterns, list), 'patterns should be a list'
@@ -541,11 +555,9 @@ class Backup:
         """
         Disconnect this client from minarca server.
         """
-        config = self.get_settings()
-        config['configured'] = False
-        config.save()
+        self.set_settings('configured', False)
         # Remove scheduler
-        Scheduler().delete()
+        self.scheduler.delete()
 
 
 class Rdiffweb:

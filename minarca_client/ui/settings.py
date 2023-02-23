@@ -44,9 +44,7 @@ class SettingsView(tkvue.Component):
         """
         Called to update the frequency.
         """
-        settings = self.backup.get_settings()
-        settings['check_latest_version'] = value
-        settings.save()
+        self.backup.set_settings('check_latest_version', value)
 
     def _prompt_latest_version(self):
         self.data['checking_for_update'] = False

@@ -183,3 +183,14 @@ class TestScheduler(unittest.TestCase):
         self.assertTrue(s.exists())
         s.delete()
         self.assertFalse(s.exists())
+
+    @skipUnless(IS_WINDOWS, reason="feature only supported on Windows")
+    @mock.patch('minarca_client.core.compat.get_minarca_exe', return_value='minarca.exe' if IS_WINDOWS else 'minarca')
+    def test_schedule_job_with_credentials(self, *unused):
+        # When trying to register a task with high priviledge with wrong username password
+        # Then an exception is raise
+        s = Scheduler()
+        with self.assertRaises(OSError) as context:
+            s.create(run_if_logged_out=('test', 'invalid'))
+
+        self.assertEqual(context.exception.winerror, -2147023564)  # invalid user

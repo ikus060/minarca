@@ -16,6 +16,7 @@ from unittest import mock
 
 from minarca_client import main
 from minarca_client.core import Backup, HttpAuthenticationError
+from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Pattern, Patterns, Settings
 from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _schedule, _status, _stop, _unlink
 
@@ -184,22 +185,34 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._schedule')
     def test_args_schedule(self, mock_schedule):
         main.main(['schedule'])
-        mock_schedule.assert_called_once_with(schedule=None)
+        if IS_WINDOWS:
+            mock_schedule.assert_called_once_with(schedule=Settings.DAILY, username=None, password=None)
+        else:
+            mock_schedule.assert_called_once_with(schedule=Settings.DAILY)
 
     @mock.patch('minarca_client.main._schedule')
     def test_args_schedule_daily(self, mock_schedule):
         main.main(['schedule', '--daily'])
-        mock_schedule.assert_called_once_with(schedule=Settings.DAILY)
+        if IS_WINDOWS:
+            mock_schedule.assert_called_once_with(schedule=Settings.DAILY, username=None, password=None)
+        else:
+            mock_schedule.assert_called_once_with(schedule=Settings.DAILY)
 
     @mock.patch('minarca_client.main._schedule')
     def test_args_schedule_hourly(self, mock_schedule):
         main.main(['schedule', '--hourly'])
-        mock_schedule.assert_called_once_with(schedule=Settings.HOURLY)
+        if IS_WINDOWS:
+            mock_schedule.assert_called_once_with(schedule=Settings.HOURLY, username=None, password=None)
+        else:
+            mock_schedule.assert_called_once_with(schedule=Settings.HOURLY)
 
     @mock.patch('minarca_client.main._schedule')
     def test_args_schedule_weekly(self, mock_schedule):
         main.main(['schedule', '--weekly'])
-        mock_schedule.assert_called_once_with(schedule=Settings.WEEKLY)
+        if IS_WINDOWS:
+            mock_schedule.assert_called_once_with(schedule=Settings.WEEKLY, username=None, password=None)
+        else:
+            mock_schedule.assert_called_once_with(schedule=Settings.WEEKLY)
 
     @mock.patch('minarca_client.main._status')
     def test_args_status(self, mock_status):
@@ -289,13 +302,15 @@ class TestMainParseArgs(unittest.TestCase):
 
     @mock.patch('minarca_client.main.Backup')
     def test_schedule(self, mock_backup):
-        _schedule()
-        mock_backup.return_value.schedule.assert_called_once_with(schedule=None)
+        # When calling schedule
+        _schedule(schedule=Settings.DAILY)
+        # Then schedule is define and job get create
+        mock_backup.return_value.set_settings.assert_called_once_with('schedule', Settings.DAILY)
 
     @mock.patch('minarca_client.main.Backup')
     def test_schedule_hourly(self, mock_backup):
         _schedule(schedule=Settings.HOURLY)
-        mock_backup.return_value.schedule.assert_called_once_with(schedule=Settings.HOURLY)
+        mock_backup.return_value.set_settings.assert_called_once_with('schedule', Settings.HOURLY)
 
     @mock.patch('minarca_client.main.Backup')
     def test_status(self, mock_backup):
