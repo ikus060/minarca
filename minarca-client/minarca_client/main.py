@@ -60,6 +60,9 @@ def _backup(force):
     except BackupError:
         # Other backup error are logged with status
         sys.exit(_EXIT_BACKUP_FAIL)
+    except Exception as e:
+        logging.exception("unexpected error during backup")
+        sys.exit(_EXIT_BACKUP_FAIL)
 
 
 def _link(remoteurl, username, name, force, password=None):
