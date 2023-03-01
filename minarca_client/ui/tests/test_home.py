@@ -50,9 +50,7 @@ class HomeTest(unittest.TestCase):
     def test_invoke_show_help(self, mock_webbrowser):
         with new_dialog(HomeDialog) as dlg:
             # Given a remotehost
-            settings = dlg.backup.get_settings()
-            settings['remoteurl'] = 'http://examples.com'
-            settings.save()
+            dlg.backup.set_settings('remoteurl', 'http://examples.com')
             # Given a Home dialog with help button
             dlg.pump_events()
             self.assertIsNotNone(dlg.status_view.start_stop_button)

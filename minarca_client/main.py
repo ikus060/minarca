@@ -20,7 +20,7 @@ from minarca_client.core import (
     RepositoryNameExistsError,
     RunningError,
 )
-from minarca_client.core.compat import get_log_file
+from minarca_client.core.compat import IS_WINDOWS, get_log_file
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
@@ -33,6 +33,7 @@ _EXIT_MISSING_PASSWD = 3
 _EXIT_REPO_EXISTS = 4
 _EXIT_NOT_RUNNING = 5
 _EXIT_LINK_ERROR = 6
+_EXIT_SCHEDULE_ERROR = 7
 
 _ARGS_ALIAS = {
     '--backup': 'backup',
@@ -59,6 +60,9 @@ def _backup(force):
         sys.exit(_EXIT_BACKUP_FAIL)
     except BackupError:
         # Other backup error are logged with status
+        sys.exit(_EXIT_BACKUP_FAIL)
+    except Exception:
+        logging.exception("unexpected error during backup")
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
@@ -96,6 +100,7 @@ def _pattern(include, pattern):
             # Resolve relative path
             path = os.path.normpath(os.path.join(os.getcwd(), path))
             p = Pattern(include, path, None)
+        # Add new pattern
         new_patterns.append(p)
     backup.set_patterns(new_patterns)
 
@@ -116,9 +121,17 @@ def _stop(force):
             sys.exit(_EXIT_NOT_RUNNING)
 
 
-def _schedule(schedule=None):
+def _schedule(schedule, username=None, password=None):
     backup = Backup()
-    backup.schedule(schedule=schedule)
+    # Define frequency
+    backup.set_settings('schedule', schedule)
+    # Make sure to schedule job in OS too.
+    run_if_logged_out = (username, password) if username or password else None
+    try:
+        backup.schedule_job(run_if_logged_out)
+    except Exception as e:
+        print(str(e))
+        sys.exit(_EXIT_SCHEDULE_ERROR)
 
 
 def _status():
@@ -231,7 +244,11 @@ def _parse_args(args):
         help=_("schedule backup to run hourly"),
     )
     sub.add_argument(
-        '--daily', dest='schedule', action='store_const', const=Settings.DAILY, help=_("schedule backup to run daily")
+        '--daily',
+        dest='schedule',
+        action='store_const',
+        const=Settings.DAILY,
+        help=_("schedule backup to run daily"),
     )
     sub.add_argument(
         '--weekly',
@@ -240,7 +257,10 @@ def _parse_args(args):
         const=Settings.WEEKLY,
         help=_("schedule backup to run weekly"),
     )
-    sub.set_defaults(func=_schedule)
+    if IS_WINDOWS:
+        sub.add_argument('-u', '--username', help=_("username required to run task when user is logged out"))
+        sub.add_argument('-p', '--password', help=_("password required to run task when user is logged out"))
+    sub.set_defaults(func=_schedule, schedule=Settings.DAILY)
 
     # Status
     sub = subparsers.add_parser('status', help=_('return the current minarca status'))

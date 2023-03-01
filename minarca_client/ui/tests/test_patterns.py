@@ -55,7 +55,9 @@ class PatternsViewTest(unittest.TestCase):
                 len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
-    @unittest.mock.patch('tkinter.filedialog.askopenfilenames', return_value=['/home/this_is_a_file'])
+    @unittest.mock.patch(
+        'tkinter.filedialog.askopenfilenames', return_value=['/home/this_is_a_file', '/home/this_is_another_file']
+    )
     def test_add_file_pattern(self, mock_askopenfilenames):
         # Given a home dialog with default patterns
         with home_dialog() as dlg:
@@ -64,13 +66,13 @@ class PatternsViewTest(unittest.TestCase):
             dlg.patterns_view.add_file_pattern()
             dlg.pump_events()
             # Then the pattern is added in the widget.
-            self.assertEqual(1, len(dlg.backup.get_patterns()))
+            self.assertEqual(2, len(dlg.backup.get_patterns()))
             self.assertEqual(
                 len(dlg.backup.get_patterns()),
                 len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
-    @unittest.mock.patch('tkinter.filedialog.askdirectory', return_value=['/home/'])
+    @unittest.mock.patch('tkinter.filedialog.askdirectory', return_value='/home/')
     def test_add_folder_pattern(self, mock_askdirectory):
         # Given a home dialog with default patterns
         with home_dialog() as dlg:
@@ -85,8 +87,8 @@ class PatternsViewTest(unittest.TestCase):
                 len(dlg.patterns_view.scrolled_frame.interior.winfo_children()[0].winfo_children()),
             )
 
-    @unittest.mock.patch('tkinter.simpledialog.askstring', return_value=['new-pattern'])
-    def test_add_custom_pattern(self, mock_askdirectory):
+    @unittest.mock.patch('tkinter.simpledialog.askstring', return_value='new-pattern')
+    def test_add_custom_pattern(self, mock_askstring):
         # Given a home dialog with default patterns
         with home_dialog() as dlg:
             self.assertEqual(0, len(dlg.backup.get_patterns()))
