@@ -42,7 +42,7 @@ class StatusView(tkvue.Component):
             }
         )
         super().__init__(*args, **kwargs)
-        self.after(1, self._watch_status)
+        self.after(500, self._watch_status)
 
     @tkvue.computed
     def header_text(self, context):

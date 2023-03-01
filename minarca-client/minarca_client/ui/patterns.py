@@ -71,15 +71,15 @@ class PatternsView(tkvue.Component):
             self.patterns.append(p)
             # Save the pattern file
             self.backup.set_patterns(self.patterns)
-            # Add pattern to the list.
-            self.data.patterns = self.patterns
+        # Add pattern to the list.
+        self.data.patterns = self.patterns
 
     def add_folder_pattern(self):
         folder = tkinter.filedialog.askdirectory(
             initialdir=get_home(),
             title=_('Add Folder Pattern'),
-            # message=_('Select folder(s) to be include or exclude from backup.'),
             parent=self.root.winfo_toplevel(),
+            mustexist=True,
         )
         if not folder:
             # Operation cancel by user

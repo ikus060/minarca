@@ -68,6 +68,7 @@ class TestBackup(unittest.TestCase):
         os.environ['MINARCA_CONFIG_HOME'] = self.tmp.name
         os.environ['MINARCA_DATA_HOME'] = self.tmp.name
         self.backup = Backup()
+        self.backup.scheduler = MagicMock()
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -99,10 +100,9 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(RepositoryNameExistsError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
-    @mock.patch('minarca_client.core.Scheduler')
     @mock.patch('rdiff_backup.Main.Main')
     @mock.patch("minarca_client.core.Rdiffweb")
-    def test_link_with_existing_patterns(self, mock_rdiffweb, mock_rdiff_backup, mock_scheduler):
+    def test_link_with_existing_patterns(self, mock_rdiffweb, mock_rdiff_backup):
         # Create patterns
         initial_patterns = self.backup.get_patterns()
         initial_patterns.append(Pattern(True, _home, None))
@@ -122,7 +122,7 @@ class TestBackup(unittest.TestCase):
         # Check calls to web api
         mock_rdiffweb.return_value.get_current_user_info.assert_called_once()
         mock_rdiffweb.return_value.add_ssh_key.assert_called_once()
-        mock_scheduler.return_value.create.assert_called_once()
+        self.backup.scheduler.create.assert_called_once()
 
         # Check if rdiff_backup get called.
         mock_rdiff_backup.assert_called_once()
@@ -188,10 +188,9 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(HttpServerError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
-    @mock.patch('minarca_client.core.Scheduler')
     @mock.patch('rdiff_backup.Main.Main')
     @mock.patch("minarca_client.core.Rdiffweb")
-    def test_link(self, mock_rdiffweb, mock_rdiff_backup, mock_scheduler):
+    def test_link(self, mock_rdiffweb, mock_rdiff_backup):
         # Define a status
         with open(self.backup.status_file, 'w') as f:
             f.write('lastresult=SUCCESS\n')
@@ -212,7 +211,7 @@ class TestBackup(unittest.TestCase):
         mock_rdiffweb.return_value.get_current_user_info.assert_called_once()
         mock_rdiffweb.return_value.add_ssh_key.assert_called_once()
         mock_rdiff_backup.assert_called_once()
-        mock_scheduler.return_value.create.assert_called_once()
+        self.backup.scheduler.create.assert_called_once()
 
         # Check if default patterns are created
         patterns = self.backup.get_patterns()
@@ -476,10 +475,22 @@ class TestBackup(unittest.TestCase):
                 source='/',
             )
 
-    @mock.patch('minarca_client.core.compat.get_minarca_exe', return_value='minarca.exe' if IS_WINDOWS else 'minarca')
-    def test_schedule(self, *unused):
-        self.backup.schedule(schedule=Settings.HOURLY)
+    def test_set_schedule(self):
+        self.backup.set_settings('schedule', Settings.HOURLY)
         self.assertEqual(Settings.HOURLY, self.backup.get_settings('schedule'))
+
+    @mock.patch('minarca_client.core.compat.get_minarca_exe', return_value='minarca.exe' if IS_WINDOWS else 'minarca')
+    def test_schedule_job(self, *unused):
+        self.backup.schedule_job()
+        self.assertTrue(self.backup.scheduler.exists())
+
+    @skipUnless(IS_WINDOWS, reason="feature only supported on Windows")
+    @mock.patch('minarca_client.core.compat.get_minarca_exe', return_value='minarca.exe' if IS_WINDOWS else 'minarca')
+    def test_schedule_job_with_credentials(self, *unused):
+        # When scheduling a job with credentials
+        self.backup.schedule_job(run_if_logged_out=('test', 'invalid'))
+        # Then scheduler is called with credentials
+        self.backup.scheduler.create.assert_called_once_with(run_if_logged_out=('test', 'invalid'))
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_echo_foo_cmd))
@@ -570,8 +581,7 @@ class TestBackup(unittest.TestCase):
             ]
         )
 
-    @mock.patch('minarca_client.core.Scheduler')
-    def test_unlink(self, mock_scheduler):
+    def test_unlink(self):
         # Mock a configuration
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
@@ -579,8 +589,9 @@ class TestBackup(unittest.TestCase):
         config['configured'] = True
         config.save()
         # Unlink
+        self.backup.scheduler = mock_scheduler = MagicMock()
         self.backup.unlink()
         config = Settings(self.backup.config_file)
         self.assertEqual(False, config['configured'])
         # Validation
-        mock_scheduler.return_value.delete.assert_called_once()
+        mock_scheduler.delete.assert_called_once()
