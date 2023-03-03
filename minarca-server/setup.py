@@ -27,7 +27,7 @@ setuptools.setup(
         "setuptools_scm>=5.0.1",
     ],
     install_requires=[
-        "rdiffweb==2.6.0a1",
+        "rdiffweb==2.6.0",
         "cherrypy>=18.0.0",
         "requests",
         "tzlocal~=2.0",
@@ -35,8 +35,10 @@ setuptools.setup(
     # required packages for build process
     extras_require={
         "test": [
-            "responses",
+            "html5lib",
             "pytest",
+            "responses",
+            "selenium",
         ]
     },
     # Declare entry point
