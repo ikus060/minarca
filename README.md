@@ -69,7 +69,7 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Release - 4.4.0
+## 4.4.0 (2023-03-15)
 
 * Upgrade Rdiffweb to v2.6.0
   * Review the application layout to use Fluid container to use all the space available on the screen
