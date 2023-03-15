@@ -45,7 +45,17 @@ For security reasons, Minarca listen on port `8080` for HTTP request on loopback
 | server-host | Define the IP address to listen to. Use `0.0.0.0` to listen on all interfaces. Use `127.0.0.1` to listen on loopback interface. | 0.0.0.0 |
 | server-port | Define the port to listen for HTTP request. Default to `8080` | 9090 |
 
-## Configure administrator username & password
+## Configure External URL
+
+To display the correct URL when sending Email Notification to Minarca users,
+you must provide Minarca with the URL your users use to reach the web application.
+You can use the IP of your server, but a Fully Qualified Domain Name (FQDN) is preferred.
+
+| Option | Description | Example |
+| --- | --- | --- |
+| external-url | Define the base URL used to reach your Minarca application | `https://minarca.mycompagny.com` |
+
+## Configure administrator username and password
 
 Using configuration file, you may setup a special administrator which cannot be
 deleted or renamed from the web interface. You may also configure a specific
@@ -109,58 +119,12 @@ You may need to install additional dependencies to connect to PostgreSQL. Step t
 
 Minarca may integrates with LDAP server to support user authentication.
 
-This integration works with most LDAP-compliant servers, including:
-
-* Microsoft Active Directory
-* Apple Open Directory
-* Open LDAP
-* 389 Server
-
-### LDAP options
-
-| Option | Description | Example |
-| --- | --- | --- |
-| ldap-add-missing-user | `True` to create users from LDAP when the credential is valid. | True |
-| ldap-add-user-default-role | Role to be used when creating a new user from LDAP. Default: user | maintainer |
-| ldap-add-user-default-userroot | Userroot to be used when creating a new user from LDAP. Default: empty | /backups/{cn[0]} |
-| ldap-base-dn | The DN of the branch of the directory where all searches should start from. | dc=my,dc=domain |
-| ldap-bind-dn | An optional DN used to bind to the server when searching for entries. If not provided, will use an anonymous bind. | cn=manager,dc=my,dc=domain |
-| ldap-bind-password | A bind password to use in conjunction with `LdapBindDn`. Note that the bind password is probably sensitive data,and should be properly protected. You should only use the LdapBindDn and LdapBindPassword if you absolutely need them to search the directory. | mypassword |
-| ldap-encoding | encoding used by your LDAP server. Default to utf-8 | cp1252 |
-| ldap-filter | A valid LDAP search filter. If not provided, defaults to `(objectClass=*)`, which will search for all objects in the tree. | (objectClass=*) |
-| ldap-group-attribute-is-dn | True if the content of the attribute ldap-group-attribute is a DN. | true |
-| ldap-group-attribute | name of the attribute defining the groups of which the user is a member. Should be used with ldap-required-group and ldap-group-attribute-is-dn. | member |
-| ldap-network-timeout | Optional timeout value. Default to 10 sec. | 10 |
-| ldap-protocol-version | Version of LDAP in use either 2 or 3. Default to 3. | 3 |
-| ldap-required-group | name of the group of which the user must be a member to access Minarca. Should be used with ldap-group-attribute and ldap-group-attribute-is-dn. | minarca |
-| ldap-scope | The scope of the search. Can be either `base`, `onelevel` or `subtree`. Default to `subtree`. | onelevel |
-| ldap-timeout | Optional timeout value. Default to 300 sec. | 300 |
-| ldap-tls | `true` to enable TLS. Default to `false` | false |
-| ldap-uri | URIs containing only the schema, the host, and the port. | ldap://localhost:389 |
-| ldap-username-attribute | The attribute to search username. If no attributes are provided, the default is to use `uid`. It's a good idea to choose an attribute that will be unique across all entries in the subtree you will be using. | cn |
-| ldap-version | version of LDAP in use either 2 or 3. Default to 3.| 3 |
-
-### Automatically create user in Minarca
-
-If you have a large number of users in your LDAP, you may want to configure Minarca to automatically create user in database that has valid LDAP credentials. The user will get created on first valid login.
-
-You may optionally pass other options like `ldap-add-user-default-role` and `ldap-add-user-default-userroot` to automatically define the default user role and default user root for any new user created from LDAP.
-
-Here a working configuration:
-
-    ldap-add-missing-user=true
-    ldap-add-user-default-role=user
-    ldap-add-user-default-userroot=/backups/{cn[0]}
-
-### Restrict access to a specific LDAP group
-
-If you are making use of LDAP credentials validation, you will usually want to limit the access to member of a specific LDAP group. Minarca support such scenario with the use of `ldap-required-group`, `ldap-group-attribute` and `ldap-group-attribute-is-dn`.
-
-Here is an example of how you may limit Minarca access to members of *Admin_Backup* group. This configuration is known to work with LDAP PosixAccount and PosixGroup.
-
-    ldap-required-group=cn=Admin_Backup,ou=Groups,dc=nodomain
-    ldap-group-attribute=memberUid
-    ldap-group-attribute-is-dn=false
+```{toctree}
+---
+titlesonly: true
+---
+configuration-ldap
+```
 
 ## Configure User Session
 
@@ -186,6 +150,7 @@ When enabled, Minarca will also send email notification for security reason when
 | email-username | username used for authentication with the SMTP server. | example@gmail.com |
 | email-password | password used for authentication with the SMTP server. | CHANGEME |
 | email-send-changed-notification | True to send notification when sensitive information get change in user profile. Default: false | True |
+| email-catch-all | When defined, all notification email will be sent to this email address using Blind carbon copy (Bcc) |
 
 To configure the notification, you need a valid SMTP server. In this example, you are making use of a Gmail account to send emails.
 
@@ -213,8 +178,8 @@ manage the quota the way you want by providing custom command line to be execute
 
 When Minarca calls the scripts, special environment variables are available. You should make use of this variables in a custom script to get and set the disk quota.
 
-* `RDIFFWEB_USERID`: rdiffweb user id. e.g.: `34`
-* `RDIFFWEB_USERNAME`: rdiffweb username. e.g.: `patrik`
+* `RDIFFWEB_USERID`: minarca user id. e.g.: `34`
+* `RDIFFWEB_USERNAME`: minarca username. e.g.: `patrik`
 * `RDIFFWEB_USERROOT`: user's root directory. e.g.: `/backups/patrik/`
 * `RDIFFWEB_ROLE`: user's role e.g.: `10` 1:Admin, 5:Maintainer, 10:User
 * `RDIFFWEB_QUOTA`: only available for `quota-set-cmd`. Define the new quota value in bytes. e.g.: 549755813888  (0.5 TiB)
@@ -224,7 +189,9 @@ recommend making use of project quotas with Minarca to simplify the management o
 presents how to configure project quota. Keep in mind it's also possible to
 configure quota using either user's quota or project quota.
 
-### Configure user quota for EXT4
+### Configure prjquota
+
+#### For EXT4
 
 This section is not a full documentation about how to configure ext4 project quota,
 but provide enough guidance to help you.
@@ -254,7 +221,7 @@ with EXT4 quota management.
 
 This effectively, makes use of Minarca user's id as project id.
 
-### Configure user quota for ZFS
+### EXT4
 
 This section is not a full documentation about how to configure ZFS project quotas,
 but provide enough guidance to help you. This documentation uses `tank/backups`
@@ -275,6 +242,7 @@ as the dataset to store Minarca backups.
    Where `1` is the Minarca user's id
 
 Take note, it's better to enable project quota attributes when the repositories are empty.
+
 
 ## Configure Rate-Limit
 
@@ -314,8 +282,12 @@ need. Most likely, you will want to make it closer to your business brand.
 | brand-header-name | Define the application name displayed in the title bar and header menu. | My Backup |
 | brand-default-theme | Define the theme. Either: `default`, `blue` or `orange`. Define the css file to be loaded in the web interface. | orange |
 | brand-favicon | Define the FavIcon to be displayed in the browser title | /etc/minarca/my-fav.ico |
-| brand-logo | location of an image (preferably a .png) to be used as a replacement for the rdiffweb logo displayed in Login page. | /etc/minarca/logo2.png |
+| brand-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca logo displayed in Login page. | /etc/minarca/logo2.png |
 | brand-header-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca header logo displayed in navigation bar. | /etc/minarca/logo1.png |
+| brand-link-color | define a CSS color to be used for link. | #eeffee |
+| brand-btn-fg-color | define a CSS color to use for the button text. Default to white if undefined | #ffffff |
+| brand-btn-bg-color | define a CSS color to use for the background of the button. Default to `link-color` if undefined | #eeeeff |
+| brand-btn-radius | activate or deactivate the rounded corners of the buttons | 0 |
 
 ## Configure repositories clean-up job
 
@@ -344,6 +316,14 @@ When defining the UserRoot value for a user, Minarca will scan the content of th
 | Parameter | Description | Example |
 | --- | --- | --- |
 | --max-depth | Define the maximum folder depthness to search into the user's root directory to find repositories. This is commonly used if your repositories are organised with multiple sub-folders. Default: 3 | 10 |
+
+## Configure default language
+
+By default, the web application uses the HTTP Accept-Language headers to determine the best language to use for display. Users can also manually select a preferred language to use for all communication. The `default-language` setting is used when the user has not selected a preferred language and none of the Accept-Language headers match a translation.
+
+| Parameter | Description | Example |
+| --- | --- | --- |
+| --default-lang | default application locale. e.g.: `fr` | es |
 
 ## Configure Minarca's help
 
