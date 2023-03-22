@@ -8,18 +8,37 @@ variables:
   MINARCA_DEV_PASSWORD: admin123
 
 stages:
+- test
 - bdist
 - doc
 - upload
 - deploy
 - e2e-test
 
+test-server:
+  artifacts:
+    paths:
+      - "./*/coverage.xml"
+      - "./*/xunit.xml"
+    expire_in: 1 day
+  image: python:3.10
+  parallel:
+    matrix:
+      - TARGET: minarca-server
+        PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
+      - TARGET: minarca-quota-api
+  before_script:
+    - apt update && apt -y --no-install-recommends install python3-dev python3-pip python3-setuptools $DEPENDS
+    - pip3 install tox
+  script:
+    - cd $TARGET
+    - tox
+  stage: test
+
 bdist-server:deb:
   artifacts:
     paths:
     - "*/dist/*/*_amd64.deb"
-    - "./*/coverage.xml"
-    - "./*/xunit.xml"
     expire_in: 1 day
   image: buildpack-deps:$DIST
   needs: []
@@ -236,6 +255,7 @@ upload:sonar:
   allow_failure: true
   stage: upload
   needs:
+  - test-server
   - bdist-server:deb
   - bdist-client:linux
   image: sonarsource/sonar-scanner-cli
