@@ -80,9 +80,10 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Release 4.5.0
+## 4.4.1 (2023-03-22)
 
 * Add back support for Debian Bookworm #196
+* Fix lookup of `rdiff-backup` executable
 
 ## 4.4.0 (2023-03-15)
 
