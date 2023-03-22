@@ -6,7 +6,7 @@
     •
     <a href="https://www.ikus-soft.com/en/minarca/doc">docs</a>
     •
-    <a href="https://groups.google.com/forum/#!forum/rdiffweb">community</a>
+    <a href="https://minarca.org/contactus">newsletter</a>
   </strong>
 </p>
 
@@ -43,15 +43,26 @@ Then start a backup in few minutes by installing minarca client for [Windows](ht
 
 [Minarca Agent Installation steps](https://www.ikus-soft.com/archive/minarca/doc/minarca-client.html#installation)
 
-# Support
+## Newsletter
+
+Subscribing to our newsletter is an effective way to stay up-to-date on the latest news about Minarca.
+By signing up for, you will receive regular updates and notifications about new features, updates, and releases related to Minarca.
+
+[Minarca Newsletter](https://minarca.org/contactus).
+
+## Documentation
+
+Want to know more about Minarca and learn it thoroughly? Read our complete documentation.
+
+[Minarca Documentation](https://www.ikus-soft.com/archive/minarca/doc/).
 
 ## Bug Reports
 
-Bug reports should be reported on the Minarca development web site at <https://github.com/ikus060/minarca/issues>
+Bug reports should be reported on the Minarca Gitlab at <https://gitlab.com/ikus-soft/minarca/-/issues>
 
 ## Professional support
 
-Professional support for Minarca is available by contacting [IKUS Software inc.](https://minarca.org/contactus).
+Professional support for Minarca Data Backup is available by [contacting IKUS Soft](https://minarca.org/contactus).
 
 # About Minarca
 
@@ -59,7 +70,7 @@ Minarca Server is written in Python and is released as open source project under
 GNU AFFERO GENERAL PUBLIC LICENSE (AGPLv3). All source code and documentation are
 Copyright IKUS Software inc. <support@ikus-soft.com>
 
-Minarca Server is actively developed by [IKU Software inc.](https://ikus-soft.com)
+Minarca Server is actively developed by [IKUS Software inc.](https://ikus-soft.com)
 since April 2015.
 
 The Minarca Server source code is hosted on [Gitlab](https://gitlab.com/ikus-soft/minarca)
@@ -68,6 +79,11 @@ and mirrored to [Github](https://github.com/ikus060/minarca).
 The Minarca website is <https://minarca.org/>.
 
 # Changelog
+
+## 4.4.1 (2023-03-22)
+
+* Add back support for Debian Bookworm #196
+* Fix lookup of `rdiff-backup` executable
 
 ## 4.4.0 (2023-03-15)
 
