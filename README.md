@@ -80,6 +80,10 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## Next Release
+
+* Replace URL used for latest version check to avoid redirection
+
 ## 4.4.1 (2023-03-22)
 
 * Add back support for Debian Bookworm #196
