@@ -84,6 +84,14 @@ The Minarca website is <https://minarca.org/>.
 
 * Replace URL used for latest version check to avoid redirection
 
+## 4.5.0 (2023-04-17)
+
+* Upgrade Rdiffweb to v2.6.0
+  * Fix MFA verification code email's subjet #270
+  * Add translation for footer not in email layout
+  * Provide a Monthly, Weekly or Daily repport for user #71
+  * Send email to administrator when a new version is available #266
+
 ## 4.4.1 (2023-03-22)
 
 * Add back support for Debian Bookworm #196

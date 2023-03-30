@@ -45,6 +45,11 @@ class MinarcaApplication(RdiffwebApp):
             }
         )
         super().__init__(cfg)
+        cherrypy.config.update(
+            {
+                'notification.current_version': self.version,
+            }
+        )
         # Add few pages.
         self.root.api.minarca = self.get_minarca
         self.root.help = self.get_help

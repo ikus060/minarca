@@ -8,6 +8,7 @@
 from base64 import b64encode
 
 import pkg_resources
+from rdiffweb.core.model import UserObject
 
 import minarca_server.tests
 
@@ -37,3 +38,30 @@ class MinarcaApplicationTestWithRemoteIdentity(minarca_server.tests.AbstractMina
     def test_get_bg_jpg(self):
         self.getPage("/static/bg.jpg")
         self.assertStatus(200)
+
+
+class MinarcaApplicationTestPageAdminUsers(minarca_server.tests.AbstractMinarcaTest):
+    login = True
+
+    def test_create_new_user(self):
+        # Given an administrator authenticated
+        # When creating a new user in Minarca
+        self.getPage(
+            "/admin/users/",
+            method="POST",
+            body={
+                'action': 'add',
+                'username': 'patrik',
+                'fullname': 'Patrik Dufresne',
+                'password': 'this is my long password',
+                'user_root': '',
+            },
+        )
+        self.assertStatus(200)
+        # Then user get added in database
+        userobj = UserObject.get_user('patrik')
+        self.assertEqual(self.base_dir + '/patrik', userobj.user_root)
+        # Then no error are displayed to the user
+        self.assertNotInBody('alert-danger')
+        # Then succes message is displayed
+        self.assertInBody('User added successfully.')

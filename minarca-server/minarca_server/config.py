@@ -194,6 +194,7 @@ def get_parser():
             'fr': 'Un logiciel de sauvegarde <b>gratuit et à code source ouvert</b> fournissant une intégration bout en bout pour vous permettre de contrôler votre stratégie de sauvegarde.<br/><br/> <a href="https://minarca.org/">site web</a> • <a href="https://ikus-soft.com/archive/minarca/doc/">documentations</a> • <a href="https://groups.google.com/d/forum/minarca">communauté</a>'
             + welcome_style,
         },
+        latest_version_url='https://latest.ikus-soft.com/minarca/latest_version',
     )
     return parser
 
