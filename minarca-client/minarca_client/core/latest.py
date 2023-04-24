@@ -12,7 +12,7 @@ from packaging import version
 from minarca_client.core import compat
 from minarca_client.locale import _
 
-LATEST_VERSION_URL = 'https://www.ikus-soft.com/archive/minarca/latest_version'
+LATEST_VERSION_URL = 'https://latest.ikus-soft.com/minarca/latest_version'
 
 
 class LatestCheckFailed(Exception):

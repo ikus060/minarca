@@ -30,7 +30,8 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 On a Debian Linux server:
 
     apt update
-    apt install apt-transport-https ca-certificates lsb-release gpg
+    apt upgrade
+    apt install apt-transport-https ca-certificates curl lsb-release gpg
     curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
     apt update
