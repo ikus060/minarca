@@ -33,11 +33,9 @@ Based on [rdiffweb](https://www.ikus-soft.com/en/rdiffweb/), **Minarca Server** 
 
 Check how Minarca is working without installing the server. We have setup a testing environment for you. You may login to <https://test.minarca.net/> using the default username / password: admin / admin123
 
-Then start a backup in few minutes by installing minarca client for [Windows](https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe) or [Linux/Debian](https://www.ikus-soft.com/archive/minarca/minarca-client_latest_all.deb).
+Then start a backup in few minutes by installing minarca client for [Linux/Debian](https://nexus.ikus-soft.com/repository/archive/minarca/4.5.0/doc/minarca-client.html#installation-on-ubuntu-or-debian), [Windows](https://www.ikus-soft.com/archive/minarca/minarca-client_latest.exe) or [MacOS](https://www.ikus-soft.com/archive/minarca/minarca-client-latest.dmg).
 
 ## Download & Install
-
-[Minarca Download Page](https://minarca.org/download)
 
 [Minarca Server Installation steps](https://www.ikus-soft.com/archive/minarca/doc/installation.html)
 
@@ -56,9 +54,21 @@ Want to know more about Minarca and learn it thoroughly? Read our complete docum
 
 [Minarca Documentation](https://www.ikus-soft.com/archive/minarca/doc/).
 
-## Bug Reports
+## Contribution
 
-Bug reports should be reported on the Minarca Gitlab at <https://gitlab.com/ikus-soft/minarca/-/issues>
+Thank you for considering contributing to Minarca Data Backup! There are several ways you can contribute to the project:
+
+* **Report bugs:** If you find any issues with the software, please let us know by opening a new issue on our [Gitlab repository](https://gitlab.com/ikus-soft/minarca/-/issues). Be sure to include as much detail as possible, such as the steps to reproduce the bug and any error messages you receive.
+
+* **Provide translations:** We are always looking to improve the accessibility of our software by supporting multiple languages. If you are fluent in a language that is not currently supported, we would greatly appreciate your help in translating the software.
+
+* **Support more architectures:** We are looking to expand our support to more architectures, such as ARM for Raspberry Pi devices. If you have experience with these platforms and are interested in helping, please reach out to us.
+
+* **Support for NAS technology:** We are targeting NAS devices as an easy deployment option for the Minarca Central server such as TrueSCALE. If you have experience with these devices and would like to help us with development, please let us know.
+
+* **Provide RPM packages:** We currently do not have support for RedHat Linux distributions. If you have experience with building RPM packages and are interested in helping us support this distribution, please reach out to us.
+
+We welcome all contributions to the project and appreciate any help you can provide.
 
 ## Professional support
 
