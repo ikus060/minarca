@@ -1,4 +1,4 @@
-# Copyright (C) 2020 IKUS Software inc. All rights reserved.
+# Copyright (C) 2023 IKUS Software. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 #
@@ -21,7 +21,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Minarca’s documentation'
-copyright = 'Copyright (C) 2022 IKUS Software'
+copyright = 'Copyright (C) 2023 IKUS Software. All rights reserved.'
 author = 'Patrik Dufresne'
 
 # -- General configuration ---------------------------------------------------
