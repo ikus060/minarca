@@ -279,7 +279,6 @@ deploy:dev:
   - upload:deb
   image: registry.gitlab.com/finestructure/pipeline-trigger
   script:
-    - apk update && apk add git
     - export DEB_VERSION=$(ls -1 minarca-server/dist/buster/minarca-server_*_amd64.deb | cut -d '_' -f 2)
     - echo DEB_VERSION=$DEB_VERSION
     # Trigger ansible-config pipeline

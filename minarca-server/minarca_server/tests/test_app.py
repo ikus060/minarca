@@ -47,7 +47,7 @@ class MinarcaApplicationTestPageAdminUsers(minarca_server.tests.AbstractMinarcaT
         # Given an administrator authenticated
         # When creating a new user in Minarca
         self.getPage(
-            "/admin/users/",
+            "/admin/users/new",
             method="POST",
             body={
                 'action': 'add',
@@ -57,11 +57,12 @@ class MinarcaApplicationTestPageAdminUsers(minarca_server.tests.AbstractMinarcaT
                 'user_root': '',
             },
         )
-        self.assertStatus(200)
-        # Then user get added in database
-        userobj = UserObject.get_user('patrik')
-        self.assertEqual(self.base_dir + '/patrik', userobj.user_root)
+        self.assertStatus(303)
+        self.getPage("/admin/users/")
         # Then no error are displayed to the user
         self.assertNotInBody('alert-danger')
         # Then succes message is displayed
         self.assertInBody('User added successfully.')
+        # Then user get added in database
+        userobj = UserObject.get_user('patrik')
+        self.assertEqual(self.base_dir + '/patrik', userobj.user_root)
