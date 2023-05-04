@@ -47,14 +47,15 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
             b['user_root'] = user_root
         if is_admin is not None:
             b['role'] = str(UserObject.ADMIN_ROLE)
-        self.getPage("/admin/users/", method='POST', body=b)
+        self.getPage("/admin/users/new", method='POST', body=b)
 
     def test_add_user_without_user_root(self):
         # Given a minarca base dir
         self.assertIsNotNone(self.app.cfg.minarca_user_base_dir)
         # When adding a new user without specific user_root
         self._add_user("mtest1", None, "pr3j5Dwi", None, False)
-        self.assertStatus(200)
+        self.assertStatus(303)
+        self.getPage("/admin/users/")
         self.assertInBody("User added successfully.")
         # Then user root directory is defined within the base dir
         user = UserObject.get_user('mtest1')
@@ -65,7 +66,8 @@ class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
         self.assertIsNotNone(self.app.cfg.minarca_user_base_dir)
         # When adding a new user with a specific user_root
         self._add_user("mtest2", None, "pr3j5Dwi", "/home/mtest2", False)
-        self.assertStatus(200)
+        self.assertStatus(303)
+        self.getPage("/admin/users/")
         self.assertInBody("User added successfully.")
         # Then user root is updated to be within the base dir
         user = UserObject.get_user('mtest2')
