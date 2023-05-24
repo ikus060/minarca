@@ -18,23 +18,19 @@ install_requires = [
     "javaproperties",
     "packaging",
     "psutil",
-    "rdiff-backup==2.0.5",
+    "rdiff-backup==2.2.5",
     "requests>=2.25.1",
     "tkvue==2.1.0",
     "wakepy==0.6.0",
-    # Charset Normalizer v3 cannot properly be froxen by PyInstaller. And this is a dependencies of Requests.
-    # Let make sure to load v2 until the problem get fixed.
-    # See https://github.com/pyinstaller/pyinstaller/issues/7372
-    "charset-normalizer<3",
 ]
 
 if os.name == "nt":
     extra_options = {
-        "install_requires": install_requires + ["psutil==5.5.1", "pywin32"],
+        "install_requires": install_requires + ["pywin32"],
         # On Windows rdiff-backup is not working with python 3.9
         # Let make it a required until rdiff-backup support other python
         # version.
-        "python_requires": ">=3.7, <3.8",
+        "python_requires": ">=3.10, <3.11",
     }
 
 elif sys.platform == "darwin":
@@ -71,6 +67,7 @@ setuptools.setup(
     # required packages for build process
     extras_require={
         "test": [
+            "parameterized",
             "responses",
         ]
     },

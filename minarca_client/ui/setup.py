@@ -6,11 +6,11 @@ import pkg_resources
 
 from minarca_client.core import Backup
 from minarca_client.core.exceptions import (
+    BackupError,
     HttpAuthenticationError,
     HttpConnectionError,
     HttpInvalidUrlError,
     RepositoryNameExistsError,
-    SshConnectionError,
 )
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
@@ -124,17 +124,16 @@ class SetupDialog(tkvue.Component):
                 )
                 % str(e),
             )
-        except SshConnectionError as e:
+        except BackupError as e:
             self.data.linking = False
-            logger.exception('ssh connection error')
+            logger.exception('connection error')
             remotehost = self.backup.get_settings().get('remotehost', '')
             tkinter.messagebox.showwarning(
                 master=self.root,
                 icon='warning',
-                title=_('Failed to connect to remote server'),
-                message=_('Failed to connect to remote server'),
-                detail=_("Your computer cannot establish a connection to the remote server: %s\n\n%s")
-                % (remotehost, str(e)),
+                title=_('Connection failed'),
+                message=_('Failed to establish connectivity with remote server: %s') % remotehost,
+                detail=str(e),
             )
         except Exception as e:
             self.data.linking = False

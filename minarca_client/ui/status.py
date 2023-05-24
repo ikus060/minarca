@@ -37,7 +37,6 @@ class StatusView(tkvue.Component):
                 'status_text_style': self.status_text_style,
                 'start_stop_text': self.start_stop_text,
                 'last_backup_text': self.last_backup_text,
-                'last_backup_description': self.last_backup_description,
                 'remote_text_tooltip': self.remote_text_tooltip,
             }
         )
@@ -72,43 +71,26 @@ class StatusView(tkvue.Component):
             return _('Backup was interrupted')
         elif lastresult == 'UNKNOWN':
             return _('No backup yet')
-        else:
-            return _('Backup is not healthy')
+        return _('Backup is not healthy')
 
     @tkvue.computed
     def status_text_style(self, context):
         lastresult = context.lastresult
         if lastresult in ['SUCCESS', 'RUNNING']:
             return 'success'
+        elif lastresult in ['UNKNOWN']:
+            return 'warning'
         return 'danger'
 
     @tkvue.computed
     def last_backup_text(self, context):
         lastresult = context['lastresult']
         lastdate = context['lastdate']
-        if lastresult == 'SUCCESS':
-            return str(lastdate)
-        elif lastresult == 'FAILURE':
-            return _('Last backup failed')
-        elif lastresult == 'RUNNING':
-            return _('Currently running')
-        elif lastresult == 'STALE':
-            return _('Stale')
-        elif lastresult == 'INTERRUPT':
-            return _('Interrupted')
-        return _('Unknown')
-
-    @tkvue.computed
-    def last_backup_description(self, context):
-        lastresult = context['lastresult']
-        lastdate = context['lastdate']
         details = context['details']
         if lastresult == 'SUCCESS':
-            return _('Complete successfully on %s. No background jobs using system resources.') % lastdate
+            return _('Complete successfully on %s.') % lastdate
         elif lastresult == 'FAILURE':
-            return _(
-                'Last backup failed on %s for the following reason: %s\nNo background jobs using system resources.'
-            ) % (lastdate, details)
+            return _('Failed on %s\n%s') % (lastdate, details)
         elif lastresult == 'RUNNING':
             return _('Backup is currently running in background and using system resources.')
         elif lastresult == 'STALE':
@@ -116,16 +98,13 @@ class StatusView(tkvue.Component):
         elif lastresult == 'INTERRUPT':
             return (
                 _(
-                    'Was interrupted on %s. May be caused by loss of connection, computer standby or manual interruption.\nNo background jobs using system resources.'
+                    'Was interrupted on %s. May be caused by loss of connection, computer standby or manual interruption.'
                 )
                 % lastdate
             )
-        elif lastresult == 'UNKNOWN':
-            return _(
-                'Initial backup need to be started. You may take time to configure your parameters and start your initial backup manually.\nNo background jobs using system resources.'
-            )
-        else:
-            'unknown'
+        return _(
+            'Initial backup need to be started. You may take time to configure your parameters and start your initial backup manually.'
+        )
 
     @tkvue.computed
     def remote_text_tooltip(self, context):

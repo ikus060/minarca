@@ -12,14 +12,7 @@ import sys
 from argparse import ArgumentParser
 
 from minarca_client import __version__
-from minarca_client.core import (
-    Backup,
-    BackupError,
-    NotRunningError,
-    NotScheduleError,
-    RepositoryNameExistsError,
-    RunningError,
-)
+from minarca_client.core import Backup, BackupError, NotRunningError, RepositoryNameExistsError
 from minarca_client.core.compat import IS_WINDOWS, get_log_file
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
@@ -54,12 +47,9 @@ def _backup(force):
     backup = Backup()
     try:
         backup.start(force)
-    except (NotScheduleError, RunningError) as e:
+    except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
-    except BackupError:
-        # Other backup error are logged with status
         sys.exit(_EXIT_BACKUP_FAIL)
     except Exception:
         logging.exception("unexpected error during backup")

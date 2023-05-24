@@ -217,7 +217,7 @@ def ssh_keygen(public_key, private_key, length=2048):
         stdout=subprocess.PIPE,
         check=True,
         cwd=tmp.name,
-        env={},
+        env={'PATH': os.environ['PATH']},
     )
     shutil.move(os.path.join(tmp.name, 'id_rsa'), private_key)
     shutil.move(os.path.join(tmp.name, 'id_rsa.pub'), public_key)
@@ -229,8 +229,8 @@ class _RedirectOutput:
     Used to redirect std to logging.
     """
 
-    def __init__(self, logger):
-        self.logger = logger
+    def __init__(self, func):
+        self.func = func
         self.buffer = self
         self.encoding = 'utf-8'
 
@@ -239,7 +239,7 @@ class _RedirectOutput:
         if hasattr(value, 'decode'):
             value = value.decode(self.encoding)
         for line in value.splitlines():
-            self.logger.debug(' local:' + line.rstrip())
+            self.func('local:  ' + line.rstrip())
 
     def flush(self):
         # Nothing to be flushed
@@ -247,7 +247,7 @@ class _RedirectOutput:
 
 
 @contextmanager
-def redirect_ouput(logger):
+def redirect_ouput(func):
     """
     Context manager to replace stdout and stderr for Rdiff-backup to
     redirect them to logging.
@@ -261,11 +261,11 @@ def redirect_ouput(logger):
             with open(fd, 'r') as f:
                 line = f.readline()
                 while line:
-                    logger.debug('remote: ' + line.rstrip())
+                    func('remote: ' + line.rstrip())
                     line = f.readline()
         except OSError:
             # OS Error 9 may happen in case of race condition.
-            logger.exception('fail to pipe')
+            func('fail to pipe')
 
     if IS_WINDOWS and (sys.stderr is None or sys.stderr.__class__.__name__ == 'NullWriter'):
         # With PyInstaller, stderr is undefined.
@@ -276,7 +276,7 @@ def redirect_ouput(logger):
         stderr_copy = None
     else:
         # Copy original file descriptor
-        _old_stderr_fd = sys.stderr.fileno()
+        _old_stderr_fd = sys.__stderr__.fileno()
         stderr_copy = os.fdopen(os.dup(_old_stderr_fd), 'wb')
         # Replace stderr file descriptor by our pipe
         r_fd, w_fd = os.pipe()
@@ -289,7 +289,7 @@ def redirect_ouput(logger):
         # Make replacement at python level
         _old_stdout = sys.stdout
         _old_stderr = sys.stderr
-        sys.stdout = sys.stderr = _RedirectOutput(logger)
+        sys.stdout = sys.stderr = _RedirectOutput(func)
         try:
             yield
         finally:
@@ -301,10 +301,10 @@ def redirect_ouput(logger):
         if stderr_copy:
             os.dup2(stderr_copy.fileno(), _old_stderr_fd)
             stderr_copy.close()
-        # Close pipe
+        # Close pipe read by thread
         os.close(w_fd)
-        # Stop thread (wait maximum 5 sec)
-        t.join(timeout=5)
+        # Stop thread (wait maximum 1 sec)
+        t.join(timeout=1)
 
 
 if IS_WINDOWS:
