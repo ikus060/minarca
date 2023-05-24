@@ -93,6 +93,7 @@ The Minarca website is <https://minarca.org/>.
 ## Next Release
 
 * Replace URL used for latest version check to avoid redirection
+* Log original SSH Command on server side for improved visibility
 
 ## 4.5.0 (2023-04-20)
 
