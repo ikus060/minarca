@@ -11,8 +11,13 @@ Created on Jan 23, 2016
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 """
 
-import grp
 import os
+import unittest
+
+if os.name == "nt":
+    raise unittest.SkipTest("only working on Linux")
+
+import grp
 import pwd
 import time
 import unittest

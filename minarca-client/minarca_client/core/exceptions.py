@@ -10,16 +10,24 @@ Created on Jun. 27, 2021
 from minarca_client.locale import _
 
 
-def raise_exception(original_exception):
-    """
-    Create a better repsentation of the given exception from an
-    rdiff-backup exception raised during it's execution.
-    """
-    for cls in [SshConnectionError, RdiffBackupError]:
-        if cls._matches(original_exception):
-            raise cls() from original_exception
-    # Raise a generic exception
-    raise BackupError() from original_exception
+class CaptureException:
+    exception = None
+
+    def __init__(self, logger) -> None:
+        self.logger = logger
+
+    def __call__(self, line):
+        self.logger.debug(line)
+        for cls in [
+            ConnectException,
+            DiskFullError,
+            DiskQuotaExceededError,
+            UnknownHostException,
+            UnknownHostKeyError,
+            PermissionDeniedError,
+        ]:
+            if cls._matches(line):
+                self.exception = cls()
 
 
 class RepositoryNameExistsError(Exception):
@@ -56,15 +64,21 @@ class InvalidFileSpecificationError(BackupError):
         )
 
 
-class RdiffBackupError(BackupError):
+class RdiffBackupException(BackupError):
+    """
+    Raise whenever rdiff-backup raise an exception.
+    """
+
+    def __init__(self, msg) -> None:
+        self.message = _('backup process terminated with an exception, check logs for more details: %s') % msg
+
+
+class RdiffBackupExitError(BackupError):
     """
     This exception is raised when rdiff-backup process return an error.
     """
 
     message = _('backup process returned non-zero exit status, check logs for more details')
-
-    def _matches(exception):
-        return exception and isinstance(exception, SystemExit)
 
 
 class NoPatternsError(BackupError):
@@ -148,21 +162,82 @@ class HttpServerError(BackupError):
     message = _('remote server return an error, check remote server log with your administrator')
 
 
-class SshConnectionError(RdiffBackupError):
+class ConnectException(BackupError):
     """
     Raised when rdiff-backup fail to establish SSH connection with remove host.
     """
 
     message = _(
-        'Unable to connect to the remote server using SSH without password. The problem may be with the remote server. If the problem persists, contact your system administrator to check the SSH server configuration and a possible firewall blocking the connection.'
+        'Unable to connect to the remote server. The problem may be with the remote server. If the problem persists, contact your system administrator to check the SSH server configuration and a possible firewall blocking the connection.'
     )
 
     @staticmethod
-    def _matches(exception):
-        # When truncated error occuren it's moslty an SSH issue.
-        return (
-            exception
-            and exception.__context__
-            and exception.__context__.args
-            and exception.__context__.args == ('Truncated header string (problem probably originated remotely)',)
-        )
+    def _matches(line):
+        # ssh: connect to host test.minarca.net port 8976: Connection refused
+        return 'ssh: connect to host' in line and 'Connection refused' in line
+
+
+class PermissionDeniedError(BackupError):
+    """
+    Raised by SSH when remote server refused our identity.
+    """
+
+    message = _(
+        'Backup failed due to our identity being refused by remote server. The problem may be with the remote server. If the problem persists, contact your system administrator to review your SSH identity.'
+    )
+
+    @staticmethod
+    def _matches(line):
+        return 'Permission denied (publickey)' in line
+
+
+class UnknownHostKeyError(BackupError):
+    """
+    Raised by SSH when remote server is unknown.
+    """
+
+    message = _(
+        'Backup failed due to unknown remote server identity. If the problem persists, contact your system administrator to review the server identity.'
+    )
+
+    @staticmethod
+    def _matches(line):
+        return 'Host key verification failed.' in line
+
+
+class DiskQuotaExceededError(BackupError):
+    """
+    Raised by rdiff-backup remote server when the disk quota is reached.
+    """
+
+    message = _('Backup failed due to disk quota exceeded. Please free up disk space to ensure successful backup.')
+
+    @staticmethod
+    def _matches(line):
+        return 'OSError: [Errno 122] Disk quota exceeded' in line
+
+
+class DiskFullError(BackupError):
+    """
+    Raised by rdiff-backup remote server when the disk is full"
+    """
+
+    message = _('Backup failed due disk is full. Please clear space on the disk to proceed with the backup.')
+
+    @staticmethod
+    def _matches(line):
+        return 'OSError: [Errno 28] No space left on device' in line
+
+
+class UnknownHostException(BackupError):
+    """
+    Raised by rdiff-backup when remote host name could not be resolved.
+    """
+
+    message = _(
+        'Backup failed due unresolvable hostname. Please check your network connection and ensure the hostname is valid.'
+    )
+
+    @staticmethod
+    def _matches(line):
+        return 'ssh: Could not resolve hostname' in line

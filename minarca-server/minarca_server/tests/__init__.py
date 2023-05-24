@@ -7,6 +7,12 @@
 # Use is subject to license terms.
 
 import os
+import unittest
+
+if os.name == "nt":
+    raise unittest.SkipTest("only working on Linux")
+
+
 import pwd
 import shutil
 import tempfile

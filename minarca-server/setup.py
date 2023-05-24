@@ -36,6 +36,7 @@ setuptools.setup(
     extras_require={
         "test": [
             "html5lib",
+            "parameterized",
             "pytest",
             "responses",
             "selenium",

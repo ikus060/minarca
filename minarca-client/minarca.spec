@@ -14,12 +14,13 @@
 #
 import os
 import platform
+import re
 import subprocess
 import tempfile
-import pkg_resources
-import re
 from email import message_from_string
-from PyInstaller.utils.hooks import copy_metadata
+
+import pkg_resources
+from PyInstaller.utils.hooks import collect_submodules, copy_metadata
 
 #
 # Common values
@@ -55,7 +56,7 @@ a = Analysis(
         ('minarca_client/ui/theme', 'minarca_client/ui/theme'),
         ('minarca_client/locales', 'minarca_client/locales'),
     ],
-    hiddenimports=[],
+    hiddenimports=collect_submodules("rdiffbackup"),
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -143,7 +144,6 @@ else:
 # Packaging
 #
 if platform.system() == "Darwin":
-
     if os.environ.get('AUTHENTICODE_CERT'):
         # Add certificate to login keychain
         keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
@@ -236,7 +236,6 @@ elif platform.system() == "Windows":
     subprocess.check_call(['dist/minarca/minarca.exe', '--version'])
 
 else:
-
     from debbuild import debbuild
 
     # For linux simply create a tar.gz with the folder

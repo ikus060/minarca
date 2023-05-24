@@ -7,26 +7,41 @@ Created on Nov. 12, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 
-import sys
+
+import logging
 import unittest
 
-import rdiff_backup.connection
+from parameterized import parameterized
 
-from minarca_client.core.exceptions import SshConnectionError, raise_exception
+from minarca_client.core.exceptions import (
+    CaptureException,
+    ConnectException,
+    DiskFullError,
+    DiskQuotaExceededError,
+    PermissionDeniedError,
+    UnknownHostException,
+    UnknownHostKeyError,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class TestExceptions(unittest.TestCase):
-    def test_create_exception(self):
-        # Given an exception raise by rdiffweb backup
-        try:
-            try:
-                raise rdiff_backup.connection.ConnectionReadError(
-                    'Truncated header string (problem probably originated remotely)'
-                )
-            except Exception:
-                sys.exit(1)
-        except SystemExit as e:
-            # When raising it as a custom exception
-            # Then it return an SSHConnectionErro
-            with self.assertRaises(SshConnectionError):
-                raise_exception(e)
+    @parameterized.expand(
+        [
+            ('ssh: connect to host test.minarca.net port 8976: Connection refused', ConnectException),
+            ('ssh: Could not resolve hostname', UnknownHostException),
+            ('Host key verification failed.', UnknownHostKeyError),
+            ('Permission denied (publickey)', PermissionDeniedError),
+            ('OSError: [Errno 122] Disk quota exceeded', DiskQuotaExceededError),
+            ('OSError: [Errno 28] No space left on device', DiskFullError),
+            ('Other', None),
+        ]
+    )
+    def test_capture_exception(self, line, expected_error):
+        capture = CaptureException(logger)
+        capture(line)
+        if expected_error:
+            self.assertIsInstance(capture.exception, expected_error)
+        else:
+            self.assertIsNone(capture.exception)
