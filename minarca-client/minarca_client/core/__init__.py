@@ -95,12 +95,11 @@ class _UpdateStatus(threading.Thread):
 
     def __enter__(self):
         try:
-            if IS_WINDOWS:
-                from wakepy import set_keepawake
+            from wakepy import set_keepawake
 
-                set_keepawake(keep_screen_awake=False)
+            set_keepawake(keep_screen_awake=False)
         except Exception:
-            pass
+            logger.warn("failed to set keep awake", exc_info=1)
         logger.info("backup START")
         self._update_status()
         self.start()
@@ -135,12 +134,11 @@ class _UpdateStatus(threading.Thread):
             self.status['details'] = str(exc_val)
             self.status.save()
         try:
-            if IS_WINDOWS:
-                from wakepy import unset_keepawake
+            from wakepy import unset_keepawake
 
-                unset_keepawake(keep_screen_awake=False)
+            unset_keepawake()
         except Exception:
-            pass
+            logger.warn("failed to unset keep awake", exc_info=1)
 
     def run(self):
         while not self.stopped():
