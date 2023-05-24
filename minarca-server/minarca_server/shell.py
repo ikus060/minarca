@@ -150,7 +150,7 @@ def main(args=None):
 
         # Run the server in chroot jail.
         cmd = [rdiff_backup, '--server'] + _extra_args
-        logger.info("running command [%s] in jail [%s]", ' '.join(cmd), userroot)
+        logger.info("running command [%s] in jail [%s] for: %s", ' '.join(cmd), userroot, ssh_original_command)
         try:
             _jail(userroot, cmd)
         except OSError:
