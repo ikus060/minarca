@@ -21,7 +21,7 @@ install_requires = [
     "rdiff-backup==2.0.5",
     "requests>=2.25.1",
     "tkvue==2.1.0",
-    "wakepy",
+    "wakepy==0.6.0",
     # Charset Normalizer v3 cannot properly be froxen by PyInstaller. And this is a dependencies of Requests.
     # Let make sure to load v2 until the problem get fixed.
     # See https://github.com/pyinstaller/pyinstaller/issues/7372
