@@ -28,7 +28,8 @@ test-server:
         PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       - TARGET: minarca-quota-api
   before_script:
-    - apt update && apt -y --no-install-recommends install python3-dev python3-pip python3-setuptools $DEPENDS
+    - apt update
+    - apt -y --no-install-recommends install python3-dev python3-pip python3-setuptools $DEPENDS
     - pip3 install tox
   script:
     - cd $TARGET
@@ -45,13 +46,14 @@ bdist-server:deb:
   parallel:
     matrix:
     - TARGET: minarca-server
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST: [buster, bullseye, bookworm, jammy, kinetic, lunar]
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
     - TARGET: minarca-quota-api
       DIST: [buster, bullseye, bookworm]
   script:
-  - apt update && apt -y --no-install-recommends install devscripts python3
+  - apt update
+  - apt -y --no-install-recommends install devscripts python3
   - cd $TARGET
   - export VERSION=$(curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
@@ -76,7 +78,8 @@ bdist-client:linux:
     - "./*/xunit.xml"
     expire_in: 1 day
   before_script:
-  - apt update && apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron
+  - apt update
+  - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron
   - pip3 install tox
   image: python:3.7-buster
   needs: []  
@@ -113,12 +116,12 @@ bdist-client:win32:
   # openssl is required to generate certificate
   # nsis for creating installer
   # osslsigncode to sign binaries
-  - choco install python3 --no-progress --version=3.7.9 -y -f --forcex86 --source "'https://nexus.ikus-soft.com/repository/choco/'"
+  - choco install python3 --no-progress --version=3.10.11 -y -f --source "'https://nexus.ikus-soft.com/repository/choco/'"
   - choco install openssl --no-progress -y --source "'https://nexus.ikus-soft.com/repository/choco/'"
   - choco install nsis --no-progress -y --source "'https://nexus.ikus-soft.com/repository/choco/'"
   - wget.exe -q https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
   - 7z x osslsigncode_2.2_windows.zip -aoa -oC:\osslsigncode
-  - $Env:path += ";C:\osslsigncode;C:\Python37\Scripts\;C:\Python37\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
+  - $Env:path += ";C:\osslsigncode;C:\Python310\Scripts\;C:\Python310\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS"
   - $Env:path
   # Sanity check
   - python.exe -VV
@@ -147,13 +150,15 @@ test-bdist-server:deb:
     # Ubuntu tzdata is broken https://githubmate.com/repo/regebro/tzlocal/issues/101
     # So we need to make it explicit using environment variable
     - TARGET: minarca-server
-      DIST: [jammy, kinetic]
+      DIST: [jammy, kinetic, lunar]
       TZ: UTC
   script:
-  - apt update && apt install -y apt-transport-https ca-certificates lsb-release gpg
+  - apt update
+  - apt install -y apt-transport-https ca-certificates lsb-release gpg
   - curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
   - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
-  - apt update && apt install -y ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb
+  - apt update
+  - apt install -y ./${TARGET}/dist/$DIST/${TARGET}_*_amd64.deb
   - /opt/minarca-server/bin/minarca-server --version
   - (/opt/minarca-server/bin/minarca-server &)
   - timeout 60 bash -c 'until curl --silent http://localhost:8080; do sleep 1; done'
@@ -164,7 +169,8 @@ doc:
     - ./minarca-client/.tox/doc/tmp
     expire_in: 1 day
   before_script:
-    - apt update && apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
+    - apt update
+    - apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
     - pip install tox
   image: python:3.10
   needs: []
@@ -181,10 +187,10 @@ upload:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST: [buster, bullseye, bookworm, jammy, kinetic, lunar]
       DIST_SPECIFIC: 0
     - TARGET: minarca-server
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST: [buster, bullseye, bookworm, jammy, kinetic, lunar]
       DEPENDS: python3
       DIST_SPECIFIC: 1
     - TARGET: minarca-quota-api
@@ -296,7 +302,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [buster, bullseye, bookworm, jammy, kinetic]
+      DIST: [buster, bullseye, bookworm, jammy, kinetic, lunar]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/minarca-client_*_amd64.deb
@@ -321,7 +327,8 @@ e2e-test:linux:
   - bdist-client:linux
   image: buildpack-deps:buster
   script:
-    - apt update && apt install -y cron openssh-client locales locales-all
+    - apt update
+    - apt install -y cron openssh-client locales locales-all
     - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
     # Smoke test
     - ./minarca --version
@@ -394,5 +401,3 @@ e2e-test:win32:
   stage: e2e-test
   tags:
   - windows
-  variables:
-    GIT_STRATEGY: none

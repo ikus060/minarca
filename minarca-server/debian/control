@@ -23,6 +23,7 @@ Depends:
  adduser,
  rdiff-backup-1.2 (>= 1.2.8-6),
  rdiff-backup-2.0 (>= 2.0.5-5),
+ rdiff-backup-2.2,
  openssh-client,
  openssh-server | ssh-server,
  ${python3:Depends},

@@ -18,8 +18,8 @@ import time
 from datetime import timedelta
 
 import psutil
-import rdiff_backup.Main
 import rdiff_backup.robust
+import rdiffbackup.run
 import requests
 from psutil import NoSuchProcess
 from rdiff_backup.connection import ConnectionReadError, ConnectionWriteError
@@ -31,6 +31,7 @@ from minarca_client.core.compat import IS_WINDOWS, Scheduler, get_minarca_exe, r
 from minarca_client.core.config import Datetime, Patterns, Settings, Status
 from minarca_client.core.exceptions import (
     BackupError,
+    CaptureException,
     HttpAuthenticationError,
     HttpConnectionError,
     HttpInvalidUrlError,
@@ -39,9 +40,10 @@ from minarca_client.core.exceptions import (
     NotConfiguredError,
     NotRunningError,
     NotScheduleError,
+    RdiffBackupException,
+    RdiffBackupExitError,
     RepositoryNameExistsError,
     RunningError,
-    raise_exception,
 )
 from minarca_client.locale import _
 
@@ -232,7 +234,7 @@ class Backup:
                     args.append('--include' if p.include else '--exclude')
                     args.append(p.pattern)
                 args.extend(['--exclude', '%s**' % drive])
-                self._rdiff_backup(args, source=drive)
+                self._rdiff_backup(extra_args=args, source=drive)
 
     def get_patterns(self):
         """
@@ -425,7 +427,7 @@ class Backup:
                 logger.debug(_('exchanging new identity with minarca server'))
                 rdiffweb.add_ssh_key(name, f.read())
 
-    def _rdiff_backup(self, extra_args, source=None):
+    def _rdiff_backup(self, action='backup', extra_args=[], source=None, repositoryname=None):
         """
         Make a call to rdiff-backup executable
         """
@@ -433,10 +435,10 @@ class Backup:
         config = self.get_settings()
         if not config['remotehost']:
             raise NotConfiguredError()
-        remote_host, unused, remote_port = config['remotehost'].partition(':')
-        repositoryname = config['repositoryname']
         if not config['repositoryname']:
             raise NotConfiguredError()
+        remote_host, unused, remote_port = config['remotehost'].partition(':')
+        repositoryname = repositoryname or config['repositoryname']
 
         # base command line
         args = ['-v', '5', '--remote-schema']
@@ -452,6 +454,7 @@ class Backup:
             user_agent_string=compat.get_user_agent(),
         )
         args.append(remote_schema)
+        args.append(action)
         args.extend(extra_args)
         if source:
             args.append(source)
@@ -466,21 +469,30 @@ class Backup:
                 "minarca@{remote_host}::{repositoryname}".format(remote_host=remote_host, repositoryname=repositoryname)
             )
 
+        capture = CaptureException(logger)
+
         # Execute the command line.
-        logging.debug(_('executing command: %s') % _sh_quote(args))
+        logger.debug(_('executing command: %s') % _sh_quote(args))
         try:
             cwd = os.getcwd()
             ld_path = os.environ.get('LD_LIBRARY_PATH')
             if ld_path:
                 del os.environ['LD_LIBRARY_PATH']
             os.chdir('..')
-            with redirect_ouput(logger):
+            with redirect_ouput(capture):
                 # We need to avoid settings signal handlers.
                 rdiff_backup.robust.install_signal_handlers = lambda: None
-                rdiff_backup.Main.Main(args)
-        except SystemExit as e:
-            logging.error('rdiff-backup exit with non-zero code')
-            raise_exception(e)
+                exit_code = rdiffbackup.run.main_run(args)
+        except Exception as e:
+            if capture.exception:
+                raise capture.exception
+            logger.debug('backup process terminated with an exception', exc_info=1)
+            raise RdiffBackupException(str(e))
+        else:
+            if capture.exception:
+                raise capture.exception
+            if exit_code == 1:
+                raise RdiffBackupExitError(exit_code)
         finally:
             os.chdir(cwd)
             if ld_path:
@@ -547,7 +559,9 @@ class Backup:
         """
         Check connectivity to the remote server using rdiff-backup.
         """
-        self._rdiff_backup(['--test-server'])
+        # Since v2.2.x, we need to pass an existing repository nave for test.
+        # Otherwise the test fail if the folder doesn't exists on the remote server.
+        self._rdiff_backup('test', repositoryname='.')
 
     def unlink(self):
         """

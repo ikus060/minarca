@@ -30,6 +30,8 @@ try:
 except Exception:
     __version__ = 'DEV'
 
+DEFAULT_RDIFF_BACKUP_VERSION = '2.0'
+
 
 def _setup_logging(cfg):
     """
@@ -53,13 +55,8 @@ def _jail(userroot, args):
         subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'TZ': tz, 'HOME': userroot})
 
 
-def _find_rdiff_backup(version=2):
-    assert version in [1, 2], 'rdiff-backup version unsupported'
-    if version == 1:
-        executable = 'rdiff-backup-1.2'
-    else:
-        executable = 'rdiff-backup-2.0'
-    return shutil.which(executable)
+def _find_rdiff_backup(version=DEFAULT_RDIFF_BACKUP_VERSION):
+    return shutil.which('rdiff-backup-%s' % (version,))
 
 
 def _parse_config():
@@ -132,13 +129,15 @@ def main(args=None):
         if ssh_original_command in ["rdiff-backup --server"]:
             # When called directly by rdiff-backup.
             # So let use default rdiff-backup version.
-            rdiff_backup = _find_rdiff_backup(version=2)
+            rdiff_backup = _find_rdiff_backup()
         elif 'minarca/' in ssh_original_command:
             # When called by Minarca, we receive a user agent string.
             if 'rdiff-backup/1.2.8' in ssh_original_command:
-                rdiff_backup = _find_rdiff_backup(version=1)
+                rdiff_backup = _find_rdiff_backup(version='1.2')
             elif 'rdiff-backup/2.0' in ssh_original_command:
-                rdiff_backup = _find_rdiff_backup(version=2)
+                rdiff_backup = _find_rdiff_backup(version='2.0')
+            elif 'rdiff-backup/2.2' in ssh_original_command:
+                rdiff_backup = _find_rdiff_backup(version='2.2')
             else:
                 logger.info("unsupported version: %s", ssh_original_command)
                 print("ERROR unsupported version: %s" % ssh_original_command, file=sys.stderr)
@@ -146,7 +145,7 @@ def main(args=None):
         else:
             # When called by legacy minarca client with rdiff-backup v1.2.8.
             # the command should be the name of the repository.
-            rdiff_backup = _find_rdiff_backup(version=1)
+            rdiff_backup = _find_rdiff_backup(version='1.2')
 
         # Run the server in chroot jail.
         cmd = [rdiff_backup, '--server'] + _extra_args

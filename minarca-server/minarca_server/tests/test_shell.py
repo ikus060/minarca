@@ -20,6 +20,7 @@ import tempfile
 import unittest
 from unittest import mock
 
+from parameterized import parameterized
 from tzlocal import get_localzone
 
 from minarca_server import shell
@@ -75,70 +76,40 @@ class Test(unittest.TestCase):
             value = f.read()
             self.assertEqual(b'1', value, "output of `echo -n 1` should be 1")
 
-    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
+    @parameterized.expand(
+        [
+            ("rdiff-backup --server", None),
+            ("my-computer-legacy", "1.2"),
+            ("minarca/3.8.0 rdiff-backup/1.2.8 (Linux 5.11.8-051108-generic amd64)", "1.2"),
+            ("minarca/4.4.0 rdiff-backup/2.0.5 (Linux 5.11.8-051108-generic amd64)", "2.0"),
+            ("minarca/5.0.0 rdiff-backup/2.2.4 (Linux 5.11.8-051108-generic amd64)", "2.2"),
+        ]
+    )
+    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup-test')
     @mock.patch('minarca_server.shell._jail')
-    def test_main_with_rdiff_backup_server(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
-        os.environ['MINARCA_USERNAME'] = USERNAME
-        os.environ['MINARCA_USER_ROOT'] = USERROOT
-        os.environ["SSH_ORIGINAL_COMMAND"] = "rdiff-backup --server"
-        try:
-            shell.main([])
-        finally:
-            del os.environ["MINARCA_USERNAME"]
-            del os.environ["MINARCA_USER_ROOT"]
-            del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
-
-    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
-    @mock.patch('minarca_server.shell._jail')
-    def test_main_with_minarca_legacy(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
-        # First minarca version send only the repository name as the command
-        # line without anymore information.
-        os.environ['MINARCA_USERNAME'] = USERNAME
-        os.environ['MINARCA_USER_ROOT'] = USERROOT
-        os.environ["SSH_ORIGINAL_COMMAND"] = "my-computer"
-        try:
-            shell.main([])
-        finally:
-            del os.environ["MINARCA_USERNAME"]
-            del os.environ["MINARCA_USER_ROOT"]
-            del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
-        find_rdiff_backup_mock.assert_called_once_with(version=1)
-
-    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
-    @mock.patch('minarca_server.shell._jail')
-    def test_main_with_minarca_with_128(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
+    def test_main_with_user_agent(
+        self,
+        ssh_original_cmd,
+        expect_version,
+        rdiff_backup_jail_mock,
+        find_rdiff_backup_mock,
+    ):
         # Minarca is sending a user agent string containing the rdiff-backup
         # version.
         os.environ['MINARCA_USERNAME'] = USERNAME
         os.environ['MINARCA_USER_ROOT'] = USERROOT
-        os.environ["SSH_ORIGINAL_COMMAND"] = "minarca/3.8.0 rdiff-backup/1.2.8 (Linux 5.11.8-051108-generic amd64)"
+        os.environ["SSH_ORIGINAL_COMMAND"] = ssh_original_cmd
         try:
             shell.main([])
         finally:
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
             del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
-        find_rdiff_backup_mock.assert_called_once_with(version=1)
-
-    @mock.patch('minarca_server.shell._find_rdiff_backup', return_value='/usr/bin/rdiff-backup')
-    @mock.patch('minarca_server.shell._jail')
-    def test_main_with_minarca_with_205(self, rdiff_backup_jail_mock, find_rdiff_backup_mock):
-        # Minarca is sending a user agent string containing the rdiff-backup
-        # version.
-        os.environ['MINARCA_USERNAME'] = USERNAME
-        os.environ['MINARCA_USER_ROOT'] = USERROOT
-        os.environ["SSH_ORIGINAL_COMMAND"] = "minarca/3.8.0 rdiff-backup/2.0.5 (Linux 5.11.8-051108-generic amd64)"
-        try:
-            shell.main([])
-        finally:
-            del os.environ["MINARCA_USERNAME"]
-            del os.environ["MINARCA_USER_ROOT"]
-            del os.environ["SSH_ORIGINAL_COMMAND"]
-        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup', '--server'])
-        find_rdiff_backup_mock.assert_called_once_with(version=2)
+        rdiff_backup_jail_mock.assert_called_once_with('/tmp/backups/joe', ['/usr/bin/rdiff-backup-test', '--server'])
+        if expect_version is None:
+            find_rdiff_backup_mock.assert_called_once_with()
+        else:
+            find_rdiff_backup_mock.assert_called_once_with(version=expect_version)
 
     def test_jail(self):
         # Write a file in jail folder

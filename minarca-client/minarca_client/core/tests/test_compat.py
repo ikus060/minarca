@@ -42,11 +42,11 @@ class TestCompat(unittest.TestCase):
 
     @mock.patch('subprocess.check_output', side_effect=mock_subprocess_check_output)
     def test_get_user_agent(self, *unused):
-        self.assertEqual(MATCH("minarca/* rdiff-backup/2.0.5 (*)"), compat.get_user_agent())
+        self.assertEqual(MATCH("minarca/* rdiff-backup/2.2.5 (*)"), compat.get_user_agent())
 
     @mock.patch('subprocess.check_output', side_effect=mock_subprocess_check_output)
     def test_get_rdiff_backup_version(self, *unused):
-        self.assertEqual("2.0.5", compat.get_rdiff_backup_version())
+        self.assertEqual("2.2.5", compat.get_rdiff_backup_version())
 
     def test_ssh_keygen(self):
         ssh_keygen('public.key', 'private.key')
@@ -60,43 +60,43 @@ class TestCompat(unittest.TestCase):
 
     def test_redirect_ouput_with_python_stderr(self):
         # Given a logger
-        logger = mock.MagicMock()
+        func = mock.MagicMock()
         # When redirecting stderr to this logger
-        with redirect_ouput(logger):
+        with redirect_ouput(func):
             sys.stderr.write('stderr')
         # Then value is send to logger
-        logger.debug.assert_called_once_with(' local:stderr')
+        func.assert_called_once_with('local:  stderr')
         # Then after redirect, output is not sent to logger
-        logger.debug.reset_mock()
+        func.reset_mock()
         sys.stderr.write('stderr')
-        logger.debug.assert_not_called()
+        func.assert_not_called()
 
     def test_redirect_ouput_with_python_stdout(self):
         # Given a logger
-        logger = mock.MagicMock()
+        func = mock.MagicMock()
         # When redirecting stdout to this logger
-        with redirect_ouput(logger):
+        with redirect_ouput(func):
             sys.stdout.write('stdout')
         # Then value is send to logger
-        logger.debug.assert_called_once_with(' local:stdout')
+        func.assert_called_once_with('local:  stdout')
         # Then after redirect, output is not sent to logger
-        logger.debug.reset_mock()
+        func.reset_mock()
         sys.stderr.write('stdout')
-        logger.debug.assert_not_called()
+        func.assert_not_called()
 
     def test_redirect_ouput_with_subprocess_stderr(self):
         # Given a logger
-        logger = mock.MagicMock()
+        func = mock.MagicMock()
         # When redirecting stdout to this logger
-        stderr_fd = sys.stderr.fileno()
-        with redirect_ouput(logger):
+        stderr_fd = sys.__stderr__.fileno()
+        with redirect_ouput(func):
             os.write(stderr_fd, b'error')
         # Then value is send to logger
-        logger.debug.assert_called_once_with('remote: error')
-        logger.debug.reset_mock()
+        func.assert_called_once_with('remote: error')
+        func.reset_mock()
         # Then writting back to stderr should work
         os.write(stderr_fd, b'error')
-        logger.debug.assert_not_called()
+        func.assert_not_called()
 
 
 @skipUnless(IS_LINUX, 'Only for Unix')

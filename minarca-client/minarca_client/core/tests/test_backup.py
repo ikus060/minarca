@@ -29,7 +29,7 @@ from minarca_client.core import (
 )
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
-from minarca_client.core.exceptions import HttpServerError, NotConfiguredError, SshConnectionError
+from minarca_client.core.exceptions import HttpServerError, NotConfiguredError, UnknownHostException
 from minarca_client.tests.test import MATCH
 
 IDENTITY = """[test.minarca.net]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK/Qng4S5d75rtYxklVdIkPiz4paf2pdnCEshUoailQO root@sestican
@@ -41,7 +41,7 @@ _original_subprocess_popen = subprocess.Popen
 
 # A couple of variable to make stuff cross-platform
 _echo_foo_cmd = ['cmd.exe', '/c', 'echo foo'] if IS_WINDOWS else ['echo', 'foo']
-_exit_1_cmd = ['cmd.exe', '/c', 'exit 1'] if IS_WINDOWS else ['sh', '-c', 'exit 1']
+_exit_1_cmd = ['cmd.exe', '/c', 'exit 1'] if IS_WINDOWS else ['exit 1']
 _ssh = 'ssh.exe' if IS_WINDOWS else '/usr/bin/ssh'
 _home = 'C:/Users' if IS_WINDOWS else '/home'
 _root = 'C:/' if IS_WINDOWS else '/'
@@ -100,7 +100,7 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(RepositoryNameExistsError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
-    @mock.patch('rdiff_backup.Main.Main')
+    @mock.patch('rdiffbackup.run.main_run', return_value=0)
     @mock.patch("minarca_client.core.Rdiffweb")
     def test_link_with_existing_patterns(self, mock_rdiffweb, mock_rdiff_backup):
         # Create patterns
@@ -188,7 +188,7 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(HttpServerError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
-    @mock.patch('rdiff_backup.Main.Main')
+    @mock.patch('rdiffbackup.run.main_run', return_value=0)
     @mock.patch("minarca_client.core.Rdiffweb")
     def test_link(self, mock_rdiffweb, mock_rdiff_backup):
         # Define a status
@@ -221,7 +221,7 @@ class TestBackup(unittest.TestCase):
         self.assertEqual('UNKNOWN', self.backup.get_status('lastresult'))
 
     @mock.patch('minarca_client.core.Scheduler')
-    @mock.patch('rdiff_backup.Main.Main')
+    @mock.patch('rdiffbackup.run.main_run', return_value=0)
     @mock.patch("minarca_client.core.Rdiffweb")
     def test_link_threading(self, mock_rdiffweb, mock_rdiff_backup, mock_scheduler):
         # Mock some https stuff
@@ -360,7 +360,7 @@ class TestBackup(unittest.TestCase):
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
-    @mock.patch('rdiff_backup.Main.Main')
+    @mock.patch('rdiffbackup.run.main_run', return_value=0)
     def test_rdiff_backup(self, mock_rdiff_backup, *unused):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
@@ -378,6 +378,7 @@ class TestBackup(unittest.TestCase):
                     _ssh
                     + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
                 ),
+                'backup',
                 '--include',
                 _home,
                 _root,
@@ -403,7 +404,7 @@ class TestBackup(unittest.TestCase):
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
-    @mock.patch('rdiff_backup.Main.Main')
+    @mock.patch('rdiffbackup.run.main_run', return_value=0)
     def test_rdiff_backup_custom_port(self, mock_rdiff_backup, *unused):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost:2222'
@@ -421,6 +422,7 @@ class TestBackup(unittest.TestCase):
                     _ssh
                     + " -oBatchMode=yes -oPreferredAuthentications=publickey -p 2222 -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
                 ),
+                'backup',
                 '--include',
                 _home,
                 _root,
@@ -437,19 +439,20 @@ class TestBackup(unittest.TestCase):
             except Exception as e:
                 self.error = e
 
+        # Given rdiff-backup started in a separate thread
+        # With invalid remote host.
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost:2222'
         config['repositoryname'] = 'test-repo'
         config.save()
-
-        # Start rdiff-backup in a separate thread.
         thread = threading.Thread(target=_start_backup)
+        # When rdiff-backup isrunning
         thread.start()
         thread.join()
-
-        # Should exit with error code 1, because remote host cannot beresolved.
-        self.assertIsInstance(self.error, SshConnectionError)
-        self.assertIsInstance(self.error.__cause__, SystemExit)
+        # Then it should exit with error code 1
+        # An exception should be raised
+        self.assertIsNotNone(self.error)
+        self.assertIsInstance(self.error, UnknownHostException)
 
     def test_rdiff_backup_not_configured_remotehost(self):
         config = Settings(self.backup.config_file)
@@ -511,7 +514,7 @@ class TestBackup(unittest.TestCase):
         # Check if rdiff-backup is called.
         if IS_WINDOWS:
             self.backup._rdiff_backup.assert_called_once_with(
-                [
+                extra_args=[
                     '--no-hard-links',
                     '--exclude-symbolic-links',
                     '--create-full-path',
@@ -525,7 +528,7 @@ class TestBackup(unittest.TestCase):
             )
         else:
             self.backup._rdiff_backup.assert_called_once_with(
-                ['--exclude-sockets', '--no-compression', '--include', _home, '--exclude', '/**'], source='/'
+                extra_args=['--exclude-sockets', '--no-compression', '--include', _home, '--exclude', '/**'], source='/'
             )
         # Check status
         status = self.backup.get_status()
@@ -559,7 +562,7 @@ class TestBackup(unittest.TestCase):
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
-    @mock.patch('rdiff_backup.Main.Main')
+    @mock.patch('rdiffbackup.run.main_run', return_value=0)
     def test_test_server(self, mock_rdiff_backup, *unused):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
@@ -576,8 +579,8 @@ class TestBackup(unittest.TestCase):
                     _ssh
                     + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/* rdiff-backup/2.0.0 (*)'"
                 ),
-                '--test-server',
-                'minarca@remotehost::test-repo',
+                'test',
+                'minarca@remotehost::.',
             ]
         )
 
