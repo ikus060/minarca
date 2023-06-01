@@ -92,8 +92,16 @@ The Minarca website is <https://minarca.org/>.
 
 ## Next Release
 
+* Upgrade rdiffweb to version 2.8.0
 * Replace URL used for latest version check to avoid redirection
 * Log original SSH Command on server side for improved visibility
+* Use rdiff-backup v2.2.5 in minarca-client #194
+* Use new rdiff-backup command line format to avoid WARNING in logs
+* Apply additional patch to rdiff-backup for better windows support
+* Add support for version 1.2.8, 2.0.x and 2.2.x #194
+* Upgrade to Python version 3.10 on Windows #190
+* Improve error handling arround rdiff-backup execution #203
+* Improve error reporting in user interface
 
 ## 4.5.0 (2023-04-20)
 
