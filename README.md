@@ -102,6 +102,7 @@ The Minarca website is <https://minarca.org/>.
 * Upgrade to Python version 3.10 on Windows #190
 * Improve error handling arround rdiff-backup execution #203
 * Improve error reporting in user interface
+* Add missing `libxcb1` dependencies
 
 ## 4.5.0 (2023-04-20)
 
