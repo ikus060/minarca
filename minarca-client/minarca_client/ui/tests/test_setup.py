@@ -93,7 +93,7 @@ class SetupTest(unittest.TestCase):
     def test_submit_form_with_already_exists(self):
         self.dlg.close = MagicMock()
         # Given an exception raised when linking
-        self.dlg.backup.link = MagicMock(side_effect=RepositoryNameExistsError)
+        self.dlg.backup.link = MagicMock(side_effect=RepositoryNameExistsError('test'))
         # Given the user press "Yes"
         tkinter.messagebox.askyesno = MagicMock(return_value=True)
         # Given a form with valid value
