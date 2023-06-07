@@ -100,6 +100,9 @@ class _UpdateStatus(threading.Thread):
             from wakepy import set_keepawake
 
             set_keepawake(keep_screen_awake=False)
+        except ImportError:
+            # When not supported, an import error is raised
+            logger.info("keep awake not supported on this system")
         except Exception:
             logger.warn("failed to set keep awake", exc_info=1)
         logger.info("backup START")
@@ -139,6 +142,8 @@ class _UpdateStatus(threading.Thread):
             from wakepy import unset_keepawake
 
             unset_keepawake()
+        except ImportError:
+            pass
         except Exception:
             logger.warn("failed to unset keep awake", exc_info=1)
 
