@@ -235,11 +235,19 @@ class _RedirectOutput:
         self.encoding = 'utf-8'
 
     def write(self, value):
+        # Check if getting called recursively.
+        # This occur only when the logging raise an exception: --- Logging error ---
+        if getattr(threading.current_thread(), 'redirect_output_inner_call', False):
+            sys.__stdout__.write(value)
         # Write each lines to logging.
         if hasattr(value, 'decode'):
             value = value.decode(self.encoding)
-        for line in value.splitlines():
-            self.func('local:  ' + line.rstrip())
+        try:
+            threading.current_thread().redirect_output_inner_call = True
+            for line in value.splitlines():
+                self.func('local:  ' + line.rstrip())
+        finally:
+            threading.current_thread().redirect_output_inner_call = False
 
     def flush(self):
         # Nothing to be flushed
