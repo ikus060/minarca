@@ -84,8 +84,8 @@ class SetupDialog(tkvue.Component):
             await self.get_event_loop().run_in_executor(None, call)
             # Link completed - Close Window.
             self.close()
-        except RepositoryNameExistsError:
-            logger.info('repository name `%s` already exists' % self.data.repository_name)
+        except RepositoryNameExistsError as e:
+            logger.info('repository name `%s` already exists' % e.name)
             self._prompt_link_force()
         except HttpInvalidUrlError:
             self.data.linking = False

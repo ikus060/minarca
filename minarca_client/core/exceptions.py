@@ -30,15 +30,6 @@ class CaptureException:
                 self.exception = cls()
 
 
-class RepositoryNameExistsError(Exception):
-    """
-    This exception is raised during the linking process when the repository
-    name already exists on the remote server.
-    """
-
-    pass
-
-
 class BackupError(Exception):
     """
     This exception is raised when the backup process failed.
@@ -48,6 +39,22 @@ class BackupError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class RepositoryNameExistsError(BackupError):
+    """
+    This exception is raised during the linking process when the repository
+    name already exists on the remote server.
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.message = (
+            _(
+                'Fail to link because repository with name `%s` already exists on remote server. You may force the operation by using `--force` on command line.'
+            )
+            % name
+        )
 
 
 class InvalidFileSpecificationError(BackupError):
