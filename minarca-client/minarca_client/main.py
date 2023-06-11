@@ -68,13 +68,14 @@ def _link(remoteurl, username, name, force, password=None):
         sys.exit(_EXIT_ALREADY_LINKED)
     # Prompt for password if missing.
     if not password:
-        password = getpass.getpass(prompt=_('password: '))
+        password = getpass.getpass(prompt=_('password or access token: '))
     if not password:
         print(_('a password is required'))
         sys.exit(_EXIT_MISSING_PASSWD)
     try:
         backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=force)
-    except RepositoryNameExistsError:
+    except RepositoryNameExistsError as e:
+        print(e.message)
         sys.exit(_EXIT_REPO_EXISTS)
     except BackupError as e:
         print(e.message)
@@ -206,7 +207,9 @@ def _parse_args(args):
         '-r', '--remoteurl', required=True, help=_("URL to the remote minarca server. e.g.: http://example.com:8080/")
     )
     sub.add_argument('-u', '--username', required=True, help=_("user name to be used for authentication"))
-    sub.add_argument('-p', '--password', help=_("password to use for authentication. Will prompt if not provided"))
+    sub.add_argument(
+        '-p', '--password', help=_("password or access token to use for authentication. Will prompt if not provided")
+    )
     sub.add_argument('-n', '--name', required=True, help=_("repository name to be used"))
     sub.add_argument(
         '--force', action='store_true', help=_("link to remote server even if the repository name already exists")
@@ -277,7 +280,7 @@ def _configure_logging(debug=False):
     root.setLevel(logging.DEBUG)
 
     # Configure log file
-    file_handler = logging.handlers.RotatingFileHandler(get_log_file(), maxBytes=(1048576 * 5), backupCount=5)
+    file_handler = logging.handlers.TimedRotatingFileHandler(get_log_file(), when='D', interval=1, backupCount=5)
     file_handler.setFormatter(
         logging.Formatter("%(asctime)s [%(process)d][%(levelname)-5.5s][%(threadName)-12.12s] %(message)s")
     )

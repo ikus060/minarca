@@ -357,10 +357,6 @@ class Backup:
                 for r in current_user.get('repos', [])
             )
             if not force and exists:
-                logger.warning(
-                    _('fail to link because repository with name `%s` already exists on remote server')
-                    % repository_name
-                )
                 raise RepositoryNameExistsError(repository_name)
 
             # Generate SSH Keys
