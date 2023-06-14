@@ -13,11 +13,7 @@ from minarca_client.locale import _
 class CaptureException:
     exception = None
 
-    def __init__(self, logger) -> None:
-        self.logger = logger
-
-    def __call__(self, line):
-        self.logger.debug(line)
+    def parse(self, line):
         for cls in [
             ConnectException,
             DiskFullError,

@@ -14,8 +14,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import threading
-from contextlib import contextmanager
 
 import pkg_resources
 
@@ -222,97 +220,6 @@ def ssh_keygen(public_key, private_key, length=2048):
     shutil.move(os.path.join(tmp.name, 'id_rsa'), private_key)
     shutil.move(os.path.join(tmp.name, 'id_rsa.pub'), public_key)
     tmp.cleanup()
-
-
-class _RedirectOutput:
-    """
-    Used to redirect std to logging.
-    """
-
-    def __init__(self, func):
-        self.func = func
-        self.buffer = self
-        self.encoding = 'utf-8'
-
-    def write(self, value):
-        # Check if getting called recursively.
-        # This occur only when the logging raise an exception: --- Logging error ---
-        if getattr(threading.current_thread(), 'redirect_output_inner_call', False):
-            sys.__stdout__.write(value)
-        # Write each lines to logging.
-        if hasattr(value, 'decode'):
-            value = value.decode(self.encoding)
-        try:
-            threading.current_thread().redirect_output_inner_call = True
-            for line in value.splitlines():
-                self.func('local:  ' + line.rstrip())
-        finally:
-            threading.current_thread().redirect_output_inner_call = False
-
-    def flush(self):
-        # Nothing to be flushed
-        pass
-
-
-@contextmanager
-def redirect_ouput(func):
-    """
-    Context manager to replace stdout and stderr for Rdiff-backup to
-    redirect them to logging.
-
-    Also need to redirect stderr at file descriptor level because it's used by
-    ssh.exe sub-process.
-    """
-
-    def _reader_thread(fd):
-        try:
-            with open(fd, 'r') as f:
-                line = f.readline()
-                while line:
-                    func('remote: ' + line.rstrip())
-                    line = f.readline()
-        except OSError:
-            # OS Error 9 may happen in case of race condition.
-            func('fail to pipe')
-
-    if IS_WINDOWS and (sys.stderr is None or sys.stderr.__class__.__name__ == 'NullWriter'):
-        # With PyInstaller, stderr is undefined.
-        import win32api
-
-        r_fd, w_fd = os.pipe()
-        win32api.SetStdHandle(win32api.STD_ERROR_HANDLE, w_fd)
-        stderr_copy = None
-    else:
-        # Copy original file descriptor
-        _old_stderr_fd = sys.__stderr__.fileno()
-        stderr_copy = os.fdopen(os.dup(_old_stderr_fd), 'wb')
-        # Replace stderr file descriptor by our pipe
-        r_fd, w_fd = os.pipe()
-        os.dup2(w_fd, _old_stderr_fd)
-    # Start a thread to read the pipe.
-    t = threading.Thread(target=_reader_thread, args=(r_fd,))
-    t.daemon = True
-    t.start()
-    try:
-        # Make replacement at python level
-        _old_stdout = sys.stdout
-        _old_stderr = sys.stderr
-        sys.stdout = sys.stderr = _RedirectOutput(func)
-        try:
-            yield
-        finally:
-            # Restore stdout and stderr
-            sys.stdout = _old_stdout
-            sys.stderr = _old_stderr
-    finally:
-        # Restore file descriptor
-        if stderr_copy:
-            os.dup2(stderr_copy.fileno(), _old_stderr_fd)
-            stderr_copy.close()
-        # Close pipe read by thread
-        os.close(w_fd)
-        # Stop thread (wait maximum 1 sec)
-        t.join(timeout=1)
 
 
 if IS_WINDOWS:

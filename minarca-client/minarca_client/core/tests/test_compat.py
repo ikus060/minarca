@@ -8,14 +8,13 @@ Created on Jun. 7, 2021
 '''
 import os
 import subprocess
-import sys
 import tempfile
 import unittest
 from unittest import mock
 from unittest.case import skipUnless
 
 from minarca_client.core import compat
-from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, Scheduler, redirect_ouput, ssh_keygen
+from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, Scheduler, ssh_keygen
 from minarca_client.tests.test import MATCH
 
 _echo_rdiff_backup_version = (
@@ -57,46 +56,6 @@ class TestCompat(unittest.TestCase):
             self.assertTrue(f.read().startswith("ssh-rsa "))
         with open('private.key') as f:
             self.assertEqual(MATCH('-----BEGIN * PRIVATE KEY-----*'), f.read())
-
-    def test_redirect_ouput_with_python_stderr(self):
-        # Given a logger
-        func = mock.MagicMock()
-        # When redirecting stderr to this logger
-        with redirect_ouput(func):
-            sys.stderr.write('stderr')
-        # Then value is send to logger
-        func.assert_called_once_with('local:  stderr')
-        # Then after redirect, output is not sent to logger
-        func.reset_mock()
-        sys.stderr.write('stderr')
-        func.assert_not_called()
-
-    def test_redirect_ouput_with_python_stdout(self):
-        # Given a logger
-        func = mock.MagicMock()
-        # When redirecting stdout to this logger
-        with redirect_ouput(func):
-            sys.stdout.write('stdout')
-        # Then value is send to logger
-        func.assert_called_once_with('local:  stdout')
-        # Then after redirect, output is not sent to logger
-        func.reset_mock()
-        sys.stderr.write('stdout')
-        func.assert_not_called()
-
-    def test_redirect_ouput_with_subprocess_stderr(self):
-        # Given a logger
-        func = mock.MagicMock()
-        # When redirecting stdout to this logger
-        stderr_fd = sys.__stderr__.fileno()
-        with redirect_ouput(func):
-            os.write(stderr_fd, b'error')
-        # Then value is send to logger
-        func.assert_called_once_with('remote: error')
-        func.reset_mock()
-        # Then writting back to stderr should work
-        os.write(stderr_fd, b'error')
-        func.assert_not_called()
 
 
 @skipUnless(IS_LINUX, 'Only for Unix')

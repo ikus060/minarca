@@ -30,6 +30,7 @@ from minarca_client.core import (
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
 from minarca_client.core.exceptions import HttpServerError, NotConfiguredError, UnknownHostException
+from minarca_client.locale import gettext as _
 from minarca_client.tests.test import MATCH
 
 IDENTITY = """[test.minarca.net]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK/Qng4S5d75rtYxklVdIkPiz4paf2pdnCEshUoailQO root@sestican
@@ -48,7 +49,11 @@ _root = 'C:/' if IS_WINDOWS else '/'
 
 
 def mock_subprocess_link(*args, **kwargs):
-    if 'rdiff-backup' in args[0][0]:
+    """
+    Mock function to avoid calling the real rdiff-backup command. But during linking, we also make call to ssh keygen.
+    """
+
+    if 'rdiff-backup' in args[0][1]:
         return _original_subprocess_popen(_echo_foo_cmd, **kwargs)
     return _original_subprocess_popen(*args, **kwargs)
 
@@ -100,9 +105,9 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(RepositoryNameExistsError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
-    @mock.patch('rdiffbackup.run.main_run', return_value=0)
+    @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     @mock.patch("minarca_client.core.Rdiffweb")
-    def test_link_with_existing_patterns(self, mock_rdiffweb, mock_rdiff_backup):
+    def test_link_with_existing_patterns(self, mock_rdiffweb, mock_popen):
         # Create patterns
         initial_patterns = self.backup.get_patterns()
         initial_patterns.append(Pattern(True, _home, None))
@@ -125,7 +130,7 @@ class TestBackup(unittest.TestCase):
         self.backup.scheduler.create.assert_called_once()
 
         # Check if rdiff_backup get called.
-        mock_rdiff_backup.assert_called_once()
+        self.assertEqual(2, mock_popen.call_count)
 
         # Check if default patterns are created
         patterns = self.backup.get_patterns()
@@ -188,9 +193,9 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(HttpServerError):
             self.backup.link("http://localhost", "admin", "admin", "coucou")
 
-    @mock.patch('rdiffbackup.run.main_run', return_value=0)
+    @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     @mock.patch("minarca_client.core.Rdiffweb")
-    def test_link(self, mock_rdiffweb, mock_rdiff_backup):
+    def test_link(self, mock_rdiffweb, mock_popen):
         # Define a status
         with open(self.backup.status_file, 'w') as f:
             f.write('lastresult=SUCCESS\n')
@@ -210,7 +215,7 @@ class TestBackup(unittest.TestCase):
         # Check calls to web api
         mock_rdiffweb.return_value.get_current_user_info.assert_called_once()
         mock_rdiffweb.return_value.add_ssh_key.assert_called_once()
-        mock_rdiff_backup.assert_called_once()
+        mock_popen.assert_called()
         self.backup.scheduler.create.assert_called_once()
 
         # Check if default patterns are created
@@ -220,10 +225,10 @@ class TestBackup(unittest.TestCase):
         # Check if default status is set.
         self.assertEqual('UNKNOWN', self.backup.get_status('lastresult'))
 
+    @mock.patch('subprocess.Popen', side_effect=mock_subprocess_link)
     @mock.patch('minarca_client.core.Scheduler')
-    @mock.patch('rdiffbackup.run.main_run', return_value=0)
     @mock.patch("minarca_client.core.Rdiffweb")
-    def test_link_threading(self, mock_rdiffweb, mock_rdiff_backup, mock_scheduler):
+    def test_link_threading(self, mock_rdiffweb, *unused):
         # Mock some https stuff
         mock_rdiffweb.return_value.get_current_user_info = mock.MagicMock(
             return_value={'email': 'admin@example.com', 'username': 'admin', 'repos': []}
@@ -360,7 +365,7 @@ class TestBackup(unittest.TestCase):
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
-    @mock.patch('rdiffbackup.run.main_run', return_value=0)
+    @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     def test_rdiff_backup(self, mock_rdiff_backup, *unused):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
@@ -371,6 +376,8 @@ class TestBackup(unittest.TestCase):
         # Validate
         mock_rdiff_backup.assert_called_once_with(
             [
+                mock.ANY,
+                'rdiff-backup',
                 '-v',
                 '5',
                 '--remote-schema',
@@ -383,7 +390,11 @@ class TestBackup(unittest.TestCase):
                 _home,
                 _root,
                 'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo',
-            ]
+            ],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding='utf-8',
         )
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
@@ -404,7 +415,7 @@ class TestBackup(unittest.TestCase):
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
-    @mock.patch('rdiffbackup.run.main_run', return_value=0)
+    @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     def test_rdiff_backup_custom_port(self, mock_rdiff_backup, *unused):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost:2222'
@@ -415,6 +426,8 @@ class TestBackup(unittest.TestCase):
         # Validate port numner
         mock_rdiff_backup.assert_called_once_with(
             [
+                mock.ANY,
+                'rdiff-backup',
                 '-v',
                 '5',
                 '--remote-schema',
@@ -427,7 +440,11 @@ class TestBackup(unittest.TestCase):
                 _home,
                 _root,
                 'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo',
-            ]
+            ],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding='utf-8',
         )
 
     def test_rdiff_backup_threading(self):
@@ -497,7 +514,7 @@ class TestBackup(unittest.TestCase):
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_echo_foo_cmd))
-    def test_start(self, mock_popen, *unused):
+    def test_backup(self, mock_popen, *unused):
         start_time = Datetime()
         # Mock call to rdiff-backup
         self.backup._rdiff_backup = MagicMock()
@@ -510,7 +527,7 @@ class TestBackup(unittest.TestCase):
         patterns = Patterns(self.backup.patterns_file)
         patterns.append(Pattern(True, _home, None))
         patterns.save()
-        self.backup.start()
+        self.backup.backup()
         # Check if rdiff-backup is called.
         if IS_WINDOWS:
             self.backup._rdiff_backup.assert_called_once_with(
@@ -542,7 +559,7 @@ class TestBackup(unittest.TestCase):
         status['lastsuccess'] = Datetime()
         status.save()
         with self.assertRaises(NotScheduleError):
-            self.backup.start()
+            self.backup.backup()
 
     def test_start_without_patterns(self):
         start_time = Datetime()
@@ -552,17 +569,17 @@ class TestBackup(unittest.TestCase):
         config['configured'] = True
         config.save()
         with self.assertRaises(NoPatternsError):
-            self.backup.start()
+            self.backup.backup()
         # Check status
         status = self.backup.get_status()
         self.assertTrue(status['lastdate'] > start_time)
         self.assertNotEqual(status['lastdate'], status['lastsuccess'])
         self.assertEqual('FAILURE', status['lastresult'])
-        self.assertEqual('include patterns are missing', status['details'])
+        self.assertEqual(_('include patterns are missing'), status['details'])
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
-    @mock.patch('rdiffbackup.run.main_run', return_value=0)
+    @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     def test_test_server(self, mock_rdiff_backup, *unused):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
@@ -572,6 +589,8 @@ class TestBackup(unittest.TestCase):
         # Validate
         mock_rdiff_backup.assert_called_once_with(
             [
+                mock.ANY,
+                'rdiff-backup',
                 '-v',
                 '5',
                 '--remote-schema',
@@ -581,7 +600,11 @@ class TestBackup(unittest.TestCase):
                 ),
                 'test',
                 'minarca@remotehost::.',
-            ]
+            ],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding='utf-8',
         )
 
     def test_unlink(self):
