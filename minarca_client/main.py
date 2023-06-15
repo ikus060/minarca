@@ -11,6 +11,8 @@ import signal
 import sys
 from argparse import ArgumentParser
 
+import rdiffbackup.run
+
 from minarca_client import __version__
 from minarca_client.core import Backup, BackupError, NotRunningError, RepositoryNameExistsError
 from minarca_client.core.compat import IS_WINDOWS, get_log_file
@@ -46,7 +48,7 @@ def _backup(force):
         logging.info(_('fail to check for latest version'))
     backup = Backup()
     try:
-        backup.start(force)
+        backup.backup(force=force)
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
@@ -102,6 +104,10 @@ def _patterns():
     patterns.write(sys.stdout)
 
 
+def _rdiff_backup(options):
+    return rdiffbackup.run.main_run(options)
+
+
 def _stop(force):
     backup = Backup()
     try:
@@ -123,6 +129,12 @@ def _schedule(schedule, username=None, password=None):
     except Exception as e:
         print(str(e))
         sys.exit(_EXIT_SCHEDULE_ERROR)
+
+
+def _start(force):
+    signal.signal(signal.SIGINT, signal.default_int_handler)
+    backup = Backup()
+    backup.start(force=force)
 
 
 def _status():
@@ -180,12 +192,17 @@ def _parse_args(args):
     #
     # Define subcommands
     #
-    subparsers = parser.add_subparsers(dest='subcommand', required=not is_ui)
+    subparsers = parser.add_subparsers(dest='subcommand', required=not is_ui, metavar="{command}")
     if is_ui:
         parser.set_defaults(func=_ui)
 
+    # Start
+    sub = subparsers.add_parser('start', help=_('start a backup in background mode'))
+    sub.add_argument('--force', action='store_true', help=_("force execution of a backup even if it's not time to run"))
+    sub.set_defaults(func=_start)
+
     # Backup
-    sub = subparsers.add_parser('backup', help=_('start a backup'))
+    sub = subparsers.add_parser('backup', help=_('start a backup in foreground mode'))
     sub.add_argument('--force', action='store_true', help=_("force execution of a backup even if it's not time to run"))
     sub.set_defaults(func=_backup)
 
@@ -267,8 +284,17 @@ def _parse_args(args):
     sub = subparsers.add_parser('ui', help=_('open graphical user interface (default when calling minarcaw)'))
     sub.set_defaults(func=_ui)
 
+    # rdiff-backup
+    sub = subparsers.add_parser('rdiff-backup')
+    sub.add_argument('options', nargs='*')
+    sub.set_defaults(func=_rdiff_backup)
+
     # Quick hack to support previous `--backup`, `--stop`
     args = [_ARGS_ALIAS.get(a, a) for a in args]
+    # Quick hack to accept any arguments for rdiff-backup sub command
+    if args and args[0] == 'rdiff-backup':
+        args = args.copy()
+        args.insert(1, '--')
     return parser.parse_args(args)
 
 
@@ -278,6 +304,8 @@ def _configure_logging(debug=False):
     """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
+    # Make requests more quiet
+    logging.getLogger('requests').setLevel(logging.WARNING)
 
     # Configure log file
     file_handler = logging.handlers.TimedRotatingFileHandler(get_log_file(), when='D', interval=1, backupCount=5)

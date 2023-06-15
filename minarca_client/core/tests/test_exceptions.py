@@ -8,7 +8,6 @@ Created on Nov. 12, 2021
 '''
 
 
-import logging
 import unittest
 
 from parameterized import parameterized
@@ -22,8 +21,6 @@ from minarca_client.core.exceptions import (
     UnknownHostException,
     UnknownHostKeyError,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class TestExceptions(unittest.TestCase):
@@ -39,8 +36,8 @@ class TestExceptions(unittest.TestCase):
         ]
     )
     def test_capture_exception(self, line, expected_error):
-        capture = CaptureException(logger)
-        capture(line)
+        capture = CaptureException()
+        capture.parse(line)
         if expected_error:
             self.assertIsInstance(capture.exception, expected_error)
         else:

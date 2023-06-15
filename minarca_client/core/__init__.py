@@ -18,8 +18,6 @@ import time
 from datetime import timedelta
 
 import psutil
-import rdiff_backup.robust
-import rdiffbackup.run
 import requests
 from psutil import NoSuchProcess
 from rdiff_backup.connection import ConnectionReadError, ConnectionWriteError
@@ -27,7 +25,7 @@ from requests.compat import urljoin
 from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
 
 from minarca_client.core import compat
-from minarca_client.core.compat import IS_WINDOWS, Scheduler, get_minarca_exe, redirect_ouput, ssh_keygen
+from minarca_client.core.compat import IS_WINDOWS, Scheduler, get_minarca_exe, ssh_keygen
 from minarca_client.core.config import Datetime, Patterns, Settings, Status
 from minarca_client.core.exceptions import (
     BackupError,
@@ -180,7 +178,29 @@ class Backup:
         self.status_file = os.path.join(compat.get_data_home(), 'status.properties')
         self.scheduler = Scheduler()
 
-    def start(self, force=False, force_patterns=None, fork=False):
+    def start(self, force=False):
+        """
+        Trigger backup in background mode.
+        """
+        # Fork process
+        args = [get_minarca_exe(), 'backup']
+        if force:
+            args += ['--force']
+        creationflags = (
+            subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
+            if IS_WINDOWS
+            else 0
+        )
+        subprocess.Popen(
+            args,
+            stdin=None,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            close_fds=True,
+            creationflags=creationflags,
+        )
+
+    def backup(self, force=False, force_patterns=None):
         """
         Execute the rdiff-backup process.
         Set `force` to True to run backup process event when it's not the time to run.
@@ -192,23 +212,6 @@ class Backup:
             raise RunningError()
         if not force and not self.is_backup_time():
             raise NotScheduleError()
-
-        # Fork process if required.
-        if fork:
-            creationflags = (
-                subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
-                if IS_WINDOWS
-                else 0
-            )
-            p = subprocess.Popen(
-                [get_minarca_exe(), 'backup', '--force'],
-                stdin=None,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                close_fds=True,
-                creationflags=creationflags,
-            )
-            return
 
         # Start a thread to update backup status.
         status = Status(self.status_file)
@@ -442,7 +445,7 @@ class Backup:
         repositoryname = repositoryname or config['repositoryname']
 
         # base command line
-        args = ['-v', '5', '--remote-schema']
+        args = [get_minarca_exe(), 'rdiff-backup', '-v', '5', '--remote-schema']
         remote_schema = _escape_remote_shema(compat.get_ssh())
         remote_schema += " -oBatchMode=yes -oPreferredAuthentications=publickey"
         if os.environ.get('MINARCA_ACCEPT_HOST_KEY', False) in ['true', '1', 'True']:
@@ -470,20 +473,23 @@ class Backup:
                 "minarca@{remote_host}::{repositoryname}".format(remote_host=remote_host, repositoryname=repositoryname)
             )
 
-        capture = CaptureException(logger)
-
         # Execute the command line.
+        capture = CaptureException()
         logger.debug(_('executing command: %s') % _sh_quote(args))
         try:
-            cwd = os.getcwd()
-            ld_path = os.environ.get('LD_LIBRARY_PATH')
-            if ld_path:
-                del os.environ['LD_LIBRARY_PATH']
-            os.chdir('..')
-            with redirect_ouput(capture):
-                # We need to avoid settings signal handlers.
-                rdiff_backup.robust.install_signal_handlers = lambda: None
-                exit_code = rdiffbackup.run.main_run(args)
+            p = subprocess.Popen(
+                args,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                encoding='utf-8',
+            )
+            # stream the output of rdiff-backup.
+            for line in p.stdout:
+                logger.debug(line.rstrip())
+                capture.parse(line)
+            # Check return code
+            exit_code = p.wait()
         except Exception as e:
             if capture.exception:
                 raise capture.exception
@@ -492,12 +498,8 @@ class Backup:
         else:
             if capture.exception:
                 raise capture.exception
-            if exit_code == 1:
+            if exit_code != 0:
                 raise RdiffBackupExitError(exit_code)
-        finally:
-            os.chdir(cwd)
-            if ld_path:
-                os.environ['LD_LIBRARY_PATH'] = ld_path
 
     def schedule_job(self, run_if_logged_out=None):
         """
