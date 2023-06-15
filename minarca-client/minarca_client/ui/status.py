@@ -150,7 +150,7 @@ class StatusView(tkvue.Component):
 
     def start_stop_backup(self):
         try:
-            self.backup.start(force=True, fork=True)
+            self.backup.start(force=True)
         except RunningError:
             self.backup.stop()
         except Exception:

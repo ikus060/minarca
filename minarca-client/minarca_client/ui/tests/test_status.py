@@ -78,4 +78,4 @@ class StatusViewTest(unittest.TestCase):
             # When invoking the button
             dlg.status_view.start_stop_button.invoke()
             # Then backup start
-            dlg.status_view.backup.start.assert_called_once_with(force=True, fork=True)
+            dlg.status_view.backup.start.assert_called_once_with(force=True)

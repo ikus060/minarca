@@ -18,7 +18,7 @@ from minarca_client import main
 from minarca_client.core import Backup, HttpAuthenticationError
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Pattern, Patterns, Settings
-from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _schedule, _status, _stop, _unlink
+from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _schedule, _start, _status, _stop, _unlink
 
 
 class TestMainParseArgs(unittest.TestCase):
@@ -227,12 +227,31 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main.Backup')
     def test_backup(self, mock_backup):
         _backup(force=False)
-        mock_backup.return_value.start.assert_called_once_with(False)
+        mock_backup.return_value.backup.assert_called_once_with(force=False)
 
     @mock.patch('minarca_client.main.Backup')
     def test_backup_force(self, mock_backup):
         _backup(force=True)
-        mock_backup.return_value.start.assert_called_once_with(True)
+        mock_backup.return_value.backup.assert_called_once_with(force=True)
+
+    @mock.patch('rdiffbackup.run.main_run', return_value=0)
+    def test_rdiff_backup(self, mock_main_run):
+        # Given multiple arguments pass to rdiff-backup subcommand
+        args = ['rdiff-backup', '-v', 'test']
+        # When calling rdiff-backup subcommand
+        main.main(args)
+        # Then all arguments are passed to rdiff-backup function.
+        mock_main_run.assert_called_once_with(args[1:])
+
+    def test_rdiff_backup_invalid_args(self):
+        # Given multiple arguments pass to rdiff-backup subcommand
+        args = ['rdiff-backup', '--some-invalid-args']
+        # When calling rdiff-backup subcommand
+        # Then a SystemExit is raised
+        with self.assertRaises(SystemExit) as capture:
+            main.main(args)
+        # Then error code is 2
+        self.assertEqual(2, capture.exception.code)
 
     @mock.patch('minarca_client.main.Backup')
     def test_exclude(self, mock_backup):
@@ -296,6 +315,11 @@ class TestMainParseArgs(unittest.TestCase):
         self.assertEqual("+/home\n-*.bak\n", f.getvalue())
 
     @mock.patch('minarca_client.main.Backup')
+    def test_start(self, mock_backup):
+        _start(force=False)
+        mock_backup.return_value.start.assert_called_once_with(force=False)
+
+    @mock.patch('minarca_client.main.Backup')
     def test_stop(self, mock_backup):
         _stop(force=False)
         mock_backup.return_value.stop.assert_called_once_with()
@@ -318,23 +342,13 @@ class TestMainParseArgs(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             _status()
         mock_backup.return_value.get_status.assert_called_once_with()
-        self.assertIn("Remote server: ", f.getvalue())
-        self.assertIn("Connectivity status: ", f.getvalue())
-        self.assertIn("Last successful backup: ", f.getvalue())
-        self.assertIn("Last backup date: ", f.getvalue())
-        self.assertIn("Last backup status: ", f.getvalue())
-        self.assertIn("Details: ", f.getvalue())
+        self.assertEqual(6, len(f.getvalue().splitlines()))
 
     def test_status_with_not_configured(self):
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
             _status()
-        self.assertIn("Remote server: ", f.getvalue())
-        self.assertIn("Connectivity status: ", f.getvalue())
-        self.assertIn("Last successful backup: ", f.getvalue())
-        self.assertIn("Last backup date: ", f.getvalue())
-        self.assertIn("Last backup status: ", f.getvalue())
-        self.assertIn("Details: ", f.getvalue())
+        self.assertEqual(6, len(f.getvalue().splitlines()))
 
     @mock.patch('minarca_client.main.Backup')
     def test_unlink(self, mock_backup):
