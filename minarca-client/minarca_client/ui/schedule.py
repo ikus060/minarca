@@ -66,6 +66,7 @@ class ScheduleView(tkvue.Component):
                 'schedule': self.backup.get_settings('schedule'),
                 'show_run_if_logged_out': IS_WINDOWS,
                 'run_if_logged_out': IS_WINDOWS and self.backup.scheduler.run_if_logged_out,
+                'paused': self.backup.get_settings('pause_until') is not None,
             }
         )
         super().__init__(*args, **kwargs)
@@ -79,6 +80,33 @@ class ScheduleView(tkvue.Component):
 
     def refresh_run_if_logged_out(self):
         self.data['run_if_logged_out'] = self.backup.scheduler.run_if_logged_out
+
+    def toggle_pause(self):
+        """
+        Called to toggle backup pause feature. Will confirm with user before.
+        """
+        # Check current pause status
+        pause_until = self.backup.get_settings('pause_until')
+        if pause_until:
+            delay = 0
+        else:
+            # Confirm with user
+            if not tkinter.messagebox.askyesno(
+                master=self.root,
+                title=_('Pause Backup Job Confirmation'),
+                message=_('Are you sure you want to pause the backup job?'),
+                detail=_(
+                    'Pausing the backup job will temporarily suspend the ongoing backup process for the next 12 hours. This action may affect the availability of recent data restore points and introduce delays in the backup schedule. Please confirm your intention before proceeding.'
+                ),
+            ):
+                # Cancel by user
+                delay = 0
+            else:
+                # Pause backup
+                delay = 12
+        # Update interface
+        self.backup.pause(delay=delay)
+        self.data.paused = self.backup.get_settings('pause_until') is not None
 
     def toggle_run_if_logged_out(self):
         """

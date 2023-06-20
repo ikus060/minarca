@@ -11,6 +11,7 @@ import subprocess
 import tempfile
 import threading
 import unittest
+from datetime import timedelta
 from unittest import mock
 from unittest.case import skipIf, skipUnless
 from unittest.mock import MagicMock
@@ -343,6 +344,21 @@ class TestBackup(unittest.TestCase):
         status.save()
         self.assertFalse(self.backup.is_backup_time())
 
+    def test_is_backup_time_pause_until(self):
+        # Given a backup that did not ran for a while
+        status = self.backup.get_status()
+        status['lastsuccess'] = Datetime(1592847257000)
+        status.save()
+        self.assertTrue(self.backup.is_backup_time())
+        # When pausing the backup
+        self.backup.set_settings('pause_until', Datetime() + timedelta(minutes=1))
+        # Then backup is paused
+        self.assertFalse(self.backup.is_backup_time())
+        # When pause is finish
+        self.backup.set_settings('pause_until', Datetime())
+        # Then backup could start
+        self.assertTrue(self.backup.is_backup_time())
+
     def test_is_running_no_pid(self):
         status = self.backup.get_status()
         status['status'] = 'SUCCESS'
@@ -362,6 +378,48 @@ class TestBackup(unittest.TestCase):
         status['pid'] = os.getpid()
         status.save()
         self.assertTrue(self.backup.is_running())
+
+    def test_pause(self):
+        # When backup never ran
+        self.assertTrue(self.backup.is_backup_time())
+        # When pausing backup for 24 hours
+        self.backup.pause(24)
+        # Then pause delay is computed
+        pause_until = self.backup.get_settings('pause_until')
+        self.assertAlmostEqual(pause_until, Datetime() + timedelta(hours=24), delta=timedelta(minutes=1))
+        # Then it's not time to backup
+        self.assertFalse(self.backup.is_backup_time())
+
+    def test_pause_zero(self):
+        # Given backup is paused
+        self.backup.pause(24)
+        self.assertFalse(self.backup.is_backup_time())
+        # When removing pause
+        self.backup.pause(0)
+        # Then backup could resume
+        self.assertIsNone(self.backup.get_settings('pause_until'))
+        self.assertTrue(self.backup.is_backup_time())
+
+    @mock.patch('subprocess.Popen', side_effect=mock_subprocess_popen(_echo_foo_cmd))
+    def test_pause_with_backup_force(self, unused):
+        # Provide default config
+        config = Settings(self.backup.config_file)
+        config['remotehost'] = 'remotehost'
+        config['repositoryname'] = 'test-repo'
+        config['configured'] = True
+        config.save()
+        patterns = Patterns(self.backup.patterns_file)
+        patterns.append(Pattern(True, _home, None))
+        patterns.save()
+        self.backup._rdiff_backup = MagicMock()
+        # Given a backup pause for 24 hours
+        self.backup.pause(24)
+        with self.assertRaises(NotScheduleError):
+            self.backup.backup()
+        # When running backup with --force
+        self.backup.backup(force=True)
+        # Then backup is unpaused
+        self.assertIsNone(self.backup.get_settings('pause_until'))
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')

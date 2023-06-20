@@ -46,7 +46,18 @@ class Datetime:
         return self.epoch_ms < other.epoch_ms
 
     def __sub__(self, other):
-        return datetime.timedelta(milliseconds=self.epoch_ms - other.epoch_ms)
+        if isinstance(other, Datetime):
+            return datetime.timedelta(milliseconds=self.epoch_ms - other.epoch_ms)
+        elif isinstance(other, datetime.timedelta):
+            return Datetime(epoch_ms=self.epoch_ms - other.total_seconds())
+        raise ValueError()
+
+    def __add__(self, other):
+        if isinstance(other, Datetime):
+            return datetime.timedelta(milliseconds=self.epoch_ms + other.epoch_ms)
+        elif isinstance(other, datetime.timedelta):
+            return Datetime(epoch_ms=self.epoch_ms + other.total_seconds())
+        raise ValueError()
 
 
 class Status(dict):
@@ -102,6 +113,7 @@ class Settings(dict):
         'remoteurl': None,
         'schedule': DAILY,
         'configured': False,
+        'pause_until': None,
         # Load default value from environment variable to ease unittest
         'check_latest_version': os.environ.get('MINARCA_CHECK_LATEST_VERSION', 'True') in [True, 'true', 'True', '1'],
     }
@@ -112,8 +124,9 @@ class Settings(dict):
         self._load()
 
     def save(self):
+        values = {k: str(int(v)) if k in ['pause_until'] else str(v) for k, v in self.items() if v is not None}
         with open(self.filename, 'w', encoding='latin-1') as f:
-            return javaproperties.dump({k: str(v) for k, v in self.items()}, f)
+            return javaproperties.dump(values, f)
 
     def _load(self):
         self.clear()
@@ -133,6 +146,11 @@ class Settings(dict):
                     self[key] = self[key] in [True, 'true', 'True', '1']
                 except KeyError:
                     self[key] = self._DEFAULT.get(key)
+            # pause_until is a date
+            try:
+                self['pause_until'] = Datetime(self['pause_until']) if self['pause_until'] else None
+            except (ValueError, KeyError):
+                self['pause_until'] = None
 
 
 class InvalidPatternError(Exception):
