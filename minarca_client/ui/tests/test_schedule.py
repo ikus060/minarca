@@ -87,3 +87,22 @@ class SettingsTest(unittest.TestCase):
         self.pump_events()
         # Then error is raised and displayed to user
         mock_showwarning.assert_called_once()
+
+    @patch("tkinter.messagebox.askyesno", return_value=True)
+    def test_toggle_pause(self, mock_showwarning):
+        # Given a Schedule dialog
+        self.pump_events()
+        # When user click on pause button
+        self.dlg.schedule_view.pause_btn.invoke()
+        # Then backup is paused
+        self.assertIsNotNone(self.dlg.backup.get_settings('pause_until'))
+
+    def test_toggle_unpause(self):
+        # Given a pause backup
+        self.dlg.backup.pause(24)
+        # Given a Schedule dialog
+        self.pump_events()
+        # When user click on pause button
+        self.dlg.schedule_view.pause_btn.invoke()
+        # Then backup is paused
+        self.assertIsNone(self.dlg.backup.get_settings('pause_until'))
