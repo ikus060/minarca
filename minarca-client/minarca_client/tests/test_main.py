@@ -14,11 +14,13 @@ import tempfile
 import unittest
 from unittest import mock
 
+from parameterized import parameterized
+
 from minarca_client import main
 from minarca_client.core import Backup, HttpAuthenticationError
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Pattern, Patterns, Settings
-from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _schedule, _start, _status, _stop, _unlink
+from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _pause, _schedule, _start, _status, _stop, _unlink
 
 
 class TestMainParseArgs(unittest.TestCase):
@@ -172,6 +174,21 @@ class TestMainParseArgs(unittest.TestCase):
         main.main(['patterns'])
         mock_patterns.assert_called_once_with()
 
+    @parameterized.expand(
+        [
+            ([], {'delay': 24}),
+            (['-d', '2'], {'delay': 2}),
+            (['--delay', '3'], {'delay': 3}),
+            (['--delay', '-5'], {'delay': -5}),
+            (['-c'], {'delay': 0}),
+            (['--clear'], {'delay': 0}),
+        ]
+    )
+    @mock.patch('minarca_client.main._pause')
+    def test_args_pause(self, args, expected_call, mock_pause):
+        main.main(['pause'] + args)
+        mock_pause.assert_called_once_with(**expected_call)
+
     @mock.patch('minarca_client.main._stop')
     def test_args_stop(self, mock_stop):
         main.main(['stop'])
@@ -304,7 +321,6 @@ class TestMainParseArgs(unittest.TestCase):
 
     @mock.patch('minarca_client.main.Backup')
     def test_patterns(self, mock_backup):
-        # FIXME
         p = Patterns('pattern.txt')
         p.append(Pattern(True, '/home', None))
         p.append(Pattern(False, '*.bak', None))
@@ -313,6 +329,11 @@ class TestMainParseArgs(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             main.main(['patterns'])
         self.assertEqual("+/home\n-*.bak\n", f.getvalue())
+
+    @mock.patch('minarca_client.main.Backup')
+    def test_pause(self, mock_backup):
+        _pause(delay=123)
+        mock_backup.return_value.pause.assert_called_once_with(delay=123)
 
     @mock.patch('minarca_client.main.Backup')
     def test_start(self, mock_backup):

@@ -213,6 +213,10 @@ class Backup:
         if not force and not self.is_backup_time():
             raise NotScheduleError()
 
+        # Clear pause if backup started with force
+        if force:
+            self.set_settings('pause_until', None)
+
         # Start a thread to update backup status.
         status = Status(self.status_file)
         with _UpdateStatus(status=status):
@@ -329,11 +333,18 @@ class Backup:
         """
         Check if it's time to backup.
         """
+        # Check if paused.
+        pause_until = self.get_settings('pause_until')
+        if pause_until and Datetime() < pause_until:
+            return False
+        # Check if backup ever ran.
         lastsuccess = self.get_status('lastsuccess')
         if lastsuccess is None:
             return True
-        delta = datetime.timedelta(hours=self.get_settings('schedule') * 98.0 / 100)
-        return delta < Datetime() - lastsuccess
+        # Check if interval passed
+        interval = datetime.timedelta(hours=self.get_settings('schedule') * 98.0 / 100)
+        time_since_last_backup = Datetime() - lastsuccess
+        return interval < time_since_last_backup
 
     def is_running(self):
         """
@@ -409,7 +420,16 @@ class Backup:
                 raise HttpAuthenticationError(e)
             raise HttpServerError(e)
 
-        # TODO Update encoding
+    def pause(self, delay):
+        """
+        Used to prevent execution of backup for a given periode of time in hours.
+        """
+        assert isinstance(delay, int)
+        # Store absolute time for calculation.
+        if delay > 0:
+            self.set_settings('pause_until', Datetime() + datetime.timedelta(hours=delay))
+        else:
+            self.set_settings('pause_until', None)
 
     def _push_identity(self, rdiffweb, name):
         # Check if ssh keys exists, if not generate new keys.
