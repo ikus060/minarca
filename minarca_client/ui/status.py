@@ -31,6 +31,7 @@ class StatusView(tkvue.Component):
                 'username': self.backup.get_settings('username'),
                 'remotehost': self.backup.get_settings('remotehost'),
                 'repositoryname': self.backup.get_settings('repositoryname'),
+                'pause_until': self.backup.get_settings('pause_until'),
                 # Computed variables
                 'header_text': self.header_text,
                 'status_text': self.status_text,
@@ -58,6 +59,11 @@ class StatusView(tkvue.Component):
         """
         Return a human description of backup health base on configuration and last result.
         """
+        # If paused, this was a manual operation.
+        if context.pause_until:
+            return _('Backup paused until %s') % context.pause_until
+
+        # Other wise, display the backup status.
         lastresult = context.lastresult
         if lastresult == 'SUCCESS':
             return _('Backup is healthy')
@@ -75,6 +81,10 @@ class StatusView(tkvue.Component):
 
     @tkvue.computed
     def status_text_style(self, context):
+        # When paused, make it as warning
+        if context.pause_until:
+            return 'warning'
+        # Otherwise check the status.
         lastresult = context.lastresult
         if lastresult in ['SUCCESS', 'RUNNING']:
             return 'success'
@@ -135,6 +145,7 @@ class StatusView(tkvue.Component):
         Used to watch the status file and trigger an update whenever the status changes.
         """
         last_status = None
+        last_pause_until = None
         try:
             while self.root.winfo_exists():
                 status = self.backup.get_status()
@@ -142,6 +153,9 @@ class StatusView(tkvue.Component):
                     self.data['lastresult'] = status['lastresult']
                     self.data['lastdate'] = status['lastdate']
                     self.data['details'] = status['details']
+                pause_until = self.backup.get_settings('pause_until')
+                if last_pause_until != pause_until:
+                    self.data['pause_until'] = last_pause_until = pause_until
                 # Sleep 500ms
                 await asyncio.sleep(0.5)
         except tkinter.TclError:

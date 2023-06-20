@@ -104,6 +104,19 @@ def _patterns():
     patterns.write(sys.stdout)
 
 
+def _pause(delay):
+    """
+    Pause backup for the given number of hours.
+    """
+    backup = Backup()
+    try:
+        backup.pause(delay=delay)
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
+
+
 def _rdiff_backup(options):
     return rdiffbackup.run.main_run(options)
 
@@ -279,6 +292,24 @@ def _parse_args(args):
     # unlink
     sub = subparsers.add_parser('unlink', help=_('unlink this minarca client from server'))
     sub.set_defaults(func=_unlink)
+
+    # pause
+    sub = subparsers.add_parser(
+        'pause',
+        help=_('temporarily delay the execution of the backup for the given amount of hours. Default 24 hours.'),
+    )
+    sub.add_argument('-d', '--delay', help=_("number of hours"), type=int, default=24)
+    sub.add_argument(
+        '-c',
+        '--clear',
+        nargs='?',
+        help=_("clear previously set delay"),
+        const=0,
+        dest='delay',
+        action='store',
+        default=0,
+    )
+    sub.set_defaults(func=_pause)
 
     # ui
     sub = subparsers.add_parser('ui', help=_('open graphical user interface (default when calling minarcaw)'))
