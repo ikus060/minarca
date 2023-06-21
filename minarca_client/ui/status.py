@@ -38,6 +38,7 @@ class StatusView(tkvue.Component):
                 'status_text_style': self.status_text_style,
                 'start_stop_text': self.start_stop_text,
                 'last_backup_text': self.last_backup_text,
+                'last_backup_text_style': self.last_backup_text_style,
                 'remote_text_tooltip': self.remote_text_tooltip,
             }
         )
@@ -85,6 +86,10 @@ class StatusView(tkvue.Component):
         if context.pause_until:
             return 'warning'
         # Otherwise check the status.
+        return self.last_backup_text_style(context)
+
+    @tkvue.computed
+    def last_backup_text_style(self, context):
         lastresult = context.lastresult
         if lastresult in ['SUCCESS', 'RUNNING']:
             return 'success'
