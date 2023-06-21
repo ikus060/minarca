@@ -214,7 +214,7 @@ class Backup:
             raise NotScheduleError()
 
         # Clear pause if backup started with force
-        if force:
+        if self.get_settings('pause_until'):
             self.set_settings('pause_until', None)
 
         # Start a thread to update backup status.
