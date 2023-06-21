@@ -25,7 +25,7 @@
             "request": "launch",
             "module": "minarca_client.main",
             "args": [
-                "--help"
+                "restore"
             ],
             "console": "integratedTerminal",
             "justMyCode": false,

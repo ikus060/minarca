@@ -28,7 +28,6 @@ from minarca_client.core import compat
 from minarca_client.core.compat import IS_WINDOWS, Scheduler, get_minarca_exe, ssh_keygen
 from minarca_client.core.config import Datetime, Patterns, Settings, Status
 from minarca_client.core.exceptions import (
-    BackupError,
     CaptureException,
     HttpAuthenticationError,
     HttpConnectionError,
@@ -88,8 +87,10 @@ class _UpdateStatus(threading.Thread):
     Update the status while the backup is running.
     """
 
-    def __init__(self, status):
+    def __init__(self, status, action='backup'):
+        assert action in ['backup', 'restore']
         self.status = status
+        self.action = action
         super(_UpdateStatus, self).__init__()
         self._stop_event = threading.Event()
 
@@ -103,7 +104,7 @@ class _UpdateStatus(threading.Thread):
             logger.info("keep awake not supported on this system")
         except Exception:
             logger.warn("failed to set keep awake", exc_info=1)
-        logger.info("backup START")
+        logger.info("%s START", self.action)
         self._update_status()
         self.start()
 
@@ -113,7 +114,7 @@ class _UpdateStatus(threading.Thread):
         if exc_type is not KeyboardInterrupt:
             self.join()
         if exc_type is None:
-            logger.info("backup SUCCESS")
+            logger.info("%s SUCCESS", self.action)
             self.status['lastresult'] = 'SUCCESS'
             self.status['lastsuccess'] = Datetime()
             self.status['lastdate'] = self.status['lastsuccess']
@@ -122,16 +123,13 @@ class _UpdateStatus(threading.Thread):
         elif exc_type is KeyboardInterrupt or exc_type is ConnectionWriteError or exc_type is ConnectionReadError:
             # Capture special exception raised when user cancel the operation
             # or when the SSH connection is interrupted.
-            logger.exception("backup INTERRUPT")
+            logger.exception("%s INTERRUPT", self.action)
             self.status['lastresult'] = 'INTERRUPT'
             self.status['lastdate'] = Datetime()
             self.status['details'] = ''
             self.status.save()
         else:
-            if isinstance(exc_val, BackupError):
-                logger.error("backup FAILED: %s", exc_val)
-            else:
-                logger.exception("backup FAILED")
+            logger.exception("%s FAILED", self.action)
             self.status['lastresult'] = 'FAILURE'
             self.status['lastdate'] = Datetime()
             self.status['details'] = str(exc_val)
@@ -161,6 +159,7 @@ class _UpdateStatus(threading.Thread):
         self.status['lastresult'] = 'RUNNING'
         self.status['lastdate'] = Datetime()
         self.status['details'] = ''
+        self.status['action'] = self.action
         self.status.save()
 
 
@@ -246,7 +245,7 @@ class Backup:
                     args.append('--include' if p.include else '--exclude')
                     args.append(p.pattern)
                 args.extend(['--exclude', '%s**' % drive])
-                self._rdiff_backup(extra_args=args, source=drive)
+                self._rdiff_backup(extra_args=args, path=drive)
 
     def get_patterns(self):
         """
@@ -451,10 +450,11 @@ class Backup:
                 logger.debug(_('exchanging new identity with minarca server'))
                 rdiffweb.add_ssh_key(name, f.read())
 
-    def _rdiff_backup(self, action='backup', extra_args=[], source=None, repositoryname=None):
+    def _rdiff_backup(self, action='backup', extra_args=[], path=None):
         """
         Make a call to rdiff-backup executable
         """
+        assert action in ['backup', 'restore', 'test']
         # Read config file for remote host
         config = self.get_settings()
         if not config['remotehost']:
@@ -462,7 +462,7 @@ class Backup:
         if not config['repositoryname']:
             raise NotConfiguredError()
         remote_host, unused, remote_port = config['remotehost'].partition(':')
-        repositoryname = repositoryname or config['repositoryname']
+        repositoryname = config['repositoryname']
 
         # base command line
         args = [get_minarca_exe(), 'rdiff-backup', '-v', '5', '--remote-schema']
@@ -478,20 +478,28 @@ class Backup:
             user_agent_string=compat.get_user_agent(),
         )
         args.append(remote_schema)
+        # Force operation on restore.
+        if action == 'restore':
+            args.append('--force')
         args.append(action)
         args.extend(extra_args)
-        if source:
-            args.append(source)
-        if IS_WINDOWS and source:
-            args.append(
-                "minarca@{remote_host}::{repositoryname}/{drive}".format(
-                    remote_host=remote_host, repositoryname=repositoryname, drive=source[0]
-                )
-            )
-        else:
-            args.append(
-                "minarca@{remote_host}::{repositoryname}".format(remote_host=remote_host, repositoryname=repositoryname)
-            )
+
+        if path:
+            if IS_WINDOWS:
+                remote = f"minarca@{remote_host}::{repositoryname}/{path[0]}/{path[3:]}"
+            else:
+                remote = f"minarca@{remote_host}::{repositoryname}{path}"
+        if action == 'backup':
+            # For backup local to remote
+            args.append(path)
+            args.append(remote)
+        elif action == 'restore':
+            # For restore remote to local
+            args.append(remote)
+            args.append(path)
+        elif action == 'test':
+            # For test-server
+            args.append(f"minarca@{remote_host}::.")
 
         # Execute the command line.
         capture = CaptureException()
@@ -520,6 +528,24 @@ class Backup:
                 raise capture.exception
             if exit_code != 0:
                 raise RdiffBackupExitError(exit_code)
+
+    def restore(self, restore_time=None, patterns=None):
+        """
+        Used to run a complete restore of data backup for the given date or latest date is not defined.
+        """
+        if self.is_running():
+            raise RunningError()
+        status = Status(self.status_file)
+        with _UpdateStatus(status=status, action='restore'):
+            # Loop on each pattern to be restored and execute rdiff-backup.
+            patterns = patterns or self.get_patterns()
+            for p in patterns:
+                if p.include and not p.is_wildcard():
+                    self._rdiff_backup(
+                        'restore',
+                        ['--at', restore_time or "now"],
+                        path=p.pattern,
+                    )
 
     def schedule_job(self, run_if_logged_out=None):
         """
@@ -584,7 +610,7 @@ class Backup:
         """
         # Since v2.2.x, we need to pass an existing repository nave for test.
         # Otherwise the test fail if the folder doesn't exists on the remote server.
-        self._rdiff_backup('test', repositoryname='.')
+        self._rdiff_backup('test')
 
     def unlink(self):
         """

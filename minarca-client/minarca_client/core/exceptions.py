@@ -21,6 +21,7 @@ class CaptureException:
             UnknownHostException,
             UnknownHostKeyError,
             PermissionDeniedError,
+            UnsuportedVersionError,
         ]:
             if cls._matches(line):
                 self.exception = cls()
@@ -244,3 +245,17 @@ class UnknownHostException(BackupError):
     @staticmethod
     def _matches(line):
         return 'ssh: Could not resolve hostname' in line
+
+
+class UnsuportedVersionError(BackupError):
+    """
+    Raised by rdiff-backup when remote server is not compatible with our client version.
+    """
+
+    message = _(
+        'Backup failed due to unsupported Minarca agent version on remote server. Consider upgrading your agent or your server.'
+    )
+
+    @staticmethod
+    def _matches(line):
+        return 'ERROR unsupported version:' in line or 'ERROR: unsupported version:' in line

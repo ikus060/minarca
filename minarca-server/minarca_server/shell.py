@@ -140,7 +140,7 @@ def main(args=None):
                 rdiff_backup = _find_rdiff_backup(version='2.2')
             else:
                 logger.info("unsupported version: %s", ssh_original_command)
-                print("ERROR unsupported version: %s" % ssh_original_command, file=sys.stderr)
+                print("ERROR: unsupported version: %s" % ssh_original_command, file=sys.stderr)
                 exit(1)
         else:
             # When called by legacy minarca client with rdiff-backup v1.2.8.
