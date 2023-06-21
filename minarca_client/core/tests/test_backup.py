@@ -18,19 +18,21 @@ from unittest.mock import MagicMock
 
 import responses
 
-from minarca_client.core import (
-    Backup,
+from minarca_client.core import Backup
+from minarca_client.core.compat import IS_WINDOWS
+from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
+from minarca_client.core.exceptions import (
     BackupError,
     HttpAuthenticationError,
     HttpConnectionError,
     HttpInvalidUrlError,
+    HttpServerError,
     NoPatternsError,
+    NotConfiguredError,
     NotScheduleError,
     RepositoryNameExistsError,
+    UnknownHostException,
 )
-from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
-from minarca_client.core.exceptions import HttpServerError, NotConfiguredError, UnknownHostException
 from minarca_client.locale import gettext as _
 from minarca_client.tests.test import MATCH
 
@@ -430,7 +432,7 @@ class TestBackup(unittest.TestCase):
         config['repositoryname'] = 'test-repo'
         config.save()
         # Make the call
-        self.backup._rdiff_backup(extra_args=['--include', _home], source=_root)
+        self.backup._rdiff_backup(extra_args=['--include', _home], path=_root)
         # Validate
         mock_rdiff_backup.assert_called_once_with(
             [
@@ -447,7 +449,7 @@ class TestBackup(unittest.TestCase):
                 '--include',
                 _home,
                 _root,
-                'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo',
+                'minarca@remotehost::test-repo/C/' if IS_WINDOWS else 'minarca@remotehost::test-repo/',
             ],
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
@@ -468,7 +470,7 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(BackupError):
             self.backup._rdiff_backup(
                 extra_args=['--include', '/home'],
-                source='/',
+                path='/',
             )
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
@@ -480,7 +482,7 @@ class TestBackup(unittest.TestCase):
         config['repositoryname'] = 'test-repo'
         config.save()
         # Make the call
-        self.backup._rdiff_backup(extra_args=['--include', _home], source=_root)
+        self.backup._rdiff_backup(extra_args=['--include', _home], path=_root)
         # Validate port numner
         mock_rdiff_backup.assert_called_once_with(
             [
@@ -497,7 +499,7 @@ class TestBackup(unittest.TestCase):
                 '--include',
                 _home,
                 _root,
-                'minarca@remotehost::test-repo/C' if IS_WINDOWS else 'minarca@remotehost::test-repo',
+                'minarca@remotehost::test-repo/C/' if IS_WINDOWS else 'minarca@remotehost::test-repo/',
             ],
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
@@ -510,7 +512,7 @@ class TestBackup(unittest.TestCase):
 
         def _start_backup():
             try:
-                self.backup._rdiff_backup(extra_args=['--include', _home], source=_root)
+                self.backup._rdiff_backup(extra_args=['--include', _home], path=_root)
             except Exception as e:
                 self.error = e
 
@@ -538,7 +540,7 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(NotConfiguredError):
             self.backup._rdiff_backup(
                 extra_args=['--include', '/home'],
-                source='/',
+                path='/',
             )
 
     def test_rdiff_backup_not_configured_repositoryname(self):
@@ -550,7 +552,7 @@ class TestBackup(unittest.TestCase):
         with self.assertRaises(NotConfiguredError):
             self.backup._rdiff_backup(
                 extra_args=['--include', '/home'],
-                source='/',
+                path='/',
             )
 
     def test_set_schedule(self):
@@ -599,11 +601,11 @@ class TestBackup(unittest.TestCase):
                     '--exclude',
                     'C:/**',
                 ],
-                source='C:/',
+                path='C:/',
             )
         else:
             self.backup._rdiff_backup.assert_called_once_with(
-                extra_args=['--exclude-sockets', '--no-compression', '--include', _home, '--exclude', '/**'], source='/'
+                extra_args=['--exclude-sockets', '--no-compression', '--include', _home, '--exclude', '/**'], path='/'
             )
         # Check status
         status = self.backup.get_status()
