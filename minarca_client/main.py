@@ -230,6 +230,8 @@ def _status():
     print(_("Last backup date:       %s") % status.get('lastdate', _('Never')))
     print(_("Last backup status:     %s") % status.get('lastresult', _('Never')))
     print(_("Details:                %s") % status.get('details', ''))
+    if settings['pause_until']:
+        print(_("Paused until:           %s") % settings['remotehost'])
 
 
 def _ui():
