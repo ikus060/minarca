@@ -526,7 +526,7 @@ class Backup:
         else:
             if capture.exception:
                 raise capture.exception
-            if exit_code != 0:
+            if exit_code not in [0, 2, 8]:
                 raise RdiffBackupExitError(exit_code)
 
     def restore(self, restore_time=None, patterns=None):
