@@ -91,11 +91,16 @@ def _link(remoteurl=None, username=None, name=None, force=False, password=None):
     name = name or get_default_repository_name()
     # Start linking process.
     try:
-        backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=force)
-        print(_('Linked successfully'))
-    except RepositoryNameExistsError as e:
-        print(e.message)
-        sys.exit(_EXIT_REPO_EXISTS)
+        try:
+            backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=force)
+            print(_('Linked successfully'))
+        except RepositoryNameExistsError as e:
+            print(e.message)
+            if _prompt_yes_no(_('Do you want to replace the existing repository ?')):
+                backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=True)
+                print(_('Linked successfully'))
+                return
+            sys.exit(_EXIT_REPO_EXISTS)
     except BackupError as e:
         print(e.message)
         sys.exit(_EXIT_LINK_ERROR)

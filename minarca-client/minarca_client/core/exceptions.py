@@ -46,12 +46,7 @@ class RepositoryNameExistsError(BackupError):
 
     def __init__(self, name):
         self.name = name
-        self.message = (
-            _(
-                'Fail to link because repository with name `%s` already exists on remote server. You may force the operation by using `--force` on command line.'
-            )
-            % name
-        )
+        self.message = _('Fail to link because repository with name `%s` already exists on remote server.') % name
 
 
 class InvalidFileSpecificationError(BackupError):
