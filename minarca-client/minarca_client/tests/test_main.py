@@ -379,7 +379,7 @@ class TestMainParseArgs(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             _status()
         mock_backup.return_value.get_status.assert_called_once_with()
-        self.assertEqual(6, len(f.getvalue().splitlines()))
+        self.assertEqual(7, len(f.getvalue().splitlines()))
 
     def test_status_with_not_configured(self):
         f = io.StringIO()
