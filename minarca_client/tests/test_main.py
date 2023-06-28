@@ -20,7 +20,18 @@ from minarca_client import main
 from minarca_client.core import Backup, HttpAuthenticationError
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Pattern, Patterns, Settings
-from minarca_client.main import _EXIT_LINK_ERROR, _backup, _pattern, _pause, _schedule, _start, _status, _stop, _unlink
+from minarca_client.main import (
+    _EXIT_LINK_ERROR,
+    _backup,
+    _pattern,
+    _pause,
+    _restore,
+    _schedule,
+    _start,
+    _status,
+    _stop,
+    _unlink,
+)
 
 
 class TestMainParseArgs(unittest.TestCase):
@@ -164,11 +175,6 @@ class TestMainParseArgs(unittest.TestCase):
             remoteurl='https://localhost', username='foo', password='bar', name='repo', force=True
         )
 
-    @mock.patch('minarca_client.main._link')
-    def test_args_link_arg_missing(self, unused_mock_link):
-        with self.assertRaises(SystemExit):
-            main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar'])
-
     @mock.patch('minarca_client.main._patterns')
     def test_args_patterns(self, mock_patterns):
         main.main(['patterns'])
@@ -188,6 +194,11 @@ class TestMainParseArgs(unittest.TestCase):
     def test_args_pause(self, args, expected_call, mock_pause):
         main.main(['pause'] + args)
         mock_pause.assert_called_once_with(**expected_call)
+
+    @mock.patch('minarca_client.main._restore')
+    def test_args_restore(self, mock_restore):
+        main.main(['restore', './test'])
+        mock_restore.assert_called_once_with(restore_time=None, force=False, pattern=['./test'])
 
     @mock.patch('minarca_client.main._stop')
     def test_args_stop(self, mock_stop):
@@ -336,6 +347,11 @@ class TestMainParseArgs(unittest.TestCase):
         mock_backup.return_value.pause.assert_called_once_with(delay=123)
 
     @mock.patch('minarca_client.main.Backup')
+    def test_restore(self, mock_backup):
+        _restore(restore_time='now', force=True, pattern=["./test"])
+        mock_backup.return_value.restore.assert_called_once_with(restore_time='now', patterns=[mock.ANY])
+
+    @mock.patch('minarca_client.main.Backup')
     def test_start(self, mock_backup):
         _start(force=False)
         mock_backup.return_value.start.assert_called_once_with(force=False)
@@ -363,7 +379,7 @@ class TestMainParseArgs(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             _status()
         mock_backup.return_value.get_status.assert_called_once_with()
-        self.assertEqual(6, len(f.getvalue().splitlines()))
+        self.assertEqual(7, len(f.getvalue().splitlines()))
 
     def test_status_with_not_configured(self):
         f = io.StringIO()

@@ -14,9 +14,10 @@ from argparse import ArgumentParser
 import rdiffbackup.run
 
 from minarca_client import __version__
-from minarca_client.core import Backup, BackupError, NotRunningError, RepositoryNameExistsError
-from minarca_client.core.compat import IS_WINDOWS, get_log_file
+from minarca_client.core import Backup
+from minarca_client.core.compat import IS_WINDOWS, get_default_repository_name, get_log_file
 from minarca_client.core.config import Pattern, Settings
+from minarca_client.core.exceptions import BackupError, NotRunningError, RepositoryNameExistsError
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
 from minarca_client.ui.home import HomeDialog
@@ -35,6 +36,19 @@ _ARGS_ALIAS = {
     '--stop': 'stop',
     '--status': 'status',
 }
+
+
+def _abort():
+    print(_('Operation aborted by the user.'))
+    exit(1)
+
+
+def _prompt_yes_no(msg):
+    """
+    Return True if user answer yes to our question.
+    """
+    answer = input(msg)
+    return answer.lower() in [_("yes"), _("y")]
 
 
 def _backup(force):
@@ -58,27 +72,35 @@ def _backup(force):
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
-def _link(remoteurl, username, name, force, password=None):
+def _link(remoteurl=None, username=None, name=None, force=False, password=None):
     """
     Start the linking process in command line.
     """
-    # TODO Support username and password in remoteurl
     backup = Backup()
     # If the backup is already linked, return an error.
     if backup.is_linked() and not force:
         print(_('minarca is already linked, execute `minarca unlink`'))
         sys.exit(_EXIT_ALREADY_LINKED)
+    # Prompt remoteurl
+    remoteurl = remoteurl or input('remote url (e.g.: https://backup.examples.com): ') or _abort()
+    # Prompt username
+    username = username or input('username: ') or _abort()
     # Prompt for password if missing.
-    if not password:
-        password = getpass.getpass(prompt=_('password or access token: '))
-    if not password:
-        print(_('a password is required'))
-        sys.exit(_EXIT_MISSING_PASSWD)
+    password = password or getpass.getpass(_('password or access token: ')) or _abort()
+    # Use default repo if not provided
+    name = name or get_default_repository_name()
+    # Start linking process.
     try:
-        backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=force)
-    except RepositoryNameExistsError as e:
-        print(e.message)
-        sys.exit(_EXIT_REPO_EXISTS)
+        try:
+            backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=force)
+            print(_('Linked successfully'))
+        except RepositoryNameExistsError as e:
+            print(e.message)
+            if _prompt_yes_no(_('Do you want to replace the existing repository ?')):
+                backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=True)
+                print(_('Linked successfully'))
+                return
+            sys.exit(_EXIT_REPO_EXISTS)
     except BackupError as e:
         print(e.message)
         sys.exit(_EXIT_LINK_ERROR)
@@ -119,6 +141,49 @@ def _pause(delay):
 
 def _rdiff_backup(options):
     return rdiffbackup.run.main_run(options)
+
+
+def _restore(restore_time, force, pattern):
+    signal.signal(signal.SIGINT, signal.default_int_handler)
+    assert isinstance(pattern, list)
+    # Prompt user to confirm restore operation.
+    if not force:
+        confirm = _prompt_yes_no(
+            _(
+                'Are you sure you want to proceed with the restore operation? Please note that this will override your current data. (Yes/No): '
+            )
+        )
+        if not confirm:
+            _abort()
+    backup = Backup()
+    if not pattern:
+        # Prompt user for folder to be restored if not provided on command line.
+        pattern = []
+        availables = backup.get_patterns()
+        for p in availables:
+            if (
+                p.include
+                and not p.is_wildcard()
+                and _prompt_yes_no(_('Do you want to restore %s (Yes/No): ') % p.pattern)
+            ):
+                pattern.append(p)
+    else:
+        # Convert specific path to be restored.
+        pattern = [Pattern(True, os.path.normpath(os.path.join(os.getcwd(), path)), None) for path in pattern]
+
+    if not pattern:
+        _abort()
+
+    # Execute restore operation.
+    try:
+        backup.restore(restore_time=restore_time, patterns=pattern)
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
+    except Exception:
+        logging.exception("unexpected error during backup")
+        sys.exit(_EXIT_BACKUP_FAIL)
 
 
 def _stop(force):
@@ -165,6 +230,8 @@ def _status():
     print(_("Last backup date:       %s") % status.get('lastdate', _('Never')))
     print(_("Last backup status:     %s") % status.get('lastresult', _('Never')))
     print(_("Details:                %s") % status.get('details', ''))
+    if settings['pause_until']:
+        print(_("Paused until:           %s") % settings['remotehost'])
 
 
 def _ui():
@@ -233,14 +300,12 @@ def _parse_args(args):
 
     # Link
     sub = subparsers.add_parser('link', help=_('link this minarca backup with a minarca server'))
-    sub.add_argument(
-        '-r', '--remoteurl', required=True, help=_("URL to the remote minarca server. e.g.: http://example.com:8080/")
-    )
-    sub.add_argument('-u', '--username', required=True, help=_("user name to be used for authentication"))
+    sub.add_argument('-r', '--remoteurl', help=_("URL to the remote minarca server. e.g.: http://example.com:8080/"))
+    sub.add_argument('-u', '--username', help=_("user name to be used for authentication"))
     sub.add_argument(
         '-p', '--password', help=_("password or access token to use for authentication. Will prompt if not provided")
     )
-    sub.add_argument('-n', '--name', required=True, help=_("repository name to be used"))
+    sub.add_argument('-n', '--name', help=_("repository name to be used"))
     sub.add_argument(
         '--force', action='store_true', help=_("link to remote server even if the repository name already exists")
     )
@@ -249,6 +314,20 @@ def _parse_args(args):
     # patterns
     sub = subparsers.add_parser('patterns', help=_('list the includes / excludes patterns'))
     sub.set_defaults(func=_patterns)
+
+    # Restore
+    sub = subparsers.add_parser('restore', help=_('restore data from backup'))
+    sub.add_argument(
+        '--restore-time',
+        help=_(
+            "Date time to be restored. Could be 'now' to retore the latest backup. Could be an epoch value like '1682367069'. Could be an ISO date format like '2023-02-24T04:11:09-04:00'. Could be an interval like '3D' for 3 days ago."
+        ),
+    )
+    sub.add_argument(
+        '--force', action='store_true', help=_("force execution of restore operation without confirmation from user")
+    )
+    sub.add_argument('pattern', nargs='*', help=_('files and folders to be restore'))
+    sub.set_defaults(func=_restore)
 
     # Stop
     sub = subparsers.add_parser('stop', help=_('stop the backup'))
@@ -337,6 +416,8 @@ def _configure_logging(debug=False):
     root.setLevel(logging.DEBUG)
     # Make requests more quiet
     logging.getLogger('requests').setLevel(logging.WARNING)
+    # Avoid "Using selector: EpollSelector"
+    logging.getLogger('asyncio').setLevel(logging.WARNING)
 
     # Configure log file
     file_handler = logging.handlers.TimedRotatingFileHandler(get_log_file(), when='D', interval=1, backupCount=5)
