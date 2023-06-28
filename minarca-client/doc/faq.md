@@ -5,8 +5,9 @@
 The Minarca client application works with Windows and Linux
 operating systems. We recommend the following configuration:
 
-* Windows 7, 8 or 10
-* Debian Linux Buster (recommended)
+* Windows 10 and 11
+* Debian Linux (recommended)
+* Ubuntu Linux
 * Other Linux
 
 To access your data on the Minarca Web interface, we recommend the following browsers:
@@ -23,7 +24,7 @@ To access your data on the Minarca Web interface, we recommend the following bro
 
 ## How do I sign up for Minarca.net SaaS ?
 
-You may subscribe to our [Minarca.net SaaS](https://www.minarca.net) (Software as a service) which allow you to benefit from Minarca without installing a server. To subscribe, you may fill the [subscription form](https://www.ikus-soft.com/en/support/#form) or send an email to [support@ikus-soft.com](mailto:support@ikus-soft.com). We will contact you to finalize your subscription, either by email or phone, depending on your preference.
+You may subscribe to our [Minarca.net SaaS](https://www.minarca.net) (Software as a service) which allow you to benefit from Minarca without installing a server. To subscribe, you may fill the [subscription form](https://minarca.org/en_CA/contactus) or send an email to [support@ikus-soft.com](mailto:support@ikus-soft.com). We will contact you to finalize your subscription, either by email or phone, depending on your preference.
 
 ## How do I install Minarca Client?
 
@@ -41,37 +42,39 @@ Enter the username and temporary password assigned to you, and then create a nam
 
 ![Minarca Setup - Sign in with your username and password.](5connect.png)
 
-![Minarca Setup - Link your system with a repository name.](6computer.png)
-
-**Warning!** The name of your device cannot be changed.
-
 ### 3. Enjoy Minarca
 
- Once the application is installed, you can access the Minarca web interface either at [**https://www.minarca.net**](https://www.minarca.net/) or by clicking on the **Go to the Minarca Web Site ** icon in your application itself. You will have to sign in again.
+ Once the application is installed, you can access the Minarca web interface by clicking on the **View my account online** in the application itself. You will have to sign in again.
 
 ## How do I change the automatic backup frequency?
 
-By default, Minarca backs up data once a day. However, you can change the frequency (hourly, daily, weekly or monthly). To change backup frequency, open the Minarca application in the **Backup Settings** section, and choose the desired schedule.
+To change the automatic backup frequency in Minarca Data Backup software, you can follow these steps:
+
+1. Open the Minarca application on your computer.
+2. Look for the "Schedule backup" option within the application's interface and click on it. It is located in the top menu or toolbar.
+3. Click on the backup frequency option to modify it. You may have the choice to select from predefined options such as hourly, daily or bi-daily backups.
+
+Your data will be backed up accordingly at the specified intervals.
 
 ## How do I perform a manual backup?
 
-Minarca automatically backs up data according to frequency settings. However, it is possible to manually backup data. To do this, open your Minarca application, and go to **Backup Settings**. Click **Start**.
+Minarca automatically backs up data according to frequency settings. However, it is possible to manually backup data. To do this, open your Minarca application, and click **Start backup**.
 
 ## How do I access my data backups?
 
-To access your data backups, you can open your Minarca application and click the icon in the **Your Data** section.
+To access your data backups, you can open your Minarca application and click the icon in the **View my account online** section.
 
 ## How do I select the folders I would like to back up?
 
-The Minarca application lets you select which folders or files you do or do not want to back up. Open your Minarca application and, in the **Backup Settings** section, click on the **Selective Backup** icon. You can then choose the folders or files you want to back up.
+The Minarca application lets you select which folders or files you do or do not want to back up. Open your Minarca application and, in the **Select files** section. You can then choose the folders or files you want to back up.
 
-## There is a folder I would like to back up, but it is not on the list.
+## There is a folder I would like to back up, but it is not on the list
 
-When you access **Selective Backup**, there is a predefined list of files. However, it is possible to customize your choice by adding folders. Click **Add Folder**, and select one of your existing folders. Follow the same steps to add only one file by clicking **Add File**.
+When you access **Select files**, there is a predefined list of files. However, it is possible to customize your choice by adding folders. Click **Add Folder**, and select one of your existing folders. Follow the same steps to add only one file by clicking **Add File**.
 
 ## How do I restore one or more file(s)?
 
-You can restore a complete backup or specific files only by accessing your data at [**https://www.minarca.net**](https://www.minarca.net/). In the **Repository** section, choose the device you would like to back up.
+You can restore a complete backup or specific files only by accessing your data using the web interface. In the **Repository** section, choose the device you would like to back up.
 
 ![Minarca Web Interface - Repository list.](10acceuil.png)
 
@@ -83,7 +86,7 @@ You can restore a complete backup or specific files only by accessing your data 
 
 ## How do I link a second device to my account?
 
-With Minarca, you can link several devices to the same account. Simply install the application on your selected devices, and give each device its own name. When you connect with [**Minarca**](https://www.minarca.net/), you will have access to all your devices in the **Repository** section.
+With Minarca, you can link several devices to the same account. Simply install the application on your selected devices, and give each device its own name. When you connect to the web interface, you will have access to all your devices in the **Repository** section.
 
 ## How do I delete a backup from one of my devices?
 
@@ -97,20 +100,17 @@ Simply reinstall the application to get the new version online.
 
 ## How do I change my password?
 
-Change your password in the *User Profile* (Top-Right corner in the web application). For security reasons, we recommend that you choose a secure password:
-
-* with at least 8 characters
-* containing letters (a-z) and numbers (0-9)
+Change your password in the *User Profile* Top-Right corner in the web application. For security reasons, we recommend that you choose a secure password. You may also enabled multi-factor authentication for better security.
 
 ![Minarca Web Interfaces - User profile to change your password.](15usersettings.png)
 
 ## I forgot my password. What should I do?
 
-It's not possible for you to recover you password. You must contact your systeme administrator to recover the password.
+It's not possible for you to recover you password. You must contact your system administrator to recover the password.
 
 ## How do I change my email address?
 
-You can change your email address in the *User Profile* (Top-Right corner in web application).
+You can change your email address in the *User Profile* Top-Right corner in web application.
 
 ## Can I change my username?
 
@@ -118,37 +118,18 @@ Your username cannot be changed.
 
 ## Can I change the names of my repository?
 
-The names of your repository cannot be changed by the user. You must ask a system administrator to rename a repository.
+The names of your repository cannot be changed by the user. You must ask a system administrator to rename a repository. To do so, the system administrator could manually rename the folder directly on the server. Any configuration settings such as notification preference defined on the repository will be lost.
 
 ## How much space do my backups use?
 
-As soon as you connect to the Minarca web interface, you can see the space used and the space available in the **Repository** section. The total space should match your plan.
+As soon as you connect to the Minarca web interface, you can see the space used and the space available in the **Repository** section.
 
-## Why are the names of my files in French in my data backup?
+## Why are rdiff-backup packages downloaded from custom repository when rdiff-backup is in Debian?
 
-Even though the folders are in English on your device, they may be backed up with French names. This has to do with your operating system. The problem is most common with Windows 7 and up.
+The reason why the rdiff-backup packages are downloaded from our repository instead of using the ones provided by Debian is due to several factors. Firstly, Minarca server is designed to support multiple versions of rdiff-backup for backward compatibility. These versions include 1.2.8, 2.0.x, and soon 2.2.x. However, the packages distributed by Debian cannot be installed side-by-side, which is a requirement for Minarca's functionality.
 
-## Why is my Minarca application installed in French?
+Moreover, the packages distributed within Minarca are pre-compiled with a specific version of Python that is guaranteed to work in any Debian or Ubuntu distribution, regardless of the Python version provided by the operating system. This ensures compatibility across different environments.
 
-If your operating system is in French, Minarca will be installed in French.
+Additionally, there are occasions when we need to apply additional patches to the original source code for compatibility reasons. While most of these patches are eventually merged upstream within a few months, we apply them directly to the packages distributed by Minarca to avoid any disruption for our end-users.
 
-## I backed up a device, and it does not appear in the "Repository" section
-
-If you back up a device for the first time and it does not appear in the **Repository** section, you can refresh your repository in [**User profile**](https://www.minarca.net/prefs/) by clicking **Refresh Repository** at the bottom of the page.
-
-## I cannot link my computer when installing Minarca
-
-While linking your computer to Minarca, you see the message **An unknown error has occurred! If the problem persists, try reinstalling Minarca**. If the problem still persists, contact us online by filling out the [**Help Form**](https://www.ikus-soft.com/en/support/#form).
-
-## Why is my backup not running ?
-
-For security measure, Minarca client on Windows is configured to only start when you have an open session. If you are not logged in to the computer, Minarca is not running the backup.
-
-To overcome this limitation, you may manually change the configuration of the scheduler to run when you are not logged in. To do this:
-
-1. Go to Start Menu
-2. Search for "Task Scheduler"
-3. Select "Minarca backup" task
-4. Select "Run Whether user is logged on or not"
-
-![Run Whether user is logged on or not](run-whether-user-is-logged-on-or-not.png)
+In summary, the rdiff-backup packages distributed by Minarca are specifically tailored and known to work seamlessly with Minarca, whereas the packages provided by Debian may not fulfill these requirements.
