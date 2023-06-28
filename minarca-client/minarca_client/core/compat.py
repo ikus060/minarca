@@ -53,6 +53,21 @@ def get_is_admin():
 IS_ADMIN = get_is_admin()
 
 
+def get_default_repository_name():
+    """
+    Return a default value for the repository name.
+    """
+    try:
+        import socket
+
+        hostname = socket.gethostname()
+    except Exception:
+        import platform
+
+        hostname = platform.node()
+    return hostname.split('.')[0]
+
+
 def get_home(is_admin=IS_ADMIN):
     if is_admin:
         if IS_WINDOWS:

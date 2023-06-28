@@ -5,6 +5,7 @@ import tkinter.messagebox
 import pkg_resources
 
 from minarca_client.core import Backup
+from minarca_client.core.compat import get_default_repository_name
 from minarca_client.core.exceptions import (
     BackupError,
     HttpAuthenticationError,
@@ -16,21 +17,6 @@ from minarca_client.locale import _
 from minarca_client.ui import tkvue
 
 logger = logging.getLogger(__name__)
-
-
-def _default_repository_name():
-    """
-    Return a default value for the repository name.
-    """
-    try:
-        import socket
-
-        hostname = socket.gethostname()
-    except Exception:
-        import platform
-
-        hostname = platform.node()
-    return hostname.split('.')[0]
 
 
 class SetupDialog(tkvue.Component):
@@ -46,7 +32,7 @@ class SetupDialog(tkvue.Component):
                 'username_valid': tkvue.computed(lambda context: context.username and 0 < len(context.username)),
                 'password': '',
                 'password_valid': tkvue.computed(lambda context: context.password and 0 < len(context.password)),
-                'repository_name': _default_repository_name(),
+                'repository_name': get_default_repository_name(),
                 'repository_name_valid': tkvue.computed(
                     lambda context: context.repository_name and 0 < len(context.repository_name)
                 ),
