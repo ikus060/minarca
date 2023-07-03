@@ -16,5 +16,4 @@ Welcome to Minarca's documentation!
    configuration
    settings
    faq
-   support-backupninja
    development
