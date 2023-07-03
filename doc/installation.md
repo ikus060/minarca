@@ -51,17 +51,11 @@ You may access the web interface at http://127.0.0.1:8080 using:
     * username: admin
     * password: admin123 
 
-## Setup Storage
+## Configure Storage
 
-Compared to Rdiffweb, Minarca intend to take over the management of your storage and for that reason,
-needs to enforce some rules regarding how your storage layout should be.
+As an additional steps to the installation, you may want to change the location used to store the backups. By default, this location is `/backups/` and may be changed to an alternate location.
 
-You need to define a folder where all your backups will reside. Everything under this folder will then be managed by Minarca. By default, this folder is `/backups`. If you want a different folder update the parameter `MinarcaUserBaseDir` in minarca configuration.
-
-When installing, this folder will be created with the right ownership and permissions. If you have created this folder yourself, make sure the ownership is set to `minarca:minarca` and permissions to `-rwxr-x---`.
-
-    chown minarca:minarca /backups/
-    chmod 0750 /backups/
+[Read how to configure Minarca storage](configuration-storage)
 
 ## Setup SSH Server
 
