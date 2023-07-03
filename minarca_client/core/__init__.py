@@ -479,6 +479,7 @@ class Backup:
             with redirect_ouput(logger):
                 # We need to avoid settings signal handlers.
                 rdiff_backup.robust.install_signal_handlers = lambda: None
+                rdiff_backup.Main.select_opts = []
                 rdiff_backup.Main.Main(args)
         except SystemExit as e:
             logging.error('rdiff-backup exit with non-zero code')
