@@ -16,6 +16,8 @@ import sys
 import tempfile
 import threading
 from contextlib import contextmanager
+from logging import FileHandler
+from logging.handlers import RotatingFileHandler
 
 import pkg_resources
 
@@ -305,6 +307,36 @@ def redirect_ouput(logger):
         os.close(w_fd)
         # Stop thread (wait maximum 5 sec)
         t.join(timeout=5)
+
+
+class RobustRotatingFileHandler(RotatingFileHandler):
+    """
+    Robust logging rotating file handler for Windows.
+
+    This rotating file handler handle the scenario when the log file
+    is already open by another application and cannot be renamed on
+    Windows operating system. Is such scenario, the logging will
+    continue in the same file until the file can be renamed.
+    """
+
+    def emit(self, record):
+        """
+        Emit a record.
+
+        Output the record to the file, catering for rollover as described
+        in doRollover().
+        """
+        # Proceed with file rollover.
+        # In case of error, rollback to original stream.
+        try:
+            if self.shouldRollover(record):
+                self.doRollover()
+        except Exception:
+            pass
+        try:
+            FileHandler.emit(self, record)
+        except Exception:
+            self.handleError(record)
 
 
 if IS_WINDOWS:
