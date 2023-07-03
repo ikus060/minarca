@@ -20,7 +20,7 @@ from minarca_client.core import (
     RepositoryNameExistsError,
     RunningError,
 )
-from minarca_client.core.compat import IS_WINDOWS, get_log_file
+from minarca_client.core.compat import IS_WINDOWS, RobustRotatingFileHandler, get_log_file
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
@@ -287,7 +287,7 @@ def _configure_logging(debug=False):
     root.setLevel(logging.DEBUG)
 
     # Configure log file
-    file_handler = logging.handlers.RotatingFileHandler(get_log_file(), maxBytes=(1048576 * 5), backupCount=5)
+    file_handler = RobustRotatingFileHandler(get_log_file(), maxBytes=(1048576 * 5), backupCount=5)
     file_handler.setFormatter(
         logging.Formatter("%(asctime)s [%(process)d][%(levelname)-5.5s][%(threadName)-12.12s] %(message)s")
     )
