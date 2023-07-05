@@ -49,14 +49,14 @@ class Datetime:
         if isinstance(other, Datetime):
             return datetime.timedelta(milliseconds=self.epoch_ms - other.epoch_ms)
         elif isinstance(other, datetime.timedelta):
-            return Datetime(epoch_ms=self.epoch_ms - other.total_seconds())
+            return Datetime(epoch_ms=self.epoch_ms - (other.total_seconds() * 1000))
         raise ValueError()
 
     def __add__(self, other):
         if isinstance(other, Datetime):
             return datetime.timedelta(milliseconds=self.epoch_ms + other.epoch_ms)
         elif isinstance(other, datetime.timedelta):
-            return Datetime(epoch_ms=self.epoch_ms + other.total_seconds())
+            return Datetime(epoch_ms=self.epoch_ms + (other.total_seconds() * 1000))
         raise ValueError()
 
 
