@@ -14,6 +14,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from logging import FileHandler
+from logging.handlers import RotatingFileHandler
 
 import pkg_resources
 
@@ -235,6 +237,36 @@ def ssh_keygen(public_key, private_key, length=2048):
     shutil.move(os.path.join(tmp.name, 'id_rsa'), private_key)
     shutil.move(os.path.join(tmp.name, 'id_rsa.pub'), public_key)
     tmp.cleanup()
+
+
+class RobustRotatingFileHandler(RotatingFileHandler):
+    """
+    Robust logging rotating file handler for Windows.
+
+    This rotating file handler handle the scenario when the log file
+    is already open by another application and cannot be renamed on
+    Windows operating system. Is such scenario, the logging will
+    continue in the same file until the file can be renamed.
+    """
+
+    def emit(self, record):
+        """
+        Emit a record.
+
+        Output the record to the file, catering for rollover as described
+        in doRollover().
+        """
+        # Proceed with file rollover.
+        # In case of error, rollback to original stream.
+        try:
+            if self.shouldRollover(record):
+                self.doRollover()
+        except Exception:
+            pass
+        try:
+            FileHandler.emit(self, record)
+        except Exception:
+            self.handleError(record)
 
 
 if IS_WINDOWS:
