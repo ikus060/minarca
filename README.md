@@ -104,6 +104,14 @@ The Minarca website is <https://minarca.org/>.
 * Improve error reporting in user interface
 * Add missing `libxcb1` dependencies
 
+## 4.5.2 (2023-07-05)
+
+* Avoid backup crash caused by log file rotation on Windows #212
+
+## 4.5.1 (2023-07-03)
+
+* Avoid backup crash for multi-disk on Windows #211
+
 ## 4.5.0 (2023-04-20)
 
 * Upgrade Rdiffweb to v2.7.0
