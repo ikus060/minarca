@@ -15,7 +15,7 @@ import rdiffbackup.run
 
 from minarca_client import __version__
 from minarca_client.core import Backup
-from minarca_client.core.compat import IS_WINDOWS, get_default_repository_name, get_log_file
+from minarca_client.core.compat import IS_WINDOWS, RobustRotatingFileHandler, get_default_repository_name, get_log_file
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.core.exceptions import BackupError, NotRunningError, RepositoryNameExistsError
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
@@ -420,7 +420,7 @@ def _configure_logging(debug=False):
     logging.getLogger('asyncio').setLevel(logging.WARNING)
 
     # Configure log file
-    file_handler = logging.handlers.TimedRotatingFileHandler(get_log_file(), when='D', interval=1, backupCount=5)
+    file_handler = RobustRotatingFileHandler(get_log_file(), maxBytes=(1048576 * 5), backupCount=5)
     file_handler.setFormatter(
         logging.Formatter("%(asctime)s [%(process)d][%(levelname)-5.5s][%(threadName)-12.12s] %(message)s")
     )
