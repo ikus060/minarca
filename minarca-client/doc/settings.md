@@ -4,41 +4,6 @@ This section describes the settings available from the web interface
 and that are editable at runtime in opposition to configuration that
 are defined at application startup.
 
-## Users’ repositories
-
-A repository represents a directory where rdiff-backup has created a
-structure to store your data. Basically, a repository is a directory
-containing the `rdiff-backup-data` folder.
-
-As an example, look at the following folder structure.
-
-    + / (root)
-      |
-      + backups
-        |
-        + patrik
-          |
-          + my-laptop
-          | |
-          | + rdiff-backup-data
-          | |
-          | + home
-          |
-          + server1
-          |
-          + rdiff-backup-data
-          |
-          + home
-          |
-          + etc
-          |
-          + var
-
-It contains two (2) repositories: `/backups/patrik/my-laptop/` and `/backups/patrik/server1/`.
-
-With Minarca, when you are creating a new user, the root directory is automatically defined
-with a default value base on the configuration option `MinarcaUserBaseDir`.
-
 ## Users' roles & permissions
 
 In the administration view, you may create a new user to give him access to Minarca

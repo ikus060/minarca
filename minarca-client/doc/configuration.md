@@ -360,6 +360,26 @@ fetch the disk usage.
 | --- | --- | --- |
 | minarca-quota-api-url | URL to access `minarca-quota-api` service either. | <http://minarca:secret@localhost:8081/> |
 
+## Configure Storage
+
+```{toctree}
+---
+titlesonly: true
+---
+configuration-storage
+```
+
+## Configure Version Check
+
+Minarca include a feature to check version and notify administrator if an upgrade is available.
+
+```{toctree}
+---
+titlesonly: true
+---
+configuration-latest
+```
+
 ## Advance Minarca Configuration
 
 Minarca automatically configure where user's backups get stored. You may customize this
@@ -375,14 +395,3 @@ recommanded to change any of these settings.
 | minarca-auth-options | Default SSH auth options. This is used to limit the user's permission on the SSH Server, effectively disabling X11 forwarding, port forwarding and PTY. | default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' |
 | minarca-remote-host | URL defining the remote SSH identity. This value is queried by Minarca Client to link and back up to the server. If not provided, the HTTP URL is used as a base. You may need to change this value if the SSH server is accessible using a different IP address or if not running on port 22. | ssh.example.com:2222 |
 | minarca-remote-host-identity | Location of SSH server identity. This value is queried by Minarca Client to authenticate the server. You may need to change this value if SSH service and the Web service are not running on the same server. (Default: /etc/ssh) | /etc/ssh |
-
-## Configure Version Check
-
-Minarca include a feature to check version and notify administrator if an upgrade is available.
-
-```{toctree}
----
-titlesonly: true
----
-configuration-latest
-```
