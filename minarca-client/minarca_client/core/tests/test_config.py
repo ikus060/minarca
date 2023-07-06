@@ -6,6 +6,7 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+import datetime
 import os
 import tempfile
 import unittest
@@ -302,3 +303,11 @@ class StatusTest(unittest.TestCase):
         self.assertTrue("lastsuccess=1622832320000" in data)
         self.assertTrue("lastdate=" not in data)
         self.assertTrue("details=" not in data)
+
+
+class DatetimeTest(unittest.TestCase):
+    def test_add(self):
+        self.assertEqual(Datetime(1688580806000) + datetime.timedelta(hours=24), Datetime(1688667206000))
+
+    def test_sub(self):
+        self.assertEqual(Datetime(1688580806000) - datetime.timedelta(hours=24), Datetime(1688494406000))
