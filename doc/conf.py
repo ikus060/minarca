@@ -20,7 +20,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Minarca’s documentation'
+project = 'Minarca documentation'
 copyright = 'Copyright (C) 2023 IKUS Software. All rights reserved.'
 author = 'Patrik Dufresne'
 
@@ -70,9 +70,10 @@ html_theme_options = {
     'body_text': '#0E2933',
     'extra_nav_links' : {
         'Home': 'https://minarca.org/',
+        'For Service Providers': 'https://minarca.org/en_CA/our-services',
+        'News': 'https://minarca.org/en_CA/blog',
+        'Features': 'https://minarca.org/en_CA/features',
         'About': 'https://minarca.org/en_CA/about-minarca',
-        'Our Service': 'https://minarca.org/en_CA/our-services',
-        'Blog': 'https://minarca.org/en_CA/blog',
         'Contact Us': 'https://minarca.org/en_CA/contactus',
         'Download': 'https://minarca.org/en_CA/download',
     }
