@@ -20,7 +20,7 @@ install_requires = [
     "psutil",
     "rdiff-backup==2.2.5",
     "requests>=2.25.1",
-    "tkvue==2.1.0",
+    "tkvue==2.1.1",
     "wakepy==0.6.0",
 ]
 

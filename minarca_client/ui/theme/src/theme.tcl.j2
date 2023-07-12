@@ -282,7 +282,17 @@ ttk::style theme create {{ theme_name }} -parent clam -settings {
     ttk::style layout {{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			{{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.{{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			{{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }

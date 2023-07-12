@@ -1229,7 +1229,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout primary.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			primary.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.primary.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			primary.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1253,7 +1263,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout primary.light.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			primary.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.primary.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			primary.light.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1277,7 +1297,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout primary.dark.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			primary.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.primary.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			primary.dark.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1303,7 +1333,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout secondary.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			secondary.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.secondary.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			secondary.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1327,7 +1367,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout secondary.light.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			secondary.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.secondary.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			secondary.light.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1351,7 +1401,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout secondary.dark.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			secondary.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.secondary.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			secondary.dark.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1377,7 +1437,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout success.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			success.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.success.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			success.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1401,7 +1471,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout success.light.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			success.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.success.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			success.light.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1425,7 +1505,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout success.dark.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			success.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.success.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			success.dark.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1451,7 +1541,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout info.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			info.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.info.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			info.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1475,7 +1575,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout info.light.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			info.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.info.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			info.light.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1499,7 +1609,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout info.dark.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			info.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.info.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			info.dark.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1525,7 +1645,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout warning.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			warning.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.warning.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			warning.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1549,7 +1679,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout warning.light.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			warning.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.warning.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			warning.light.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1573,7 +1713,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout warning.dark.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			warning.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.warning.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			warning.dark.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1599,7 +1749,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout danger.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			danger.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.danger.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			danger.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1623,7 +1783,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout danger.light.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			danger.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.danger.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			danger.light.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1647,7 +1817,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout danger.dark.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			danger.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.danger.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			danger.dark.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1673,7 +1853,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout light.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			light.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.light.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			light.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1699,7 +1889,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout light.dark.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			light.dark.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.light.dark.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			light.dark.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1725,7 +1925,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout dark.default.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			dark.default.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.dark.default.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			dark.default.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
@@ -1749,7 +1959,17 @@ ttk::style theme create minarca -parent clam -settings {
     ttk::style layout dark.light.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side left -children {
 			dark.light.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.focus -side left -sticky w -children {
+            Checkbutton.padding -side left -sticky {}
+			Checkbutton.focus -side left -sticky w -children {
+                Checkbutton.label -sticky nswe
+            }
+        }
+    }
+	ttk::style layout right.dark.light.Roundtoggle.TCheckbutton {
+        Checkbutton.padding -sticky nswe -side right -children {
+			dark.light.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+			Checkbutton.padding -side right -sticky {}
+			Checkbutton.focus -side right -sticky w -children {
                 Checkbutton.label -sticky nswe
             }
         }
