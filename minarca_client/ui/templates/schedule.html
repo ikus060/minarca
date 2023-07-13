@@ -2,16 +2,14 @@
     
     <!-- Title -->
     <Label pack-side="top" text="Schedule backup" style="H1.dark.default.TLabel" pack-fill="x" />
-    
-    <!-- Subtitle -->
-    <Label text="Configure when you want your backup to take place, or suspend it temporarily." style="dark.default.TLabel" pack-fill="x" wrap="1"/>
 
     <ScrolledFrame id="scrolled_frame" pack-fill="both" pack-expand="1" style="default.TFrame" pack-pady="25 0">
         <Frame padding="0" pack-fill="x" pack-expand="1" style="default.TFrame">
 
             <!-- Frequency -->
             <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="0 0">
-                <Label style="H3.dark.light.TLabel" text="Frequency" pack-anchor="nw" pack-pady="0 15" width="15" />
+                <Label style="H3.dark.light.TLabel" text="Frequency" pack-anchor="nw" width="15" />
+                <Label text="Configure when you want your backup to take place." style="dark.light.TLabel" pack-fill="x" wrap="1" pack-pady="0 15"/>
                 <Radiobutton id="hourly_btn" style="dark.light.TRadiobutton" value="1" text="Hourly" variable="{{schedule}}" pack-side="left" pack-pady="0 5" width="22"/>
                 <Radiobutton id="daily_btn" style="dark.light.TRadiobutton" value="24" text="Once a day" variable="{{schedule}}" pack-side="left" pack-pady="0 5" width="22"/>
                 <Radiobutton id="twice_btn" style="dark.light.TRadiobutton" value="12" text="Twice a day" variable="{{schedule}}" pack-side="left" pack-pady="0 5" width="22"/>
@@ -29,7 +27,7 @@
             </Frame>
 
             <!-- Run if logged out -->
-            <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0" >
+            <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0" visible="{{show_run_if_logged_out}}">
                 <Frame style="light.TFrame" padding="0" pack-fill="x" pack-pady="0 15">
                     <Label style="H3.dark.light.TLabel" text="Advance Options" pack-side="left" />
                     <Checkbutton id="run_if_logged_out_btn" pack-side="right" command="toggle_run_if_logged_out" variable="{{run_if_logged_out}}" text="Run whether user is logged on or not"
