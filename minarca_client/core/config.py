@@ -15,7 +15,7 @@ from functools import total_ordering
 
 import javaproperties
 
-from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, get_home, get_temp
+from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, get_config_home, get_home, get_temp
 from minarca_client.locale import _
 
 
@@ -215,11 +215,10 @@ class Patterns(list):
         Restore defaults patterns.
         """
         self.clear()
-        self.extend(
-            [
-                Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")),
-            ]
-        )
+        # Add user's documents
+        self.append(Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")))
+        # Add Minarca config
+        self.append(Pattern(True, get_config_home(), _("Minarca Config")))
 
         if IS_WINDOWS:
             self.extend(
@@ -239,13 +238,13 @@ class Patterns(list):
                     Pattern(False, "**/*.pst.tmp", _("Outlook POP temporary files")),
                 ]
             )
-        if IS_MAC:
+        elif IS_MAC:
             self.extend(
                 [
                     Pattern(False, "**/.DS_Store", _("Desktop Services Store")),
                 ]
             )
-        if IS_LINUX:
+        elif IS_LINUX:
             self.extend(
                 [
                     Pattern(False, "/dev", _("dev filesystem")),

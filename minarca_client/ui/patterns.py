@@ -110,3 +110,26 @@ class PatternsView(tkvue.Component):
         self.backup.set_patterns(self.patterns)
         # Add pattern to the list.
         self.data.patterns = self.patterns
+
+    def reset_pattern(self):
+        """
+        Called when user click to reset patterns.
+        """
+        # Confirm with user
+        if not tkinter.messagebox.askyesno(
+            master=self.root,
+            title=_('Confirm Restore Default'),
+            message=_('Are you sure you want to restore default list of selected file and folder?'),
+            detail=_(
+                'This action will reset the selected files and folders to their default settings. Any changes you have made will be lost. Please note that this operation cannot be undone.'
+            ),
+        ):
+            # Cancel by user
+            return
+
+        self.patterns = self.backup.get_patterns()
+        self.patterns.defaults()
+        # Save the pattern file
+        self.backup.set_patterns(self.patterns)
+        # Add pattern to the list.
+        self.data.patterns = self.patterns

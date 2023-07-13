@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: minarca_client 4.6.0a4.dev23+g2d1c61c.d20230713\n"
+"Project-Id-Version: minarca_client 4.6.0a4.dev24+g39057af.d20230713\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-13 14:13-0400\n"
+"POT-Creation-Date: 2023-07-13 16:07-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -281,99 +281,103 @@ msgid ""
 "running even when nobody is using the server."
 msgstr ""
 
-#: minarca_client/core/config.py:220
+#: minarca_client/core/config.py:219
 msgid "User's Documents"
 msgstr ""
 
-#: minarca_client/core/config.py:227
+#: minarca_client/core/config.py:221
+msgid "Minarca Config"
+msgstr ""
+
+#: minarca_client/core/config.py:226
 msgid "Thumbnails cache"
 msgstr ""
 
-#: minarca_client/core/config.py:228
+#: minarca_client/core/config.py:227
 msgid "Arrangement of a Windows folder"
 msgstr ""
 
-#: minarca_client/core/config.py:229
+#: minarca_client/core/config.py:228
 msgid "Swap System File"
 msgstr ""
 
-#: minarca_client/core/config.py:230
+#: minarca_client/core/config.py:229
 msgid "Page System File"
 msgstr ""
 
-#: minarca_client/core/config.py:231
+#: minarca_client/core/config.py:230
 msgid "Hibernation System File"
 msgstr ""
 
-#: minarca_client/core/config.py:232
+#: minarca_client/core/config.py:231
 msgid "System Volume Information"
 msgstr ""
 
-#: minarca_client/core/config.py:233
+#: minarca_client/core/config.py:232
 msgid "System Recovery"
 msgstr ""
 
-#: minarca_client/core/config.py:234
+#: minarca_client/core/config.py:233
 msgid "Recycle bin"
 msgstr ""
 
-#: minarca_client/core/config.py:235 minarca_client/core/config.py:254
+#: minarca_client/core/config.py:234 minarca_client/core/config.py:253
 msgid "Temporary Folder"
 msgstr ""
 
-#: minarca_client/core/config.py:236
+#: minarca_client/core/config.py:235
 msgid "AutoCAD backup files"
 msgstr ""
 
-#: minarca_client/core/config.py:237
+#: minarca_client/core/config.py:236
 msgid "Office temporary files"
 msgstr ""
 
-#: minarca_client/core/config.py:238
+#: minarca_client/core/config.py:237
 msgid "Outlook IMAP temporary files"
 msgstr ""
 
-#: minarca_client/core/config.py:239
+#: minarca_client/core/config.py:238
 msgid "Outlook POP temporary files"
 msgstr ""
 
-#: minarca_client/core/config.py:245
+#: minarca_client/core/config.py:244
 msgid "Desktop Services Store"
 msgstr ""
 
-#: minarca_client/core/config.py:251
+#: minarca_client/core/config.py:250
 msgid "dev filesystem"
 msgstr ""
 
-#: minarca_client/core/config.py:252
+#: minarca_client/core/config.py:251
 msgid "proc filesystem"
 msgstr ""
 
-#: minarca_client/core/config.py:253
+#: minarca_client/core/config.py:252
 msgid "sys filesystem"
 msgstr ""
 
-#: minarca_client/core/config.py:255
+#: minarca_client/core/config.py:254
 msgid "Volatile program files"
 msgstr ""
 
-#: minarca_client/core/config.py:256
+#: minarca_client/core/config.py:255
 msgid "Mounted filesystems"
 msgstr ""
 
-#: minarca_client/core/config.py:257
+#: minarca_client/core/config.py:256
 msgid "External media"
 msgstr ""
 
-#: minarca_client/core/config.py:258
+#: minarca_client/core/config.py:257
 msgid "Ext4 Lost and Found"
 msgstr ""
 
-#: minarca_client/core/config.py:259
+#: minarca_client/core/config.py:258
 msgid "Hidden temporary files"
 msgstr ""
 
-#: minarca_client/core/config.py:260
+#: minarca_client/core/config.py:259
 msgid "Vim Temporary files"
 msgstr ""
 
@@ -509,6 +513,21 @@ msgstr ""
 msgid ""
 "You may provide a custom pattern to include or exclude file.\n"
 "Custom pattern may include wildcard `*` or `?`."
+msgstr ""
+
+#: minarca_client/ui/patterns.py:121
+msgid "Confirm Restore Default"
+msgstr ""
+
+#: minarca_client/ui/patterns.py:122
+msgid "Are you sure you want to restore default list of selected file and folder?"
+msgstr ""
+
+#: minarca_client/ui/patterns.py:123
+msgid ""
+"This action will reset the selected files and folders to their default "
+"settings. Any changes you have made will be lost. Please note that this "
+"operation cannot be undone."
 msgstr ""
 
 #: minarca_client/ui/schedule.py:96
@@ -781,7 +800,11 @@ msgstr ""
 msgid "Add ..."
 msgstr ""
 
-#: minarca_client/ui/templates/patterns.html:14
+#: minarca_client/ui/templates/patterns.html:9
+msgid "Restore default"
+msgstr ""
+
+#: minarca_client/ui/templates/patterns.html:15
 msgid "Remove pattern"
 msgstr ""
 
