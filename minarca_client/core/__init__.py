@@ -253,25 +253,22 @@ class Backup:
         """
         return Patterns(self.patterns_file)
 
-    def get_remote_url(self):
+    def get_repo_url(self, page='browse'):
         """
         Return a URL to browse data.
         """
+        assert page in ['browse', 'settings']
         settings = self.get_settings()
         if IS_WINDOWS:
             # On Windows, we happen a drive letter.
             roots = list(self.get_patterns().group_by_roots())
-            if roots:
-                drive_letter = roots[0][0][0]
-                return "%s/browse/%s/%s/%s" % (
-                    settings['remoteurl'],
-                    settings['username'],
-                    settings['repositoryname'],
-                    drive_letter,
-                )
-            else:
+            if not roots:
                 return settings['remoteurl']
-        return "%s/browse/%s/%s" % (settings['remoteurl'], settings['username'], settings['repositoryname'])
+            drive_letter = roots[0][0][0]
+            repo = settings['repositoryname'] + '/' + drive_letter
+        else:
+            repo = settings['repositoryname']
+        return "%s/%s/%s/%s" % (settings['remoteurl'], page, settings['username'], repo)
 
     def get_help_url(self):
         """

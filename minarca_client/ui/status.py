@@ -139,7 +139,7 @@ class StatusView(tkvue.Component):
         """
         Open web browser.
         """
-        remote_url = self.backup.get_remote_url()
+        remote_url = self.backup.get_repo_url()
         webbrowser.open(remote_url)
 
     def _watch_status(self):

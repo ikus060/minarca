@@ -90,6 +90,13 @@ class SettingsView(tkvue.Component):
         finally:
             self.data['checking_for_update'] = False
 
+    def notification(self):
+        """
+        Called when user click to modify user's notification settings.
+        """
+        remote_url = self.backup.get_repo_url('settings')
+        webbrowser.open(remote_url)
+
     def unlink(self):
         """
         Called to un register this agent from minarca server.
