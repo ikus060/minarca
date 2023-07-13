@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: minarca_client 4.6.0a4.dev17+g9f9fadd.d20230712\n"
+"Project-Id-Version: minarca_client 4.6.0a4.dev23+g2d1c61c.d20230713\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-12 15:14-0400\n"
+"POT-Creation-Date: 2023-07-13 14:13-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -245,23 +245,23 @@ msgstr ""
 msgid "open graphical user interface (default when calling minarcaw)"
 msgstr ""
 
-#: minarca_client/core/__init__.py:436
+#: minarca_client/core/__init__.py:433
 msgid "generating identity"
 msgstr ""
 
-#: minarca_client/core/__init__.py:442
+#: minarca_client/core/__init__.py:439
 msgid "exchanging identity with minarca server"
 msgstr ""
 
-#: minarca_client/core/__init__.py:446
+#: minarca_client/core/__init__.py:443
 msgid "generating new identity"
 msgstr ""
 
-#: minarca_client/core/__init__.py:450
+#: minarca_client/core/__init__.py:447
 msgid "exchanging new identity with minarca server"
 msgstr ""
 
-#: minarca_client/core/__init__.py:506
+#: minarca_client/core/__init__.py:503
 #, python-format
 msgid "executing command: %s"
 msgstr ""
@@ -552,15 +552,15 @@ msgid ""
 "checks for updates in Minarca's settings."
 msgstr ""
 
-#: minarca_client/ui/settings.py:99
+#: minarca_client/ui/settings.py:106
 msgid "Are you sure ?"
 msgstr ""
 
-#: minarca_client/ui/settings.py:100
+#: minarca_client/ui/settings.py:107
 msgid "Are you sure you want to disconnect this Minarca agent ?"
 msgstr ""
 
-#: minarca_client/ui/settings.py:101
+#: minarca_client/ui/settings.py:108
 msgid ""
 "If you disconnect this computer, this Minarca agent will erase its identity "
 "and will no longer run backup on schedule."
@@ -785,61 +785,61 @@ msgstr ""
 msgid "Remove pattern"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:7
-msgid "Configure when you want your backup to take place, or suspend it temporarily."
-msgstr ""
-
-#: minarca_client/ui/templates/schedule.html:14
+#: minarca_client/ui/templates/schedule.html:11
 msgid "Frequency"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:15
+#: minarca_client/ui/templates/schedule.html:12
+msgid "Configure when you want your backup to take place."
+msgstr ""
+
+#: minarca_client/ui/templates/schedule.html:13
 msgid "Hourly"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:16
+#: minarca_client/ui/templates/schedule.html:14
 msgid "Once a day"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:17
+#: minarca_client/ui/templates/schedule.html:15
 msgid "Twice a day"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:23
+#: minarca_client/ui/templates/schedule.html:21
 msgid "Suspend"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:25
+#: minarca_client/ui/templates/schedule.html:23
 msgid "Suspended"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:28
+#: minarca_client/ui/templates/schedule.html:26
 msgid ""
 "This feature lets you pause backup operations for 24 hours. Ideal when you "
 "need to reduce the use of system resources or free up bandwidth for other "
 "activities."
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:34
+#: minarca_client/ui/templates/schedule.html:32
 msgid "Advance Options"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:35
+#: minarca_client/ui/templates/schedule.html:33
 msgid "Run whether user is logged on or not"
 msgstr ""
 
-#: minarca_client/ui/templates/schedule.html:38
+#: minarca_client/ui/templates/schedule.html:36
 msgid ""
 "This feature allows Minarca to run scheduled backup tasks regardless of "
 "whether a user is currently logged on to the system or not. This is "
 "particularly useful for server."
 msgstr ""
 
-#: minarca_client/ui/templates/settings.html:9
+#: minarca_client/ui/templates/settings.html:11
 msgid "Updates"
 msgstr ""
 
-#: minarca_client/ui/templates/settings.html:10
+#: minarca_client/ui/templates/settings.html:12
 msgid "Check now"
 msgstr ""
 
@@ -847,31 +847,49 @@ msgstr ""
 msgid "Check for update at startup"
 msgstr ""
 
-#: minarca_client/ui/templates/settings.html:18
+#: minarca_client/ui/templates/settings.html:19
 msgid "Checking for updates"
 msgstr ""
 
-#: minarca_client/ui/templates/settings.html:20
+#: minarca_client/ui/templates/settings.html:21
 msgid "Current version is up-to-date"
 msgstr ""
 
-#: minarca_client/ui/templates/settings.html:22
+#: minarca_client/ui/templates/settings.html:23
 msgid "Your version may be upgraded"
 msgstr ""
 
-#: minarca_client/ui/templates/settings.html:24
+#: minarca_client/ui/templates/settings.html:25
 msgid "Cannot check for updates. Try again later."
 msgstr ""
 
-#: minarca_client/ui/templates/settings.html:36
-msgid "Disconnect the backup"
-msgstr ""
-
-#: minarca_client/ui/templates/settings.html:37
-msgid "Disconnect"
+#: minarca_client/ui/templates/settings.html:29
+msgid "Allows you to easily verify if there are any new software updates available."
 msgstr ""
 
 #: minarca_client/ui/templates/settings.html:39
+msgid "Notification"
+msgstr ""
+
+#: minarca_client/ui/templates/settings.html:40
+msgid "Modify"
+msgstr ""
+
+#: minarca_client/ui/templates/settings.html:42
+msgid ""
+"To change your notification preferences and be notified of problems, log in "
+"to your online account."
+msgstr ""
+
+#: minarca_client/ui/templates/settings.html:48
+msgid "Disconnect the backup"
+msgstr ""
+
+#: minarca_client/ui/templates/settings.html:49
+msgid "Disconnect"
+msgstr ""
+
+#: minarca_client/ui/templates/settings.html:51
 msgid "When you disconnect this computer, the backup process will no longer work."
 msgstr ""
 
