@@ -258,7 +258,7 @@ class TestBackup(unittest.TestCase):
         self.assertIsNone(self.error)
 
     @skipIf(IS_WINDOWS, 'linux/macos specific test')
-    def test_get_remote_url_linux(self):
+    def test_get_repo_url_linux(self):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
         config['remoteurl'] = 'http://remotehost'
@@ -266,10 +266,10 @@ class TestBackup(unittest.TestCase):
         config['username'] = 'username'
         config.save()
         # Get value
-        self.assertEqual('http://remotehost/browse/username/test-repo', self.backup.get_remote_url())
+        self.assertEqual('http://remotehost/browse/username/test-repo', self.backup.get_repo_url())
 
     @skipUnless(IS_WINDOWS, 'windows specific test')
-    def test_get_remote_url_windows(self):
+    def test_get_repo_url_windows(self):
         config = Settings(self.backup.config_file)
         config['remotehost'] = 'remotehost'
         config['remoteurl'] = 'http://remotehost'
@@ -280,7 +280,7 @@ class TestBackup(unittest.TestCase):
         patterns.defaults()
         patterns.save()
         # Get value
-        self.assertEqual('http://remotehost/browse/username/test-repo/C', self.backup.get_remote_url())
+        self.assertEqual('http://remotehost/browse/username/test-repo/C', self.backup.get_repo_url())
 
     def test_get_help_url(self):
         config = Settings(self.backup.config_file)
