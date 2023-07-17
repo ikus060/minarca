@@ -320,7 +320,7 @@ e2e-test:linux:
   needs:
   - deploy:dev
   - bdist-client:linux
-  image: buildpack-deps:buster
+  image: buildpack-deps:jammy
   script:
     - apt update && apt install -y cron openssh-client locales locales-all
     - tar -zxvf ./minarca-client/dist/$DIST/minarca-client*.tar.gz --strip 1
@@ -329,6 +329,8 @@ e2e-test:linux:
     - ./minarcaw --version
     # Check translation
     - LANGUAGE=fr_CA:fr LANG=fr_CA.UTF-8 ./minarca --help | grep 'démarrer une sauvegarde'
+    # Test with space
+    - export MINARCA_CONFIG_HOME="/tmp/My Folder With Space/Minarca/"
     # Check backup
     - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
     - ./minarca -d include /etc /var /home
@@ -387,6 +389,8 @@ e2e-test:win32:
   # Check translation
   - $Env:LANGUAGE="fr"; if (!(minarca.exe --help | Select-String -quiet 'sauvegarde')){ exit 1 }
   - $Env:LANGUAGE="en"
+  # Test with space 
+  - $Env:MINARCA_CONFIG_HOME="$Env:APPDATA/My Folder With Space/Minarca/"
   # Check backup
   - minarca.exe -d link --force --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
   - minarca.exe -d include /etc /var /home
