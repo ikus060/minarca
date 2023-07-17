@@ -67,7 +67,7 @@ def _sh_quote(args):
     return value
 
 
-def _escape_remote_shema(path):
+def _escape_path(path):
     """
     Used to escape the ssh.exe path that contains spaces.
     On Windows we use DOS compatible file path.
@@ -80,7 +80,7 @@ def _escape_remote_shema(path):
 
         return win32api.GetShortPathName(path)
     else:
-        return path.replace(' ', '\\ ')
+        return "'" + path + "'"
 
 
 class _UpdateStatus(threading.Thread):
@@ -442,17 +442,22 @@ class Backup:
 
         # base command line
         args = ['-v', '5', '--remote-schema']
-        remote_schema = _escape_remote_shema(compat.get_ssh())
+        remote_schema = _escape_path(compat.get_ssh())
         remote_schema += " -oBatchMode=yes -oPreferredAuthentications=publickey"
         if os.environ.get('MINARCA_ACCEPT_HOST_KEY', False) in ['true', '1', 'True']:
             remote_schema += ' -oStrictHostKeyChecking=no'
         if remote_port:
             remote_schema += ' -p %s' % remote_port
-        remote_schema += " -oUserKnownHostsFile='{known_hosts}' -oIdentitiesOnly=yes -i '{identity}' %s '{user_agent_string}'".format(
-            known_hosts=self.known_hosts,
-            identity=self.private_key_file,
-            user_agent_string=compat.get_user_agent(),
-        )
+        # SSH options need extract escaping
+        remote_schema += " -oUserKnownHostsFile=%s" % _escape_path(self.known_hosts).replace(' ', '\\ ')
+        remote_schema += " -oIdentitiesOnly=yes"
+        # Identity file must be escape if it contains spaces
+        remote_schema += " -i %s" % _escape_path(self.private_key_file)
+        # Litera "%s" will get replace by rdiff-backup
+        remote_schema += " %s"
+        # Add user agent as command line
+        remote_schema += " '%s'" % compat.get_user_agent()
+
         args.append(remote_schema)
         args.extend(extra_args)
         if source:

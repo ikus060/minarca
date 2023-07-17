@@ -376,7 +376,7 @@ class TestBackup(unittest.TestCase):
                 '--remote-schema',
                 MATCH(
                     _ssh
-                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
+                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile=*known_hosts -oIdentitiesOnly=yes -i *id_rsa %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
                 ),
                 '--include',
                 _home,
@@ -419,7 +419,7 @@ class TestBackup(unittest.TestCase):
                 '--remote-schema',
                 MATCH(
                     _ssh
-                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -p 2222 -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
+                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -p 2222 -oUserKnownHostsFile=*known_hosts -oIdentitiesOnly=yes -i *id_rsa %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
                 ),
                 '--include',
                 _home,
@@ -574,7 +574,7 @@ class TestBackup(unittest.TestCase):
                 '--remote-schema',
                 MATCH(
                     _ssh
-                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile='*known_hosts' -oIdentitiesOnly=yes -i '*id_rsa' %s 'minarca/* rdiff-backup/2.0.0 (*)'"
+                    + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile=*known_hosts -oIdentitiesOnly=yes -i *id_rsa %s 'minarca/* rdiff-backup/2.0.0 (*)'"
                 ),
                 '--test-server',
                 'minarca@remotehost::test-repo',
