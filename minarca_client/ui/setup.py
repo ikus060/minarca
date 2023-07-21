@@ -11,6 +11,7 @@ from minarca_client.core.exceptions import (
     HttpAuthenticationError,
     HttpConnectionError,
     HttpInvalidUrlError,
+    HttpServerError,
     RepositoryNameExistsError,
 )
 from minarca_client.locale import _
@@ -86,7 +87,7 @@ class SetupDialog(tkvue.Component):
             logger.exception('http connection error')
             tkinter.messagebox.showinfo(
                 master=self.root,
-                title=_('Failed to connect to remote server'),
+                title=_('Connection Error'),
                 message=_('Failed to connect to remote server'),
                 detail=_(
                     "Your computer cannot establish a connection to the remote server. Make sure your Internet connection is working and that the following URL is accessible with a Web browser: %s"
@@ -104,6 +105,15 @@ class SetupDialog(tkvue.Component):
                     "The username or password you entered to connect to the remote server is not valid.\n\nDetails: %s"
                 )
                 % str(e),
+            )
+        except HttpServerError as e:
+            self.data.linking = False
+            logger.exception('http error')
+            tkinter.messagebox.showwarning(
+                master=self.root,
+                title=_('Server Error'),
+                message=_('The remote server returned an error. You may try again later.'),
+                detail=str(e),
             )
         except BackupError as e:
             self.data.linking = False
