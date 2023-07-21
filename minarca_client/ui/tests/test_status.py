@@ -74,8 +74,19 @@ class StatusViewTest(unittest.TestCase):
             # Given a Home dialog with a start_stop button
             dlg.pump_events()
             dlg.status_view.backup = MagicMock()
-            self.assertIsNotNone(dlg.status_view.start_stop_button)
+            self.assertIsNotNone(dlg.status_view.start_button)
             # When invoking the button
-            dlg.status_view.start_stop_button.invoke()
+            dlg.status_view.start_button.invoke()
             # Then backup start
             dlg.status_view.backup.start.assert_called_once_with(force=True)
+
+    def test_invoke_stop_backup(self):
+        with home_dialog() as dlg:
+            # Given a Home dialog with a stop button
+            dlg.pump_events()
+            dlg.status_view.backup = MagicMock()
+            self.assertIsNotNone(dlg.status_view.start_button)
+            # When invoking the button
+            dlg.status_view.stop_button.invoke()
+            # Then backup start
+            dlg.status_view.backup.stop.assert_called_once_with()

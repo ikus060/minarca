@@ -9,6 +9,7 @@ import logging.handlers
 import os
 import signal
 import sys
+import traceback
 from argparse import ArgumentParser
 
 import rdiffbackup.run
@@ -149,7 +150,15 @@ def _pause(delay):
 
 
 def _rdiff_backup(options):
-    return rdiffbackup.run.main_run(options)
+    """
+    Execute rdiff-backup process within minarca.
+    """
+    try:
+        return rdiffbackup.run.main_run(options)
+    except Exception as e:
+        # Capture any exception and return exitcode.
+        traceback.print_exception(e)
+        sys.exit(_EXIT_BACKUP_FAIL)
 
 
 def _restore(restore_time, force, pattern):
