@@ -22,6 +22,8 @@ class CaptureException:
             UnknownHostKeyError,
             PermissionDeniedError,
             UnsuportedVersionError,
+            RepositoryLocked,
+            RestoreFileNotFound,
         ]:
             if cls._matches(line):
                 self.exception = cls()
@@ -254,3 +256,19 @@ class UnsuportedVersionError(BackupError):
     @staticmethod
     def _matches(line):
         return 'ERROR unsupported version:' in line or 'ERROR: unsupported version:' in line
+
+
+class RestoreFileNotFound(BackupError):
+    message = _('The path you are trying to restore from backup does not exists.')
+
+    @staticmethod
+    def _matches(line):
+        return "couldn't be identified as being within an existing backup repository" in line
+
+
+class RepositoryLocked(BackupError):
+    message = _('Another backup session is currently in progress on the remote server.')
+
+    @staticmethod
+    def _matches(line):
+        return "Fatal Error: It appears that a previous rdiff-backup session" in line
