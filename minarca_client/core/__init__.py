@@ -401,10 +401,8 @@ class Backup:
             status.save()
 
             # etc.
-            self.schedule_job()
             config['configured'] = True
             config.save()
-
         except ConnectionError:
             # Raised with invalid url or port
             raise HttpConnectionError(remoteurl)

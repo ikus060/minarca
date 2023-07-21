@@ -68,8 +68,6 @@ class SetupDialog(tkvue.Component):
                 force=force,
             )
             await self.get_event_loop().run_in_executor(None, call)
-            # Link completed - Close Window.
-            self.close()
         except RepositoryNameExistsError as e:
             logger.info('repository name `%s` already exists' % e.name)
             self._prompt_link_force()
@@ -77,7 +75,6 @@ class SetupDialog(tkvue.Component):
             self.data.linking = False
             tkinter.messagebox.showwarning(
                 master=self.root,
-                icon='warning',
                 title=_('Invalid remote server URL !'),
                 message=_('Invalid remote server URL !'),
                 detail=_(
@@ -87,9 +84,8 @@ class SetupDialog(tkvue.Component):
         except HttpConnectionError as e:
             self.data.linking = False
             logger.exception('http connection error')
-            tkinter.messagebox.showwarning(
+            tkinter.messagebox.showinfo(
                 master=self.root,
-                icon='info',
                 title=_('Failed to connect to remote server'),
                 message=_('Failed to connect to remote server'),
                 detail=_(
@@ -102,7 +98,6 @@ class SetupDialog(tkvue.Component):
             logger.warning('authentication failed')
             tkinter.messagebox.showwarning(
                 master=self.root,
-                icon='warning',
                 title=_('Invalid username or password'),
                 message=_('Invalid username or password'),
                 detail=_(
@@ -116,7 +111,6 @@ class SetupDialog(tkvue.Component):
             remotehost = self.backup.get_settings().get('remotehost', '')
             tkinter.messagebox.showwarning(
                 master=self.root,
-                icon='warning',
                 title=_('Connection failed'),
                 message=_('Failed to establish connectivity with remote server: %s') % remotehost,
                 detail=str(e),
@@ -126,11 +120,25 @@ class SetupDialog(tkvue.Component):
             logger.exception('fail to connect')
             tkinter.messagebox.showwarning(
                 master=self.root,
-                icon='warning',
                 title=_('Unknown problem when connecting to the remote server'),
                 message=_('Unknown problem when connecting to the remote server'),
                 detail=_("An error occurred during the connection to Minarca server.\n\nDetails: %s") % str(e),
             )
+        else:
+            try:
+                self.backup.schedule_job()
+            except OSError as e:
+                tkinter.messagebox.showwarning(
+                    master=self.root,
+                    title=_('Task Scheduler'),
+                    message=_(
+                        'A problem prevent the automatic scheduling of backup jobs. As a result, your backup tasks cannot be executed as planned.'
+                    ),
+                    detail=str(e),
+                )
+
+            # Link completed - Close Window.
+            self.close()
 
     def close(self, event=None):
         """

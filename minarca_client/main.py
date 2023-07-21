@@ -25,7 +25,6 @@ from minarca_client.ui.setup import SetupDialog
 
 _EXIT_BACKUP_FAIL = 1
 _EXIT_ALREADY_LINKED = 2
-_EXIT_MISSING_PASSWD = 3
 _EXIT_REPO_EXISTS = 4
 _EXIT_NOT_RUNNING = 5
 _EXIT_LINK_ERROR = 6
@@ -104,6 +103,16 @@ def _link(remoteurl=None, username=None, name=None, force=False, password=None):
     except BackupError as e:
         print(e.message)
         sys.exit(_EXIT_LINK_ERROR)
+    # If link is success, Schedule job.
+    # On windows this step fail for unknown reason with various user priviledge.
+    try:
+        backup.schedule_job()
+    except OSError:
+        print(
+            _(
+                'A problem prevent the automatic scheduling of backup jobs. As a result, your backup tasks cannot be executed as planned.'
+            )
+        )
 
 
 def _pattern(include, pattern):
