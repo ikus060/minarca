@@ -75,6 +75,7 @@ class SetupTest(unittest.TestCase):
     def test_submit_form(self):
         self.dlg.close = MagicMock()
         self.dlg.backup.link = MagicMock()
+        self.dlg.backup.schedule_job = MagicMock()
         # Given a form with valid value
         self.dlg.data.username = 'test'
         self.dlg.data.password = 'test'
@@ -87,13 +88,16 @@ class SetupTest(unittest.TestCase):
         self.dlg.backup.link.assert_called_once_with(
             remoteurl='http://examples.com', username='test', password='test', repository_name=ANY, force=False
         )
+        # Then schedule_job() get called
+        self.dlg.backup.schedule_job.assert_called_once()
         # Then close() get called
         self.dlg.close.assert_called_once()
 
     def test_submit_form_with_already_exists(self):
         self.dlg.close = MagicMock()
         # Given an exception raised when linking
-        self.dlg.backup.link = MagicMock(side_effect=RepositoryNameExistsError('test'))
+        self.dlg.backup.link = MagicMock(side_effect=[RepositoryNameExistsError('test'), None])
+        self.dlg.backup.schedule_job = MagicMock()
         # Given the user press "Yes"
         tkinter.messagebox.askyesno = MagicMock(return_value=True)
         # Given a form with valid value
@@ -108,9 +112,11 @@ class SetupTest(unittest.TestCase):
         self.dlg.backup.link.assert_any_call(
             remoteurl='http://examples.com', username='test', password='test', repository_name=ANY, force=False
         )
-        # Then link() get called a second time with force=False
+        # Then link() get called a second time with force=True
         self.dlg.backup.link.assert_any_call(
             remoteurl='http://examples.com', username='test', password='test', repository_name=ANY, force=True
         )
+        # Then schedule_job() get called
+        self.dlg.backup.schedule_job.assert_called_once()
         # Then close() is not called
-        self.dlg.close.assert_not_called()
+        self.dlg.close.assert_called_once()

@@ -130,7 +130,6 @@ class TestBackup(unittest.TestCase):
         # Check calls to web api
         mock_rdiffweb.return_value.get_current_user_info.assert_called_once()
         mock_rdiffweb.return_value.add_ssh_key.assert_called_once()
-        self.backup.scheduler.create.assert_called_once()
 
         # Check if rdiff_backup get called.
         self.assertEqual(2, mock_popen.call_count)
@@ -219,7 +218,6 @@ class TestBackup(unittest.TestCase):
         mock_rdiffweb.return_value.get_current_user_info.assert_called_once()
         mock_rdiffweb.return_value.add_ssh_key.assert_called_once()
         mock_popen.assert_called()
-        self.backup.scheduler.create.assert_called_once()
 
         # Check if default patterns are created
         patterns = self.backup.get_patterns()
