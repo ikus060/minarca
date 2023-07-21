@@ -11,7 +11,6 @@ import datetime
 import logging
 import os
 import re
-import signal
 import subprocess
 import threading
 import time
@@ -20,7 +19,6 @@ from datetime import timedelta
 import psutil
 import requests
 from psutil import NoSuchProcess
-from rdiff_backup.connection import ConnectionReadError, ConnectionWriteError
 from requests.compat import urljoin
 from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
 
@@ -118,14 +116,6 @@ class _UpdateStatus(threading.Thread):
             self.status['lastresult'] = 'SUCCESS'
             self.status['lastsuccess'] = Datetime()
             self.status['lastdate'] = self.status['lastsuccess']
-            self.status['details'] = ''
-            self.status.save()
-        elif exc_type is KeyboardInterrupt or exc_type is ConnectionWriteError or exc_type is ConnectionReadError:
-            # Capture special exception raised when user cancel the operation
-            # or when the SSH connection is interrupted.
-            logger.exception("%s INTERRUPT", self.action)
-            self.status['lastresult'] = 'INTERRUPT'
-            self.status['lastdate'] = Datetime()
             self.status['details'] = ''
             self.status.save()
         else:
@@ -575,10 +565,10 @@ class Backup:
         Stop the running backup process.
         """
         # Check status for running backup.
-        status = self.get_status()
-        if status['lastresult'] != 'RUNNING':
+        if not self.is_running():
             raise NotRunningError()
         # Get pid and checkif process is running.
+        status = self.get_status()
         try:
             pid = int(status['pid'])
         except ValueError:
@@ -587,22 +577,27 @@ class Backup:
         if not p.is_running():
             raise NotRunningError()
         # Send appropriate signal
-
+        logger.info('terminating process %s' % pid)
         try:
-            if IS_WINDOWS:
-                # On windows, we need to terminate the process. Ideally, we
-                # terminate the ssh connection to clean-up everything properly.
-                # It give a chance to minarca to leave cleanly.
-                # https://stackoverflow.com/questions/44124338/trying-to-implement-signal-ctrl-c-event-in-python3-6
-                for child in p.children(recursive=True):
-                    if 'ssh.exe' in child.name():
-                        child.terminate()
-                        return
-                p.terminate()
-            else:
-                p.send_signal(signal.SIGINT)
+            # To terminate the backup, the best is to kill the SSH connection.
+            for child in p.children(recursive=True):
+                if 'ssh.exe' in child.name() or 'ssh' in child.name():
+                    child.terminate()
+            p.terminate()
         except SystemError:
-            logger.debug('error trying to stop minarca', exc_info=1)
+            logger.warn('error trying to stop minarca', exc_info=1)
+        # Wait until process get killed
+        count = 1
+        while p.is_running() and count < 10:
+            time.sleep(0.1)
+            count += 1
+        # Replace status by INTERRUPT
+        logger.info('process interrupted successfully')
+        status = self.get_status()
+        status['lastresult'] = 'INTERRUPT'
+        status['lastdate'] = Datetime()
+        status['details'] = ''
+        status.save()
 
     def test_server(self):
         """
