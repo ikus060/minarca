@@ -31,8 +31,10 @@
     <!-- Start/Stop backup -->
     <Frame style="default.TFrame" pack-fill="x" pack-expand="1" />
     <Frame style="default.TFrame">
-        <Button id="start_stop_button" command="start_stop_backup" text="{{start_stop_text}}" pack-side="top"
-            style="success.TButton" cursor="hand2" padding="12"/>
+        <Button id="start_button" command="start_backup" text="Start backup" pack-side="left"
+            style="success.TButton" cursor="hand2" padding="12" visible="{{lastresult not in ['RUNNING', 'STALE']}}"/>
+        <Button id="stop_button" command="stop_backup" text="Stop process" pack-side="left"
+            style="success.TButton" cursor="hand2" padding="12" visible="{{lastresult in ['RUNNING', 'STALE']}}"/>
     </Frame>
     <Frame style="default.TFrame" pack-fill="x" pack-expand="1" />
         

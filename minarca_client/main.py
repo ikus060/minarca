@@ -9,6 +9,7 @@ import logging.handlers
 import os
 import signal
 import sys
+import traceback
 from argparse import ArgumentParser
 
 import rdiffbackup.run
@@ -25,7 +26,6 @@ from minarca_client.ui.setup import SetupDialog
 
 _EXIT_BACKUP_FAIL = 1
 _EXIT_ALREADY_LINKED = 2
-_EXIT_MISSING_PASSWD = 3
 _EXIT_REPO_EXISTS = 4
 _EXIT_NOT_RUNNING = 5
 _EXIT_LINK_ERROR = 6
@@ -104,6 +104,16 @@ def _link(remoteurl=None, username=None, name=None, force=False, password=None):
     except BackupError as e:
         print(e.message)
         sys.exit(_EXIT_LINK_ERROR)
+    # If link is success, Schedule job.
+    # On windows this step fail for unknown reason with various user priviledge.
+    try:
+        backup.schedule_job()
+    except OSError:
+        print(
+            _(
+                'A problem prevent the automatic scheduling of backup jobs. As a result, your backup tasks cannot be executed as planned.'
+            )
+        )
 
 
 def _pattern(include, pattern):
@@ -140,7 +150,15 @@ def _pause(delay):
 
 
 def _rdiff_backup(options):
-    return rdiffbackup.run.main_run(options)
+    """
+    Execute rdiff-backup process within minarca.
+    """
+    try:
+        return rdiffbackup.run.main_run(options)
+    except Exception as e:
+        # Capture any exception and return exitcode.
+        traceback.print_exception(e)
+        sys.exit(_EXIT_BACKUP_FAIL)
 
 
 def _restore(restore_time, force, pattern):
