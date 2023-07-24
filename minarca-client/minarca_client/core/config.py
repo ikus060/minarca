@@ -218,7 +218,7 @@ class Patterns(list):
         # Add user's documents
         self.append(Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")))
         # Add Minarca config
-        self.append(Pattern(True, get_config_home(), _("Minarca Config")))
+        self.append(Pattern(True, os.path.join(get_config_home(), 'patterns'), _("Minarca Config")))
 
         if IS_WINDOWS:
             self.extend(

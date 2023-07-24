@@ -10,7 +10,7 @@ import webbrowser
 
 import pkg_resources
 
-from minarca_client.core import Backup, RunningError
+from minarca_client.core import Backup
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
 
@@ -36,7 +36,6 @@ class StatusView(tkvue.Component):
                 'header_text': self.header_text,
                 'status_text': self.status_text,
                 'status_text_style': self.status_text_style,
-                'start_stop_text': self.start_stop_text,
                 'last_backup_text': self.last_backup_text,
                 'last_backup_text_style': self.last_backup_text_style,
                 'remote_text_tooltip': self.remote_text_tooltip,
@@ -128,13 +127,6 @@ class StatusView(tkvue.Component):
         repositoryname = context['repositoryname']
         return '%s @ %s::%s' % (username, remotehost, repositoryname)
 
-    @tkvue.computed
-    def start_stop_text(self, context):
-        lastresult = context['lastresult']
-        if lastresult in ['RUNNING', 'STALE']:
-            return _('Stop backup')
-        return _('Start backup')
-
     def browse_remote(self):
         """
         Open web browser.
@@ -167,18 +159,28 @@ class StatusView(tkvue.Component):
             # Swallow exception raised when application get destroyed.
             pass
 
-    def start_stop_backup(self):
+    def start_backup(self):
         try:
             self.backup.start(force=True)
-        except RunningError:
-            self.backup.stop()
-        except Exception:
+        except Exception as e:
             logger.exception('fail to start backup')
             tkinter.messagebox.showerror(
                 parent=self.root,
-                title=_("Fail to start backup !"),
-                message=_("Fail to start backup !"),
-                detail=_(
-                    "A fatal error occurred when trying to start the backup process. This usually indicate a problem with the installation. Try re-installing Minarca Backup."
-                ),
+                title=_("Start Backup"),
+                message=_("A problem occurred when trying to start the backup process."),
+                detail=_("This usually indicate a problem with the installation. Try re-installing Minarca Backup.")
+                + '\n'
+                + str(e),
+            )
+
+    def stop_backup(self):
+        try:
+            self.backup.stop()
+        except Exception as e:
+            logger.exception('fail to stop')
+            tkinter.messagebox.showerror(
+                parent=self.root,
+                title=_("Stop process"),
+                message=_("A problem occurred when trying to stop the process."),
+                detail=str(e),
             )

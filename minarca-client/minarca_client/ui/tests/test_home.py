@@ -53,7 +53,7 @@ class HomeTest(unittest.TestCase):
             dlg.backup.set_settings('remoteurl', 'http://examples.com')
             # Given a Home dialog with help button
             dlg.pump_events()
-            self.assertIsNotNone(dlg.status_view.start_stop_button)
+            self.assertIsNotNone(dlg.status_view.start_button)
             # When invoking the button
             dlg.help_button.invoke()
             dlg.pump_events()
