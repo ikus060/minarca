@@ -14,7 +14,11 @@
             <Button id="button_schedule" selected="{{active_view == 'schedule'}}"
                 style="dark.TButton"
                 command="set_active_view('schedule')"
-                text="Schedule backup" cursor="hand2" pack-side="left" width="0"/>
+                text="Schedule Backup" cursor="hand2" pack-side="left" width="0"/>
+            <Button id="button_restore" selected="{{active_view == 'restore'}}"
+                style="dark.TButton"
+                command="set_active_view('restore')"
+                text="Restore" cursor="hand2" pack-side="left" width="0"/>
             <Button id="button_settings" selected="{{active_view == 'settings'}}"
                 style="dark.TButton"
                 command="set_active_view('settings')"
@@ -26,6 +30,7 @@
         <StatusView id="status_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'home'}}" />
         <PatternsView id="patterns_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'patterns'}}" />
         <ScheduleView id="schedule_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'schedule'}}" />
+        <RestoreView id="restore_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'restore'}}" />
         <SettingsView id="settings_view" pack-fill="both" pack-expand="1" visible="{{active_view == 'settings'}}" />
     </Frame>
 </TopLevel>

@@ -1218,6 +1218,249 @@ ttk::style theme create minarca -parent clam -settings {
 	
 	
 	
+    ttk::style configure primary.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #1C4062 \
+	  -foreground #1C4062 \
+	  -background #ffffff;
+	ttk::style map primary.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure primary.light.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #1C4062 \
+	  -foreground #1C4062 \
+	  -background #f4f4f4;
+	ttk::style map primary.light.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure primary.dark.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #1C4062 \
+	  -foreground #1C4062 \
+	  -background #0E2933;
+	ttk::style map primary.dark.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure secondary.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #B6DDE2 \
+	  -foreground #B6DDE2 \
+	  -background #ffffff;
+	ttk::style map secondary.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure secondary.light.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #B6DDE2 \
+	  -foreground #B6DDE2 \
+	  -background #f4f4f4;
+	ttk::style map secondary.light.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure secondary.dark.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #B6DDE2 \
+	  -foreground #B6DDE2 \
+	  -background #0E2933;
+	ttk::style map secondary.dark.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure success.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #50A254 \
+	  -foreground #50A254 \
+	  -background #ffffff;
+	ttk::style map success.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure success.light.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #50A254 \
+	  -foreground #50A254 \
+	  -background #f4f4f4;
+	ttk::style map success.light.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure success.dark.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #50A254 \
+	  -foreground #50A254 \
+	  -background #0E2933;
+	ttk::style map success.dark.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure info.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #009FB9 \
+	  -foreground #009FB9 \
+	  -background #ffffff;
+	ttk::style map info.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure info.light.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #009FB9 \
+	  -foreground #009FB9 \
+	  -background #f4f4f4;
+	ttk::style map info.light.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure info.dark.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #009FB9 \
+	  -foreground #009FB9 \
+	  -background #0E2933;
+	ttk::style map info.dark.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure warning.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #D88C46 \
+	  -foreground #D88C46 \
+	  -background #ffffff;
+	ttk::style map warning.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure warning.light.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #D88C46 \
+	  -foreground #D88C46 \
+	  -background #f4f4f4;
+	ttk::style map warning.light.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure warning.dark.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #D88C46 \
+	  -foreground #D88C46 \
+	  -background #0E2933;
+	ttk::style map warning.dark.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure danger.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #CA393C \
+	  -foreground #CA393C \
+	  -background #ffffff;
+	ttk::style map danger.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure danger.light.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #CA393C \
+	  -foreground #CA393C \
+	  -background #f4f4f4;
+	ttk::style map danger.light.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+    ttk::style configure danger.dark.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #CA393C \
+	  -foreground #CA393C \
+	  -background #0E2933;
+	ttk::style map danger.dark.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure light.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #f4f4f4 \
+	  -foreground #f4f4f4 \
+	  -background #ffffff;
+	ttk::style map light.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+	
+	
+    ttk::style configure light.dark.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #f4f4f4 \
+	  -foreground #f4f4f4 \
+	  -background #0E2933;
+	ttk::style map light.dark.TCheckbutton \
+      -background { {hover !disabled} #0C242D }
+	
+	
+	
+	
+	
+    ttk::style configure dark.default.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #0E2933 \
+	  -foreground #0E2933 \
+	  -background #ffffff;
+	ttk::style map dark.default.TCheckbutton \
+      -background { {hover !disabled} #E5E5E5 }
+	
+	
+	
+    ttk::style configure dark.light.TCheckbutton \
+	  -indicatorsize 14 \
+	  -indicatorforeground #0E2933 \
+	  -foreground #0E2933 \
+	  -background #f4f4f4;
+	ttk::style map dark.light.TCheckbutton \
+      -background { {hover !disabled} #DBDBDB }
+	
+	
+	
+	
+	
+
+    
+	
+	
+	
 	image create photo switch-on-primary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABjElEQVRIx+3UMWsUcRAF8N/umQgiV1roBq4JCCpy2BmRRZBEP4ClxX4FbUQQUbDSr7Bgay0YsVkL014isZJANKtIwCYIYs5zLfwfxrALtzHp8rqdeftm/m+Y4RB7RZJmUZJm0f/yorofMIWjdfkGVPiBYVnkVW2BIDyLa5jDyVBoEgzxGW/wAu/HhaIgPo0buIVz6LRws9rRaIW3eIxnZZFvj/27iUeh60mxidcY4BfO4ApO4Qvu4OkRXMDtluIruIdXZZF/3+HCHB7gUtBc7XR7/bu4bvKBfg1WPi+LfHsc3FofjLq9/geshZfMYhRjoYU4LIXOR7sTYbBLeBlC8zFmWohXWC2L/FsToSzyYbAQZuIW4ntCjI0W/AhnkzQ73kRI0mwK58PnRozF8PRJcRFXkzTr1IhHIT8fQoudbq+/GYInJixwDKfxqdvrf9xaH/wM4tO4jIf+LOs73N+PRVvGSMOiHcSpWMET41Oxy7+DOXY1g9r/c91QSFnkVZJmtZyyyP/htbD1EH/xG6bajMkvHn/UAAAAAElFTkSuQmCC"
 	image create photo switch-off-primary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABSUlEQVRIx+3ULUtDcRQG8N+uE0zComGYFGbxBQRZsMiCIBhEBD+ASRA/gfoJLAY/gFjEIIhDbYZpEKdBFkyyIFisyvAl7D+4E5R7xWHxSefc/+V5OC/P4R9/jUw8qVRrrTCLHkQJed7wggYURwvtAoE4g37MYhJ96Eoo8IoHnOEA93gvjhZkAnkX5rCGwufKUuAdNWxgH6/Z8LCALeTwiGPcBOFxTIW3JC0fwnZo824Ww1gPBJdYxXkoG7pRwiYGE1aSC5y3WSxhIPRwBZX4oCrVWgNHoZod9CYUGcBShOnw4RAXcfJP8WkYYhpMR8iH5Epz3b7CM65TCuST7vmPEaEe4jHfG6sHIyn56xHKIZnBBG2OjsclTQOmQTlTqdaGsac59d9aU7jDfMvJi9qNdqI50LRGa+EJy9jt+Kno/LGL/9WJc/2Pv8cH0ARkJWLvdFkAAAAASUVORK5CYII="
 	image create photo switch-disabled-primary-default -data "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABF0lEQVQ4y93SIUtDcRQF8N97bwOTsLggpsm0KIJgEIssKIJBRPADmATxE4hdEMEgy2IRgyAOtRnUIDKTD5ZkQbBYlbHNMIco74GLesK98Oce7v/cc/j7CDothow+YcJMy7sGxS4hJjBowbS8KIHQ9OzKiSftoiAmsmjTcHdbItoebTnWzGDZnpwX5x5EJszIJXx9xL6MwyAedaTgzoYbTWSV7BhK3FOzlLGq4Nm6646suOFM5EB/AqFgNTSLU7fdKxTh0lWKltnQAO61vj2/qaYQBkI9IlTH+A/D+oylzNdDFcyb/HS7U0umUwiVUFlN3q4pUSwma8524o2oKQcxK5/GXaimGgev1hz2HI3ew+dL6q/i/R/wAVtDUBnF6UmWAAAAAElFTkSuQmCC"

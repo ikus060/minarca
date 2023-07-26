@@ -24,9 +24,12 @@ class StatusView(tkvue.Component):
         self.backup = Backup()
         self.data = tkvue.Context(
             {
+                # Status
+                'action': self.backup.get_status('action'),
                 'lastresult': self.backup.get_status('lastresult'),
                 'lastdate': self.backup.get_status('lastdate'),
                 'details': self.backup.get_status('details'),
+                # settings
                 'remoteurl': self.backup.get_settings('remoteurl'),
                 'username': self.backup.get_settings('username'),
                 'remotehost': self.backup.get_settings('remotehost'),
@@ -62,22 +65,24 @@ class StatusView(tkvue.Component):
         # If paused, this was a manual operation.
         if context.pause_until:
             return _('Backup paused until %s') % context.pause_until
-
-        # Other wise, display the backup status.
-        lastresult = context.lastresult
-        if lastresult == 'SUCCESS':
-            return _('Backup is healthy')
-        elif lastresult == 'FAILURE':
-            return _('Backup failed')
-        elif lastresult == 'RUNNING':
-            return _('Backup in progress')
-        elif lastresult == 'STALE':
-            return _('Backup is stale')
-        elif lastresult == 'INTERRUPT':
-            return _('Backup was interrupted')
-        elif lastresult == 'UNKNOWN':
-            return _('No backup yet')
-        return _('Backup is not healthy')
+        status_table = {
+            'backup': {
+                'SUCCESS': _('Backup is healthy'),
+                'FAILURE': _('Backup failed'),
+                'RUNNING': _('Backup in progress'),
+                'STALE': _('Backup is stale'),
+                'INTERRUPT': _('Backup was interrupted'),
+                'UNKNOWN': _('No backup yet'),
+            },
+            'restore': {
+                'SUCCESS': _('Restore completed'),
+                'FAILURE': _('Restore failed'),
+                'RUNNING': _('Restore in progress'),
+                'STALE': _('Restore is stale'),
+                'INTERRUPT': _('Restore was interrupted'),
+            },
+        }
+        return status_table.get(context.action, {}).get(context.lastresult, _('Backup is not healthy'))
 
     @tkvue.computed
     def status_text_style(self, context):
@@ -98,26 +103,21 @@ class StatusView(tkvue.Component):
 
     @tkvue.computed
     def last_backup_text(self, context):
-        lastresult = context['lastresult']
-        lastdate = context['lastdate']
-        details = context['details']
-        if lastresult == 'SUCCESS':
-            return _('Complete successfully on %s.') % lastdate
-        elif lastresult == 'FAILURE':
-            return _('Failed on %s\n%s') % (lastdate, details)
-        elif lastresult == 'RUNNING':
-            return _('Backup is currently running in background and using system resources.')
-        elif lastresult == 'STALE':
-            return _('Was started in background on %s, but is currently stale an may use system resources.') % lastdate
-        elif lastresult == 'INTERRUPT':
-            return (
-                _(
-                    'Was interrupted on %s. May be caused by loss of connection, computer standby or manual interruption.'
-                )
-                % lastdate
-            )
-        return _(
-            'Initial backup need to be started. You may take time to configure your parameters and start your initial backup manually.'
+        text_table = {
+            'SUCCESS': _('Completed successfully on %s.') % context.lastdate,
+            'FAILURE': _('Failed on %s\n%s') % (context.lastdate, context.details),
+            'RUNNING': _('Running in background and using system resources.'),
+            'STALE': _('Started in background on %s, but is currently stale an may use system resources.')
+            % context.lastdate,
+            'INTERRUPT': _('Interrupted on %s. May be caused by computer standby or manual interruption.')
+            % context.lastdate,
+            'UNKNOWN': _('No backup yet'),
+        }
+        return text_table.get(
+            context.lastresult,
+            _(
+                'Initial backup need to be started. You may take time to configure your parameters and start your initial backup manually.'
+            ),
         )
 
     @tkvue.computed
@@ -147,6 +147,7 @@ class StatusView(tkvue.Component):
             while self.root.winfo_exists():
                 status = self.backup.get_status()
                 if last_status != status:
+                    self.data['action'] = status['action']
                     self.data['lastresult'] = status['lastresult']
                     self.data['lastdate'] = status['lastdate']
                     self.data['details'] = status['details']

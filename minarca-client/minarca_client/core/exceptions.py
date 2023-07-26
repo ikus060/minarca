@@ -95,7 +95,7 @@ class NotRunningError(Exception):
     Raised when trying to stop a backup when it's not running.
     """
 
-    message = _("cannot stop backup when it's not running")
+    message = _("cannot stop process when it's not running")
 
 
 class RunningError(BackupError):
@@ -103,7 +103,7 @@ class RunningError(BackupError):
     Raised when a backup is already running.
     """
 
-    message = _("cannot start backup when it's already running")
+    message = _("cannot start process when it's already running")
 
 
 class NotConfiguredError(BackupError):

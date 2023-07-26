@@ -117,7 +117,7 @@ class PatternsView(tkvue.Component):
         """
         # Confirm with user
         if not tkinter.messagebox.askyesno(
-            master=self.root,
+            parent=self.root,
             title=_('Confirm Restore Default'),
             message=_('Are you sure you want to restore default list of selected file and folder?'),
             detail=_(

@@ -267,6 +267,21 @@ ttk::style theme create {{ theme_name }} -parent clam -settings {
     ttk::style configure {{ name }}.TFrame -background {{ color }};
     {% endfor %}
 
+    {# TCheckbutton #}
+	{% for fgname, fgcolor in fg_colors.items() %}
+	{% for bgname, bgcolor in bg_colors.items() %}
+	{% if fgname != bgname %}
+    ttk::style configure {{ fgname }}.{{ bgname }}.TCheckbutton \
+	  -indicatorsize {{ font_size|abs - 2 }} \
+	  -indicatorforeground {{ fgcolor }} \
+	  -foreground {{ fgcolor }} \
+	  -background {{ bgcolor }};
+	ttk::style map {{ fgname }}.{{ bgname }}.TCheckbutton \
+      -background { {hover !disabled} {{ darker(bgcolor, 0.1) }} }
+	{% endif %}
+	{% endfor %}
+	{% endfor %}
+
     {# Roundtoggle.TCheckbutton #}
 	{% for fgname, fgcolor in fg_colors.items() %}
 	{% for bgname, bgcolor in bg_colors.items() %}
