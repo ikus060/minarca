@@ -50,7 +50,7 @@ class SettingsView(tkvue.Component):
         self.data['checking_for_update'] = False
         latest_version = self.latest_check.get_latest_version()
         ret = tkinter.messagebox.askquestion(
-            master=self.root,
+            parent=self.root,
             title=_("New version available"),
             message=_(
                 "A new version of Minarca (%s) is available from IKUS Software. Do you want to upgrade your copy ?"

@@ -66,7 +66,14 @@ class Status(dict):
     """
 
     LAST_RESULTS = ['SUCCESS', 'FAILURE', 'UNKNOWN', 'RUNNING', 'STALE', 'INTERRUPT']
-    _DEFAULT = {'details': None, 'lastdate': None, 'lastresult': 'UNKNOWN', 'lastsuccess': None, 'pid': None}
+    _DEFAULT = {
+        'details': None,
+        'lastdate': None,
+        'lastresult': 'UNKNOWN',
+        'lastsuccess': None,
+        'pid': None,
+        'action': 'backup',
+    }
 
     def __init__(self, filename):
         assert filename

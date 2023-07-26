@@ -75,7 +75,7 @@ class SetupDialog(tkvue.Component):
         except HttpInvalidUrlError:
             self.data.linking = False
             tkinter.messagebox.showwarning(
-                master=self.root,
+                parent=self.root,
                 title=_('Invalid remote server URL !'),
                 message=_('Invalid remote server URL !'),
                 detail=_(
@@ -86,7 +86,7 @@ class SetupDialog(tkvue.Component):
             self.data.linking = False
             logger.exception('http connection error')
             tkinter.messagebox.showinfo(
-                master=self.root,
+                parent=self.root,
                 title=_('Connection Error'),
                 message=_('Failed to connect to remote server'),
                 detail=_(
@@ -98,7 +98,7 @@ class SetupDialog(tkvue.Component):
             self.data.linking = False
             logger.warning('authentication failed')
             tkinter.messagebox.showwarning(
-                master=self.root,
+                parent=self.root,
                 title=_('Invalid username or password'),
                 message=_('Invalid username or password'),
                 detail=_(
@@ -110,7 +110,7 @@ class SetupDialog(tkvue.Component):
             self.data.linking = False
             logger.exception('http error')
             tkinter.messagebox.showwarning(
-                master=self.root,
+                parent=self.root,
                 title=_('Server Error'),
                 message=_('The remote server returned an error. You may try again later.'),
                 detail=str(e),
@@ -120,7 +120,7 @@ class SetupDialog(tkvue.Component):
             logger.exception('connection error')
             remotehost = self.backup.get_settings().get('remotehost', '')
             tkinter.messagebox.showwarning(
-                master=self.root,
+                parent=self.root,
                 title=_('Connection failed'),
                 message=_('Failed to establish connectivity with remote server: %s') % remotehost,
                 detail=str(e),
@@ -129,7 +129,7 @@ class SetupDialog(tkvue.Component):
             self.data.linking = False
             logger.exception('fail to connect')
             tkinter.messagebox.showwarning(
-                master=self.root,
+                parent=self.root,
                 title=_('Unknown problem when connecting to the remote server'),
                 message=_('Unknown problem when connecting to the remote server'),
                 detail=_("An error occurred during the connection to Minarca server.\n\nDetails: %s") % str(e),
@@ -139,7 +139,7 @@ class SetupDialog(tkvue.Component):
                 self.backup.schedule_job()
             except OSError as e:
                 tkinter.messagebox.showwarning(
-                    master=self.root,
+                    parent=self.root,
                     title=_('Task Scheduler'),
                     message=_(
                         'A problem prevent the automatic scheduling of backup jobs. As a result, your backup tasks cannot be executed as planned.'
@@ -159,7 +159,7 @@ class SetupDialog(tkvue.Component):
 
     def _prompt_link_force(self):
         button_idx = tkinter.messagebox.askyesno(
-            master=self.root,
+            parent=self.root,
             icon='question',
             title=_('Repository name already exists'),
             message=_('Do you want to replace the existing repository ?'),

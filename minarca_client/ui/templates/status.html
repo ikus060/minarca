@@ -15,7 +15,7 @@
     <Frame style="light.TFrame" pack-fill="x" padding="0 15">
         <!-- Current status -->
         <Frame style="light.TFrame" pack-side="left" pack-fill="both" pack-expand="1" padding="25">
-            <Label style="H4.dark.light.TLabel" wrap="true" text="Backup Status: " pack-expand="1" pack-fill="x" width="15" anchor="s" />
+            <Label style="H4.dark.light.TLabel" wrap="true" text="Status: " pack-expand="1" pack-fill="x" width="15" anchor="s" />
             <Label style="{{ f'H5.{status_text_style}.light.TLabel' }}" pack-expand="1" pack-fill="x" wrap="true" text="{{ status_text }}" compound="right" width="20" anchor="s" pack-pady="25 0" image="{{ 'dots-16-success' if lastresult == 'RUNNING' else None }}"/>
         </Frame>
 
@@ -23,7 +23,7 @@
 
         <!-- Last back-->
         <Frame style="light.TFrame" pack-side="left" pack-fill="both" pack-expand="1" padding="25">
-            <Label style="H4.dark.light.TLabel" pack-expand="1" pack-fill="x" wrap="true" text="Last Backup: " width="15" anchor="s" />
+            <Label style="H4.dark.light.TLabel" pack-expand="1" pack-fill="x" wrap="true" text="Details: " width="15" anchor="s" />
             <Label style="{{ f'H5.{last_backup_text_style}.light.TLabel' }}" justify="center" pack-expand="1" pack-fill="x" wrap="true" text="{{ last_backup_text }}" width="20" anchor="s" pack-pady="25 0" />
         </Frame>
     </Frame>
