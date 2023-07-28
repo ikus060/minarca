@@ -92,7 +92,7 @@ class ScheduleView(tkvue.Component):
         else:
             # Confirm with user
             if not tkinter.messagebox.askyesno(
-                master=self.root,
+                parent=self.root,
                 title=_('Pause Backup Job Confirmation'),
                 message=_('Are you sure you want to pause the backup job?'),
                 detail=_(
@@ -131,7 +131,7 @@ class ScheduleView(tkvue.Component):
                 self.backup.schedule_job(run_if_logged_out=(dlg.data['username'], dlg.data['password']))
             except Exception as e:
                 tkinter.messagebox.showwarning(
-                    master=self.root,
+                    parent=self.root,
                     icon='warning',
                     title=_('Task Scheduler'),
                     message=_('Task Scheduler cannot apply your changes.'),
