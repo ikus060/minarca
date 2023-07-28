@@ -1,0 +1,16 @@
+<Frame pack-fill="both" style="default.TFrame">
+    <!-- Title -->
+    <Label pack-side="top" text="Restore your data" style="H1.dark.default.TLabel" pack-fill="x" pack-pady="0 25"/>
+    <!-- Partial restore -->
+    <Frame style="light.TFrame" pack-side="left" pack-expand="1" pack-fill="both" pack-padx="0 12" padding="25">
+        <Label text="Partial restoration" style="H3.dark.light.TLabel" pack-side="top" pack-fill="x" anchor="nw" width="15"/>
+        <Label style="dark.light.TLabel" pack-side="top" pack-fill="both" pack-expand="1" wrap="1" anchor="nw" width="15" text="Through your online account, accessible via a web browser, you can perform partial recovery by selecting specific files or folders to restore from your backup.&#10;&#10;You have total control over the items you wish to recover, enabling targeted and rapid restoration without having to restore the entire system."/>
+        <Button text="Partial Restore" command="partial_restore" style="dark.TButton" pack-side="bottom" cursor="hand2"/>
+    </Frame>
+    <!-- Full restore -->
+    <Frame style="light.TFrame" pack-side="left" pack-expand="1" pack-fill="both" pack-padx="12 0" padding="25">
+        <Label text="Full restoration" style="H3.dark.light.TLabel" pack-side="top"  pack-fill="x" anchor="nw" width="15"/>
+        <Label style="dark.light.TLabel" pack-side="top" pack-fill="both" pack-expand="1" wrap="1" anchor="nw" width="15" text="This allows you to restore your entire data set from a backup, including your previously backed-up files and folders.&#10;&#10;This method is ideal for situations where you need to restore your entire system in the event of hardware failure, total data loss or migration to a new device."/>
+        <Button text="Full Restore" command="full_restore" style="dark.TButton" pack-side="bottom" cursor="hand2"/>
+    </Frame>
+</Frame>

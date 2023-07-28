@@ -167,20 +167,24 @@ class Backup:
         self.status_file = os.path.join(compat.get_data_home(), 'status.properties')
         self.scheduler = Scheduler()
 
-    def start(self, force=False):
+    def start(self, action='backup', force=False, patterns=None):
         """
-        Trigger backup in background mode.
+        Trigger execution of minarca in detach mode.
         """
+        assert action in ['backup', 'restore']
         # Fork process
-        args = [get_minarca_exe(), 'backup']
+        args = [get_minarca_exe(), action]
         if force:
             args += ['--force']
+        if patterns:
+            assert action == 'restore'
+            args += [p.pattern for p in patterns]
         creationflags = (
             subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
             if IS_WINDOWS
             else 0
         )
-        subprocess.Popen(
+        child = subprocess.Popen(
             args,
             stdin=None,
             stdout=subprocess.DEVNULL,
@@ -188,6 +192,7 @@ class Backup:
             close_fds=True,
             creationflags=creationflags,
         )
+        logger.info('subprocess %s started' % child.pid)
 
     def backup(self, force=False, force_patterns=None):
         """
