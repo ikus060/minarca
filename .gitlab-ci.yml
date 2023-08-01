@@ -53,12 +53,12 @@ bdist-server:deb:
       DIST: [buster, bullseye, bookworm]
   script:
   - apt update
-  - apt -y --no-install-recommends install devscripts python3 python3-setuptools python3-setuptools-scm
+  - apt -y --no-install-recommends install devscripts
   - cd $TARGET
+  - apt build-dep -y .
   - export VERSION=$(python3 setup.py --version)
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
   - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
-  - apt build-dep -y .
   - dpkg-buildpackage -b
   - mkdir -p "./dist/$DIST/"
   - mv ../*.deb "./dist/$DIST/"
