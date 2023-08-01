@@ -53,7 +53,7 @@ bdist-server:deb:
       DIST: [buster, bullseye, bookworm]
   script:
   - apt update
-  - apt -y --no-install-recommends install devscripts python3 python3-setuptools-scm
+  - apt -y --no-install-recommends install devscripts python3 python3-setuptools python3-setuptools-scm
   - cd $TARGET
   - export VERSION=$(python3 setup.py --version)
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
