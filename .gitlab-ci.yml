@@ -55,7 +55,7 @@ bdist-server:deb:
   - apt update
   - apt -y --no-install-recommends install devscripts python3
   - cd $TARGET
-  - export VERSION=$(curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
+  - export VERSION=$(python3 setup.py --version)
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
   - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
   - apt build-dep -y .
