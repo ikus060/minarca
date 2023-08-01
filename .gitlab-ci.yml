@@ -53,12 +53,14 @@ bdist-server:deb:
       DIST: [buster, bullseye, bookworm]
   script:
   - apt update
-  - apt -y --no-install-recommends install devscripts python3
+  - apt -y --no-install-recommends install devscripts lsb-release
   - cd $TARGET
-  - export VERSION=$(curl -L https://gitlab.com/ikus-soft/maven-scm-version/-/raw/master/version.sh 2>/dev/null | bash -s DEB)
+  - apt build-dep -y .
+  - export DEB_VERSION=$(lsb_release -rs)
+  - export APP_VERSION=$(python3 setup.py --version)
+  - export VERSION=${APP_VERSION}+deb${DEB_VERSION}
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
   - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
-  - apt build-dep -y .
   - dpkg-buildpackage -b
   - mkdir -p "./dist/$DIST/"
   - mv ../*.deb "./dist/$DIST/"
@@ -285,7 +287,7 @@ deploy:dev:
   - upload:deb
   image: registry.gitlab.com/finestructure/pipeline-trigger
   script:
-    - export DEB_VERSION=$(ls -1 minarca-server/dist/buster/minarca-server_*_amd64.deb | cut -d '_' -f 2)
+    - export DEB_VERSION=$(ls -1 minarca-server/dist/bookworm/minarca-server_*_amd64.deb | cut -d '_' -f 2)
     - echo DEB_VERSION=$DEB_VERSION
     # Trigger ansible-config pipeline
     - trigger -a "$ANSIBLE_PIPELINE_GITLAB_API_TOKEN" -t master -e "MINARCA_VERSION=$DEB_VERSION" -p 36bae86778d901fc6b2d6453a41844 18716492

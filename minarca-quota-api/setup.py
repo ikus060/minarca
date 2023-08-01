@@ -20,7 +20,7 @@ setuptools.setup(
     include_package_data=True,
     python_requires=">=3.5",
     setup_requires=[
-        "setuptools_scm>=5.0.1",
+        "setuptools_scm>=3.2",
     ],
     install_requires=["cherrypy", "ConfigArgParse"],
     # requirement for testing
