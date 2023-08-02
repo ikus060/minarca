@@ -287,7 +287,7 @@ deploy:dev:
   - upload:deb
   image: registry.gitlab.com/finestructure/pipeline-trigger
   script:
-    - export DEB_VERSION=$(ls -1 minarca-server/dist/buster/minarca-server_*_amd64.deb | cut -d '_' -f 2)
+    - export DEB_VERSION=$(ls -1 minarca-server/dist/bookworm/minarca-server_*_amd64.deb | cut -d '_' -f 2)
     - echo DEB_VERSION=$DEB_VERSION
     # Trigger ansible-config pipeline
     - trigger -a "$ANSIBLE_PIPELINE_GITLAB_API_TOKEN" -t master -e "MINARCA_VERSION=$DEB_VERSION" -p 36bae86778d901fc6b2d6453a41844 18716492
