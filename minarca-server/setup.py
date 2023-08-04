@@ -24,10 +24,10 @@ setuptools.setup(
     python_requires=">=3.5",
     packages=["minarca_server", "minarca_server.plugins", "minarca_server.core"],
     setup_requires=[
-        "setuptools_scm>=5.0.1",
+        "setuptools_scm>=3.2",
     ],
     install_requires=[
-        "rdiffweb==2.8.0a9",
+        "rdiffweb==2.8.1",
         "cherrypy>=18.0.0",
         "requests",
         "tzlocal~=2.0",

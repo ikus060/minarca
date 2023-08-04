@@ -37,9 +37,24 @@ Then start a backup in few minutes by installing minarca client for [Linux/Debia
 
 ## Download & Install
 
+[Minarca Agent Installation steps](https://www.ikus-soft.com/archive/minarca/doc/minarca-client.html#installation)
+
 [Minarca Server Installation steps](https://www.ikus-soft.com/archive/minarca/doc/installation.html)
 
-[Minarca Agent Installation steps](https://www.ikus-soft.com/archive/minarca/doc/minarca-client.html#installation)
+## Pre-releases
+
+We provide the ability to easily test future versions without having to compiling from source.
+
+**Minarca Agent** can be downloaded from our archive: <https://www.ikus-soft.com/archive/minarca/>
+
+**Minarca Server** can be install using our APT Dev repository:
+
+```sh
+curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-dev-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
+apt update
+apt install minarca-server
+```
 
 ## Newsletter
 
@@ -92,10 +107,11 @@ The Minarca website is <https://minarca.org/>.
 
 ## Next Release
 
-* Upgrade rdiffweb to version 2.8.0
+* Upgrade rdiffweb to version 2.8.1
 * Replace URL used for latest version check to avoid redirection
 * Log original SSH Command on server side for improved visibility
 * Use rdiff-backup v2.2.5 in minarca-client #194
+* Keep backward compatibility with previous rdiff-backup version
 * Use new rdiff-backup command line format to avoid WARNING in logs
 * Apply additional patch to rdiff-backup for better windows support
 * Add support for version 1.2.8, 2.0.x and 2.2.x #194
@@ -103,6 +119,9 @@ The Minarca website is <https://minarca.org/>.
 * Improve error handling arround rdiff-backup execution #203
 * Improve error reporting in user interface
 * Add missing `libxcb1` dependencies
+* Add command line and graphical interface for full restore #213
+* Inhebit should be working on Linux, Macos and Windows to prevent computer going to sleep during backup
+* Allow user to pause backup for 24 hours to prevent backup execution, useful when you are in a remote location with slow bandwidth
 
 ## 4.5.2 (2023-07-05)
 
