@@ -20,6 +20,8 @@ These minimum requirements are solely for evaluation and shall not be used in a 
   * Debian Bookworm
   * Ubuntu Jammy 22.04 LTS
   * Ubuntu Kinetic 22.10
+  * Ubuntu Lunar 23.04
+  * Ubuntu Mantic 23.10
 * Cpu: 64bit x86-64 or amd64, 4 core
 * Memory: minimum 4 GiB
 * Storage: consider the storage according to your backup needs. A couple of terabytes should be considered for the long term. Ideally, you should consider hardware or ZFS raid for your storage. If you plan to support user quota, make sure that your file system supports it. E.g. ext4 and ZFS. Other file systems might not be well supported.
