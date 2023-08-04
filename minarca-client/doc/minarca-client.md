@@ -14,6 +14,8 @@ restriction. You are limited to the following operating system.
   * Debian Bookworm (64bit)
   * Ubuntu Jammy (64bit)
   * Ubuntu Kinetic (64bit)
+  * Ubuntu Lunar (64bit)
+  * Ubuntu Mantic (64bit)
   * Linux (64bit)
 
 ## Installation Steps
@@ -54,6 +56,10 @@ On a Ubuntu or Debian workstation, download the appropriate installer.
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-jammy-latest.deb"><img alt="Minarca Client for Ubuntu Jammy" src="https://img.shields.io/badge/Ubuntu-Jammy-blue?&logo=ubuntu&style=for-the-badge"></a>
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-kinetic-latest.deb"><img alt="Minarca Client for Ubuntu Kinetic" src="https://img.shields.io/badge/Ubuntu-Kinetic-blue?&logo=ubuntu&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-lunar-latest.deb"><img alt="Minarca Client for Ubuntu Lunar" src="https://img.shields.io/badge/Ubuntu-Lunar-blue?&logo=ubuntu&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-mantic-latest.deb"><img alt="Minarca Client for Ubuntu Mantic" src="https://img.shields.io/badge/Ubuntu-Mantic-blue?&logo=ubuntu&style=for-the-badge"></a>
 
 *Debian*
 
