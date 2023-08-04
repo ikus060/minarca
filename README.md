@@ -122,6 +122,7 @@ The Minarca website is <https://minarca.org/>.
 * Add command line and graphical interface for full restore #213
 * Inhebit should be working on Linux, Macos and Windows to prevent computer going to sleep during backup
 * Allow user to pause backup for 24 hours to prevent backup execution, useful when you are in a remote location with slow bandwidth
+* Add support for Ubuntu Lunar, Ubuntu Mantic
 
 ## 4.5.2 (2023-07-05)
 
