@@ -1,4 +1,4 @@
-# Minarca Server Installation
+# Server Installation
 
 ## System requirements
 

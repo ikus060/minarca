@@ -1,4 +1,4 @@
-# Minarca Client Installation
+# Client Installation
 
 ## System requirements
 
