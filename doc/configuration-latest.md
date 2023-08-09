@@ -1,4 +1,4 @@
-# Minarca Server Version Check
+# Server Version Check
 
 The Minarca Version Check feature is designed to automatically check for
 the latest version of Minarca and notify the administrator via email if
