@@ -91,6 +91,28 @@ bdist-client:linux:
   - tox -e pyinstaller
   stage: bdist
 
+bdist-client:linux:arm64:
+  artifacts:
+    paths:
+    - "minarca-client/dist/minarca-client_*.tar.gz"
+    - "minarca-client/dist/minarca-client_*.deb"
+    - "./*/coverage.xml"
+    - "./*/xunit.xml"
+    expire_in: 1 day
+  before_script:
+  - apt update
+  - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron
+  - pip3 install tox
+  image: python:3.7-buster
+  needs: []
+  tags:
+  - arm64
+  script:
+  - cd minarca-client
+  - tox
+  - tox -e pyinstaller
+  stage: bdist
+
 bdist-client:macos:
   artifacts:
     paths:
