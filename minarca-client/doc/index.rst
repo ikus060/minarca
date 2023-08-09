@@ -15,6 +15,7 @@ This comprehensive resource is designed to assist service providers in harnessin
    introduction
    installation
    minarca-client
+   minarca-client-cli
    configuration
    settings
    faq
