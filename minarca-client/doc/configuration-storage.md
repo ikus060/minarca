@@ -1,4 +1,4 @@
-# Minarca Storage
+# Storage
 
 This documentation provides details on how to configure the storage settings for Minarca, a backup solution. Properly configuring the storage location and directory structure is essential to ensure efficient and reliable backup operations.
 
