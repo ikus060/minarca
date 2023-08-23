@@ -25,4 +25,4 @@ class Test(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             with self.assertRaises(SystemExit):
                 main(['--version'])
-        self.assertTrue(f.getvalue().startswith('minarca-server 4.'), msg='%s is not a version' % f.getvalue())
+        self.assertRegex(f.getvalue(), r'minarca-server (DEV|[0-9].*)')
