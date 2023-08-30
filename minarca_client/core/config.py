@@ -313,9 +313,14 @@ class Patterns(list):
                     elif p.is_wildcard() and not p.include:
                         sublist.append(Pattern(p.include, '**/' + pattern, None))
                 # Then sort include / exclude from most precise to least precise
-                # absolute path first, then longuer path, then exclude value
+                # absolute path first, then longuer path, then exclude value.
                 sublist = sorted(
                     sublist,
-                    key=lambda p: (p.pattern.startswith('**'), -len(p.pattern.split('/')), p.include, p.pattern),
+                    key=lambda p: (
+                        not p.pattern.startswith('**'),  # exclude wildcard pattern, should be first.
+                        -len(p.pattern.split('/')),  # Longuer path define before shorter path.
+                        p.include,  # Exclude define before includes
+                        p.pattern,
+                    ),
                 )
                 yield (prefix, sublist)

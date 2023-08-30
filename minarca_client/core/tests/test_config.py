@@ -113,12 +113,12 @@ class PatternsTest(unittest.TestCase):
                 (
                     '/',
                     [
+                        Pattern(False, '**/*.bak', None),
+                        Pattern(False, '**/*.tmp', None),
                         Pattern(False, '/srv/jellyfin/config/transcodes', None),
                         Pattern(False, '/home/*.tmp', None),
                         Pattern(True, '/home/', None),
                         Pattern(True, '/srv/', None),
-                        Pattern(False, '**/*.bak', None),
-                        Pattern(False, '**/*.tmp', None),
                     ],
                 )
             ],
@@ -143,20 +143,20 @@ class PatternsTest(unittest.TestCase):
                 (
                     'C:/',
                     [
-                        Pattern(True, 'C:/bar', None),
-                        Pattern(True, 'C:/foo', None),
                         Pattern(False, '**/$~*', None),
                         Pattern(False, '**/*.bak', None),
                         Pattern(False, '**/*.tmp', None),
+                        Pattern(True, 'C:/bar', None),
+                        Pattern(True, 'C:/foo', None),
                     ],
                 ),
                 (
                     'D:/',
                     [
-                        Pattern(True, 'D:/bar', None),
                         Pattern(False, '**/$~*', None),
                         Pattern(False, '**/*.bak', None),
                         Pattern(False, '**/*.tmp', None),
+                        Pattern(True, 'D:/bar', None),
                     ],
                 ),
             ],
@@ -180,10 +180,10 @@ class PatternsTest(unittest.TestCase):
                 (
                     'C:/',
                     [
-                        Pattern(True, 'C:/bar', None),
-                        Pattern(True, 'C:/foo', None),
                         Pattern(False, '**/$~*', None),
                         Pattern(False, '**/*.bak', None),
+                        Pattern(True, 'C:/bar', None),
+                        Pattern(True, 'C:/foo', None),
                     ],
                 ),
             ],
