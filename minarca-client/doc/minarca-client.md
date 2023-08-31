@@ -6,7 +6,9 @@ Minarca client could be installed on almost any hardware without
 restriction. You are limited to the following operating system.
 
 * Supported Operating System:
+  * Windows 7 (64bits) - best effort support
   * Windows 10 (64bit)
+  * Windows 11 (64 bits)
   * MacOS Catalina (Intel)
   * MacOS BigSur (Intel)
   * Debian Buster (64bit)
@@ -29,6 +31,8 @@ On a Windows workstation, download the appropriate installer.
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca-blue?&logo=windows&style=for-the-badge"></a>
 
 Then launch the execution of the installer and follow the instructions.
+
+**Windows7**: Your installation must be up-to-date or manually install [VC 2015 Redistributable](https://www.microsoft.com/en-US/download/details.aspx?id=48145).
 
 ## Installation on MacOS
 
