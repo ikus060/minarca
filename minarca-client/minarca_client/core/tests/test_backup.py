@@ -453,6 +453,7 @@ class TestBackup(unittest.TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding='utf-8',
+            errors='replace',
         )
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
@@ -503,6 +504,7 @@ class TestBackup(unittest.TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding='utf-8',
+            errors='replace',
         )
 
     def test_rdiff_backup_threading(self):
@@ -663,6 +665,7 @@ class TestBackup(unittest.TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding='utf-8',
+            errors='replace',
         )
 
     def test_unlink(self):

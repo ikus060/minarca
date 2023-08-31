@@ -506,6 +506,7 @@ class Backup:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 encoding='utf-8',
+                errors='replace',
             )
             # stream the output of rdiff-backup.
             for line in p.stdout:
