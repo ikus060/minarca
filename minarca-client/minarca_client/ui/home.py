@@ -21,7 +21,6 @@ class HomeDialog(tkvue.Component):
         )
         self.backup = Backup()
         super().__init__(*args, **kwargs)
-        self.root.tk.eval('tk::PlaceWindow %s center' % (self.root))
 
     def set_active_view(self, name):
         assert name in ['home', 'patterns', 'schedule', 'settings']

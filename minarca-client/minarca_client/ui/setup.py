@@ -61,7 +61,6 @@ class SetupDialog(tkvue.Component):
             }
         )
         super().__init__(master=master)
-        self.root.tk.eval('tk::PlaceWindow %s center' % (self.root))
 
     def link(self, force=False):
         self.get_event_loop().create_task(self._link_task(force=force))
