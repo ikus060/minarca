@@ -124,6 +124,7 @@ The Minarca website is <https://minarca.org/>.
 * Allow user to pause backup for 24 hours to prevent backup execution, useful when you are in a remote location with slow bandwidth
 * Add support for Ubuntu Lunar, Ubuntu Mantic
 * Fix include/exclude pattern ordering to support exclusion with wildcard e.g.: `**/Backuo of*`
+* Remove Ubuntu Kinetic support (22.10)
 
 ## 4.5.2 (2023-07-05)
 
