@@ -27,6 +27,19 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 * Storage: consider the storage according to your backup needs. A couple of terabytes should be considered for the long term. Ideally, you should consider hardware or ZFS raid for your storage. If you plan to support user quota, make sure that your file system supports it. E.g. ext4 and ZFS. Other file systems might not be well supported.
 * Temporary storage: Rdiffweb requires a temporary storage location that is used during the restoration process. This location should be greater than 8gb. This temporary storage will be closer to the web application. Ideally, it should be in ram using tmpfs.
 
+### Compatibility Matrix
+
+Here's a compatibility matrix for Minarca Server and Minarca Agent:
+
+| Agent                      | v5.x | v4.5 - v4.3 | v4.2 - v4.0 | v3.x |
+| -------------------------- | ---- | ----------- | ----------- | ---- |
+| Minarca Server v5.*        | ✓    | ✓           | ✓ (1)       | ✓ (1)|
+| Minarca Server v4.5 - v4.3 |      | ✓           | ✓ (1)       | ✓ (1)|
+| Minarca Server v4.2 - v4.0 |      | ✓ (1)       | ✓ (1)       | ✓ (1)|
+| Minarca Server v3.*        |      |             |             | ✓    |
+
+1. Supported if the agent is already configured.
+
 ## Installation Steps
 
 On a Debian Linux server:
