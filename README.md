@@ -107,7 +107,7 @@ The Minarca website is <https://minarca.org/>.
 
 ## Next Release
 
-* Upgrade rdiffweb to version 2.8.1
+* Upgrade rdiffweb to version 2.8.5
 * Replace URL used for latest version check to avoid redirection
 * Log original SSH Command on server side for improved visibility
 * Use rdiff-backup v2.2.6 in minarca-client #194
