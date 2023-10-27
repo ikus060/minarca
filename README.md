@@ -107,6 +107,10 @@ The Minarca website is <https://minarca.org/>.
 
 ## Next Release
 
+* Add support for Debian Trixie
+
+## 5.0.0 (2023-10-10)
+
 * Upgrade rdiffweb to version 2.8.5
 * Replace URL used for latest version check to avoid redirection
 * Log original SSH Command on server side for improved visibility
