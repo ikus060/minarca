@@ -89,6 +89,12 @@ We welcome all contributions to the project and appreciate any help you can prov
 
 Professional support for Minarca Data Backup is available by [contacting IKUS Soft](https://minarca.org/contactus).
 
+## Support Us Through Github Sponsorship
+
+We are passionate about developing and maintaining this open-source project to make it better with each update. Your support can help us continue our efforts and enhance the project for the entire community. By becoming a Github Sponsor, you directly contribute to the project's sustainability and growth.
+
+[Becoming a Sponsor](https://github.com/sponsors/ikus060)
+
 # About Minarca
 
 Minarca Server is written in Python and is released as open source project under the
