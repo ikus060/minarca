@@ -27,7 +27,7 @@ Minarca is a **free and open-source** backup software providing end-to-end integ
 
 **Minarca client** may be used to simplify the integration of new computers running **Windows or Linux Debian**. It's user interface and command line interface allow simple usage for **desktop users or headless servers**. Minarca also keep interoperability with legacy installation of [rdiff-backup](https://rdiff-backup.net/).
 
-Based on [rdiffweb](https://www.ikus-soft.com/en/rdiffweb/), **Minarca Server** may be used to browse, **restore your data easily** with a convenient web interface accessible from everywhere.
+Based on [rdiffweb](https://rdiffweb.org/), **Minarca Server** may be used to browse, **restore your data easily** with a convenient web interface accessible from everywhere.
 
 ## Getting started
 
@@ -112,6 +112,10 @@ The Minarca website is <https://minarca.org/>.
 # Changelog
 
 ## Next Release
+
+* Fix broken link to <https://www.ikus-soft.com> in documentation
+
+## 5.0.0 (2023-10-10)
 
 * Upgrade rdiffweb to version 2.8.5
 * Replace URL used for latest version check to avoid redirection
@@ -407,7 +411,7 @@ This new version include a new Minarca client with better integration with the o
 
 ## v3.9.0 (2021-05-17)
 
-This new version include alot of changes from Rdiffweb release (<https://www.ikus-soft.com/en/blog/2021-05-11-rdiffweb-v220/>)
+This new version include alot of changes from Rdiffweb release (<https://rdiffweb.org/blog/rdiffweb-s-blog-6/ready-for-bigger-deployment-10>)
 
 * Server: Upgrade to Rdiffweb v2.2.0
   * Use ConfigArgPare for configuration to support configuration file, environment variables and arguments to configure rdiffweb (rdiffweb#114)
@@ -670,5 +674,5 @@ Little bug fixes following the previous release.
 
 # Related projects
 
-* [rdiffweb](https://www.ikus-soft.com/en/rdiffweb/): web interface
+* [rdiffweb](https://rdiffweb.org/): web interface
 * [rdiff-backup](https://rdiff-backup.net/): core engine used to run the backup
