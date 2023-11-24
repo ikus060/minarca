@@ -59,4 +59,4 @@ If you encounter a problem, you should start by asking to be added to the mailin
 
 If you need professional support or custom development, you should contact Ikus Software directly.
 
-[IKUS Soft Support Form](https://www.ikus-soft.com/en/support/#form)
+[Support Form](https://minarca.org/contactus)

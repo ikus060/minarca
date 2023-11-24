@@ -49,7 +49,7 @@ class MinarcaPlugin(SimplePlugin):
     remote_host = None
     remote_host_identity = '/etc/ssh'
     restricted_to_base_dir = True
-    help_url = 'https://www.ikus-soft.com/en/support/#form'
+    help_url = 'https://minarca.org/contactus'
     quota_api_url = None
 
     @property
