@@ -111,9 +111,11 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Release
+## 5.0.1
 
 * Fix broken link to <https://www.ikus-soft.com> in documentation
+* Add German translation - credit to [Michael Nitzsche](https://github.com/einzelfabrik)
+* Upgrade rdiffweb to version 2.8.6
 
 ## 5.0.0 (2023-10-10)
 

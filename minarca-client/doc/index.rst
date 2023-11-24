@@ -18,5 +18,6 @@ This comprehensive resource is designed to assist service providers in harnessin
    minarca-client-cli
    configuration
    settings
+   hardening
    faq
    development
