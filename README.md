@@ -111,7 +111,14 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## 5.0.1
+## 5.0.2 (2024-01-08)
+
+* Upgrade rdiffweb to version 2.8.8
+  * Fix usage of `session-idle-timeout` in config file
+  * Adjust the session idle and absolute timeouts to 10 and 30 minutes, respectively.
+  * Fix date calculation when generating report in January 
+
+## 5.0.1 (2023-11-24)
 
 * Fix broken link to <https://www.ikus-soft.com> in documentation
 * Add German translation - credit to [Michael Nitzsche](https://github.com/einzelfabrik)
