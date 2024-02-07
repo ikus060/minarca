@@ -111,6 +111,11 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## Next Release
+
+* Upgrade rdiffweb version v2.9.0
+* Support `$minarcaid$` authentication for Minarca Agent.
+
 ## 5.0.2 (2024-01-08)
 
 * Upgrade rdiffweb to version 2.8.8
