@@ -17,9 +17,8 @@ from unittest.mock import MagicMock
 from urllib.parse import urlencode
 
 import cherrypy
-from cherrypy.test import helper
-
 import minarca_quota_api
+from cherrypy.test import helper
 from minarca_quota_api.zfs_quota import ZFSQuotaException
 
 

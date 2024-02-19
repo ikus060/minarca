@@ -6,6 +6,7 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+import asyncio
 import datetime
 import os
 import pathlib
@@ -25,6 +26,11 @@ IS_WINDOWS = os.name == 'nt'
 IS_LINUX = sys.platform in ['linux', 'linux2']
 IS_MAC = sys.platform == 'darwin'
 HAS_DISPLAY = os.environ.get('DISPLAY', None) or IS_WINDOWS or IS_MAC
+
+if IS_WINDOWS:
+    import wmi
+
+    c = wmi.WMI()
 
 
 def makedirs(func, mode=0o750):
@@ -55,7 +61,7 @@ def get_is_admin():
 IS_ADMIN = get_is_admin()
 
 
-def get_default_repository_name():
+def get_default_repositoryname():
     """
     Return a default value for the repository name.
     """
@@ -237,6 +243,69 @@ def ssh_keygen(public_key, private_key, length=2048):
     shutil.move(os.path.join(tmp.name, 'id_rsa'), private_key)
     shutil.move(os.path.join(tmp.name, 'id_rsa.pub'), public_key)
     tmp.cleanup()
+
+
+def detach_call(args):
+    """
+    Create a subprogress in detached mode.
+    """
+    creationflags = (
+        subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
+        if IS_WINDOWS
+        else 0
+    )
+    return subprocess.Popen(
+        args,
+        stdin=None,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        close_fds=True,
+        creationflags=creationflags,
+    )
+
+
+def file_read(fn, default=None, maxsize=4096):
+    try:
+        with open(fn, 'r') as f:
+            return f.read(maxsize).strip()
+    except OSError:
+        # Silently ignore any os error
+        return default
+
+
+def file_stat(self):
+    try:
+        return os.stat(self._fn)
+    except FileNotFoundError:
+        # Silently ignore error if file doesn't exists
+        return None
+
+
+async def watch_file(filename, poll_delay=0.25, timeout=None):
+    """
+    Return changes whenever the file get updated.
+    """
+    assert 0 < poll_delay
+    assert timeout is None or poll_delay < timeout
+    remaining_time = timeout or 1
+    prev_stat = file_stat(filename)
+    while 0 < remaining_time:
+        await asyncio.sleep(poll_delay)
+        if timeout:
+            remaining_time = timeout - poll_delay
+        new_stat = file_stat(filename)
+        if prev_stat != new_stat:
+            yield "changed"
+        prev_stat = new_stat
+
+
+def filebrowser_open(path):
+    if IS_WINDOWS:
+        os.startfile(path)
+    elif IS_MAC:
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
 
 
 class RobustRotatingFileHandler(RotatingFileHandler):

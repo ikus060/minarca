@@ -24,7 +24,7 @@ setuptools.setup(
     python_requires=">=3.5",
     packages=["minarca_server", "minarca_server.plugins", "minarca_server.core", "minarca_server.controller"],
     setup_requires=[
-        "setuptools_scm>=3.2",
+        "setuptools_scm>=3.2,<8",
     ],
     install_requires=[
         "rdiffweb==2.8.9.dev3+g78db124",

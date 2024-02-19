@@ -20,11 +20,10 @@ import tempfile
 import unittest
 from unittest import mock
 
-from parameterized import parameterized
-from tzlocal import get_localzone
-
 from minarca_server import shell
 from minarca_server.shell import Jail
+from parameterized import parameterized
+from tzlocal import get_localzone
 
 USERNAME = 'joe'
 USERROOT = tempfile.gettempdir() + '/backups/joe'

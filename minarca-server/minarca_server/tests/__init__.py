@@ -20,7 +20,6 @@ import unittest
 
 import rdiffweb
 import rdiffweb.test
-
 from minarca_server.app import MinarcaApplication
 
 

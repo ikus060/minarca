@@ -1,0 +1,65 @@
+<Frame pack-fill="both" style="default.TFrame" columnconfigure-weight="1" rowconfigure-weight="0 1 0">
+    <!-- Title -->
+    <Label text="Add a backup" style="h1.dark.default.TLabel" grid-column="0" grid-row="0" grid-sticky="nw"/>
+
+    <!-- Step1 -->
+    <Frame style="default.TFrame" grid-column="0" grid-row="1" visible="{{ step==1 }}" grid-sticky="nsew">
+        <Label text="Select the type of backup you wish to add." style="dark.default.TLabel" pack-side="top" pack-fill="x" pack-pady="0 15"/>
+
+        <Button text="Remote backup" command="set_remote" style="{{ 'dark.TButton' if is_remote else 'light.TButton' }}" pack-side="left" pack-fill="both" pack-expand="1" pack-padx="0 10"/>
+
+        <Button text="Local backup" command="set_local" style="{{ 'dark.TButton' if is_local else 'light.TButton' }}" pack-side="right" pack-fill="both" pack-expand="1" pack-padx="10 0"/>
+
+    </Frame>
+
+    <!-- Step2 Remote -->
+    <Frame style="default.TFrame" grid-column="0" grid-row="1" visible="{{ step==2 and is_remote }}" grid-sticky="nsew">
+        <!--Remote -->
+        <Label text="Remote Minarca server" style="strong.dark.default.TLabel" pack-fill="x" pack-pady="0 5"/>
+        <Entry textvariable="{{remoteurl}}" pack-fill="x" 
+            state="{{'disabled' if linking else '!disabled'}}"/>
+        <Label text="e.g.: https://www.servername.com" style="small.dark.default.TLabel" pack-fill="x" pack-pady="0 10"/>
+
+        <!-- Username -->
+        <Label text="Username" style="strong.dark.default.TLabel" pack-fill="x" pack-pady="0 5"/>
+        <Entry textvariable="{{username}}" pack-fill="x" pack-pady="0 10"
+            state="{{'disabled' if linking else '!disabled'}}" />
+
+        <!-- Password -->
+        <Label text="Password" style="strong.dark.default.TLabel" pack-fill="x" pack-pady="0 5" />
+        <Entry textvariable="{{password}}" show="•" pack-fill="x"
+            state="{{'disabled' if linking else '!disabled'}}" />
+        <Label text="If two-factor authentication is enabled on your account, use an Access Token."
+            style="small.dark.default.TLabel" pack-fill="x" pack-pady="0 10"/>
+
+        <!--Repository name-->
+        <Label text="Repository name" style="strong.dark.default.TLabel" pack-fill="x" pack-pady="0 5" />
+        <Entry textvariable="{{repository_name}}" pack-fill="x" pack-pady="0 10"
+            state="{{'disabled' if linking else '!disabled'}}" />
+    </Frame>
+
+    <!-- Step2 Local -->
+    <Frame style="default.TFrame" grid-column="0" grid-row="1" visible="{{ step==2 and is_local }}" grid-sticky="nsew" columnconfigure-weight="1 0 0" rowconfigure-weight="0 1 0">
+
+        <Label text="Select an external hard disk to be used for backing up your data" style="dark.default.TLabel" grid-column="0" grid-row="0" grid-sticky="ew"/>
+        <Button text="Refresh" command="refresh_removable_disks" style="secondary.TButton" grid-column="1" grid-row="0" grid-sticky="e" />
+        <Button text="Browse" command="select_custom_disk()" style="secondary.TButton" grid-column="2" grid-row="0" grid-sticky="e"/>
+
+        <ScrolledFrame id="scrolled_frame" style="default.TFrame" grid-column="0" grid-row="1" grid-pady="5 0"  grid-sticky="nsew" grid-columnspan="3">
+            <Button for="disk in removable_disks" text="{{disk.caption}}" command="set_disk(disk)" style="{{ 'dark.TButton' if selected_disk==disk else 'light.TButton' }}" pack-fill="x" />
+            <Label text="No external disk detected is suitable for data backup." style="default.TLabel" visible="{{ not removable_disks and not removable_disks_loading }}" pack-fill="x" />
+            <Label text="Loading..." style="default.TLabel" visible="{{removable_disks_loading}}" pack-fill="x" />
+        </ScrolledFrame>
+
+        <Label text="{{ warning_message }}" visible="{{ warning_message }}" style="warning.default.TLabel" grid-column="0" grid-row="2" grid-columnspan="3" wrap="1"/>
+
+    </Frame>
+
+    <!-- Button -->
+    <Frame style="default.TFrame" grid-column="0" grid-row="2" grid-sticky="se" grid-pady="15 0" columnconfigure-weight="1 0 0">
+        <Button text="Next" command="go_next" style="success.TButton" state="{{'disabled' if not valid or linking else '!disabled'}}" cursor="hand2" visible="{{step==1}}" grid-column="1" grid-row="0" />
+        <Button text="Create" command="create" style="success.TButton" state="{{'disabled' if not valid or linking else '!disabled'}}" cursor="hand2" visible="{{step==2}}" grid-column="1" grid-row="0" />
+        <Button text="Cancel" command="cancel" style="dark.TButton" cursor="hand2" grid-column="2" grid-row="0" grid-padx="15 0" />
+    </Frame>
+
+</Frame>

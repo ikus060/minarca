@@ -40,9 +40,9 @@ class PatternsTest(unittest.TestCase):
 
     def test_defaults(self):
         patterns = Patterns('patterns')
-        self.assertEqual([], patterns)
-        patterns.defaults()
-        self.assertNotEqual([], patterns)
+        self.assertEqual(0, len(patterns))
+        data = patterns.defaults()
+        self.assertNotEqual(0, len(data))
 
     def test_load(self):
         with open('patterns', 'w') as f:
@@ -91,6 +91,25 @@ class PatternsTest(unittest.TestCase):
         patterns.append(Pattern(True, '*.bak', 'AutoCAD Backup file'))
         patterns.append(Pattern(True, '$~*', 'Office Temporary files'))
         patterns.save()
+        with open('patterns', 'r') as f:
+            data = f.read()
+        self.assertEqual("# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
+
+    def test_transaction(self):
+        # Given a pattern file
+        with open('patterns', 'w') as f:
+            f.write("")
+        patterns = Patterns('patterns')
+        # When starting a transaction
+        with patterns as t:
+            t.append(Pattern(True, '*.bak', 'AutoCAD Backup file'))
+            t.append(Pattern(True, '$~*', 'Office Temporary files'))
+
+            # Then changes are not saved to file.
+            with open('patterns', 'r') as f:
+                data = f.read()
+            self.assertEqual("", data)
+        # Then after transaction, changes are saved.
         with open('patterns', 'r') as f:
             data = f.read()
         self.assertEqual("# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
@@ -203,12 +222,12 @@ class SettingsTest(unittest.TestCase):
 
     def test_load_without_file(self):
         config = Settings('test.properties')
-        self.assertEqual(None, config['username'])
-        self.assertEqual(None, config['repositoryname'])
-        self.assertEqual(False, config['configured'])
-        self.assertEqual(24, config['schedule'])
+        self.assertEqual(None, config.username)
+        self.assertEqual(None, config.repositoryname)
+        self.assertEqual(False, config.configured)
+        self.assertEqual(24, config.schedule)
         # Validate default value
-        self.assertEqual(True, config['check_latest_version'])
+        self.assertEqual(True, config.check_latest_version)
 
     def test_load_without_check_latest_version(self):
         with open('test.properties', 'w') as f:
@@ -217,12 +236,12 @@ class SettingsTest(unittest.TestCase):
             f.write("configured=true\n")
             f.write("schedule=24\n")
         config = Settings('test.properties')
-        self.assertEqual('foo', config['username'])
-        self.assertEqual('bar', config['repositoryname'])
-        self.assertEqual(True, config['configured'])
-        self.assertEqual(24, config['schedule'])
+        self.assertEqual('foo', config.username)
+        self.assertEqual('bar', config.repositoryname)
+        self.assertEqual(True, config.configured)
+        self.assertEqual(24, config.schedule)
         # Validate default value
-        self.assertEqual(True, config['check_latest_version'])
+        self.assertEqual(True, config.check_latest_version)
 
     def test_load_with_check_latest_version(self):
         with open('test.properties', 'w') as f:
@@ -232,36 +251,78 @@ class SettingsTest(unittest.TestCase):
             f.write("schedule=24\n")
             f.write("check_latest_version=False")
         config = Settings('test.properties')
-        self.assertEqual(False, config['check_latest_version'])
+        self.assertEqual(False, config.check_latest_version)
 
     def test_configured(self):
         for text in ['true', 'True', '1']:
             with open('test.properties', 'w') as f:
                 f.write("configured=%s\n" % text)
             config = Settings('test.properties')
-            self.assertEqual(True, config['configured'])
+            self.assertEqual(True, config.configured)
 
         for text in ['False', 'false', '0']:
             with open('test.properties', 'w') as f:
                 f.write("configured=%s\n" % text)
             config = Settings('test.properties')
-            self.assertEqual(False, config['configured'])
-
-    def test_load_with_missing_file(self):
-        config = Settings('invalid.properties')
-        self.assertEqual(Settings._DEFAULT, config)
+            self.assertEqual(False, config.configured)
 
     def test_save(self):
         with open('test.properties', 'w') as f:
             f.write("\n")
         config = Settings('test.properties')
-        config['username'] = 'foo'
-        config['repositoryname'] = 'bar'
+        config.username = 'foo'
+        config.repositoryname = 'bar'
         config.save()
         with open('test.properties', 'r') as f:
             data = f.read()
         self.assertTrue("username=foo" in data)
         self.assertTrue("repositoryname=bar" in data)
+
+    def test_transaction(self):
+        # Given a config file
+        with open('test.properties', 'w') as f:
+            f.write("\n")
+        config = Settings('test.properties')
+        # When starting a transaction
+        with config as c:
+            c.username = 'foo'
+            c.repositoryname = 'bar'
+            # Then within transaction, changes are not saved
+            with open('test.properties', 'r') as f:
+                data = f.read()
+            self.assertEqual('\n', data)
+        # Then after transaction, changes are saved
+        with open('test.properties', 'r') as f:
+            data = f.read()
+        self.assertTrue("username=foo" in data)
+        self.assertTrue("repositoryname=bar" in data)
+
+    def test_set_value_invalid(self):
+        # Given a config file
+        config = Settings('test.properties')
+        # When trying to set an invalid value type
+        # Then an exception is raised
+        with self.assertRaises(ValueError):
+            config.schedule = 'invalid'
+        # When trying to set the wrong type
+        config.schedule = '4321'
+        # Then value is coerse
+        self.assertEqual(4321, config.schedule)
+
+    def test_pause_until(self):
+        # Given an empty status file
+        config = Settings('test.properties')
+        # Then pause_until is None
+        self.assertIsNone(config.pause_until)
+        # When setting value
+        now = Datetime()
+        config.pause_until = now
+        # Then value get updated
+        self.assertEqual(now, config.pause_until)
+        # When pause_until is set to None
+        config.pause_until = None
+        # Then value is None
+        self.assertIsNone(config.pause_until)
 
 
 class StatusTest(unittest.TestCase):
@@ -274,6 +335,16 @@ class StatusTest(unittest.TestCase):
         os.chdir(self.cwd)
         self.tmp.cleanup()
 
+    def test_load_without_file(self):
+        # Given an invalid invalid.
+        status = Status('invalid.properties')
+        # Then default value are used
+        self.assertEqual(None, status.details)
+        self.assertEqual(None, status.lastdate)
+        self.assertEqual('UNKNOWN', status.lastresult)
+        self.assertEqual(None, status.pid)
+        self.assertEqual(None, status.action)
+
     def test_load(self):
         with open('status.properties', 'w') as f:
             f.write("details=nothing to backup, make sure you have at least one valid include patterns\n")
@@ -281,21 +352,17 @@ class StatusTest(unittest.TestCase):
             f.write("lastresult=FAILURE\n")
             f.write("lastsuccess=1622832320569\n")
         status = Status('status.properties')
-        self.assertEqual('nothing to backup, make sure you have at least one valid include patterns', status['details'])
-        self.assertEqual(Datetime(1623094810348), status['lastdate'])
-        self.assertEqual('FAILURE', status['lastresult'])
-        self.assertEqual(Datetime(1622832320569), status['lastsuccess'])
-
-    def test_load_with_missing_file(self):
-        status = Status('invalid.properties')
-        self.assertEqual(Status._DEFAULT, status)
+        self.assertEqual('nothing to backup, make sure you have at least one valid include patterns', status.details)
+        self.assertEqual(Datetime(1623094810348), status.lastdate)
+        self.assertEqual('FAILURE', status.lastresult)
+        self.assertEqual(Datetime(1622832320569), status.lastsuccess)
 
     def test_save(self):
         with open('status.properties', 'w') as f:
             f.write("\n")
         status = Status('status.properties')
-        status['lastresult'] = 'SUCCESS'
-        status['lastsuccess'] = Datetime(1622832320000)
+        status.lastresult = 'SUCCESS'
+        status.lastsuccess = Datetime(1622832320000)
         status.save()
         with open('status.properties', 'r') as f:
             data = f.read()
@@ -304,6 +371,24 @@ class StatusTest(unittest.TestCase):
         self.assertTrue("lastdate=" not in data)
         self.assertTrue("details=" not in data)
 
+    def test_transaction(self):
+        # Given a status
+        status = Status('status.properties')
+        self.assertNotEqual('RUNNING', status.current_status)
+        with status as t:
+            t.pid = os.getpid()
+            t.lastresult = 'RUNNING'
+            t.lastdate = Datetime()
+            t.details = ''
+            t.action = 'backup'
+        with status as t:
+            t.lastresult = 'SUCCESS'
+            self.assertEqual('SUCCESS', status.lastresult)
+            t.lastsuccess = Datetime()
+            t.lastdate = status.lastsuccess
+            t.details = ''
+        self.assertEqual('SUCCESS', status.lastresult)
+
 
 class DatetimeTest(unittest.TestCase):
     def test_add(self):
@@ -311,3 +396,6 @@ class DatetimeTest(unittest.TestCase):
 
     def test_sub(self):
         self.assertEqual(Datetime(1688580806000) - datetime.timedelta(hours=24), Datetime(1688494406000))
+
+    def test_strftime(self):
+        self.assertEqual("2023-10-24 08:14", Datetime(1698149641123).strftime("%Y-%m-%d %H:%M"))

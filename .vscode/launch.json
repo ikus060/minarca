@@ -25,7 +25,17 @@
             "request": "launch",
             "module": "minarca_client.main",
             "args": [
-                "restore"
+                "rdiff-backup",
+                "-v",
+                "5",
+                "backup",
+                "--no-compression",
+                "--include",
+                "/home/ikus060/Pictures/Wallpapers/update*",
+                "--exclude",
+                "/**",
+                "/",
+                "/media/ikus060/Backups/minarca/pop-os/"
             ],
             "console": "integratedTerminal",
             "justMyCode": false,

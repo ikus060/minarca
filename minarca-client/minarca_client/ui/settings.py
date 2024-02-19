@@ -8,7 +8,6 @@ import webbrowser
 import pkg_resources
 
 import minarca_client
-from minarca_client.core import Backup
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
 from minarca_client.ui import tkvue
@@ -17,14 +16,16 @@ logger = logging.getLogger(__name__)
 
 
 class SettingsView(tkvue.Component):
-    template = pkg_resources.resource_string('minarca_client.ui', 'templates/settings.html').decode("utf-8")
+    template = pkg_resources.resource_string('minarca_client.ui', 'templates/settings.tkml').decode("utf-8")
 
-    def __init__(self, *args, **kwargs):
-        self.backup = Backup()
+    def __init__(self, *args, backup, url=None, **kwargs):
+        assert backup is not None
+        self.backup = backup
         self.latest_check = LatestCheck()
         self.data = tkvue.Context(
             {
-                'check_latest_version': self.backup.get_settings('check_latest_version'),
+                "instances": list(backup),
+                'check_latest_version': True,  # TODO self.backup.get_settings('check_latest_version')
                 'checking_for_update': False,  # True when background thread is running.
                 'is_latest': None,
                 'check_latest_version_error': None,
@@ -40,11 +41,18 @@ class SettingsView(tkvue.Component):
             # After 5 secs, check for update.
             self.root.after(5000, self._check_latest_version)
 
+    def show_instance_settings(self, instance):
+        """
+        Switch to settings page
+        """
+        toplevel = self.root.winfo_toplevel()
+        toplevel.set_active_view('instancesettings://%s' % instance.id)
+
     def update_check_latest_version(self, value):
         """
         Called to update the frequency.
         """
-        self.backup.set_settings('check_latest_version', value)
+        self.backup.settings.check_latest_version = value
 
     def _prompt_latest_version(self):
         self.data['checking_for_update'] = False
@@ -90,27 +98,9 @@ class SettingsView(tkvue.Component):
         finally:
             self.data['checking_for_update'] = False
 
-    def notification(self):
+    def show_instance_create(self):
         """
-        Called when user click to modify user's notification settings.
+        Called to create a new backup instance.
         """
-        remote_url = self.backup.get_repo_url('settings')
-        webbrowser.open(remote_url)
-
-    def unlink(self):
-        """
-        Called to un register this agent from minarca server.
-        """
-        return_code = tkinter.messagebox.askyesno(
-            parent=self.root,
-            title=_('Are you sure ?'),
-            message=_('Are you sure you want to disconnect this Minarca agent ?'),
-            detail=_(
-                'If you disconnect this computer, this Minarca agent will erase its identity and will no longer run backup on schedule.'
-            ),
-        )
-        if not return_code:
-            # Operation cancel by user.
-            return
-        self.backup.unlink()
-        self.root.winfo_toplevel().destroy()
+        toplevel = self.root.winfo_toplevel()
+        toplevel.set_active_view('instancecreate://')

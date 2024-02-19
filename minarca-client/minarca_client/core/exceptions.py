@@ -24,9 +24,16 @@ class CaptureException:
             UnsuportedVersionError,
             RepositoryLocked,
             RestoreFileNotFound,
+            UnrecognizedArguments,
+            DiskDisconnectedError,
         ]:
             if cls._matches(line):
                 self.exception = cls()
+
+
+# TODO Need to split exceptions.
+# RuntimeBackupError
+# ConfigureBackupError
 
 
 class BackupError(Exception):
@@ -35,20 +42,56 @@ class BackupError(Exception):
     """
 
     message = None  # should be updated by subclasses.
+    detail = None
 
     def __str__(self):
         return self.message
 
 
-class RepositoryNameExistsError(BackupError):
+class ConfigureBackupError(BackupError):
     """
-    This exception is raised during the linking process when the repository
-    name already exists on the remote server.
+    These exception are raise during configuration of backup.
+    """
+
+
+class RuntimeBackupError(BackupError):
+    """
+    These exception are raise during configuration of backup.
+    """
+
+
+class InstanceNotFoundError(BackupError):
+    """
+    This exception is raised whenever a backup[foo] return nothing
+    """
+
+    def __init__(self, limit):
+        self.limit = limit
+        self.message = _('No backup instances matches limit: %s') % limit
+
+
+class RepositoryNameExistsError(ConfigureBackupError):
+    """
+    This exception is raised during the configuration process when the repository
+    name already exists on the destination server.
     """
 
     def __init__(self, name):
         self.name = name
-        self.message = _('Fail to link because repository with name `%s` already exists on remote server.') % name
+        self.message = _('Destination `%s` already exists.') % name
+
+
+class DuplicateSettingsError(ConfigureBackupError):
+    """
+    This exception is raised when trying to configure a new backup instance with similar settings to an existing one.
+    """
+
+    def __init__(self, other_instance):
+        self.other = other_instance
+        self.message = _('These settings conflict with an existing backup and therefore cannot be created.')
+        self.detail = _(
+            "It is not possible to create two backups with the same destination settings. These will conflict during backup. Be sure to define a different destination for this backup."
+        )
 
 
 class InvalidFileSpecificationError(BackupError):
@@ -122,46 +165,53 @@ class NotScheduleError(BackupError):
     message = _("backup not yet scheduled to run, you may force execution using `--force`")
 
 
-class HttpConnectionError(BackupError):
+class HttpConnectionError(ConfigureBackupError):
     """
     Raised if the HTTP connection failed.
     """
 
     def __init__(self, url):
-        super().__init__(url)
-        self.message = _('cannot establish connection to `%s`, verify if the URL is valid') % url
+        self.message = _('Cannot establish connection to remote server.')
+        self.detail = _(
+            "Your computer cannot establish a connection to the remote server. Make sure your Internet connection is working and that the following URL is accessible with a Web browser: %s"
+        ) % url
 
-
-class HttpInvalidUrlError(BackupError):
+class HttpInvalidUrlError(ConfigureBackupError):
     """
     Raised when the URL is not valid.
     """
 
     def __init__(self, url):
-        super().__init__(url)
-        self.message = (
-            _(
-                'the given URL `%s` is not properly formated, verify if the URL is valid. It must start with either https:// or http://'
-            )
-            % url
+        self.message = _('Invalid remote server URL !')
+        self.detail = _(
+            "The remote server URL you entered for the connection is not valid. Check that you have entered the correct value. The URL must begin with `http://` or `https://` followed by a domain name."
         )
 
 
-class HttpAuthenticationError(BackupError):
+class HttpAuthenticationError(ConfigureBackupError):
     """
     Raised for HTTP status code 401 or 403.
     """
 
-    message = _('authentication refused, verify your username and password')
+    def __init__(self, server_message=None):
+        self.server_message = server_message
+        self.message = _('Invalid username or password')
+        self.detail = _(
+            "The username or password you entered to connect to the remote server is not valid. If you enabled multi-factor authentication you need to use an access token."
+        )
+    
+    def __str__(self):
+        # Print original error in logs.
+        return self.message + " " + str(self.server_message)
 
 
-class HttpServerError(BackupError):
+class HttpServerError(ConfigureBackupError):
     """
     Raised for HTTP status code 5xx.
     """
-
-    message = _('remote server return an error, check remote server log with your administrator')
-
+    def __init__(self, server_error) -> None:
+        self.message = _('The remote server returned an error. You may try again later.')
+        self.detail = str(server_error)
 
 class ConnectException(BackupError):
     """
@@ -184,7 +234,7 @@ class PermissionDeniedError(BackupError):
     """
 
     message = _(
-        'Backup failed due to our identity being refused by remote server. The problem may be with the remote server. If the problem persists, contact your system administrator to review your SSH identity.'
+        'The connection to the remote server failed because our identity was refused. The problem may lie with the remote server. If the problem persists, contact your system administrator to check your SSH identity.'
     )
 
     @staticmethod
@@ -198,7 +248,7 @@ class UnknownHostKeyError(BackupError):
     """
 
     message = _(
-        'Backup failed due to unknown remote server identity. If the problem persists, contact your system administrator to review the server identity.'
+        "The connection to the remote server cannot be established securely because the server's identity has changed. If the problem persists, contact your system administrator to verify the server's identity."
     )
 
     @staticmethod
@@ -236,7 +286,7 @@ class UnknownHostException(BackupError):
     """
 
     message = _(
-        'Backup failed due unresolvable hostname. Please check your network connection and ensure the hostname is valid.'
+        'The connection to the remote server has failed due to an unresolvable host name. Please check your network connection and ensure that the host name is still valid. If the problem persists, contact your system administrator to check the host name.'
     )
 
     @staticmethod
@@ -250,7 +300,7 @@ class UnsuportedVersionError(BackupError):
     """
 
     message = _(
-        'Backup failed due to unsupported Minarca agent version on remote server. Consider upgrading your agent or your server.'
+        'The connection to the remote server has failed due to an unsupported version of the Minarca agent on the remote server. Consider updating your agent or server.'
     )
 
     @staticmethod
@@ -272,3 +322,71 @@ class RepositoryLocked(BackupError):
     @staticmethod
     def _matches(line):
         return "Fatal Error: It appears that a previous rdiff-backup session" in line
+
+
+class UnrecognizedArguments(BackupError):
+    message = _('An internal error was raised by an unknown operation send to the background process.')
+
+    @staticmethod
+    def _matches(line):
+        return "error: unrecognized arguments: " in line
+
+
+class LocalDestinationNotEmptyError(ConfigureBackupError):
+    """
+    Raised when the location defined by the user for a local backup is not empty and doesn't contains rdiff-backup-data.
+    """
+
+    message = _('Backup Destination Occupied')
+    detail = _(
+        'Unable to proceed with the selected destination as it contains existing data. If you intend to use this location, kindly empty the directory of any files and folders.'
+    )
+
+
+class InitDestinationError(ConfigureBackupError):
+    """
+    Raised when a problem occured during the initialisation process of a local destination. e.g.: fail to create file or folder.
+    """
+
+    message = _("Destination Not Suitable")
+    detail = _(
+        'Unable to proceed with the selected destination as it cannot be initialized. Make sure the external device is connected and operational.'
+    )
+
+
+class LocalDiskNotFound(RuntimeBackupError):
+    """
+    Raised whenever we are looking for a local destination, but external disk fast not found.
+    """
+
+    message = _("The locale device could not be found. Make sure your device is connected.")
+
+
+class DiskDisconnectedError(BackupError):
+    message = _(
+        "Backup unsuccessful due to a copy operation encountering an issue, potentially because the device is disconnected. Ensure your device is properly connected."
+    )
+
+    @staticmethod
+    def _matches(line):
+        return 'OSError: [Errno 5] Input/output error' in line
+
+
+class RemoteRepositoryNotFound(BackupError):
+    """
+    This exception is raised when the repository is expected to exists but cannot be found.
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.message = _('Repository `%s` cannot be found on remote server') % name
+
+
+class InvalidRepositoryName(ConfigureBackupError):
+    """
+    This exception is raised when repository name is not valid.
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.message = _("Repository name must only contains letters, numbers, dash (-) and dot (.)")

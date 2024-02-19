@@ -17,9 +17,9 @@ import subprocess
 import sys
 
 import configargparse
-from tzlocal import get_localzone
-
+from minarca_server.app import MinarcaApplication
 from minarca_server.config import get_parser
+from tzlocal import get_localzone
 
 from .core.jail import Jail
 
@@ -72,6 +72,8 @@ def _parse_config():
     parser.add_argument('--minarca-rdiff-backup-extra-args', '--rdiffbackup-args')
     return parser.parse_known_args(args=[])[0]
 
+def _get_currentuser():
+    app = MinarcaApplication()
 
 def main(args=None):
     parser = argparse.ArgumentParser()
@@ -112,7 +114,9 @@ def main(args=None):
 
     # Either we get called by rdiff-backup directly
     # or we get called by minarca client which replace the command by the name of the repository.
-    if ssh_original_command in ["echo -n 1", "echo -n host is alive"]:
+    if ssh_original_command == 'currentuser':
+        _get_currentuser()
+    elif ssh_original_command in ["echo -n 1", "echo -n host is alive"]:
         # Used by backup-ninja to verify connectivity
         subprocess.check_call(
             ssh_original_command.split(' '),

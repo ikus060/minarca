@@ -9,7 +9,9 @@
 import logging
 
 import cherrypy
+import minarca_server.plugins.minarca  # noqa
 import pkg_resources
+from minarca_server.config import parse_args
 from rdiffweb.controller.dispatch import staticfile
 from rdiffweb.rdw_app import RdiffwebApp
 

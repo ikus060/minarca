@@ -1,339 +1,554 @@
 {%- set theme_name = 'minarca' %}
-{%- set frame_color = '#ffffff' %}
-{%- set font_color = '#000000' %}
-{%- set font_size = -16 %}
-{%- set font_family = 'Lato' %}
-{% set fg_colors = {
-    "primary": "#1C4062",
-    "secondary": "#B6DDE2",
-    "success": "#50A254",
-    "info": "#009FB9",
-    "warning": "#D88C46",
-    "danger": "#CA393C",
-    "light": "#f4f4f4",
-    "dark": "#0E2933"}
-%}
-{% set bg_colors = {
-	"default": frame_color,
-	"light": "#f4f4f4",
-    "dark": "#0E2933"}
-%}
 
-{# Create all variation of glyphs #}
-{% set glyphs=["trash"] %}
-{% for glyph in glyphs %}
-{% for name, color in fg_colors.items() %}
-{% for size in [16] %}
-image create photo {{ glyph }}-{{ size }}-{{ name }} -data "{{ svg_to_base64(glyph + '.svg', size|string + 'x' + size|string , color ) }}"
-{% endfor %}
-{% endfor %}
-{% endfor %}
+{# Color pallet #}
+{%- set primary_color = "#1C4062" %}
+{%- set secondary_color = "#B6DDE2" %}
+{%- set success_color = "#50A254" %}
+{%- set info_color = "#009FB9" %}
+{%- set warning_color = "#D88C46" %}
+{%- set danger_color = "#CA393C" %}
+{%- set dark_color = "#0E2933" %}
+{%- set gray_10 = "#EEF0F1" %}
+{%- set gray_20 = "#CFD4D6" %}
+{%- set gray_50 = "#7E8D92" %}
+{%- set white_color = "#ffffff" %}
+{%- set light_color = gray_10 %}
+{%- set frame_color = light_color %}
+{%- set font_color = dark_color %}
+
+{# Font sizes #}
+{%- set font_size = -14 %}
+{%- set font_family = 'Tahoma,TkDefaultFont' %}
+{%- set font_variation = [('h1', -20), ('h2', -18), ('h3', -16), ('sm', -12), ('xs', -10)] %}
+{%- set btn_variation = [('lg', -16), ('sm', -12)] %}
+
+{# Build colors tables #}
+{% set color_mixin = {
+    "default": (frame_color, {
+        "default": font_color,
+        "secondary": secondary_color,
+        "success": success_color,
+        "info": info_color,
+        "warning": warning_color,
+        "danger": danger_color,
+        "light": gray_50 }),
+
+    "white": (white_color, {
+        "default": font_color,
+        "secondary": secondary_color,
+        "success": success_color,
+        "info": info_color,
+        "warning": warning_color,
+        "danger": danger_color,
+        "light": gray_50 }),
+
+    "dark": (dark_color, {
+        "white": white_color,
+        "light": gray_50 }),
+
+    "warning": (warning_color, {
+        "white": white_color,
+        "warning": warning_color }),
+
+    "danger": (danger_color, {
+        "default": font_color,
+        "white": white_color }),
+
+    "light-info": ('#DBEEF0', {
+        "default": font_color,
+        "info": info_color }),
+
+    "light-success": ('#EDF6EE', {
+        "default": font_color,
+        "success": success_color }),
+
+    "light-warning": ('#FFF0D9', {
+        "default": font_color,
+        "warning": warning_color }),
+
+    "light-danger": (lighter(danger_color, 0.9), {
+        "default": font_color,
+        "white": white_color }),
+}%}
+{% set btn_colors = {
+    "default": font_color,
+    "secondary": secondary_color,
+    "success": success_color,
+    "info": info_color,
+    "warning": warning_color,
+    "danger": danger_color,
+    "light": gray_50,
+}%}
+{% set outline_colors = {
+    "white": (white_color, gray_20, {
+        "default": font_color }),
+
+    "light-info": ('#DBEEF0', info_color, {
+        "default": font_color,
+        "info": info_color }),
+
+    "light-success": ('#EDF6EE', success_color, {
+        "default": font_color,
+        "success": success_color }),
+
+    "light-warning": ('#FFF0D9', warning_color, {
+        "default": font_color,
+        "warning": warning_color }),
+
+    "light-danger": (lighter(danger_color, 0.9), danger_color, {
+        "default": font_color,
+        "white": white_color,
+        "danger": danger_color }),
+    }
+%}
+{% set switch_colors = {
+    "white": (white_color, {
+        "default": font_color,
+        "info": info_color,
+    }),
+}%}
+{% set listitem_variation = ['play-circle','stop-circle'] %}
 
 {# Create all variation of icons #}
 {% for size in [16, 22, 32, 48, 128, 256] -%}
 image create photo minarca-{{ size }} -data "{{ svg_to_base64( "minarca.svg", size|string + 'x' + size|string ) }}"
 {% endfor %}
 
-{# Create all variation of dots #}
-{% for name, color in fg_colors.items() %}
-{% for size in [16] %}
-{% for idx in range(0,4) %}
-image create photo dots-{{ size }}-{{ name }}_{{ "%02d" | format(idx) }} -data "{{ svg_to_base64('dots%s.svg' | format(idx),  'x%s' | format(size), color ) }}"
-{% endfor %}
-{% endfor %}
-{% endfor %}
-
 {# Create Setup Logo #}
-image create photo minarca-logo -data "{{ svg_to_base64( "minarca-logo.svg", '256') }}"
+image create photo minarca-logo -data "{{ svg_to_base64( "minarca-logo.svg", '256x') }}"
 
 {# Create header logo #}
-image create photo minarca-header-logo -data "{{ svg_to_base64( "minarca-header-logo.svg", 'x48') }}"
+image create photo minarca-header-logo -data "{{ svg_to_base64( "minarca-header-logo.svg", 'x30') }}"
 
-{# Create background decoration  #}
-image create photo minarca-line -data "{{ svg_to_base64("line.svg", size="670x15") }}"
+{# Remote Local icons #}
+image create photo remote-backup-logo-64 -data "{{ svg_to_base64( "remote-backup.svg", '64x64') }}"
+image create photo remote-backup-logo-128 -data "{{ svg_to_base64( "remote-backup.svg", '128x128') }}"
+image create photo remote-backup-logo-256 -data "{{ svg_to_base64( "remote-backup.svg", '256x256') }}"
+image create photo local-backup-logo-64 -data "{{ svg_to_base64( "local-backup.svg", '64x64') }}"
+image create photo local-backup-logo-128 -data "{{ svg_to_base64( "local-backup.svg", '128x128') }}"
+image create photo local-backup-logo-256 -data "{{ svg_to_base64( "local-backup.svg", '256x256') }}"
+
+
+{# Glyphs logo #}
+image create photo check-circle-fill-success -data "{{ svg_to_base64( "check-circle-fill.svg", 'x14', success_color) }}"
+image create photo exclamation-triangle-fill-warning -data "{{ svg_to_base64( "exclamation-triangle-fill.svg", 'x14', warning_color) }}"
+image create photo x-circle-fill-danger -data "{{ svg_to_base64( "x-circle-fill.svg", 'x14', danger_color) }}"
+image create photo chevron-right -data "{{ svg_to_base64( "chevron-right.svg", 'x14', font_color) }}"
+image create photo chevron-down -data "{{ svg_to_base64( "chevron-right.svg", 'x14', font_color, rotate=90) }}"
+image create photo trash -data "{{ svg_to_base64( "trash.svg", 'x14', font_color) }}"
+image create photo trash-danger -data "{{ svg_to_base64( "trash.svg", 'x14', danger_color) }}"
+image create photo play-circle-fill -data "{{ svg_to_base64( "play-circle-fill.svg", 'x14', font_color) }}"
+image create photo play-circle -data "{{ svg_to_base64( "play-circle.svg", 'x14', font_color) }}"
+image create photo stop-circle -data "{{ svg_to_base64( "stop-circle.svg", 'x14', font_color) }}"
+image create photo question-circle-fill -data "{{ svg_to_base64( "question-circle-fill.svg", 'x14', font_color) }}"
+
+
+{# Spinner #}
+{% for size in [16, 64] %}
+{% for idx in range(0,5) %}
+image create photo spinner-{{ size }}_{{ "%02d" | format(idx) }} -data "{{ svg_to_base64('spinner.svg',  'x%s' | format(size), font_color, rotate=9*idx ) }}"
+{% endfor %}
+{% endfor %}
 
 {#
   Default clam theme
-  Do not replace all colors to keep a "native" look and feel in default dialog.
+  Do not replace all colors to keep a "native" look and feel in default dialog like file browser.
 #}
 array set colors {
-	-disabledfg		"#999999"
-	-frame  		"#e1dedb"
-	-window  		"#ffffff"
-	-dark			"#cfcdc8"
-	-darker 		"#bab5ab"
-	-darkest		"#9e9a91"
-	-lighter		"#eeebe7"
-	-lightest 		"#ffffff"
-	-selectbg		"#4a6984"
-	-selectfg		"#ffffff"
-	-altindicator		"#5895bc"
-	-disabledaltindicator	"#a0a0a0"
+    -disabledfg        "#999999"
+    -frame          "{{ frame_color }}"
+    -window          "#ffffff"
+    {# Those are use for borders #}
+    -dark            "{{ darker(frame_color, 0.05) }}"
+    -darker         "{{ darker(frame_color, 0.15) }}"
+    -darkest        "{{ darker(frame_color, 0.25) }}"
+    -lighter        "{{ light_color }}"
+    -selectbg        "{{ primary_color }}"
+    -selectfg        "#ffffff"
+    -altindicator        "{{ lighter(primary_color) }}"
+    -disabledaltindicator    "{{ darker(frame_color) }}"
 }
 ttk::style theme create {{ theme_name }} -parent clam -settings {
 
-	ttk::style configure "." \
-	    -background $colors(-frame) \
-	    -foreground black \
-	    -bordercolor $colors(-darkest) \
-	    -darkcolor $colors(-dark) \
-	    -lightcolor $colors(-lighter) \
-	    -troughcolor $colors(-darker) \
-	    -selectbackground $colors(-selectbg) \
-	    -selectforeground $colors(-selectfg) \
-	    -selectborderwidth 0 \
-	    -font TkDefaultFont \
-	    ;
+    ttk::style configure "." \
+        -background $colors(-frame) \
+        -foreground {{dark_color}} \
+        -bordercolor $colors(-darkest) \
+        -darkcolor $colors(-frame) \
+        -lightcolor $colors(-frame) \
+        -troughcolor $colors(-darker) \
+        -selectbackground $colors(-selectbg) \
+        -selectforeground $colors(-selectfg) \
+        -selectborderwidth 0 \
+        -font { {{ font_family }} {{ font_size }} } \
+        ;
 
-	ttk::style map "." \
-	    -background [list disabled $colors(-frame) \
-			     active $colors(-lighter)] \
-	    -foreground [list disabled $colors(-disabledfg)] \
-	    -selectbackground [list  !focus $colors(-darkest)] \
-	    -selectforeground [list  !focus white] \
-	    ;
-	# -selectbackground [list  !focus "#847d73"]
+    ttk::style map "." \
+        -foreground [list disabled $colors(-disabledfg)] \
+        -selectbackground [list  !focus $colors(-darkest)] \
+        -selectforeground [list  !focus white] \
+        ;
 
-	ttk::style configure TButton \
-	    -anchor center -width -11 -padding 5 -relief raised
-	ttk::style map TButton \
-	    -background [list \
-			     disabled $colors(-frame) \
-			     pressed $colors(-darker) \
-			     active $colors(-lighter)] \
-	    -lightcolor [list pressed $colors(-darker)] \
-	    -darkcolor [list pressed $colors(-darker)] \
-	    -bordercolor [list alternate "#000000"] \
-	    ;
+    ttk::style configure Toolbutton \
+        -anchor center -padding 2 -relief flat
+    ttk::style map Toolbutton \
+        -relief [list \
+            disabled flat \
+            selected sunken \
+            pressed sunken \
+            active raised] \
+        -background [list \
+            disabled $colors(-frame) \
+            pressed $colors(-darker) \
+            active $colors(-lighter)] \
+        -lightcolor [list pressed $colors(-darker)] \
+        -darkcolor [list pressed $colors(-darker)] \
+        ;
 
-	ttk::style configure Toolbutton \
-	    -anchor center -padding 2 -relief flat
-	ttk::style map Toolbutton \
-	    -relief [list \
-		    disabled flat \
-		    selected sunken \
-		    pressed sunken \
-		    active raised] \
-	    -background [list \
-		    disabled $colors(-frame) \
-		    pressed $colors(-darker) \
-		    active $colors(-lighter)] \
-	    -lightcolor [list pressed $colors(-darker)] \
-	    -darkcolor [list pressed $colors(-darker)] \
-	    ;
+    ttk::style configure TMenubutton \
+        -width -11 -padding 5 -relief raised
 
-	ttk::style configure TCheckbutton \
-	    -indicatorbackground "#ffffff" \
-	    -indicatormargin {1 1 4 1} \
-	    -padding 2 ;
-	ttk::style configure TRadiobutton \
-	    -indicatorbackground "#ffffff" \
-	    -indicatormargin {1 1 4 1} \
-	    -padding 2 ;
-	ttk::style map TCheckbutton -indicatorbackground \
-	    [list  pressed $colors(-frame) \
-			{!disabled alternate} $colors(-altindicator) \
-			{disabled alternate} $colors(-disabledaltindicator) \
-			disabled $colors(-frame)]
-	ttk::style map TRadiobutton -indicatorbackground \
-	    [list  pressed $colors(-frame) \
-			{!disabled alternate} $colors(-altindicator) \
-			{disabled alternate} $colors(-disabledaltindicator) \
-			disabled $colors(-frame)]
+    ttk::style configure TEntry \
+        -padding { {{ (font_size * 0.75)|abs|int }} {{ (font_size * 0.375)|abs|int }} } \
+        -insertwidth 1;
+    ttk::style map TEntry \
+        -background [list  readonly $colors(-frame)] \
+        -bordercolor [list  focus "{{secondary_color}}"] \
+        -lightcolor [list  focus "{{primary_color}}"] \
+        -darkcolor [list  focus "{{primary_color}}"] \
+        ;
 
-	ttk::style configure TMenubutton \
-	    -width -11 -padding 5 -relief raised
+    {# TCombobox - make it more modern #}
+    ttk::style element create TCombobox.chevron-down image { chevron-down };
+    ttk::style layout TCombobox { \
+        Entry.field -sticky nswe -children { \
+            Combobox.padding -sticky nswe -children { \
+                TCombobox.chevron-down -side right -sticky ns \
+                Combobox.textarea -sticky nswe \
+            } \
+        } \
+    }
+    ttk::style configure TCombobox \
+        -arrowsize 16 \
+        -padding { {{ (font_size * 0.75)|abs|int }} {{ (font_size * 0.375)|abs|int }} } \
+        -insertwidth 1
+    ttk::style map TCombobox \
+        -bordercolor [list focus "{{secondary_color}}"] \
+        -lightcolor [list focus "{{primary_color}}"] \
+        -darkcolor [list focus "{{primary_color}}"] \
+        -selectbackground [list  readonly $colors(-selectfg)] \
+        -selectforeground [list  readonly $colors(-selectbg)] \
+        -background [list active $colors(-lighter) \
+                 pressed $colors(-lighter)] \
+        -arrowcolor [list disabled $colors(-disabledfg)]
+    ttk::style configure ComboboxPopdownFrame \
+        -relief solid -borderwidth 1
 
-	ttk::style configure TEntry -padding 1 -insertwidth 1
-	ttk::style map TEntry \
-	    -background [list  readonly $colors(-frame)] \
-	    -bordercolor [list  focus $colors(-selectbg)] \
-	    -lightcolor [list  focus "#6f9dc6"] \
-	    -darkcolor [list  focus "#6f9dc6"] \
-	    ;
-
-	ttk::style configure TCombobox -padding 1 -insertwidth 1
-	ttk::style map TCombobox \
-	    -background [list active $colors(-lighter) \
-			     pressed $colors(-lighter)] \
-	    -fieldbackground [list {readonly focus} $colors(-selectbg) \
-				  readonly $colors(-frame)] \
-	    -foreground [list {readonly focus} $colors(-selectfg)] \
-	    -arrowcolor [list disabled $colors(-disabledfg)]
-	ttk::style configure ComboboxPopdownFrame \
-	    -relief solid -borderwidth 1
-
-	ttk::style configure TSpinbox -arrowsize 10 -padding {2 0 10 0}
-	ttk::style map TSpinbox \
-	    -background [list  readonly $colors(-frame)] \
+    ttk::style configure TSpinbox -arrowsize 10 -padding {2 0 10 0}
+    ttk::style map TSpinbox \
+        -background [list  readonly $colors(-frame)] \
             -arrowcolor [list disabled $colors(-disabledfg)]
 
-	ttk::style configure TNotebook.Tab -padding {6 2 6 2}
-	ttk::style map TNotebook.Tab \
-	    -padding [list selected {6 4 6 2}] \
-	    -background [list selected $colors(-frame) {} $colors(-darker)] \
-	    -lightcolor [list selected $colors(-lighter) {} $colors(-dark)] \
-	    ;
+    ttk::style configure TNotebook.Tab -padding {6 2 6 2}
+    ttk::style map TNotebook.Tab \
+        -padding [list selected {6 4 6 2}] \
+        -background [list selected $colors(-frame) {} $colors(-darker)] \
+        -lightcolor [list selected $colors(-lighter) {} $colors(-dark)] \
+        ;
 
-	# Treeview:
-	ttk::style configure Heading \
-	    -font TkHeadingFont -relief raised -padding {3}
-	ttk::style configure Treeview -background $colors(-window)
-	ttk::style map Treeview \
-	    -background [list disabled $colors(-frame)\
-				selected $colors(-selectbg)] \
-	    -foreground [list disabled $colors(-disabledfg) \
-				selected $colors(-selectfg)]
+    # Treeview:
+    ttk::style configure Heading \
+        -font TkHeadingFont -relief raised -padding {3}
+    ttk::style configure Treeview -background $colors(-window)
+    ttk::style map Treeview \
+        -background [list disabled $colors(-frame)\
+                selected $colors(-selectbg)] \
+        -foreground [list disabled $colors(-disabledfg) \
+                selected $colors(-selectfg)]
 
-    	ttk::style configure TLabelframe \
-	    -labeloutside true -labelmargins {0 0 0 4} \
-	    -borderwidth 2 -relief raised
+    {# Progressbar with custom layout to avoid useless padding and border #}
+    ttk::style element create Horizontal.TProgressbar.pbar from default
+    ttk::style layout Horizontal.TProgressbar { \
+        Horizontal.TProgressbar.trough -sticky nswe -children { \
+            Horizontal.TProgressbar.pbar -side left -sticky ns \
+        } \
+    }
+    ttk::style configure TProgressbar \
+        -thickness 4 \
+        -padding 0 \
+        -borderwidth 0 \
+        -background {{font_color}};;
+    {% for name, color in btn_colors.items() %}
+    ttk::style configure {{ name }}.Horizontal.TProgressbar \
+        -bordercolor {{lighter(color, 0.7)}} \
+        -troughcolor {{lighter(color, 0.7)}} \
+        -lightcolor {{color}} \
+        -darkcolor {{color}} \
+        -background {{color}};
+    ttk::style configure {{ name }}.Vertical.TProgressbar \
+        -bordercolor {{lighter(color, 0.7)}} \
+        -troughcolor {{lighter(color, 0.7)}} \
+        -lightcolor {{color}} \
+        -darkcolor {{color}} \
+        -background {{color}};
+    {% endfor %}
 
-	ttk::style configure TProgressbar -background $colors(-frame)
+    ttk::style configure Sash -sashthickness 6 -gripcount 10
 
-	ttk::style configure Sash -sashthickness 6 -gripcount 10
+    {# Define custom color for tooltip #}
+    ttk::style configure tooltip.TLabel -background #ffffe0;
 
-	{# Define custom color for tooltip #}
-	ttk::style configure tooltip.TLabel -background #ffffe0;
+    {# Separator #}
+    {% for bgname, (bgcolor, fg_colors) in color_mixin.items() %}
+    ttk::style configure {{bgname}}.TSeparator -background {{ fg_colors.get(bgname, darker(bgcolor)) }};
+    {% endfor %}
 
-	{# Define custom font #}
-		ttk::style configure "." \
-	    -font { {{ font_family }} {{ font_size }} };
 
     {# TButton #}
-    {% for name, color in fg_colors.items() %}
-    {% set fg = fg_colors['light'] if lightness(color) < 0.8 else fg_colors['dark'] %}
+    ttk::style configure TButton \
+        -anchor center -width -11 -padding { {{ (font_size * 0.75)|abs|int }} {{ (font_size * 0.375)|abs|int }} } -relief raised;
+    ttk::style map TButton \
+        -background [list \
+                 disabled $colors(-frame) \
+                 pressed $colors(-darker) \
+                 hover $colors(-dark) \
+                 active $colors(-lighter)] \
+        -lightcolor [list pressed $colors(-darker)] \
+        -darkcolor [list pressed $colors(-darker)] \
+        -bordercolor [list alternate "#000000"];
+    {% for name, color in btn_colors.items() %}
+    {% set fg = white_color if lightness(color) < 0.8 else font_color %}
     ttk::style configure {{ name }}.TButton \
       -foreground {{ fg }} \
       -background {{ color }} \
-      -bordercolor {{ darker(color, 0.05) }} \
+      -bordercolor {{ darker(color) }} \
       -darkcolor {{ color }} \
       -lightcolor {{ color }} \
-      -focuscolor {{ fg }};
-    
+      -focuscolor {{ fg }} \
+      -relief flat;
     ttk::style map {{ name }}.TButton \
-      -background {disabled {{ lighter(color, 0.7) }} {hover !disabled} {{ darker(color) }} {pressed !disabled} {{ darker(color, 0.25) }} }  \
-      -lightcolor {disabled {{ lighter(color, 0.5) }} {hover !disabled} {{ darker(color) }} {pressed !disabled} {{ darker(color, 0.25) }} }  \
-      -darkcolor {disabled {{ lighter(color, 0.5) }} {hover !disabled} {{ darker(color) }} {pressed !disabled} {{ darker(color, 0.25) }} }  \
-      -bordercolor {disabled {{ lighter(color, 0.5) }} {hover !disabled} {{ darker(color) }} {pressed !disabled} {{ darker(color, 0.25) }} }  \
+      -background {disabled {{ lighter(color, 0.7) }} pressed {{ darker(color) }} hover {{ darker(color, 0.05) }} } \
+      -lightcolor {disabled {{ lighter(color, 0.5) }} pressed {{ darker(color) }} hover {{ darker(color, 0.05) }} }  \
+      -darkcolor {disabled {{ lighter(color, 0.5) }} pressed {{ darker(color) }} hover {{ darker(color, 0.05) }} }  \
+      -bordercolor {disabled {{ lighter(color, 0.5) }} pressed {{ darker(color) }} hover {{ darker(color) }} }  \
       -foreground {disabled {{ lighter(fg, 0.5) }} };
-
-	{% for variation, size in [('H1', -60), ('H2', -40), ('H3', -32), ('H4', -26), ('small', -10)] %}
-	ttk::style configure {{ variation }}.{{ name }}.TButton \
-	  -padding { {{ (size * 0.8)|abs|int }} {{ (size * 0.4)|abs|int }} } \
-	  -font { {{font_family}} {{ size }} };
+    {% for variation, size in btn_variation %}
+    ttk::style configure {{ variation }}.{{ name }}.TButton \
+      -padding { {{ (size * 0.75)|abs|int }} {{ (size * 0.375)|abs|int }} } \
+      -font { {{font_family}} {{ size }} };
+    {% endfor %}
     {% endfor %}
 
+    {# TOutlineButton #}
+    ttk::style layout TOutlineButton {
+        Button.border -sticky nswe -border 1 -children {
+            Button.padding -sticky nswe -border 0 -children {
+                Button.focus -side left -sticky w -children {
+                    Button.label -sticky nswe
+                }
+            }
+        }
+    }
+    ttk::style configure TOutlineButton \
+        -anchor left \
+        -width -11 \
+        -padding { {{ (font_size * 0.75)|abs|int }} {{ (font_size * 0.375)|abs|int }} } \
+        -relief raised \
+        -borderwidth 1 \
+        -background {{ frame_color }} \
+        -lightcolor {{ frame_color }} \
+        -darkcolor {{ frame_color }} \
+        -bordercolor {{ font_color }};
+    ttk::style map TOutlineButton \
+        -background { disabled {{ frame_color }} pressed {{ darker(frame_color, 0.05) }} hover {{ darker(frame_color, 0.03) }} active {{ lighter(frame_color) }} } \
+        -lightcolor { disabled {{ frame_color }} pressed {{ darker(frame_color, 0.05) }} hover {{ darker(frame_color, 0.03) }} active {{ lighter(frame_color) }} } \
+        -darkcolor { disabled {{ frame_color }} pressed {{ darker(frame_color, 0.05) }} hover {{ darker(frame_color, 0.03) }} active {{ lighter(frame_color) }} } \
+        ;
+    {% for bgname, (bgcolor, bordercolor, fg_colors) in outline_colors.items() %}
+    ttk::style configure {{ bgname }}.TOutlineButton \
+        -background {{ bgcolor }} \
+        -bordercolor {{ bordercolor }} \
+        -lightcolor {{ bgcolor }} \
+        -darkcolor {{ bgcolor }};
+    ttk::style map {{ bgname }}.TOutlineButton \
+        -background { disabled {{ frame_color }} pressed {{ darker(bgcolor, 0.05) }} hover {{ darker(bgcolor, 0.03) }} active {{ lighter(bgcolor) }} } \
+        -lightcolor { disabled {{ frame_color }} pressed {{ darker(bgcolor, 0.05) }} hover {{ darker(bgcolor, 0.03) }} active {{ lighter(bgcolor) }} } \
+        -darkcolor { disabled {{ frame_color }} pressed {{ darker(bgcolor, 0.05) }} hover {{ darker(bgcolor, 0.03) }} active {{ lighter(bgcolor) }} } \
+        ;
+    {% for fgname, fgcolor in fg_colors.items() %}
+    ttk::style configure {{ fgname }}.{{ bgname }}.TOutlineButton \
+        -foreground {{ fgcolor }};
+    {% endfor %}
     {% endfor %}
 
-	{# FIXME check if applicable to all style #}
-	ttk::style map dark.TButton \
-	  -foreground { selected {{ fg_colors['secondary'] }} };
-
-    {# Link.TButton - special button without border #}
-    ttk::style configure Link.TButton \
+    {# TLink - special button without border #}
+    ttk::style layout TLink {
+        Label.padding -sticky nswe -border 0 -children {
+            Label.focus -side left -sticky w -children {
+                Label.label -sticky nswe
+            }
+        }
+    }
+    ttk::style configure TLink \
       -foreground {{ font_color }} \
       -background {{ frame_color }} \
       -padding 0 \
       -border 0 \
       -relief flat \
-	  -anchor left \
-	  -font { {{font_family}} {{ font_size }} underline };
-    ttk::style map Link.TButton \
-      -background {} \
-      -font {disabled { {{font_family}} {{ font_size }} } {hover !disabled} { {{font_family}} {{ font_size }} } {pressed !disabled} { {{font_family}} {{ font_size }} } };
-	{% for fgname, fgcolor in fg_colors.items() %}
-	{% for bgname, bgcolor in bg_colors.items() %}
-    {% if fgname != bgname %}
-	ttk::style configure {{ fgname }}.{{ bgname }}.Link.TButton -foreground {{ fgcolor }} -background {{ bgcolor }};
-	{% endif %}
-    {% endfor %}
-	{% endfor %}
-
+      -anchor left \
+      -font { {{font_family}} {{ font_size }} underline };
+    ttk::style map TLink \
+      -font {disabled { {{font_family}} {{ font_size }} } {hover !disabled} { {{font_family}} {{ font_size }} } {pressed !disabled} { {{font_family}} {{ font_size }} } } \
+      -foreground {disabled {{ lighter(font_color, 0.7) }} pressed {{ darker(font_color) }} hover {{ darker(font_color, 0.05) }} };
+    {% for bgname, (bgcolor, fg_colors) in color_mixin.items() %}
+    ttk::style configure {{ bgname }}.TLink \
+      -background {{ bgcolor }};
     {% for fgname, fgcolor in fg_colors.items() %}
-	{% for bgname, bgcolor in bg_colors.items() %}
-	{% if fgname != bgname %}
-    ttk::style configure {{ fgname }}.{{ bgname }}.TLabel -foreground {{ fgcolor }} -background {{ bgcolor }};
-    {# H1, H2, small, strong TLabel #}
-	{% for variation, size in [('H1', -60), ('H1', -60), ('H2', -40), ('H3', -32), ('H4', -26), ('small', -10), ('strong', '-14 bold')] %}
-	ttk::style configure {{ variation }}.{{ fgname }}.{{bgname}}.TLabel -font { {{font_family}} {{ size }} };
+    ttk::style configure {{ fgname }}.{{ bgname }}.TLink \
+      -foreground {{ fgcolor }};
+    ttk::style map {{ fgname }}.{{ bgname }}.TLink \
+      -foreground {disabled {{ lighter(fgcolor, 0.7) }} pressed {{ darker(fgcolor) }} hover {{ darker(fgcolor, 0.05) }} };
     {% endfor %}
-	{% endif %}
-	{% endfor %}
-	{% endfor %}
+    {% endfor %}
+
+    {# TListitem - special button with special indicator on the right #}
+    ttk::style element create TListitem.chevron-right image { chevron-right };
+    ttk::style layout TListitem {
+        Label.padding -sticky nswe -border 0 -children {
+            Label.focus -side left -sticky w -children {
+                Label.label -sticky nswe
+            }
+            TListitem.chevron-right -side right -sticky {}
+        }
+    }
+    {% for indicator in listitem_variation %}
+    ttk::style element create TListitem.{{indicator}} image { {{indicator}} };
+    ttk::style layout {{indicator}}.TListitem {
+        Label.padding -sticky nswe -border 0 -children {
+            Label.focus -side left -sticky w -children {
+                Label.label -sticky nswe
+            }
+            TListitem.{{indicator}} -side right -sticky {}
+        }
+        Label.border -sticky we -side bottom
+    }
+    {% endfor %}
+    ttk::style configure TListitem \
+      -foreground {{ font_color }} \
+      -background {{ frame_color }} \
+      -padding 5 \
+      -border 0 \
+      -relief flat \
+      -anchor left;
+    ttk::style map TListitem \
+        -background { disabled {{ frame_color }} pressed {{ darker(frame_color, 0.05) }} hover {{ darker(frame_color, 0.03) }} active {{ lighter(frame_color) }} };
+    {% for bgname, (bgcolor, bordercolor, fg_colors) in outline_colors.items() %}
+    ttk::style configure {{ bgname }}.TListitem \
+	    -background {{ bgcolor }};
+    ttk::style map {{ bgname }}.TListitem \
+        -background { disabled {{ frame_color }} pressed {{ darker(bgcolor, 0.05) }} hover {{ darker(bgcolor, 0.03) }} active {{ lighter(bgcolor) }} };
+    {% for indicator in listitem_variation %}
+    ttk::style configure {{ bgname }}.{{indicator}}.TListitem \
+	    -background {{ bgcolor }};
+    ttk::style map {{ bgname }}.{{indicator}}.TListitem \
+        -background { disabled {{ frame_color }} pressed {{ darker(bgcolor, 0.05) }} hover {{ darker(bgcolor, 0.03) }} active {{ lighter(bgcolor) }} };
+    {% endfor %}
+    {% endfor %}
+
+    {# TLabel #}
+    {% for bgname, (bgcolor, fg_colors) in color_mixin.items() %}
+    ttk::style configure {{ bgname }}.TLabel -background {{ bgcolor }};
+    {% for fgname, fgcolor in fg_colors.items() %}
+    ttk::style configure {{ fgname }}.{{ bgname }}.TLabel -foreground {{ fgcolor }};
+    {% for variation, size in font_variation %}
+    ttk::style configure {{ variation }}.{{ fgname }}.{{bgname}}.TLabel -font { {{font_family}} {{ size }} };
+    {% endfor %}
+    {% endfor %}
+    {% endfor %}
 
     {# TFrame #}
-    {% for name, color in bg_colors.items() %}
-    ttk::style configure {{ name }}.TFrame -background {{ color }};
+    {% for bgname, (bgcolor, fg_colors) in color_mixin.items() %}
+    ttk::style configure {{ bgname }}.TFrame \
+	    -background {{ bgcolor }};
+    {% endfor %}
+
+    {# TLabelframe i.e Card #}
+    ttk::style configure TLabelframe \
+        -labeloutside true -labelmargins 0 -borderwidth 1 -relief solid
+    {% for bgname, (bgcolor, bordercolor, fg_colors) in outline_colors.items() %}
+    ttk::style configure {{ bgname }}.TLabelframe \
+        -bordercolor {{ bordercolor }} \
+	    -background {{ bgcolor }};
     {% endfor %}
 
     {# TCheckbutton #}
-	{% for fgname, fgcolor in fg_colors.items() %}
-	{% for bgname, bgcolor in bg_colors.items() %}
-	{% if fgname != bgname %}
+    ttk::style configure TCheckbutton \
+        -indicatorsize {{ font_size|abs }} \
+        -indicatorforeground {{ font_color }} \
+        -indicatorbackground "#ffffff" \
+        -indicatormargin {1 1 7 1} \
+        -padding 2;
+    ttk::style map TCheckbutton -indicatorbackground \
+        [list  pressed $colors(-frame) \
+            {!disabled alternate} $colors(-altindicator) \
+            {disabled alternate} $colors(-disabledaltindicator) \
+            disabled $colors(-frame)]
+    {% for bgname, (bgcolor, fg_colors) in color_mixin.items() %}
+    ttk::style configure {{ bgname }}.TCheckbutton \
+      -background {{ bgcolor }};
+    {% for fgname, fgcolor in fg_colors.items() %}
     ttk::style configure {{ fgname }}.{{ bgname }}.TCheckbutton \
-	  -indicatorsize {{ font_size|abs - 2 }} \
-	  -indicatorforeground {{ fgcolor }} \
-	  -foreground {{ fgcolor }} \
-	  -background {{ bgcolor }};
-	ttk::style map {{ fgname }}.{{ bgname }}.TCheckbutton \
-      -background { {hover !disabled} {{ darker(bgcolor, 0.1) }} }
-	{% endif %}
-	{% endfor %}
-	{% endfor %}
+      -indicatorforeground {{ fgcolor }} \
+      -foreground {{ fgcolor }};
+    {% endfor %}
+    {% endfor %}
 
+    {# TODO possible optimization - Rounded switch only on White background. #}
     {# Roundtoggle.TCheckbutton #}
-	{% for fgname, fgcolor in fg_colors.items() %}
-	{% for bgname, bgcolor in bg_colors.items() %}
-	{% if fgname != bgname %}
-	image create photo switch-on-{{ fgname }}-{{ bgname }} -data "{{ svg_to_base64('switch.svg', 'x24', fgcolor, rotate=180) }}"
-	image create photo switch-off-{{ fgname }}-{{ bgname }} -data "{{ svg_to_base64('switch.svg', 'x24', interpolate(fgcolor, bgcolor, 0.75)) }}"
-	image create photo switch-disabled-{{ fgname }}-{{ bgname }} -data "{{ svg_to_base64('switch.svg', 'x24', darker(bgcolor)) }}"
-
+    {% for bgname, (bgcolor, fg_colors) in switch_colors.items() %}
+    image create photo switch-disabled-{{ bgname }} -data "{{ svg_to_base64('switch.svg', 'x18', darker(bgcolor)) }}"
+    {% for fgname, fgcolor in fg_colors.items() %}
+    image create photo switch-on-{{ fgname }}-{{ bgname }} -data "{{ svg_to_base64('switch.svg', 'x18', fgcolor, rotate=180) }}"
+    image create photo switch-off-{{ fgname }}-{{ bgname }} -data "{{ svg_to_base64('switch.svg', 'x18', interpolate(fgcolor, bgcolor, 0.75)) }}"
     ttk::style element create {{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton.indicator image { \
         switch-on-{{ fgname }}-{{ bgname }} \
-        disabled switch-disabled-{{ fgname }}-{{ bgname }} \
+        disabled switch-disabled-{{ bgname }} \
         !selected  switch-off-{{ fgname }}-{{ bgname }} };
     ttk::style layout {{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton {
-        Checkbutton.padding -sticky nswe -side left -children {
-			{{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton.indicator -side left -sticky {}
-            Checkbutton.padding -side left -sticky {}
-			Checkbutton.focus -side left -sticky w -children {
-                Checkbutton.label -sticky nswe
-            }
-        }
-    }
-	ttk::style layout right.{{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton {
         Checkbutton.padding -sticky nswe -side right -children {
-			{{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
-			Checkbutton.padding -side right -sticky {}
-			Checkbutton.focus -side right -sticky w -children {
+            {{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton.indicator -side right -sticky {}
+            Checkbutton.padding -side right -sticky {}
+            Checkbutton.focus -side right -sticky e -children {
                 Checkbutton.label -sticky nswe
             }
         }
     }
-	ttk::style configure {{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton \
-	  -foreground {{ fgcolor }} \
-	  -background {{ bgcolor }};
-	ttk::style map {{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton \
-      -background { {hover !disabled} {{ darker(bgcolor, 0.1) }} }
-	{% endif %}
-	{% endfor %}
-	{% endfor %}
+    ttk::style configure {{ fgname }}.{{ bgname }}.Roundtoggle.TCheckbutton \
+      -foreground {{ fgcolor }} \
+      -background {{ bgcolor }};
+    {% endfor %}
+    {% endfor %}
 
-	{# TRadiobutton #}
+    {# TRadiobutton #}
+    ttk::style configure TRadiobutton \
+        -indicatorsize {{ font_size|abs }} \
+        -indicatorforeground {{ font_color }} \
+        -indicatorbackground "#ffffff" \
+        -indicatormargin {1 1 7 1} \
+        -padding 2 ;
+    ttk::style map TRadiobutton -indicatorbackground \
+        [list  pressed $colors(-frame) \
+            {!disabled alternate} $colors(-altindicator) \
+            {disabled alternate} $colors(-disabledaltindicator) \
+            disabled $colors(-frame)]
+    {% for bgname, (bgcolor, fg_colors) in color_mixin.items() %}
+    ttk::style configure {{ bgname }}.TRadiobutton \
+      -background {{ bgcolor }};
     {% for fgname, fgcolor in fg_colors.items() %}
-	{% for bgname, bgcolor in bg_colors.items() %}
-	{% if fgname != bgname %}
     ttk::style configure {{ fgname }}.{{ bgname }}.TRadiobutton \
-	  -indicatorsize {{ font_size|abs - 2 }} \
-	  -indicatorforeground {{ fgcolor }} \
-	  -foreground {{ fgcolor }} \
-	  -background {{ bgcolor }};
-	ttk::style map {{ fgname }}.{{ bgname }}.TRadiobutton \
-      -background { {hover !disabled} {{ darker(bgcolor, 0.1) }} }
-	{% endif %}
-	{% endfor %}
-	{% endfor %}
+      -indicatorforeground {{ fgcolor }} \
+      -foreground {{ fgcolor }};
+    {% endfor %}
+    {% endfor %}
 
 }

@@ -53,11 +53,13 @@ def svg_to_base64(svgfile, size, color=None, rotate=None):
             "SRT",
             str(rotate),
         ]
-    cmd += [
-        "-resize",
-        str(size),
-        "PNG:-",
-    ]
+    # If width and height are define, we need to extend the image to given size.
+    width, height = size.split('x', 2) if 'x' in size else (size, 0)
+    if width and height:
+        cmd += ["-resize", str(size), "-gravity", "center", "-extent", str(size)]
+    else:
+        cmd += ["-resize", str(size)]
+    cmd += ["PNG:-"]
     # Execute the conversion.
     data = subprocess.check_output(cmd, cwd=basedir)
     return base64.b64encode(data).decode('ascii')
@@ -114,6 +116,7 @@ def create_icns(name, images):
 
 
 def hex_to_rgb(value):
+    assert isinstance(value, str), 'expect a RGB code: ' + value
     if not re.match('^#(?:[0-9a-fA-F]{3}){1,2}$', value):
         raise ValueError(value)
     return (int(value[1:3], 16), int(value[3:5], 16), int(value[5:7], 16))

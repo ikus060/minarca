@@ -1,0 +1,73 @@
+<Frame style="default.TFrame">
+
+    <!-- Title -->
+    <Label pack-side="top" text="Settings" style="h1.dark.default.TLabel" pack-fill="x" />
+
+    <ScrolledFrame id="scrolled_frame" pack-fill="both" pack-expand="1" style="default.TFrame" pack-pady="25 0">
+
+        <!-- Backup instances -->
+        <Frame for="item in instances" pack-fill="both" style="light.TFrame" padding="25" pack-pady="0 25" columnconfigure-weight="0 0 1 0">
+            <!-- Icon -->
+            <Label image="remote-96-dark" visible="{{ item.is_remote() }}" style="light.TLabel" grid-row="0" grid-column="0" grid-sticky="nw" grid-padx="0 15" grid-rowspan="5"/>
+            <Label image="local-96-dark" visible="{{ item.is_local() }}" style="light.TLabel" grid-row="0" grid-column="0" grid-sticky="nw" grid-padx="0 15" grid-rowspan="5"/>
+
+            <!-- Title -->
+            <Label text="Remote backup" visible="{{ item.is_remote() }}" style="h4.dark.light.TLabel" grid-row="0" grid-column="1" grid-sticky="nw" />
+            <Label text="Local backup" visible="{{ item.is_local() }}" style="h4.dark.light.TLabel" grid-row="0" grid-column="1" grid-sticky="nw" />
+
+            <!-- Remote server-->
+            <Label text="Remote Server: " visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="1" grid-row="1" grid-sticky="w"/>
+            <Label text="{{ item.settings.remoteurl }}" visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="2" grid-row="1" grid-sticky="w"/>
+            <!-- Remote host-->
+            <Label text="Remote Host: " visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="1" grid-row="2" grid-sticky="w"/>
+            <Label text="{{ item.settings.remotehost }}" visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="2" grid-row="2" grid-sticky="w"/>
+            <!-- Username -->
+            <Label text="Username: " visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="1" grid-row="3" grid-sticky="w"/>
+            <Label text="{{ item.settings.username }}" visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="2" grid-row="3" grid-sticky="w"/>
+            <!-- Repo name -->
+            <Label text="Repository name: " visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="1" grid-row="4" grid-sticky="w"/>
+            <Label text="{{ item.settings.repositoryname }}" visible="{{ item.is_remote() }}" style="dark.light.TLabel" grid-column="2" grid-row="4" grid-sticky="w"/>
+
+            <!-- Local disk caption -->
+            <Label text="Device name: " visible="{{ item.is_local() }}" style="dark.light.TLabel" grid-column="1" grid-row="1" grid-sticky="w"/>
+            <Label text="{{ item.settings.localcaption }}" visible="{{ item.is_local() }}" style="dark.light.TLabel" grid-column="2" grid-row="1" grid-sticky="w"/>
+            <!-- Local path -->
+            <Label text="Location: " visible="{{ item.is_local() }}" style="dark.light.TLabel" grid-column="1" grid-row="2" grid-sticky="w"/>
+            <Label text="{{ item.settings.localrelpath }}" visible="{{ item.is_local() }}" style="dark.light.TLabel" grid-column="2" grid-row="2" grid-sticky="w"/>
+
+            <!-- Configure -->
+            <Button text="Configure" command="show_instance_settings(item)" style="secondary.TButton" cursor="hand2" grid-row="0" grid-column="2" grid-sticky="ne"/>
+        </Frame>
+
+        <!-- Create instance -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="0 25" columnconfigure-weight="1 0">
+            <Label style="h3.dark.light.TLabel" text="Add a backup" grid-row="0" grid-column="0" grid-sticky="w"/>
+            <Button style="secondary.TButton" text="Add" command="show_instance_create" cursor="hand2" grid-row="0" grid-column="1" grid-sticky="e"/>
+            <Label style="dark.light.TLabel" text="Allows you to configure another remote data backup." wrap="1" grid-row="1" grid-column="0" grid-columnspan="2" grid-sticky="we" />
+        </Frame>
+
+        <!-- Update -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="0 0">
+            <Frame style="light.TFrame" pack-fill="x" pack-side="top">
+                <Label style="h3.dark.light.TLabel" text="Updates" pack-side="left" />
+                <Button id="check_latest_version_button" text="Check now" command="_check_latest_version" pack-side="right" style="secondary.TButton" cursor="hand2"/>
+                <Checkbutton id="check_latest_version_toggle_button" text="Check for update at startup" variable="{{check_latest_version}}" style="right.dark.light.Roundtoggle.TCheckbutton" pack-fill="x" pack-side="right" pack-padx="0 10" cursor="hand2"/>
+            </Frame>
+
+            <Frame style="light.TFrame" pack-fill="x" pack-side="left">
+                <Label text="Checking for updates" visible="{{checking_for_update}}" pack-fill="x" style="info.light.TLabel" compound="right" image="dots-16-info" />
+                <Label text="Current version is up-to-date" style="success.light.TLabel" visible="{{is_latest is True}}" pack-fill="x" />
+                <Label text="Your version may be upgraded" style="info.light.TLabel" visible="{{is_latest is False}}" pack-fill="x" />
+                <Label text="Cannot check for updates. Try again later." style="danger.light.TLabel" visible="{{check_latest_version_error is not None}}" pack-fill="x">
+                    <Tooltip text="{{check_latest_version_error}}" width="50" />
+                </Label>
+                <Label text="Allows you to easily verify if there are any new software updates available." style="dark.light.TLabel" visible="{{not checking_for_update and is_latest is None and check_latest_version_error is None}}" pack-fill="x" />
+            </Frame>
+
+            <Label text="{{ version }}" style="small.dark.light.TLabel" pack-fill="x" pack-side="right"/>
+        </Frame>
+
+
+    </ScrolledFrame>
+
+</Frame>

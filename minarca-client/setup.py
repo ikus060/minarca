@@ -15,12 +15,13 @@ import sys
 import setuptools
 
 install_requires = [
+    "humanfriendly",
     "javaproperties",
     "packaging",
     "psutil",
     "rdiff-backup==2.2.5",
     "requests>=2.25.1",
-    "tkvue==2.1.4",
+    "tkvue==3.0.0a20",
     "wakepy==0.6.0",
 ]
 
@@ -62,7 +63,7 @@ setuptools.setup(
     include_package_data=True,
     packages=setuptools.find_packages("."),
     setup_requires=[
-        "setuptools_scm>=3.2",
+        "setuptools_scm>=3.2,<8",
     ],
     # required packages for build process
     extras_require={

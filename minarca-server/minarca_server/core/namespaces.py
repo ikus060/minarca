@@ -10,7 +10,8 @@ import subprocess
 import sys
 import time
 
-from .mount import MS_NODEV, MS_NOEXEC, MS_NOSUID, MS_PRIVATE, MS_REC, MS_RELATIME, MS_SLAVE
+from .mount import (MS_NODEV, MS_NOEXEC, MS_NOSUID, MS_PRIVATE, MS_REC,
+                    MS_RELATIME, MS_SLAVE)
 from .mount import mount as _mount
 
 CLONE_FS = 0x00000200

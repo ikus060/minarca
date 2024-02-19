@@ -7,7 +7,6 @@
 # Use is subject to license terms.
 
 import rdiffweb.main
-
 from minarca_server.app import MinarcaApplication
 
 

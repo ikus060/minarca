@@ -18,8 +18,8 @@ import sys
 
 import cherrypy
 import configargparse
-
-from minarca_quota_api.zfs_quota import get_quota, is_project_quota_enabled, set_quota
+from minarca_quota_api.zfs_quota import (get_quota, is_project_quota_enabled,
+                                         set_quota)
 
 try:
     import pkg_resources

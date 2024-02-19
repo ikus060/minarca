@@ -26,12 +26,11 @@ from io import open
 from unittest.mock import ANY
 
 import cherrypy
+import minarca_server
+import minarca_server.tests
 import pkg_resources
 import responses
 from rdiffweb.core.model import SshKey, UserObject
-
-import minarca_server
-import minarca_server.tests
 
 
 class MinarcaApplicationTestPageAdminUsers(minarca_server.tests.AbstractMinarcaTest):
