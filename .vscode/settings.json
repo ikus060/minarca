@@ -1,8 +1,6 @@
 {
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
-    "python.formatting.provider": "black",
-    "python.formatting.autopep8Args": [
-        "--max-line-length=200"
-    ]
+    "python.testing.autoTestDiscoverOnSaveEnabled": false,
+    "editor.suggestSelection": "recentlyUsedByPrefix"
 }

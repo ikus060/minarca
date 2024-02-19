@@ -12,7 +12,7 @@ import unittest
 
 import responses  # @UnresolvedImport
 
-from minarca_client.core import Rdiffweb
+from minarca_client.core.rdiffweb import Rdiffweb
 
 IDENTITY = """[test.minarca.net]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK/Qng4S5d75rtYxklVdIkPiz4paf2pdnCEshUoailQO root@sestican
 [test.minarca.net]:2222 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCi0uz4rVsLpVl8b6ozYzL+t1Lh9P98a0tY7KqAtzFupjtZivdIYxh6jXPeonYo7egY+mFgMX22Tlrth8woRa2M= root@sestican
@@ -25,7 +25,10 @@ class TestRdiffweb(unittest.TestCase):
     def setUp(self):
         responses.add(responses.GET, "http://localhost/", status=303, headers={'Location': '/login/?redirect=%2F'})
         responses.add(responses.GET, "http://localhost/api/")
-        self.rdiffweb = Rdiffweb('http://localhost/', 'admin', 'admin123')
+        self.rdiffweb = Rdiffweb('http://localhost/')
+        self.rdiffweb.auth = ('admin', 'admin123')
+        # Make a call to test to trigger verification.
+        self.rdiffweb._test()
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
         os.chdir(self.tmp.name)
@@ -36,20 +39,23 @@ class TestRdiffweb(unittest.TestCase):
 
     @responses.activate
     def test_get_current_user_info(self):
+        # Give a server returning a response
         responses.add(
             responses.GET,
             "http://localhost/api/currentuser/",
             body='{"email": "admin@example.com", "username": "admin", "repos": []}',
         )
+        # When making query of current user info
         data = self.rdiffweb.get_current_user_info()
+        # Then info is
         self.assertEqual("admin@example.com", data['email'])
         self.assertEqual("admin", data['username'])
         self.assertEqual([], data['repos'])
 
     @responses.activate
-    def test_add_ssh_key(self):
+    def test_post_ssh_key(self):
         responses.add(responses.POST, "http://localhost/api/currentuser/sshkeys")
-        self.rdiffweb.add_ssh_key(
+        self.rdiffweb.post_ssh_key(
             'coucou',
             'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCpGT3vU6FBQ6fsd4Ph/Bs9UtCqJS2OgR2s53Ud1YSsPSGU6hbowh/KJT5RtN7XIoXT4JI28sHH/HodkaG1g6G3320YPD6KNJPoFxEhl5tCFCqrORD98nBO9bJBTtldHAtNTrQXPFx04PeHMrm58We9tCe6xaSt4udLxQScv+r6F1iSgEfGTuYS7/XT/1n4KMHciPeFADWpN5Vd8aj+c//xJY+DvAoyGGu5VhSqg2QBsr/D56h9Xxwtau/zrFlTnEe1yx9ar2udMGgOjUmh4Um/EOLyBWpqQERnbdENATeUtiGssmsxDoC8JBMhAz+mP8bMTm23ZS2VXysT3Qz/mUEt',
         )

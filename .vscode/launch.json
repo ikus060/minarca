@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+        {
             "name": "Python: Minarca Client GUI",
             "type": "python",
             "request": "launch",
@@ -17,6 +25,7 @@
             "env": {
                 "LANGUAGE": "fr",
                 "MINARCA_CONFIG_HOME": "/tmp",
+                "__NV_PRIME_RENDER_OFFLOAD": "0",
             }
         },
         {
@@ -25,7 +34,17 @@
             "request": "launch",
             "module": "minarca_client.main",
             "args": [
-                "restore"
+                "rdiff-backup",
+                "-v",
+                "5",
+                "backup",
+                "--no-compression",
+                "--include",
+                "/home/ikus060/Pictures/Wallpapers/update*",
+                "--exclude",
+                "/**",
+                "/",
+                "/media/ikus060/Backups/minarca/pop-os/"
             ],
             "console": "integratedTerminal",
             "justMyCode": false,
@@ -54,12 +73,6 @@
                 "ikus060"
             ],
             "console": "integratedTerminal",
-            "justMyCode": false,
-        },
-        {
-            "name": "Debug Unit Test",
-            "type": "python",
-            "request": "test",
             "justMyCode": false,
         },
     ]

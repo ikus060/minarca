@@ -1,11 +1,12 @@
 # Python script used to apply the patches
 
-import patch  # noqa
+import glob
+import os
 import subprocess
 import sys
-import os
-import glob
 import sysconfig
+
+import patch  # noqa
 
 # Get location of all the patch file
 patches_dir = os.path.dirname(os.path.realpath(__file__))

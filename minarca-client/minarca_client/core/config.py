@@ -6,17 +6,36 @@ Created on Jun. 8, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+import ast
 import datetime
+import logging
 import os
 import re
 import time
 from collections import namedtuple
+from collections.abc import MutableSequence
 from functools import total_ordering
+from typing import Any
 
 import javaproperties
+import psutil
 
 from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, get_config_home, get_home, get_temp
 from minarca_client.locale import _
+
+logger = logging.getLogger(__name__)
+
+
+def list_from_string(value):
+    """
+    Convert string "[5, 6]" to a real python array.
+    """
+    if isinstance(value, list):
+        return value
+    value = ast.literal_eval(value)
+    if isinstance(value, list):
+        return value
+    return []
 
 
 @total_ordering
@@ -31,7 +50,7 @@ class Datetime:
         self.epoch_ms = int(epoch_ms)
 
     def __str__(self):
-        return time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(self.epoch_ms / 1000))
+        return str(int(self))
 
     def __repr__(self):
         return 'Datetime(%s)' % self.epoch_ms
@@ -59,105 +78,188 @@ class Datetime:
             return Datetime(epoch_ms=self.epoch_ms + (other.total_seconds() * 1000))
         raise ValueError()
 
+    def strftime(self, fmt):
+        return time.strftime(fmt, time.localtime(self.epoch_ms / 1000))
 
-class Status(dict):
+
+class AbstractConfigFile:
+    def __init__(self, filename: str):
+        assert filename, 'a filename is required'
+        self._fn = filename
+        self._data = None
+        self.reload()
+
+    def reload(self):
+        """
+        Check if the file changed since last loading. If not does nothing. Othersiw will read the file data.
+        """
+        self._data = self._load()
+
+    def _load(self):
+        raise NotImplementedError()
+
+    def save(self):
+        raise NotImplementedError()
+
+    def __enter__(self):
+        # Load file content.
+        self.reload()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Save changes in all cases.
+        self.save()
+
+
+class KeyValueConfigFile(AbstractConfigFile):
     """
-    Used to persists backup status.
+    Configurated with key value supporting getter and setter.
     """
 
-    LAST_RESULTS = ['SUCCESS', 'FAILURE', 'UNKNOWN', 'RUNNING', 'STALE', 'INTERRUPT']
-    _DEFAULT = {
-        'details': None,
-        'lastdate': None,
-        'lastresult': 'UNKNOWN',
-        'lastsuccess': None,
-        'pid': None,
-        'action': 'backup',
-    }
+    def __init__(self, filename: str):
+        assert self._fields, 'subclass must define list of fields'
+        super().__init__(filename)
 
-    def __init__(self, filename):
-        assert filename
-        self.filename = filename
-        self._load()
+    def _load(self):
+        data = {field: default for field, unused, default in self._fields}
+        try:
+            with open(self._fn, 'r', encoding='latin-1') as f:
+                # Read raw data from java properties files.
+                raw_data = javaproperties.load(f)
+                # Then read values field by field, use default if not defined otherwise try to coerse the value.
+                for field, coerse, default in self._fields:
+                    value = raw_data.get(field, None)
+                    if value is None:
+                        data[field] = default
+                    else:
+                        try:
+                            data[field] = coerse(value)
+                        except (ValueError, KeyError):
+                            data[field] = default
+        except FileNotFoundError:
+            pass
+        return data
 
     def save(self):
         values = {
-            k: str(int(v)) if k in ['lastdate', 'lastsuccess'] else str(v) for k, v in self.items() if v is not None
+            field: str(self._data.get(field)) for field, *unused in self._fields if self._data.get(field) is not None
         }
-        with open(self.filename, 'w', encoding='latin-1') as f:
-            return javaproperties.dump(values, f)
+        with open(self._fn, 'w', encoding='latin-1') as f:
+            javaproperties.dump(values, f)
 
-    def _load(self):
-        self.clear()
-        self.update(self._DEFAULT)
-        if not os.path.exists(self.filename):
-            return
-        with open(self.filename, 'r', encoding='latin-1') as f:
-            self.update(javaproperties.load(f))
-            # Convert date from epoch in milliseconds
-            for field in ['lastdate', 'lastsuccess']:
-                if self[field]:
-                    try:
-                        self[field] = Datetime(self[field])
-                    except (ValueError, KeyError):
-                        self[field] = None
+    def __getattr__(self, name: str) -> Any:
+        # Check if name is valid
+        if name not in [f for f, *unused in self._fields]:
+            raise AttributeError(name)
+        # If not, we need to reload the file.
+        return self._data.get(name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name.startswith("_"):
+            # Attribute starting with "_" are private variables.
+            super().__setattr__(name, value)
+        else:
+            # Check if name is valid
+            for f, coerse, unused in self._fields:
+                if name == f:
+                    # Update dict
+                    self._data[name] = coerse(value)
+                    return
+            raise AttributeError(name)
+
+    def clear(self):
+        """
+        Restore defaults.
+        """
+        self._data = {field: default for field, unused, default in self._fields}
 
 
-class Settings(dict):
-    """
-    Used to store minarca settings in `minarca.properties`
-    """
+LAST_RESULTS = ['SUCCESS', 'FAILURE', 'RUNNING', 'STALE', 'INTERRUPT']
 
+
+def _default(cls, default_value=None):
+    def func(x):
+        if x is None:
+            return default_value
+        else:
+            return cls(x)
+
+    return func
+
+
+class Status(KeyValueConfigFile):
+    RUNNING_DELAY = 5  # When running status file get updated every 5 seconds.
+
+    _fields = [
+        ('details', str, None),
+        ('lastdate', lambda x: Datetime(x) if x else None, None),
+        ('lastresult', lambda x: x if x in LAST_RESULTS else 'UNKNOWN', 'UNKNOWN'),
+        ('lastsuccess', lambda x: Datetime(x) if x else None, None),
+        ('pid', int, None),
+        ('action', lambda x: x if x in ['backup', 'restore'] else None, None),
+    ]
+
+    @property
+    def current_status(self):
+        """
+        Return a backup status. Read data from the status file and make
+        interpretation of it.
+        """
+        now = Datetime()
+        # After reading the status file, let determine the real status.
+        data = dict(self._data)
+        if data.get('lastresult') == 'RUNNING':
+            # Get pid and checkif process is running.
+            pid = data.get('pid')
+            if not pid:
+                return 'INTERRUPT'
+            try:
+                psutil.Process(data.get('pid')).is_running()
+            except (ValueError, psutil.NoSuchProcess):
+                return 'INTERRUPT'
+            # Then let check if the status file was updated within the last 10 seconds.
+            lastdate = data.get('lastdate')
+            if lastdate and now - lastdate > datetime.timedelta(seconds=self.RUNNING_DELAY * 2):
+                return 'STALE'
+        # By default return lastresult value.
+        return data.get('lastresult')
+
+
+class Settings(KeyValueConfigFile):
     DAILY = 24
     HOURLY = 1
     WEEKLY = 168
     MONTHLY = 720
 
-    _DEFAULT = {
-        'username': None,
-        'repositoryname': None,
-        'remotehost': None,
-        'remoteurl': None,
-        'schedule': DAILY,
-        'configured': False,
-        'pause_until': None,
+    _fields = [
+        ('username', str, None),
+        ('accesstoken', str, None),
+        ('repositoryname', str, None),
+        ('remotehost', str, None),
+        ('remoteurl', str, None),
+        ('schedule', int, DAILY),
+        ('configured', lambda x: x in [True, 'true', 'True', '1'], False),
+        ('pause_until', lambda x: Datetime(x) if x else None, None),
+        ('diskid', str, None),
+        ('maxage', int, None),
+        ('remove_older', int, None),
+        ('ignore_weekday', list_from_string, None),
+        ('keepdays', int, None),
+        ('maxage', int, None),
         # Load default value from environment variable to ease unittest
-        'check_latest_version': os.environ.get('MINARCA_CHECK_LATEST_VERSION', 'True') in [True, 'true', 'True', '1'],
-    }
+        (
+            'check_latest_version',
+            lambda x: os.environ.get('MINARCA_CHECK_LATEST_VERSION', str(x)).lower() in ['true', 'True', '1'],
+            True,
+        ),
+        ('localuuid', str, None),
+        ('localrelpath', str, None),
+        ('localcaption', str, None),
+    ]
 
-    def __init__(self, filename):
-        assert filename
-        self.filename = filename
-        self._load()
-
-    def save(self):
-        values = {k: str(int(v)) if k in ['pause_until'] else str(v) for k, v in self.items() if v is not None}
-        with open(self.filename, 'w', encoding='latin-1') as f:
-            return javaproperties.dump(values, f)
-
-    def _load(self):
-        self.clear()
-        self.update(self._DEFAULT)
-        if not os.path.exists(self.filename):
-            return
-        with open(self.filename, 'r', encoding='latin-1') as f:
-            self.update(javaproperties.load(f))
-            # schedule is an integer
-            try:
-                self['schedule'] = int(self['schedule'])
-            except (ValueError, KeyError):
-                self['schedule'] = self._DEFAULT.get('schedule')
-            # boolean fields
-            for key in ['configured', 'check_latest_version']:
-                try:
-                    self[key] = self[key] in [True, 'true', 'True', '1']
-                except KeyError:
-                    self[key] = self._DEFAULT.get(key)
-            # pause_until is a date
-            try:
-                self['pause_until'] = Datetime(self['pause_until']) if self['pause_until'] else None
-            except (ValueError, KeyError):
-                self['pause_until'] = None
+    @property
+    def remote(self):
+        return self.diskid is None
 
 
 class InvalidPatternError(Exception):
@@ -172,63 +274,66 @@ Pattern = namedtuple('Pattern', ['include', 'pattern', 'comment'])
 Pattern.is_wildcard = lambda self: '*' in self.pattern or '?' in self.pattern or '[' in self.pattern
 
 
-class Patterns(list):
-    def __init__(self, filename):
-        assert filename
-        self.filename = filename
-        self._load()
-
+class Patterns(AbstractConfigFile, MutableSequence):
     def _load(self):
-        self.clear()
-        if not os.path.exists(self.filename):
-            return
-        with open(self.filename, 'r', encoding='utf-8', errors='replace') as f:
-            comment = None
-            for line in f.readlines():
-                line = line.rstrip()
-                # Skip comment
-                if line.startswith("#") or not line.strip():
-                    comment = line[1:].strip()
-                    continue
-                if line[0] not in ['+', '-']:
-                    raise InvalidPatternError(line)
-                include = line[0] == '+'
-                try:
-                    self.append(Pattern(include, line[1:], comment))
-                except ValueError:
-                    # Ignore duplicate pattern
-                    pass
+        data = []
+        try:
+            with open(self._fn, 'r', encoding='utf-8', errors='replace') as f:
                 comment = None
+                for line in f.readlines():
+                    line = line.rstrip()
+                    # Skip comment
+                    if line.startswith("#") or not line.strip():
+                        comment = line[1:].strip()
+                        continue
+                    if line[0] not in ['+', '-']:
+                        raise InvalidPatternError(line)
+                    include = line[0] == '+'
+                    try:
+                        data.append(Pattern(include, line[1:], comment))
+                    except ValueError:
+                        # Ignore duplicate pattern
+                        pass
+                    comment = None
+        except FileNotFoundError:
+            data = []
+        return data
 
-    def append(self, p):
-        """
-        Check for duplicate pattern.
-        """
+    def __getitem__(self, idx):
+        return self._data[idx]
+
+    def __setitem__(self, idx, value):
+        assert isinstance(value, Pattern), 'this collection only support pattern'
+        # Update list
+        self._data[idx] = value
+
+    def __delitem__(self, idx):
+        del self._data[idx]
+
+    def __len__(self):
+        return len(self._data)
+
+    def insert(self, index, value):
+        assert isinstance(value, Pattern), 'this collection only support pattern'
         # Make sure to remove opposite pattern
-        for item in self:
-            if item.pattern == p.pattern:
+        for item in self._data:
+            if item.pattern == value.pattern:
                 self.remove(item)
-        super().append(p)
+        self._data.insert(index, value)
 
-    def extend(self, other_patterns):
-        """
-        Check for duplicate pattern.
-        """
-        for p in other_patterns:
-            self.append(p)
-
+    @classmethod
     def defaults(self):
         """
         Restore defaults patterns.
         """
-        self.clear()
+        data = []
         # Add user's documents
-        self.append(Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")))
+        data.append(Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")))
         # Add Minarca config
-        self.append(Pattern(True, os.path.join(get_config_home(), 'patterns'), _("Minarca Config")))
+        data.append(Pattern(True, os.path.join(get_config_home(), 'patterns*'), _("Minarca Config")))
 
         if IS_WINDOWS:
-            self.extend(
+            data.extend(
                 [
                     Pattern(False, "**/Thumbs.db", _("Thumbnails cache")),
                     Pattern(False, "**/desktop.ini", _("Arrangement of a Windows folder")),
@@ -246,13 +351,13 @@ class Patterns(list):
                 ]
             )
         elif IS_MAC:
-            self.extend(
+            data.extend(
                 [
                     Pattern(False, "**/.DS_Store", _("Desktop Services Store")),
                 ]
             )
         elif IS_LINUX:
-            self.extend(
+            data.extend(
                 [
                     Pattern(False, "/dev", _("dev filesystem")),
                     Pattern(False, "/proc", _("proc filesystem")),
@@ -266,20 +371,19 @@ class Patterns(list):
                     Pattern(False, "**/*~", _("Vim Temporary files")),
                 ]
             )
+        return data
 
     def save(self):
-        with open(self.filename, 'w', encoding='utf-8') as f:
-            self.write(f)
-
-    def write(self, f):
-        assert f
-        assert hasattr(f, 'write')
-        for pattern in self:
-            # Write comments if any
-            if pattern.comment:
-                f.write("# %s\n" % pattern.comment.strip())
-            # Write patterns
-            f.write(('+%s\n' if pattern.include else '-%s\n') % pattern.pattern)
+        """
+        Write all the pattern to the file.
+        """
+        with open(self._fn, 'w', encoding='utf-8') as f:
+            for pattern in self._data:
+                # Write comments if any
+                if pattern.comment:
+                    f.write("# %s\n" % pattern.comment.strip())
+                # Write patterns
+                f.write(('+%s\n' if pattern.include else '-%s\n') % pattern.pattern)
 
     def group_by_roots(self):
         """

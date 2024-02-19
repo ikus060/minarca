@@ -43,8 +43,8 @@
   OutFile "${OutFile}"
   
   ; Define icon
-  !define MUI_ICON "minarca_client/ui/theme/minarca.ico"
-  !define MUI_UNICON "minarca_client/ui/theme/minarca.ico"
+  !define MUI_ICON "minarca_client/ui/theme/resources/minarca.ico"
+  !define MUI_UNICON "minarca_client/ui/theme/resources/minarca.ico"
  
   ;Folder selection page
   InstallDir "$PROGRAMFILES64\Minarca"

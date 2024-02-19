@@ -1,0 +1,97 @@
+<Frame style="default.TFrame">
+    <!-- Title -->
+    <Frame pack-fill="x" style="default.TFrame">
+        <Button image="arrow-left-circle-fill-24-dark" command="show_home" style="dark.default.TLink" pack-side="left" cursor="hand2" />
+        <Label pack-side="top" text="{{ header_text }}" style="h1.dark.default.TLabel" pack-side="left" pack-fill="x" />
+    </Frame>
+
+    <!-- Backup instances -->
+    <ScrolledFrame id="scrolled_frame" pack-fill="both" pack-expand="1" style="default.TFrame" pack-pady="5 0">
+
+        <!-- General Info -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="0 0">
+            <Label style="h3.dark.light.TLabel" text="Destination" grid-column="0" grid-row="0" grid-columnspan="2" width="15" grid-sticky="w"/>
+            <!-- Remote server-->
+            <Label text="Remote Server: " visible="{{ is_remote }}" style="dark.light.TLabel" grid-column="0" grid-row="1" grid-sticky="w"/>
+            <Button text="{{ remoteurl }}" visible="{{ is_remote }}" command="show_backup_files" style="dark.light.TLink" grid-column="1" grid-row="1" grid-sticky="w" cursor="hand2"/>
+            <!-- Remote host-->
+            <Label text="Remote Host: " visible="{{ is_remote }}" style="dark.light.TLabel" grid-column="0" grid-row="2" grid-sticky="w"/>
+            <Label text="{{ remotehost }}" visible="{{ is_remote }}" style="dark.light.TLabel" grid-column="1" grid-row="2" grid-sticky="w"/>
+            <!-- Username -->
+            <Label text="Username: " visible="{{ is_remote }}" style="dark.light.TLabel" grid-column="0" grid-row="3" grid-sticky="w"/>
+            <Label text="{{ username }}" visible="{{ is_remote }}" style="dark.light.TLabel" grid-column="1" grid-row="3" grid-sticky="w"/>
+            <!-- Repo name -->
+            <Label text="Repository name: " visible="{{ is_remote }}" style="dark.light.TLabel" grid-column="0" grid-row="4" grid-sticky="w"/>
+            <Label text="{{ repositoryname }}" visible="{{ is_remote }}" style="dark.light.TLabel" grid-column="1" grid-row="4" grid-sticky="w"/>
+
+            <!-- Local disk caption -->
+            <Label text="Device name: " visible="{{ is_local }}" style="dark.light.TLabel" grid-column="0" grid-row="1" grid-sticky="w"/>
+            <Label text="{{ localcaption }}" visible="{{ is_local }}" style="dark.light.TLabel" grid-column="1" grid-row="1" grid-sticky="w"/>
+            <!-- Local path -->
+            <Label text="Location: " visible="{{ is_local }}" style="dark.light.TLabel" grid-column="0" grid-row="2" grid-sticky="w"/>
+            <Label text="{{ localrelpath }}" visible="{{ is_local }}" style="dark.light.TLabel" grid-column="1" grid-row="2" grid-sticky="w"/>
+            <!-- Local UUID -->
+            <Label text="Unique identifier: " visible="{{ is_local }}" style="dark.light.TLabel" grid-column="0" grid-row="3" grid-sticky="w"/>
+            <Label text="{{ localuuid }}" visible="{{ is_local }}" style="dark.light.TLabel" grid-column="1" grid-row="3" grid-sticky="w"/>
+        </Frame>
+
+        <!-- Selected files -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+            <Frame style="light.TFrame" padding="0" pack-fill="x" pack-pady="0 15">
+                <Label style="h3.dark.light.TLabel" text="Selected files" width="15" pack-side="left"/>
+                <Button text="Change" command="show_patterns" style="secondary.TButton" cursor="hand2" pack-side="right" />
+            </frame>
+            <Label for="item in patterns" text="{{item.comment or item.pattern}}" style="dark.light.TLabel" pack-side="top" pack-anchor="w">
+                <ToolTip text="{{ item.pattern }}" />
+            </Label>
+        </Frame>
+
+        <!-- Frequency -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+            <Label style="h3.dark.light.TLabel" text="Frequency" pack-anchor="nw" width="15" />
+            <Label text="Configure when you want your backup to take place." style="dark.light.TLabel" pack-fill="x" wrap="1" pack-pady="0 15"/>
+            <Radiobutton id="hourly_btn" style="dark.light.TRadiobutton" command="update_schedule(1)" value="1" text="Hourly" variable="{{schedule}}" pack-side="left" pack-pady="0 5" width="22" cursor="hand2"/>
+            <Radiobutton id="daily_btn" style="dark.light.TRadiobutton" command="update_schedule(24)" value="24" text="Once a day" variable="{{schedule}}" pack-side="left" pack-pady="0 5" width="22" cursor="hand2"/>
+            <Radiobutton id="twice_btn" style="dark.light.TRadiobutton" command="update_schedule(12)" value="12" text="Twice a day" variable="{{schedule}}" pack-side="left" pack-pady="0 5" width="22" cursor="hand2"/>
+        </Frame>
+
+        <!-- Pause -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+            <Frame style="light.TFrame" padding="0" pack-fill="x" pack-pady="0 15">
+                <Label style="h3.dark.light.TLabel" text="Suspend" width="15" pack-side="left"/>
+                <!-- Pause button -->
+                <Checkbutton id="pause_btn" pack-side="right" command="toggle_pause" selected="{{ pause_until is not None }}" text="Suspended" style="right.dark.light.Roundtoggle.TCheckbutton" cursor="hand2"/>
+            </frame>
+            <Label style="dark.light.TLabel" text="This feature lets you pause backup operations for 24 hours. Ideal when you need to reduce the use of system resources or free up bandwidth for other activities." pack-fill="x" wrap="1" />
+        </Frame>
+
+        <!-- Run if logged out -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0" visible="{{show_run_if_logged_out}}">
+            <Frame style="light.TFrame" padding="0" pack-fill="x" pack-pady="0 15">
+                <Label style="h3.dark.light.TLabel" text="Advance Options" pack-side="left" />
+                <Checkbutton id="run_if_logged_out_btn" pack-side="right" command="toggle_run_if_logged_out" selected="{{run_if_logged_out}}" text="Run whether user is logged on or not" style="right.dark.light.Roundtoggle.TCheckbutton" cursor="hand2"/>
+            </Frame>
+            <Label style="dark.light.TLabel" text="This feature allows Minarca to run scheduled backup tasks regardless of whether a user is currently logged on to the system or not. This is particularly useful for server." pack-fill="x" wrap="1" />
+        </Frame>
+
+        <!-- Notification -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+            <Frame style="light.TFrame" pack-fill="x">
+                <Label style="h3.dark.light.TLabel" text="Notification" pack-side="left" />
+                <Button style="secondary.TButton" text="Modify" command="show_notification" cursor="hand2" pack-side="right" />
+            </Frame>
+            <Label style="dark.light.TLabel" text="To change your notification preferences and be notified of problems, log in to your online account." pack-fill="x" wrap="1" />
+        </Frame>
+
+        <!-- Forget -->
+        <Frame pack-fill="both" style="light.TFrame" padding="25" pack-pady="25 0">
+            <Frame style="light.TFrame" pack-fill="x">
+                <Label style="h3.dark.light.TLabel" text="Forgetting the backup" pack-side="left" />
+                <Button style="secondary.TButton" text="Forget" command="forget" cursor="hand2" pack-side="right" />
+            </Frame>
+            <Label style="dark.light.TLabel" text="Allows you to delete the configuration of this backup and stop automatic data backup for this destination." pack-fill="x" wrap="1" />
+        </Frame>
+
+    </ScrolledFrame>
+
+</Frame>

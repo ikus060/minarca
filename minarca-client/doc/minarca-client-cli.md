@@ -136,12 +136,12 @@ minarca status [-h]
 
 - `-h`, `--help`: Show the help message and exit.
 
-### `unlink`
+### `forget`
 
-Unlink the Minarca agent from the server.
+Forget the Minarca agent from the server.
 
 ```sh
-minarca unlink [-h]
+minarca forget [-h]
 ```
 
 - `-h`, `--help`: Show the help message and exit.
