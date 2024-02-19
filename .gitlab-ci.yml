@@ -56,9 +56,9 @@ bdist-server:deb:
   - apt -y --no-install-recommends install devscripts lsb-release
   - cd $TARGET
   - apt build-dep -y .
-  - export DEB_VERSION=$(lsb_release -rs)
+  - export DEB_VERSION=$(lsb_release -is | sed -e 's/\(.*\)/\L\1/')$(lsb_release -rs| sed -e 's/\.//')
   - export APP_VERSION=$(python3 setup.py --version)
-  - export VERSION=${APP_VERSION}+deb${DEB_VERSION}
+  - export VERSION=${APP_VERSION}+${DEB_VERSION}
   - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
   - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
   - dpkg-buildpackage -b

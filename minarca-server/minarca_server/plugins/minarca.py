@@ -118,12 +118,17 @@ class MinarcaPlugin(SimplePlugin):
         When added (manually or not). Update user's attributes.
         """
         assert isinstance(userobj, UserObject)
+        # Assign new user_root
         try:
             userobj.user_root = self._get_user_root(userobj)
             self._create_user_root(userobj)
-            userobj.refresh_repos(delete=True)
         except Exception:
             logger.warning('fail to update user [%s] root', userobj.username, exc_info=1)
+        # Refresh list of repo
+        try:
+            userobj.refresh_repos(delete=True)
+        except Exception:
+            logger.warning('fail to refresh user [%s] repositories', userobj.username, exc_info=1)
 
     def user_attr_changed(self, userobj, attrs={}):
         """

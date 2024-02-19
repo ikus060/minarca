@@ -7,9 +7,6 @@
 # Use is subject to license terms.
 
 import logging
-import os
-from io import open
-from urllib.parse import urlparse
 
 import cherrypy
 import pkg_resources
@@ -18,6 +15,7 @@ from rdiffweb.rdw_app import RdiffwebApp
 
 import minarca_server.plugins.minarca  # noqa
 from minarca_server.config import parse_args
+from minarca_server.controller.api import MinarcaApiPage
 
 # Define logger for this module
 logger = logging.getLogger(__name__)
@@ -50,42 +48,12 @@ class MinarcaApplication(RdiffwebApp):
                 'notification.current_version': self.version,
             }
         )
-        # Add few pages.
-        self.root.api.minarca = self.get_minarca
+        # Replace API to support additional endpoint and authentication method.
+        self.root.api = MinarcaApiPage()
+        # Provide /help
         self.root.help = self.get_help
         # Add background
         self.root.static.bg_jpg = staticfile(pkg_resources.resource_filename(__name__, 'bg.jpg'))
-
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def get_minarca(self):
-        # RemoteHost
-        remotehost = self.cfg.minarca_remote_host
-        if not remotehost:
-            remotehost = urlparse(cherrypy.request.base).hostname
-
-        # Identity known_hosts
-        identity = ""
-        files = [
-            f
-            for f in os.listdir(self.cfg.minarca_remote_host_identity)
-            if f.startswith('ssh_host')
-            if f.endswith('.pub')
-        ]
-        for fn in files:
-            with open(os.path.join(self.cfg.minarca_remote_host_identity, fn)) as fh:
-                if ':' in remotehost:
-                    hostname, port = remotehost.split(':', 1)
-                    identity += "[" + hostname + "]:" + port + " " + fh.read()
-                else:
-                    identity += remotehost + " " + fh.read()
-
-        # Get remote host value from config or from URL
-        return {
-            "version": pkg_resources.get_distribution("minarca-server").version,
-            "remotehost": remotehost,
-            "identity": identity,
-        }
 
     @cherrypy.expose
     @cherrypy.tools.i18n(on=False)

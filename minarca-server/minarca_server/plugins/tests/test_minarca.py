@@ -34,6 +34,34 @@ import minarca_server
 import minarca_server.tests
 
 
+class MinarcaApplicationTestPageAdminUsers(minarca_server.tests.AbstractMinarcaTest):
+    login = True
+
+    def test_create_new_user(self):
+        # Given an administrator authenticated
+        # When creating a new user in Minarca
+        self.getPage(
+            "/admin/users/new",
+            method="POST",
+            body={
+                'action': 'add',
+                'username': 'patrik',
+                'fullname': 'Patrik Dufresne',
+                'password': 'this is my long password',
+                'user_root': '',
+            },
+        )
+        self.assertStatus(303)
+        self.getPage("/admin/users/")
+        # Then no error are displayed to the user
+        self.assertNotInBody('alert-danger')
+        # Then succes message is displayed
+        self.assertInBody('User added successfully.')
+        # Then user get added in database
+        userobj = UserObject.get_user('patrik')
+        self.assertEqual(self.base_dir + '/patrik', userobj.user_root)
+
+
 class MinarcaPluginTest(minarca_server.tests.AbstractMinarcaTest):
     basic_headers = [("Authorization", "Basic " + b64encode(b"admin:admin123").decode('ascii'))]
 
