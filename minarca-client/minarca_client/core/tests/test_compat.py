@@ -6,6 +6,7 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+import asyncio
 import os
 import subprocess
 import tempfile
@@ -14,7 +15,8 @@ from unittest import mock
 from unittest.case import skipUnless
 
 from minarca_client.core import compat
-from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, Scheduler, ssh_keygen
+from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, Scheduler, tail
+from minarca_client.core.minarcaid import ssh_keygen
 from minarca_client.tests.test import MATCH
 
 _echo_rdiff_backup_version = (
@@ -29,7 +31,7 @@ def mock_subprocess_check_output(*args, **kwargs):
     return _original_subprocess_check_output(_echo_rdiff_backup_version, **kwargs)
 
 
-class TestCompat(unittest.TestCase):
+class TestCompat(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
@@ -56,6 +58,25 @@ class TestCompat(unittest.TestCase):
             self.assertTrue(f.read().startswith("ssh-rsa "))
         with open('private.key') as f:
             self.assertEqual(MATCH('-----BEGIN * PRIVATE KEY-----*'), f.read())
+
+    async def test_tail(self):
+        # Given a text file with 2 line of text
+        with tempfile.NamedTemporaryFile(delete=False) as fp:
+            fp.write(b'First line of text!\n')
+            fp.write(b'second line\n')
+            fp.close()
+            lines = []
+
+            # Open using tail on that test file
+            async def task():
+                async for line in tail(fp.name):
+                    lines.append(line)
+
+            try:
+                await asyncio.wait_for(task(), timeout=2.0)
+            except asyncio.TimeoutError:
+                # Then 2 line of text is returned
+                self.assertEqual(len(lines), 2)
 
 
 @skipUnless(IS_LINUX, 'Only for Unix')

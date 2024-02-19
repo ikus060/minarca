@@ -76,26 +76,32 @@ bdist-client:linux:
     paths:
     - "minarca-client/dist/minarca-client_*.tar.gz"
     - "minarca-client/dist/minarca-client_*.deb"
-    - "./*/coverage.xml"
-    - "./*/xunit.xml"
+    - "./*/coverage*.xml"
+    - "./*/xunit*.xml"
     expire_in: 1 day
   before_script:
   - apt update
-  - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron
+  - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron zenity
   - pip3 install tox
-  image: python:3.7-buster
+  # Required Python 3.10 for KivyMD
+  image: python:3.10-buster
   needs: []  
   script:
   - cd minarca-client
-  - tox
-  - tox -e pyinstaller
+  - tox -e flake8,black,isort,py3-linux
+  - tox -e pyinstaller-linux
   stage: bdist
 
 bdist-client:macos:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.dmg"
+    - "./*/coverage*.xml"
+    - "./*/xunit*.xml"
     expire_in: 1 day
+  variables:
+    # Required because our macos cannot run opengl.
+    KIVY_GL_BACKEND: mock
   before_script:
     - pip3 install tox
   needs: []  
@@ -103,14 +109,16 @@ bdist-client:macos:
   - macos
   script:
   - cd minarca-client
-  - tox
-  - tox -e pyinstaller
+  - tox -e flake8,black,isort,py3-mac
+  - tox -e pyinstaller-mac
   stage: bdist
 
 bdist-client:win32:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.exe"
+    - "./*/coverage*.xml"
+    - "./*/xunit*.xml"
     expire_in: 1 day
   before_script:
   # Install required dependencies for building on Windows
@@ -135,8 +143,8 @@ bdist-client:win32:
   needs: []  
   script:
   - cd minarca-client
-  - tox.exe
-  - tox.exe -e pyinstaller
+  - tox.exe -e flake8,black,isort,py3-win
+  - tox.exe -e pyinstaller-win
   stage: bdist
   tags:
   - windows
@@ -266,6 +274,8 @@ upload:sonar:
   - test-server
   - bdist-server:deb
   - bdist-client:linux
+  - bdist-client:win32
+  - bdist-client:macos
   image: sonarsource/sonar-scanner-cli
   only:
     variables:
@@ -274,7 +284,9 @@ upload:sonar:
   variables:
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
   script:
-  - sonar-scanner -X -Dsonar.qualitygate.wait=True -Dsonar.python.coverage.reportPaths=*/coverage.xml -Dsonar.python.xunit.reportPath=*/xunit.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe) -Dsonar.exclusions=**/test_*.py,**/snippet_*.py
+  # Patch coverage repport
+  - sed -i "s|<source>minarca_client|<source>minarca-client/minarca_client|g" minarca-client/coverage-*.xml
+  - sonar-scanner -X -Dsonar.qualitygate.wait=True -Dsonar.python.coverage.reportPaths=*/coverage*.xml -Dsonar.python.xunit.reportPath=*/xunit*.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe)
 
 
 deploy:dev:
@@ -369,6 +381,7 @@ e2e-test:macos:
   - /Applications/Minarca.app/Contents/MacOS/minarca --help | grep 'démarrer une sauvegarde'
   - defaults write -g AppleLocale en_CA
   # Check backup
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d forget --force
   - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
   - /Applications/Minarca.app/Contents/MacOS/minarca -d include "$HOME/Documents"
   - /Applications/Minarca.app/Contents/MacOS/minarca -d status
@@ -400,6 +413,7 @@ e2e-test:win32:
   # Test with space 
   - $Env:MINARCA_CONFIG_HOME="$Env:APPDATA/My Folder With Space/Minarca/"
   # Check backup
+  - minarca.exe -d forget --force
   - minarca.exe -d link --force --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
   - minarca.exe -d include /etc /var /home
   - minarca.exe -d status

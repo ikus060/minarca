@@ -68,7 +68,7 @@ html_theme_options = {
     'show_powered_by': False,
     'page_width': '1170px',
     'body_text': '#0E2933',
-    'extra_nav_links' : {
+    'extra_nav_links': {
         'Home': 'https://minarca.org/',
         'For Service Providers': 'https://minarca.org/en_CA/our-services',
         'News': 'https://minarca.org/en_CA/blog',
@@ -76,7 +76,7 @@ html_theme_options = {
         'About': 'https://minarca.org/en_CA/about-minarca',
         'Contact Us': 'https://minarca.org/en_CA/contactus',
         'Download': 'https://minarca.org/en_CA/download',
-    }
+    },
 }
 html_show_sourcelink = False
 
@@ -85,4 +85,4 @@ html_show_sourcelink = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_favicon = '../minarca_client/ui/theme/minarca.ico'
+html_favicon = '../minarca_client/ui/theme/resources/minarca.ico'

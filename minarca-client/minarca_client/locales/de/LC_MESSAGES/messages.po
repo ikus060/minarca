@@ -386,7 +386,7 @@ msgstr "Ihre Dateiangabe [%s] entspricht keinem der Basisverzeichnisse Ihres Sys
 
 #: minarca_client/core/exceptions.py:74
 #, python-format
-msgid "backup process terminated with an exception, check logs for more details: %s"
+msgid "process terminated with an exception, check logs for more details: %s"
 msgstr "Backup-Prozess durch eine Ausnahme beendet, überprüfen Sie die Protokolle für weitere Details: %s"
 
 #: minarca_client/core/exceptions.py:82

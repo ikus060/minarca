@@ -3,6 +3,7 @@
 # Use is subject to license terms.
 
 
+import asyncio
 import getpass
 import logging
 import logging.handlers
@@ -15,21 +16,26 @@ from argparse import ArgumentParser
 import rdiffbackup.run
 
 from minarca_client import __version__
-from minarca_client.core import Backup
-from minarca_client.core.compat import IS_WINDOWS, RobustRotatingFileHandler, get_default_repository_name, get_log_file
+from minarca_client.core import Backup, limit
+from minarca_client.core.compat import IS_WINDOWS, RobustRotatingFileHandler, get_default_repositoryname, get_log_file
 from minarca_client.core.config import Pattern, Settings
-from minarca_client.core.exceptions import BackupError, NotRunningError, RepositoryNameExistsError
+from minarca_client.core.exceptions import (
+    BackupError,
+    InstanceNotFoundError,
+    NotRunningError,
+    RepositoryNameExistsError,
+)
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
-from minarca_client.ui.home import HomeDialog
-from minarca_client.ui.setup import SetupDialog
 
 _EXIT_BACKUP_FAIL = 1
-_EXIT_ALREADY_LINKED = 2
 _EXIT_REPO_EXISTS = 4
 _EXIT_NOT_RUNNING = 5
 _EXIT_LINK_ERROR = 6
 _EXIT_SCHEDULE_ERROR = 7
+_EXIT_KIVY_ERROR = 8
+_EXIT_RESTORE_FAIL = 9
+_EXIT_INTERUPT = 10
 
 _ARGS_ALIAS = {
     '--backup': 'backup',
@@ -37,10 +43,12 @@ _ARGS_ALIAS = {
     '--status': 'status',
 }
 
+logger = logging.getLogger(__name__)
 
-def _abort():
-    print(_('Operation aborted by the user.'))
-    exit(1)
+
+def _abort(msg=None):
+    print(msg or _('Operation aborted by the user.'))
+    sys.exit(1)
 
 
 def _prompt_yes_no(msg):
@@ -51,7 +59,7 @@ def _prompt_yes_no(msg):
     return answer.lower() in [_("yes"), _("y")]
 
 
-def _backup(force):
+def _backup(force, limit):
     signal.signal(signal.SIGINT, signal.default_int_handler)
     # Check version
     try:
@@ -62,7 +70,8 @@ def _backup(force):
         logging.info(_('fail to check for latest version'))
     backup = Backup()
     try:
-        backup.backup(force=force)
+        for instance in backup[limit]:
+            asyncio.run(instance.backup(force=force))
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
@@ -72,15 +81,23 @@ def _backup(force):
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
+def _forget(limit, force=False):
+    backup = Backup()
+    # Start by listing the backup
+    print(_("Backup Instances:"))
+    for instance in backup[limit]:
+        title = instance.settings.repositoryname or _("No name")
+        print('* %s' % title)
+    if force or _prompt_yes_no(_('Are you sure you want to forget the above backup settings ? (Yes/No): ')):
+        for instance in backup[limit]:
+            instance.forget()
+
+
 def _link(remoteurl=None, username=None, name=None, force=False, password=None):
     """
     Start the linking process in command line.
     """
     backup = Backup()
-    # If the backup is already linked, return an error.
-    if backup.is_linked() and not force:
-        print(_('minarca is already linked, execute `minarca unlink`'))
-        sys.exit(_EXIT_ALREADY_LINKED)
     # Prompt remoteurl
     remoteurl = remoteurl or input('remote url (e.g.: https://backup.examples.com): ') or _abort()
     # Prompt username
@@ -88,16 +105,24 @@ def _link(remoteurl=None, username=None, name=None, force=False, password=None):
     # Prompt for password if missing.
     password = password or getpass.getpass(_('password or access token: ')) or _abort()
     # Use default repo if not provided
-    name = name or get_default_repository_name()
+    name = name or get_default_repositoryname()
     # Start linking process.
     try:
         try:
-            backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=force)
+            asyncio.run(
+                backup.configure_remote(
+                    remoteurl=remoteurl, username=username, password=password, repositoryname=name, force=force
+                )
+            )
             print(_('Linked successfully'))
         except RepositoryNameExistsError as e:
             print(e.message)
-            if _prompt_yes_no(_('Do you want to replace the existing repository ?')):
-                backup.link(remoteurl=remoteurl, username=username, password=password, repository_name=name, force=True)
+            if _prompt_yes_no(_('Do you want to replace the existing repository ? (Yes/No): ')):
+                asyncio.run(
+                    backup.configure_remote(
+                        remoteurl=remoteurl, username=username, password=password, repositoryname=name, force=True
+                    )
+                )
                 print(_('Linked successfully'))
                 return
             sys.exit(_EXIT_REPO_EXISTS)
@@ -116,36 +141,62 @@ def _link(remoteurl=None, username=None, name=None, force=False, password=None):
         )
 
 
-def _pattern(include, pattern):
+def _pattern(include, pattern, limit):
     backup = Backup()
-    new_patterns = backup.get_patterns()
-    for path in pattern:
-        p = Pattern(include, path, None)
-        if not p.is_wildcard():
-            # Resolve relative path
-            path = os.path.normpath(os.path.join(os.getcwd(), path))
-            p = Pattern(include, path, None)
-        # Add new pattern
-        new_patterns.append(p)
-    backup.set_patterns(new_patterns)
+    if not backup.is_configured():
+        print(_('To update include or exclude pattern, you must configure at least one backup instance.'))
+        sys.exit(1)
+    try:
+        for instance in backup[limit]:
+            patterns = instance.patterns
+            for path in pattern:
+                p = Pattern(include, path, None)
+                if not p.is_wildcard():
+                    # Resolve relative path
+                    path = os.path.normpath(os.path.join(os.getcwd(), path))
+                    p = Pattern(include, path, None)
+                # Add new pattern
+                patterns.append(p)
+            patterns.save()
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
+    except Exception:
+        logging.exception("unexpected error updating patterns")
+        sys.exit(_EXIT_BACKUP_FAIL)
 
 
-def _patterns():
+def _patterns(limit):
     backup = Backup()
-    patterns = backup.get_patterns()
-    patterns.write(sys.stdout)
+    try:
+        for instance in backup[limit]:
+            for p in instance.patterns:
+                line = ('+%s' if p.include else '-%s') % p.pattern
+                print(line)
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
+    except Exception:
+        logging.exception("unexpected error retrieving patterns")
+        sys.exit(_EXIT_BACKUP_FAIL)
 
 
-def _pause(delay):
+def _pause(delay, limit):
     """
     Pause backup for the given number of hours.
     """
     backup = Backup()
     try:
-        backup.pause(delay=delay)
+        for instance in backup[limit]:
+            instance.pause(delay=delay)
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
+    except Exception:
+        logging.exception("unexpected error updating backup config")
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
@@ -161,10 +212,62 @@ def _rdiff_backup(options):
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
-def _restore(restore_time, force, pattern):
+def _restore(restore_time, force, paths, limit, destination):
     signal.signal(signal.SIGINT, signal.default_int_handler)
-    assert isinstance(pattern, list)
+    assert isinstance(paths, list)
+    backup = Backup()
+
+    #
+    # Prompt user to define the backup source.
+    #
+    if limit.value is None and len(backup) >= 2:
+        print(_('From which backup source do you want to restore data from ?'))
+        for instance in backup:
+            if instance.is_remote():
+                print(
+                    '%s - Remote backup `%s` from `%s`'
+                    % (instance.id, instance.settings.repositoryname, instance.settings.remoteurl)
+                )
+            elif instance.is_local():
+                print(
+                    '%s - Local backup `%s` from `%s`'
+                    % (instance.id, instance.settings.repositoryname, instance.settings.localcaption)
+                )
+        value = input('Enter backup instance id: ') or _abort()
+        try:
+            instance = backup[value]
+        except InstanceNotFoundError:
+            _abort(_('Invalid instance id: %s') % limit)
+    else:
+        instances = backup[limit]
+        if len(instances) == 0:
+            _abort(_("Your limit value doesn't matches any backup instances"))
+        elif len(instances) >= 2:
+            _abort(_("Your limit value matches too many backup instances"))
+        instance = instances[0]
+
+    #
+    # Prompt user for paths
+    #
+    if not paths:
+        # Prompt user for folder(s) to be restored if not provided on command line.
+        paths = []
+        for p in instance.patterns:
+            if (
+                p.include
+                and not p.is_wildcard()
+                and _prompt_yes_no(_('Do you want to restore %s? (Yes/No): ') % p.pattern)
+            ):
+                paths.append(p)
+    else:
+        # Convert specific path to be restored.
+        paths = [os.path.normpath(os.path.join(os.getcwd(), path)) for path in paths]
+    if not paths:
+        _abort()
+
+    #
     # Prompt user to confirm restore operation.
+    #
     if not force:
         confirm = _prompt_yes_no(
             _(
@@ -173,51 +276,42 @@ def _restore(restore_time, force, pattern):
         )
         if not confirm:
             _abort()
-    backup = Backup()
-    if not pattern:
-        # Prompt user for folder to be restored if not provided on command line.
-        pattern = []
-        availables = backup.get_patterns()
-        for p in availables:
-            if (
-                p.include
-                and not p.is_wildcard()
-                and _prompt_yes_no(_('Do you want to restore %s (Yes/No): ') % p.pattern)
-            ):
-                pattern.append(p)
-    else:
-        # Convert specific path to be restored.
-        pattern = [Pattern(True, os.path.normpath(os.path.join(os.getcwd(), path)), None) for path in pattern]
-
-    if not pattern:
-        _abort()
-
     # Execute restore operation.
     try:
-        backup.restore(restore_time=restore_time, patterns=pattern)
+        asyncio.run(instance.restore(restore_time=restore_time, paths=paths, destination=destination))
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(_EXIT_RESTORE_FAIL)
+    except Exception:
+        logging.exception("unexpected error during restore")
+        sys.exit(_EXIT_RESTORE_FAIL)
+
+
+def _stop(force, limit):
+    backup = Backup()
+    try:
+        for instance in backup[limit]:
+            instance.stop()
+    except NotRunningError:
+        print(_('backup not running'))
+        if not force:
+            sys.exit(_EXIT_NOT_RUNNING)
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
         sys.exit(_EXIT_BACKUP_FAIL)
     except Exception:
-        logging.exception("unexpected error during backup")
+        logging.exception("unexpected error stoping backup")
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
-def _stop(force):
-    backup = Backup()
-    try:
-        backup.stop()
-    except NotRunningError:
-        print(_('backup not running'))
-        if not force:
-            sys.exit(_EXIT_NOT_RUNNING)
-
-
-def _schedule(schedule, username=None, password=None):
+def _schedule(schedule, limit, username=None, password=None):
     backup = Backup()
     # Define frequency
-    backup.set_settings('schedule', schedule)
+    for instance in backup[limit]:
+        instance.settings.schedule = schedule
+        instance.settings.save()
     # Make sure to schedule job in OS too.
     run_if_logged_out = (username, password) if username or password else None
     try:
@@ -227,51 +321,110 @@ def _schedule(schedule, username=None, password=None):
         sys.exit(_EXIT_SCHEDULE_ERROR)
 
 
-def _start(force):
+def _start(force, limit):
     signal.signal(signal.SIGINT, signal.default_int_handler)
     backup = Backup()
-    backup.start(force=force)
-
-
-def _status():
-    backup = Backup()
-    status = backup.get_status()
-    settings = backup.get_settings()
+    # Check if limit is valid.
     try:
-        backup.test_server()
-        connected = True
-    except BackupError:
-        connected = False
-    print(_("Remote server:          %s") % settings['remotehost'])
-    print(_("Connectivity status:    %s" % (_("Connected") if connected else _("Not connected"))))
-    print(_("Last successful backup: %s") % status.get('lastsuccess', _('Never')))
-    print(_("Last backup date:       %s") % status.get('lastdate', _('Never')))
-    print(_("Last backup status:     %s") % status.get('lastresult', _('Never')))
-    print(_("Details:                %s") % status.get('details', ''))
-    if settings['pause_until']:
-        print(_("Paused until:           %s") % settings['remotehost'])
+        list(backup[limit])
+    except InstanceNotFoundError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
+
+    # Trigger backup execution.
+    backup.start_all(force=force, limit=limit.value)
+
+
+def _status(limit):
+    """
+    Return status for each backup.
+    """
+    backup = Backup()
+    try:
+        # Test connection for all backup.
+        if len(backup):
+            print('Verifying connection...')
+        entries = []
+        for instance in backup[limit]:
+            status = instance.status
+            settings = instance.settings
+            try:
+                asyncio.run(instance.test_connection())
+                connected = True
+            except BackupError:
+                connected = False
+            entries.append((instance, connected))
+
+        # Print result.
+        for instance, connected in entries:
+            title = _("Backup Instance: %s") % (settings.repositoryname or _("No name"))
+            print(title)
+            print('=' * len(title))
+
+            if instance.is_remote():
+                print(" * " + _("Remote server:          %s") % settings.remotehost)
+            elif instance.is_local():
+                print(" * " + _("Local device:           %s") % settings.localcaption)
+            print(" * " + _("Connectivity status:    %s" % (_("Connected") if connected else _("Not connected"))))
+            print(
+                " * "
+                + _("Last successful backup: %s")
+                % (status.lastsuccess.strftime("%Y-%m-%dT%H:%M:%S%z") if status.lastsuccess else _('Never'))
+            )
+            print(
+                " * "
+                + _("Last backup date:       %s")
+                % (status.lastdate.strftime("%Y-%m-%dT%H:%M:%S%z") if status.lastdate else _('Never'))
+            )
+            print(" * " + _("Last backup status:     %s") % (status.current_status or _('Never')))
+            if status.details:
+                print(" * " + _("Details:                %s") % status.details or '')
+            if settings.pause_until:
+                print(_("Paused until:           %s") % settings.pause_until)
+
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
+    except Exception:
+        logging.exception("unexpected error getting backup status")
+        sys.exit(_EXIT_BACKUP_FAIL)
 
 
 def _ui():
     """
     Entry point to start minarca user interface.
     """
-    # If not linked, let the user configure mianrca
+    try:
+        from minarca_client.ui.app import MinarcaApp
+    except Exception:
+        # This is raised by kivy if it can create a window.
+        # In that scenario, we still need to display an error message to the user.
+        logger.exception('application startup failed')
+        from minarca_client.dialogs import error_dialog
+
+        dlg = error_dialog(
+            parent=None,
+            title=_('Minarca'),
+            message=_('Application fail to start'),
+            detail=_(
+                'If the problem persists, check the logs with your administrator or try reinstalling the application.'
+            ),
+        )
+        asyncio.run(dlg)
+        sys.exit(_EXIT_KIVY_ERROR)
+
+    # Start event loop with backup instance.
     backup = Backup()
-    if not backup.is_linked():
-        dlg = SetupDialog()
-        dlg.mainloop()
-        if not backup.is_linked():
-            # Operation canceled by user
-            return
-
-    home = HomeDialog()
-    home.mainloop()
+    app = MinarcaApp(backup=backup)
+    app.mainloop()
 
 
-def _unlink():
+def _verify(limit):
     backup = Backup()
-    backup.unlink()
+    for instance in backup[limit]:
+        asyncio.run(instance.verify())
 
 
 def _parse_args(args):
@@ -297,21 +450,29 @@ def _parse_args(args):
     # Start
     sub = subparsers.add_parser('start', help=_('start a backup in background mode'))
     sub.add_argument('--force', action='store_true', help=_("force execution of a backup even if it's not time to run"))
+    sub.add_argument('--limit', help=_("Limit backup to the given instance(s)."), default=limit(None), type=limit)
     sub.set_defaults(func=_start)
 
     # Backup
     sub = subparsers.add_parser('backup', help=_('start a backup in foreground mode'))
     sub.add_argument('--force', action='store_true', help=_("force execution of a backup even if it's not time to run"))
+    sub.add_argument('--limit', help=_("Limit backup to the given instance(s)."), default=limit(None), type=limit)
     sub.set_defaults(func=_backup)
 
     # exclude
     sub = subparsers.add_parser('exclude', help=_('exclude files to be backup'))
+    sub.add_argument(
+        '--limit', help=_("Add exclude file pattern to the given instance(s)."), default=limit(None), type=limit
+    )
     sub.add_argument('pattern', nargs='+', help=_('file pattern to be exclude. may contains `*` or `?` wildcard'))
     sub.set_defaults(func=_pattern)
     sub.set_defaults(include=False)
 
     # include
     sub = subparsers.add_parser('include', help=_('include files to be backup'))
+    sub.add_argument(
+        '--limit', help=_("Add include file pattern to the given instance(s)."), default=limit(None), type=limit
+    )
     sub.add_argument('pattern', nargs='+', help=_('file pattern to be exclude. may contains `*` or `?` wildcard'))
     sub.set_defaults(func=_pattern)
     sub.set_defaults(include=True)
@@ -331,10 +492,19 @@ def _parse_args(args):
 
     # patterns
     sub = subparsers.add_parser('patterns', help=_('list the includes / excludes patterns'))
+    sub.add_argument(
+        '--limit',
+        help=_("Show include and exclude patterns only for the given instance(s)."),
+        default=limit(None),
+        type=limit,
+    )
     sub.set_defaults(func=_patterns)
 
     # Restore
     sub = subparsers.add_parser('restore', help=_('restore data from backup'))
+    sub.add_argument(
+        '--limit', help=_("Force usage of a given instance to be used for restore."), default=limit(None), type=limit
+    )
     sub.add_argument(
         '--restore-time',
         help=_(
@@ -342,13 +512,18 @@ def _parse_args(args):
         ),
     )
     sub.add_argument(
-        '--force', action='store_true', help=_("force execution of restore operation without confirmation from user")
+        '--destination',
+        help=_("Define alternate location where to restore file or folder instead of restoring them in place"),
     )
-    sub.add_argument('pattern', nargs='*', help=_('files and folders to be restore'))
+    sub.add_argument(
+        '--force', action='store_true', help=_("Force execution of restore operation without confirmation from user")
+    )
+    sub.add_argument('paths', nargs='*', help=_('files and folders to be restore'))
     sub.set_defaults(func=_restore)
 
     # Stop
     sub = subparsers.add_parser('stop', help=_('stop the backup'))
+    sub.add_argument('--limit', help=_("Stop only the given instance(s)."), default=limit(None), type=limit)
     sub.add_argument('--force', action='store_true', help=_("doesn't fail if the backup is not running"))
     sub.set_defaults(func=_stop)
 
@@ -377,6 +552,7 @@ def _parse_args(args):
         const=Settings.WEEKLY,
         help=_("schedule backup to run weekly"),
     )
+    sub.add_argument('--limit', help=_("Configure only the given instance(s)."), default=limit(None), type=limit)
     if IS_WINDOWS:
         sub.add_argument('-u', '--username', help=_("username required to run task when user is logged out"))
         sub.add_argument('-p', '--password', help=_("password required to run task when user is logged out"))
@@ -384,17 +560,23 @@ def _parse_args(args):
 
     # Status
     sub = subparsers.add_parser('status', help=_('return the current minarca status'))
+    sub.add_argument('--limit', help=_("Show status for the given instance(s)."), default=limit(None), type=limit)
     sub.set_defaults(func=_status)
 
-    # unlink
-    sub = subparsers.add_parser('unlink', help=_('unlink this minarca client from server'))
-    sub.set_defaults(func=_unlink)
+    # forget
+    sub = subparsers.add_parser('forget', aliases='unlink', help=_('forget settings of backup'))
+    sub.add_argument(
+        '--limit', help=_("Forget settings of the given backup instance(s)."), default=limit(None), type=limit
+    )
+    sub.add_argument('--force', action='store_true', help=_("Force forget operation without confirmation from user"))
+    sub.set_defaults(func=_forget)
 
     # pause
     sub = subparsers.add_parser(
         'pause',
         help=_('temporarily delay the execution of the backup for the given amount of hours. Default 24 hours.'),
     )
+    sub.add_argument('--limit', help=_("Pause only the given instance(s)."), default=limit(None), type=limit)
     sub.add_argument('-d', '--delay', help=_("number of hours"), type=int, default=24)
     sub.add_argument(
         '-c',
@@ -407,6 +589,13 @@ def _parse_args(args):
         default=0,
     )
     sub.set_defaults(func=_pause)
+
+    # verify
+    sub = subparsers.add_parser('verify', help=_('verify backup integrity'))
+    sub.add_argument(
+        '--limit', help=_("Verify backup integrity of the given backup instance(s)."), default=limit(None), type=limit
+    )
+    sub.set_defaults(func=_verify)
 
     # ui
     sub = subparsers.add_parser('ui', help=_('open graphical user interface (default when calling minarcaw)'))
@@ -430,6 +619,7 @@ def _configure_logging(debug=False):
     """
     Configure logging system. Make stdout quiet when running within a cron job.
     """
+
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     # Make requests more quiet
@@ -437,13 +627,15 @@ def _configure_logging(debug=False):
     # Avoid "Using selector: EpollSelector"
     logging.getLogger('asyncio').setLevel(logging.WARNING)
 
-    # Configure log file
-    file_handler = RobustRotatingFileHandler(get_log_file(), maxBytes=(1048576 * 5), backupCount=5)
-    file_handler.setFormatter(
+    #
+    # Configure default logging for the whole application. e.g.: minarca.log
+    #
+    default_file_handler = RobustRotatingFileHandler(get_log_file(), maxBytes=(1048576 * 5), backupCount=5)
+    default_file_handler.setFormatter(
         logging.Formatter("%(asctime)s [%(process)d][%(levelname)-5.5s][%(threadName)-12.12s] %(message)s")
     )
-    file_handler.setLevel(logging.DEBUG)
-    root.addHandler(file_handler)
+    default_file_handler.setLevel(logging.DEBUG)
+    root.addHandler(default_file_handler)
 
     # Configure stdout
     # With non_interactive mode, only print error.
@@ -471,7 +663,11 @@ def main(args=None):
     # Configure logging
     _configure_logging(debug=args.debug)
     # Call appropriate function
-    return args.func(**kwargs)
+    try:
+        return args.func(**kwargs)
+    except KeyboardInterrupt:
+        print(_('Process interrupt by user.'))
+        sys.exit(_EXIT_INTERUPT)
 
 
 if __name__ == "__main__":
