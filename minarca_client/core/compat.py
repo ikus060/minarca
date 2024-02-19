@@ -6,6 +6,7 @@ Created on Jun. 7, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+import asyncio
 import datetime
 import os
 import pathlib
@@ -17,6 +18,7 @@ import tempfile
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 
+import aiofiles
 import pkg_resources
 
 from minarca_client.locale import _
@@ -25,6 +27,44 @@ IS_WINDOWS = os.name == 'nt'
 IS_LINUX = sys.platform in ['linux', 'linux2']
 IS_MAC = sys.platform == 'darwin'
 HAS_DISPLAY = os.environ.get('DISPLAY', None) or IS_WINDOWS or IS_MAC
+
+
+async def tail(filepath, num_lines=1000):
+    """
+    Tails a file asynchronously and yields the last 1000 lines and subsequent additions.
+
+    Args:
+        filepath (str): Path to the text file.
+        block_size (int, optional): Block size for reading the file. Defaults to 4096.
+
+    Yields:
+        str: Line from the tail of the file.
+    """
+    async with aiofiles.open(filepath, mode='rb') as f:
+        # Read the file as fast as possible
+        await f.seek(0, 2)
+        init_pos = pos = await f.tell()
+        block_size = 4096
+        lines_found = 0
+        blocks = []
+        while lines_found <= num_lines and pos > 0:
+            pos -= block_size
+            await f.seek(max(0, pos))
+            block = await f.read(block_size if pos > 0 else (pos + block_size))
+            blocks.append(block)
+            lines_found += block.count(b'\n')
+        lines = b''.join(reversed(blocks)).splitlines()
+        for line in lines:
+            yield line
+
+        # Seek to initial end-of-file
+        await f.seek(init_pos, 0)
+        while True:
+            line = await f.readline()
+            if not line:
+                await asyncio.sleep(0.1)
+                continue
+            yield line
 
 
 def makedirs(func, mode=0o750):
@@ -45,6 +85,19 @@ def makedirs(func, mode=0o750):
     return _wrap_func
 
 
+def flush(path):
+    if IS_WINDOWS:
+        # On Windows this required administrator priviledge.
+        return
+    if hasattr(os, 'O_DIRECTORY'):
+        try:
+            fd = os.open(path, os.O_DIRECTORY)
+            os.fsync(fd)
+            os.close(fd)
+        except IOError:
+            pass
+
+
 def get_is_admin():
     if IS_WINDOWS:
         return False
@@ -55,7 +108,7 @@ def get_is_admin():
 IS_ADMIN = get_is_admin()
 
 
-def get_default_repository_name():
+def get_default_repositoryname():
     """
     Return a default value for the repository name.
     """
@@ -167,6 +220,7 @@ def get_ssh():
     """
     Return the location of SSH executable.
     """
+    # TODO Drop support for SSH 32bits.
     if os.environ.get('MINARCA_SSH'):
         return os.environ.get('MINARCA_SSH')
     name = 'ssh.exe' if IS_WINDOWS else 'ssh'
@@ -175,19 +229,6 @@ def get_ssh():
     if not ssh:
         raise FileNotFoundError(name)
     return ssh
-
-
-def get_ssh_keygen():
-    """
-    Return the location of SSH executable.
-    """
-    if os.environ.get('MINARCA_SSH_KEYGEN'):
-        return os.environ.get('MINARCA_SSH_KEYGEN')
-    name = 'ssh-keygen.exe' if IS_WINDOWS else 'ssh-keygen'
-    ssh_keygen = shutil.which(name, path=_get_path())
-    if not ssh_keygen:
-        raise FileNotFoundError(name)
-    return ssh_keygen
 
 
 def get_temp():
@@ -220,23 +261,67 @@ def get_minarca_exe():
     return os.path.abspath(path)
 
 
-def ssh_keygen(public_key, private_key, length=2048):
+def detach_call(args):
     """
-    Generate public and private SSH Keys.
+    Create a subprogress in detached mode.
     """
-    # On Windows, pychrypto is not available. For this reason we are using
-    # ssh-keygen directly to generate RSA key.
-    tmp = tempfile.TemporaryDirectory()
-    subprocess.run(
-        [get_ssh_keygen(), '-b', str(length), '-t', 'rsa', '-f', os.path.join(tmp.name, 'id_rsa'), '-q', '-N', ''],
-        stdout=subprocess.PIPE,
-        check=True,
-        cwd=tmp.name,
-        env={'PATH': os.environ['PATH']},
+    creationflags = (
+        subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
+        if IS_WINDOWS
+        else 0
     )
-    shutil.move(os.path.join(tmp.name, 'id_rsa'), private_key)
-    shutil.move(os.path.join(tmp.name, 'id_rsa.pub'), public_key)
-    tmp.cleanup()
+    return subprocess.Popen(
+        args,
+        stdin=None,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        close_fds=True,
+        creationflags=creationflags,
+    )
+
+
+def file_read(fn, default=None, maxsize=4096):
+    try:
+        with open(fn, 'r') as f:
+            return f.read(maxsize).strip()
+    except OSError:
+        # Silently ignore any os error
+        return default
+
+
+def file_stat(self):
+    try:
+        return os.stat(self._fn)
+    except FileNotFoundError:
+        # Silently ignore error if file doesn't exists
+        return None
+
+
+async def watch_file(filename, poll_delay=0.25, timeout=None):
+    """
+    Return changes whenever the file get updated.
+    """
+    assert 0 < poll_delay
+    assert timeout is None or poll_delay < timeout
+    remaining_time = timeout or 1
+    prev_stat = file_stat(filename)
+    while 0 < remaining_time:
+        await asyncio.sleep(poll_delay)
+        if timeout:
+            remaining_time = timeout - poll_delay
+        new_stat = file_stat(filename)
+        if prev_stat != new_stat:
+            yield "changed"
+        prev_stat = new_stat
+
+
+def open_file_with_default_app(path):
+    if IS_WINDOWS:
+        os.startfile(path)
+    elif IS_MAC:
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
 
 
 class RobustRotatingFileHandler(RotatingFileHandler):
