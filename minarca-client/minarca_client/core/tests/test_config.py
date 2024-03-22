@@ -398,6 +398,7 @@ class DatetimeTest(unittest.TestCase):
     def test_sub(self):
         self.assertEqual(Datetime(1688580806000) - datetime.timedelta(hours=24), Datetime(1688494406000))
 
+    @skipIf(IS_WINDOWS, 'time.tzset not available on Windows')
     def test_strftime(self):
         old_tz = os.environ.get('TZ')
         try:

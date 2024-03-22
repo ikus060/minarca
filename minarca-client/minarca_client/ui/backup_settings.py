@@ -3,7 +3,6 @@
 # Use is subject to license terms.
 import asyncio
 import logging
-import webbrowser
 
 from kivy.app import App
 from kivy.lang import Builder
@@ -14,7 +13,7 @@ from minarca_client.core import BackupInstance
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.exceptions import BackupError, RemoteRepositoryNotFound
 from minarca_client.locale import _
-from minarca_client.ui.dialogs import question_dialog, warning_dialog
+from minarca_client.ui.dialogs import question_dialog, username_password_dialog, warning_dialog
 from minarca_client.ui.utils import alias_property
 
 logger = logging.getLogger(__name__)
@@ -66,6 +65,12 @@ Builder.load_string(
                     value: root.schedule
                     on_value: root.schedule = self.value
                     data: root.schedule_choices
+
+                CCheckbox:
+                    text: _('Run whether user is logged on or not')
+                    display: root.show_run_if_logged_out
+                    active: root.run_if_logged_out
+                    on_active: root.toggle_run_if_logged_out()
 
                 CLabel:
                     text: _('Excluded Days of the Week')
@@ -198,16 +203,18 @@ class BackupSettings(MDBoxLayout):
     _load_task = None
     _save_task = None
     _forget_task = None
+    _run_if_logged_out_task = None
 
     def __init__(self, master=None, backup=None, instance=None, create=False):
         """Edit or create backup configuration for the given instance"""
         assert backup
         assert instance and isinstance(instance, BackupInstance)
         # Initialise the state.
+        self.backup = backup
         self.instance = instance
         self.create = create
         self.is_remote = instance.is_remote()
-        self.run_if_logged_out = IS_WINDOWS and backup.scheduler.run_if_logged_out
+        self.run_if_logged_out = IS_WINDOWS and self.backup.scheduler.run_if_logged_out
 
         # When editing current settings, load values from local settings or remote server.
         if not create:
@@ -239,6 +246,10 @@ class BackupSettings(MDBoxLayout):
             self._load_task.cancel()
         if self._save_task:
             self._save_task.cancel()
+        if self._forget_task:
+            self._forget_task.cancel()
+        if self._run_if_logged_out_task:
+            self._run_if_logged_out_task.cancel()
 
     @alias_property()
     def schedule_choices(self):
@@ -307,11 +318,10 @@ class BackupSettings(MDBoxLayout):
             self.keepdays = self.instance.settings.keepdays
         except BackupError as e:
             logger.warning(str(e))
-            self.error_message = _('Cannot retrive settings from remote server.')
-            self.error_detail = str(e)
+            self.error_message = str(e)
         except Exception as e:
             logger.exception('unknown exception')
-            self.error_message = _('Cannot retrive settings from remote server.')
+            self.error_message = _('Unable to retrieve configuration from remote server.')
             self.error_detail = _("An error occurred during the connection.\n\nDetails: %s") % str(e)
         else:
             self.error_message = ""
@@ -378,7 +388,7 @@ class BackupSettings(MDBoxLayout):
                 message=_('A problem occured while trying to save the backup settings.'),
                 detail=str(e),
             )
-        else:
+        finally:
             self.working = False
 
     def forget_instance(self):
@@ -401,6 +411,44 @@ class BackupSettings(MDBoxLayout):
         # Prompt in a different thread.
         self._forget_task = asyncio.get_event_loop().create_task(_forget_instance())
 
-    def _edit_online(self):
-        url = self.instance.get_repo_url('settings')
-        webbrowser.open(url)
+    def toggle_run_if_logged_out(self):
+        """
+        Called to toggle the "run_if_logged_out" settings.
+        """
+        # This is only applicable to Windows scheduler.
+        if not IS_WINDOWS:
+            return
+        value = self.backup.scheduler.run_if_logged_out
+        if value:
+            # If disable, re-schedule the taks with default settings.
+            self.backup.schedule_job()
+            return
+
+        async def _run_if_logged_out():
+            # If enabled, prompt user for password.
+            username, password = await username_password_dialog(
+                parent=self, title=_('Windows Credentials'), message=_('Enter credentials for local machine:')
+            )
+            if not username or not password:
+                # Operation cancel by user
+                return
+            try:
+                self.backup.schedule_job(run_if_logged_out=(username, password))
+            except Exception as e:
+                self.backup.schedule_job()
+                message = _('Minarca cannot apply your changes.')
+                detail = str(e)
+                # When username or password is invalid, provide a better help message.
+                if getattr(e, 'winerror') == -2147023570:
+                    detail = _(
+                        'The user account is unknown or the password is incorrect. Be sure to enter your Windows credentials, not your Minarca credentials.'
+                    )
+                await warning_dialog(
+                    parent=self,
+                    title=_('Backup Configuration'),
+                    message=message,
+                    detail=detail,
+                )
+                self.run_if_logged_out = self.backup.scheduler.run_if_logged_out
+
+        self._run_if_logged_out_task = asyncio.get_event_loop().create_task(_run_if_logged_out())

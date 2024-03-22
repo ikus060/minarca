@@ -11,6 +11,8 @@ import os
 from ctypes.wintypes import INT
 
 import pywintypes
+import win32api
+import win32cred
 from win32com.shell import shell, shellcon
 from win32con import OFN_ALLOWMULTISELECT, OFN_EXPLORER
 from win32gui import GetOpenFileNameW, GetSaveFileNameW
@@ -71,10 +73,13 @@ def _disable(parent):
             window.children[0].disabled = False
 
 
-async def message_dialog(parent, title, message, detail, icon, buttons, success_result=None):  # Not used with GTK
+async def message_dialog(parent, title, message, detail, icon, buttons, success_result=None):
+    owner = None
+    if parent and parent.get_root_window():
+        owner = parent.get_root_window().get_window_info().window
     func = functools.partial(
         task_dialog,
-        owner=None,
+        owner=owner,
         title=title,
         main_instr=message,
         content=detail,
@@ -129,7 +134,7 @@ async def error_dialog(parent, title, message, detail=None):
         title=title,
         message=message,
         detail=detail,
-        icons=TD_ERROR_ICON,
+        icon=TD_ERROR_ICON,
         buttons=TDCBF_OK_BUTTON,
     )
 
@@ -140,7 +145,7 @@ async def warning_dialog(parent, title, message, detail=None):
         title=title,
         message=message,
         detail=detail,
-        message_type=TD_WARNING_ICON,
+        icon=TD_WARNING_ICON,
         buttons=TDCBF_OK_BUTTON,
     )
 
@@ -280,3 +285,32 @@ async def open_folder_dialog(
         # Operation cancel by user.
         return None
     return shell.SHGetPathFromIDList(pidl).decode('latin1')
+
+
+async def username_password_dialog(parent, title, message, username=None):
+    """
+    Display message dialog to ask for username and password.
+    """
+    # https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduicmdlinepromptforcredentialsa
+    owner = None
+    if parent and parent.get_root_window():
+        owner = parent.get_root_window().get_window_info().window
+
+    username = username or win32api.GetUserName()
+    uiinfo = {
+        "Parent": owner,
+        "MessageText": message,
+        "CaptionText": title,
+    }
+    with _disable(parent):
+        # For unknown reason, this dialog cannot be open in another thread.
+        # So execute it in main thread.
+        target, pwd, save = win32cred.CredUIPromptForCredentials(
+            TargetName=win32api.GetComputerName(),
+            AuthError=0,
+            UserName=username,
+            Flags=win32cred.CREDUI_FLAGS_DO_NOT_PERSIST,
+            Save=False,
+            UiInfo=uiinfo,
+        )
+    return target, pwd

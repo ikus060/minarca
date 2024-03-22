@@ -590,8 +590,19 @@ class BackupInstance:
         Fetch current repository settings from remote server.
         """
         conn = self._remote_conn()
+        # Get reference to remote repo
         repo_name = self.settings.repositoryname
-        data = conn.get_repo_settings(repo_name)
+        current_user = conn.get_current_user_info()
+        repo_name_found = [
+            r.get('name')
+            for r in current_user.get('repos', [])
+            if repo_name == r.get('name') or r.get('name').startswith(repo_name + '/')
+        ]
+        if not repo_name_found:
+            raise RemoteRepositoryNotFound(repo_name)
+
+        # Get first repo settings.
+        data = conn.get_repo_settings(repo_name_found[0])
         if 'maxage':
             self.settings.maxage = int(data['maxage'])
         if 'keepdays':

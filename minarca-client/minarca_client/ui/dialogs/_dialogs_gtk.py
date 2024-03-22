@@ -211,3 +211,7 @@ async def open_folder_dialog(
         action=Gtk.FileChooserAction.SELECT_FOLDER,
         ok_icon=Gtk.STOCK_OPEN,
     )
+
+
+async def username_password_dialog(parent, title, message, username=None):
+    return None, None

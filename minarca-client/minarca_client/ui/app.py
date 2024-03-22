@@ -74,6 +74,7 @@ class MinarcaApp(MDApp, ExceptionHandler):
         self.theme_cls = MinarcaTheme()
 
     def mainloop(self):
+        # FIXME Investigate alternative and make use of trio ?
         # Start the main even loop.
         loop = asyncio.get_event_loop()
         # Configure default executor.
