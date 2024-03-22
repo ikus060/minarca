@@ -15,7 +15,7 @@ import win32api
 import win32cred
 from win32com.shell import shell, shellcon
 from win32con import OFN_ALLOWMULTISELECT, OFN_EXPLORER
-from win32gui import GetOpenFileNameW, GetSaveFileNameW
+from win32gui import GetOpenFileNameW
 
 # Icons
 PWSTR = ctypes.c_wchar_p
@@ -150,9 +150,7 @@ async def warning_dialog(parent, title, message, detail=None):
     )
 
 
-async def open_file_dialog(
-    parent, title, filename=None, initial_directory=None, file_types=None, multiple_select=False
-):
+async def file_dialog(parent, title, filename=None, initial_directory=None, file_types=None, multiple_select=False):
     if initial_directory is None:
         initial_directory = os.getcwd()  # noqa: PTH109
 
@@ -205,53 +203,7 @@ async def open_file_dialog(
     return paths
 
 
-async def save_file_dialog(
-    parent,
-    title,
-    filename=None,
-    initial_directory=None,
-    file_types=None,
-):
-    if initial_directory is None:
-        initial_directory = os.getcwd()  # noqa: PTH109
-
-    if file_types is None:
-        ext_filter = "All Files\0*.*\0"
-    else:
-        ext_filter = ""
-        for name, extensions in file_types:
-            if isinstance(extensions, str):
-                ext_filter += f"{name}\0*.{extensions}\0"
-                continue
-            ext_filter += f"{name}\0" + ";".join(f"*.{extension}" for extension in extensions) + "\0"
-
-    owner = None
-    if parent and parent.get_root_window():
-        owner = parent.get_root_window().get_window_info().window
-    func = functools.partial(
-        GetSaveFileNameW,
-        hwndOwner=owner,
-        InitialDir=initial_directory,
-        File=filename,
-        Title=title,
-        MaxFile=2**16,
-        Filter=ext_filter,
-        DefExt="",
-    )
-
-    with _disable(parent):
-        try:
-            file_path, _, _ = await asyncio.get_event_loop().run_in_executor(None, func)
-        except pywintypes.error as error:
-            if error.winerror == 0:
-                # Operation cancel by user.
-                return None
-            raise IOError from error
-
-    return file_path
-
-
-async def open_folder_dialog(
+async def folder_dialog(
     parent,
     title,
     initial_directory=None,

@@ -14,7 +14,7 @@ from minarca_client.core import BackupInstance
 from minarca_client.core.compat import get_home
 from minarca_client.core.config import Pattern, Patterns
 from minarca_client.locale import _
-from minarca_client.ui.dialogs import open_file_dialog, open_folder_dialog
+from minarca_client.ui.dialogs import file_dialog, folder_dialog
 from minarca_client.ui.utils import alias_property
 
 logger = logging.getLogger(__name__)
@@ -249,7 +249,7 @@ class BackupPatterns(MDBoxLayout):
 
     def add_folder_pattern(self):
         async def _add_folder_pattern():
-            folder = await open_folder_dialog(parent=self, title=_('Add Folder Pattern'), initial_directory=get_home())
+            folder = await folder_dialog(parent=self, title=_('Add Folder Pattern'), initial_directory=get_home())
             if not folder:
                 # Operation cancel by user
                 return
@@ -260,7 +260,7 @@ class BackupPatterns(MDBoxLayout):
     def add_file_pattern(self):
         async def _add_file_pattern():
             # Prompt user to select one or more file.
-            filenames = await open_file_dialog(
+            filenames = await file_dialog(
                 parent=self, title=_('Add File Pattern'), multiple_select=True, initial_directory=get_home()
             )
             if not filenames:

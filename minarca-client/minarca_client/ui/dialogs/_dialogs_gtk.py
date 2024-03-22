@@ -108,7 +108,7 @@ async def error_dialog(parent, title, message, detail=None):
         message=message,
         detail=detail,
         message_type=Gtk.MessageType.ERROR,
-        buttons=Gtk.ResponseType.OK,
+        buttons=Gtk.ButtonsType.OK,
     )
 
 
@@ -119,7 +119,7 @@ async def warning_dialog(parent, title, message, detail=None):
         message=message,
         detail=detail,
         message_type=Gtk.MessageType.WARNING,
-        buttons=Gtk.ResponseType.OK,
+        buttons=Gtk.ButtonsType.OK,
     )
 
 
@@ -161,9 +161,7 @@ async def _file_dialog(parent, title, filename, initial_directory, file_types, m
     return result
 
 
-async def open_file_dialog(
-    parent, title, filename=None, initial_directory=None, file_types=None, multiple_select=False
-):
+async def file_dialog(parent, title, filename=None, initial_directory=None, file_types=None, multiple_select=False):
     return await _file_dialog(
         parent=parent,
         title=title,
@@ -176,26 +174,7 @@ async def open_file_dialog(
     )
 
 
-async def save_file_dialog(
-    parent,
-    title,
-    filename=None,
-    initial_directory=None,
-    file_types=None,
-):
-    return await _file_dialog(
-        parent=parent,
-        title=title,
-        filename=filename,
-        initial_directory=initial_directory,
-        file_types=file_types,
-        multiple_select=False,
-        action=Gtk.FileChooserAction.SAVE,
-        ok_icon=Gtk.STOCK_SAVE,
-    )
-
-
-async def open_folder_dialog(
+async def folder_dialog(
     parent,
     title,
     initial_directory=None,
