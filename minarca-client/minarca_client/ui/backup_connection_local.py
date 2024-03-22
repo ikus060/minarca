@@ -47,6 +47,7 @@ Builder.load_string(
 
 
 <BackupConnectionLocal>:
+    id: backup_connection_local
     orientation: "horizontal"
     md_bg_color: app.white
 
@@ -98,6 +99,7 @@ Builder.load_string(
                     display: root.error_detail
 
             CTextField:
+                id: repositoryname
                 name: _("Backup name")
                 text: root.repositoryname
                 on_text: root.repositoryname = self.text
