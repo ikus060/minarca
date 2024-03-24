@@ -67,7 +67,7 @@ Builder.load_string(
                     data: root.schedule_choices
 
                 CCheckbox:
-                    text: _('Run whether user is logged on or not')
+                    text: _("Run whether user's session is open or not")
                     display: root.show_run_if_logged_out
                     active: root.run_if_logged_out
                     on_active: root.toggle_run_if_logged_out()
@@ -426,7 +426,7 @@ class BackupSettings(MDBoxLayout):
 
         async def _run_if_logged_out():
             # If enabled, prompt user for password.
-            username, password = await username_password_dialog(
+            username, password = username_password_dialog(
                 parent=self, title=_('Windows Credentials'), message=_('Enter credentials for local machine:')
             )
             if not username or not password:

@@ -239,7 +239,7 @@ async def folder_dialog(
     return shell.SHGetPathFromIDList(pidl).decode('latin1')
 
 
-async def username_password_dialog(parent, title, message, username=None):
+def username_password_dialog(parent, title, message, username=None):
     """
     Display message dialog to ask for username and password.
     """
@@ -255,8 +255,7 @@ async def username_password_dialog(parent, title, message, username=None):
         "CaptionText": title,
     }
     with _disable(parent):
-        # For unknown reason, this dialog cannot be open in another thread.
-        # So execute it in main thread.
+        # When excuted in secondary thread, it's not working.
         target, pwd, save = win32cred.CredUIPromptForCredentials(
             TargetName=win32api.GetComputerName(),
             AuthError=0,
