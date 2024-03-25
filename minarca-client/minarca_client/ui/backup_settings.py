@@ -135,6 +135,7 @@ Builder.load_string(
                     padding: (0, "30dp", 0 , 0)
 
                     CButton:
+                        id: btn_cancel
                         text: _('Back') if root.create else _('Cancel')
                         on_release: root.cancel()
                         disabled: root.working

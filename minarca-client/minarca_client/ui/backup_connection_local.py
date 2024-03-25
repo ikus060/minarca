@@ -112,6 +112,7 @@ Builder.load_string(
                 adaptive_height: True
 
                 CButton:
+                    id: btn_refresh
                     text: _('Refresh')
                     on_release: root.refresh_removable_disks()
                     role: "small"
@@ -160,6 +161,7 @@ Builder.load_string(
                 adaptive_height: True
 
                 CButton:
+                    id: btn_cancel
                     text: _('Back') if root.create else _('Cancel')
                     on_release: root.cancel()
                     disabled: root.working

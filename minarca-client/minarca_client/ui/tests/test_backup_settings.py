@@ -3,15 +3,15 @@ import os
 import tempfile
 import unittest
 
-from minarca_client.core.backup import Backup
+from minarca_client.core.backup import Backup, BackupInstance
 from minarca_client.core.compat import IS_LINUX
-from minarca_client.ui.app import BackupConnectionLocal, BackupCreate, MinarcaApp
+from minarca_client.ui.app import BackupPatterns, BackupSettings, MinarcaApp
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
 
 @unittest.skipIf(IS_LINUX and NO_DISPLAY, 'cannot run this without display')
-class MainDialogTest(unittest.IsolatedAsyncioTestCase):
+class BackupSettingsTest(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.cwd = os.getcwd()
         self.tmp = tempfile.TemporaryDirectory()
@@ -25,20 +25,22 @@ class MainDialogTest(unittest.IsolatedAsyncioTestCase):
         self.tmp.cleanup()
 
     async def asyncSetUp(self):
+        # Given a local backup
+        self.instance = instance = BackupInstance('1')
+        instance.settings.configured = True
+        instance.settings.save()
         # Starting Minarca
         self.app = MinarcaApp(backup=Backup())
         asyncio.create_task(self.app.async_run())
         await asyncio.sleep(0)
         # When Browse to create local backup
-        self.app.set_active_view('BackupConnectionLocal')
+        self.app.set_active_view('BackupPatterns', instance=instance, create=True)
         await asyncio.sleep(0)
         self.view = self.app.root.ids.body.children[0]
 
-    async def test_backup_connection_local(self):
+    async def test_view(self):
         # Then the view get displayed.
-        self.assertIsInstance(self.view, BackupConnectionLocal)
-        # Then the view contains a default repository name
-        self.assertNotEqual("", self.view.ids.repositoryname.text)
+        self.assertIsInstance(self.view, BackupPatterns)
 
     async def test_btn_cancel(self):
         # When user click on back or cancel button
@@ -47,10 +49,4 @@ class MainDialogTest(unittest.IsolatedAsyncioTestCase):
         await asyncio.sleep(0)
         # Then view is updated
         self.view = self.app.root.ids.body.children[0]
-        self.assertIsInstance(self.view, BackupCreate)
-
-    async def test_btn_refresh(self):
-        # When user click on refresh, then disk list get refreshed.
-        btn_refresh = self.view.ids.btn_refresh
-        btn_refresh.dispatch('on_release')
-        await asyncio.sleep(0)
+        self.assertIsInstance(self.view, BackupSettings)

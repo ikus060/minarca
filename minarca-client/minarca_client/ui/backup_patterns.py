@@ -153,6 +153,7 @@ Builder.load_string(
             adaptive_height: True
 
             CButton:
+                id: btn_cancel
                 text: _('Cancel')
                 on_release: root.cancel()
                 theme_bg_color: "Custom"
