@@ -82,7 +82,7 @@ a = Analysis(
     **extras,
 )
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure, cipher=block_cipher)
 
 # First executable for windowed mode.
 exe_w = EXE(
@@ -98,7 +98,6 @@ exe_w = EXE(
     icon=icon,
     console=False,
 )
-all_exe = [exe_w]
 
 # Another executable on for console mode.
 exe_c = EXE(
@@ -114,7 +113,6 @@ exe_c = EXE(
     icon=icon,
     console=True,
 )
-all_exe += [exe_c]
 
 extras = []
 if platform.system() == "Windows":
@@ -124,10 +122,12 @@ if platform.system() == "Windows":
     extras = [Tree(p) for p in (sdl2.dep_bins + glew.dep_bins + angle.dep_bins)]
 
 coll = COLLECT(
-    *all_exe,
+    exe_w,
+    exe_c,
     a.binaries,
     a.zipfiles,
     a.datas,
+    a.zipped_data,
     *extras,
     strip=False,
     upx=False,
