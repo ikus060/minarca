@@ -76,8 +76,8 @@ bdist-client:linux:
     paths:
     - "minarca-client/dist/minarca-client_*.tar.gz"
     - "minarca-client/dist/minarca-client_*.deb"
-    - "./*/coverage.xml"
-    - "./*/xunit.xml"
+    - "./*/coverage*.xml"
+    - "./*/xunit*.xml"
     expire_in: 1 day
   before_script:
   - apt update
@@ -97,6 +97,8 @@ bdist-client:macos:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.dmg"
+    - "./*/coverage*.xml"
+    - "./*/xunit*.xml"
     expire_in: 1 day
   before_script:
     - pip3 install tox
@@ -113,6 +115,8 @@ bdist-client:win32:
   artifacts:
     paths:
     - "minarca-client/dist/minarca-client_*.exe"
+    - "./*/coverage*.xml"
+    - "./*/xunit*.xml"
     expire_in: 1 day
   before_script:
   # Install required dependencies for building on Windows
