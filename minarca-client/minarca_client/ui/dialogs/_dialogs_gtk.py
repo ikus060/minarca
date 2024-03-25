@@ -192,5 +192,5 @@ async def folder_dialog(
     )
 
 
-async def username_password_dialog(parent, title, message, username=None):
+def username_password_dialog(parent, title, message, username=None):
     return None, None
