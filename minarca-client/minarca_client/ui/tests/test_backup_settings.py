@@ -5,7 +5,7 @@ import unittest
 
 from minarca_client.core.backup import Backup, BackupInstance
 from minarca_client.core.compat import IS_LINUX
-from minarca_client.ui.app import BackupCreate, BackupPatterns, MinarcaApp
+from minarca_client.ui.app import BackupPatterns, BackupSettings, MinarcaApp
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
@@ -34,13 +34,13 @@ class BackupSettingsTest(unittest.IsolatedAsyncioTestCase):
         asyncio.create_task(self.app.async_run())
         await asyncio.sleep(0)
         # When Browse to create local backup
-        self.app.set_active_view('BackupPatterns', instance=instance, create=True)
+        self.app.set_active_view('BackupSettings', instance=instance, create=True)
         await asyncio.sleep(0)
         self.view = self.app.root.ids.body.children[0]
 
     async def test_view(self):
         # Then the view get displayed.
-        self.assertIsInstance(self.view, BackupPatterns)
+        self.assertIsInstance(self.view, BackupSettings)
 
     async def test_btn_cancel(self):
         # When user click on back or cancel button
@@ -49,4 +49,4 @@ class BackupSettingsTest(unittest.IsolatedAsyncioTestCase):
         await asyncio.sleep(0)
         # Then view is updated
         self.view = self.app.root.ids.body.children[0]
-        self.assertIsInstance(self.view, BackupCreate)
+        self.assertIsInstance(self.view, BackupPatterns)
