@@ -11,9 +11,14 @@ import gi
 gi.require_version('Gtk', '3.0')  # noqa
 from gi.repository import Gtk  # noqa
 
+# Used for unit testing.
+_last_dlg = None
+
 
 @contextlib.contextmanager
 def _place_dlg(parent, dlg):
+    global _last_dlg
+    _last_dlg = dlg
     try:
         # Place Window on top of parent
         if parent and parent.get_root_window():

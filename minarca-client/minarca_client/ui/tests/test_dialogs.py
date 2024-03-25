@@ -37,6 +37,14 @@ class MainDialogTest(unittest.IsolatedAsyncioTestCase):
             else:
                 self.fail('fail to close dialog')
 
+        elif IS_LINUX:
+            from minarca_client.ui.dialogs._dialogs_gtk import _last_dlg
+
+            if _last_dlg:
+                _last_dlg.close()
+            else:
+                self.fail('fail to close dialog')
+
     @parameterized.expand([error_dialog, warning_dialog, confirm_dialog, info_dialog])
     async def test_message_dialog(self, dlg):
         # Given a dialog
