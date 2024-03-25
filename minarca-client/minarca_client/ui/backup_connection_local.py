@@ -480,7 +480,7 @@ class BackupConnectionLocal(MDBoxLayout):
     def forget_instance(self):
         assert not self.create
 
-        async def _forget_instance(self):
+        async def _forget_instance():
             # In edit mode, confirm operation, destroy the configuration and go to dashboard.
             ret = await question_dialog(
                 parent=self,

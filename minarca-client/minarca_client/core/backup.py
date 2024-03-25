@@ -114,7 +114,7 @@ class Backup:
         if patterns:
             assert action == 'restore'
             args += [p.pattern for p in patterns]
-        child = detach_call()
+        child = detach_call(args)
         logger.info('subprocess %s started' % child.pid)
 
     def get_help_url(self):

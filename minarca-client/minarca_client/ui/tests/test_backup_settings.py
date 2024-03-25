@@ -5,7 +5,7 @@ import unittest
 
 from minarca_client.core.backup import Backup, BackupInstance
 from minarca_client.core.compat import IS_LINUX
-from minarca_client.ui.app import BackupPatterns, BackupSettings, MinarcaApp
+from minarca_client.ui.app import BackupCreate, BackupPatterns, MinarcaApp
 
 NO_DISPLAY = not os.environ.get('DISPLAY', False)
 
@@ -49,4 +49,4 @@ class BackupSettingsTest(unittest.IsolatedAsyncioTestCase):
         await asyncio.sleep(0)
         # Then view is updated
         self.view = self.app.root.ids.body.children[0]
-        self.assertIsInstance(self.view, BackupSettings)
+        self.assertIsInstance(self.view, BackupCreate)
