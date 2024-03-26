@@ -84,8 +84,7 @@ bdist-client:linux:
   - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron zenity
   - pip3 install tox
   # Required Python 3.10 for KivyMD
-  # Required bullseye for PyGObject
-  image: python:3.10-bullseye
+  image: python:3.10-buster
   needs: []  
   script:
   - cd minarca-client
