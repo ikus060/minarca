@@ -48,16 +48,16 @@ setuptools.setup(
         "wakepy==0.6.0",
         "kivy==2.3.0",
         # FIXME We need to define version or commit hash
-        "KivyMD @ git+https://github.com/ikus060/KivyMD.git@patrik-hotfix",
+        "KivyMD @ git+https://github.com/kivymd/KivyMD@master",
         # Windows dependencies
         "pywin32 ; sys_platform=='win32'",
         # MacOS dependencies
         "launchd ; sys_platform=='darwin'",
+        # FIXME We need to define version. This is required to compile on MacOS.
         "materialyoucolor @ git+https://github.com/T-Dynamos/materialyoucolor-python.git@main ; sys_platform=='darwin'",
         # Linux dependencies
         "python-crontab ; sys_platform=='linux'",
         "pylibacl ; sys_platform=='linux'",
         "pyxattr ; sys_platform=='linux'",
-        "PyGObject ; sys_platform=='linux'",
     ],
 )

@@ -73,7 +73,7 @@ def _disable(parent):
             window.children[0].disabled = False
 
 
-async def message_dialog(parent, title, message, detail, icon, buttons, success_result=None):
+async def _message_dialog(parent, title, message, detail, icon, buttons, success_result=None):
     owner = None
     if parent and parent.get_root_window():
         owner = parent.get_root_window().get_window_info().window
@@ -94,7 +94,7 @@ async def message_dialog(parent, title, message, detail, icon, buttons, success_
 
 
 async def info_dialog(parent, title, message, detail=None):
-    return await message_dialog(
+    return await _message_dialog(
         parent=parent,
         title=title,
         message=message,
@@ -105,7 +105,7 @@ async def info_dialog(parent, title, message, detail=None):
 
 
 async def question_dialog(parent, title, message, detail=None):
-    return await message_dialog(
+    return await _message_dialog(
         parent=parent,
         title=title,
         message=message,
@@ -116,20 +116,8 @@ async def question_dialog(parent, title, message, detail=None):
     )
 
 
-async def confirm_dialog(parent, title, message, detail=None):
-    return await message_dialog(
-        parent=parent,
-        title=title,
-        message=message,
-        detail=detail,
-        icon=TD_INFORMATION_ICON,
-        buttons=TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON,
-        success_result=TDCBF_OK_BUTTON,
-    )
-
-
 async def error_dialog(parent, title, message, detail=None):
-    return await message_dialog(
+    return await _message_dialog(
         parent=parent,
         title=title,
         message=message,
@@ -140,7 +128,7 @@ async def error_dialog(parent, title, message, detail=None):
 
 
 async def warning_dialog(parent, title, message, detail=None):
-    return await message_dialog(
+    return await _message_dialog(
         parent=parent,
         title=title,
         message=message,
@@ -150,24 +138,14 @@ async def warning_dialog(parent, title, message, detail=None):
     )
 
 
-async def file_dialog(parent, title, filename=None, initial_directory=None, file_types=None, multiple_select=False):
+async def file_dialog(parent, title, filename=None, initial_directory=None, multiple_select=False):
     if initial_directory is None:
         initial_directory = os.getcwd()  # noqa: PTH109
 
     flags = OFN_EXPLORER
     if multiple_select:
         flags = flags | OFN_ALLOWMULTISELECT
-
-    if file_types is None:
-        ext_filter = "All Files\0*.*\0"
-    else:
-        ext_filter = ""
-        for name, extensions in file_types:
-            if isinstance(extensions, str):
-                ext_filter += f"{name}\0*.{extensions}\0"
-                continue
-            ext_filter += f"{name}\0" + ";".join(f"*.{extension}" for extension in extensions) + "\0"
-
+    ext_filter = "All Files\0*.*\0"
     owner = None
     if parent and parent.get_root_window():
         owner = parent.get_root_window().get_window_info().window
