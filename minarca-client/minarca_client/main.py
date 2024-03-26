@@ -296,7 +296,10 @@ def _status(limit):
     """
     backup = Backup()
     try:
-        # TODO Review this code
+        # Test connection for all backup.
+        if len(backup):
+            print('Verifying connection...')
+        entries = []
         for instance in backup[limit]:
             status = instance.status
             settings = instance.settings
@@ -305,14 +308,35 @@ def _status(limit):
                 connected = True
             except BackupError:
                 connected = False
-            print(_("Remote server:          %s") % settings.remotehost)
-            print(_("Connectivity status:    %s" % (_("Connected") if connected else _("Not connected"))))
-            print(_("Last successful backup: %s") % status.lastsuccess or _('Never'))
-            print(_("Last backup date:       %s") % status.lastdate or _('Never'))
-            print(_("Last backup status:     %s") % status.current_status or _('Never'))
-            print(_("Details:                %s") % status.details or '')
+            entries.append((instance, connected))
+
+        # Print result.
+        for instance, connected in entries:
+            title = _("Backup Instance: %s") % (settings.repositoryname or _("No name"))
+            print(title)
+            print('=' * len(title))
+
+            if instance.is_remote():
+                print(" * " + _("Remote server:          %s") % settings.remotehost)
+            elif instance.is_local():
+                print(" * " + _("Local device:           %s") % settings.localcaption)
+            print(" * " + _("Connectivity status:    %s" % (_("Connected") if connected else _("Not connected"))))
+            print(
+                " * "
+                + _("Last successful backup: %s")
+                % (status.lastsuccess.strftime("%Y-%m-%dT%H:%M:%S%z") if status.lastsuccess else _('Never'))
+            )
+            print(
+                " * "
+                + _("Last backup date:       %s")
+                % (status.lastdate.strftime("%Y-%m-%dT%H:%M:%S%z") if status.lastdate else _('Never'))
+            )
+            print(" * " + _("Last backup status:     %s") % (status.current_status or _('Never')))
+            if status.details:
+                print(" * " + _("Details:                %s") % status.details or '')
             if settings.pause_until:
                 print(_("Paused until:           %s") % settings.pause_until)
+
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))

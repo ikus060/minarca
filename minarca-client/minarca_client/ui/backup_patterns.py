@@ -250,11 +250,11 @@ class BackupPatterns(MDBoxLayout):
 
     def add_folder_pattern(self):
         async def _add_folder_pattern():
-            folder = await folder_dialog(parent=self, title=_('Add Folder Pattern'), initial_directory=get_home())
-            if not folder:
-                # Operation cancel by user
-                return
-            self._add_pattern(folder)
+            folders = await folder_dialog(
+                parent=self, title=_('Add Folder Pattern'), initial_directory=get_home(), multiple_select=True
+            )
+            for folder in folders:
+                self._add_pattern(folder)
 
         self._add_folder_task = asyncio.get_event_loop().create_task(_add_folder_pattern())
 
@@ -264,9 +264,6 @@ class BackupPatterns(MDBoxLayout):
             filenames = await file_dialog(
                 parent=self, title=_('Add File Pattern'), multiple_select=True, initial_directory=get_home()
             )
-            if not filenames:
-                # Operation cancel by user
-                return
             for fn in filenames:
                 self._add_pattern(fn)
 

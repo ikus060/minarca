@@ -412,8 +412,11 @@ class TestMainParseArgs(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             main.main(['status'])
         # Then status get printed to stdout
-        self.assertIn('Remote server:', f.getvalue())
-        self.assertEqual(6, len(f.getvalue().splitlines()))
+        self.assertIn('Backup Instance:', f.getvalue())
+        self.assertIn('Connectivity status:', f.getvalue())
+        self.assertIn('Last successful backup:', f.getvalue())
+        self.assertIn('Last backup date:', f.getvalue())
+        self.assertIn('Last backup status:', f.getvalue())
 
     def test_forget(self):
         # Given a backup instance

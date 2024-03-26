@@ -9,6 +9,7 @@
 # stuff during packaging.
 import asyncio
 import contextlib
+import os
 
 
 @contextlib.contextmanager
@@ -117,8 +118,14 @@ async def _file_dialog(parent, title, filename, initial_directory, multiple_sele
     with _disable(parent):
         proc = await asyncio.create_subprocess_exec(cmd[0], *cmd[1:], stdout=asyncio.subprocess.PIPE)
         stdout, _unused = await proc.communicate()
-        filenames = await stdout.read()
-    return filenames
+        # Use FS encoding
+        stdout = os.fsdecode(stdout)
+        # Zenity output a newline
+        stdout = stdout.strip('\n')
+        # If multi select, always return a list of files.
+        if multiple_select:
+            return stdout.split('|') if stdout else None
+        return stdout if stdout else None
 
 
 async def file_dialog(parent, title, filename=None, initial_directory=None, multiple_select=False):
