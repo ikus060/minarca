@@ -19,7 +19,7 @@ import psutil
 from minarca_client.core import compat
 from minarca_client.core.compat import IS_WINDOWS, detach_call, file_read, get_minarca_exe, ssh_keygen
 from minarca_client.core.config import Datetime, Patterns, Settings, Status
-from minarca_client.core.disk import list_disks, sync
+from minarca_client.core.disk import list_disks
 from minarca_client.core.exceptions import (
     CaptureException,
     LocalDiskNotFound,
@@ -223,7 +223,8 @@ class BackupInstance:
                     # For local disk, make sure to "flush" disk cache
                     if self.is_local():
                         logger.info("flush changes to disk")
-                        sync(dest)
+                        with os.open(dest, os.O_DIRECTORY) as fd:
+                            os.fsync(fd)
 
     def get_repo_url(self, page="browse"):
         """

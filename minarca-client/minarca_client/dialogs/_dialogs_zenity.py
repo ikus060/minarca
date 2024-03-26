@@ -113,8 +113,8 @@ async def _file_dialog(parent, title, filename, initial_directory, multiple_sele
     if title:
         cmd.append('--title=%s' % title)
     if parent and parent.get_parent_window():
-        winfo = parent.get_parent_window().get_window_info().window
-        cmd.append('--attach=%s' % winfo)
+        # Zenity --attach is deprecated. So dont use it.
+        cmd.append('--modal')
     with _disable(parent):
         proc = await asyncio.create_subprocess_exec(cmd[0], *cmd[1:], stdout=asyncio.subprocess.PIPE)
         stdout, _unused = await proc.communicate()

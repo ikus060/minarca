@@ -186,12 +186,3 @@ def get_disk_info(filename):
     return DiskInfo(
         device, part.mountpoint, relpath, info.caption, usage.free, usage.used, usage.total, part.fstype, info.removable
     )
-
-
-def sync(filename):
-    """
-    Synchronize cached writes to persistent storage.
-    """
-    if hasattr(os, 'sync'):
-        os.sync()
-    # TODO Implement "Sync" for Windows.
