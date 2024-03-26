@@ -11,8 +11,8 @@ from kivy.properties import BooleanProperty, DictProperty, ObjectProperty
 
 from minarca_client.core import BackupInstance
 from minarca_client.core.compat import watch_file
+from minarca_client.dialogs import question_dialog
 from minarca_client.locale import _
-from minarca_client.ui.dialogs import question_dialog
 from minarca_client.ui.theme import CCard
 from minarca_client.ui.utils import alias_property
 

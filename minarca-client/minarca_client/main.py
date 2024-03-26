@@ -3,6 +3,7 @@
 # Use is subject to license terms.
 
 
+import asyncio
 import getpass
 import logging
 import logging.handlers
@@ -352,15 +353,21 @@ def _ui():
     """
     try:
         from minarca_client.ui.app import MinarcaApp
-    except SystemExit:
+    except Exception:
         # This is raised by kivy if it can create a window.
         # In that scenario, we still need to display an error message to the user.
         logger.exception('application startup failed')
-        # TODO Show native message dialog.
-        sys.exit(_EXIT_KIVY_ERROR)
-    except Exception:
-        # Multiple condition could raise this.
-        logger.exception('unknown error raised during application startup')
+        from minarca_client.dialogs import error_dialog
+
+        dlg = error_dialog(
+            parent=None,
+            title=_('Minarca'),
+            message=_('Application fail to start'),
+            detail=_(
+                'If the problem persists, check the logs with your administrator or try reinstalling the application.'
+            ),
+        )
+        asyncio.run(dlg)
         sys.exit(_EXIT_KIVY_ERROR)
 
     # Start event loop with backup instance.

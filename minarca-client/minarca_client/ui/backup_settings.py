@@ -12,8 +12,8 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from minarca_client.core import BackupInstance
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.exceptions import BackupError, RemoteRepositoryNotFound
+from minarca_client.dialogs import question_dialog, username_password_dialog, warning_dialog
 from minarca_client.locale import _
-from minarca_client.ui.dialogs import question_dialog, username_password_dialog, warning_dialog
 from minarca_client.ui.utils import alias_property
 
 logger = logging.getLogger(__name__)

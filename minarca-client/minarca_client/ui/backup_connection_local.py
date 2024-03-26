@@ -16,8 +16,8 @@ from kivymd.uix.list import MDListItem
 from minarca_client.core.compat import get_default_repositoryname
 from minarca_client.core.disk import DiskInfo, get_disk_info, list_disks
 from minarca_client.core.exceptions import ConfigureBackupError, LocalDiskNotFound, RepositoryNameExistsError
+from minarca_client.dialogs import folder_dialog, question_dialog, warning_dialog
 from minarca_client.locale import _
-from minarca_client.ui.dialogs import folder_dialog, question_dialog, warning_dialog
 from minarca_client.ui.utils import alias_property
 
 logger = logging.getLogger(__name__)

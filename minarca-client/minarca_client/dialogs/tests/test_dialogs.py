@@ -6,7 +6,7 @@ import psutil
 from parameterized import parameterized
 
 from minarca_client.core.compat import IS_LINUX, IS_WINDOWS
-from minarca_client.ui.dialogs import (
+from minarca_client.dialogs import (
     error_dialog,
     file_dialog,
     folder_dialog,

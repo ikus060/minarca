@@ -12,8 +12,8 @@ from kivymd.uix.boxlayout import MDBoxLayout
 
 from minarca_client.core.compat import get_default_repositoryname
 from minarca_client.core.exceptions import BackupError, ConfigureBackupError, RepositoryNameExistsError
+from minarca_client.dialogs import question_dialog
 from minarca_client.locale import _
-from minarca_client.ui.dialogs import question_dialog
 
 logger = logging.getLogger(__name__)
 
