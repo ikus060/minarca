@@ -35,6 +35,10 @@ from minarca_client.core.exceptions import (
 from minarca_client.core.instance import BackupInstance
 from minarca_client.core.rdiffweb import Rdiffweb
 
+if IS_WINDOWS:
+    import win32api
+    import win32con
+
 _REPOSITORY_NAME_PATTERN = "^[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*$"
 
 logger = logging.getLogger(__name__)
@@ -207,7 +211,13 @@ class Backup:
                 with open(uuid_fn, 'w') as f:
                     localuuid = str(uuid.uuid4())
                     f.write(localuuid)
-                # TODO Hide the file and make it readonly.
+                # Hide the file and make it readonly.
+                if IS_WINDOWS:
+                    win32api.SetFileAttributes(
+                        uuid_fn, win32con.FILE_ATTRIBUTE_READONLY | win32con.FILE_ATTRIBUTE_HIDDEN
+                    )
+                else:
+                    os.chmod(uuid_fn, 0o444)
             except OSError:
                 raise InitDestinationError()
 
