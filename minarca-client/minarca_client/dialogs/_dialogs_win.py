@@ -193,12 +193,13 @@ async def folder_dialog(
     if parent and parent.get_root_window():
         owner = parent.get_root_window().get_window_info().window
     desktop_pidl = shell.SHGetFolderLocation(0, shellcon.CSIDL_DESKTOP, 0, 0)
+    BIF_NEWDIALOGSTYLE = 0x00000040
     func = functools.partial(
         shell.SHBrowseForFolder,
         owner,
         desktop_pidl,
         title,
-        shellcon.BIF_DONTGOBELOWDOMAIN | shellcon.BIF_RETURNONLYFSDIRS,
+        shellcon.BIF_DONTGOBELOWDOMAIN | shellcon.BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE | shellcon.BIF_EDITBOX,
         None,
         None,
     )
@@ -214,7 +215,9 @@ async def folder_dialog(
     if pidl is None:
         # Operation cancel by user.
         return None
-    return shell.SHGetPathFromIDList(pidl).decode('latin1')
+    if multiple_select:
+        return [os.fsdecode(shell.SHGetPathFromIDList(pidl))]
+    return os.fsdecode(shell.SHGetPathFromIDList(pidl))
 
 
 def username_password_dialog(parent, title, message, username=None):
