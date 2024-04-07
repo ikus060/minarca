@@ -126,7 +126,7 @@ def main(args=None):
             [rdiff_backup, '-V'], env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno()
         )
     else:
-        if ssh_original_command in ["rdiff-backup --server"]:
+        if ssh_original_command.startswith("rdiff-backup ") and "--server" in ssh_original_command:
             # When called directly by rdiff-backup.
             # So let use default rdiff-backup version.
             rdiff_backup = _find_rdiff_backup()
