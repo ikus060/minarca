@@ -111,6 +111,10 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 5.0.4 (2024-04-07)
+
+* Fix compatibility issue with backupninja #237
+
 ## 5.0.3 (2024-02-19)
 
 * Upgrade rdiffweb to version 2.8.8
