@@ -142,6 +142,9 @@ Section "Installation of $(DisplayName)" SecAppFiles
   
   ;Store install folder
   WriteRegStr HKLM "SOFTWARE\${Vendor}\${ShortName}" "" $INSTDIR
+
+  ; Enable Long file path support by default.
+  WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Control\FileSystem" "LongPathsEnabled" "1"
  
   !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$(DisplayName)"
