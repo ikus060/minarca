@@ -111,6 +111,10 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 5.0.5 (2024-04-16)
+
+* Add a fix to enable long file path on Windows OS by default
+
 ## 5.0.4 (2024-04-07)
 
 * Fix compatibility issue with backupninja #237
