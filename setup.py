@@ -7,47 +7,8 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
-from __future__ import print_function
-
-import os
-import sys
 
 import setuptools
-
-install_requires = [
-    "javaproperties",
-    "packaging",
-    "psutil",
-    "rdiff-backup==2.2.5",
-    "requests>=2.25.1",
-    "tkvue==2.1.4",
-    "wakepy==0.6.0",
-]
-
-if os.name == "nt":
-    extra_options = {
-        "install_requires": install_requires + ["pywin32"],
-        # On Windows rdiff-backup is not working with python 3.9
-        # Let make it a required until rdiff-backup support other python
-        # version.
-        "python_requires": ">=3.10, <3.11",
-    }
-
-elif sys.platform == "darwin":
-    extra_options = {
-        # On MacOS, we use launchd for scheduling
-        "install_requires": install_requires + ["launchd"],
-        # Python 3.6 and more are supported
-        "python_requires": "~=3.7",
-    }
-
-else:
-    extra_options = {
-        # On Linux we use Crontab for scheduling
-        "install_requires": install_requires + ["python-crontab", "pylibacl", "pyxattr"],
-        # Python 3.6 and more are supported
-        "python_requires": "~=3.7",
-    }
 
 setuptools.setup(
     name="minarca_client",
@@ -62,7 +23,7 @@ setuptools.setup(
     include_package_data=True,
     packages=setuptools.find_packages("."),
     setup_requires=[
-        "setuptools_scm>=3.2",
+        "setuptools_scm>=3.2,<8",
     ],
     # required packages for build process
     extras_require={
@@ -76,5 +37,29 @@ setuptools.setup(
         "console_scripts": ["minarca = minarca_client.main:main"],
         "gui_scripts": ["minarcaw = minarca_client.main:main"],
     },
-    **extra_options
+    install_requires=[
+        "aiofiles",
+        "cryptography",
+        "humanfriendly",
+        "javaproperties",
+        "packaging",
+        "psutil",
+        "rdiff-backup==2.2.5",
+        "requests>=2.25.1",
+        "tzlocal~=2.0",
+        "wakepy==0.6.0",
+        "kivy==2.3.0",
+        # TODO We need to define version
+        "KivyMD @ git+https://github.com/kivymd/KivyMD@cfe5aac30f50708c6208c8b33b0ef1aa390721e8",
+        # Windows dependencies
+        "pywin32 ; sys_platform=='win32'",
+        # MacOS dependencies
+        "launchd ; sys_platform=='darwin'",
+        # TODO We need to define version when release. This is required to compile on MacOS.
+        "materialyoucolor @ git+https://github.com/T-Dynamos/materialyoucolor-python.git@57ec2e45ea4596edae0d9133af4732fa25a6407e ; sys_platform=='darwin'",
+        # Linux dependencies
+        "python-crontab ; sys_platform=='linux'",
+        "pylibacl ; sys_platform=='linux'",
+        "pyxattr ; sys_platform=='linux'",
+    ],
 )

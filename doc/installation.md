@@ -31,14 +31,18 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 
 Here's a compatibility matrix for Minarca Server and Minarca Agent:
 
-| Agent                      | v5.x | v4.5 - v4.3 | v4.2 - v4.0 | v3.x |
-| -------------------------- | ---- | ----------- | ----------- | ---- |
-| Minarca Server v5.*        | ✓    | ✓           | ✓ (1)       | ✓ (1)|
-| Minarca Server v4.5 - v4.3 |      | ✓           | ✓ (1)       | ✓ (1)|
-| Minarca Server v4.2 - v4.0 |      | ✓ (1)       | ✓ (1)       | ✓ (1)|
-| Minarca Server v3.*        |      |             |             | ✓    |
+| Agent                      | v6.x | v5.x | v4.5 - v4.3 | v4.2 - v4.0 | v3.x |
+| -------------------------- | ---- | ---- | ----------- | ----------- | ---- |
+| Minarca Server v6.x        | ✓    | ✓    | ✓           | ✓ *1        | ✓ *1 |
+| Minarca Server v5.x        | ✓ *2 | ✓    | ✓           | ✓ *1        | ✓ *1 |
+| Minarca Server v4.5 - v4.3 |      |      | ✓           | ✓ *1        | ✓ *1 |
+| Minarca Server v4.2 - v4.0 |      |      | ✓ *1        | ✓ *1        | ✓ *1 |
+| Minarca Server v3.x        |      |      |             |             | ✓    |
 
-1. Supported if the agent is already configured.
+1. Supported only if the agent is already configured because the initialisation
+   process was using the web form which is no longer supported for security reason.
+2. Some features are not available: updating the backup settings from Minarca Agents,
+    retrieving the Disk usage from server.
 
 ## Installation Steps
 
