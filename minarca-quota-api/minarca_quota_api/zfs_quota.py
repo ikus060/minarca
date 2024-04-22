@@ -105,7 +105,7 @@ def main(args=None):
             set_quota(projectid=args.project, user=args.user, group=args.group, pool=args.pool[0], quota=args.quota)
     except Exception as e:
         print(e)
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == '__main__':  # Script executed directly?

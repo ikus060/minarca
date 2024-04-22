@@ -22,13 +22,14 @@ setuptools.setup(
     url="https://minarca.org/",
     include_package_data=True,
     python_requires=">=3.5",
-    packages=["minarca_server", "minarca_server.plugins", "minarca_server.core"],
+    packages=["minarca_server", "minarca_server.plugins", "minarca_server.core", "minarca_server.controller"],
     setup_requires=[
-        "setuptools_scm>=3.2",
+        "setuptools_scm>=3.2,<8",
     ],
     install_requires=[
-        "rdiffweb==2.8.9",
+        "cryptography",
         "cherrypy>=18.0.0",
+        "rdiffweb==2.9.0b1",
         "requests",
         "tzlocal~=2.0",
     ],

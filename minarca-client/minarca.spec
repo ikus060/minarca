@@ -18,19 +18,32 @@ import re
 import subprocess
 import tempfile
 from email import message_from_string
-
 import pkg_resources
 from PyInstaller.utils.hooks import collect_submodules, copy_metadata
+
+# Use Mock OpenGL to avoid issue on headless
+os.environ['KIVY_GL_BACKEND'] = 'mock'
+# Disable Kivy config file.
+os.environ['KIVY_NO_CONFIG'] = '1'
+# Disable Kivy logging
+os.environ['KIVY_NO_FILELOG'] = '1'
+os.environ['KIVY_LOG_MODE'] = 'PYTHON'
+
+from kivy.tools.packaging.pyinstaller_hooks import hookspath, get_deps_minimal
 
 #
 # Common values
 #
-icon = 'minarca_client/ui/theme/minarca.ico'
-macos_icon = 'minarca_client/ui/theme/minarca.icns'
+icon = 'minarca_client/ui/theme/resources/minarca.ico'
+macos_icon = 'minarca_client/ui/theme/resources/minarca.icns'
+
 # Read pacakage info
 pkg = pkg_resources.get_distribution("minarca_client")
 version = pkg.version
-_metadata = message_from_string(pkg.get_metadata('METADATA'))
+try:
+    _metadata = message_from_string(pkg.get_metadata('METADATA'))
+except IOError:
+    _metadata = message_from_string(pkg.get_metadata('PKG-INFO'))
 pkg_info = dict(_metadata.items())
 long_description = _metadata._payload
 block_cipher = None
@@ -42,31 +55,34 @@ if platform.system() == "Windows":
 else:
     openssh = []
 
+extras = get_deps_minimal(video=None, audio=None, spelling=None, camera=None)
+
+extras['hiddenimports'].extend(collect_submodules("rdiffbackup"))
+
+extras['hiddenimports'].extend(collect_submodules("kivymd"))
+
 a = Analysis(
     ['minarca_client/main.py'],
     pathex=[],
-    binaries=[],
     datas=copy_metadata('minarca_client')
     + copy_metadata('rdiff-backup')
     + openssh
     + [
         ('README.md', '.'),
         ('LICENSE', '.'),
-        ('minarca_client/ui/templates', 'minarca_client/ui/templates'),
-        ('minarca_client/ui/theme', 'minarca_client/ui/theme'),
+        ('minarca_client/ui/theme/resources', 'minarca_client/ui/theme/resources'),
         ('minarca_client/locales', 'minarca_client/locales'),
     ],
-    hiddenimports=collect_submodules("rdiffbackup"),
     hookspath=[],
     runtime_hooks=[],
-    excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
     noarchive=False,
+    **extras,
 )
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure, cipher=block_cipher)
 
 # First executable for windowed mode.
 exe_w = EXE(
@@ -82,7 +98,6 @@ exe_w = EXE(
     icon=icon,
     console=False,
 )
-all_exe = [exe_w]
 
 # Another executable on for console mode.
 exe_c = EXE(
@@ -98,9 +113,27 @@ exe_c = EXE(
     icon=icon,
     console=True,
 )
-all_exe += [exe_c]
 
-coll = COLLECT(*all_exe, a.binaries, a.zipfiles, a.datas, strip=False, upx=False, upx_exclude=[], name='minarca')
+extras = []
+if platform.system() == "Windows":
+    # On Windows extra dependencies must be collected.
+    from kivy_deps import sdl2, glew, angle
+
+    extras = [Tree(p) for p in (sdl2.dep_bins + glew.dep_bins + angle.dep_bins)]
+
+coll = COLLECT(
+    exe_w,
+    exe_c,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    a.zipped_data,
+    *extras,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    name='minarca',
+)
 
 # Extract certificate from environment variable.
 cert_file = tempfile.mktemp(suffix='.key')
@@ -250,7 +283,7 @@ else:
         data_src=[
             ('/opt/minarca', './dist/minarca'),
             ('/usr/share/applications/minarca-client.desktop', './minarca.desktop'),
-            ('/opt/minarca/minarca.svg', './minarca_client/ui/theme/minarca.svg'),
+            ('/opt/minarca/minarca.svg', './minarca_client/ui/theme/resources/minarca.svg'),
             ('/usr/share/doc/minarca-client/copyright', './LICENSE'),
         ],
         description=pkg_info['Summary'],

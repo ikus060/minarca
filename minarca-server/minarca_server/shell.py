@@ -141,7 +141,7 @@ def main(args=None):
             else:
                 logger.info("unsupported version: %s", ssh_original_command)
                 print("ERROR: unsupported version: %s" % ssh_original_command, file=sys.stderr)
-                exit(1)
+                sys.exit(1)
         else:
             # When called by legacy minarca client with rdiff-backup v1.2.8.
             # the command should be the name of the repository.

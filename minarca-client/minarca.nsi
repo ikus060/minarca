@@ -43,8 +43,8 @@
   OutFile "${OutFile}"
   
   ; Define icon
-  !define MUI_ICON "minarca_client/ui/theme/minarca.ico"
-  !define MUI_UNICON "minarca_client/ui/theme/minarca.ico"
+  !define MUI_ICON "minarca_client/ui/theme/resources/minarca.ico"
+  !define MUI_UNICON "minarca_client/ui/theme/resources/minarca.ico"
  
   ;Folder selection page
   InstallDir "$PROGRAMFILES64\Minarca"
@@ -148,7 +148,7 @@ Section "Installation of $(DisplayName)" SecAppFiles
  
   !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$(DisplayName)"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\minarca_client\ui\theme\minarca.ico"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\minarca_client\ui\theme\resources\minarca.ico"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${AppVersion}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${Vendor}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "UninstallString" '"$INSTDIR\uninstall.exe"'
@@ -160,8 +160,8 @@ Section "Installation of $(DisplayName)" SecAppFiles
 
   ; Create startup menu
   CreateDirectory "$SMPROGRAMS\$(DisplayName)"
-  CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\minarca_client\ui\theme\minarca.ico" 0
-  CreateShortCut "$SMPROGRAMS\$(DisplayName)\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\minarca_client\ui\theme\minarca.ico" 0
+  CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\minarca_client\ui\theme\resources\minarca.ico" 0
+  CreateShortCut "$SMPROGRAMS\$(DisplayName)\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\minarca_client\ui\theme\resources\minarca.ico" 0
 
 SectionEnd
  

@@ -111,6 +111,11 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## Next Release
+
+* Upgrade rdiffweb version v2.9.0
+* Support `$minarcaid$` authentication for Minarca Agent.
+
 ## 5.0.5 (2024-04-16)
 
 * Add a fix to enable long file path on Windows OS by default
