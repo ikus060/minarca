@@ -111,8 +111,18 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Release
+## Next Beta Release
 
+* Minarca Agent
+  * Support Kivy inspector in debug mode (enabled using CTRL + E)
+  * Fix display of disk usage
+
+## 6.0.0b1
+
+* Minarca Agent
+  * Support multiple backup source and target
+  * Redesign interface using Kivy
+  * Support Full & Partial restor
 * Upgrade rdiffweb version v2.9.0
 * Support `$minarcaid$` authentication for Minarca Agent.
 
