@@ -68,7 +68,7 @@ a = Analysis(
     + copy_metadata('rdiff-backup')
     + openssh
     + [
-        ('README.md', '.'),
+        ('../README.md', '.'),
         ('LICENSE', '.'),
         ('minarca_client/ui/theme/resources', 'minarca_client/ui/theme/resources'),
         ('minarca_client/locales', 'minarca_client/locales'),
