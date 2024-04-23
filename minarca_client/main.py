@@ -619,9 +619,8 @@ def _configure_logging(debug=False):
     """
     Configure logging system. Make stdout quiet when running within a cron job.
     """
-
     root = logging.getLogger()
-    root.setLevel(logging.DEBUG)
+    root.setLevel(logging.DEBUG if debug else logging.ERROR)
     # Make requests more quiet
     logging.getLogger('requests').setLevel(logging.WARNING)
     # Avoid "Using selector: EpollSelector"
