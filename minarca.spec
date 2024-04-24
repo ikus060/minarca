@@ -82,6 +82,10 @@ a = Analysis(
     **extras,
 )
 
+# To avoid issue on Linux with mixed version, make sure to exclude libstdc++ to use the one provided by the system.
+if platform.system() == 'Linux':
+    a.binaries = [entry for entry in a.binaries if 'libstdc++' not in entry[0]]
+
 pyz = PYZ(a.pure, cipher=block_cipher)
 
 # First executable for windowed mode.
@@ -299,6 +303,7 @@ else:
         depends=[
             'cron',
             'libc6',
+            'libstdc++6',
             'libxcb1',
         ],
     )
