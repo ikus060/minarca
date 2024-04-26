@@ -367,21 +367,21 @@ class BackupInstance:
     async def _push_identity(self, conn, name):
         # Check if ssh keys exists, if not generate new keys.
         if not os.path.exists(self.public_key_file) and not os.path.exists(self.private_key_file):
-            logger.debug(_('generating identity'))
+            logger.info(_('generating identity'))
             ssh_keygen(self.public_key_file, self.private_key_file)
 
         # Push SSH Keys to Minarca server
         try:
             with open(self.public_key_file) as f:
-                logger.debug(_('exchanging identity with minarca server'))
+                logger.info(_('exchanging identity with minarca server'))
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
         except Exception:
             # Probably a duplicate SSH Key, let generate new identity
-            logger.debug(_('generating new identity'))
+            logger.info(_('generating new identity'))
             ssh_keygen(self.public_key_file, self.private_key_file)
             # Publish new identify
             with open(self.public_key_file) as f:
-                logger.debug(_('exchanging new identity with minarca server'))
+                logger.info(_('exchanging new identity with minarca server'))
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
 
     async def _rdiff_backup(self, *extra_args, log_file=None):
@@ -394,7 +394,7 @@ class BackupInstance:
 
         # Execute the command line.
         capture = CaptureException()
-        logger.debug(_('executing command: %s') % _sh_quote(args))
+        logger.info(_('executing command: %s') % _sh_quote(args))
         try:
             process = await asyncio.create_subprocess_exec(
                 get_minarca_exe(),
@@ -420,7 +420,7 @@ class BackupInstance:
         except Exception as e:
             if capture.exception:
                 raise capture.exception
-            logger.debug('process terminated with an exception', exc_info=1)
+            logger.info('process terminated with an exception', exc_info=1)
             raise RdiffBackupException(str(e))
         else:
             if capture.exception:
