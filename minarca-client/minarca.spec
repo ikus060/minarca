@@ -15,9 +15,11 @@
 import os
 import platform
 import re
+import shutil
 import subprocess
 import tempfile
 from email import message_from_string
+
 import pkg_resources
 from PyInstaller.utils.hooks import collect_submodules, copy_metadata
 
@@ -29,7 +31,7 @@ os.environ['KIVY_NO_CONFIG'] = '1'
 os.environ['KIVY_NO_FILELOG'] = '1'
 os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 
-from kivy.tools.packaging.pyinstaller_hooks import hookspath, get_deps_minimal
+from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, hookspath
 
 #
 # Common values
@@ -48,7 +50,6 @@ pkg_info = dict(_metadata.items())
 long_description = _metadata._payload
 block_cipher = None
 
-
 # Include openssh client for windows
 if platform.system() == "Windows":
     openssh = [('minarca_client/core/openssh', 'minarca_client/core/openssh')]
@@ -57,9 +58,18 @@ else:
 
 extras = get_deps_minimal(video=None, audio=None, spelling=None, camera=None)
 
+# Make sure to collect all the files from rdiffbackup (namely the actions)
 extras['hiddenimports'].extend(collect_submodules("rdiffbackup"))
 
+# Do the same for Kivymd
 extras['hiddenimports'].extend(collect_submodules("kivymd"))
+
+# On MacOS, make sure to include librsync.2.dylib because @rpath is not working properly in PyInstaller<6
+if platform.system() == "Darwin":
+    librsync_path = shutil.which(
+        'librsync.2.dylib', path='/usr/lib:/usr/local/lib:/System/Library/Frameworks:/Library/Frameworks'
+    )
+    extras['binaries'].append((librsync_path, '.'))
 
 a = Analysis(
     ['minarca_client/main.py'],
@@ -121,7 +131,7 @@ exe_c = EXE(
 extras = []
 if platform.system() == "Windows":
     # On Windows extra dependencies must be collected.
-    from kivy_deps import sdl2, glew, angle
+    from kivy_deps import angle, glew, sdl2
 
     extras = [Tree(p) for p in (sdl2.dep_bins + glew.dep_bins + angle.dep_bins)]
 
