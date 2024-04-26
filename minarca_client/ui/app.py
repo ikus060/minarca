@@ -7,6 +7,7 @@ import logging
 
 from kivy.base import ExceptionHandler, ExceptionManager
 from kivy.lang import Builder
+from kivy.modules import inspector
 from kivymd.app import MDApp
 
 from minarca_client.ui.theme import MinarcaTheme
@@ -83,7 +84,6 @@ class MinarcaApp(MDApp, ExceptionHandler):
         self.theme_cls = MinarcaTheme()
 
     def mainloop(self):
-        # FIXME Investigate alternative and make use of trio ?
         # Start the main even loop.
         loop = asyncio.get_event_loop()
         # Configure default executor.
@@ -108,8 +108,9 @@ class MinarcaApp(MDApp, ExceptionHandler):
         return ExceptionManager.RAISE
 
     def _install_settings_keys(self, window):
-        # Do nothing to avoid creating settings view.
-        pass
+        # Replace settings view by inspector when debug is enabled.
+        if logger.isEnabledFor(logging.DEBUG):
+            inspector.start(window, self)
 
     def on_start(self):
         # Show default view.

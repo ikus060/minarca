@@ -70,8 +70,8 @@ Builder.load_string(
         adaptive_height: True
 
         MDLinearProgressIndicator:
-            value: 12 #root.disk_usage.get('used', 0)
-            max: 100 #root.disk_usage.get('total', 100)
+            value: root._disk_usage_pct
+            max: 100
             size_hint_y: None
             height: "8dp"
 
@@ -248,6 +248,13 @@ class BackupCard(CCard):
             self.disk_usage = {'used': value[0], 'total': value[1]}
         else:
             self.disk_usage = {'used': 0, 'total': 0}
+
+    @alias_property(bind=['disk_usage'])
+    def _disk_usage_pct(self):
+        try:
+            return int(self.disk_usage['used'] / self.disk_usage['total'] * 100)
+        except Exception:
+            return 0
 
     async def _test_connection(self, instance):
         # Test connectivity with remote server every 5 secs
