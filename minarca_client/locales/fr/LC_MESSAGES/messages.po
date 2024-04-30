@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-04-21 07:59-0400\n"
-"PO-Revision-Date: 2024-04-22 13:45-0400\n"
+"PO-Revision-Date: 2024-04-30 13:34-0400\n"
 "Last-Translator: \n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -131,7 +131,7 @@ msgstr "Serveur distant :       %s"
 #: minarca_client/main.py:368
 #, python-format
 msgid "Local device:           %s"
-msgstr "Appareil local :         %s"
+msgstr "Appareil local :        %s"
 
 #: minarca_client/main.py:369
 #, python-format
@@ -538,7 +538,7 @@ msgstr "Fichiers temporaires Vim"
 #: minarca_client/core/exceptions.py:71
 #, python-format
 msgid "No backup instances matches limit: %s"
-msgstr "Aucune instance de sauvegarde ne correspond à la limite : %s"
+msgstr "Aucune instance de sauvegarde ne correspond à : %s"
 
 #: minarca_client/core/exceptions.py:82
 #, python-format
@@ -889,7 +889,7 @@ msgstr "Arrêter la sauvegarde"
 
 #: minarca_client/ui/backup_card.py:307
 msgid "Start Backup now"
-msgstr "Démarrer la sauvegarde "
+msgstr "Démarrer la sauvegarde"
 
 #: minarca_client/ui/backup_card.py:315 minarca_client/ui/backup_logs.py:269
 msgid "No backup yet"
