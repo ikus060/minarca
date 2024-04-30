@@ -358,15 +358,18 @@ def _status(limit):
 
         # Print result.
         for instance, connected in entries:
+            status = instance.status
+            settings = instance.settings
             title = _("Backup Instance: %s") % (settings.repositoryname or _("No name"))
             print(title)
             print('=' * len(title))
 
+            print(" * " + _("Identifier:             %s") % instance.id)
             if instance.is_remote():
                 print(" * " + _("Remote server:          %s") % settings.remotehost)
             elif instance.is_local():
                 print(" * " + _("Local device:           %s") % settings.localcaption)
-            print(" * " + _("Connectivity status:    %s" % (_("Connected") if connected else _("Not connected"))))
+            print(" * " + _("Connectivity status:    %s") % (_("Connected") if connected else _("Not connected")))
             print(
                 " * "
                 + _("Last successful backup: %s")
