@@ -43,11 +43,11 @@ class TestCompat(unittest.IsolatedAsyncioTestCase):
 
     @mock.patch('subprocess.check_output', side_effect=mock_subprocess_check_output)
     def test_get_user_agent(self, *unused):
-        self.assertEqual(MATCH("minarca/* rdiff-backup/2.2.5 (*)"), compat.get_user_agent())
+        self.assertEqual(MATCH("minarca/* rdiff-backup/2.2.6 (*)"), compat.get_user_agent())
 
     @mock.patch('subprocess.check_output', side_effect=mock_subprocess_check_output)
     def test_get_rdiff_backup_version(self, *unused):
-        self.assertEqual("2.2.5", compat.get_rdiff_backup_version())
+        self.assertEqual("2.2.6", compat.get_rdiff_backup_version())
 
     def test_ssh_keygen(self):
         ssh_keygen('public.key', 'private.key')

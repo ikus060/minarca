@@ -266,8 +266,8 @@ class TestMainParseArgs(unittest.TestCase):
         # Then a SystemExit is raised
         with self.assertRaises(SystemExit) as capture:
             main.main(args)
-        # Then error code is 2
-        self.assertEqual(2, capture.exception.code)
+        # Then error code is 1
+        self.assertEqual(1, capture.exception.code)
 
     def test_exclude(self):
         # Given a backup instance

@@ -29,6 +29,18 @@ Minarca is a **free and open-source** backup software providing end-to-end integ
 
 Based on [rdiffweb](https://rdiffweb.org/), **Minarca Server** may be used to browse, **restore your data easily** with a convenient web interface accessible from everywhere.
 
+## Features
+
+| Powerful web interface | Backup to multiple destination | Self Hosted |
+|---|---|---|
+| ![Powerful web interface](minarca-client/doc/_static/feature1.png) | ![Backup to multiple destination](minarca-client/doc/_static/feature3.png) | ![Self Hosted](minarca-client/doc/_static/feature4.png) |
+
+
+| Windows Agent | Linux Agent | MacOS Agent |
+|---|---|---|
+| ![Windows Agent](minarca-client/doc/_static/feature2-win.png) | ![Linux Agent](minarca-client/doc/_static/feature2-mac.png) | ![MacOS Agent](minarca-client/doc/_static/feature2-linux.png) |
+
+
 ## Getting started
 
 Check how Minarca is working without installing the server. We have setup a testing environment for you. You may login to <https://test.minarca.net/> using the default username / password: admin / admin123

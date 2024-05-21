@@ -44,7 +44,7 @@ setuptools.setup(
         "javaproperties",
         "packaging",
         "psutil",
-        "rdiff-backup==2.2.5",
+        "rdiff-backup==2.2.6",
         "requests>=2.25.1",
         "tzlocal~=2.0",
         "wakepy==0.6.0",
