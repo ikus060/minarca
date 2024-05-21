@@ -64,6 +64,10 @@ extras['hiddenimports'].extend(collect_submodules("rdiffbackup"))
 # Do the same for Kivymd
 extras['hiddenimports'].extend(collect_submodules("kivymd"))
 
+# To work arround a bug with setuptools>=70.0.0 and pyinstaller<6
+# See https://github.com/pyinstaller/pyinstaller/issues/8554
+extras['hiddenimports'].append('pkg_resources.extern')
+
 # On MacOS, make sure to include librsync.2.dylib because @rpath is not working properly in PyInstaller<6
 if platform.system() == "Darwin":
     librsync_path = shutil.which(
