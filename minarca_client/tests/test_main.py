@@ -230,6 +230,11 @@ class TestMainParseArgs(unittest.TestCase):
         main.main(['forget'])
         mock_forget.assert_called_once_with(limit=limit(None), force=False)
 
+    @mock.patch('minarca_client.main._forget')
+    def test_args_unlink(self, mock_forget):
+        main.main(['unlink'])
+        mock_forget.assert_called_once_with(limit=limit(None), force=False)
+
     @mock.patch('minarca_client.main.Backup')
     def test_backup(self, mock_backup):
         # Given a backup instance

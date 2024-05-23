@@ -48,7 +48,6 @@ MDScreen:
 
 
 class DateSelectionTest(BaseAppTest):
-
     async def asyncSetUp(self):
         self.app = DemoDateSelectionApp()
         self._task = asyncio.create_task(self.app.async_run())
