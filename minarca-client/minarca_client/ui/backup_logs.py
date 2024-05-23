@@ -105,7 +105,7 @@ Builder.load_string(
         CLabel:
             text: root.error_message
             text_color: self.theme_cls.onWarningColor
-            md_bg_color: self.theme_cls.warningColor
+            md_bg_color: self.theme_cls.warningContainerColor
             padding: ("15dp", "12dp")
             display: root.error_message
 
@@ -284,7 +284,13 @@ class BackupLogs(MDBoxLayout):
     def error_message(self):
         if self.status is None:
             return ""
-        return self.status.details or ""
+        if self.status.details:
+            action = self.status.action
+            if action == 'backup':
+                return _('The last backup ended with the following error: %s') % self.status.details
+            elif action == 'restore':
+                return _('The last restoration ended with the following error: %s') % self.status.details
+        return ""
 
     @alias_property(bind=['status'])
     def filename(self):
