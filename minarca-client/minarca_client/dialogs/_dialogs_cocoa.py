@@ -1,8 +1,6 @@
 # Copyleft (C) 2023 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-#
-# Original source code taken from Toga projet.
 import contextlib
 
 import objc  # noqa
@@ -89,7 +87,6 @@ async def warning_dialog(parent, title, message, detail=None):
 
 
 async def _open_panel(parent, title, filename, initial_directory=None, multiple_select=False, open_file=True):
-
     panel = NSOpenPanel.openPanel()
     panel.setCanChooseDirectories_(not open_file)
     panel.setCanChooseFiles_(open_file)

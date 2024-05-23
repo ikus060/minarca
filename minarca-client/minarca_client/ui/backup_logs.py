@@ -153,7 +153,6 @@ Builder.load_string(
 
 
 class LogLine(TextInput, RecycleDataViewBehavior):
-
     def refresh_view_attrs(self, rv, index, data):
         ret = super().refresh_view_attrs(rv, index, data)
         # When reusing widgets, reinitialize the scroll.

@@ -19,11 +19,17 @@ from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 
 import aiofiles
-import pkg_resources
 
 from minarca_client.locale import _
 
-IS_WINDOWS = os.name == 'nt'
+try:
+    from importlib.metadata import distribution as get_distribution
+    from importlib.resources import resource_filename
+except ImportError:
+    # For Python 2 or Python 3 with older setuptools
+    from pkg_resources import get_distribution, resource_filename
+
+IS_WINDOWS = sys.platform in ['win32']
 IS_LINUX = sys.platform in ['linux', 'linux2']
 IS_MAC = sys.platform == 'darwin'
 HAS_DISPLAY = os.environ.get('DISPLAY', None) or IS_WINDOWS or IS_MAC
@@ -201,7 +207,7 @@ def _get_path():
     path = os.environ.get('PATH', 'C:\\Windows\\system32' if IS_WINDOWS else '/usr/bin')
     path = os.path.dirname(sys.executable) + os.pathsep + path
     if IS_WINDOWS:
-        ssh_path = pkg_resources.resource_filename(__name__, 'openssh\\win_%s' % platform.machine().lower())
+        ssh_path = resource_filename(__name__, 'openssh\\win_%s' % platform.machine().lower())
         path = ssh_path + os.pathsep + path
     return path
 
@@ -211,7 +217,7 @@ def get_rdiff_backup_version():
     Return the version of rdiff-backup
     """
     try:
-        return pkg_resources.get_distribution("rdiff-backup").version
+        return get_distribution("rdiff-backup").version
     except Exception:
         return 'unknown'
 

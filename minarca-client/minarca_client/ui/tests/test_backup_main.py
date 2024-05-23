@@ -4,7 +4,6 @@ from minarca_client.ui.tests import BaseAppTest
 
 
 class MainDialogTest(BaseAppTest):
-
     async def test_default_dialog(self):
         # When no backup configure. Then BackupCreate is displayed by default.
         self.assertIsInstance(self.view, BackupCreate)
@@ -20,7 +19,6 @@ class MainDialogTest(BaseAppTest):
 
 
 class MainDialogWithBackupTest(BaseAppTest):
-
     def setUp(self):
         super().setUp()
         # Given a local backup

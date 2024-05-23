@@ -10,7 +10,11 @@ import locale
 import os
 import sys
 
-import pkg_resources
+try:
+    from importlib.resources import resource_filename
+except ImportError:
+    # For Python 2 or Python 3 with older setuptools
+    from pkg_resources import resource_filename
 
 # On MacOS, we need to get the language using native API. Because the LANG
 # environment variable is not pass to the application bundle.
@@ -36,7 +40,7 @@ elif sys.platform == 'win32':
         pass
 
 # Load translations
-localedir = pkg_resources.resource_filename(__name__, 'locales')
+localedir = resource_filename(__name__, 'locales')
 try:
     t = _gt.translation('messages', localedir, languages=languages)
 except OSError:
