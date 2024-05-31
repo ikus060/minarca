@@ -50,7 +50,7 @@ setuptools.setup(
         "wakepy==0.6.0",
         "kivy==2.3.0",
         # TODO We need to define version
-        "KivyMD @ git+https://github.com/kivymd/KivyMD@cfe5aac30f50708c6208c8b33b0ef1aa390721e8",
+        "KivyMD @ git+https://github.com/kivymd/KivyMD@5fb6654a83ffa1a20bd9c617be17986cc2e0778b",
         # Windows dependencies
         "pywin32 ; sys_platform=='win32'",
         # MacOS dependencies
