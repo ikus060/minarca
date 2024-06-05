@@ -206,9 +206,10 @@ def _rdiff_backup(options):
     """
     try:
         return rdiffbackup.run.main_run(options)
-    except Exception as e:
+    except Exception:
         # Capture any exception and return exitcode.
-        traceback.print_exception(e)
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback)
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
