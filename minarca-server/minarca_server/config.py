@@ -170,7 +170,7 @@ def get_parser():
     welcome_style = '''
         <style>
           body { color: white; background-color: rgb(14,41,51); background-image: url(/static/bg.jpg); background-size: cover; }
-          .form-login { border: 2px solid var(--btn-bg-color); padding: 25px; }
+          .form-login { border: 2px solid #fff; padding: 25px; }
           h1 { text-transform: uppercase; font-weight: bold; }
           h2 { text-align: center; }
           a, a:hover, .btn-link { color: var(--btn-bg-color); }
@@ -185,10 +185,10 @@ def get_parser():
         header_name='Minarca',
         header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.png'),  # @UndefinedVariable
         logo=pkg_resources.resource_filename(__name__, 'logo.png'),  # @UndefinedVariable
-        link_color='1C4062',
+        link_color='009FB9',
         navbar_color='0E2933',
-        btn_fg_color='0E2933',
-        btn_bg_color='B6DDE2',
+        btn_fg_color='FFFFFF',
+        btn_bg_color='009FB9',
         btn_rounded=0,
         font_family="Lato",
         log_access_file='/var/log/minarca/access.log',
