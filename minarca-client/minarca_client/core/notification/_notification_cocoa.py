@@ -6,6 +6,8 @@ import uuid
 import objc  # noqa
 from Foundation import NSUserNotification, NSUserNotificationCenter
 
+__all__ = ['send_notification', 'clear_notification']
+
 
 def send_notification(title, body, replace_id=None):
     assert replace_id is None or isinstance(replace_id, str)

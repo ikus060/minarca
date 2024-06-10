@@ -51,7 +51,7 @@ _original_create_subprocess_exec = asyncio.create_subprocess_exec
 
 # A couple of variable to make stuff cross-platform
 _echo_foo_cmd = ['cmd.exe', '/c', 'echo foo'] if IS_WINDOWS else ['echo', 'foo']
-_exit_1_cmd = ['cmd.exe', '/c', 'exit 1'] if IS_WINDOWS else ['exit 1']
+_exit_1_cmd = ['cmd.exe', '/c', 'exit 1'] if IS_WINDOWS else ['bash', '-c', 'exit 1']
 _ssh = 'ssh.exe' if IS_WINDOWS else '/usr/bin/ssh'
 _home = 'C:/Users' if IS_WINDOWS else '/home'
 _root = 'C:/' if IS_WINDOWS else '/'
@@ -968,3 +968,49 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
+
+    @mock.patch('minarca_client.core.instance.send_notification', return_value='12345')
+    @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
+    @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_exit_1_cmd))
+    async def test_backup_send_notification(self, mock_popen, mock_get_user_agent, mock_send_notification):
+        # Given a repository defined with a maxage value.
+        settings = self.instance.settings
+        settings.remotehost = 'remotehost'
+        settings.repositoryname = 'test-repo'
+        settings.configured = True
+        settings.maxage = 3
+        settings.save()
+        # Given a repository configured with some patterns.
+        patterns = self.instance.patterns
+        patterns.append(Pattern(True, _home, None))
+        patterns.save()
+        # When backup fail.
+        with self.assertRaises(BackupError):
+            await self.instance.backup()
+        self.instance.status.reload()
+        self.assertEqual('FAILURE', self.instance.status.lastresult)
+        # Then notification was raised to user.
+        mock_send_notification.assert_called_once_with(title='Your backup is outdated', body=mock.ANY, replace_id=None)
+
+    @mock.patch('minarca_client.core.instance.clear_notification', return_value='12345')
+    @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
+    @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
+    async def test_backup_clear_notification_time(self, mock_popen, mock_get_user_agent, mock_clear_notification):
+        # Given a repository defined with a maxage value.
+        settings = self.instance.settings
+        settings.remotehost = 'remotehost'
+        settings.repositoryname = 'test-repo'
+        settings.configured = True
+        settings.maxage = 3
+        settings.save()
+        self.instance.status.lastnotificationid = 'previous-id'
+        # Given a repository configured with some patterns.
+        patterns = self.instance.patterns
+        patterns.append(Pattern(True, _home, None))
+        patterns.save()
+        # When backup success.
+        await self.instance.backup()
+        self.instance.status.reload()
+        self.assertEqual('SUCCESS', self.instance.status.lastresult)
+        # Then notification was raised to user.
+        mock_clear_notification.assert_called_once_with('previous-id')

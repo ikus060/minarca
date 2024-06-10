@@ -323,7 +323,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
         self._data.insert(index, value)
 
     @classmethod
-    def defaults(self):
+    def defaults(cls):
         """
         Restore defaults patterns.
         """
@@ -396,7 +396,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
             # On Windows, Find list of drives from patterns
             prefixes = list()
             for p in self:
-                m = re.match('^[A-Z]:(\\\\|/)', p.pattern)
+                m = re.match(r'^[A-Z]:[\\/]', p.pattern)
                 if p.include and m:
                     drive = m.group(0).replace('\\', '/')
                     if drive not in prefixes:

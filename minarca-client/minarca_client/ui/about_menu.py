@@ -20,13 +20,13 @@ logger = logging.getLogger(__name__)
 Builder.load_string(
     '''
 <BackupInstanceLabel>:
-    text: root.repository_name
+    text: root.repositoryname
     text_color: self.theme_cls.primaryColor
     padding: 0,0,0,10
 
 <RepositoriesItem>:
     MDListItemSupportingText:
-        text: _('Browse online')
+        text: _('Browse')
 
     MDListItemTrailingIcon:
         icon: "chevron-right"
@@ -118,13 +118,15 @@ class BackupInstanceLabel(CLabel):
     instance = ObjectProperty()
 
     @alias_property(bind=['instance'])
-    def repository_name(self):
+    def repositoryname(self):
         if self.instance is None:
             return ""
-        if self.instance.is_remote:
-            settings = self.instance.settings
+        settings = self.instance.settings
+        if self.instance.is_remote():
             return (_("%s on %s") % (settings.repositoryname, settings.remoteurl)).capitalize()
-        return settings.repository_name
+        elif self.instance.is_local() and settings.localcaption:
+            return (_("%s on %s") % (settings.repositoryname, settings.localcaption)).capitalize()
+        return settings.repositoryname
 
 
 class RepositoriesItem(CListItem):
@@ -191,24 +193,25 @@ class AboutMenu(MDNavigationDrawer):
         # TODO For each backup, display the appropriate buttons
         # Aka, refresh the button list.
         for instance in self.backup:
+            # Label
+            label = BackupInstanceLabel()
+            label.instance = instance
+            drawer_menu.add_widget(label)
+            # Browser online or local
+            repo = RepositoriesItem()
+            repo.instance = instance
+            drawer_menu.add_widget(repo)
+            # Options specific for remote.
             if instance.is_remote():
-                label = BackupInstanceLabel()
-                label.instance = instance
-                drawer_menu.add_widget(label)
-
-                repo = RepositoriesItem()
-                repo.instance = instance
-                drawer_menu.add_widget(repo)
-
-                settings = SettingsItem()
-                settings.instance = instance
-                drawer_menu.add_widget(settings)
-
-                help = HelpItem()
-                help.instance = instance
-                drawer_menu.add_widget(help)
-
-                drawer_menu.add_widget(MDNavigationDrawerDivider())
+                # Online settings
+                settings_btn = SettingsItem()
+                settings_btn.instance = instance
+                drawer_menu.add_widget(settings_btn)
+                # Oneline Help.
+                help_btn = HelpItem()
+                help_btn.instance = instance
+                drawer_menu.add_widget(help_btn)
+            drawer_menu.add_widget(MDNavigationDrawerDivider())
 
     @alias_property(bind=['update_available', 'checking_for_update', 'latest_version'])
     def update_available_text(self):
