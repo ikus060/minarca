@@ -76,7 +76,6 @@ MDScreen:
 
 
 class MinarcaApp(MDApp, ExceptionHandler):
-
     def __init__(self, *args, backup=None, **kwargs):
         assert backup is not None
         self.backup = backup

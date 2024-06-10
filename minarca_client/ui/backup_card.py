@@ -258,14 +258,12 @@ class BackupCard(CCard):
 
     async def _test_connection(self, instance):
         # Test connectivity with remote server every 5 secs
-        while True:
-            try:
-                await instance.test_connection()
-                self.test_connection = True
-            except Exception as e:
-                # Exception raise - either server is not responding or disk is not connected.
-                self.test_connection = e
-            await asyncio.sleep(5)
+        try:
+            await instance.test_connection()
+            self.test_connection = True
+        except Exception as e:
+            # Exception raise - either server is not responding or disk is not connected.
+            self.test_connection = e
 
     def on_instance(self, widget, instance):
         assert isinstance(instance, BackupInstance)

@@ -145,7 +145,16 @@ Section "Installation of $(DisplayName)" SecAppFiles
 
   ; Enable Long file path support by default.
   WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Control\FileSystem" "LongPathsEnabled" "1"
- 
+
+   ; Define Custom Protocol for Toast Notification
+  DeleteRegKey HKCR "minarca"
+  WriteRegStr HKCR "minarca" "" "URL:minarca"
+  WriteRegStr HKCR "minarca" "URL Protocol" ""
+  WriteRegStr HKCR "minarca\DefaultIcon" "" "$INSTDIR\minarca_client\ui\theme\resources\minarca.ico"
+  WriteRegStr HKCR "minarca\shell" "" ""
+  WriteRegStr HKCR "minarca\shell\Open" "" ""
+  WriteRegStr HKCR "minarca\shell\Open\command" "" "$INSTDIR\minarcaw.exe ui"
+
   !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$(DisplayName)"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\minarca_client\ui\theme\resources\minarca.ico"

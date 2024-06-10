@@ -1,8 +1,6 @@
 # Copyleft (C) 2023 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-#
-# Original source code taken from Toga projet.
 import asyncio
 import contextlib
 import ctypes
