@@ -7,6 +7,8 @@ import psutil
 from jeepney import DBusAddress, new_method_call
 from jeepney.io.blocking import open_dbus_connection
 
+__all__ = ['send_notification', 'clear_notification']
+
 # From conjob, in order to send notification to the user's dbus session,
 # we need to lookup the DBUS address from other process owned by the same user.
 if 'DBUS_SESSION_BUS_ADDRESS' not in os.environ:
@@ -18,7 +20,7 @@ if 'DBUS_SESSION_BUS_ADDRESS' not in os.environ:
             if current_uid == uid and env and 'DBUS_SESSION_BUS_ADDRESS' in env:
                 os.environ['DBUS_SESSION_BUS_ADDRESS'] = env['DBUS_SESSION_BUS_ADDRESS']
                 break
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
 
 
@@ -45,7 +47,7 @@ def send_notification(title, body, replace_id=None):
         'Notify',
         'susssasa{sv}i',
         (
-            'jeepney_test',  # App name
+            'minarca',  # App name
             replace_id,
             '',  # Icon
             title,  # Summary
@@ -64,4 +66,29 @@ def send_notification(title, body, replace_id=None):
 
 
 def clear_notification(notification_id):
-    pass
+    assert (
+        notification_id is None
+        or isinstance(notification_id, int)
+        or (isinstance(notification_id, str) and notification_id.isdigit())
+    )
+    # Convert string to integer
+    if isinstance(notification_id, str):
+        notification_id = int(notification_id)
+    # Do nothing if notification is not defined
+    if notification_id is None:
+        return
+    notifications = DBusAddress(
+        '/org/freedesktop/Notifications',
+        bus_name='org.freedesktop.Notifications',
+        interface='org.freedesktop.Notifications',
+    )
+    connection = open_dbus_connection(bus='SESSION')
+    # Construct a new D-Bus message. new_method_call takes the address, the
+    # method name, the signature string, and a tuple of arguments.
+    msg = new_method_call(
+        notifications,
+        'CloseNotification',
+        'u',
+        (notification_id,),
+    )
+    connection.send(msg)
