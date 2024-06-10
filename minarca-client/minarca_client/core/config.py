@@ -244,7 +244,6 @@ class Settings(KeyValueConfigFile):
         ('pause_until', lambda x: Datetime(x) if x else None, None),
         ('diskid', str, None),
         ('maxage', int, None),
-        ('remove_older', int, None),
         ('ignore_weekday', list_from_string, None),
         ('keepdays', int, None),
         ('maxage', int, None),
