@@ -24,7 +24,6 @@ class BackupConnectionRemoteTest(BaseAppTest):
         self.assertIsInstance(self.view, BackupCreate)
 
     async def test_btn_next(self):
-
         def create_instance(*args, **kwargs):
             instance = self.view.backup._new_instance()
             instance.settings.remoteurl = 'https://example.com'

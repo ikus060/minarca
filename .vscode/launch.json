@@ -24,8 +24,6 @@
             "justMyCode": false,
             "env": {
                 "LANGUAGE": "fr",
-                "MINARCA_CONFIG_HOME": "/tmp",
-                "__NV_PRIME_RENDER_OFFLOAD": "0",
             }
         },
         {
@@ -34,21 +32,14 @@
             "request": "launch",
             "module": "minarca_client.main",
             "args": [
-                "restore",
-                "--force",
+                "backup",
                 "--limit",
-                "2",
-                "--restore-time",
-                "1712088862",
-                "--destination",
-                "/home/ikus060/Downloads",
-                "/home/ikus060/Documents/Passwords.kdbx"
+                "0",
             ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
                 "LANGUAGE": "fr",
-                "MINARCA_CONFIG_HOME": "/tmp",
             }
         },
         {

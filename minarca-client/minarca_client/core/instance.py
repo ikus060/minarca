@@ -43,6 +43,7 @@ from minarca_client.core.exceptions import (
     RunningError,
 )
 from minarca_client.core.minarcaid import ssh_keygen
+from minarca_client.core.notification import clear_notification, send_notification
 from minarca_client.core.rdiffweb import Rdiffweb
 from minarca_client.locale import _
 
@@ -164,6 +165,73 @@ def safe_keepawake():
         logger.warning("failed to unset keep awake", exc_info=1)
 
 
+class UpdateNotification:
+    """
+    Handle update of notification when backup is success or fail.
+    """
+
+    def __init__(self, instance):
+        assert instance
+        self.instance = instance
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        status = self.instance.status
+        settings = self.instance.settings
+        if exc_type is None:
+            # Backup is successful
+            # clear previous notification (if any).
+            notification_id = status.lastnotificationid
+            if notification_id:
+                logger.debug("clear previous notification %s", notification_id)
+                try:
+                    clear_notification(notification_id)
+                except Exception:
+                    pass
+                status.lastnotificationid = None
+        else:
+            # Backup failed
+            if self.is_notification_time():
+                # show notification if inactivity period is reached.
+                previous_id = status.lastnotificationid
+                logger.info("create or replace notification: %s", previous_id)
+                maxage = settings.maxage
+                try:
+                    notification_id = send_notification(
+                        title=_('Your backup is outdated'),
+                        body=_(
+                            'Your backup %s is outdated by over %s days. Please plug in your local device and run the backup.'
+                        )
+                        % (settings.repositoryname, maxage),
+                        replace_id=previous_id,
+                    )
+                    status.lastnotificationid = notification_id
+                    status.lastnotificationdate = Datetime()
+                except Exception:
+                    logger.warn("problem while sending new notification", exc_info=1)
+        status.save()
+
+    def is_notification_time(self):
+        """
+        Return true if the application should raise a notification.
+        """
+        status = self.instance.status
+        settings = self.instance.settings
+        # Do not notify if max age is not defined.
+        if settings.maxage is None or settings.maxage <= 0:
+            return False
+        # Only notify every 24 hrs.
+        if status.lastnotificationdate and Datetime() - status.lastnotificationdate < datetime.timedelta(days=1):
+            return False
+        # Notify if last backup never occured.
+        if status.lastsuccess is None:
+            return True
+        # Notify if reaching maxage.
+        return Datetime() - status.lastsuccess > datetime.timedelta(days=settings.maxage)
+
+
 class UpdateStatus:
     """
     Update the status while the backup is running.
@@ -207,7 +275,7 @@ class UpdateStatus:
                 t.lastdate = self.status.lastsuccess
                 t.details = ''
         else:
-            logger.exception("%s FAILED", self.action)
+            logger.error("%s FAILED", self.action)
             with self.status as t:
                 t.lastresult = 'FAILURE'
                 t.lastdate = Datetime()
@@ -251,50 +319,50 @@ class BackupInstance:
             self.settings.pause_until = None
 
         # Start a thread to update backup status.
-        status = Status(self.status_file)
         with safe_keepawake():
-            async with UpdateStatus(status=status):
-                with open(self.backup_log_file, 'w', errors='replace', newline='') as log_file:
-                    # Check patterns
-                    patterns = self.patterns
-                    if not patterns:
-                        raise NoPatternsError()
+            with UpdateNotification(instance=self):
+                async with UpdateStatus(status=self.status):
+                    with open(self.backup_log_file, 'w', errors='replace', newline='') as log_file:
+                        # Check patterns
+                        patterns = self.patterns
+                        if not patterns:
+                            raise NoPatternsError()
 
-                    # On Windows operating system, the computer may have multiple Root
-                    # (C:\, D:\, etc). To support this scenario, we need to run
-                    # rdiff-backup multiple time on the same computer. Once for each Root
-                    # to be backup (if required).
-                    for drive, patterns in patterns.group_by_roots():
-                        args = []
-                        # If required add remote-schema to define how to connect to SSH Server
-                        if self.is_remote():
-                            args.append("--remote-schema")
-                            args.append(self._remote_schema())
-                        args.append("backup")
-                        if IS_WINDOWS:
-                            args.extend(
-                                [
-                                    "--no-hard-links",
-                                    "--exclude-symbolic-links",
-                                    "--create-full-path",
-                                ]
-                            )
-                        else:
-                            args.append("--exclude-sockets")
-                        args.append("--no-compression")
-                        # Add Include exclude patterns. Those are already sorted.
-                        for p in patterns:
-                            args.append("--include" if p.include else "--exclude")
-                            args.append(p.pattern)
-                        # Exclude everything else
-                        args.extend(["--exclude", "%s**" % drive])
-                        # Call rdiff-backup
-                        dest = self._backup_path(drive)
-                        await self._rdiff_backup(*args, drive, dest, log_file=log_file)
-                        # For local disk, make sure to "flush" disk cache
-                        if self.is_local():
-                            logger.info("flush changes to disk")
-                            flush(dest)
+                        # On Windows operating system, the computer may have multiple Root
+                        # (C:\, D:\, etc). To support this scenario, we need to run
+                        # rdiff-backup multiple time on the same computer. Once for each Root
+                        # to be backup (if required).
+                        for drive, patterns in patterns.group_by_roots():
+                            args = []
+                            # If required add remote-schema to define how to connect to SSH Server
+                            if self.is_remote():
+                                args.append("--remote-schema")
+                                args.append(self._remote_schema())
+                            args.append("backup")
+                            if IS_WINDOWS:
+                                args.extend(
+                                    [
+                                        "--no-hard-links",
+                                        "--exclude-symbolic-links",
+                                        "--create-full-path",
+                                    ]
+                                )
+                            else:
+                                args.append("--exclude-sockets")
+                            args.append("--no-compression")
+                            # Add Include exclude patterns. Those are already sorted.
+                            for p in patterns:
+                                args.append("--include" if p.include else "--exclude")
+                                args.append(p.pattern)
+                            # Exclude everything else
+                            args.extend(["--exclude", "%s**" % drive])
+                            # Call rdiff-backup
+                            dest = self._backup_path(drive)
+                            await self._rdiff_backup(*args, drive, dest, log_file=log_file)
+                            # For local disk, make sure to "flush" disk cache
+                            if self.is_local():
+                                logger.info("flush changes to disk")
+                                flush(dest)
 
     def get_repo_url(self, page="browse"):
         """

@@ -23,6 +23,7 @@ from minarca_client.core.exceptions import (
     BackupError,
     InstanceNotFoundError,
     NotRunningError,
+    NotScheduleError,
     RepositoryNameExistsError,
 )
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
@@ -71,10 +72,14 @@ def _backup(force, limit):
     backup = Backup()
     try:
         for instance in backup[limit]:
-            asyncio.run(instance.backup(force=force))
+            try:
+                asyncio.run(instance.backup(force=force))
+            except NotScheduleError as e:
+                # If one backup is not schedule to run, continue with next backup.
+                logging.info(str(e))
     except BackupError as e:
         # Print message to stdout and log file.
-        logging.info(str(e))
+        logging.error(str(e))
         sys.exit(_EXIT_BACKUP_FAIL)
     except Exception:
         logging.exception("unexpected error during backup")
@@ -206,9 +211,10 @@ def _rdiff_backup(options):
     """
     try:
         return rdiffbackup.run.main_run(options)
-    except Exception as e:
+    except Exception:
         # Capture any exception and return exitcode.
-        traceback.print_exception(e)
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback)
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
@@ -567,7 +573,7 @@ def _parse_args(args):
     sub.set_defaults(func=_status)
 
     # forget
-    sub = subparsers.add_parser('forget', aliases='unlink', help=_('forget settings of backup'))
+    sub = subparsers.add_parser('forget', aliases=['unlink'], help=_('forget settings of backup'))
     sub.add_argument(
         '--limit', help=_("Forget settings of the given backup instance(s)."), default=limit(None), type=limit
     )

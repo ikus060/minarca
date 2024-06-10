@@ -38,7 +38,7 @@ Based on [rdiffweb](https://rdiffweb.org/), **Minarca Server** may be used to br
 
 | Windows Agent | Linux Agent | MacOS Agent |
 |---|---|---|
-| ![Windows Agent](minarca-client/doc/_static/feature2-win.png) | ![Linux Agent](minarca-client/doc/_static/feature2-mac.png) | ![MacOS Agent](minarca-client/doc/_static/feature2-linux.png) |
+| ![Windows Agent](minarca-client/doc/_static/feature2-win.png) | ![Linux Agent](minarca-client/doc/_static/feature2-linux.png) | ![MacOS Agent](minarca-client/doc/_static/feature2-mac.png) |
 
 
 ## Getting started
@@ -124,6 +124,14 @@ The Minarca website is <https://minarca.org/>.
 # Changelog
 
 ## Next Beta Release
+
+* Minarca Agent
+  * Add backup identifier to `minarca status` command line output
+  * Uppgrade to rdiff-backup v2.2.6
+  * Include rdiff-backup patch to improve regression speed
+  * Fix support for setuptools >= 70
+
+## 6.0.0b2
 
 * Minarca Agent
   * Support Kivy inspector in debug mode (enabled using CTRL + E)

@@ -6,7 +6,6 @@ from minarca_client.core.disk import get_disk_info, list_disks
 
 
 class TestDisk(unittest.TestCase):
-
     @unittest.skipIf(IS_LINUX, 'linux testing is run in container without abilities to create block device')
     def test_get_disk_info(self):
         filename = os.getcwd()

@@ -69,7 +69,7 @@ class Datetime:
             return datetime.timedelta(milliseconds=self.epoch_ms - other.epoch_ms)
         elif isinstance(other, datetime.timedelta):
             return Datetime(epoch_ms=self.epoch_ms - (other.total_seconds() * 1000))
-        raise ValueError()
+        raise TypeError("unsupported operand type(s) for -: 'Datetime' and '%s'" % other.__class__.__name__)
 
     def __add__(self, other):
         if isinstance(other, Datetime):
@@ -197,6 +197,8 @@ class Status(KeyValueConfigFile):
         ('lastsuccess', lambda x: Datetime(x) if x else None, None),
         ('pid', int, None),
         ('action', lambda x: x if x in ['backup', 'restore'] else None, None),
+        ('lastnotificationid', str, None),
+        ('lastnotificationdate', lambda x: Datetime(x) if x else None, None),
     ]
 
     @property
