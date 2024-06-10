@@ -286,7 +286,7 @@ upload:sonar:
   script:
   # Patch coverage repport
   - sed -i "s|<source>minarca_client|<source>minarca-client/minarca_client|g" minarca-client/coverage-*.xml
-  - sonar-scanner -X -Dsonar.qualitygate.wait=True -Dsonar.python.coverage.reportPaths=*/coverage*.xml -Dsonar.python.xunit.reportPath=*/xunit*.xml -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe)
+  - sonar-scanner -X -Dsonar.qualitygate.wait=True -Dsonar.python.coverage.reportPaths=*/coverage*.xml -Dsonar.python.xunit.reportPath=*/xunit*.xml -Dsonar.host.url=$SONAR_URL -Dsonar.token=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe)
 
 
 deploy:dev:

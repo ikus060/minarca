@@ -2,7 +2,7 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import os
-import uuid
+import time
 
 from win11toast import clear_toast, notify
 
@@ -16,6 +16,8 @@ except ImportError:
 
 APP_ID = 'Minarca'
 
+__all__ = ['send_notification', 'clear_notification']
+
 
 def send_notification(title, body, replace_id=None):
     icon = resource_filename('minarca_client', 'ui/theme/resources/minarca.ico')
@@ -27,12 +29,12 @@ def send_notification(title, body, replace_id=None):
     if replace_id:
         tag = replace_id
     else:
-        tag = str(uuid.uuid4())
+        tag = str(int(time.time()))
 
     # This make use of "minarca://" protocol.
     buttons = [{'activationType': 'protocol', 'arguments': 'minarca://test', 'content': _('Show details')}]
     notify(title=title, body=body, icon=icon_def, app_id=APP_ID, buttons=buttons, tag=tag, group='default')
-    return None
+    return tag
 
 
 def clear_notification(notification_id):

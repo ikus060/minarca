@@ -364,6 +364,18 @@ class BackupInstance:
                                 logger.info("flush changes to disk")
                                 flush(dest)
 
+                            # For local disk, we need to manage the retention period too.
+                            if self.is_local() and self.settings.keepdays:
+                                await self._rdiff_backup(
+                                    '--force',
+                                    'remove',
+                                    'increments',
+                                    '--older-than',
+                                    '%sD' % self.settings.keepdays,
+                                    dest,
+                                    log_file=log_file,
+                                )
+
     def get_repo_url(self, page="browse"):
         """
         Return a URL to browse data. Either https:// or file://

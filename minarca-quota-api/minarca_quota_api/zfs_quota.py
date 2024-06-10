@@ -99,10 +99,10 @@ def main(args=None):
     args = _parse_args(sys.argv[1:] if args is None else args)
     try:
         if args.quota is None:
-            values = get_quota(projectid=args.project, user=args.user, group=args.group, pool=args.pool[0])
+            values = get_quota(pool=args.pool[0], projectid=args.project)
             print("%s\t%s\t%s" % (args.project or args.user or args.group, values['used'], values['quota']))
         else:
-            set_quota(projectid=args.project, user=args.user, group=args.group, pool=args.pool[0], quota=args.quota)
+            set_quota(pool=args.pool[0], quota=args.quota, projectid=args.project)
     except Exception as e:
         print(e)
         sys.exit(1)

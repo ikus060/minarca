@@ -123,7 +123,6 @@ async def folder_dialog(
     initial_directory=None,
     multiple_select=False,  # Not supported in Window.
 ):
-    # TODO Check why this dialog return None on MacOS.
     return await _open_panel(parent, title, None, initial_directory, multiple_select, open_file=False)
 
 

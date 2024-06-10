@@ -234,7 +234,7 @@ def username_password_dialog(parent, title, message, username=None):
     }
     with _disable(parent):
         # When excuted in secondary thread, it's not working.
-        target, pwd, save = win32cred.CredUIPromptForCredentials(
+        target, pwd, _ = win32cred.CredUIPromptForCredentials(
             TargetName=win32api.GetComputerName(),
             AuthError=0,
             UserName=username,
