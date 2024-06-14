@@ -254,10 +254,11 @@ class Backup:
                 raise DuplicateSettingsError(others[0])
 
             # Then check if the repo name already exists remotely.
-            exists = any(
-                repositoryname == r.get('name') or r.get('name').startswith(repositoryname + '/')
+            exists = [
+                r
                 for r in current_user.get('repos', [])
-            )
+                if repositoryname == r.get('name') or r.get('name').startswith(repositoryname + '/')
+            ]
             if not force and exists:
                 raise RepositoryNameExistsError(repositoryname)
 
@@ -273,12 +274,11 @@ class Backup:
                 f.write(minarca_info['identity'])
 
             # Create default config
-            with instance.settings as t:
-                t.username = username
-                t.repositoryname = repositoryname
-                t.remotehost = minarca_info['remotehost']
-                t.remoteurl = remoteurl
-                t.schedule = Settings.DAILY
+            instance.settings.username = username
+            instance.settings.repositoryname = repositoryname
+            instance.settings.remotehost = minarca_info['remotehost']
+            instance.settings.remoteurl = remoteurl
+            instance.settings.schedule = Settings.DAILY
 
             # Only test the connection
             await instance.test_connection()
@@ -289,6 +289,18 @@ class Backup:
 
             # Clear previous status file
             instance.status.clear()
+
+            # For data consistency. Also store existing configuration if repo exists.
+            if exists:
+                data = exists[0]
+                if 'maxage' in data:
+                    instance.settings.maxage = int(data['maxage'])
+                if 'keepdays' in data:
+                    instance.settings.keepdays = int(data['keepdays'])
+                if 'ignore_weekday' in data and isinstance(data['ignore_weekday'], list):
+                    instance.settings.ignore_weekday = data['ignore_weekday']
+                if 'role' in current_user:
+                    instance.settings.remoterole = int(current_user['role'])
 
             # Save configuration
             instance.settings.configured = True

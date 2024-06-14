@@ -123,21 +123,29 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Beta Release
+## 6.0.0b3
 
 * Minarca Agent
   * Add backup identifier to `minarca status` command line output
   * Uppgrade to rdiff-backup v2.2.6
   * Include rdiff-backup patch to improve regression speed
   * Fix support for setuptools >= 70
+  * Upgrade to latest KivyMD version
+  * Raise notification if local backup is too old
+  * Implement retention period for local backup
+  * Disable retention period setting if user lacks permission to modify it
+* Minarca Server
+  * Upgrade rdiffweb to v2.9.1
+* Docs:
+  * Add details regard the path to help troubleshooting
 
-## 6.0.0b2
+## 6.0.0b2 (2024-04-26)
 
 * Minarca Agent
   * Support Kivy inspector in debug mode (enabled using CTRL + E)
   * Fix display of disk usage
 
-## 6.0.0b1
+## 6.0.0b1 (2024-04-22)
 
 * Minarca Agent
   * Support multiple backup source and target
