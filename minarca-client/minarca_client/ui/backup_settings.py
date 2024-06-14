@@ -122,6 +122,8 @@ Builder.load_string(
                     value: root.keepdays
                     on_value: root.keepdays = self.value
                     data: root.keepdays_choices
+                    # Make this field ReadOnly if user doesn't have permissions to change it.
+                    disabled: root.is_remote and root.remoterole == 10 # USER_ROLE
 
                 CDropDown:
                     name: _('Inactivity Notification Period')
@@ -181,6 +183,7 @@ class BackupSettings(MDBoxLayout):
     keepdays = NumericProperty(-1)
     maxage = NumericProperty(3)
     ignore_weekday = ListProperty([False, False, False, False, False, True, True])
+    remoterole = NumericProperty(None)
     working = StringProperty()
     error_message = StringProperty("")
     error_detail = StringProperty("")
@@ -203,25 +206,26 @@ class BackupSettings(MDBoxLayout):
         self.is_remote = instance.is_remote()
         self.run_if_logged_out = IS_WINDOWS and self.backup.scheduler.run_if_logged_out
 
-        # When editing current settings, load values from local settings or remote server.
-        if not create:
-            # Load settings from local values
-            if self.instance.settings.schedule:
-                self.schedule = self.instance.settings.schedule
-            if self.instance.settings.ignore_weekday is not None:
-                self.ignore_weekday = [i in self.instance.settings.ignore_weekday for i in range(0, 7)]
-            if self.instance.settings.maxage:
-                self.maxage = self.instance.settings.maxage
-            if self.instance.settings.keepdays:
-                self.keepdays = self.instance.settings.keepdays
-            # Then load remote settings asynchronously if remote.
-            if instance.is_remote():
-                self.working = _('Please wait. Loading backup settings...')
-                self._load_task = asyncio.create_task(self._load())
+        # Also check user role if user is allowed to change the retention period.
+        settings = self.instance.settings
+        if settings.remoterole is not None:
+            self.remoterole = settings.remoterole
+        # Load settings from local values
+        if settings.schedule is not None:
+            self.schedule = settings.schedule
+        if settings.ignore_weekday is not None:
+            self.ignore_weekday = [i in settings.ignore_weekday for i in range(0, 7)]
+        if settings.maxage is not None:
+            self.maxage = settings.maxage
+        if settings.keepdays is not None:
+            self.keepdays = settings.keepdays
+        # Then load remote settings asynchronously if remote.
+        if not create and instance.is_remote():
+            self.working = _('Please wait. Loading backup settings...')
+            self._load_task = asyncio.create_task(self._load())
 
         # Create the view
         super().__init__()
-        # TODO Also check user role if user is allowed to change the retention period.
 
     def on_parent(self, widget, value):
         if value is None:
@@ -298,13 +302,16 @@ class BackupSettings(MDBoxLayout):
         try:
             # Get settings from remote server
             await self.instance.load_remote_settings()
-            # Update view accordingly.
-            self.schedule = self.instance.settings.schedule
-            self.ignore_weekday = [i in (self.instance.settings.ignore_weekday or []) for i in range(0, 7)]
-            if self.instance.settings.maxage:
-                self.maxage = self.instance.settings.maxage
-            if self.instance.settings.keepdays:
-                self.keepdays = self.instance.settings.keepdays
+            # Update properties accordingly.
+            settings = self.instance.settings
+            if settings.ignore_weekday is not None:
+                self.ignore_weekday = [i in settings.ignore_weekday for i in range(0, 7)]
+            if settings.maxage is not None:
+                self.maxage = settings.maxage
+            if settings.keepdays is not None:
+                self.keepdays = settings.keepdays
+            if settings.remoterole is not None:
+                self.remoterole = settings.remoterole
         except HttpAuthenticationError as e:
             logger.warning(str(e))
             self.error_message = _('Unable to retrieve settings from remote server.')

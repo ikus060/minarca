@@ -12,6 +12,7 @@ import datetime
 import functools
 import logging
 import os
+import re
 import stat
 import subprocess
 import tempfile
@@ -98,7 +99,13 @@ def handle_http_errors(func):
             # Raise for invalid status code.
             if e.response.status_code in [401, 403]:
                 raise HttpAuthenticationError(e)
-            raise HttpServerError(e)
+            # Special case to extract error message from HTML body.
+            server_error = HttpServerError(e)
+            if e.response.status_code == 400 and e.response.text.startswith('<'):
+                m = re.search(r'<p>(.*)</p>', e.response.text)
+                if m and m[1]:
+                    server_error.message = m[1]
+            raise server_error
 
     return wrapper
 
@@ -762,6 +769,7 @@ class BackupInstance:
                 raise RemoteRepositoryNotFound(repo_name)
             elif time.time() > (start_time + timeout):
                 raise TimeoutError()
+            await asyncio.sleep(0.2)
         # For each repo, update the settings.
         for repo_name in repo_name_found:
             await asyncio.get_running_loop().run_in_executor(
@@ -800,6 +808,9 @@ class BackupInstance:
             self.settings.keepdays = int(data['keepdays'])
         if 'ignore_weekday' in data and isinstance(data['ignore_weekday'], list):
             self.settings.ignore_weekday = data['ignore_weekday']
+        # For interface consistency. We need to get the user's role from remote server.
+        if self.is_remote() and 'role' in current_user:
+            self.settings.remoterole = int(current_user['role'])
 
     async def list_increments(self):
         """

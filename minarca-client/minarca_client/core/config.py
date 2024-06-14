@@ -239,6 +239,7 @@ class Settings(KeyValueConfigFile):
         ('repositoryname', str, None),
         ('remotehost', str, None),
         ('remoteurl', str, None),
+        ('remoterole', int, None),
         ('schedule', int, DAILY),
         ('configured', lambda x: x in [True, 'true', 'True', '1'], False),
         ('pause_until', lambda x: Datetime(x) if x else None, None),

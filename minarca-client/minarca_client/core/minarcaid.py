@@ -67,6 +67,8 @@ def ssh_keygen(public_key, private_key, length=2048):
         serialization.Encoding.PEM, serialization.PrivateFormat.TraditionalOpenSSL, serialization.NoEncryption()
     )
     public_key_bytes = key.public_key().public_bytes(serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH)
+    if os.path.isfile(private_key):
+        os.unlink(private_key)
     with open(private_key, 'wb') as f:
         f.write(private_key_bytes)
     # Set proper permissions on private key.
