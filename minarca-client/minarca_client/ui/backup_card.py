@@ -39,7 +39,8 @@ Builder.load_string(
         MDBoxLayout:
             orientation: "vertical"
             adaptive_height: True
-            adaptive_width: True
+            adaptive_width: False
+            minimum_width: 50
             pos_hint: {'center_y': .5}
 
             CLabel:
@@ -49,8 +50,6 @@ Builder.load_string(
 
             CLabel:
                 text: root.settings.repositoryname or _("No name") if root.settings else ""
-
-        Widget:
 
         CLabel:
             text:  _('Paused') if root.settings and root.settings.pause_until else _('Active')
