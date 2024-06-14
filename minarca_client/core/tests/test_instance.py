@@ -111,17 +111,17 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         del os.environ['MINARCA_CONFIG_HOME']
         del os.environ['MINARCA_DATA_HOME']
 
-    async def test_link_with_empty_repository_name(self):
+    async def test_configure_remote_with_empty_repository_name(self):
         with self.assertRaises(InvalidRepositoryName):
             await self.backup.configure_remote("http://localhost", "admin", "admin", "")
 
-    async def test_link_with_invalid_repository_name(self):
+    async def test_configure_remote_with_invalid_repository_name(self):
         with self.assertRaises(InvalidRepositoryName):
             await self.backup.configure_remote("http://localhost", "admin", "admin", "invalid!?%$/")
 
     @responses.activate
-    async def test_link_with_existing_repository_name(self):
-        # Mock some https stuff
+    async def test_configure_remote_with_existing_repository_name(self):
+        # Given an existing repositori on remote server
         responses.add(responses.GET, "http://localhost/api/")
         responses.add(
             responses.GET,
@@ -135,7 +135,8 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         )
         responses.add(responses.POST, "http://localhost/api/currentuser/sshkeys", status=200)
 
-        # Check with identical repo name
+        # When configuring the repo
+        # Then error is raised.
         with self.assertRaises(RepositoryNameExistsError):
             await self.backup.configure_remote("http://localhost", "admin", "admin", "coucou")
 
@@ -150,7 +151,39 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     @responses.activate
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link_with_existing_patterns(self, mock_popen):
+    async def test_configure_remote_with_existing_repository_name_forced(self, mock_popen):
+        # Given an existing repositori on remote server
+        responses.add(responses.GET, "http://localhost/api/")
+        responses.add(
+            responses.GET,
+            "http://localhost/api/currentuser/",
+            json={
+                'email': 'admin@example.com',
+                'username': 'admin',
+                "role": 10,
+                'repos': [{'name': 'coucou', "maxage": 3, "keepdays": 365, "ignore_weekday": [5, 6]}],
+            },
+        )
+        responses.add(
+            responses.GET,
+            "http://localhost/api/minarca/",
+            json={'remotehost': 'remote', 'version': '3.9.0', 'identity': IDENTITY},
+        )
+        responses.add(responses.POST, "http://localhost/api/currentuser/sshkeys", status=200)
+
+        # When configuring the repo with force (to replace existing repo)
+        instance = await self.backup.configure_remote("http://localhost", "admin", "admin", "coucou", force=True)
+
+        # Then instance is configure and settings are initialized with remoter server settings,
+        self.assertIsNotNone(instance)
+        self.assertEqual(instance.settings.maxage, 3)
+        self.assertEqual(instance.settings.keepdays, 365)
+        self.assertEqual(instance.settings.ignore_weekday, [5, 6])
+        self.assertEqual(instance.settings.remoterole, 10)
+
+    @responses.activate
+    @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
+    async def test_configure_remote_with_existing_patterns(self, mock_popen):
         # Create patterns
         self.instance.patterns.append(Pattern(True, _home, None))
         initial_patterns = list(self.instance.patterns)
@@ -188,21 +221,21 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(initial_patterns, list(patterns))
 
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link_with_http_invalid_url_error(self, mock_subprocess):
+    async def test_configure_remote_with_http_invalid_url_error(self, mock_subprocess):
         # Link
         with self.assertRaises(HttpInvalidUrlError):
             await self.backup.configure_remote("not_http_url", "admin", "admin", "coucou")
         mock_subprocess.assert_not_called()
 
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link_with_http_invalid_url_error_2(self, mock_subprocess):
+    async def test_configure_remote_with_http_invalid_url_error_2(self, mock_subprocess):
         # Link
         with self.assertRaises(HttpInvalidUrlError):
             await self.backup.configure_remote("ssh://localhost", "admin", "admin", "coucou")
         mock_subprocess.assert_not_called()
 
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link_with_http_connection_error(self, mock_subprocess):
+    async def test_configure_remote_with_http_connection_error(self, mock_subprocess):
         # Link
         with self.assertRaises(HttpConnectionError):
             await self.backup.configure_remote("http://invalid_host_name", "admin", "admin", "coucou")
@@ -210,7 +243,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     @responses.activate
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link_with_http_authentication_error_401(self, mock_subprocess):
+    async def test_configure_remote_with_http_authentication_error_401(self, mock_subprocess):
         # Mock authentication fail
         responses.add(responses.GET, "http://localhost/api/")
         responses.add(responses.GET, "http://localhost/api/currentuser/", status=401)
@@ -222,7 +255,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     @responses.activate
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link_with_http_authentication_error_403(self, mock_subprocess):
+    async def test_configure_remote_with_http_authentication_error_403(self, mock_subprocess):
         # Mock authentication fail
         responses.add(responses.GET, "http://localhost/api/")
         responses.add(responses.GET, "http://localhost/api/currentuser/", status=403)
@@ -234,7 +267,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     @responses.activate
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link_with_http_authentication_error_503(self, mock_subprocess):
+    async def test_configure_remote_with_http_authentication_error_503(self, mock_subprocess):
         # Mock authentication fail
         responses.add(responses.GET, "http://localhost/api/")
         responses.add(responses.GET, "http://localhost/api/currentuser/", status=503)
@@ -246,7 +279,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     @responses.activate
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
-    async def test_link(self, mock_popen):
+    async def test_configure_remote(self, mock_popen):
         # Define a status
         status = self.instance.status
         status.lastresult = 'SUCCESS'
