@@ -7,10 +7,10 @@ Created on Oct. 22, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 import requests
-from packaging import version
 
 from minarca_client.core import compat
 from minarca_client.locale import _
+from packaging import version
 
 LATEST_VERSION_URL = 'https://latest.ikus-soft.com/minarca/latest_version'
 
