@@ -123,6 +123,11 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## Next Beta release
+
+* Minarca Agent
+  * Add exclude pattern for Google Drive temporary files
+
 ## 6.0.0b3
 
 * Minarca Agent
