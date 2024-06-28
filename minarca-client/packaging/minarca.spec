@@ -13,6 +13,7 @@
 # For MacOS, it creates a redistributable .app archived into a .dgm file.
 #
 import os
+from os.path import abspath, join
 import platform
 import re
 import shutil
@@ -20,8 +21,14 @@ import subprocess
 import tempfile
 from email import message_from_string
 
-import pkg_resources
 from PyInstaller.utils.hooks import collect_submodules, copy_metadata
+
+try:
+    from importlib.metadata import distribution as get_distribution
+    from importlib.resources import resource_filename
+except ImportError:
+    # For Python 2 or Python 3 with older setuptools
+    from pkg_resources import get_distribution, resource_filename
 
 # Use Mock OpenGL to avoid issue on headless
 os.environ['KIVY_GL_BACKEND'] = 'mock'
@@ -31,17 +38,20 @@ os.environ['KIVY_NO_CONFIG'] = '1'
 os.environ['KIVY_NO_FILELOG'] = '1'
 os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 
-from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, hookspath
+from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, hookspath # noqa
+
 
 #
 # Common values
 #
-icon = 'minarca_client/ui/theme/resources/minarca.ico'
-macos_icon = 'minarca_client/ui/theme/resources/minarca.icns'
+icon = resource_filename('minarca_client', '/ui/theme/resources/minarca.ico')
+macos_icon = resource_filename('minarca_client', '/ui/theme/resources/minarca.icns')
 
 # Read pacakage info
-pkg = pkg_resources.get_distribution("minarca_client")
+pkg = get_distribution('minarca_client')
 version = pkg.version
+# Get License file's data
+license = pkg.get_metadata('LICENSE')
 try:
     _metadata = message_from_string(pkg.get_metadata('METADATA'))
 except IOError:
@@ -51,10 +61,12 @@ long_description = _metadata._payload
 block_cipher = None
 
 # Include openssh client for windows
+datas = copy_metadata('minarca_client') + copy_metadata('rdiff-backup') + [
+    (resource_filename('minarca_client','ui/theme/resources'), 'minarca_client/ui/theme/resources'),
+    (resource_filename('minarca_client', 'locales'), 'minarca_client/locales'),
+]
 if platform.system() == "Windows":
-    openssh = [('minarca_client/core/openssh', 'minarca_client/core/openssh')]
-else:
-    openssh = []
+    datas.append((resource_filename('minarca_client', 'core/openssh'), 'minarca_client/core/openssh'))
 
 extras = get_deps_minimal(video=None, audio=None, spelling=None, camera=None)
 
@@ -75,18 +87,11 @@ if platform.system() == "Darwin":
     )
     extras['binaries'].append((librsync_path, '.'))
 
+main_py = resource_filename('minarca_client', 'main.py')
 a = Analysis(
-    ['minarca_client/main.py'],
+    [main_py],
     pathex=[],
-    datas=copy_metadata('minarca_client')
-    + copy_metadata('rdiff-backup')
-    + openssh
-    + [
-        ('../README.md', '.'),
-        ('LICENSE', '.'),
-        ('minarca_client/ui/theme/resources', 'minarca_client/ui/theme/resources'),
-        ('minarca_client/locales', 'minarca_client/locales'),
-    ],
+    datas=datas,
     hookspath=[],
     runtime_hooks=[],
     win_no_prefer_redirects=False,
@@ -186,7 +191,8 @@ if os.environ.get('AUTHENTICODE_CERT'):
             '-export',
             '-out',
             pfx_file,
-        ]
+        ],
+        stderr=subprocess.STDOUT,
     )
 else:
     print('AUTHENTICODE_CERT is missing, skip signing')
@@ -198,7 +204,7 @@ if platform.system() == "Darwin":
     if os.environ.get('AUTHENTICODE_CERT'):
         # Add certificate to login keychain
         keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
-        subprocess.check_call(['security', 'import', pfx_file, '-k', keychain, '-P', passphrase])
+        subprocess.check_call(['security', 'import', pfx_file, '-k', keychain, '-P', passphrase], stderr=subprocess.STDOUT)
 
     # Create app bundle
     app = BUNDLE(
@@ -209,14 +215,14 @@ if platform.system() == "Darwin":
         version=version,
         codesign_identity=cert_cn,
     )
-    app_file = os.path.abspath('dist/Minarca.app')
+    app_file = join(DISTPATH, 'Minarca.app')
 
     # Binary smoke test
-    subprocess.check_call(['dist/minarca.app/Contents/MacOS/minarca', '--version'])
+    subprocess.check_call([join(DISTPATH, 'minarca.app/Contents/MacOS/minarca'), '--version'], stderr=subprocess.STDOUT)
 
     # Generate dmg image
-    dmg_file = os.path.abspath('dist/minarca-client_%s.dmg' % version)
-    subprocess.check_call(['dmgbuild', '-s', 'minarca.dmgbuild', '-D', 'app=' + app_file, 'Minarca', dmg_file])
+    dmg_file = join(DISTPATH, 'minarca-client_%s.dmg' % version)
+    subprocess.check_call(['dmgbuild', '-s', join(SPECPATH, 'minarca.dmgbuild'), '-D', 'app=' + app_file, 'Minarca', dmg_file], stderr=subprocess.STDOUT)
 
 elif platform.system() == "Windows":
 
@@ -250,23 +256,23 @@ elif platform.system() == "Windows":
                 unsigned,
                 '-out',
                 path,
-            ]
+            ],
+            stderr=subprocess.STDOUT,
         )
         if not os.path.isfile(path):
             raise Exception('fail to sign executable: output file found: %s' % path)
 
     # Sign executable
-    sign_exe('dist/minarca/minarca.exe')
+    sign_exe(join(DISTPATH, 'minarca/minarca.exe'))
 
-    # For NSIS, we need to convert the license encoding
-    with open('dist/minarca/LICENSE', 'r', encoding='UTF-8') as input:
-        with open('dist/minarca/LICENSE.txt', 'w', encoding='ISO-8859-1') as out:
-            out.write(input.read())
+    # For NSIS, we need to create a license file with Windows encoding.
+    with open(join(DISTPATH, 'minarca/LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
+        out.write(license)
 
     # Create installer using NSIS
-    exe_version = re.search('.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
-    nsi_file = os.path.abspath('minarca.nsi')
-    setup_file = os.path.abspath('dist/minarca-client_%s.exe' % version)
+    exe_version = re.search(r'.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
+    nsi_file = join(SPECPATH, 'minarca.nsi')
+    setup_file = join(DISTPATH, 'minarca-client_%s.exe' % version)
     subprocess.check_call(
         [
             'makensis',
@@ -277,21 +283,22 @@ elif platform.system() == "Windows":
             '-DOutFile=' + setup_file,
             nsi_file,
         ],
-        cwd='dist/minarca',
+        cwd=join(DISTPATH, 'minarca'),
+        stderr=subprocess.STDOUT,
     )
 
     # Sign installer
     sign_exe(setup_file)
 
     # Binary smoke test
-    subprocess.check_call(['dist/minarca/minarca.exe', '--version'])
+    subprocess.check_call([join(DISTPATH, 'minarca/minarca.exe'), '--version'], stderr=subprocess.STDOUT)
 
 else:
     from debbuild import debbuild
 
     # For linux simply create a tar.gz with the folder
-    targz_file = os.path.abspath('dist/minarca-client_%s.tar.gz' % version)
-    subprocess.check_call(['tar', '-zcvf', targz_file, 'minarca'], cwd=os.path.abspath('./dist'))
+    targz_file = join(DISTPATH, 'minarca-client_%s.tar.gz' % version)
+    subprocess.check_call(['tar', '-zcvf', targz_file, 'minarca'], cwd=DISTPATH, stderr=subprocess.STDOUT)
 
     # Also create a Debian package
     debbuild(
@@ -299,17 +306,16 @@ else:
         version=version,
         architecture='amd64',
         data_src=[
-            ('/opt/minarca', './dist/minarca'),
-            ('/usr/share/applications/minarca-client.desktop', './minarca.desktop'),
-            ('/opt/minarca/minarca.svg', './minarca_client/ui/theme/resources/minarca.svg'),
-            ('/usr/share/doc/minarca-client/copyright', './LICENSE'),
+            ('/opt/minarca', join(DISTPATH, 'minarca')),
+            ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
+            ('/opt/minarca/minarca.svg', join(DISTPATH, 'minarca/minarca_client/ui/theme/resources/minarca.svg')),
         ],
         description=pkg_info['Summary'],
         long_description=long_description,
         url=pkg_info['Home-page'],
         maintainer="%s <%s>" % (pkg_info['Maintainer'], pkg_info['Maintainer-email']),
-        output='./dist',
-        postinst="./minarca.postinst",
+        output=DISTPATH,
+        postinst=join(SPECPATH, "minarca.postinst"),
         symlink=[
             ("/usr/bin/minarca", "/opt/minarca/minarca"),
             ("/opt/minarca/bin/minarca", "../minarca"),
