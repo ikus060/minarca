@@ -17,7 +17,7 @@
 ; The following should be overide by pyinstaller script.
 ;!define AppVersion "1.1.1.1"
 ;!define OutFile "minarca-installer-dev.exe"
- 
+
 ;--------------------------------
 ;Includes
 
@@ -117,21 +117,31 @@
   LangString DisplayName ${LANG_ENGLISH} "Minarca Backup"
   LangString DisplayName ${LANG_FRENCH} "Sauvegarde Minarca"
 
-  LangString APP_IS_RUNNING ${LANG_ENGLISH} "The installation process detected ${AppName} is running. Please close it and try again."
-  LangString APP_IS_RUNNING ${LANG_FRENCH} "Le processus d'installation a détecté que ${AppName} est en cours d'exécution. S'il vous plaît, fermez l'application et essayez à nouveau."
+  LangString APP_IS_RUNNING ${LANG_ENGLISH} "$(DisplayName) is currently running. To continue with the installation, verify that no backup is currently in progress and close $(DisplayName) application."
+  LangString APP_IS_RUNNING ${LANG_FRENCH} "$(DisplayName) est en cours d'exécution. Pour poursuivre l'installation, vérifiez qu'aucune sauvegarde n'est en cours et fermez l'application $(DisplayName)."
  
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
   LangString DESC_SecAppFiles ${LANG_FRENCH} "Copie des fichiers"
   
-  LangString RunMinarca ${LANG_ENGLISH} "Start ${AppName}"
-  LangString RunMinarca ${LANG_FRENCH} "Démarrer ${AppName}"
- 
 ;--------------------------------
 ;Installer Sections
  
 Section "Installation of $(DisplayName)" SecAppFiles
-  
+
+  ; Check if minarca is running
+  retry_label:
+  DetailPrint "Check if application is running..."
+  nsExec::ExecToLog `cmd /c "%SystemRoot%\System32\tasklist.exe /FI $\"IMAGENAME eq ${AppExeFile}$\" | %SystemRoot%\System32\find /I $\"${AppExeFile}$\" "`
+  Pop $0  ; Get the exit code of the command
+
+  # Check if the exit code is zero using ${If}
+  ${If} $0 == 0
+      MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION "$(APP_IS_RUNNING)" IDRETRY retry_label IDIGNORE ignore_label
+      Abort
+  ${EndIf}
+  ignore_label:
+
   ; Remove previous files
   RMDir /r "$INSTDIR"
   
@@ -192,14 +202,7 @@ Function .onInit
   ${EndIf}
   
   !insertmacro MUI_LANGDLL_DISPLAY
-  
-FunctionEnd
 
-;--------------------------------
-;Finish Section
-
-Function LaunchLink
-    ExecShell "" "$SMPROGRAMS\$(DisplayName)\${AppName}.lnk"
 FunctionEnd
 
 ;--------------------------------

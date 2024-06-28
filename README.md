@@ -127,6 +127,7 @@ The Minarca website is <https://minarca.org/>.
 
 * Minarca Agent
   * Add exclude pattern for Google Drive temporary files
+  * Check if application is running before proceeding with installation on Windows OS #249
 
 ## 6.0.0b3
 
