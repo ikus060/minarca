@@ -51,13 +51,13 @@ setuptools.setup(
         "kivy==2.3.0",
         # TODO We need to define version
         "KivyMD @ git+https://github.com/kivymd/KivyMD@5fb6654a83ffa1a20bd9c617be17986cc2e0778b",
+        # Fixed version for MacOS compatibility
+        "materialyoucolor==2.0.9",
         # Windows dependencies
         "pywin32 ; sys_platform=='win32'",
         "win11toast==0.35 ; sys_platform=='win32'",
         # MacOS dependencies
         "launchd ; sys_platform=='darwin'",
-        # TODO We need to define version when release. This is required to compile on MacOS.
-        "materialyoucolor @ git+https://github.com/T-Dynamos/materialyoucolor-python.git@57ec2e45ea4596edae0d9133af4732fa25a6407e ; sys_platform=='darwin'",
         # Linux dependencies
         "python-crontab ; sys_platform=='linux'",
         "pylibacl ; sys_platform=='linux'",
