@@ -126,8 +126,13 @@ The Minarca website is <https://minarca.org/>.
 ## Next Beta release
 
 * Minarca Agent
-  * Add exclude pattern for Google Drive temporary files
+  * Add exclude pattern for Google Drive temporary files (.tmp.driveupload & .tmp.drivedownload)
   * Check if application is running before proceeding with installation on Windows OS #249
+  * Fix layout to display repository name
+  * Used fixed version of materialyoucolor for MacOS compatibility
+* Minarca Server:
+  * Upgrade Rdiffweb to v2.9.2
+  * Use default language to send notification if user doesn't have a "Preferred Language" #306
 
 ## 6.0.0b3
 
