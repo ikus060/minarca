@@ -123,7 +123,12 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Beta release
+## Next Release
+
+* Minarc Agent
+  * Show Toast Notification using PowerShell instead of WinRT python binding #250
+
+## 6.0.0b4
 
 * Minarca Agent
   * Add exclude pattern for Google Drive temporary files (.tmp.driveupload & .tmp.drivedownload)

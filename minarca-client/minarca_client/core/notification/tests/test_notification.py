@@ -18,7 +18,7 @@ NO_DBUS = not os.environ.get('DBUS_SESSION_BUS_ADDRESS', False)
 @unittest.skipIf(IS_LINUX and NO_DBUS, 'On Linux, D-Bus is required for this test')
 class TestNotification(unittest.TestCase):
 
-    def test_send__and_clear_notification(self):
+    def test_send_and_clear_notification(self):
         notification_id = send_notification('Some title', 'Some Body', replace_id=None)
         self.assertIsNotNone(notification_id)
         clear_notification(notification_id)

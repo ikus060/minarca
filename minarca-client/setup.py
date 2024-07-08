@@ -55,7 +55,6 @@ setuptools.setup(
         "materialyoucolor==2.0.9",
         # Windows dependencies
         "pywin32 ; sys_platform=='win32'",
-        "win11toast==0.35 ; sys_platform=='win32'",
         # MacOS dependencies
         "launchd ; sys_platform=='darwin'",
         # Linux dependencies
