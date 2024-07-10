@@ -48,7 +48,7 @@ Builder.load_string(
     SidePanel:
         is_remote: root.is_remote
         create: root.create
-        text: _("Provide your login details to configure remote backup.")
+        text: _("Select the files and folders you want to back up.")
         step: 2
 
     MDBoxLayout:
@@ -286,8 +286,9 @@ class BackupPatterns(MDBoxLayout):
         """
         Called when user click to reset patterns.
         """
-        defaults = Patterns.defaults()
-        self.patterns = defaults
+        defaults = [p for p in Patterns.defaults() if p.include == self.include]
+        existing = [p for p in self.patterns if p.include != self.include]
+        self.patterns = defaults + existing
 
     def cancel(self):
         # In create mode, destroy the configuration and go to dashboard.

@@ -127,6 +127,7 @@ The Minarca website is <https://minarca.org/>.
 
 * Minarc Agent
   * Show Toast Notification using PowerShell instead of WinRT python binding #250
+  * Support Network mountpoint as destination #234
 
 ## 6.0.0b4
 

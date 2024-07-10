@@ -47,9 +47,9 @@ if IS_MAC:
 DeviceInfo = namedtuple('DeviceInfo', ['caption', 'removable'])
 
 
-class DiskInfo(
+class LocationInfo(
     namedtuple(
-        'DiskInfo', ['device', 'mountpoint', 'relpath', 'caption', 'free', 'used', 'size', 'fstype', 'removable']
+        'LocationInfo', ['device', 'mountpoint', 'relpath', 'caption', 'free', 'used', 'size', 'fstype', 'removable']
     )
 ):
     def __eq__(self, other):
@@ -120,7 +120,7 @@ def _get_device_name(filename):
     Determine the device name where the given filename reside on.
     """
     if IS_WINDOWS:
-        # On Windows, the device name if the Drive Letter.
+        # On Windows, the device name if the Drive Letter or a Network Location .e.g.: \\serverName\share\
         device_name = os.path.splitdrive(filename)[0]
         return device_name + '\\'
     elif IS_MAC or IS_LINUX:
@@ -154,7 +154,7 @@ def list_disks(removable=False):
             continue
         usage = psutil.disk_usage(part.mountpoint)
         disks.append(
-            DiskInfo(
+            LocationInfo(
                 part.device,
                 part.mountpoint,
                 '.',
@@ -169,7 +169,7 @@ def list_disks(removable=False):
     return disks
 
 
-def get_disk_info(filename):
+def get_location_info(filename):
     """
     For a given filename, return a Disk Info
     """
@@ -181,14 +181,25 @@ def get_disk_info(filename):
     info = _get_device_info(device)
     if not info:
         return None
-    # Lookup mountpoint
-    part = next((p for p in psutil.disk_partitions() if p.device == device), None)
-    if not part:
-        return None
     # Get Disk usage information
     usage = psutil.disk_usage(filename)
-    # Calculate the relative path between the filename and mount point.
-    relpath = os.path.relpath(filename, part.mountpoint)
-    return DiskInfo(
-        device, part.mountpoint, relpath, info.caption, usage.free, usage.used, usage.total, part.fstype, info.removable
+    # Lookup mountpoint
+    part = next((p for p in psutil.disk_partitions() if _device_eq(p.device, device)), None)
+    if part:
+        # Calculate the relative path between the filename and mount point.
+        relpath = os.path.relpath(filename, part.mountpoint)
+        return LocationInfo(
+            device,
+            part.mountpoint,
+            relpath,
+            info.caption,
+            usage.free,
+            usage.used,
+            usage.total,
+            part.fstype,
+            info.removable,
+        )
+    relpath = os.path.relpath(filename, device)
+    return LocationInfo(
+        device, device, relpath, info.caption, usage.free, usage.used, usage.total, None, info.removable
     )

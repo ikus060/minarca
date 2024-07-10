@@ -257,7 +257,7 @@ msgstr "nom du dépôt à utiliser"
 
 #: minarca_client/main.py:489
 msgid "link to remote server even if the repository name already exists"
-msgstr "lier avec le serveur distant même si le nom du référentiel existe déjà"
+msgstr "lier avec le serveur distant même si le nom du dépôt existe déjà"
 
 #: minarca_client/main.py:494
 msgid "list the includes / excludes patterns"
@@ -998,7 +998,7 @@ msgstr "La destination existe déjà"
 #: minarca_client/ui/backup_connection_local.py:375
 #: minarca_client/ui/backup_connection_remote.py:286
 msgid "Do you want to replace the existing repository ?"
-msgstr "Vous souhaitez remplacer le référentiel existant ?"
+msgstr "Vous souhaitez remplacer le dépôt existant ?"
 
 #: minarca_client/ui/backup_connection_local.py:376
 msgid ""

@@ -254,6 +254,8 @@ class Settings(KeyValueConfigFile):
             lambda x: os.environ.get('MINARCA_CHECK_LATEST_VERSION', str(x)).lower() in ['true', 'True', '1'],
             True,
         ),
+        ('localdevice', str, None),
+        ('localmountpoint', str, None),
         ('localuuid', str, None),
         ('localrelpath', str, None),
         ('localcaption', str, None),
@@ -262,14 +264,6 @@ class Settings(KeyValueConfigFile):
     @property
     def remote(self):
         return self.diskid is None
-
-
-class InvalidPatternError(Exception):
-    """
-    Raised when a pattern file contains an invalid line.
-    """
-
-    pass
 
 
 Pattern = namedtuple('Pattern', ['include', 'pattern', 'comment'])
@@ -288,8 +282,9 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     if line.startswith("#") or not line.strip():
                         comment = line[1:].strip()
                         continue
+                    # Silently ignore invalid patterns
                     if line[0] not in ['+', '-']:
-                        raise InvalidPatternError(line)
+                        pass
                     include = line[0] == '+'
                     try:
                         data.append(Pattern(include, line[1:], comment))

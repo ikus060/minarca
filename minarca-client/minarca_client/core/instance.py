@@ -26,14 +26,14 @@ from tzlocal import get_localzone
 from minarca_client.core import compat
 from minarca_client.core.compat import IS_WINDOWS, detach_call, file_read, flush, get_minarca_exe
 from minarca_client.core.config import Datetime, Patterns, Settings, Status
-from minarca_client.core.disk import list_disks
+from minarca_client.core.disk import get_location_info, list_disks
 from minarca_client.core.exceptions import (
     CaptureException,
     HttpAuthenticationError,
     HttpConnectionError,
     HttpInvalidUrlError,
     HttpServerError,
-    LocalDiskNotFound,
+    LocalDestinationNotFound,
     NoPatternsError,
     NotConfiguredError,
     NotRunningError,
@@ -372,7 +372,7 @@ class BackupInstance:
                                 flush(dest)
 
                             # For local disk, we need to manage the retention period too.
-                            if self.is_local() and self.settings.keepdays:
+                            if self.is_local() and self.settings.keepdays and self.settings.keepdays > 0:
                                 await self._rdiff_backup(
                                     '--force',
                                     'remove',
@@ -628,7 +628,7 @@ class BackupInstance:
             args.append(self._backup_path(None))
             await self._rdiff_backup(*args)
         elif self.is_local():
-            self.find_local_disk()
+            self.find_local_destination()
 
     def forget(self):
         """
@@ -665,20 +665,31 @@ class BackupInstance:
             return f"minarca@{remote_host}::."
         elif self.is_local():
             # For local destination, we need to lookup the external drive
-            disk = self.find_local_disk()
+            disk = self.find_local_destination()
             if path is not None:
-                return os.path.join(disk.mountpoint, self.settings.localrelpath) + path
-            return os.path.join(disk.mountpoint, self.settings.localrelpath)
+                return os.path.join(disk.mountpoint, disk.relpath) + path
+            return os.path.join(disk.mountpoint, disk.relpath)
         else:
             raise NotConfiguredError()
 
-    def find_local_disk(self):
+    def find_local_destination(self):
+        """
+        For local backup, we need to search for our destination since it might change from time to time.
+        """
         assert self.settings.localrelpath and self.settings.localuuid
-        for d in list_disks():
-            uuid_fn = os.path.join(d.mountpoint, self.settings.localrelpath, '..', '.minarca-id')
+        # Let start by searching our previous location (if any)
+        if self.settings.localmountpoint:
+            uuid_fn = os.path.join(self.settings.localmountpoint, self.settings.localrelpath, '..', '.minarca-id')
             if file_read(uuid_fn) == self.settings.localuuid:
-                return d
-        raise LocalDiskNotFound()
+                path = os.path.join(self.settings.localmountpoint, self.settings.localrelpath)
+                return get_location_info(path)
+
+        # Otherwise look on all disk and search our UUID.
+        for disk in list_disks():
+            uuid_fn = os.path.join(disk.mountpoint, self.settings.localrelpath, '..', '.minarca-id')
+            if file_read(uuid_fn) == self.settings.localuuid:
+                return disk._replace(relpath=self.settings.localrelpath)
+        raise LocalDestinationNotFound()
 
     def _remote_schema(self):
         """
@@ -729,7 +740,7 @@ class BackupInstance:
 
         elif self.is_local():
             # Get disk usage.
-            disk = self.find_local_disk()
+            disk = self.find_local_destination()
             return (disk.used, disk.size)
 
     def _remote_conn(self):

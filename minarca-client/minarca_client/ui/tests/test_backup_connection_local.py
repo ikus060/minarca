@@ -2,12 +2,12 @@ import asyncio
 import os
 from unittest import mock
 
-from minarca_client.core.disk import DiskInfo
+from minarca_client.core.disk import LocationInfo
 from minarca_client.core.instance import BackupInstance
 from minarca_client.ui.app import BackupConnectionLocal, BackupCreate
 from minarca_client.ui.tests import BaseAppTest
 
-DISK_INFO = DiskInfo(
+DISK_INFO = LocationInfo(
     device='/dev/sda1',
     mountpoint='/',
     relpath='tmp/tmp3p15kod6',
@@ -43,24 +43,24 @@ class BackupConnectionLocalTest(BaseAppTest):
         btn_refresh.dispatch('on_release')
         await self.pump_events()
 
-    @mock.patch('minarca_client.ui.backup_connection_local.get_disk_info', return_value=DISK_INFO)
+    @mock.patch('minarca_client.ui.backup_connection_local.get_location_info', return_value=DISK_INFO)
     @mock.patch('minarca_client.ui.backup_connection_local.folder_dialog', new_callable=mock.AsyncMock)
-    async def test_select_custom_disk(self, mock_folder_dialog, mock_disk_info):
+    async def test_select_custom_location(self, mock_folder_dialog, mock_disk_info):
         # Mock disk selection
         mock_folder_dialog.return_value = self.tmp.name
         # When user click on "browser" then user can manually select a disk.
         self.view.ids.btn_browse.dispatch('on_release')
         # Then a task is created to select folder
-        await self.view._select_custom_disk_task
+        await self.view._select_custom_location_task
         # Then a disk is selected
-        self.assertEqual(self.view.selected_disk, DISK_INFO)
+        self.assertEqual(self.view.selected_location, DISK_INFO)
 
     async def test_btn_save(self):
         # Mock Backup instance
         self.view.backup = backup = mock.AsyncMock()
         repositoryname = self.view.repositoryname
         # Give a selected disk
-        self.view.selected_disk = DISK_INFO
+        self.view.selected_location = DISK_INFO
         # When user click save
         self.view.ids.btn_save.dispatch('on_release')
         try:

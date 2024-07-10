@@ -34,7 +34,7 @@
             "args": [
                 "backup",
                 "--limit",
-                "0",
+                "2",
             ],
             "console": "integratedTerminal",
             "justMyCode": false,
