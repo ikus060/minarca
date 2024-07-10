@@ -164,6 +164,8 @@ class AboutMenu(MDNavigationDrawer):
     checking_for_update = BooleanProperty(True)
     update_available = BooleanProperty()
     latest_version = StringProperty()
+    _task = None
+    _check_update_task = None
 
     def __init__(self, *args, **kwargs):
         self.latest_check = LatestCheck()
@@ -179,10 +181,16 @@ class AboutMenu(MDNavigationDrawer):
         """On destroy, make sure to delete task."""
         if self._check_update_task:
             self._check_update_task.cancel()
+        if self._task:
+            self._task.cancel()
 
     def on_backup(self, widget, backup):
         """When backup get assigned, update the menu items."""
+        if self._task:
+            self._task.cancel()
         self.refresh_menu_items()
+        if backup is not None:
+            self._task = asyncio.create_task(self._watch_instances_task(backup))
 
     def refresh_menu_items(self):
         # Clear existing updates
@@ -190,7 +198,6 @@ class AboutMenu(MDNavigationDrawer):
         drawer_menu.ids.menu.clear_widgets()
         if self.backup is None:
             return
-        # TODO For each backup, display the appropriate buttons
         # Aka, refresh the button list.
         for instance in self.backup:
             # Label
@@ -244,3 +251,13 @@ class AboutMenu(MDNavigationDrawer):
             pass
         finally:
             self.checking_for_update = False
+
+    async def _watch_instances_task(self, backup):
+        """
+        Watch changes to instances.
+        """
+        try:
+            async for unused in backup.awatch():
+                self.refresh_menu_items()
+        except Exception:
+            logger.exception('problem occur while watching backup instances')

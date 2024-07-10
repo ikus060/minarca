@@ -361,12 +361,14 @@ class InitDestinationError(ConfigureBackupError):
     )
 
 
-class LocalDiskNotFound(RuntimeBackupError):
+class LocalDestinationNotFound(RuntimeBackupError):
     """
-    Raised whenever we are looking for a local destination, but external disk fast not found.
+    Raised whenever we are looking for a local destination, but external disk is not found or nout mounted.
     """
 
-    message = _("The locale device could not be found. Make sure your device is connected.")
+    message = _(
+        "Backup Destination Not Found. Please ensure that your external disk or network share is properly connected and accessible."
+    )
 
 
 class DiskDisconnectedError(BackupError):

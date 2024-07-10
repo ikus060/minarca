@@ -196,7 +196,7 @@ async def folder_dialog(
         owner,
         desktop_pidl,
         title,
-        shellcon.BIF_DONTGOBELOWDOMAIN | shellcon.BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE | shellcon.BIF_EDITBOX,
+        shellcon.BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE | shellcon.BIF_EDITBOX,
         None,
         None,
     )

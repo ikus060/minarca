@@ -260,4 +260,4 @@ class BackupRestoreFull(MDBoxLayout):
             # Go to Logs
             App.get_running_app().set_active_view('BackupLogs', instance=self.instance)
 
-        self._select_custom_disk_task = asyncio.create_task(_save())
+        self._select_custom_location_task = asyncio.create_task(_save())

@@ -9,6 +9,7 @@ Created on Oct. 13, 2023, 2021
 
 import asyncio
 import fnmatch
+import glob
 import logging
 import os
 import re
@@ -19,7 +20,7 @@ from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, Missi
 
 from minarca_client.core.compat import IS_WINDOWS, Scheduler, detach_call, file_read, get_config_home, get_minarca_exe
 from minarca_client.core.config import Patterns, Settings
-from minarca_client.core.disk import get_disk_info
+from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
     DuplicateSettingsError,
     HttpAuthenticationError,
@@ -156,7 +157,7 @@ class Backup:
         _check_repositoryname(repositoryname)
 
         # Get detail information about the destination
-        disk_info = get_disk_info(path)
+        disk_info = get_location_info(path)
         if disk_info is None:
             # Only block device are support for the moment.
             raise ValueError('not a block device')
@@ -176,10 +177,13 @@ class Backup:
             if others:
                 raise DuplicateSettingsError(others[0])
 
-        # Make sure the destination is an empty folder.
+        # Make sure the destination is an empty folder or an existing backup.
         content = os.listdir(path)
         if content:
-            if 'rdiff-backup-data' not in content:
+            # Take into account Windows Drive letter
+            rdiff_backup_data = '?/rdiff-backup-data' if IS_WINDOWS else 'rdiff-backup-data'
+            existing_backup = glob.glob(rdiff_backup_data, root_dir=path, recursive=True)
+            if not existing_backup:
                 raise LocalDestinationNotEmptyError(path)
             elif not force:
                 reponame = os.path.basename(path)
@@ -220,6 +224,8 @@ class Backup:
             t.localuuid = localuuid
             t.localrelpath = disk_info.relpath
             t.localcaption = disk_info.caption
+            t.localdevice = disk_info.device
+            t.localmountpoint = disk_info.mountpoint
             t.schedule = Settings.DAILY
             # Save configuration
             t.configured = True
@@ -331,35 +337,6 @@ class Backup:
                 idx += 1
                 continue
             return instance
-
-    def check_duplicate(self, instance):
-        """
-        Check if the given instance has a dusplicate instance.
-        """
-
-        def eq(a, b):
-            if a.is_remote():
-                return (
-                    b.is_remote()
-                    and a.settings.repositoryname == b.settings.repositoryname
-                    and a.settings.remoteurl == b.settings.remoteurl
-                    and a.settings.username == b.settings.username
-                )
-            elif a.is_local():
-                return (
-                    b.is_local()
-                    and a.settings.localuuid == b.settings.localuuid
-                    and a.settings.localrelpath == b.settings.localrelpath
-                )
-            return False
-
-        for other in self:
-            if other is instance:
-                # Do not compare to our self.
-                continue
-            if eq(other, instance):
-                return other
-        return None
 
     async def awatch(self, poll_delay_ms=250):
         """

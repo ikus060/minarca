@@ -24,7 +24,7 @@ import responses
 from minarca_client.core import Backup, BackupInstance
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
-from minarca_client.core.disk import DiskInfo
+from minarca_client.core.disk import LocationInfo
 from minarca_client.core.exceptions import (
     BackupError,
     HttpAuthenticationError,
@@ -86,8 +86,8 @@ def mock_subprocess_popen(replace_cmd):
 
 
 def remove_readonly(func, path, excinfo):
-    """Special handle to remove readonly file on Windows."""
-    if not os.access(path, os.W_OK):
+    """Special handler to remove readonly file on Windows."""
+    if excinfo[0].__name__ == 'PermissionError':
         os.chmod(path, stat.S_IWUSR)
         func(path)
     else:
@@ -684,7 +684,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-    @mock.patch('minarca_client.core.backup.get_disk_info')
+    @mock.patch('minarca_client.core.backup.get_location_info')
     @mock.patch('minarca_client.core.instance.list_disks')
     async def test_get_disk_usage_with_local(self, mock_list_disk, mock_disk_info):
         # Given a local backup instance
@@ -693,7 +693,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             mountpoint, relpath = os.path.splitdrive(tempdir)
         else:
             mountpoint, relpath = tempdir[0], tempdir[1:]
-        my_disk_info = DiskInfo(
+        my_disk_info = LocationInfo(
             device='/dev/sda1',
             mountpoint=mountpoint,
             relpath=relpath,
@@ -1047,3 +1047,91 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         self.assertEqual('SUCCESS', self.instance.status.lastresult)
         # Then notification was raised to user.
         mock_clear_notification.assert_called_once_with('previous-id')
+
+    async def test_local_backup(self):
+        # Given a backup with local destination
+        tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        try:
+            self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+            patterns = self.instance.patterns
+            patterns.clear()
+            patterns.append(Pattern(True, self.tmp.name, None))
+            patterns.save()
+            # when running backup
+            await self.instance.backup()
+            # then a backup get created
+            if IS_WINDOWS:
+                drive = os.path.splitdrive(tempdir)[0][0]
+                self.assertTrue(os.path.isdir(os.path.join(tempdir, drive, 'rdiff-backup-data')))
+            else:
+                self.assertTrue(os.path.isdir(os.path.join(tempdir, 'rdiff-backup-data')))
+        finally:
+            shutil.rmtree(tempdir, onerror=remove_readonly)
+
+    @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
+    async def test_local_backup_with_keepdays(self, mock_popen):
+        # Given a backup with local destination
+        tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        try:
+            self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+            self.instance.settings.keepdays = 3
+            patterns = self.instance.patterns
+            patterns.clear()
+            patterns.append(Pattern(True, self.tmp.name, None))
+            patterns.save()
+            # when running backup
+            await self.instance.backup()
+            # then rdiff-backup is called twice.
+            self.assertEqual(2, mock_popen.call_count)
+            # then last call should remove increments
+            mock_popen.assert_called_with(
+                mock.ANY,
+                'rdiff-backup',
+                '-v',
+                '5',
+                '--force',
+                'remove',
+                'increments',
+                '--older-than',
+                '3D',
+                mock.ANY,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+        finally:
+            shutil.rmtree(tempdir, onerror=remove_readonly)
+
+    async def test_configure_local_with_existing_repository_name(self):
+        # Given a local backup
+        tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        try:
+            self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+            self.instance.patterns.clear()
+            self.instance.patterns.append(Pattern(True, self.tmp.name, None))
+            self.instance.patterns.save()
+            await self.instance.backup()
+            self.instance.forget()
+
+            # When trying to configure a local backup at the same destination
+            # Then an exception is raised
+            with self.assertRaises(RepositoryNameExistsError):
+                self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+        finally:
+            shutil.rmtree(tempdir, onerror=remove_readonly)
+
+    async def test_configure_local_with_existing_repository_name_forced(self):
+        # Given a local backup
+        tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        try:
+            self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+            self.instance.patterns.clear()
+            self.instance.patterns.append(Pattern(True, self.tmp.name, None))
+            self.instance.patterns.save()
+            await self.instance.backup()
+            self.instance.forget()
+            # When trying to configure a local backup at the same destination with Force mode
+            self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo', force=True)
+            # Then the backup get configured.
+        finally:
+            shutil.rmtree(tempdir, onerror=remove_readonly)
