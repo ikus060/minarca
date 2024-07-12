@@ -1,6 +1,7 @@
 import asyncio
 import os
 import unittest
+from pathlib import Path
 
 import psutil
 from parameterized import parameterized
@@ -58,12 +59,13 @@ class MainDialogTest(unittest.IsolatedAsyncioTestCase):
             task.exception()
         await self._close_dlg('test')
 
-    async def test_file_dialog(self):
+    @parameterized.expand([None, os.getcwd(), Path.cwd()])
+    async def test_file_dialog(self, initial_directory):
         coroutine = file_dialog(
             parent=None,
             title='test',
             filename='filename',
-            initial_directory=None,
+            initial_directory=initial_directory,
             multiple_select=True,
         )
         # When showing the dialog
@@ -73,12 +75,13 @@ class MainDialogTest(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(asyncio.exceptions.InvalidStateError):
             task.exception()
 
-    @unittest.skipIf(IS_WINDOWS, 'cannot close dialog on Windows')
-    async def test_folder_dialog(self):
-        coroutine = folder_dialog(parent=None, title='test', initial_directory=None, multiple_select=True)
+    @parameterized.expand([None, os.getcwd(), Path.cwd()])
+    async def test_folder_dialog(self, initial_directory):
+        coroutine = folder_dialog(parent=None, title='test', initial_directory=initial_directory, multiple_select=True)
         # When showing the dialog
         task = asyncio.create_task(coroutine)
-        await self._close_dlg('test')
+        # On Windows, the dialog always has the same name.
+        await self._close_dlg('Browse for folder' if IS_WINDOWS else 'test')
         # Then no exception should be raised
         with self.assertRaises(asyncio.exceptions.InvalidStateError):
             task.exception()

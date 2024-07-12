@@ -274,6 +274,19 @@ class TestMainParseArgs(unittest.TestCase):
         # Then error code is 1
         self.assertEqual(1, capture.exception.code)
 
+    @mock.patch('rdiffbackup.run.main_run', side_effect=OSError(22))
+    def test_rdiff_backup_os_error(self, mock_main_run):
+        # Given a command line ith rdiff-backup
+        args = ['rdiff-backup', '-v', 'test']
+        # When calling rdiff-backup subcommand that raises a OSError
+        # Then a SystemExit is raised
+        with self.assertRaises(SystemExit) as capture:
+            main.main(args)
+        # Then function was called
+        mock_main_run.assert_called_once_with(args[1:])
+        # Then error code is 1
+        self.assertEqual(1, capture.exception.code)
+
     def test_exclude(self):
         # Given a backup instance
         instance = BackupInstance('')

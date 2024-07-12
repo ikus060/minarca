@@ -15,6 +15,7 @@ import subprocess
 import tempfile
 import unittest
 from datetime import timedelta
+from pathlib import Path
 from unittest import mock
 from unittest.case import skipIf, skipUnless
 from unittest.mock import MagicMock
@@ -689,27 +690,26 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     async def test_get_disk_usage_with_local(self, mock_list_disk, mock_disk_info):
         # Given a local backup instance
         tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        dest = os.path.join(tempdir, 'minarca', 'test-repo')
         if IS_WINDOWS:
-            mountpoint, relpath = os.path.splitdrive(tempdir)
+            mountpoint, relpath = os.path.splitdrive(dest)
         else:
-            mountpoint, relpath = tempdir[0], tempdir[1:]
+            mountpoint, relpath = dest[0], dest[1:]
         my_disk_info = LocationInfo(
-            device='/dev/sda1',
-            mountpoint=mountpoint,
-            relpath=relpath,
+            mountpoint=Path(mountpoint),
+            relpath=Path(relpath),
             caption='SAMSUNG MZVL2512HDJD-00BL2',
             free=14288068608,
             used=48573071360,
             size=66260148224,
             fstype='ext4',
-            removable=False,
+            device_type=LocationInfo.FIXED,
         )
-        mock_list_disk.return_value = [my_disk_info]
+        mock_list_disk.return_value = [Path(mountpoint)]
         mock_disk_info.return_value = my_disk_info
         try:
-            path = os.path.join(tempdir, 'minarca', 'test-repo')
-            os.makedirs(path)
-            self.instance = await self.backup.configure_local(path, repositoryname='test-repo')
+            os.makedirs(dest)
+            self.instance = await self.backup.configure_local(dest, repositoryname='test-repo')
             # When get getting disk usage
             used, size = await self.instance.get_disk_usage()
             # Then disk usage is returned

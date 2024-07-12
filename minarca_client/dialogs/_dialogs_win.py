@@ -13,7 +13,7 @@ import win32api
 import win32cred
 from win32com.shell import shell, shellcon
 from win32con import OFN_ALLOWMULTISELECT, OFN_EXPLORER
-from win32gui import GetOpenFileNameW
+from win32gui import GetOpenFileNameW, PyGetBufferAddressAndLen, SendMessage
 
 # Icons
 PWSTR = ctypes.c_wchar_p
@@ -150,7 +150,7 @@ async def file_dialog(parent, title, filename=None, initial_directory=None, mult
     func = functools.partial(
         GetOpenFileNameW,
         hwndOwner=owner,
-        InitialDir=initial_directory,
+        InitialDir=str(initial_directory),
         File=filename,
         Flags=flags,
         Title=title,
@@ -186,19 +186,24 @@ async def folder_dialog(
     multiple_select=False,  # Not supported in Window.
 ):
     # http://timgolden.me.uk/python/win32_how_do_i/browse-for-a-folder.html
-    owner = None
+    owner = 0
     if parent and parent.get_root_window():
         owner = parent.get_root_window().get_window_info().window
-    desktop_pidl = shell.SHGetFolderLocation(0, shellcon.CSIDL_DESKTOP, 0, 0)
+
+    def _set_start_folder(hwnd, msg, lp, data):
+        if msg == shellcon.BFFM_INITIALIZED and data:
+            address, _ = PyGetBufferAddressAndLen(data)
+            SendMessage(hwnd, shellcon.BFFM_SETSELECTION, 1, address)
+
     BIF_NEWDIALOGSTYLE = 0x00000040
     func = functools.partial(
         shell.SHBrowseForFolder,
         owner,
-        desktop_pidl,
+        None,
         title,
         shellcon.BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE | shellcon.BIF_EDITBOX,
-        None,
-        None,
+        _set_start_folder,
+        initial_directory,  # 'data' param for the callback
     )
 
     with _disable(parent):

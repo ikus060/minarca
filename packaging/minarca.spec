@@ -13,22 +13,17 @@
 # For MacOS, it creates a redistributable .app archived into a .dgm file.
 #
 import os
-from os.path import abspath, join
 import platform
 import re
 import shutil
 import subprocess
 import tempfile
 from email import message_from_string
+from importlib.metadata import distribution as get_distribution
+from importlib.resources import files
+from os.path import join
 
 from PyInstaller.utils.hooks import collect_submodules, copy_metadata
-
-try:
-    from importlib.metadata import distribution as get_distribution
-    from importlib.resources import resource_filename
-except ImportError:
-    # For Python 2 or Python 3 with older setuptools
-    from pkg_resources import get_distribution, resource_filename
 
 # Use Mock OpenGL to avoid issue on headless
 os.environ['KIVY_GL_BACKEND'] = 'mock'
@@ -38,35 +33,37 @@ os.environ['KIVY_NO_CONFIG'] = '1'
 os.environ['KIVY_NO_FILELOG'] = '1'
 os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 
-from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, hookspath # noqa
-
+from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, hookspath  # noqa
 
 #
 # Common values
 #
-icon = resource_filename('minarca_client', '/ui/theme/resources/minarca.ico')
-macos_icon = resource_filename('minarca_client', '/ui/theme/resources/minarca.icns')
+minarca_client_pkg = files('minarca_client')
+icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.ico')
+macos_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.icns')
 
 # Read pacakage info
 pkg = get_distribution('minarca_client')
 version = pkg.version
 # Get License file's data
-license = pkg.get_metadata('LICENSE')
-try:
-    _metadata = message_from_string(pkg.get_metadata('METADATA'))
-except IOError:
-    _metadata = message_from_string(pkg.get_metadata('PKG-INFO'))
+license = pkg.read_text('LICENSE')
+_metadata = message_from_string(pkg.read_text('PKG-INFO') or pkg.read_text('METADATA'))
 pkg_info = dict(_metadata.items())
 long_description = _metadata._payload
 block_cipher = None
 
+# Include theme resources and locales
+datas = (
+    copy_metadata('minarca_client')
+    + copy_metadata('rdiff-backup')
+    + [
+        (minarca_client_pkg / 'ui/theme/resources', 'minarca_client/ui/theme/resources'),
+        (minarca_client_pkg / 'locales', 'minarca_client/locales'),
+    ]
+)
 # Include openssh client for windows
-datas = copy_metadata('minarca_client') + copy_metadata('rdiff-backup') + [
-    (resource_filename('minarca_client','ui/theme/resources'), 'minarca_client/ui/theme/resources'),
-    (resource_filename('minarca_client', 'locales'), 'minarca_client/locales'),
-]
 if platform.system() == "Windows":
-    datas.append((resource_filename('minarca_client', 'core/openssh'), 'minarca_client/core/openssh'))
+    datas.append((minarca_client_pkg / 'core/openssh', 'minarca_client/core/openssh'))
 
 extras = get_deps_minimal(video=None, audio=None, spelling=None, camera=None)
 
@@ -87,7 +84,7 @@ if platform.system() == "Darwin":
     )
     extras['binaries'].append((librsync_path, '.'))
 
-main_py = resource_filename('minarca_client', 'main.py')
+main_py = minarca_client_pkg / 'main.py'
 a = Analysis(
     [main_py],
     pathex=[],
@@ -204,7 +201,9 @@ if platform.system() == "Darwin":
     if os.environ.get('AUTHENTICODE_CERT'):
         # Add certificate to login keychain
         keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
-        subprocess.check_call(['security', 'import', pfx_file, '-k', keychain, '-P', passphrase], stderr=subprocess.STDOUT)
+        subprocess.check_call(
+            ['security', 'import', pfx_file, '-k', keychain, '-P', passphrase], stderr=subprocess.STDOUT
+        )
 
     # Create app bundle
     app = BUNDLE(
@@ -222,7 +221,10 @@ if platform.system() == "Darwin":
 
     # Generate dmg image
     dmg_file = join(DISTPATH, 'minarca-client_%s.dmg' % version)
-    subprocess.check_call(['dmgbuild', '-s', join(SPECPATH, 'minarca.dmgbuild'), '-D', 'app=' + app_file, 'Minarca', dmg_file], stderr=subprocess.STDOUT)
+    subprocess.check_call(
+        ['dmgbuild', '-s', join(SPECPATH, 'minarca.dmgbuild'), '-D', 'app=' + app_file, 'Minarca', dmg_file],
+        stderr=subprocess.STDOUT,
+    )
 
 elif platform.system() == "Windows":
 

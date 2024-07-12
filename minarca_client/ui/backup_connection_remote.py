@@ -6,7 +6,7 @@ import logging
 
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.properties import AliasProperty, BooleanProperty, StringProperty
+from kivy.properties import BooleanProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
 from minarca_client.core.compat import get_default_repositoryname
@@ -14,6 +14,7 @@ from minarca_client.core.exceptions import BackupError, ConfigureBackupError, Re
 from minarca_client.dialogs import question_dialog
 from minarca_client.locale import _
 from minarca_client.ui.spinner_overlay import SpinnerOverlay  # noqa
+from minarca_client.ui.utils import alias_property
 
 logger = logging.getLogger(__name__)
 
@@ -209,13 +210,12 @@ class BackupConnectionRemote(MDBoxLayout):
             # Show error message.
             self.error_detail = str(e)
 
-    def _get_valid(self):
+    @alias_property(bind=['repositoryname', 'remoteurl', 'username', 'password'])
+    def valid(self):
         """
         Used to check if the data is valid according to the current step.
         """
         return self.repositoryname and self.remoteurl and self.username and self.password
-
-    valid = AliasProperty(_get_valid, None, bind=['repositoryname', 'remoteurl', 'username', 'password'])
 
     def reset(self):
         # When user click on Reset server connexion. Let enable editing.

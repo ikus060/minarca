@@ -12,6 +12,7 @@ import signal
 import sys
 import traceback
 from argparse import ArgumentParser
+from pathlib import Path
 
 import rdiffbackup.run
 
@@ -158,7 +159,7 @@ def _pattern(include, pattern, limit):
                 p = Pattern(include, path, None)
                 if not p.is_wildcard():
                     # Resolve relative path
-                    path = os.path.normpath(os.path.join(os.getcwd(), path))
+                    path = (Path.cwd() / path).resolve()
                     p = Pattern(include, path, None)
                 # Add new pattern
                 patterns.append(p)
@@ -267,7 +268,7 @@ def _restore(restore_time, force, paths, limit, destination):
                 paths.append(p)
     else:
         # Convert specific path to be restored.
-        paths = [os.path.normpath(os.path.join(os.getcwd(), path)) for path in paths]
+        paths = [(Path.cwd() / path).resolve() for path in paths]
     if not paths:
         _abort()
 

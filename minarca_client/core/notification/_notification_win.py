@@ -1,18 +1,12 @@
 # Copyleft (C) 2023 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-import os
 import subprocess
 import time
 import xml.etree.ElementTree as et
+from importlib.resources import files
 
 from minarca_client.locale import _
-
-try:
-    from importlib.resources import resource_filename
-except ImportError:
-    # For Python 2 or Python 3 with older setuptools
-    from pkg_resources import resource_filename
 
 APP_ID = 'Minarca'
 
@@ -118,10 +112,10 @@ def _clear(tag=None, group=None):
 
 
 def send_notification(title, body, replace_id=None):
-    icon = resource_filename('minarca_client', 'ui/theme/resources/minarca.ico')
+    icon_path = files('minarca_client') / 'ui/theme/resources/minarca.ico'
     icon_def = None
-    if os.path.isfile(icon):
-        icon_def = {'src': icon, 'placement': 'appLogoOverride'}
+    if icon_path.is_file():
+        icon_def = {'src': str(icon_path), 'placement': 'appLogoOverride'}
 
     # Generate or reuse notificaiton id as tag.
     if replace_id:

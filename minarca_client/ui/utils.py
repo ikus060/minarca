@@ -1,10 +1,12 @@
-import functools
-
 from kivy.properties import AliasProperty
 
 
-def alias_property(bind=[]):
+def alias_property(setter=None, bind=[], cache=False, rebind=False, watch_before_use=True):
     """
     Alias property decorator.
     """
-    return functools.partial(AliasProperty, setter=None, bind=bind)
+
+    def decorator(getter):
+        return AliasProperty(getter, setter, bind=bind, cache=cache, rebind=rebind, watch_before_use=watch_before_use)
+
+    return decorator

@@ -9,25 +9,20 @@ Created on Jun. 7, 2021
 import asyncio
 import datetime
 import os
-import pathlib
 import platform
 import shutil
 import subprocess
 import sys
 import tempfile
+from importlib.metadata import distribution as get_distribution
+from importlib.resources import files
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 import aiofiles
 
 from minarca_client.locale import _
-
-try:
-    from importlib.metadata import distribution as get_distribution
-    from importlib.resources import resource_filename
-except ImportError:
-    # For Python 2 or Python 3 with older setuptools
-    from pkg_resources import get_distribution, resource_filename
 
 IS_WINDOWS = sys.platform in ['win32']
 IS_LINUX = sys.platform in ['linux', 'linux2']
@@ -132,20 +127,21 @@ def get_default_repositoryname():
 def get_home(is_admin=IS_ADMIN):
     if is_admin:
         if IS_WINDOWS:
-            return os.path.join(
-                os.path.abspath(os.environ.get('WINDIR', 'C:/Windows')), 'System32/config/systemprofile'
-            )
+            windir = Path(os.environ.get('WINDIR', 'C:/Windows')).absolute()
+            return windir / 'System32/config/systemprofile'
         else:
-            return "/root"
-    else:
-        return os.path.abspath(str(pathlib.Path.home()))
+            return Path("/root")
+    return Path.home()
 
 
 def get_local_appdata(is_admin=IS_ADMIN):
     """
     Return Local App folder.
     """
-    return os.path.abspath(os.environ.get("LOCALAPPDATA", os.path.join(get_home(is_admin), "AppData", "Local")))
+    localappdata = os.environ.get("LOCALAPPDATA")
+    if localappdata:
+        return Path(localappdata).absolute()
+    return get_home(is_admin) / "AppData/Local"
 
 
 @makedirs
@@ -154,50 +150,50 @@ def get_log_path(is_admin=IS_ADMIN):
     Return the location of the log file.
     """
     if IS_WINDOWS:
-        return os.path.join(get_local_appdata(is_admin), "minarca")
+        return get_local_appdata(is_admin) / "minarca"
     elif IS_MAC:
-        return os.path.join(get_home(), "Library/Logs/Minarca")
-    # IS_LINUX
-    if is_admin:
-        return "/var/log"
-    return get_data_home(is_admin)
+        return get_home() / "Library/Logs/Minarca"
+    elif IS_LINUX:
+        if is_admin:
+            return Path("/var/log")
+        return get_data_home(is_admin)
+    raise RuntimeError('unsupported platform')
 
 
 def get_log_file(is_admin=IS_ADMIN):
-    return os.path.join(get_log_path(is_admin), "minarca.log")
+    return get_log_path(is_admin) / "minarca.log"
 
 
 @makedirs
 def get_config_home(is_admin=IS_ADMIN):
-    if os.environ.get('MINARCA_CONFIG_HOME'):
-        return os.path.abspath(os.environ.get('MINARCA_CONFIG_HOME'))
+    config_home = os.environ.get('MINARCA_CONFIG_HOME')
+    if config_home:
+        return Path(config_home).absolute()
     if IS_WINDOWS:
-        return os.path.join(get_local_appdata(is_admin), "minarca")
+        return get_local_appdata(is_admin) / "minarca"
     elif IS_MAC:
-        return os.path.join(get_home(is_admin), "Library/Preferences/Minarca")
-    # IS_LINUX
-    if is_admin:
-        return "/etc/minarca"
-    return os.path.abspath(
-        os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.join(get_home(is_admin), ".config/")), "minarca")
-    )
+        return get_home(is_admin) / "Library/Preferences/Minarca"
+    elif IS_LINUX:
+        if is_admin:
+            return Path("/etc/minarca")
+        return Path(os.environ.get("XDG_CONFIG_HOME", get_home(is_admin) / ".config")) / "minarca"
+    raise RuntimeError('unsupported platform')
 
 
 @makedirs
 def get_data_home(is_admin=IS_ADMIN):
     if os.environ.get('MINARCA_DATA_HOME'):
-        return os.path.abspath(os.environ.get('MINARCA_DATA_HOME'))
+        return Path(os.environ.get('MINARCA_DATA_HOME')).absolute()
     if IS_WINDOWS:
-        return os.path.join(get_local_appdata(is_admin), "minarca")
+        return get_local_appdata(is_admin) / "minarca"
     elif IS_MAC:
-        return os.path.join(get_home(is_admin), "Library/Minarca")
-    # IS_LINUX
-    if is_admin:
-        return "/var/lib/minarca"
-    else:
-        return os.path.abspath(
-            os.path.join(os.environ.get("XDG_DATA_HOME", os.path.join(get_home(is_admin), ".local/share/")), "minarca")
-        )
+        return get_home(is_admin) / "Library/Minarca"
+    elif IS_LINUX:
+        if is_admin:
+            return Path("/var/lib/minarca")
+        else:
+            return Path(os.environ.get("XDG_DATA_HOME", get_home(is_admin) / ".local/share")) / "minarca"
+    raise RuntimeError('unsupported platform')
 
 
 def _get_path():
@@ -207,8 +203,8 @@ def _get_path():
     path = os.environ.get('PATH', 'C:\\Windows\\system32' if IS_WINDOWS else '/usr/bin')
     path = os.path.dirname(sys.executable) + os.pathsep + path
     if IS_WINDOWS:
-        ssh_path = resource_filename(__name__, 'openssh\\win_%s' % platform.machine().lower())
-        path = ssh_path + os.pathsep + path
+        ssh_path = files(__package__) / ('openssh/win_%s' % platform.machine().lower())
+        path = str(ssh_path) + os.pathsep + path
     return path
 
 
@@ -228,17 +224,17 @@ def get_ssh():
     """
     # TODO Drop support for SSH 32bits.
     if os.environ.get('MINARCA_SSH'):
-        return os.environ.get('MINARCA_SSH')
+        return Path(os.environ.get('MINARCA_SSH'))
     name = 'ssh.exe' if IS_WINDOWS else 'ssh'
     path = _get_path()
     ssh = shutil.which(name, path=path)
     if not ssh:
         raise FileNotFoundError(name)
-    return ssh
+    return Path(ssh)
 
 
 def get_temp():
-    return tempfile.gettempdir()
+    return Path(tempfile.gettempdir())
 
 
 def get_user_agent():
@@ -264,7 +260,7 @@ def get_minarca_exe():
     path = shutil.which(name, path=_get_path())
     if not path:
         raise FileNotFoundError(name)
-    return os.path.abspath(path)
+    return Path(path).absolute()
 
 
 def detach_call(args):
@@ -293,6 +289,21 @@ def file_read(fn, default=None, maxsize=4096):
     except OSError:
         # Silently ignore any os error
         return default
+
+
+async def file_read_async(filepath: Path, errors='none'):
+    try:
+        async with aiofiles.open(filepath, 'r') as f:
+            return await f.read()
+    except OSError:
+        if errors == 'none':
+            return None
+        raise
+
+
+async def file_write_async(filepath: Path, text):
+    async with aiofiles.open(filepath, 'w') as f:
+        return await f.write(text)
 
 
 def file_stat(self):
@@ -422,7 +433,7 @@ if IS_WINDOWS:
             TASK_ACTION_EXEC = 0
             action = task_def.Actions.Create(TASK_ACTION_EXEC)
             action.ID = 'MINARCA'
-            action.Path = get_minarca_exe()
+            action.Path = str(get_minarca_exe())
             action.Arguments = 'backup'
 
             # Set parameters
@@ -489,7 +500,7 @@ if IS_MAC:
             self.plist = {
                 "Label": "org.minarca.minarca-client.plist",
                 "StartInterval": 900,  # 15 min interval
-                "ProgramArguments": [get_minarca_exe(), "backup"],
+                "ProgramArguments": [str(get_minarca_exe()), "backup"],
             }
             self.label = self.plist['Label']
 
@@ -498,9 +509,8 @@ if IS_MAC:
                 # Task already exists. leave.
                 return
             # Create missing directory.
-            fname = launchd.plist.compute_filename(self.label, scope=launchd.plist.USER)
-            if not os.path.exists(os.path.dirname(fname)):
-                os.mkdir(os.path.dirname(fname))
+            fname = Path(launchd.plist.compute_filename(self.label, scope=launchd.plist.USER))
+            fname.parent.mkdir(parents=1, exist_ok=1)
             # Dump plist file
             fname = launchd.plist.write(self.label, self.plist)
             launchd.load(fname)
