@@ -17,6 +17,7 @@ import stat
 import subprocess
 import tempfile
 import time
+from pathlib import Path
 
 import psutil
 import yaml
@@ -57,6 +58,7 @@ def _sh_quote(args):
     """
     value = ''
     for a in args:
+        a = str()
         if value:
             value += " "
         if " " in a or "*" in a or "?" in a:
@@ -72,14 +74,13 @@ def _escape_path(path):
     On Windows we use DOS compatible file path.
     On other platform, we escape the spaces.
     """
-    if ' ' not in path:
-        return path
+    if ' ' not in str(path):
+        return str(path)
     if IS_WINDOWS:
         import win32api
 
-        return win32api.GetShortPathName(path)
-    else:
-        return "'" + path + "'"
+        return win32api.GetShortPathName(str(path))
+    return "'%s'" % path
 
 
 def handle_http_errors(func):
@@ -217,7 +218,7 @@ class UpdateNotification:
                     status.lastnotificationid = notification_id
                     status.lastnotificationdate = Datetime()
                 except Exception:
-                    logger.warn("problem while sending new notification", exc_info=1)
+                    logger.warning("problem while sending new notification", exc_info=1)
         status.save()
 
     def is_notification_time(self):
@@ -297,14 +298,14 @@ class BackupInstance:
         assert (isinstance(id, int) and id >= 0) or isinstance(id, str)
         self.id = id
         # Get file location.
-        self.public_key_file = os.path.join(compat.get_config_home(), "id_rsa%s.pub" % id)
-        self.private_key_file = os.path.join(compat.get_config_home(), "id_rsa%s" % id)
-        self.known_hosts = os.path.join(compat.get_config_home(), "known_hosts%s" % id)
-        self.config_file = os.path.join(compat.get_config_home(), "minarca%s.properties" % id)
-        self.patterns_file = os.path.join(compat.get_config_home(), "patterns%s" % id)
-        self.status_file = os.path.join(compat.get_data_home(), 'status%s.properties' % id)
-        self.backup_log_file = os.path.join(compat.get_data_home(), 'backup%s.log' % id)
-        self.restore_log_file = os.path.join(compat.get_data_home(), 'restore%s.log' % id)
+        self.public_key_file = compat.get_config_home() / ("id_rsa%s.pub" % id)
+        self.private_key_file = compat.get_config_home() / ("id_rsa%s" % id)
+        self.known_hosts = compat.get_config_home() / ("known_hosts%s" % id)
+        self.config_file = compat.get_config_home() / ("minarca%s.properties" % id)
+        self.patterns_file = compat.get_config_home() / ("patterns%s" % id)
+        self.status_file = compat.get_data_home() / ('status%s.properties' % id)
+        self.backup_log_file = compat.get_data_home() / ('backup%s.log' % id)
+        self.restore_log_file = compat.get_data_home() / ('restore%s.log' % id)
         # Create wrapper arround config files.
         self.patterns = Patterns(self.patterns_file)
         self.status = Status(self.status_file)
@@ -453,7 +454,7 @@ class BackupInstance:
 
     async def _push_identity(self, conn, name):
         # Check if ssh keys exists, if not generate new keys.
-        if not os.path.exists(self.public_key_file) and not os.path.exists(self.private_key_file):
+        if not self.public_key_file.exists() and not self.private_key_file.exists():
             logger.info(_('generating identity'))
             ssh_keygen(self.public_key_file, self.private_key_file)
 
@@ -520,8 +521,8 @@ class BackupInstance:
         Used to run a complete restore of data backup for the given date or latest date is not defined.
         """
         assert restore_time is None or isinstance(restore_time, str)
-        assert isinstance(paths, list)
-        assert destination is None or isinstance(destination, str)
+        assert isinstance(paths, list) and all(isinstance(p, (str, Path)) for p in paths)
+        assert destination is None or isinstance(destination, (str, Path))
         if self.is_running():
             raise RunningError()
         status = Status(self.status_file)
@@ -532,7 +533,7 @@ class BackupInstance:
                     for path in paths:
                         if destination:
                             # Restore into different location
-                            final_destination = os.path.join(destination, os.path.basename(path))
+                            final_destination = os.path.join(str(destination), os.path.basename(str(path)))
                         else:
                             # Restore in place
                             final_destination = path
@@ -542,7 +543,13 @@ class BackupInstance:
                         if self.is_remote():
                             args.append("--remote-schema")
                             args.append(self._remote_schema())
-                        args += ["restore", "--at", restore_time or "now", self._backup_path(path), final_destination]
+                        args += [
+                            "restore",
+                            "--at",
+                            restore_time or "now",
+                            self._backup_path(str(path)),
+                            str(final_destination),
+                        ]
                         # FIXME For full restore we should add exclude pattern, but rdiff-backup raise an error.
                         await self._rdiff_backup(
                             *args,
@@ -643,18 +650,18 @@ class BackupInstance:
             self.status_file,
             self.config_file,
         ]:
-            if os.path.isfile(fn):
-                if not os.access(fn, os.W_OK):
-                    os.chmod(fn, stat.S_IWUSR)
-                os.remove(fn)
+            if fn.is_file():
+                fn.chmod(stat.S_IWUSR)
+                fn.unlink()
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, BackupInstance) and self.id == other.id
 
     def _backup_path(self, path):
         """
-        Return the path definin the location of the backup. Either remote or local.
+        Return the path defining the location of the backup. Either remote or local.
         """
+        assert path is None or isinstance(path, str)
         if path is not None and IS_WINDOWS:
             path = f"/{path[0]}/{path[3:]}"
         if self.is_remote():
@@ -667,8 +674,8 @@ class BackupInstance:
             # For local destination, we need to lookup the external drive
             disk = self.find_local_destination()
             if path is not None:
-                return os.path.join(disk.mountpoint, disk.relpath) + path
-            return os.path.join(disk.mountpoint, disk.relpath)
+                return disk / path.lstrip('/').lstrip('\\')
+            return disk
         else:
             raise NotConfiguredError()
 
@@ -676,19 +683,19 @@ class BackupInstance:
         """
         For local backup, we need to search for our destination since it might change from time to time.
         """
-        assert self.settings.localrelpath and self.settings.localuuid
+        assert self.settings.localrelpath and self.settings.localuuid, 'only supported for local backup'
         # Let start by searching our previous location (if any)
         if self.settings.localmountpoint:
-            uuid_fn = os.path.join(self.settings.localmountpoint, self.settings.localrelpath, '..', '.minarca-id')
+            uuid_fn = Path(self.settings.localmountpoint) / self.settings.localrelpath / '..' / '.minarca-id'
             if file_read(uuid_fn) == self.settings.localuuid:
-                path = os.path.join(self.settings.localmountpoint, self.settings.localrelpath)
-                return get_location_info(path)
+                return Path(self.settings.localmountpoint) / self.settings.localrelpath
 
         # Otherwise look on all disk and search our UUID.
         for disk in list_disks():
-            uuid_fn = os.path.join(disk.mountpoint, self.settings.localrelpath, '..', '.minarca-id')
+            uuid_fn = disk / self.settings.localrelpath / '..' / '.minarca-id'
             if file_read(uuid_fn) == self.settings.localuuid:
-                return disk._replace(relpath=self.settings.localrelpath)
+                return Path(disk) / self.settings.localrelpath
+
         raise LocalDestinationNotFound()
 
     def _remote_schema(self):
@@ -741,7 +748,8 @@ class BackupInstance:
         elif self.is_local():
             # Get disk usage.
             disk = self.find_local_destination()
-            return (disk.used, disk.size)
+            detail = get_location_info(disk)
+            return (detail.used, detail.size)
 
     def _remote_conn(self):
         """

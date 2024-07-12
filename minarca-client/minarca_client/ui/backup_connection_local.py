@@ -3,17 +3,18 @@
 # Use is subject to license terms.
 import asyncio
 import logging
-import os
+from pathlib import Path
 
 import humanfriendly
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.properties import BooleanProperty, ListProperty, ObjectProperty, StringProperty
+from kivy.properties import BooleanProperty, ListProperty, NumericProperty, ObjectProperty, StringProperty
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDListItem
 
-from minarca_client.core.compat import IS_LINUX, IS_WINDOWS, get_default_repositoryname
-from minarca_client.core.disk import LocationInfo, get_location_info, list_disks
+from minarca_client.core.compat import IS_LINUX, get_default_repositoryname
+from minarca_client.core.disk import LocationInfo, get_location_info, list_disk_with_location_info
 from minarca_client.core.exceptions import ConfigureBackupError, LocalDestinationNotFound, RepositoryNameExistsError
 from minarca_client.dialogs import folder_dialog, question_dialog, warning_dialog
 from minarca_client.locale import _
@@ -32,8 +33,8 @@ Builder.load_string(
     md_bg_color: self.theme_cls.secondaryContainerColor if root.selected else self.theme_cls.surfaceColor
 
     MDListItemLeadingIcon:
-        icon_color: self.theme_cls.primaryColor if root.check_criterias else self.theme_cls.onSurfaceColor
-        icon: "alert-circle-outline" if root.check_criterias else "harddisk"
+        icon_color: self.theme_cls.onSurfaceColor
+        icon: root.icon
 
     MDListItemHeadlineText:
         text: root.title
@@ -43,7 +44,7 @@ Builder.load_string(
 
     MDListItemTertiaryText:
         theme_text_color: "Custom"
-        text_color: self.theme_cls.primaryColor
+        text_color: self.theme_cls.warningColor
         text: root.check_criterias or " "
 
 
@@ -141,13 +142,15 @@ Builder.load_string(
                     size_hint_x: 1
                     halign: "center"
                     padding: "20dp", "50dp", "20dp", "50dp"
-                    display: not root.sorted_locations
+                    display: not root.location_infos and not root.working
 
                 RecycleView:
+                    id: rv
                     viewclass: "LocationItem"
-                    data: root.sorted_locations
+                    data: root.location_infos
 
-                    RecycleBoxLayout:
+                    SelectableRecycleBoxLayout:
+                        multiselect: False
                         spacing: "1dp"
                         padding: "0dp"
                         default_size: None, "88dp"
@@ -155,6 +158,7 @@ Builder.load_string(
                         orientation: 'vertical'
                         size_hint_y: None
                         height: self.minimum_height
+                        on_selected_nodes: root.on_selected_nodes(*args)
 
             MDBoxLayout:
                 orientation: "horizontal"
@@ -200,28 +204,36 @@ Builder.load_string(
 )
 
 
-class LocationItem(MDListItem):
+class LocationItem(MDListItem, RecycleDataViewBehavior):
     location_info = ObjectProperty()
-    selected = BooleanProperty()
-    on_location_item_release = None
+    index = NumericProperty()
+    selected = BooleanProperty(False)
+    selectable = BooleanProperty(True)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def on_touch_down(self, touch):
+        '''Add selection on touch down'''
+        ret = super(LocationItem, self).on_touch_down(touch)
+        if self.collide_point(*touch.pos) and self.selectable:
+            return self.parent.select_with_touch(self.index, touch)
+        return ret
 
-    def remove_widget(self, widget, *args, **kwargs):
-        super().remove_widget(widget, *args, **kwargs)
+    def refresh_view_attrs(self, rv, index, data):
+        '''Catch and handle the view changes'''
+        self.index = index
+        self.selected = data.get('selected', False)
+        super(LocationItem, self).refresh_view_attrs(rv, index, data)
 
-    def on_release(self):
-        if callable(self.on_location_item_release):
-            self.on_location_item_release(self)
-        return super().on_release()
+    def apply_selection(self, rv, index, is_selected):
+        '''Respond to the selection of items in the view.'''
+        self.selected = is_selected
+        rv.data[index]['selected'] = is_selected
 
     @alias_property(bind=['location_info'])
     def title(self):
         if not self.location_info:
             return ""
         # When user select a subdirectory in a mountpoint, let display the path.
-        if self.location_info.relpath != '.':
+        if not self.location_info.is_mountpoint:
             return _("%s on %s") % (self.location_info.relpath, self.location_info.caption)
         return self.location_info.caption
 
@@ -245,16 +257,26 @@ class LocationItem(MDListItem):
         if not self.location_info:
             return ""
         # Check disk criteria.
-        if self.location_info.removable is False:
-            return _("Make sure to use a removable storage device for backups to avoid data loss.")
-        elif self.location_info.fstype in ['vfat', 'FAT32', 'msdos']:
+        if self.location_info.fixed:
+            return _("Detected as a fixed device. Prefer using removable or network storage to avoid data loss.")
+        elif self.location_info.remote:
+            return _("Ensure this network location is configured to automatically reconnect to avoid data loss.")
+        elif self.location_info.fstype in ['vfat', 'FAT32', 'msdos', 'MS-DOS FAT32']:
             return _("FAT32 file system is not recommended for backup.")
+        elif IS_LINUX and str(self.location_info.relpath).startswith('smb-share:'):
+            return _("Samba share over Gnome Virtual File system is not compatible.")
         if IS_LINUX and self.location_info.fstype in ['ntfs']:
-            return _("NTFS is not recommended for backup on Linux.")
+            return _("NTFS isn't recommended on Linux due to remount issues after improper unmounting.")
         elif self.location_info.free and self.location_info.free <= 250 * 1000 * 1000 * 1000:
             # Warn if the disk space available is less then 250 GiB.
             return _("Available disk space at this location is limited.")
         return ""
+
+    @alias_property(bind=['location_info'])
+    def icon(self):
+        if self.location_info and self.location_info.remote:
+            return "folder-network-outline"
+        return "harddisk"
 
 
 class BackupConnectionLocal(MDBoxLayout):
@@ -262,8 +284,7 @@ class BackupConnectionLocal(MDBoxLayout):
     edit = BooleanProperty(True)
     create = BooleanProperty(False)
     repositoryname = StringProperty("")
-    removable_locations_loading = BooleanProperty(False)
-    locations = ListProperty([])
+    location_infos = ListProperty([])
     selected_location = ObjectProperty(None, allownone=True)
     error_message = StringProperty("")
     error_detail = StringProperty("")
@@ -288,28 +309,27 @@ class BackupConnectionLocal(MDBoxLayout):
         else:
             self.repositoryname = instance.settings.repositoryname
 
-    @alias_property(bind=['locations', 'selected_location'])
-    def sorted_locations(self):
-        available_locations = self.locations
-        # Add custom location to the list.
-        if self.selected_location and self.selected_location not in available_locations:
-            available_locations.insert(0, self.selected_location)
-        return [
-            {
-                'location_info': i,
-                'selected': i == self.selected_location,
-                'on_location_item_release': self.on_location_item_release,
-            }
-            for i in self.locations
-        ]
-
-    def on_location_item_release(self, location_item):
-        # Change selected location when user click on it.
-        self.selected_location = location_item.location_info
-
     def on_parent(self, widget, value):
         if value is None:
             self._cancel_tasks()
+
+    def on_selected_nodes(self, widget, nodes):
+        """When selected is updated, update the "selected_location" attribute."""
+        if not nodes:
+            self.selected_location = None
+        else:
+            idx = nodes[0]
+            data = widget.recycleview.data[idx]
+            self.selected_location = data['location_info']
+
+    def on_selected_location(self, widget, value):
+        """When selection get updated, update the "selected_nodes" attribute."""
+        rv = self.ids.rv
+        nodes = [idx for idx, data in enumerate(rv.data) if data['location_info'] == value]
+        if rv.layout_manager.selected_nodes != nodes:
+            rv.layout_manager.clear_selection()
+            if nodes:
+                rv.layout_manager.select_node(nodes[0])
 
     def _cancel_tasks(self, event=None):
         """On destroy, make sure to delete task."""
@@ -326,49 +346,49 @@ class BackupConnectionLocal(MDBoxLayout):
         """
         Every couple of seconds, check if the list of local disks get updated.
         """
-        if self.instance is not None:
-            # If instance is configure, load current disk
-            try:
-                local_disk = await asyncio.get_event_loop().run_in_executor(None, self.instance.find_local_destination)
-                self.selected_location = local_disk
-            except LocalDestinationNotFound:
-                self.selected_location = LocationInfo(
-                    device=None,
-                    mountpoint=self.instance.settings.localmountpoint,
-                    relpath=self.instance.settings.localrelpath,
-                    caption=self.instance.settings.localcaption,
-                    free=None,
-                    used=None,
-                    size=None,
-                    fstype=None,
-                    removable=None,
-                )
-            finally:
-                self.removable_locations_loading = False
-        else:
-            try:
-                disks = await asyncio.get_event_loop().run_in_executor(None, list_disks, True)
-                self.locations = disks
-            except Exception:
-                logger.warning('fail to list removable disks', exc_info=1)
-            finally:
-                self.removable_locations_loading = False
+        try:
+            if self.instance is not None:
+                # If instance is configure, load current location only
+                try:
+                    path = await asyncio.get_event_loop().run_in_executor(None, self.instance.find_local_destination)
+                    location_detail = await asyncio.get_event_loop().run_in_executor(None, get_location_info, path)
+                except LocalDestinationNotFound:
+                    location_detail = LocationInfo(
+                        mountpoint=Path(self.instance.settings.localmountpoint),
+                        relpath=Path(self.instance.settings.localrelpath),
+                        caption=Path(self.instance.settings.localcaption),
+                        free=None,
+                        used=None,
+                        size=None,
+                        fstype=None,
+                        device_type=None,
+                    )
+                self.location_infos.append({'location_info': location_detail})
+                self.selected_location = location_detail
+            else:
+                # Get full list of disk with location info
+                try:
+                    disks = await asyncio.get_event_loop().run_in_executor(None, list_disk_with_location_info, True)
+                    self.location_infos = [{'location_info': d} for d in disks]
+                except Exception:
+                    logger.warning('fail to list removable disks', exc_info=1)
+        finally:
+            self.working = ''
 
     async def _create_local(self, location, repositoryname, force=False):
         assert location
         assert repositoryname
 
         # Get full path of selected location
-        path = os.path.join(location.mountpoint, location.relpath)
+        path = location.mountpoint / location.relpath
 
         # Create a new backup instance configuration.
         try:
             # If the relpath is the root of the external drive,
             # will create additonal directory structure using the reponame.
-            # TODO Consider moving this part into configure_local
-            if location.relpath == '.':
-                path = os.path.join(location.mountpoint, "minarca", repositoryname)
-                os.makedirs(path, exist_ok=True)
+            if location.is_mountpoint:
+                path = location.mountpoint / "minarca" / repositoryname
+                path.mkdir(parents=1, exist_ok=1)
             self.instance = await self.backup.configure_local(
                 path=path,
                 repositoryname=repositoryname,
@@ -427,7 +447,7 @@ class BackupConnectionLocal(MDBoxLayout):
             return
         self.error_message = ""
         self.error_detail = ""
-        self.removable_locations_loading = True
+        self.working = _('Please wait. Scanning for removable disk...')
         self.selected_location = None
         self._refresh_locations_task = asyncio.create_task(self._refresh_locations())
 
@@ -441,13 +461,8 @@ class BackupConnectionLocal(MDBoxLayout):
             if not folder:
                 # Operation cancel by user
                 return
-            # FIXME
-            # Check if it's a network location.
-            if IS_WINDOWS and folder.replace('\\', '/').startswith('//'):
-                # On windows, it's possible to access mountpoint using \\hostname\share\path\to\file. Before doing so, let confirm if this is whats the user really want.
-                pass
             # Get Location Info
-            location = get_location_info(folder)
+            location = get_location_info(Path(folder))
             # If location information could not be retrived, abort the operation.
             if not location:
                 await warning_dialog(
@@ -460,6 +475,7 @@ class BackupConnectionLocal(MDBoxLayout):
                 )
                 return
             # Add selected location to the list.
+            self.location_infos.append({'location_info': location, 'selected': True})
             self.selected_location = location
 
         self._select_custom_location_task = asyncio.create_task(_select_custom_location())

@@ -9,16 +9,24 @@ Created on Oct. 13, 2023, 2021
 
 import asyncio
 import fnmatch
-import glob
 import logging
 import os
 import re
 import uuid
 from collections import namedtuple
+from pathlib import Path
 
 from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
 
-from minarca_client.core.compat import IS_WINDOWS, Scheduler, detach_call, file_read, get_config_home, get_minarca_exe
+from minarca_client.core.compat import (
+    IS_WINDOWS,
+    Scheduler,
+    detach_call,
+    file_read_async,
+    file_write_async,
+    get_config_home,
+    get_minarca_exe,
+)
 from minarca_client.core.config import Patterns, Settings
 from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
@@ -54,7 +62,7 @@ def _check_repositoryname(name):
 
 class Backup:
     """
-    Collection of backup instances base on "minarca*.properties" files.
+    Collection of backup instances based on "minarca*.properties" files.
     """
 
     def __init__(self):
@@ -66,19 +74,27 @@ class Backup:
 
     def _entries(self):
         """Return list of config files"""
+        logger.debug("Fetching list of config files")
         return [fn for fn in os.listdir(self._config_home) if fnmatch.fnmatch(fn, "minarca*.properties")]
 
     def __iter__(self):
         """
         Return an iterator on backup instances.
         """
+        logger.debug("Creating iterator on backup instances")
         filenames = sorted(self._entries())
-        return [BackupInstance(fn[7:-11]) for fn in filenames].__iter__()
+        return iter([BackupInstance(fn[7:-11]) for fn in filenames])
 
     def __len__(self):
+        logger.debug("Getting number of backup instances")
         return len(self._entries())
 
+    def __bool__(self):
+        # Required for assert
+        return True
+
     def __getitem__(self, key):
+        logger.debug(f"Accessing backup instance with key: {key}")
         assert isinstance(key, int) or isinstance(key, limit) or isinstance(key, str)
         if isinstance(key, int):
             # If key is an integer, this is the index value
@@ -90,6 +106,7 @@ class Backup:
             # If key is a string, this is the "num"
             instance = BackupInstance(key)
             if instance not in self:
+                logger.error(f"Instance not found for key: {key}")
                 raise InstanceNotFoundError(key)
             return instance
         # If key is a list, return list of corresponding instances.
@@ -99,16 +116,19 @@ class Backup:
             criterias = key.value.split(',')
             # TODO Add more matching criteria. e.g.: remoteurl
             instances = [instance for instance in self if str(instance.id) in criterias]
-            # Raise error is nothing matches our limit.
+            # Raise error if nothing matches our limit.
             if not instances:
+                logger.error(f"No instances match the criteria: {key.value}")
                 raise InstanceNotFoundError(key.value)
             return instances
 
     def __contains__(self, other):
+        logger.debug(f"Checking if backup contains instance: {other}")
         assert isinstance(other, BackupInstance)
         return ("minarca%s.properties" % other.id) in self._entries()
 
     def start_all(self, action='backup', force=False, patterns=None, limit=None):
+        logger.info(f"Starting all backups with action: {action}, force: {force}, patterns: {patterns}, limit: {limit}")
         assert action in ['backup', 'restore']
         # Fork process
         args = [get_minarca_exe(), action]
@@ -120,17 +140,19 @@ class Backup:
             assert action == 'restore'
             args += [p.pattern for p in patterns]
         child = detach_call(args)
-        logger.info('subprocess %s started' % child.pid)
+        logger.info('Subprocess %s started' % child.pid)
 
     def schedule_job(self, run_if_logged_out=None):
         """
         Used to schedule the job in operating system task scheduler. e.g.: crontab.
 
         On Windows, username and password are required if we want to run the task whenever the user is logged out.
-        `run_if_logged_out` should then containe a tuple with username and password.
+        `run_if_logged_out` should then contain a tuple with username and password.
         """
+        logger.info("Scheduling job in OS task scheduler")
         # Also schedule task in Operating system scheduler.
         if self.scheduler.exists():
+            logger.debug("Scheduler exists, replacing existing schedule")
             self.scheduler.delete()
         if IS_WINDOWS:
             self.scheduler.create(run_if_logged_out=run_if_logged_out)
@@ -139,8 +161,9 @@ class Backup:
 
     def is_configured(self):
         """
-        Return true if any of the backup instance is property configured.
+        Return true if any of the backup instances is properly configured.
         """
+        logger.debug("Checking if any backup instance is configured")
         return any(instance.settings.configured for instance in self)
 
     async def configure_local(self, path, repositoryname, force=False, instance=None):
@@ -152,19 +175,18 @@ class Backup:
 
         <mountpoint>/<path>/../.minarca-<localuuid>
         """
-        assert os.path.isdir(path), 'path must be a folder'
+        logger.info(f"Configuring local instance with path: {path}, repositoryname: {repositoryname}, force: {force}")
+        assert isinstance(path, (str, Path))
+        path = Path(path) if isinstance(path, str) else path
         # Validate the repository name
         _check_repositoryname(repositoryname)
 
         # Get detail information about the destination
         disk_info = get_location_info(path)
-        if disk_info is None:
-            # Only block device are support for the moment.
-            raise ValueError('not a block device')
 
         # Check if duplicate of current settings
-        uuid_fn = os.path.join(disk_info.mountpoint, disk_info.relpath, '..', '.minarca-id')
-        localuuid = file_read(uuid_fn)
+        uuid_fn = path.parent / '.minarca-id'
+        localuuid = await file_read_async(uuid_fn)
         if localuuid:
             others = [
                 other
@@ -175,43 +197,48 @@ class Backup:
                 and other.settings.repositoryname == repositoryname
             ]
             if others:
+                logger.error("Duplicate settings found")
                 raise DuplicateSettingsError(others[0])
 
         # Make sure the destination is an empty folder or an existing backup.
-        content = os.listdir(path)
+        content = list(path.iterdir())
         if content:
-            # Take into account Windows Drive letter
-            rdiff_backup_data = '?/rdiff-backup-data' if IS_WINDOWS else 'rdiff-backup-data'
-            existing_backup = glob.glob(rdiff_backup_data, root_dir=path, recursive=True)
+            if IS_WINDOWS:
+                # Take into account Windows Drive letter
+                existing_backup = all([[len(f.name) == 1 and (f / 'rdiff-backup-data').exists for f in path.iterdir()]])
+            else:
+                existing_backup = (path / 'rdiff-backup-data').exists()
             if not existing_backup:
+                logger.error(f"Destination not empty: {path}")
                 raise LocalDestinationNotEmptyError(path)
             elif not force:
-                reponame = os.path.basename(path)
+                reponame = path.name
+                logger.error(f"Repository name exists: {reponame}")
                 raise RepositoryNameExistsError(reponame)
 
         # Generate a diskuuid if missing
         if localuuid is None:
+            localuuid = str(uuid.uuid4())
             try:
                 # Create missing directory structure
-                os.makedirs(os.path.join(path, '..'), exist_ok=1)
+                uuid_fn.parent.mkdir(exist_ok=1)
                 # Create uuid file
-                with open(uuid_fn, 'w') as f:
-                    localuuid = str(uuid.uuid4())
-                    f.write(localuuid)
+                await file_write_async(uuid_fn, localuuid)
                 # Hide the file and make it readonly.
                 if IS_WINDOWS:
                     win32api.SetFileAttributes(
-                        uuid_fn, win32con.FILE_ATTRIBUTE_READONLY | win32con.FILE_ATTRIBUTE_HIDDEN
+                        str(uuid_fn), win32con.FILE_ATTRIBUTE_READONLY | win32con.FILE_ATTRIBUTE_HIDDEN
                     )
                 else:
                     os.chmod(uuid_fn, 0o444)
-            except OSError:
+            except OSError as e:
+                logger.error(f"Failed to initialize destination: {e}")
                 raise InitDestinationError()
 
         # Create or update instance
         instance = self._new_instance() if instance is None else instance
 
-        # Define default patterns if none are define.
+        # Define default patterns if none are defined.
         if len(list(instance.patterns.group_by_roots())) == 0:
             instance.patterns.extend(Patterns.defaults())
 
@@ -223,21 +250,24 @@ class Backup:
             t.repositoryname = repositoryname
             t.localuuid = localuuid
             t.localrelpath = disk_info.relpath
-            t.localcaption = disk_info.caption
-            t.localdevice = disk_info.device
             t.localmountpoint = disk_info.mountpoint
+            t.localcaption = disk_info.caption
             t.schedule = Settings.DAILY
             # Save configuration
             t.configured = True
 
+        logger.info(f"Local instance configured: {instance.id}")
         return instance
 
     async def configure_remote(self, remoteurl, username, password, repositoryname, force=False, instance=None):
         """
         Use to configure new or existing instance for remote backup
 
-        Set `force` to True to link event if the repository name already exists.
+        Set `force` to True to link even if the repository name already exists.
         """
+        logger.info(
+            f"Configuring remote instance with URL: {remoteurl}, username: {username}, repositoryname: {repositoryname}, force: {force}"
+        )
         # Validate the repository name
         _check_repositoryname(repositoryname)
 
@@ -247,7 +277,7 @@ class Backup:
             conn.auth = (username, password)
             current_user = await asyncio.get_running_loop().run_in_executor(None, conn.get_current_user_info)
 
-            # Check if the settings already exists.
+            # Check if the settings already exist.
             others = [
                 other
                 for other in self
@@ -257,6 +287,7 @@ class Backup:
                 and other.settings.username == username
             ]
             if others:
+                logger.error(f"Duplicate settings found for remoteurl: {remoteurl}")
                 raise DuplicateSettingsError(others[0])
 
             # Then check if the repo name already exists remotely.
@@ -266,6 +297,7 @@ class Backup:
                 if repositoryname == r.get('name') or r.get('name').startswith(repositoryname + '/')
             ]
             if not force and exists:
+                logger.error(f"Repository name exists remotely: {repositoryname}")
                 raise RepositoryNameExistsError(repositoryname)
 
             # Create or update instance
@@ -276,8 +308,7 @@ class Backup:
 
             # Store minarca identity
             minarca_info = await asyncio.get_running_loop().run_in_executor(None, conn.get_minarca_info)
-            with open(instance.known_hosts, 'w') as f:
-                f.write(minarca_info['identity'])
+            await file_write_async(instance.known_hosts, minarca_info['identity'])
 
             # Create default config
             instance.settings.username = username
@@ -289,7 +320,7 @@ class Backup:
             # Only test the connection
             await instance.test_connection()
 
-            # Define default patterns if none are define.
+            # Define default patterns if none are defined.
             if len(list(instance.patterns.group_by_roots())) == 0:
                 instance.patterns.extend(Patterns.defaults())
 
@@ -311,12 +342,16 @@ class Backup:
             # Save configuration
             instance.settings.configured = True
             instance.settings.save()
-        except ConnectionError:
-            # Raised with invalid url or port
+            logger.info(f"Remote instance configured: {instance.id}")
+        except ConnectionError as e:
+            logger.error(f"Connection error: {e}")
+            # Raised with invalid URL or port
             raise HttpConnectionError(remoteurl)
-        except (MissingSchema, InvalidSchema):
+        except (MissingSchema, InvalidSchema) as e:
+            logger.error(f"Invalid URL schema: {e}")
             raise HttpInvalidUrlError(remoteurl)
         except HTTPError as e:
+            logger.error(f"HTTP error: {e}")
             # Raise for invalid status code.
             if e.response.status_code in [401, 403]:
                 raise HttpAuthenticationError(e)
@@ -340,12 +375,14 @@ class Backup:
 
     async def awatch(self, poll_delay_ms=250):
         """
-        Return changes whenever the file get updated.
+        Return changes whenever the file gets updated.
         """
+        logger.debug(f"Starting async watch with poll delay: {poll_delay_ms} ms")
         prev_entries = self._entries()
         while True:
             await asyncio.sleep(poll_delay_ms / 1000)
             new_entries = self._entries()
             if prev_entries != new_entries:
+                logger.info("Configuration files changed")
                 yield "changed"
             prev_entries = new_entries

@@ -254,7 +254,6 @@ class Settings(KeyValueConfigFile):
             lambda x: os.environ.get('MINARCA_CHECK_LATEST_VERSION', str(x)).lower() in ['true', 'True', '1'],
             True,
         ),
-        ('localdevice', str, None),
         ('localmountpoint', str, None),
         ('localuuid', str, None),
         ('localrelpath', str, None),
@@ -325,9 +324,9 @@ class Patterns(AbstractConfigFile, MutableSequence):
         """
         data = []
         # Add user's documents
-        data.append(Pattern(True, os.path.join(get_home(), 'Documents'), _("User's Documents")))
+        data.append(Pattern(True, str(get_home() / 'Documents'), _("User's Documents")))
         # Add Minarca config
-        data.append(Pattern(True, os.path.join(get_config_home(), 'patterns*'), _("Minarca Config")))
+        data.append(Pattern(True, str(get_config_home() / 'patterns*'), _("Minarca Config")))
 
         if IS_WINDOWS:
             data.extend(
@@ -340,7 +339,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     Pattern(False, "C:/System Volume Information", _("System Volume Information")),
                     Pattern(False, "C:/Recovery/", _("System Recovery")),
                     Pattern(False, "C:/$Recycle.Bin/", _("Recycle bin")),
-                    Pattern(False, get_temp(), _("Temporary Folder")),
+                    Pattern(False, str(get_temp()), _("Temporary Folder")),
                     Pattern(False, "**/*.bak", _("AutoCAD backup files")),
                     Pattern(False, "**/~$*", _("Office temporary files")),
                     Pattern(False, "**/*.ost.tmp", _("Outlook IMAP temporary files")),

@@ -11,6 +11,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 from unittest.case import skipUnless
 
@@ -80,7 +81,7 @@ class TestCompat(unittest.IsolatedAsyncioTestCase):
 
 
 @skipUnless(IS_LINUX, 'Only for Unix')
-@mock.patch('minarca_client.core.compat.get_home', return_value='/home/username')
+@mock.patch('minarca_client.core.compat.get_home', return_value=Path('/home/username'))
 class TestCompatLinux(unittest.TestCase):
     def setUp(self):
         self.cwd = os.getcwd()
@@ -91,20 +92,20 @@ class TestCompatLinux(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_get_config_home(self, *unused):
-        self.assertEqual('/home/username/.config/minarca', compat.get_config_home(False))
+        self.assertEqual(Path('/home/username/.config/minarca'), compat.get_config_home(False))
 
     def test_get_data_home(self, *unused):
-        self.assertEqual('/home/username/.local/share/minarca', compat.get_data_home(False))
+        self.assertEqual(Path('/home/username/.local/share/minarca'), compat.get_data_home(False))
 
     def test_get_log_file(self, *unused):
-        self.assertEqual('/home/username/.local/share/minarca/minarca.log', compat.get_log_file(False))
+        self.assertEqual(Path('/home/username/.local/share/minarca/minarca.log'), compat.get_log_file(False))
 
     def test_get_ssh(self, *unused):
-        self.assertTrue(compat.get_ssh().endswith('ssh'))
+        self.assertEqual('ssh', compat.get_ssh().name)
 
 
 @skipUnless(IS_MAC, 'Only for MacOS')
-@mock.patch('minarca_client.core.compat.get_home', return_value='/Users/username')
+@mock.patch('minarca_client.core.compat.get_home', return_value=Path('/Users/username'))
 class TestCompatMacos(unittest.TestCase):
     def setUp(self):
         self.cwd = os.getcwd()
@@ -115,20 +116,20 @@ class TestCompatMacos(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_get_config_home(self, *unused):
-        self.assertEqual('/Users/username/Library/Preferences/Minarca', compat.get_config_home(False))
+        self.assertEqual(Path('/Users/username/Library/Preferences/Minarca'), compat.get_config_home(False))
 
     def test_get_data_home(self, *unused):
-        self.assertEqual('/Users/username/Library/Minarca', compat.get_data_home(False))
+        self.assertEqual(Path('/Users/username/Library/Minarca'), compat.get_data_home(False))
 
     def test_get_log_file(self, *unused):
-        self.assertEqual('/Users/username/Library/Logs/Minarca/minarca.log', compat.get_log_file(False))
+        self.assertEqual(Path('/Users/username/Library/Logs/Minarca/minarca.log'), compat.get_log_file(False))
 
     def test_get_ssh(self, *unused):
-        self.assertTrue(compat.get_ssh().endswith('ssh'))
+        self.assertTrue(str(compat.get_ssh()).endswith('ssh'))
 
 
 @skipUnless(IS_WINDOWS, 'Only for Windows')
-@mock.patch('minarca_client.core.compat.get_home', return_value='C:\\Users\\username')
+@mock.patch('minarca_client.core.compat.get_home', return_value=Path('C:\\Users\\username'))
 class TestCompatWindows(unittest.TestCase):
     def setUp(self):
         self.cwd = os.getcwd()
@@ -141,16 +142,16 @@ class TestCompatWindows(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_get_config_home(self, *unused):
-        self.assertEqual('C:\\Users\\username\\AppData\\Local\\minarca', compat.get_config_home(False))
+        self.assertEqual(Path('C:\\Users\\username\\AppData\\Local\\minarca'), compat.get_config_home(False))
 
     def test_get_data_home(self, *unused):
-        self.assertEqual('C:\\Users\\username\\AppData\\Local\\minarca', compat.get_data_home(False))
+        self.assertEqual(Path('C:\\Users\\username\\AppData\\Local\\minarca'), compat.get_data_home(False))
 
     def test_get_log_file(self, *unused):
-        self.assertEqual('C:\\Users\\username\\AppData\\Local\\minarca\\minarca.log', compat.get_log_file(False))
+        self.assertEqual(Path('C:\\Users\\username\\AppData\\Local\\minarca\\minarca.log'), compat.get_log_file(False))
 
     def test_get_ssh(self, *unused):
-        self.assertTrue(compat.get_ssh().endswith('ssh.exe'))
+        self.assertTrue(str(compat.get_ssh()).endswith('ssh.exe'))
 
 
 class TestScheduler(unittest.TestCase):

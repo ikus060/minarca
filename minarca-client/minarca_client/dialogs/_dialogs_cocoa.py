@@ -97,7 +97,7 @@ async def _open_panel(parent, title, filename, initial_directory=None, multiple_
         panel.setTitle_(title)
 
     if initial_directory:
-        url = NSURL.fileURLWithPath_(initial_directory)
+        url = NSURL.fileURLWithPath_(str(initial_directory))
         panel.setDirectoryURL_(url)
 
     if multiple_select:
