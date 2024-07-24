@@ -352,6 +352,11 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     Pattern(False, "**/*.pst.tmp", _("Outlook POP temporary files")),
                     Pattern(False, "**/.tmp.driveupload", _("Google Drive temporary upload files")),
                     Pattern(False, "**/.tmp.drivedownload", _("Google Drive temporary download files")),
+                    Pattern(
+                        False,
+                        "**/OneDrive*/.*[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]",
+                        _("OneDrive GUID File"),
+                    ),
                 ]
             )
         elif IS_MAC:
