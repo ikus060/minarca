@@ -13,7 +13,7 @@ from unittest import mock
 from unittest.case import skipUnless
 from unittest.mock import MagicMock
 
-from minarca_client.core import Backup, BackupInstance, limit
+from minarca_client.core import Backup, BackupInstance, InstanceId
 from minarca_client.core.compat import IS_WINDOWS
 
 
@@ -55,7 +55,7 @@ class TestBackup(unittest.TestCase):
         self.assertIsNotNone(BackupInstance('1'), self.backup[1])
         self.assertEqual([BackupInstance(''), BackupInstance('1')], list(self.backup))
 
-    def test_getitem_limit(self):
+    def test_getitem_instance(self):
         # Given a single minarca.properties
         with open(os.path.join(self.tmp.name, 'minarca.properties'), 'w') as f:
             f.write('')
@@ -64,13 +64,13 @@ class TestBackup(unittest.TestCase):
             f.write('')
         # With limit(None)
         # Then all instances are returned
-        self.assertEqual(2, len(self.backup[limit(None)]))
+        self.assertEqual(2, len(self.backup[InstanceId(None)]))
         # With limit(0)
         # Then first instance is returned
-        self.assertEqual([BackupInstance('')], self.backup[limit('')])
+        self.assertEqual([BackupInstance('')], self.backup[InstanceId('')])
         # With limit(1)
         # Then second instances is returned
-        self.assertEqual([BackupInstance('1')], self.backup[limit('1')])
+        self.assertEqual([BackupInstance('1')], self.backup[InstanceId('1')])
 
     @mock.patch('minarca_client.core.compat.get_minarca_exe', return_value='minarca.exe' if IS_WINDOWS else 'minarca')
     def test_schedule_job(self, *unused):

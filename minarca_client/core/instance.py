@@ -563,7 +563,7 @@ class BackupInstance:
         args = [get_minarca_exe(), 'backup']
         if force:
             args += ['--force']
-        args += ['--limit', str(self.id)]
+        args += ['--instance', str(self.id)]
         child = detach_call(args)
         logger.info('subprocess %s started' % child.pid)
 
@@ -577,7 +577,7 @@ class BackupInstance:
 
         args = [get_minarca_exe(), 'restore']
         args += ['--force']
-        args += ['--limit', str(self.id)]
+        args += ['--instance', str(self.id)]
         if restore_time:
             args += ['--restore-time', str(restore_time)]
         if destination:
