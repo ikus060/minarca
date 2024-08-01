@@ -33,7 +33,7 @@
             "module": "minarca_client.main",
             "args": [
                 "backup",
-                "--limit",
+                "--instance",
                 "2",
             ],
             "console": "integratedTerminal",

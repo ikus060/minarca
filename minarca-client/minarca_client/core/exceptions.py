@@ -66,9 +66,9 @@ class InstanceNotFoundError(BackupError):
     This exception is raised whenever a backup[foo] return nothing
     """
 
-    def __init__(self, limit):
-        self.limit = limit
-        self.message = _('No backup instances matches limit: %s') % limit
+    def __init__(self, instance_id):
+        self.instance_id = instance_id
+        self.message = _('No backup instances matches: %s') % instance_id
 
 
 class RepositoryNameExistsError(ConfigureBackupError):

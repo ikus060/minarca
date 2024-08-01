@@ -17,7 +17,7 @@ from unittest import mock
 from parameterized import parameterized
 
 from minarca_client import main
-from minarca_client.core import Backup, BackupInstance, limit
+from minarca_client.core import Backup, BackupInstance, InstanceId
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.core.exceptions import HttpAuthenticationError
@@ -40,32 +40,36 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._backup')
     def test_args_backup(self, mock_backup):
         main.main(['backup'])
-        mock_backup.assert_called_once_with(force=False, limit=limit(None))
+        mock_backup.assert_called_once_with(force=False, instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._backup')
     def test_args_backup_force(self, mock_backup):
         main.main(['backup', '--force'])
-        mock_backup.assert_called_once_with(force=True, limit=limit(None))
+        mock_backup.assert_called_once_with(force=True, instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_exclude(self, mock_pattern):
         main.main(['exclude', '*.bak'])
-        mock_pattern.assert_called_once_with(include=False, pattern=['*.bak'], limit=limit(None))
+        mock_pattern.assert_called_once_with(include=False, pattern=['*.bak'], instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_exclude_multiple(self, mock_pattern):
         main.main(['exclude', '*.bak', '$~*', '/proc'])
-        mock_pattern.assert_called_once_with(include=False, pattern=['*.bak', '$~*', '/proc'], limit=limit(None))
+        mock_pattern.assert_called_once_with(
+            include=False, pattern=['*.bak', '$~*', '/proc'], instance_id=InstanceId(None)
+        )
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_include(self, mock_pattern):
         main.main(['include', '*.bak'])
-        mock_pattern.assert_called_once_with(include=True, pattern=['*.bak'], limit=limit(None))
+        mock_pattern.assert_called_once_with(include=True, pattern=['*.bak'], instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_include_multiple(self, mock_pattern):
         main.main(['include', '*.bak', '$~*', '/proc'])
-        mock_pattern.assert_called_once_with(include=True, pattern=['*.bak', '$~*', '/proc'], limit=limit(None))
+        mock_pattern.assert_called_once_with(
+            include=True, pattern=['*.bak', '$~*', '/proc'], instance_id=InstanceId(None)
+        )
 
     @mock.patch('minarca_client.main._link')
     def test_args_link(self, mock_link):
@@ -158,7 +162,7 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._patterns')
     def test_args_patterns(self, mock_patterns):
         main.main(['patterns'])
-        mock_patterns.assert_called_once_with(limit=limit(None))
+        mock_patterns.assert_called_once_with(instance_id=InstanceId(None))
 
     @parameterized.expand(
         [
@@ -173,7 +177,7 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._pause')
     def test_args_pause(self, args, expected_call, mock_pause):
         main.main(['pause'] + args)
-        mock_pause.assert_called_once_with(**expected_call, limit=limit(value=None))
+        mock_pause.assert_called_once_with(**expected_call, instance_id=InstanceId(None))
 
     @parameterized.expand(
         [
@@ -198,42 +202,42 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._restore')
     def test_args_restore(self, args, expected_call, mock_restore):
         main.main(['restore'] + args)
-        mock_restore.assert_called_once_with(**expected_call, limit=limit(None))
+        mock_restore.assert_called_once_with(**expected_call, instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._stop')
     def test_args_stop(self, mock_stop):
         main.main(['stop'])
-        mock_stop.assert_called_once_with(force=False, limit=limit(None))
+        mock_stop.assert_called_once_with(force=False, instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._stop')
     def test_args_stop_force(self, mock_stop):
         main.main(['stop', '--force'])
-        mock_stop.assert_called_once_with(force=True, limit=limit(None))
+        mock_stop.assert_called_once_with(force=True, instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._schedule')
     def test_args_schedule(self, mock_schedule):
         main.main(['schedule'])
         if IS_WINDOWS:
             mock_schedule.assert_called_once_with(
-                schedule=Settings.DAILY, username=None, password=None, limit=limit(value=None)
+                schedule=Settings.DAILY, username=None, password=None, instance_id=InstanceId(None)
             )
         else:
-            mock_schedule.assert_called_once_with(schedule=Settings.DAILY, limit=limit(value=None))
+            mock_schedule.assert_called_once_with(schedule=Settings.DAILY, instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._status')
     def test_args_status(self, mock_status):
         main.main(['status'])
-        mock_status.assert_called_once_with(limit=limit(None))
+        mock_status.assert_called_once_with(instance_id=InstanceId(None))
 
     @mock.patch('minarca_client.main._forget')
     def test_args_forget(self, mock_forget):
         main.main(['forget'])
-        mock_forget.assert_called_once_with(limit=limit(None), force=False)
+        mock_forget.assert_called_once_with(instance_id=InstanceId(None), force=False)
 
     @mock.patch('minarca_client.main._forget')
     def test_args_unlink(self, mock_forget):
         main.main(['unlink'])
-        mock_forget.assert_called_once_with(limit=limit(None), force=False)
+        mock_forget.assert_called_once_with(instance_id=InstanceId(None), force=False)
 
     @mock.patch('minarca_client.main.Backup')
     def test_backup(self, mock_backup):
@@ -241,7 +245,7 @@ class TestMainParseArgs(unittest.TestCase):
         instance = mock.AsyncMock()
         mock_backup.return_value.__getitem__.return_value = [instance]
         # Calling backup with arguments.
-        _backup(force=False, limit=limit(None))
+        _backup(force=False, instance_id=InstanceId(None))
         # Then backup get triggered with force=false
         instance.backup.assert_called_once_with(force=False)
 
@@ -251,7 +255,7 @@ class TestMainParseArgs(unittest.TestCase):
         instance = mock.AsyncMock()
         mock_backup.return_value.__getitem__.return_value = [instance]
         # Calling backup with --force
-        _backup(force=True, limit=limit(None))
+        _backup(force=True, instance_id=InstanceId(None))
         # Then backup get triggered with force=false
         instance.backup.assert_called_once_with(force=True)
 
@@ -478,17 +482,17 @@ class TestMainParseArgs(unittest.TestCase):
         # Then backup instance get removed
         self.assertEqual(0, len(backup))
 
-    def test_invalid_limit(self):
+    def test_invalid_instance(self):
         # Given a backup instances
         instance = BackupInstance('')
         instance.settings.configured = True
         instance.settings.save()
         backup = Backup()
         self.assertEqual(1, len(backup))
-        # When trying to list status with invalid limit
+        # When trying to list status with invalid instance_id
         # Then application raise an exception.
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
             with self.assertRaises(SystemExit) as cm:
-                main.main(['status', '--limit', 'invalid'])
+                main.main(['status', '--instance', 'invalid'])
         self.assertEqual(cm.exception.code, 1)

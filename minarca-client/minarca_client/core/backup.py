@@ -52,7 +52,7 @@ _REPOSITORY_NAME_PATTERN = "^[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*$"
 
 logger = logging.getLogger(__name__)
 
-limit = namedtuple('limit', 'value')
+InstanceId = namedtuple('InstanceId', 'value')
 
 
 def _check_repositoryname(name):
@@ -95,7 +95,7 @@ class Backup:
 
     def __getitem__(self, key):
         logger.debug(f"Accessing backup instance with key: {key}")
-        assert isinstance(key, int) or isinstance(key, limit) or isinstance(key, str)
+        assert isinstance(key, int) or isinstance(key, InstanceId) or isinstance(key, str)
         if isinstance(key, int):
             # If key is an integer, this is the index value
             filenames = sorted(self._entries())
@@ -110,13 +110,13 @@ class Backup:
                 raise InstanceNotFoundError(key)
             return instance
         # If key is a list, return list of corresponding instances.
-        if isinstance(key, limit):
+        if isinstance(key, InstanceId):
             if key.value is None:
                 return list(self)
             criterias = key.value.split(',')
             # TODO Add more matching criteria. e.g.: remoteurl
             instances = [instance for instance in self if str(instance.id) in criterias]
-            # Raise error if nothing matches our limit.
+            # Raise error if nothing matches our instance_id.
             if not instances:
                 logger.error(f"No instances match the criteria: {key.value}")
                 raise InstanceNotFoundError(key.value)
@@ -127,15 +127,17 @@ class Backup:
         assert isinstance(other, BackupInstance)
         return ("minarca%s.properties" % other.id) in self._entries()
 
-    def start_all(self, action='backup', force=False, patterns=None, limit=None):
-        logger.info(f"Starting all backups with action: {action}, force: {force}, patterns: {patterns}, limit: {limit}")
+    def start_all(self, action='backup', force=False, patterns=None, instance_id=None):
+        logger.info(
+            f"Starting all backups with action: {action}, force: {force}, patterns: {patterns}, instance_id: {instance_id}"
+        )
         assert action in ['backup', 'restore']
         # Fork process
         args = [get_minarca_exe(), action]
         if force:
             args += ['--force']
-        if limit:
-            args += ['--limit', str(limit)]
+        if instance_id:
+            args += ['--instance', str(instance_id)]
         if patterns:
             assert action == 'restore'
             args += [p.pattern for p in patterns]
