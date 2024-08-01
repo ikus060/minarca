@@ -283,7 +283,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
                         continue
                     # Silently ignore invalid patterns
                     if line[0] not in ['+', '-']:
-                        pass
+                        continue
                     include = line[0] == '+'
                     try:
                         data.append(Pattern(include, line[1:], comment))
