@@ -85,6 +85,19 @@ class PatternsTest(unittest.TestCase):
         self.assertEqual(Pattern(include=True, pattern='�ric_file.txt', comment='comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', 'Ignore Backup file'), patterns[1])
 
+    def test_load_with_invalid_line(self):
+        # Given a file with invalid line
+        with open('patterns', 'w', encoding='latin1') as f:
+            f.write("# comments\n")
+            f.write("+/this-is-a-set\n")
+            f.write("invalid-line\n")
+            f.write("-*.bak\n")
+        # When reading the pattern file
+        patterns = Patterns('patterns')
+        # Then we have 2 patterns sorted
+        self.assertEqual(Pattern(include=True, pattern='/this-is-a-set', comment='comments'), patterns[0])
+        self.assertEqual(Pattern(False, '*.bak', comment=None), patterns[1])
+
     def test_save(self):
         with open('patterns', 'w') as f:
             f.write("")
