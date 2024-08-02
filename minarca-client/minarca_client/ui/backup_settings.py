@@ -400,7 +400,7 @@ class BackupSettings(MDBoxLayout):
                 ),
             )
         except Exception as e:
-            logger.exception('problem occured while saving backup settings.')
+            logger.exception('problem occured while saving backup settings')
             await warning_dialog(
                 parent=self,
                 title=_('Cannot save settings'),

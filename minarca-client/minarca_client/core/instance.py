@@ -58,7 +58,7 @@ def _sh_quote(args):
     """
     value = ''
     for a in args:
-        a = str()
+        a = str(a)
         if value:
             value += " "
         if " " in a or "*" in a or "?" in a:
@@ -159,7 +159,7 @@ def safe_keepawake():
         set_keepawake(keep_screen_awake=False)
     except ImportError:
         # When not supported, an import error is raised
-        logger.info("keep awake not supported on this system")
+        logger.warning("keep awake not supported on this system")
     except Exception:
         logger.warning("failed to set keep awake", exc_info=1)
     yield
@@ -193,7 +193,7 @@ class UpdateNotification:
             # clear previous notification (if any).
             notification_id = status.lastnotificationid
             if notification_id:
-                logger.debug("clear previous notification %s", notification_id)
+                logger.debug(f"{self.instance.id}: clear previous notification %s", notification_id)
                 try:
                     clear_notification(notification_id)
                 except Exception:
@@ -204,7 +204,7 @@ class UpdateNotification:
             if self.is_notification_time():
                 # show notification if inactivity period is reached.
                 previous_id = status.lastnotificationid
-                logger.info("create or replace notification: %s", previous_id)
+                logger.debug(f"{self.instance.id}: create or replace notification: %s", previous_id)
                 maxage = settings.maxage
                 try:
                     notification_id = send_notification(
@@ -218,7 +218,7 @@ class UpdateNotification:
                     status.lastnotificationid = notification_id
                     status.lastnotificationdate = Datetime()
                 except Exception:
-                    logger.warning("problem while sending new notification", exc_info=1)
+                    logger.warning(f"{self.instance.id}: problem while sending new notification", exc_info=1)
         status.save()
 
     def is_notification_time(self):
@@ -245,9 +245,10 @@ class UpdateStatus:
     Update the status while the backup is running.
     """
 
-    def __init__(self, status, action='backup'):
+    def __init__(self, instance, action='backup'):
         assert action in ['backup', 'restore']
-        self.status = status
+        self.instance = instance
+        self.status = instance.status
         self.action = action
         self.running = False
 
@@ -268,7 +269,7 @@ class UpdateStatus:
     async def __aenter__(self):
         self.running = True
         # Start the process by writing a file time to the file
-        logger.info("%s START", self.action)
+        logger.info(f"{self.instance.log_id}: {self.action} START")
         self._write_status()
         self.task = asyncio.create_task(self._task())
 
@@ -276,14 +277,14 @@ class UpdateStatus:
         self.running = False
         await self.task
         if exc_type is None:
-            logger.info("%s SUCCESS", self.action)
+            logger.info(f"{self.instance.log_id}: {self.action} SUCCESS")
             with self.status as t:
                 t.lastresult = 'SUCCESS'
                 t.lastsuccess = Datetime()
                 t.lastdate = self.status.lastsuccess
                 t.details = ''
         else:
-            logger.error("%s FAILED", self.action)
+            logger.error(f"{self.instance.log_id}: {self.action} FAILED")
             with self.status as t:
                 t.lastresult = 'FAILURE'
                 t.lastdate = Datetime()
@@ -293,20 +294,21 @@ class UpdateStatus:
 class BackupInstance:
     def __init__(self, id):
         """
-        Create a new minarca backup backup.
+        Create a new minarca backup instance.
         """
         assert (isinstance(id, int) and id >= 0) or isinstance(id, str)
         self.id = id
-        # Get file location.
-        self.public_key_file = compat.get_config_home() / ("id_rsa%s.pub" % id)
-        self.private_key_file = compat.get_config_home() / ("id_rsa%s" % id)
-        self.known_hosts = compat.get_config_home() / ("known_hosts%s" % id)
-        self.config_file = compat.get_config_home() / ("minarca%s.properties" % id)
-        self.patterns_file = compat.get_config_home() / ("patterns%s" % id)
-        self.status_file = compat.get_data_home() / ('status%s.properties' % id)
-        self.backup_log_file = compat.get_data_home() / ('backup%s.log' % id)
-        self.restore_log_file = compat.get_data_home() / ('restore%s.log' % id)
-        # Create wrapper arround config files.
+        self.log_id = f'instance {self.id}' if str(self.id) else 'instance default'
+        # Get file locations.
+        self.public_key_file = compat.get_config_home() / f"id_rsa{id}.pub"
+        self.private_key_file = compat.get_config_home() / f"id_rsa{id}"
+        self.known_hosts = compat.get_config_home() / f"known_hosts{id}"
+        self.config_file = compat.get_config_home() / f"minarca{id}.properties"
+        self.patterns_file = compat.get_config_home() / f"patterns{id}"
+        self.status_file = compat.get_data_home() / f"status{id}.properties"
+        self.backup_log_file = compat.get_data_home() / f"backup{id}.log"
+        self.restore_log_file = compat.get_data_home() / f"restore{id}.log"
+        # Create wrapper around config files.
         self.patterns = Patterns(self.patterns_file)
         self.status = Status(self.status_file)
         self.settings = Settings(self.config_file)
@@ -314,8 +316,9 @@ class BackupInstance:
     async def backup(self, force=False):
         """
         Execute the rdiff-backup process.
-        Set `force` to True to run backup process event when it's not the time to run.
+        Set `force` to True to run backup process even when it's not the time to run.
         """
+        logger.debug(f"{self.log_id}: starting backup with force: {force}")
         # Check if it's time to run a backup
         if self.is_running():
             raise RunningError()
@@ -324,12 +327,12 @@ class BackupInstance:
 
         # Clear pause if backup started with force
         if self.settings.pause_until is not None:
+            logger.debug(f"{self.log_id}: clearing pause setting as backup started with force")
             self.settings.pause_until = None
 
-        # Start a thread to update backup status.
         with safe_keepawake():
             with UpdateNotification(instance=self):
-                async with UpdateStatus(status=self.status):
+                async with UpdateStatus(instance=self):
                     with open(self.backup_log_file, 'w', errors='replace', newline='') as log_file:
                         # Check patterns
                         patterns = self.patterns
@@ -363,58 +366,61 @@ class BackupInstance:
                                 args.append("--include" if p.include else "--exclude")
                                 args.append(p.pattern)
                             # Exclude everything else
-                            args.extend(["--exclude", "%s**" % drive])
+                            args.extend(["--exclude", f"{drive}**"])
                             # Call rdiff-backup
                             dest = self._backup_path(drive)
                             await self._rdiff_backup(*args, drive, dest, log_file=log_file)
                             # For local disk, make sure to "flush" disk cache
                             if self.is_local():
-                                logger.info("flush changes to disk")
+                                logger.debug(f"{self.log_id}: flushing changes to disk")
                                 flush(dest)
 
-                            # For local disk, we need to manage the retention period too.
+                            # # For local disk, we need to manage the retention period too.
                             if self.is_local() and self.settings.keepdays and self.settings.keepdays > 0:
                                 await self._rdiff_backup(
                                     '--force',
                                     'remove',
                                     'increments',
                                     '--older-than',
-                                    '%sD' % self.settings.keepdays,
+                                    f"{self.settings.keepdays}D",
                                     dest,
                                     log_file=log_file,
                                 )
+        logger.debug(f"{self.log_id}: backup process completed successfully")
 
     def get_repo_url(self, page="browse"):
         """
         Return a URL to browse data. Either https:// or file://
         """
+        logger.debug(f"{self.log_id}: generating repo URL for page: {page}")
         if self.is_remote():
             assert page in ['browse', 'settings']
             if IS_WINDOWS:
                 # On Windows, we append a drive letter.
-                drive_letter, unused = next(self.patterns.group_by_roots(), (None, []))
+                drive_letter, _ = next(self.patterns.group_by_roots(), (None, []))
                 if not drive_letter:
                     return self.settings.remoteurl
-                repo = self.settings.repositoryname + '/' + drive_letter[0]
+                repo = f"{self.settings.repositoryname}/{drive_letter[0]}"
             else:
                 repo = self.settings.repositoryname
-            return "%s/%s/%s/%s" % (self.settings.remoteurl, page, self.settings.username, repo)
+            return f"{self.settings.remoteurl}/{page}/{self.settings.username}/{repo}"
         else:
             assert page in ['browse']
-            return "file://%s" % self._backup_path(None)
+            return f"file://{self._backup_path(None)}"
 
     def get_help_url(self):
         """
         Return a URL to help.
         """
         if self.settings.remoteurl:
-            return "%s/help" % (self.settings.remoteurl,)
+            return f"{self.settings.remoteurl}/help"
 
     def is_backup_time(self):
         """
         Check if it's time to backup.
         """
         # Check if paused.
+        logger.debug(f"{self.log_id}: checking if it's backup time")
         pause_until = self.settings.pause_until
         if pause_until and Datetime() < pause_until:
             return False
@@ -431,7 +437,6 @@ class BackupInstance:
         """
         Return true if a backup is running.
         """
-        # Check status for running backup.
         return self.status.current_status == 'RUNNING'
 
     def is_local(self):
@@ -442,7 +447,7 @@ class BackupInstance:
 
     def pause(self, delay):
         """
-        Used to prevent execution of backup for a given periode of time in hours.
+        Used to prevent execution of backup for a given period of time in hours.
         """
         assert isinstance(delay, int)
         # Store absolute time for calculation.
@@ -451,38 +456,33 @@ class BackupInstance:
         else:
             self.settings.pause_until = None
         self.settings.save()
+        logger.debug(f"{self.log_id}: backup paused for {delay} hours")
 
     async def _push_identity(self, conn, name):
-        # Check if ssh keys exists, if not generate new keys.
         if not self.public_key_file.exists() and not self.private_key_file.exists():
-            logger.info(_('generating identity'))
+            logger.debug(f"{self.log_id}: generating new SSH identity")
             ssh_keygen(self.public_key_file, self.private_key_file)
 
-        # Push SSH Keys to Minarca server
         try:
             with open(self.public_key_file) as f:
-                logger.info(_('exchanging identity with minarca server'))
+                logger.debug(f"{self.log_id}: exchanging SSH identity with server")
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
         except Exception:
-            # Probably a duplicate SSH Key, let generate new identity
-            logger.info(_('generating new identity'))
+            logger.debug(f"{self.log_id}: generating new SSH identity after failure")
             ssh_keygen(self.public_key_file, self.private_key_file)
-            # Publish new identify
             with open(self.public_key_file) as f:
-                logger.info(_('exchanging new identity with minarca server'))
+                logger.debug(f"{self.log_id}: exchanging new SSH identity with server")
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
 
     async def _rdiff_backup(self, *extra_args, log_file=None):
         """
-        Make a call to rdiff-backup executable
+        Make a call to rdiff-backup executable.
         """
-        # base command line
         args = ["rdiff-backup", "-v", "5"]
         args.extend(extra_args)
 
-        # Execute the command line.
         capture = CaptureException()
-        logger.info(_('executing command: %s') % _sh_quote(args))
+        logger.debug(f"{self.log_id}: executing command: {_sh_quote(args)}")
         try:
             process = await asyncio.create_subprocess_exec(
                 get_minarca_exe(),
@@ -508,7 +508,6 @@ class BackupInstance:
         except Exception as e:
             if capture.exception:
                 raise capture.exception
-            logger.info('process terminated with an exception', exc_info=1)
             raise RdiffBackupException(str(e))
         else:
             if capture.exception:
@@ -518,16 +517,15 @@ class BackupInstance:
 
     async def restore(self, restore_time=None, paths=[], destination=None):
         """
-        Used to run a complete restore of data backup for the given date or latest date is not defined.
+        Used to run a complete restore of data backup for the given date or latest date if not defined.
         """
         assert restore_time is None or isinstance(restore_time, str)
         assert isinstance(paths, list) and all(isinstance(p, (str, Path)) for p in paths)
         assert destination is None or isinstance(destination, (str, Path))
         if self.is_running():
             raise RunningError()
-        status = Status(self.status_file)
         with safe_keepawake():
-            async with UpdateStatus(status=status, action='restore'):
+            async with UpdateStatus(instance=self, action='restore'):
                 with open(self.restore_log_file, 'w', errors='replace', newline='') as log_file:
                     # Loop on each pattern to be restored and execute rdiff-backup.
                     for path in paths:
@@ -565,7 +563,7 @@ class BackupInstance:
             args += ['--force']
         args += ['--instance', str(self.id)]
         child = detach_call(args)
-        logger.info('subprocess %s started' % child.pid)
+        logger.debug(f"{self.log_id}: subprocess {child.pid} started for backup: {_sh_quote(args)}")
 
     def start_restore(self, restore_time=None, paths=[], destination=None):
         assert restore_time is None or isinstance(restore_time, int)
@@ -584,7 +582,7 @@ class BackupInstance:
             args += ['--destination', str(destination)]
         args += paths
         child = detach_call(args)
-        logger.info('subprocess %s started' % child.pid)
+        logger.debug(f"{self.log_id}: subprocess {child.pid} started for restore: {args}")
 
     def stop(self):
         """
@@ -593,13 +591,16 @@ class BackupInstance:
         # Check status for running backup.
         if not self.is_running():
             raise NotRunningError()
-        # Get pid and checkif process is running.
+
+        # Get pid and check if process is running.
         pid = self.status.pid
+        logger.debug(f"{self.log_id}: stopping backup process with PID: {pid}")
         p = psutil.Process(pid)
         if not p.is_running():
             raise NotRunningError()
+
         # Send appropriate signal
-        logger.info('terminating process %s' % pid)
+        logger.debug(f"{self.log_id}: terminating process {pid}")
         try:
             # To terminate the backup, the best is to kill the SSH connection.
             for child in p.children(recursive=True):
@@ -607,14 +608,16 @@ class BackupInstance:
                     child.terminate()
             p.terminate()
         except SystemError:
-            logger.warning('error trying to stop minarca', exc_info=1)
-        # Wait until process get killed
+            logger.error(f"{self.log_id}: error trying to stop process", exc_info=True)
+
+        # Wait until process gets killed
         count = 1
         while p.is_running() and count < 10:
             time.sleep(0.1)
             count += 1
+
         # Replace status by INTERRUPT
-        logger.info('process interrupted successfully')
+        logger.debug(f"{self.log_id}: process interrupted successfully")
         with self.status as t:
             t.lastresult = 'INTERRUPT'
             t.lastdate = Datetime()
@@ -624,10 +627,10 @@ class BackupInstance:
         """
         Check connectivity to the remote server or local disk using rdiff-backup.
         """
-
+        logger.debug(f"{self.log_id}: testing connection")
         if self.is_remote():
             # Since v2.2.x, we need to pass an existing repository for test.
-            # Otherwise the test fail if the folder doesn't exists on the remote server.
+            # Otherwise the test fail if the folder doesn't exist on the remote server.
             args = []
             args.append("--remote-schema")
             args.append(self._remote_schema())
@@ -639,8 +642,9 @@ class BackupInstance:
 
     def forget(self):
         """
-        Disconnect this client from minarca server.
+        Disconnect this client from server.
         """
+        logger.debug(f"{self.log_id}: forgetting this instance from server")
         # Delete configuration file (support deleting readonly file).
         for fn in [
             self.public_key_file,
@@ -653,6 +657,7 @@ class BackupInstance:
             if fn.is_file():
                 fn.chmod(stat.S_IWUSR)
                 fn.unlink()
+                logger.debug(f"{self.log_id}: deleted file: {fn}")
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, BackupInstance) and self.id == other.id
@@ -662,65 +667,79 @@ class BackupInstance:
         Return the path defining the location of the backup. Either remote or local.
         """
         assert path is None or isinstance(path, str)
+        logger.debug(f"{self.log_id}: constructing backup path for {path}")
         if path is not None and IS_WINDOWS:
             path = f"/{path[0]}/{path[3:]}"
         if self.is_remote():
             remote_host, unused, unused = self.settings.remotehost.partition(":")
             repositoryname = self.settings.repositoryname
             if path is not None:
-                return f"minarca@{remote_host}::{repositoryname}{path}"
-            return f"minarca@{remote_host}::."
+                backup_path = f"minarca@{remote_host}::{repositoryname}{path}"
+                logger.debug(f"{self.log_id}: remote backup path: {backup_path}")
+                return backup_path
+            backup_path = f"minarca@{remote_host}::."
+            logger.debug(f"{self.log_id}: remote backup path: {backup_path}")
+            return backup_path
         elif self.is_local():
             # For local destination, we need to lookup the external drive
             disk = self.find_local_destination()
             if path is not None:
-                return disk / path.lstrip('/').lstrip('\\')
+                backup_path = disk / path.lstrip('/').lstrip('\\')
+                logger.debug(f"{self.log_id}: local backup path: {backup_path}")
+                return backup_path
+            logger.debug(f"{self.log_id}: local backup path: {disk}")
             return disk
-        else:
-            raise NotConfiguredError()
+        raise NotConfiguredError()
 
     def find_local_destination(self):
         """
         For local backup, we need to search for our destination since it might change from time to time.
         """
         assert self.settings.localrelpath and self.settings.localuuid, 'only supported for local backup'
+        logger.debug(f"{self.log_id}: finding local destination")
+
         # Let start by searching our previous location (if any)
         if self.settings.localmountpoint:
             uuid_fn = Path(self.settings.localmountpoint) / self.settings.localrelpath / '..' / '.minarca-id'
             if file_read(uuid_fn) == self.settings.localuuid:
-                return Path(self.settings.localmountpoint) / self.settings.localrelpath
+                destination = Path(self.settings.localmountpoint) / self.settings.localrelpath
+                logger.debug(f"{self.log_id}: found local destination: {destination}")
+                return destination
 
-        # Otherwise look on all disk and search our UUID.
+        # Otherwise look on all disks and search our UUID.
         for disk in list_disks():
             uuid_fn = disk / self.settings.localrelpath / '..' / '.minarca-id'
             if file_read(uuid_fn) == self.settings.localuuid:
-                return Path(disk) / self.settings.localrelpath
+                destination = Path(disk) / self.settings.localrelpath
+                logger.debug(f"{self.log_id}: found local destination: {destination}")
+                return destination
 
         raise LocalDestinationNotFound()
 
     def _remote_schema(self):
         """
-        Return the remote schema to be pass to rdiff-backup command line argument
+        Return the remote schema to be passed to rdiff-backup command line argument.
         """
         if not self.settings.remotehost:
             raise NotConfiguredError()
-        unused, unused, remote_port = self.settings.remotehost.partition(":")
 
+        unused, unused, remote_port = self.settings.remotehost.partition(":")
         remote_schema = _escape_path(compat.get_ssh())
         remote_schema += " -oBatchMode=yes -oPreferredAuthentications=publickey"
         if os.environ.get("MINARCA_ACCEPT_HOST_KEY", False) in ["true", "1", "True"]:
             remote_schema += " -oStrictHostKeyChecking=no"
         if remote_port:
             remote_schema += " -p %s" % remote_port
-        # SSH options need extract escaping
+        # SSH options need extra escaping
         remote_schema += " -oUserKnownHostsFile=%s" % _escape_path(self.known_hosts).replace(" ", "\\ ")
         remote_schema += " -oIdentitiesOnly=yes"
-        # Identity file must be escape if it contains spaces
+        # Identity file must be escaped if it contains spaces
         remote_schema += " -i %s" % _escape_path(self.private_key_file)
-        # Litera "%s" will get replace by rdiff-backup
+        # Literal "%s" will get replaced by rdiff-backup
         remote_schema += " %s"
         # Add user agent as command line
         remote_schema += " '%s'" % compat.get_user_agent()
+        logger.debug(f"{self.log_id}: remote schema: {remote_schema}")
         return remote_schema
 
     async def verify(self):
@@ -728,8 +747,10 @@ class BackupInstance:
         if self.is_remote():
             args.append("--remote-schema")
             args.append(self._remote_schema())
+
         args.append("verify")
         args.append(self._backup_path(None))
+        logger.debug(f"{self.log_id}: verify instance with : {args}")
         await self._rdiff_backup(*args)
 
     @handle_http_errors
@@ -737,19 +758,23 @@ class BackupInstance:
         """
         Get disk usage for remote or local backup.
         """
+        logger.debug(f"{self.log_id}: getting disk usage")
         if self.is_remote():
             # Get quota from server - on authentication failure it's
             # most likely an older minarca server not supporting minarcaid.
             conn = self._remote_conn()
             current_user = await asyncio.get_running_loop().run_in_executor(None, conn.get_current_user_info)
             if 'disk_usage' in current_user and 'disk_quota' in current_user:
-                return (current_user['disk_usage'], current_user['disk_quota'])
-
+                disk_usage = (current_user['disk_usage'], current_user['disk_quota'])
+                logger.debug(f"{self.log_id}: remote disk usage: {disk_usage}")
+                return disk_usage
         elif self.is_local():
             # Get disk usage.
             disk = self.find_local_destination()
             detail = get_location_info(disk)
-            return (detail.used, detail.size)
+            disk_usage = (detail.used, detail.size)
+            logger.debug(f"{self.log_id}: local disk usage: {disk_usage}")
+            return disk_usage
 
     def _remote_conn(self):
         """
@@ -770,6 +795,7 @@ class BackupInstance:
         """
         assert self.is_remote(), 'only possible to push settings for remote instances'
         assert isinstance(timeout, int), 'expect a timeout as seconds'
+        logger.debug(f"{self.log_id}: saving remote settings with wait={wait} and timeout={timeout}")
         conn = self._remote_conn()
         # Wait for repositories to be created
         repo_name = self.settings.repositoryname
@@ -801,12 +827,14 @@ class BackupInstance:
                     ignore_weekday=self.settings.ignore_weekday,
                 ),
             )
+            logger.debug(f"{self.log_id}: updated remote repository settings for: {repo_name}")
 
     @handle_http_errors
     async def load_remote_settings(self):
         """
         Fetch current repository settings from remote server.
         """
+        logger.debug(f"{self.log_id}: loading remote settings")
         conn = self._remote_conn()
         # Get reference to remote repo
         repo_name = self.settings.repositoryname
@@ -830,6 +858,7 @@ class BackupInstance:
         # For interface consistency. We need to get the user's role from remote server.
         if self.is_remote() and 'role' in current_user:
             self.settings.remoterole = int(current_user['role'])
+        logger.debug(f"{self.log_id}: loaded remote settings: {self.settings}")
 
     async def list_increments(self):
         """
@@ -837,6 +866,7 @@ class BackupInstance:
         Raise an error if the disk or remote server is not reachable.
         Return dates
         """
+        logger.debug(f"{self.log_id}: listing increments")
         all_increments = []
         # On Windows operating system, the computer may have multiple Root
         # (C:\, D:\, etc). To support this scenario, we need to run
@@ -872,6 +902,7 @@ class BackupInstance:
                             if 'time' in inc
                         ]
                     )
+        logger.debug(f"{self.log_id}: found {len(all_increments)} increments")
         return all_increments
 
     async def list_files(self, increment_datetime):
@@ -881,6 +912,7 @@ class BackupInstance:
         Return files
         """
         assert increment_datetime and isinstance(increment_datetime, datetime.datetime)
+        logger.debug(f"{self.log_id}: listing files for increment date: {increment_datetime}")
         all_files = []
         # On Windows operating system, the computer may have multiple Root
         # (C:\, D:\, etc). To support this scenario, we need to run
@@ -916,5 +948,5 @@ class BackupInstance:
                     # Prefix with drive
                     path = os.path.join(drive, line)
                     all_files.append(path)
-
+        logger.debug(f"{self.log_id}: found {len(all_files)} files")
         return all_files

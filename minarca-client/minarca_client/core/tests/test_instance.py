@@ -39,6 +39,7 @@ from minarca_client.core.exceptions import (
     RepositoryNameExistsError,
     UnknownHostException,
 )
+from minarca_client.core.instance import _sh_quote
 from minarca_client.core.minarcaid import ssh_keygen
 from minarca_client.locale import gettext as _
 from minarca_client.tests.test import MATCH
@@ -1139,3 +1140,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.assertIsNotNone(self.instance.settings.pause_until)
         finally:
             shutil.rmtree(tempdir, onerror=remove_readonly)
+
+    def test_sh_quote(self):
+        self.assertEqual(_sh_quote(['a', 'b', 'c']), "a b c")
+        self.assertEqual(_sh_quote(['path with space', 'b', 'c']), '"path with space" b c')
