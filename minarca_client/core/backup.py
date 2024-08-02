@@ -8,6 +8,7 @@ Created on Oct. 13, 2023, 2021
 '''
 
 import asyncio
+import datetime
 import fnmatch
 import logging
 import os
@@ -27,7 +28,7 @@ from minarca_client.core.compat import (
     get_config_home,
     get_minarca_exe,
 )
-from minarca_client.core.config import Patterns, Settings
+from minarca_client.core.config import Datetime, Patterns, Settings
 from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
     DuplicateSettingsError,
@@ -255,6 +256,8 @@ class Backup:
             t.localmountpoint = disk_info.mountpoint
             t.localcaption = disk_info.caption
             t.schedule = Settings.DAILY
+            # Pause 1 hour to avoid getting started while configuring.
+            t.pause_until = Datetime() + datetime.timedelta(hours=1)
             # Save configuration
             t.configured = True
 
@@ -341,6 +344,8 @@ class Backup:
                 if 'role' in current_user:
                     instance.settings.remoterole = int(current_user['role'])
 
+            # Pause 1 hour to avoid getting started while configuring.
+            instance.settings.pause_until = Datetime() + datetime.timedelta(hours=1)
             # Save configuration
             instance.settings.configured = True
             instance.settings.save()
