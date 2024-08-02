@@ -1057,8 +1057,10 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             patterns.clear()
             patterns.append(Pattern(True, self.tmp.name, None))
             patterns.save()
+            # Then backup is created in pause mode.
+            self.assertIsNotNone(self.instance.settings.pause_until)
             # when running backup
-            await self.instance.backup()
+            await self.instance.backup(force=True)
             # then a backup get created
             if IS_WINDOWS:
                 drive = os.path.splitdrive(tempdir)[0][0]
@@ -1080,7 +1082,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             patterns.append(Pattern(True, self.tmp.name, None))
             patterns.save()
             # when running backup
-            await self.instance.backup()
+            await self.instance.backup(force=True)
             # then rdiff-backup is called twice.
             self.assertEqual(2, mock_popen.call_count)
             # then last call should remove increments
@@ -1110,7 +1112,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.instance.patterns.clear()
             self.instance.patterns.append(Pattern(True, self.tmp.name, None))
             self.instance.patterns.save()
-            await self.instance.backup()
+            await self.instance.backup(force=True)
             self.instance.forget()
 
             # When trying to configure a local backup at the same destination
@@ -1128,10 +1130,12 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.instance.patterns.clear()
             self.instance.patterns.append(Pattern(True, self.tmp.name, None))
             self.instance.patterns.save()
-            await self.instance.backup()
+            await self.instance.backup(force=True)
             self.instance.forget()
             # When trying to configure a local backup at the same destination with Force mode
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo', force=True)
             # Then the backup get configured.
+            # Then backup is paused
+            self.assertIsNotNone(self.instance.settings.pause_until)
         finally:
             shutil.rmtree(tempdir, onerror=remove_readonly)
