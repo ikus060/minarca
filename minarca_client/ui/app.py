@@ -101,7 +101,7 @@ class MinarcaApp(MDApp, ExceptionHandler):
 
     def handle_exception(self, exception):
         # Handle the exception globally
-        logger.exception('An error occurred')
+        logger.exception('an error occurred')
         # FIXME Optionally, you can display an error message to the user
         # I'm not sure this is working.
         return ExceptionManager.RAISE

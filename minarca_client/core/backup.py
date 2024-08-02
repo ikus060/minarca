@@ -75,19 +75,19 @@ class Backup:
 
     def _entries(self):
         """Return list of config files"""
-        logger.debug("Fetching list of config files")
+        logger.debug("fetching list of config files")
         return [fn for fn in os.listdir(self._config_home) if fnmatch.fnmatch(fn, "minarca*.properties")]
 
     def __iter__(self):
         """
         Return an iterator on backup instances.
         """
-        logger.debug("Creating iterator on backup instances")
+        logger.debug("creating iterator on backup instances")
         filenames = sorted(self._entries())
         return iter([BackupInstance(fn[7:-11]) for fn in filenames])
 
     def __len__(self):
-        logger.debug("Getting number of backup instances")
+        logger.debug("getting number of backup instances")
         return len(self._entries())
 
     def __bool__(self):
@@ -95,7 +95,7 @@ class Backup:
         return True
 
     def __getitem__(self, key):
-        logger.debug(f"Accessing backup instance with key: {key}")
+        logger.debug(f"accessing backup instance with key: {key}")
         assert isinstance(key, int) or isinstance(key, InstanceId) or isinstance(key, str)
         if isinstance(key, int):
             # If key is an integer, this is the index value
@@ -107,7 +107,6 @@ class Backup:
             # If key is a string, this is the "num"
             instance = BackupInstance(key)
             if instance not in self:
-                logger.error(f"Instance not found for key: {key}")
                 raise InstanceNotFoundError(key)
             return instance
         # If key is a list, return list of corresponding instances.
@@ -119,18 +118,17 @@ class Backup:
             instances = [instance for instance in self if str(instance.id) in criterias]
             # Raise error if nothing matches our instance_id.
             if not instances:
-                logger.error(f"No instances match the criteria: {key.value}")
                 raise InstanceNotFoundError(key.value)
             return instances
 
     def __contains__(self, other):
-        logger.debug(f"Checking if backup contains instance: {other}")
+        logger.debug(f"checking if backup contains instance: {other}")
         assert isinstance(other, BackupInstance)
         return ("minarca%s.properties" % other.id) in self._entries()
 
     def start_all(self, action='backup', force=False, patterns=None, instance_id=None):
-        logger.info(
-            f"Starting all backups with action: {action}, force: {force}, patterns: {patterns}, instance_id: {instance_id}"
+        logger.debug(
+            f"starting all backups with action: {action}, force: {force}, patterns: {patterns}, instance_id: {instance_id}"
         )
         assert action in ['backup', 'restore']
         # Fork process
@@ -143,7 +141,7 @@ class Backup:
             assert action == 'restore'
             args += [p.pattern for p in patterns]
         child = detach_call(args)
-        logger.info('Subprocess %s started' % child.pid)
+        logger.debug(f'subprocess {child.pid} started')
 
     def schedule_job(self, run_if_logged_out=None):
         """
@@ -152,10 +150,10 @@ class Backup:
         On Windows, username and password are required if we want to run the task whenever the user is logged out.
         `run_if_logged_out` should then contain a tuple with username and password.
         """
-        logger.info("Scheduling job in OS task scheduler")
+        logger.debug("scheduling job in OS task scheduler")
         # Also schedule task in Operating system scheduler.
         if self.scheduler.exists():
-            logger.debug("Scheduler exists, replacing existing schedule")
+            logger.debug("scheduler exists, replacing existing schedule")
             self.scheduler.delete()
         if IS_WINDOWS:
             self.scheduler.create(run_if_logged_out=run_if_logged_out)
@@ -166,7 +164,7 @@ class Backup:
         """
         Return true if any of the backup instances is properly configured.
         """
-        logger.debug("Checking if any backup instance is configured")
+        logger.debug("checking if any backup instance is configured")
         return any(instance.settings.configured for instance in self)
 
     async def configure_local(self, path, repositoryname, force=False, instance=None):
@@ -178,7 +176,7 @@ class Backup:
 
         <mountpoint>/<path>/../.minarca-<localuuid>
         """
-        logger.info(f"Configuring local instance with path: {path}, repositoryname: {repositoryname}, force: {force}")
+        logger.debug(f"configuring local instance with path: {path}, repositoryname: {repositoryname}, force: {force}")
         assert isinstance(path, (str, Path))
         path = Path(path) if isinstance(path, str) else path
         # Validate the repository name
@@ -200,7 +198,6 @@ class Backup:
                 and other.settings.repositoryname == repositoryname
             ]
             if others:
-                logger.error("Duplicate settings found")
                 raise DuplicateSettingsError(others[0])
 
         # Make sure the destination is an empty folder or an existing backup.
@@ -212,11 +209,9 @@ class Backup:
             else:
                 existing_backup = (path / 'rdiff-backup-data').exists()
             if not existing_backup:
-                logger.error(f"Destination not empty: {path}")
                 raise LocalDestinationNotEmptyError(path)
             elif not force:
                 reponame = path.name
-                logger.error(f"Repository name exists: {reponame}")
                 raise RepositoryNameExistsError(reponame)
 
         # Generate a diskuuid if missing
@@ -234,8 +229,7 @@ class Backup:
                     )
                 else:
                     os.chmod(uuid_fn, 0o444)
-            except OSError as e:
-                logger.error(f"Failed to initialize destination: {e}")
+            except OSError:
                 raise InitDestinationError()
 
         # Create or update instance
@@ -261,7 +255,7 @@ class Backup:
             # Save configuration
             t.configured = True
 
-        logger.info(f"Local instance configured: {instance.id}")
+        logger.debug(f"local instance configured: {instance.id}")
         return instance
 
     async def configure_remote(self, remoteurl, username, password, repositoryname, force=False, instance=None):
@@ -270,7 +264,7 @@ class Backup:
 
         Set `force` to True to link even if the repository name already exists.
         """
-        logger.info(
+        logger.debug(
             f"Configuring remote instance with URL: {remoteurl}, username: {username}, repositoryname: {repositoryname}, force: {force}"
         )
         # Validate the repository name
@@ -292,7 +286,6 @@ class Backup:
                 and other.settings.username == username
             ]
             if others:
-                logger.error(f"Duplicate settings found for remoteurl: {remoteurl}")
                 raise DuplicateSettingsError(others[0])
 
             # Then check if the repo name already exists remotely.
@@ -302,7 +295,6 @@ class Backup:
                 if repositoryname == r.get('name') or r.get('name').startswith(repositoryname + '/')
             ]
             if not force and exists:
-                logger.error(f"Repository name exists remotely: {repositoryname}")
                 raise RepositoryNameExistsError(repositoryname)
 
             # Create or update instance
@@ -349,16 +341,13 @@ class Backup:
             # Save configuration
             instance.settings.configured = True
             instance.settings.save()
-            logger.info(f"Remote instance configured: {instance.id}")
-        except ConnectionError as e:
-            logger.error(f"Connection error: {e}")
+            logger.debug(f"remote instance configured: {instance.id}")
+        except ConnectionError:
             # Raised with invalid URL or port
             raise HttpConnectionError(remoteurl)
-        except (MissingSchema, InvalidSchema) as e:
-            logger.error(f"Invalid URL schema: {e}")
+        except (MissingSchema, InvalidSchema):
             raise HttpInvalidUrlError(remoteurl)
         except HTTPError as e:
-            logger.error(f"HTTP error: {e}")
             # Raise for invalid status code.
             if e.response.status_code in [401, 403]:
                 raise HttpAuthenticationError(e)
@@ -384,12 +373,12 @@ class Backup:
         """
         Return changes whenever the file gets updated.
         """
-        logger.debug(f"Starting async watch with poll delay: {poll_delay_ms} ms")
+        logger.debug(f"starting async watch with poll delay: {poll_delay_ms} ms")
         prev_entries = self._entries()
         while True:
             await asyncio.sleep(poll_delay_ms / 1000)
             new_entries = self._entries()
             if prev_entries != new_entries:
-                logger.info("Configuration files changed")
+                logger.debug("backup instances updated")
                 yield "changed"
             prev_entries = new_entries

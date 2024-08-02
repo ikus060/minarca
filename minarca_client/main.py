@@ -7,7 +7,6 @@ import asyncio
 import getpass
 import logging
 import logging.handlers
-import os
 import signal
 import sys
 import traceback
@@ -288,7 +287,7 @@ def _restore(restore_time, force, paths, instance_id, destination):
         asyncio.run(instance.restore(restore_time=restore_time, paths=paths, destination=destination))
     except BackupError as e:
         # Print message to stdout and log file.
-        logging.info(str(e))
+        logging.error(str(e))
         sys.exit(_EXIT_RESTORE_FAIL)
     except Exception:
         logging.exception("unexpected error during restore")
@@ -306,7 +305,7 @@ def _stop(force, instance_id):
             sys.exit(_EXIT_NOT_RUNNING)
     except BackupError as e:
         # Print message to stdout and log file.
-        logging.info(str(e))
+        logging.error(str(e))
         sys.exit(_EXIT_BACKUP_FAIL)
     except Exception:
         logging.exception("unexpected error stoping backup")
@@ -684,10 +683,10 @@ def _parse_args(args):
 
 def _configure_logging(debug=False):
     """
-    Configure logging system. Make stdout quiet when running within a cron job.
+    Configure logging system.
     """
     root = logging.getLogger()
-    root.setLevel(logging.DEBUG if debug else logging.ERROR)
+    root.setLevel(logging.DEBUG)
     # Make requests more quiet
     logging.getLogger('requests').setLevel(logging.WARNING)
     # Avoid "Using selector: EpollSelector"
@@ -703,16 +702,20 @@ def _configure_logging(debug=False):
     default_file_handler.setLevel(logging.DEBUG)
     root.addHandler(default_file_handler)
 
-    # Configure stdout
-    # With non_interactive mode, only print error.
+    # Make stdout very-quiet when running as cron job (or any non-interactive stdout).
+    # Unless the --debug flag is used.
     try:
-        interactive = sys.stdout and os.isatty(sys.stdout.fileno())
+        interactive = sys.stdout and sys.stdout.isatty()
     except Exception:
         interactive = False
-    default_level = logging.INFO if interactive else logging.ERROR
+    console_level = logging.INFO
+    if not interactive:
+        console_level = logging.ERROR
+    if debug:
+        console_level = logging.DEBUG
     console = logging.StreamHandler(stream=sys.stdout)
     console.setFormatter(logging.Formatter("%(message)s"))
-    console.setLevel(logging.DEBUG if debug else default_level)
+    console.setLevel(console_level)
     root.addHandler(console)
 
 
