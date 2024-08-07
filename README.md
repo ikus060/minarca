@@ -123,11 +123,21 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Release
+## 6.0.0b5
 
 * Minarc Agent
-  * Show Toast Notification using PowerShell instead of WinRT python binding #250
-  * Support Network mountpoint as destination #234
+  * Show Toast Notification using PowerShell instead of WinRT python binding to reduce dependencies #250
+  * Support Network mountpoint as destination on Linux, Windows and MacOS #234
+  * Upgrade KivyMD
+  * Exclude OneDrive GUID file by default on Windows #251
+  * Update French translation
+  * Rename `--limit` to `--instance` for command line usage
+  * Improve parsing of patterns file with invalid lines
+  * Configure backup to avoid backup starting before configuration is complete
+  * Improve and adjust logging to help debug
+* Minarca Server
+  * Upgrade Rdiffweb to v2.9.3
+  * Define default encoding value for backward compatibility with older database
 
 ## 6.0.0b4
 
