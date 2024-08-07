@@ -4,6 +4,7 @@
 
 
 import asyncio
+import functools
 import getpass
 import logging
 import logging.handlers
@@ -19,6 +20,7 @@ from minarca_client import __version__
 from minarca_client.core import Backup, InstanceId
 from minarca_client.core.compat import IS_WINDOWS, RobustRotatingFileHandler, get_default_repositoryname, get_log_file
 from minarca_client.core.config import Pattern, Settings
+from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
     BackupError,
     InstanceNotFoundError,
@@ -82,7 +84,7 @@ def _backup(force, instance_id):
         logging.error(str(e))
         sys.exit(_EXIT_BACKUP_FAIL)
     except Exception:
-        logging.exception("unexpected error during backup")
+        logging.exception(_("unexpected error during backup"))
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
@@ -98,39 +100,74 @@ def _forget(instance_id, force=False):
             instance.forget()
 
 
-def _link(remoteurl=None, username=None, name=None, force=False, password=None):
+def _configure(remoteurl=None, username=None, name=None, force=False, password=None, localdest=None):
     """
-    Start the linking process in command line.
+    Start the configuration process in command line.
     """
     backup = Backup()
-    # Prompt remoteurl
-    remoteurl = remoteurl or input('remote url (e.g.: https://backup.examples.com): ') or _abort()
-    # Prompt username
-    username = username or input('username: ') or _abort()
-    # Prompt for password if missing.
-    password = password or getpass.getpass(_('password or access token: ')) or _abort()
-    # Use default repo if not provided
-    name = name or get_default_repositoryname()
+
+    # Prompt destination type
+    if remoteurl:
+        is_local = False
+    elif localdest:
+        is_local = True
+    else:
+        is_local = (
+            _prompt_yes_no(_('Do you want to backup to a local device (external disk or network share)? (Yes/No): '))
+            or _abort()
+        )
+
+    if is_local:
+        # Prompt destination
+        localdest = localdest or input(_('Enter the local destination path: ')) or _abort()
+        location = get_location_info(Path(localdest))
+
+        # Use default repo if not provided
+        name = name or get_default_repositoryname()
+
+        # Create the minarca structure if required
+        if location.is_mountpoint:
+            path = location.mountpoint / "minarca" / name
+            path.mkdir(parents=1, exist_ok=1)
+        else:
+            path = location.mountpoint / location.relpath
+        configure_func = functools.partial(
+            backup.configure_local,
+            path=path,
+            repositoryname=name,
+            force=force,
+        )
+    else:
+        # Prompt remoteurl
+        remoteurl = remoteurl or input(_('Remote url (e.g.: https://backup.examples.com): ')) or _abort()
+        # Prompt username
+        username = username or input(_('Username: ')) or _abort()
+        # Prompt for password if missing.
+        password = password or getpass.getpass(_('Password or access token: ')) or _abort()
+        # Use default repo if not provided
+        name = name or get_default_repositoryname()
+
+        configure_func = functools.partial(
+            backup.configure_remote,
+            remoteurl=remoteurl,
+            username=username,
+            password=password,
+            repositoryname=name,
+            force=force,
+        )
+
     # Start linking process.
     try:
         try:
-            asyncio.run(
-                backup.configure_remote(
-                    remoteurl=remoteurl, username=username, password=password, repositoryname=name, force=force
-                )
-            )
+            asyncio.run(configure_func())
             print(_('Linked successfully'))
         except RepositoryNameExistsError as e:
             print(e.message)
             if _prompt_yes_no(_('Do you want to replace the existing repository ? (Yes/No): ')):
-                asyncio.run(
-                    backup.configure_remote(
-                        remoteurl=remoteurl, username=username, password=password, repositoryname=name, force=True
-                    )
-                )
+                asyncio.run(configure_func(force=True))
                 print(_('Linked successfully'))
-                return
-            sys.exit(_EXIT_REPO_EXISTS)
+            else:
+                sys.exit(_EXIT_REPO_EXISTS)
     except BackupError as e:
         print(e.message)
         sys.exit(_EXIT_LINK_ERROR)
@@ -239,7 +276,7 @@ def _restore(restore_time, force, paths, instance_id, destination):
                     '%s - Local backup `%s` from `%s`'
                     % (instance.id, instance.settings.repositoryname, instance.settings.localcaption)
                 )
-        value = input('Enter backup instance id: ') or _abort()
+        value = input(_('Enter backup instance id: ')) or _abort()
         try:
             instance = backup[value]
         except InstanceNotFoundError:
@@ -506,18 +543,23 @@ def _parse_args(args):
     sub.set_defaults(func=_pattern)
     sub.set_defaults(include=True)
 
-    # Link
-    sub = subparsers.add_parser('link', help=_('link this minarca backup with a minarca server'))
-    sub.add_argument('-r', '--remoteurl', help=_("URL to the remote minarca server. e.g.: http://example.com:8080/"))
-    sub.add_argument('-u', '--username', help=_("user name to be used for authentication"))
+    # configure
+    sub = subparsers.add_parser(
+        'configure', aliases=['link'], help=_('configure this agent to backup to a new destination (remote or local)')
+    )
+    sub.add_argument('-r', '--remoteurl', help=_("URL to the remote server. e.g.: http://example.com:8080/"))
+    sub.add_argument('-u', '--username', help=_("username to be used for authentication with remote server"))
     sub.add_argument(
         '-p', '--password', help=_("password or access token to use for authentication. Will prompt if not provided")
     )
     sub.add_argument('-n', '--name', help=_("repository name to be used"))
     sub.add_argument(
-        '--force', action='store_true', help=_("link to remote server even if the repository name already exists")
+        '--force',
+        action='store_true',
+        help=_("replace existing repository on backup destination if it exists without confirmation"),
     )
-    sub.set_defaults(func=_link)
+    sub.add_argument('-d', '--localdest', help=_('path to local destination'))
+    sub.set_defaults(func=_configure)
 
     # patterns
     sub = subparsers.add_parser('patterns', help=_('list the includes / excludes patterns'))

@@ -12,6 +12,7 @@ import logging
 import os
 import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from parameterized import parameterized
@@ -71,13 +72,13 @@ class TestMainParseArgs(unittest.TestCase):
             include=True, pattern=['*.bak', '$~*', '/proc'], instance_id=InstanceId(None)
         )
 
-    @mock.patch('minarca_client.main._link')
-    def test_args_link(self, mock_link):
+    @mock.patch('minarca_client.main._configure')
+    def test_args_link(self, mock_configure):
         main.main(
             ['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar', '--name', 'repo']
         )
-        mock_link.assert_called_once_with(
-            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=False
+        mock_configure.assert_called_once_with(
+            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=False, localdest=None
         )
 
     @mock.patch('minarca_client.main.Backup')
@@ -102,7 +103,7 @@ class TestMainParseArgs(unittest.TestCase):
         mock_app.return_value.mainloop.assert_called_once()
 
     @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
-    def test_link(self, mock_backup):
+    def test_configure_remote(self, mock_backup):
         main.main(
             ['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar', '--name', 'repo']
         )
@@ -112,7 +113,7 @@ class TestMainParseArgs(unittest.TestCase):
 
     @mock.patch('getpass.getpass')
     @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
-    def test_link_prompt_password(self, mock_backup, mock_getpass):
+    def test_configure_remote_prompt_password(self, mock_backup, mock_getpass):
         mock_getpass.return_value = 'bar'
         main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
         mock_backup.return_value.configure_remote.assert_called_once_with(
@@ -121,10 +122,17 @@ class TestMainParseArgs(unittest.TestCase):
 
     @mock.patch('getpass.getpass')
     @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
-    def test_link_prompt_password_null(self, mock_backup, mock_getpass):
+    def test_configure_remote_prompt_password_null(self, mock_backup, mock_getpass):
         mock_getpass.return_value = ''
         with self.assertRaises(SystemExit):
             main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
+
+    @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
+    def test_configure_local(self, mock_backup):
+        main.main(['configure', '--localdest', self.tmp.name, '--name', 'repo'])
+        mock_backup.return_value.configure_local.assert_called_once_with(
+            path=Path(self.tmp.name), repositoryname='repo', force=False
+        )
 
     @mock.patch('getpass.getpass')
     @mock.patch('minarca_client.main.Backup')
@@ -139,8 +147,8 @@ class TestMainParseArgs(unittest.TestCase):
             main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
         self.assertEqual(_EXIT_LINK_ERROR, context.exception.code)
 
-    @mock.patch('minarca_client.main._link')
-    def test_args_link_force(self, mock_link):
+    @mock.patch('minarca_client.main._configure')
+    def test_args_link_force(self, mock_configure):
         main.main(
             [
                 'link',
@@ -155,8 +163,8 @@ class TestMainParseArgs(unittest.TestCase):
                 '--force',
             ]
         )
-        mock_link.assert_called_once_with(
-            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=True
+        mock_configure.assert_called_once_with(
+            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=True, localdest=None
         )
 
     @mock.patch('minarca_client.main._patterns')
