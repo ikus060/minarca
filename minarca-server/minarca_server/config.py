@@ -169,12 +169,13 @@ def get_parser():
     # Override a couple of arguments with Minarca.
     welcome_style = '''
         <style>
-          body { color: white; background-color: rgb(14,41,51); background-image: url(/static/bg.jpg); background-size: cover; }
+          :root { --btn-bg-color: rgb(182, 221, 226); --btn-fg-color: rgb(14,41,51); }
+          body { color: var(--white); background-color: rgb(14,41,51); background-image: url(/static/bg.jpg); background-size: cover; }
           .form-login { border: 2px solid #fff; padding: 25px; }
           h1 { text-transform: uppercase; font-weight: bold; }
           h2 { text-align: center; }
           a, a:hover, .btn-link { color: var(--btn-bg-color); }
-          .text-secondary { color: #fff!important; }
+          .text-secondary { color: var(--white)!important; }
         </style>
         '''
     parser.set_defaults(
@@ -185,7 +186,7 @@ def get_parser():
         header_name='Minarca',
         header_logo=pkg_resources.resource_filename(__name__, 'minarca_logo.png'),  # @UndefinedVariable
         logo=pkg_resources.resource_filename(__name__, 'logo.png'),  # @UndefinedVariable
-        link_color='009FB9',
+        link_color='1C4062',
         navbar_color='0E2933',
         btn_fg_color='FFFFFF',
         btn_bg_color='009FB9',
