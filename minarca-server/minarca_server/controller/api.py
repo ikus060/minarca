@@ -52,7 +52,7 @@ def minarca_auth(realm):
             cherrypy.log('Minarcaid auth fail: %s' % str(e), 'TOOLS.MINARCA_AUTH')
             # Respond with 401 status and a WWW-Authenticate header
             cherrypy.serving.response.headers['www-authenticate'] = 'Basic realm="%s"' % realm
-            raise cherrypy.HTTPError(401, 'You are not authorized to access that resource')
+            raise cherrypy.HTTPError(401, str(e))
 
     # Fallback to basic_auth
     basic_auth(realm, _checkpassword)
