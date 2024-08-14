@@ -75,19 +75,16 @@ class Backup:
 
     def _entries(self):
         """Return list of config files"""
-        logger.debug("fetching list of config files")
         return [fn for fn in os.listdir(self._config_home) if fnmatch.fnmatch(fn, "minarca*.properties")]
 
     def __iter__(self):
         """
         Return an iterator on backup instances.
         """
-        logger.debug("creating iterator on backup instances")
         filenames = sorted(self._entries())
         return iter([BackupInstance(fn[7:-11]) for fn in filenames])
 
     def __len__(self):
-        logger.debug("getting number of backup instances")
         return len(self._entries())
 
     def __bool__(self):
@@ -95,7 +92,6 @@ class Backup:
         return True
 
     def __getitem__(self, key):
-        logger.debug(f"accessing backup instance with key: {key}")
         assert isinstance(key, int) or isinstance(key, InstanceId) or isinstance(key, str)
         if isinstance(key, int):
             # If key is an integer, this is the index value
@@ -122,7 +118,6 @@ class Backup:
             return instances
 
     def __contains__(self, other):
-        logger.debug(f"checking if backup contains instance: {other}")
         assert isinstance(other, BackupInstance)
         return ("minarca%s.properties" % other.id) in self._entries()
 
