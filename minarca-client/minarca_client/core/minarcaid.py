@@ -112,11 +112,11 @@ def _verify_minarcaid_v1(value, public_key_callback):
     fingerprint, epoch, signature_base64 = parts[1:]
     signature_bytes = base64.b64decode(signature_base64)
     #
-    # Validate epoch
+    # Validate epoch +/- 5min
     #
     if not epoch.isdigit():
         raise ValueError('invalid epoch value for minarcaid version 1')
-    if abs(int(epoch) - int(time.time())) > 10:
+    if abs(int(epoch) - int(time.time())) > 300:
         raise ValueError('expired minarcaid')
     epoch_bytes = int(epoch).to_bytes(4, 'big')
     #

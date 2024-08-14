@@ -21,7 +21,7 @@ import minarca_server
 import minarca_server.tests
 from minarca_server.core.minarcaid import gen_minarcaid_v1
 
-private_key = """-----BEGIN RSA PRIVATE KEY-----
+private_key = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIEogIBAAKCAQEAtC7N4D1f7d+XVDgI+hSVz908CYQGo0DLMd4KD0aeBiBJjseh
 SrPiAsOvyqOXHir9yJkADz7JGBvo3Q9JxPr3ukQX0ZmNonwOUE9lmdsPt6/+Qk+l
 eenTwWz5N49Mi9ZdqHXRRi86pT+yrGMrrd9DHj/DyyotRvu9YY6R3jYUgw9cYSC8
@@ -104,7 +104,7 @@ class MinarcaApplicationTestMinarcaId(minarca_server.tests.AbstractMinarcaTest):
         user.add_authorizedkey(key=public_key, comment="test@mysshkey")
         user.commit()
         # Given an expired minarcaid
-        minarcaid = gen_minarcaid_v1(private_key, epoch=int(time.time()) - 11)
+        minarcaid = gen_minarcaid_v1(private_key, epoch=int(time.time()) - 305)
         # When querying current user API with minarcaid
         headers = [("Authorization", f"Minarcaid {minarcaid}")]
         self.getPage('/api/currentuser/', headers=headers)
@@ -112,7 +112,7 @@ class MinarcaApplicationTestMinarcaId(minarca_server.tests.AbstractMinarcaTest):
         self.assertStatus(401)
 
         # Given an epoch in future minarcaid
-        minarcaid = gen_minarcaid_v1(private_key, epoch=int(time.time()) + 60)
+        minarcaid = gen_minarcaid_v1(private_key, epoch=int(time.time()) + 305)
         # When querying current user API with minarcaid
         headers = [("Authorization", f"Minarcaid {minarcaid}")]
         self.getPage('/api/currentuser/', headers=headers)
