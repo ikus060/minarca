@@ -88,14 +88,17 @@ class SidePanel(MDBoxLayout):
     def on_create(self, *args, **kwargs):
         self._title = self.get_title()
 
+    def on_restore(self, *args, **kwargs):
+        self._title = self.get_title()
+
     def get_title(self):
         if self.is_remote:
             if self.create:
-                return _('Create a remote backup')
+                return _('Create an online backup')
             elif self.restore:
-                return _('Remote restore')
+                return _('Online restore')
             else:
-                return _('Remote backup')
+                return _('Online backup')
         else:
             if self.create:
                 return _('Create a local backup')

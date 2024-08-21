@@ -95,7 +95,7 @@ def _forget(instance_id, force=False):
     for instance in backup[instance_id]:
         title = instance.settings.repositoryname or _("No name")
         print('* %s' % title)
-    if force or _prompt_yes_no(_('Are you sure you want to forget the above backup settings ? (Yes/No): ')):
+    if force or _prompt_yes_no(_('Are you sure you want to forget the above backup settings? (Yes/No): ')):
         for instance in backup[instance_id]:
             instance.forget()
 
@@ -139,7 +139,7 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
         )
     else:
         # Prompt remoteurl
-        remoteurl = remoteurl or input(_('Remote url (e.g.: https://backup.examples.com): ')) or _abort()
+        remoteurl = remoteurl or input(_('Remote URL (e.g.: https://backup.examples.com): ')) or _abort()
         # Prompt username
         username = username or input(_('Username: ')) or _abort()
         # Prompt for password if missing.
@@ -163,7 +163,7 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
             print(_('Linked successfully'))
         except RepositoryNameExistsError as e:
             print(e.message)
-            if _prompt_yes_no(_('Do you want to replace the existing repository ? (Yes/No): ')):
+            if _prompt_yes_no(_('Do you want to replace the existing repository? (Yes/No): ')):
                 asyncio.run(configure_func(force=True))
                 print(_('Linked successfully'))
             else:
@@ -178,7 +178,7 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
     except OSError:
         print(
             _(
-                'A problem prevent the automatic scheduling of backup jobs. As a result, your backup tasks cannot be executed as planned.'
+                'A problem prevents the automatic scheduling of backup jobs. As a result, your backup tasks cannot be executed as planned.'
             )
         )
 
@@ -186,7 +186,7 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
 def _pattern(include, pattern, instance_id):
     backup = Backup()
     if not backup.is_configured():
-        print(_('To update include or exclude pattern, you must configure at least one backup instance.'))
+        print(_('To update include or exclude patterns, you must configure at least one backup instance.'))
         sys.exit(1)
     try:
         for instance in backup[instance_id]:
@@ -264,11 +264,11 @@ def _restore(restore_time, force, paths, instance_id, destination):
     # Prompt user to define the backup source.
     #
     if instance_id.value is None and len(backup) >= 2:
-        print(_('From which backup source do you want to restore data from ?'))
+        print(_('From which backup source do you want to restore data from?'))
         for instance in backup:
             if instance.is_remote():
                 print(
-                    '%s - Remote backup `%s` from `%s`'
+                    '%s - Online Backup `%s` from `%s`'
                     % (instance.id, instance.settings.repositoryname, instance.settings.remoteurl)
                 )
             elif instance.is_local():
@@ -276,15 +276,15 @@ def _restore(restore_time, force, paths, instance_id, destination):
                     '%s - Local backup `%s` from `%s`'
                     % (instance.id, instance.settings.repositoryname, instance.settings.localcaption)
                 )
-        value = input(_('Enter backup instance id: ')) or _abort()
+        value = input(_('Enter backup instance ID: ')) or _abort()
         try:
             instance = backup[value]
         except InstanceNotFoundError:
-            _abort(_('Invalid instance id: %s') % instance_id)
+            _abort(_('Invalid instance ID: %s') % instance_id)
     else:
         instances = backup[instance_id]
         if len(instances) == 0:
-            _abort(_("Your instance value doesn't matches any backup instances"))
+            _abort(_("Your instance value doesn't match any backup instances"))
         elif len(instances) >= 2:
             _abort(_("Your instance value matches too many backup instances"))
         instance = instances[0]
@@ -453,7 +453,7 @@ def _ui():
         dlg = error_dialog(
             parent=None,
             title=_('Minarca'),
-            message=_('Application fail to start'),
+            message=_('Application failed to start'),
             detail=_(
                 'If the problem persists, check the logs with your administrator or try reinstalling the application.'
             ),
@@ -476,7 +476,7 @@ def _verify(instance_id):
 def _parse_args(args):
     parser = ArgumentParser(
         description=_(
-            "Minarca manage your computer's backup by linking your computer with a centralized server and running backups on a given schedule."
+            "Minarca manages your computer's backup by linking your computer with a centralized server and running backups on a given schedule."
         ),
         add_help=True,
     )
@@ -518,7 +518,7 @@ def _parse_args(args):
     sub.set_defaults(func=_backup)
 
     # exclude
-    sub = subparsers.add_parser('exclude', help=_('exclude files to be backup'))
+    sub = subparsers.add_parser('exclude', help=_('exclude files from being backed up'))
     sub.add_argument(
         '--instance',
         dest='instance_id',
@@ -526,12 +526,12 @@ def _parse_args(args):
         default=InstanceId(None),
         type=InstanceId,
     )
-    sub.add_argument('pattern', nargs='+', help=_('file pattern to be exclude. may contains `*` or `?` wildcard'))
+    sub.add_argument('pattern', nargs='+', help=_('file pattern to be excluded. May contain `*` or `?` wildcard'))
     sub.set_defaults(func=_pattern)
     sub.set_defaults(include=False)
 
     # include
-    sub = subparsers.add_parser('include', help=_('include files to be backup'))
+    sub = subparsers.add_parser('include', help=_('include files to be backed up'))
     sub.add_argument(
         '--instance',
         dest='instance_id',
@@ -539,7 +539,7 @@ def _parse_args(args):
         default=InstanceId(None),
         type=InstanceId,
     )
-    sub.add_argument('pattern', nargs='+', help=_('file pattern to be exclude. may contains `*` or `?` wildcard'))
+    sub.add_argument('pattern', nargs='+', help=_('file pattern to be excluded. May contain `*` or `?` wildcard'))
     sub.set_defaults(func=_pattern)
     sub.set_defaults(include=True)
 
@@ -548,9 +548,11 @@ def _parse_args(args):
         'configure', aliases=['link'], help=_('configure this agent to backup to a new destination (remote or local)')
     )
     sub.add_argument('-r', '--remoteurl', help=_("URL to the remote server. e.g.: http://example.com:8080/"))
-    sub.add_argument('-u', '--username', help=_("username to be used for authentication with remote server"))
+    sub.add_argument('-u', '--username', help=_("username to be used for authentication with the remote server"))
     sub.add_argument(
-        '-p', '--password', help=_("password or access token to use for authentication. Will prompt if not provided")
+        '-p',
+        '--password',
+        help=_("password or access token to use for authentication. You will be prompted if not provided"),
     )
     sub.add_argument('-n', '--name', help=_("repository name to be used"))
     sub.add_argument(
@@ -562,7 +564,7 @@ def _parse_args(args):
     sub.set_defaults(func=_configure)
 
     # patterns
-    sub = subparsers.add_parser('patterns', help=_('list the includes / excludes patterns'))
+    sub = subparsers.add_parser('patterns', help=_('list the include/exclude patterns'))
     sub.add_argument(
         '--instance',
         dest='instance_id',
@@ -577,24 +579,26 @@ def _parse_args(args):
     sub.add_argument(
         '--instance',
         dest='instance_id',
-        help=_("Force usage of a given instance to be used for restore."),
+        help=_("Force the use of a given instance for restore."),
         default=InstanceId(None),
         type=InstanceId,
     )
     sub.add_argument(
         '--restore-time',
         help=_(
-            "Date time to be restored. Could be 'now' to retore the latest backup. Could be an epoch value like '1682367069'. Could be an ISO date format like '2023-02-24T04:11:09-04:00'. Could be an interval like '3D' for 3 days ago."
+            "Date and time to be restored. Could be 'now' to restore the latest backup. Could be an epoch value like '1682367069'. Could be an ISO date format like '2023-02-24T04:11:09-04:00'. Could be an interval like '3D' for 3 days ago."
         ),
     )
     sub.add_argument(
         '--destination',
-        help=_("Define alternate location where to restore file or folder instead of restoring them in place"),
+        help=_("Define an alternate location to restore files or folders instead of restoring them in place."),
     )
     sub.add_argument(
-        '--force', action='store_true', help=_("Force execution of restore operation without confirmation from user")
+        '--force',
+        action='store_true',
+        help=_("Force execution of restore operation without confirmation from the user."),
     )
-    sub.add_argument('paths', nargs='*', help=_('files and folders to be restore'))
+    sub.add_argument('paths', nargs='*', help=_('files and folders to be restored'))
     sub.set_defaults(func=_restore)
 
     # Stop
@@ -606,12 +610,12 @@ def _parse_args(args):
         default=InstanceId(None),
         type=InstanceId,
     )
-    sub.add_argument('--force', action='store_true', help=_("doesn't fail if the backup is not running"))
+    sub.add_argument('--force', action='store_true', help=_("doesn't fail if the backup is not running."))
     sub.set_defaults(func=_stop)
 
     # scheduler
     sub = subparsers.add_parser(
-        'schedule', help=_('create required schedule task in crontab or Windows Task Scheduler')
+        'schedule', help=_('create the required scheduled task in crontab or Windows Task Scheduler')
     )
     sub.add_argument(
         '--hourly',
@@ -642,12 +646,12 @@ def _parse_args(args):
         type=InstanceId,
     )
     if IS_WINDOWS:
-        sub.add_argument('-u', '--username', help=_("username required to run task when user is logged out"))
-        sub.add_argument('-p', '--password', help=_("password required to run task when user is logged out"))
+        sub.add_argument('-u', '--username', help=_("username required to run task when the user is logged out"))
+        sub.add_argument('-p', '--password', help=_("password required to run task when the user is logged out"))
     sub.set_defaults(func=_schedule, schedule=Settings.DAILY)
 
     # Status
-    sub = subparsers.add_parser('status', help=_('return the current minarca status'))
+    sub = subparsers.add_parser('status', help=_('return the current Minarca status'))
     sub.add_argument(
         '--instance',
         dest='instance_id',
@@ -658,7 +662,7 @@ def _parse_args(args):
     sub.set_defaults(func=_status)
 
     # forget
-    sub = subparsers.add_parser('forget', aliases=['unlink'], help=_('forget settings of backup'))
+    sub = subparsers.add_parser('forget', aliases=['unlink'], help=_('forget backup settings'))
     sub.add_argument(
         '--instance',
         dest='instance_id',
@@ -666,13 +670,15 @@ def _parse_args(args):
         default=InstanceId(None),
         type=InstanceId,
     )
-    sub.add_argument('--force', action='store_true', help=_("Force forget operation without confirmation from user"))
+    sub.add_argument(
+        '--force', action='store_true', help=_("Force forget operation without confirmation from the user.")
+    )
     sub.set_defaults(func=_forget)
 
     # pause
     sub = subparsers.add_parser(
         'pause',
-        help=_('temporarily delay the execution of the backup for the given amount of hours. Default 24 hours.'),
+        help=_('temporarily delay the execution of the backup for the given number of hours. Default is 24 hours.'),
     )
     sub.add_argument(
         '--instance',
@@ -777,7 +783,7 @@ def main(args=None):
     try:
         return args.func(**kwargs)
     except KeyboardInterrupt:
-        print(_('Process interrupt by user.'))
+        print(_('Process interrupted by user.'))
         sys.exit(_EXIT_INTERUPT)
 
 

@@ -96,7 +96,7 @@ Pre-requisite: You need to have a functional Mianrca Server deployed. You may us
 
 **From Command line:**
 
-    minarca link -r REMOTEURL -u USERNAME [-p PASSWORD] -n NAME
+    minarca configure -r REMOTEURL -u USERNAME [-p PASSWORD] -n NAME
 
 ## Troubleshooting
 

@@ -56,7 +56,7 @@ Builder.load_string(
     SidePanel:
         is_remote: False
         create: root.create
-        text: _("Select an location to be used for backing up your data.")
+        text: _("Select a location to be used for backing up your data.")
         step: 1
 
     MDRelativeLayout:
@@ -79,7 +79,7 @@ Builder.load_string(
                     text_color: self.theme_cls.primaryColor
 
                 CButton:
-                    text: _('Reset target location')
+                    text: _('Edit target location')
                     on_release: root.reset()
                     role: "small"
                     theme_bg_color: "Custom"
@@ -404,11 +404,11 @@ class BackupConnectionLocal(MDBoxLayout):
             ret = await question_dialog(
                 parent=self,
                 title=_('Destination already exists'),
-                message=_('Do you want to replace the existing repository ?'),
+                message=_('Do you want to replace the existing repository?'),
                 detail=_(
                     "The selected destination already exists at this "
                     "location. If you continue with this repository, "
-                    "you will replace it's content using this computer. "
+                    "you will replace its content using this computer. "
                 ),
             )
             if ret:
@@ -419,7 +419,7 @@ class BackupConnectionLocal(MDBoxLayout):
             self.error_detail = e.detail
         except Exception as e:
             logger.warning(str(e))
-            self.error_message = _("Unknown problem happen when trying to configure the destination.")
+            self.error_message = _("Unknown problem occurred when trying to configure the destination.")
             self.error_detail = str(e)
         else:
             self.error_message = ""
@@ -447,7 +447,7 @@ class BackupConnectionLocal(MDBoxLayout):
             return
         self.error_message = ""
         self.error_detail = ""
-        self.working = _('Please wait. Scanning for removable disk...')
+        self.working = _('Please wait. Scanning for removable disks...')
         self.selected_location = None
         self._refresh_locations_task = asyncio.create_task(self._refresh_locations())
 
@@ -457,7 +457,9 @@ class BackupConnectionLocal(MDBoxLayout):
         """
 
         async def _select_custom_location():
-            folder = await folder_dialog(parent=self, title=_('Select location where to backup your files.'))
+            folder = await folder_dialog(
+                parent=self, title=_('Please choose an external device or network share as your backup destination.')
+            )
             if not folder:
                 # Operation cancel by user
                 return
@@ -505,8 +507,8 @@ class BackupConnectionLocal(MDBoxLayout):
             # In edit mode, confirm operation, destroy the configuration and go to dashboard.
             ret = await question_dialog(
                 parent=self,
-                title=_('Are you sure ?'),
-                message=_('Are you sure you want to delete this backup configuration ?'),
+                title=_('Are you sure?'),
+                message=_('Are you sure you want to delete this backup configuration?'),
                 detail=_(
                     'If you delete this backup configuration, this Minarca agent will erase its identity and will no longer run backup on schedule.'
                 ),
