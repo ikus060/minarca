@@ -80,7 +80,7 @@ Builder.load_string(
         pos_hint: {'center_x': .5}
 
     CLabel:
-        text: _('Minarca Desktop Application')
+        text: _('Minarca Agent')
         halign: "center"
         font_style: "Title"
         padding: 0,20,0,0
@@ -103,7 +103,7 @@ Builder.load_string(
         pos_hint: {'center_x': 0.5}
 
     CLabel:
-        text: _('Copyright © 2024 IKUS Software inc.')
+        text: _('Copyright © 2024 IKUS Software')
         halign: "center"
         padding: 0,30,0,0
         role: "small"
@@ -223,13 +223,13 @@ class AboutMenu(MDNavigationDrawer):
     @alias_property(bind=['update_available', 'checking_for_update', 'latest_version'])
     def update_available_text(self):
         if self.checking_for_update:
-            return _('Checking for update...')
+            return _('Checking for updates...')
         elif self.update_available is None:
-            return _('Unable to verify update availability currently.')
+            return _('Unable to verify update availability at this time.')
         elif self.update_available and self.latest_version:
             return _('New version %s available') % self.latest_version
         else:
-            return _('Current version up-to-date')
+            return _('Current version is up-to-date')
 
     def download_latest(self):
         """Called when user click to update."""

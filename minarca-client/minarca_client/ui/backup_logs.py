@@ -42,7 +42,7 @@ Builder.load_string(
     SidePanel:
         is_remote: root.is_remote
         create: False
-        text: _("Get detailed information about you last backup or restore operation.")
+        text: _("Get detailed information about your last backup or restore operation.")
 
     MDBoxLayout:
         orientation: "vertical"

@@ -80,7 +80,7 @@ Builder.load_string(
                 on_text: root.search = self.text
 
                 MDTextFieldHintText:
-                    text: _("Search for files or folder...")
+                    text: _("Search for files or folders...")
 
                 MDTextFieldTrailingIcon:
                     icon: "magnify"
@@ -215,11 +215,11 @@ class BackupRestoreCustom(MDBoxLayout):
             self.file_items = file_items
         except BackupError as e:
             logger.warning(str(e))
-            self.error_message = _('Fail to retrieve available files.')
+            self.error_message = _('Failed to retrieve available files.')
             self.error_detail = str(e)
         except Exception as e:
             logger.exception('unknown exception')
-            self.error_message = _('Unknown problem occured when collecting file list.')
+            self.error_message = _('Unknown problem occurred when collecting file list.')
             self.error_detail = str(e)
         finally:
             self.working = ''
@@ -263,7 +263,7 @@ class BackupRestoreCustom(MDBoxLayout):
     def save(self):
         # Prompt user where to restore files/folder.
         async def _save():
-            folder = await folder_dialog(parent=self, title=_('Select folder where to restore data'))
+            folder = await folder_dialog(parent=self, title=_('Select a folder where to restore data.'))
             if not folder:
                 # Operation cancel by user
                 return

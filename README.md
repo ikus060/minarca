@@ -123,7 +123,21 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## 6.0.0b5
+## 6.0.0b8
+
+* Minarca Agent
+  * Adjust english and french translation.
+
+## 6.0.0b7
+
+* Minarca Agent
+  * Fix all typo and translation errors.
+* Minarca Server
+  * Adjust colors in login screen
+  * Adjust log verbosity
+  * Adjust authentication mecanisme between server and agent
+
+## 6.0.0b6
 
 * Minarc Agent
   * Show Toast Notification using PowerShell instead of WinRT python binding to reduce dependencies #250
@@ -138,6 +152,11 @@ The Minarca website is <https://minarca.org/>.
 * Minarca Server
   * Upgrade Rdiffweb to v2.9.3
   * Define default encoding value for backward compatibility with older database
+
+## 6.0.0b5
+
+* Minarca Agent
+  * Fix layout for repository name in dashboard #248
 
 ## 6.0.0b4
 
@@ -158,8 +177,8 @@ The Minarca website is <https://minarca.org/>.
   * Include rdiff-backup patch to improve regression speed
   * Fix support for setuptools >= 70
   * Upgrade to latest KivyMD version
-  * Raise notification if local backup is too old
-  * Implement retention period for local backup
+  * Raise notification if backup is too old
+  * Implement retention period for direct backup
   * Disable retention period setting if user lacks permission to modify it
 * Minarca Server
   * Upgrade rdiffweb to v2.9.1

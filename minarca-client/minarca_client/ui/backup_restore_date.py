@@ -46,7 +46,7 @@ Builder.load_string(
     SidePanel:
         is_remote: root.is_remote
         restore: True
-        text: _("Choose the point in time of data to be restore.")
+        text: _("Choose the point in time of data to be restored.")
 
     MDRelativeLayout:
 
@@ -170,7 +170,7 @@ class BackupRestoreDate(MDBoxLayout):
         self.selected_date = datetime.date(date_picker.sel_year, date_picker.sel_month, date_picker.sel_day)
 
         # Start task to get increments list.
-        self.working = _('Please Wait. Loading backup dates ...')
+        self.working = _('Please wait. Loading backup dates...')
         self._fetch_increment_task = asyncio.create_task(self._fetch_increments(instance))
 
     async def _fetch_increments(self, instance):
@@ -178,11 +178,11 @@ class BackupRestoreDate(MDBoxLayout):
             self.increments = await instance.list_increments()
         except BackupError as e:
             logger.warning(str(e))
-            self.error_message = _('Fail to retrieve available backup dates.')
+            self.error_message = _('"Failed to retrieve available backup dates.')
             self.error_detail = str(e)
         except Exception as e:
             logger.exception('unknown exception')
-            self.error_message = _('Unknown problem occured when collecting backup dates.')
+            self.error_message = _('Unknown problem occurred when collecting backup dates.')
             self.error_detail = str(e)
         finally:
             self.working = ''

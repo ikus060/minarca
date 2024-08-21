@@ -626,7 +626,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(status.lastdate > start_time)
         self.assertNotEqual(status.lastdate, status.lastsuccess)
         self.assertEqual('FAILURE', status.lastresult)
-        self.assertEqual(_('No file included in backup. Check configuration.'), status.details)
+        self.assertEqual(_('No files included in backup. Check configuration.'), status.details)
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)

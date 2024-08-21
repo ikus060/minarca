@@ -62,13 +62,13 @@ Builder.load_string(
                     display: root.error_detail
 
                 CDropDown:
-                    name: _('Backup Frequency')
+                    name: _('Backup frequency')
                     value: root.schedule
                     on_value: root.schedule = self.value
                     data: root.schedule_choices
 
                 CCheckbox:
-                    text: _("Run whether user's session is open or not")
+                    text: _("Run whether the user's session is open or not")
                     display: root.show_run_if_logged_out
                     active: root.run_if_logged_out
                     on_active: root.toggle_run_if_logged_out()
@@ -108,7 +108,7 @@ Builder.load_string(
                         on_active: root.ignore_weekday[4] = self.active
 
                     CCheckbox:
-                        text: _('Satursday')
+                        text: _('Saturday')
                         active: root.ignore_weekday[5]
                         on_active: root.ignore_weekday[5] = self.active
 
@@ -419,9 +419,9 @@ class BackupSettings(MDBoxLayout):
             # In edit mode, confirm operation, destroy the configuration and go to dashboard.
             ret = await question_dialog(
                 parent=self,
-                title=_('Are you sure ?'),
-                message=_('Are you sure you want to forget this backup settings?'),
-                detail=_('If you forget this settings, the backup will no longer run on schedule.'),
+                title=_('Are you sure?'),
+                message=_('Are you sure you want to forget these backup settings?'),
+                detail=_('If you forget these settings, the backup will no longer run on schedule.'),
             )
             if not ret:
                 # Operation cancel by user.

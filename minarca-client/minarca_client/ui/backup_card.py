@@ -44,7 +44,7 @@ Builder.load_string(
             pos_hint: {'center_y': .5}
 
             CLabel:
-                text: _('Remote backup') if root.is_remote else _('Local backup')
+                text: _('Online backup') if root.is_remote else _('Local backup')
                 text_color: self.theme_cls.primaryColor
                 role: "small"
 
@@ -300,7 +300,7 @@ class BackupCard(CCard):
     @alias_property(bind=['status', 'in_transition'])
     def stop_start_text(self):
         if self.in_transition:
-            return _('Stoping...') if self.is_running else _('Starting...')
+            return _('Stopping...') if self.is_running else _('Starting...')
         else:
             if self.is_running:
                 action = self.instance.status.action

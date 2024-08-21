@@ -64,12 +64,12 @@ minarca include [-h] pattern [pattern ...]
 - `-h`, `--help`: Show the help message and exit.
 - `pattern`: File pattern(s) to be included. Wildcards (`*` or `?`) can be used.
 
-### `link`
+### `configure`
 
 Link the Minarca backup with a Minarca server.
 
 ```sh
-minarca link [-h] [-r REMOTEURL] [-u USERNAME] [-p PASSWORD] [-n NAME] [--force]
+minarca configure [-h] [-r REMOTEURL] [-u USERNAME] [-p PASSWORD] [-n NAME] [--force]
 ```
 
 - `-h`, `--help`: Show the help message and exit.
@@ -168,7 +168,7 @@ minarca start
 minarca exclude '*.log' '*.tmp'
 
 # Link Minarca backup with a remote server
-minarca link -r http://example.com:8080/ -u user -p pass -n myrepo
+minarca configure -r http://example.com:8080/ -u user -p pass -n myrepo
 
 # Restore specific files from backup
 minarca restore --restore-time '3D' file.txt

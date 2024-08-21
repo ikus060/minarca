@@ -201,11 +201,11 @@ class BackupRestoreFull(MDBoxLayout):
             self.file_items = file_items
         except BackupError as e:
             logger.warning(str(e))
-            self.error_message = _('Fail to retrieve available files.')
+            self.error_message = _('Failed to retrieve available files.')
             self.error_detail = str(e)
         except Exception as e:
             logger.exception('unknown exception')
-            self.error_message = _('Unknown problem occured when collecting file list.')
+            self.error_message = _('Unknown problem occurred when collecting file list.')
             self.error_detail = str(e)
         finally:
             self.working = ''

@@ -68,7 +68,7 @@ class InstanceNotFoundError(BackupError):
 
     def __init__(self, instance_id):
         self.instance_id = instance_id
-        self.message = _('No backup instances matches: %s') % instance_id
+        self.message = _('No backup instances match: %s') % instance_id
 
 
 class RepositoryNameExistsError(ConfigureBackupError):
@@ -105,7 +105,7 @@ class InvalidFileSpecificationError(BackupError):
         # Try to remove 'b'pattern''
         file_spec = file_spec.strip().strip("'").strip("b").strip("'")
         self.message = (
-            _("your file specification [%s] doesn't matches any of the base directory of your system") % file_spec
+            _("your file specification [%s] doesn't match any of the base directories of your system") % file_spec
         )
 
 
@@ -115,7 +115,7 @@ class RdiffBackupException(BackupError):
     """
 
     def __init__(self, msg) -> None:
-        self.message = _('process terminated with an exception, check logs for more details: %s') % msg
+        self.message = _('process terminated with an exception. Check logs for more details: %s') % msg
 
 
 class RdiffBackupExitError(BackupError):
@@ -123,7 +123,7 @@ class RdiffBackupExitError(BackupError):
     This exception is raised when rdiff-backup process return an error.
     """
 
-    message = _('process returned non-zero exit status, check logs for more details')
+    message = _('process returned a non-zero exit status. Check logs for more details')
 
 
 class NoPatternsError(BackupError):
@@ -131,7 +131,7 @@ class NoPatternsError(BackupError):
     This exception is raised when a backup is started without any valid patterns.
     """
 
-    message = _('No file included in backup. Check configuration.')
+    message = _('No files included in backup. Check configuration.')
 
 
 class NotRunningError(Exception):
@@ -139,7 +139,7 @@ class NotRunningError(Exception):
     Raised when trying to stop a backup when it's not running.
     """
 
-    message = _("cannot stop process when it's not running")
+    message = _("cannot stop process when it's not running.")
 
 
 class RunningError(BackupError):
@@ -147,7 +147,7 @@ class RunningError(BackupError):
     Raised when a backup is already running.
     """
 
-    message = _("cannot start process when it's already running")
+    message = _("cannot start process when it's already running.")
 
 
 class NotConfiguredError(BackupError):
@@ -155,7 +155,7 @@ class NotConfiguredError(BackupError):
     Raised when the backup is not configured
     """
 
-    message = _('not configured, use `minarca link` to configure remote host')
+    message = _('not configured, use `minarca configure` to configure remote host')
 
 
 class NotScheduleError(BackupError):
@@ -163,7 +163,7 @@ class NotScheduleError(BackupError):
     Raised when it's not time to run a backup.
     """
 
-    message = _("backup not yet scheduled to run, you may force execution using `--force`")
+    message = _("backup not yet scheduled to run. You may force execution using `--force`")
 
 
 class HttpConnectionError(ConfigureBackupError):
@@ -187,7 +187,7 @@ class HttpInvalidUrlError(ConfigureBackupError):
     """
 
     def __init__(self, url):
-        self.message = _('Invalid remote server URL !')
+        self.message = _('Invalid remote server URL!')
         self.detail = _(
             "The remote server URL you entered for the connection is not valid. Check that you have entered the correct value. The URL must begin with `http://` or `https://` followed by a domain name."
         )
@@ -202,7 +202,7 @@ class HttpAuthenticationError(ConfigureBackupError):
         self.server_message = server_message
         self.message = _('Invalid username or password')
         self.detail = _(
-            "The username or password you entered to connect to the remote server is not valid. If you enabled multi-factor authentication you need to use an access token."
+            "The username or password you entered to connect to the remote server is not valid. If you have enabled multi-factor authentication, you need to use an access token."
         )
 
     def __str__(self):
@@ -280,7 +280,7 @@ class DiskFullError(BackupError):
     Raised by rdiff-backup remote server when the disk is full"
     """
 
-    message = _('Backup failed due disk is full. Please clear space on the disk to proceed with the backup.')
+    message = _('Backup failed due to disk being full. Please clear space on the disk to proceed with the backup.')
 
     @staticmethod
     def _matches(line):
@@ -316,7 +316,7 @@ class UnsuportedVersionError(BackupError):
 
 
 class RestoreFileNotFound(BackupError):
-    message = _('The path you are trying to restore from backup does not exists.')
+    message = _('The path you are trying to restore from backup does not exist.')
 
     @staticmethod
     def _matches(line):
@@ -332,7 +332,7 @@ class RepositoryLocked(BackupError):
 
 
 class UnrecognizedArguments(BackupError):
-    message = _('An internal error was raised by an unknown operation send to the background process.')
+    message = _('An internal error was raised by an unknown operation sent to the background process.')
 
     @staticmethod
     def _matches(line):
@@ -407,4 +407,4 @@ class InvalidRepositoryName(ConfigureBackupError):
 
     def __init__(self, name):
         self.name = name
-        self.message = _("Repository name must only contains letters, numbers, dash (-) and dot (.)")
+        self.message = _("Repository name must contain only letters, numbers, dashes (-), and dots (.)")

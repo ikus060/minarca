@@ -59,9 +59,15 @@ Builder.load_string(
                     size_hint_y: None
 
                 CLabel:
-                    text: _("Remote backup")
+                    text: _("Online backup")
                     font_style: "Title"
                     text_color: self.theme_cls.primaryColor
+                    halign: "center"
+
+                MDDivider:
+
+                CLabel:
+                    text: _("Dedicated centralized server")
                     halign: "center"
 
                 MDDivider:
@@ -73,13 +79,7 @@ Builder.load_string(
                 MDDivider:
 
                 CLabel:
-                    text: _("Scalable storage")
-                    halign: "center"
-
-                MDDivider:
-
-                CLabel:
-                    text: _("Centralized management")
+                    text: _("Remote backup")
                     halign: "center"
 
                 MDDivider:
@@ -110,19 +110,19 @@ Builder.load_string(
                 MDDivider:
 
                 CLabel:
-                    text: _("Offline Accessibility")
+                    text: _("External disk or network share")
                     halign: "center"
 
                 MDDivider:
 
                 CLabel:
-                    text: _("Cost Savings")
+                    text: _("Offline accessibility")
                     halign: "center"
 
                 MDDivider:
 
                 CLabel:
-                    text: _("Back on External Disk")
+                    text: _("Standalone backup")
                     halign: "center"
 
                 MDDivider:

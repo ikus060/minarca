@@ -99,7 +99,7 @@ Builder.load_string(
                 on_release: root.add_file_pattern()
 
             CButton:
-                text: _('Add folder') if root.include else _('Exclude file')
+                text: _('Add folder') if root.include else _('Exclude folder')
                 role: "small"
                 on_release: root.add_folder_pattern()
 
@@ -251,7 +251,7 @@ class BackupPatterns(MDBoxLayout):
     def add_folder_pattern(self):
         async def _add_folder_pattern():
             folders = await folder_dialog(
-                parent=self, title=_('Add Folder Pattern'), initial_directory=get_home(), multiple_select=True
+                parent=self, title=_('Add folder'), initial_directory=get_home(), multiple_select=True
             )
             for folder in folders:
                 self._add_pattern(folder)
@@ -262,7 +262,7 @@ class BackupPatterns(MDBoxLayout):
         async def _add_file_pattern():
             # Prompt user to select one or more file.
             filenames = await file_dialog(
-                parent=self, title=_('Add File Pattern'), multiple_select=True, initial_directory=get_home()
+                parent=self, title=_('Add file'), multiple_select=True, initial_directory=get_home()
             )
             for fn in filenames:
                 self._add_pattern(fn)

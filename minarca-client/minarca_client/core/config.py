@@ -371,7 +371,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     Pattern(False, "/media", _("External media")),
                     Pattern(False, "**/lost+found", _("Ext4 Lost and Found")),
                     Pattern(False, "**/.~*", _("Hidden temporary files")),
-                    Pattern(False, "**/*~", _("Vim Temporary files")),
+                    Pattern(False, "**/*~", _("Vim temporary files")),
                 ]
             )
         return data

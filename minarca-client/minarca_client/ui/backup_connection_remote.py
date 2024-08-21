@@ -49,13 +49,13 @@ Builder.load_string(
                     adaptive_height: True
 
                     CLabel:
-                        text: _("Server connexion")
+                        text: _("Server connection")
                         font_style: "Title"
                         role: "small"
                         text_color: self.theme_cls.primaryColor
 
                     CButton:
-                        text: _('Reset server connexion')
+                        text: _('Edit server connection')
                         on_release: root.reset()
                         role: "small"
                         theme_bg_color: "Custom"
@@ -250,9 +250,9 @@ class BackupConnectionRemote(MDBoxLayout):
             # In edit mode, confirm operation, destroy the configuration and go to dashboard.
             ret = await question_dialog(
                 parent=self,
-                title=_('Are you sure ?'),
-                message=_('Are you sure you want to forget this backup settings?'),
-                detail=_('If you forget this settings, the backup will no longer run on schedule.'),
+                title=_('Are you sure?'),
+                message=_('Are you sure you want to forget these backup settings?'),
+                detail=_('If you forget these settings, the backup will no longer run on schedule.'),
             )
             if not ret:
                 # Operation cancel by user.
@@ -283,11 +283,11 @@ class BackupConnectionRemote(MDBoxLayout):
             ret = await question_dialog(
                 parent=self,
                 title=_('Repository name already exists'),
-                message=_('Do you want to replace the existing repository ?'),
+                message=_('Do you want to replace the existing repository?'),
                 detail=_(
                     "The repository name you have entered already exists on "
                     "the remote server. If you continue with this repository, "
-                    "you will replace it's content using this computer. "
+                    "you will replace its content using this computer. "
                     "Otherwise, you must enter a different repository name."
                 ),
             )
