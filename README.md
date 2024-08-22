@@ -123,6 +123,11 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 6.0.0b9
+
+* Minarca Server
+  * Provide a container image for Docker deployment
+
 ## 6.0.0b8
 
 * Minarca Agent

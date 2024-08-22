@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  minarca-server:
+    image: minarca-server
+    ports:
+      - "8080:8080"
+      - "2222:22"
+    volumes:
+      # Location of the backups
+      - ./backups:/backups
+      # Configuration file and local database
+      - ./conf:/etc/minarca
+      # Application logs
+      - ./logs:/var/log/minarca
+    restart: always
+    enviornment:
+      # Define the URL to be used by users to connect to this container port 8080 running the webserver.
+      MINARCA_EXTERNAL_URL: https://minarca.mycompagny.com
+      # Define the hostname and ip address to be used by Minarca Agent to connect to this container on port 2222 running SSH Server.
+      MINARCA_MINARCA_REMOTE_HOST: minarca.mycompagny.com:2222
