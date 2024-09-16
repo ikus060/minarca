@@ -333,7 +333,7 @@ class BackupInstance:
         with safe_keepawake():
             with UpdateNotification(instance=self):
                 async with UpdateStatus(instance=self):
-                    with open(self.backup_log_file, 'w', errors='replace', newline='') as log_file:
+                    with open(self.backup_log_file, 'w', encoding='utf-8', errors='replace', newline='') as log_file:
                         # Check patterns
                         patterns = self.patterns
                         if not patterns:
@@ -464,13 +464,13 @@ class BackupInstance:
             ssh_keygen(self.public_key_file, self.private_key_file)
 
         try:
-            with open(self.public_key_file) as f:
+            with open(self.public_key_file, encoding='latin-1') as f:
                 logger.debug(f"{self.log_id}: exchanging SSH identity with server")
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
         except Exception:
             logger.debug(f"{self.log_id}: generating new SSH identity after failure")
             ssh_keygen(self.public_key_file, self.private_key_file)
-            with open(self.public_key_file) as f:
+            with open(self.public_key_file, encoding='latin-1') as f:
                 logger.debug(f"{self.log_id}: exchanging new SSH identity with server")
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
 
@@ -484,12 +484,17 @@ class BackupInstance:
         capture = CaptureException()
         logger.debug(f"{self.log_id}: executing command: {_sh_quote(args)}")
         try:
+            # Enforce UTF-8 to be used by rdiff-backup stdout.
+            env = os.environ.copy()
+            env['PYTHONUTF8'] = '1'
             process = await asyncio.create_subprocess_exec(
                 get_minarca_exe(),
                 *args,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                # Enforce use of utf-8 for stdout.
+                env=env,
             )
             # Stream the output of rdiff-backup to log file and exception capture.
             while True:
@@ -526,7 +531,7 @@ class BackupInstance:
             raise RunningError()
         with safe_keepawake():
             async with UpdateStatus(instance=self, action='restore'):
-                with open(self.restore_log_file, 'w', errors='replace', newline='') as log_file:
+                with open(self.restore_log_file, 'w', encoding='utf-8', errors='replace', newline='') as log_file:
                     # Loop on each pattern to be restored and execute rdiff-backup.
                     for path in paths:
                         if destination:

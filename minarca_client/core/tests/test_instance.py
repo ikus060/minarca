@@ -493,6 +493,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+            env=mock.ANY,
         )
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
@@ -653,6 +654,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+            env=mock.ANY,
         )
 
     def test_forget(self):
@@ -906,6 +908,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+            env=mock.ANY,
         )
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
@@ -1001,6 +1004,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+            env=mock.ANY,
         )
 
     @mock.patch('minarca_client.core.instance.send_notification', return_value='12345')
@@ -1071,6 +1075,32 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         finally:
             shutil.rmtree(tempdir, onerror=remove_readonly)
 
+    async def test_local_backup_with_special_encoding(self):
+        # Given a backup with local destination
+        tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        try:
+            self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+            patterns = self.instance.patterns
+            patterns.clear()
+            patterns.append(Pattern(True, os.path.realpath(self.tmp.name), None))
+            patterns.save()
+            # Create a file with special char (Euro sign €)
+            Path(self.tmp.name, 'my \u20ac income').write_text('some data')
+            # Then backup is created in pause mode.
+            self.assertIsNotNone(self.instance.settings.pause_until)
+            # when running backup
+            await self.instance.backup(force=True)
+            # then a backup get created
+            if IS_WINDOWS:
+                drive = os.path.splitdrive(tempdir)[0][0]
+                self.assertTrue(os.path.isdir(os.path.join(tempdir, drive, 'rdiff-backup-data')))
+            else:
+                self.assertTrue(os.path.isdir(os.path.join(tempdir, 'rdiff-backup-data')))
+            # then backup logs contains our filename with special char.
+            self.assertIn('my \u20ac income', Path(self.instance.backup_log_file).read_text(encoding='utf-8'))
+        finally:
+            shutil.rmtree(tempdir, onerror=remove_readonly)
+
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     async def test_local_backup_with_keepdays(self, mock_popen):
         # Given a backup with local destination
@@ -1101,6 +1131,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                env=mock.ANY,
             )
         finally:
             shutil.rmtree(tempdir, onerror=remove_readonly)
