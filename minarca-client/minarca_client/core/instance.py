@@ -487,6 +487,8 @@ class BackupInstance:
             # Enforce UTF-8 to be used by rdiff-backup stdout.
             env = os.environ.copy()
             env['PYTHONUTF8'] = '1'
+            # Do not create a window
+            creationflags = subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0
             process = await asyncio.create_subprocess_exec(
                 get_minarca_exe(),
                 *args,
@@ -495,6 +497,7 @@ class BackupInstance:
                 stderr=subprocess.STDOUT,
                 # Enforce use of utf-8 for stdout.
                 env=env,
+                creationflags=creationflags,
             )
             # Stream the output of rdiff-backup to log file and exception capture.
             while True:

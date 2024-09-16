@@ -22,7 +22,7 @@ from minarca_client.core import Backup, BackupInstance, InstanceId
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.core.exceptions import HttpAuthenticationError
-from minarca_client.main import _EXIT_LINK_ERROR, _backup
+from minarca_client.main import _EXIT_BACKUP_FAIL, _EXIT_LINK_ERROR, _backup
 from minarca_client.tests.test import MATCH
 
 
@@ -297,7 +297,7 @@ class TestMainParseArgs(unittest.TestCase):
         # Then function was called
         mock_main_run.assert_called_once_with(args[1:])
         # Then error code is 1
-        self.assertEqual(1, capture.exception.code)
+        self.assertEqual(_EXIT_BACKUP_FAIL, capture.exception.code)
 
     def test_exclude(self):
         # Given a backup instance
@@ -503,4 +503,4 @@ class TestMainParseArgs(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             with self.assertRaises(SystemExit) as cm:
                 main.main(['status', '--instance', 'invalid'])
-        self.assertEqual(cm.exception.code, 1)
+        self.assertEqual(cm.exception.code, _EXIT_BACKUP_FAIL)

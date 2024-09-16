@@ -494,6 +494,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=mock.ANY,
+            creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
@@ -655,6 +656,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=mock.ANY,
+            creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
 
     def test_forget(self):
@@ -909,6 +911,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=mock.ANY,
+            creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
@@ -1005,6 +1008,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=mock.ANY,
+            creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
 
     @mock.patch('minarca_client.core.instance.send_notification', return_value='12345')
@@ -1132,6 +1136,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 env=mock.ANY,
+                creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
             )
         finally:
             shutil.rmtree(tempdir, onerror=remove_readonly)
