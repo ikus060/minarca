@@ -138,7 +138,7 @@ class Backup:
         child = detach_call(args)
         logger.debug(f'subprocess {child.pid} started')
 
-    def schedule_job(self, run_if_logged_out=None):
+    def schedule_job(self, run_if_logged_out=None, replace=True):
         """
         Used to schedule the job in operating system task scheduler. e.g.: crontab.
 
@@ -147,9 +147,12 @@ class Backup:
         """
         logger.debug("scheduling job in OS task scheduler")
         # Also schedule task in Operating system scheduler.
-        if self.scheduler.exists():
+        exists = self.scheduler.exists()
+        if replace and exists:
             logger.debug("scheduler exists, replacing existing schedule")
             self.scheduler.delete()
+        elif exists:
+            return  # Do nothing
         if IS_WINDOWS:
             self.scheduler.create(run_if_logged_out=run_if_logged_out)
         else:
