@@ -249,14 +249,17 @@ def get_user_agent():
     )
 
 
-def get_minarca_exe():
+def get_minarca_exe(windowed=0):
     """
     Generate the appropriate command line for the scheduler.
 
-    On Windows return minarcaw.exe to be in Windowed mode to avoid command line
+    On Windows return minarca.exe to be in Windowed mode to avoid command line
     window to be created.
     """
-    name = 'minarcaw.exe' if IS_WINDOWS else 'minarca'
+    if IS_WINDOWS:
+        name = 'minarcaw.exe' if windowed else 'minarca.exe'
+    else:
+        name = 'minarca'
     path = shutil.which(name, path=_get_path())
     if not path:
         raise FileNotFoundError(name)
@@ -433,7 +436,7 @@ if IS_WINDOWS:
             TASK_ACTION_EXEC = 0
             action = task_def.Actions.Create(TASK_ACTION_EXEC)
             action.ID = 'MINARCA'
-            action.Path = str(get_minarca_exe())
+            action.Path = str(get_minarca_exe(windowed=True))
             action.Arguments = 'backup'
 
             # Set parameters

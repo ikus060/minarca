@@ -31,14 +31,15 @@ from minarca_client.core.exceptions import (
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
 
-_EXIT_BACKUP_FAIL = 1
-_EXIT_REPO_EXISTS = 4
-_EXIT_NOT_RUNNING = 5
-_EXIT_LINK_ERROR = 6
-_EXIT_SCHEDULE_ERROR = 7
-_EXIT_KIVY_ERROR = 8
-_EXIT_RESTORE_FAIL = 9
-_EXIT_INTERUPT = 10
+_EXIT_BACKUP_FAIL = 101
+_EXIT_REPO_EXISTS = 104
+_EXIT_NOT_RUNNING = 105
+_EXIT_LINK_ERROR = 106
+_EXIT_SCHEDULE_ERROR = 107
+_EXIT_KIVY_ERROR = 108
+_EXIT_RESTORE_FAIL = 109
+_EXIT_INTERUPT = 110
+_EXIT_NO_STDOUT = 111
 
 _ARGS_ALIAS = {
     '--backup': 'backup',
@@ -246,6 +247,12 @@ def _rdiff_backup(options):
     """
     Execute rdiff-backup process within minarca.
     """
+    # Write directly to stdout to check for error.
+    try:
+        print('backup starting...')
+    except IOError:
+        sys.exit(_EXIT_NO_STDOUT)
+    # Start the backup process
     try:
         return rdiffbackup.run.main_run(options)
     except Exception:

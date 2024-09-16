@@ -123,7 +123,8 @@ class RdiffBackupExitError(BackupError):
     This exception is raised when rdiff-backup process return an error.
     """
 
-    message = _('process returned a non-zero exit status. Check logs for more details')
+    def __init__(self, exit_code) -> None:
+        self.message = _('process returned a non-zero exit status (%s). Check logs for more details') % exit_code
 
 
 class NoPatternsError(BackupError):
