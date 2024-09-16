@@ -364,6 +364,8 @@ class BackupSettings(MDBoxLayout):
                 await self.instance.save_remote_settings(wait=wait)
             # Finnaly save the changes.
             t.save()
+            # Make sure a task scheduler is created at this point.
+            self.backup.schedule_job(replace=False)
             # Redirect user to dashboard.
             App.get_running_app().set_active_view('DashboardView')
 

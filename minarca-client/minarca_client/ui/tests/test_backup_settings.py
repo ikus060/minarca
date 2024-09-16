@@ -51,6 +51,8 @@ class BackupSettingsTest(BaseAppTest):
         self.assertEqual(self.instance.settings.schedule, 1)
         # The dashboard view is displayed
         self.assertIsInstance(self.view, DashboardView)
+        # Then make sure schedule get created
+        self.assertTrue(self.app.backup.scheduler.exists())
 
     @responses.activate
     async def test_edit_and_save_remote(self):
@@ -118,6 +120,8 @@ class BackupSettingsTest(BaseAppTest):
             await task
         except asyncio.CancelledError:
             pass
+        # Then make sure schedule get created
+        self.assertTrue(self.app.backup.scheduler.exists())
 
     async def test_btn_cancel(self):
         # When user click on back or cancel button
