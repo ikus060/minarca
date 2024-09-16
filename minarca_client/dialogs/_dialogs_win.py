@@ -192,6 +192,7 @@ async def folder_dialog(
 
     def _set_start_folder(hwnd, msg, lp, data):
         if msg == shellcon.BFFM_INITIALIZED and data:
+            data = os.fsencode(str(data))
             address, _ = PyGetBufferAddressAndLen(data)
             SendMessage(hwnd, shellcon.BFFM_SETSELECTION, 1, address)
 
