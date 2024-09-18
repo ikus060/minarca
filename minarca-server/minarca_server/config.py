@@ -53,6 +53,7 @@ def get_parser():
     parser = get_rdiffweb_parser()
     parser.prog = 'minarca-server'
     parser.description = 'Web server to browse and restore backups.'
+    parser._auto_env_var_prefix = 'MINARCA_'
 
     parser.add(
         '--minarca-user-dir-mode',

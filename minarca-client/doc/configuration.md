@@ -25,9 +25,9 @@ E.g.:
 
 ## Environment variables
 
-In addition to configuration files, you may pass environment variables. The options name must be uppercase and prefixed with `RDIFFWEB_`. As an example, if you want to change the port used to listen for HTTP request for 8081, you must define `server-port` option as follow.
+In addition to configuration files, you may pass environment variables. The options name must be uppercase and prefixed with `MINARCA_`. As an example, if you want to change the port used to listen for HTTP request for 8081, you must define `server-port` option as follow.
 
-    RDIFFWEB_SERVER_PORT=8081
+    MINARCA_SERVER_PORT=8081
 
 ## Command line arguments
 
