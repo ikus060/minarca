@@ -3,7 +3,7 @@
 # Use is subject to license terms.
 
 MINARCA_USER=minarca
-MINARCA_HOME=/backups/
+DEFAULT_MINARCA_HOME=/backups/
 MINARCA_ETC=/etc/minarca
 MINARCA_LOG=/var/log/minarca
 MINARCA_SESSION=/var/lib/minarca
@@ -83,10 +83,11 @@ add_apt_repo() {
 case "$1" in
   configure)
         if ! getent passwd "$MINARCA_USER" >/dev/null; then
-            adduser --quiet --system --home "$MINARCA_HOME" --shell /bin/bash \
+            adduser --quiet --system --home "$DEFAULT_MINARCA_HOME" --shell /bin/bash \
                 --no-create-home --gecos 'minarca repository hosting' \
                 --group "$MINARCA_USER"
         fi
+        MINARCA_HOME=$(getent passwd minarca | cut -d: -f6)
         # Create folder for logs & session
         mkdir -p "$MINARCA_ETC" "$MINARCA_LOG" "$MINARCA_HOME" "$MINARCA_SESSION"
         chown -R minarca:minarca "$MINARCA_ETC" "$MINARCA_SESSION"
