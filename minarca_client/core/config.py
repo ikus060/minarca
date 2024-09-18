@@ -8,6 +8,7 @@ Created on Jun. 8, 2021
 '''
 import ast
 import datetime
+import glob
 import logging
 import os
 import re
@@ -323,12 +324,49 @@ class Patterns(AbstractConfigFile, MutableSequence):
         Restore defaults patterns.
         """
         data = []
+
+        def _append(p):
+            if p.is_wildcard():
+                for m in glob.iglob(p.pattern, recursive=True):
+                    data.append(p)
+                    return
+            elif os.path.exists(p.pattern):
+                data.append(p)
+
         # Add user's documents
-        data.append(Pattern(True, str(get_home() / 'Documents'), _("User's Documents")))
+        _append(Pattern(True, str(get_home() / 'Documents'), _("User's Documents")))
         # Add Minarca config
-        data.append(Pattern(True, str(get_config_home() / 'patterns*'), _("Minarca Config")))
+        _append(Pattern(True, str(get_config_home() / 'patterns*'), _("Minarca Config")))
 
         if IS_WINDOWS:
+            _append(
+                Pattern(
+                    True,
+                    str(get_home() / 'AppData/Roaming/Mozilla/Firefox/Profiles/*/places.sqlite'),
+                    _("Firefox Bookmark"),
+                )
+            )
+            _append(
+                Pattern(
+                    True,
+                    str(get_home() / 'AppData/Local/Google/Chrome/User Data/Default/Bookmarks'),
+                    _("Chrome Bookmark"),
+                )
+            )
+            _append(
+                Pattern(
+                    True,
+                    str(get_home() / 'AppData/Local/Microsoft/Outlook/*.?st'),
+                    _("Outlook Offline Data"),
+                )
+            )
+            _append(
+                Pattern(
+                    True,
+                    str(get_home() / 'AppData/Local/Microsoft/Outlook/Offline Address Books'),
+                    _("Outlook Address Books"),
+                )
+            )
             data.extend(
                 [
                     Pattern(False, "**/Thumbs.db", _("Thumbnails cache")),
@@ -354,12 +392,28 @@ class Patterns(AbstractConfigFile, MutableSequence):
                 ]
             )
         elif IS_MAC:
+            _append(
+                Pattern(
+                    True,
+                    str(get_home() / 'Library/Application Support/Firefox/Profiles/*/places.sqlite'),
+                    _("Firefox Bookmark"),
+                )
+            )
+            _append(
+                Pattern(
+                    True,
+                    str(get_home() / 'Library/Application Support/Google/Chrome/Default/Bookmarks'),
+                    _("Chrome Bookmark"),
+                )
+            )
             data.extend(
                 [
                     Pattern(False, "**/.DS_Store", _("Desktop Services Store")),
                 ]
             )
         elif IS_LINUX:
+            _append(Pattern(True, str(get_home() / '.mozilla/firefox/*/places.sqlite'), _("Firefox Bookmark")))
+            _append(Pattern(True, str(get_home() / '.config/google-chrome/Default/Bookmarks'), _("Chrome Bookmark")))
             data.extend(
                 [
                     Pattern(False, "/dev", _("dev filesystem")),
@@ -374,6 +428,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     Pattern(False, "**/*~", _("Vim temporary files")),
                 ]
             )
+
         return data
 
     def save(self):
