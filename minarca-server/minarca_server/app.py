@@ -7,6 +7,7 @@
 # Use is subject to license terms.
 
 import logging
+import pwd
 
 import cherrypy
 import pkg_resources
@@ -27,6 +28,13 @@ class MinarcaApplication(RdiffwebApp):
         return parse_args(args, config_file_contents)
 
     def __init__(self, cfg):
+        # Define the value for home-dir is not define in configuration.
+        if cfg.minarca_home_dir is None:
+            try:
+                cfg.minarca_home_dir = pwd.getpwuid(cfg.minarca_user_dir_owner).pw_dir
+            except KeyError:
+                logger.warning("can't get user's home for user id: %s" % cfg.minarca_user_dir_owner)
+                cfg.minarca_home_dir = cfg.minarca_user_base_dir
         cherrypy.config.update(
             {
                 'minarca.auth_options': cfg.minarca_auth_options,
@@ -40,6 +48,7 @@ class MinarcaApplication(RdiffwebApp):
                 'minarca.user_dir_group_id': cfg.minarca_user_dir_group,
                 'minarca.user_dir_mode': cfg.minarca_user_dir_mode,
                 'minarca.user_dir_owner_id': cfg.minarca_user_dir_owner,
+                'minarca.home_dir': cfg.minarca_home_dir,
             }
         )
         super().__init__(cfg)

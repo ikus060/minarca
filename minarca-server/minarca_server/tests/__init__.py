@@ -40,6 +40,7 @@ class AbstractMinarcaTest(rdiffweb.test.WebCase):
             os.mkdir(cls.base_dir)
         # Use temporary folder for base dir
         cls.default_config['MinarcaUserBaseDir'] = cls.base_dir
+        cls.default_config['minarca-home-dir'] = cls.base_dir
         cls.default_config['logfile'] = os.path.join(cls.base_dir, 'server.log')
         # Use current user for owner and group
         cls.default_config['MinarcaUserDirOwner'] = pwd.getpwuid(os.getuid())[0]

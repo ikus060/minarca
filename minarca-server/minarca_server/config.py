@@ -93,6 +93,13 @@ def get_parser():
     )
 
     parser.add(
+        '--minarca-home-dir',
+        metavar='FOLDER',
+        help=argparse.SUPPRESS,
+        default=None,
+    )
+
+    parser.add(
         '--minarca-restricted-to-base-dir',
         '--minarca-restricted-to-based-dir',
         '--minarcarestrictedtobaseddir',

@@ -44,6 +44,7 @@ class MinarcaPlugin(SimplePlugin):
     user_dir_owner_id = 65534  # nobody
     user_dir_group_id = 65534  # nobody
     user_base_dir = '/backups'
+    home_dir = '/backups'
     shell = '/opt/minarca-server/bin/minarca-shell'
     auth_options = 'no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty'
     remote_host = None
@@ -193,7 +194,7 @@ class MinarcaPlugin(SimplePlugin):
         """
 
         # Create ssh subfolder
-        ssh_dir = os.path.join(self.user_base_dir, '.ssh')
+        ssh_dir = os.path.join(self.home_dir, '.ssh')
         if not os.path.exists(ssh_dir):
             logger.info("creating .ssh folder [%s]", ssh_dir)
             os.mkdir(ssh_dir, 0o700)
