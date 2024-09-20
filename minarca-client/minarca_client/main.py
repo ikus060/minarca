@@ -746,7 +746,8 @@ def _configure_logging(debug=False):
     logging.getLogger('requests').setLevel(logging.WARNING)
     # Avoid "Using selector: EpollSelector"
     logging.getLogger('asyncio').setLevel(logging.WARNING)
-
+    # Avoid kivy logs by default.
+    logging.getLogger('kivy').setLevel(logging.DEBUG if debug else logging.WARNING)
     #
     # Configure default logging for the whole application. e.g.: minarca.log
     #
