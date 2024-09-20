@@ -329,6 +329,7 @@ class BackupInstance:
         if self.settings.pause_until is not None:
             logger.debug(f"{self.log_id}: clearing pause setting as backup started with force")
             self.settings.pause_until = None
+            self.settings.save()
 
         with safe_keepawake():
             with UpdateNotification(instance=self):
