@@ -123,6 +123,20 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 6.0.0b9
+
+* Minarca Agent
+  * Adjust English and French translations.
+  * Fix initial location of folder dialogs on Windows OS.
+  * Enforce UTF-8 encoding for `rdiff-backup` stdout.
+  * Ensure creation of Scheduled Job in Backup Settings during initial setup (#258).
+  * Utilize `minarca.exe` to prevent exception dialog from being shown by background processes on Windows OS.
+  * Add more default exclusion patterns, including Firefox and Chrome bookmarks.
+  * Adjust Kivy log level.
+* Minarca Server
+  * Define distinct settings for `minarca-home-dir` and `minarca-base-dir`.
+  * Update environment variable prefix to `MINARCA_`.
+
 ## 6.0.0b8
 
 * Minarca Agent
