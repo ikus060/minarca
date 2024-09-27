@@ -4,9 +4,9 @@ import shutil
 import tempfile
 from functools import reduce
 
-from .contexts import SplitExec
-from .mount import MS_BIND, MS_RDONLY, MS_REC, mount
-from .namespaces import simple_unshare
+from snakeoil.contexts import SplitExec
+from snakeoil.osutils.mount import MS_BIND, MS_RDONLY, MS_REC, mount
+from snakeoil.process.namespaces import simple_unshare
 
 
 class Jail(SplitExec):

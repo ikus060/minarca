@@ -11,17 +11,18 @@ Created on Sep. 25, 2020
 '''
 import argparse
 import logging
+import logging.handlers
 import os
 import shutil
 import subprocess
 import sys
+from collections import deque
 
 import configargparse
 from tzlocal import get_localzone
 
 from minarca_server.config import get_parser
-
-from .core.jail import Jail
+from minarca_server.core.jail import Jail
 
 try:
     import pkg_resources
@@ -41,8 +42,13 @@ def _setup_logging(cfg):
     # location of the minarca-shell log file.
     if cfg.log_file:
         shell_logfile = os.path.join(os.path.dirname(cfg.log_file), 'shell.log')
-        fmt = "[%(asctime)s][%(levelname)-7s][%(ip)s][%(user)s][%(threadName)s][%(name)s] %(message)s"
-        logging.basicConfig(filename=shell_logfile, level=logging.DEBUG, format=fmt)
+        root = logging.getLogger()
+        root.setLevel(logging.DEBUG)
+        default_handler = logging.handlers.RotatingFileHandler(shell_logfile, maxBytes=10485760, backupCount=20)
+        default_handler.setFormatter(
+            logging.Formatter("[%(asctime)s][%(levelname)-7s][%(ip)s][%(user)s][PID:%(process)d][%(name)s] %(message)s")
+        )
+        root.addHandler(default_handler)
 
 
 def _jail(userroot, args):
@@ -52,7 +58,28 @@ def _jail(userroot, args):
     """
     tz = get_localzone().zone
     with Jail(userroot):
-        subprocess.check_call(args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'TZ': tz, 'HOME': userroot})
+        process = subprocess.Popen(
+            args, cwd=userroot, env={'LANG': 'en_US.utf-8', 'TZ': tz, 'HOME': userroot}, stderr=subprocess.PIPE
+        )
+        # This implementation capture the last 25 lines of output.
+        last_logs = deque(maxlen=25)
+        out = sys.stderr.buffer
+        try:
+            line = process.stderr.readline()
+            while line:
+                last_logs.append(line)
+                out.write(line)
+                out.flush()
+                line = process.stderr.readline()
+        except BrokenPipeError:
+            pass
+        # Wait for the process to finish
+        process.stderr.close()
+        retcode = process.wait()
+        if retcode:
+            raise subprocess.CalledProcessError(
+                retcode, args[0], stderr=''.join([line.decode('utf-8', 'replace') for line in last_logs])
+            )
 
 
 def _find_rdiff_backup(version=DEFAULT_RDIFF_BACKUP_VERSION):
@@ -112,51 +139,60 @@ def main(args=None):
 
     # Either we get called by rdiff-backup directly
     # or we get called by minarca client which replace the command by the name of the repository.
-    if ssh_original_command in ["echo -n 1", "echo -n host is alive"]:
-        # Used by backup-ninja to verify connectivity
-        subprocess.check_call(
-            ssh_original_command.split(' '),
-            env={'LANG': 'en_US.utf-8'},
-            stdout=sys.stdout.fileno(),
-            stderr=sys.stderr.fileno(),
-        )
-    elif ssh_original_command in ["/usr/bin/rdiff-backup -V"]:
-        rdiff_backup = _find_rdiff_backup()
-        subprocess.check_call(
-            [rdiff_backup, '-V'], env={'LANG': 'en_US.utf-8'}, stdout=sys.stdout.fileno(), stderr=sys.stderr.fileno()
-        )
-    else:
-        if ssh_original_command.startswith("rdiff-backup ") and "--server" in ssh_original_command:
-            # When called directly by rdiff-backup.
-            # So let use default rdiff-backup version.
-            rdiff_backup = _find_rdiff_backup()
-        elif 'minarca/' in ssh_original_command:
-            # When called by Minarca, we receive a user agent string.
-            if 'rdiff-backup/1.2.8' in ssh_original_command:
-                rdiff_backup = _find_rdiff_backup(version='1.2')
-            elif 'rdiff-backup/2.0' in ssh_original_command:
-                rdiff_backup = _find_rdiff_backup(version='2.0')
-            elif 'rdiff-backup/2.2' in ssh_original_command:
-                rdiff_backup = _find_rdiff_backup(version='2.2')
-            else:
-                logger.info("unsupported version: %s", ssh_original_command)
-                print("ERROR: unsupported version: %s" % ssh_original_command, file=sys.stderr)
-                sys.exit(1)
-        else:
-            # When called by legacy minarca client with rdiff-backup v1.2.8.
-            # the command should be the name of the repository.
-            rdiff_backup = _find_rdiff_backup(version='1.2')
-
-        # Run the server in chroot jail.
-        cmd = [rdiff_backup, '--server'] + _extra_args
-        logger.info("running command [%s] in jail [%s] for: %s", ' '.join(cmd), userroot, ssh_original_command)
-        try:
-            _jail(userroot, cmd)
-        except OSError:
-            logger.error(
-                "Fail to create rdiff-backup jail. If you are running minarca-shell in Docker, make sure you started the container with `--privileged`. If you are on Debian, make sure to disable userns hardening `echo 1 > /proc/sys/kernel/unprivileged_userns_clone`.",
-                exc_info=1,
+    try:
+        if ssh_original_command in ["echo -n 1", "echo -n host is alive"]:
+            # Used by backup-ninja to verify connectivity
+            subprocess.check_call(
+                ssh_original_command.split(' '),
+                env={'LANG': 'en_US.utf-8'},
+                stdout=sys.stdout.fileno(),
+                stderr=sys.stderr.fileno(),
             )
+        elif ssh_original_command in ["/usr/bin/rdiff-backup -V"]:
+            rdiff_backup = _find_rdiff_backup()
+            subprocess.check_call(
+                [rdiff_backup, '-V'],
+                env={'LANG': 'en_US.utf-8'},
+                stdout=sys.stdout.fileno(),
+                stderr=sys.stderr.fileno(),
+            )
+        else:
+            if ssh_original_command.startswith("rdiff-backup ") and "--server" in ssh_original_command:
+                # When called directly by rdiff-backup.
+                # So let use default rdiff-backup version.
+                rdiff_backup = _find_rdiff_backup()
+            elif 'minarca/' in ssh_original_command:
+                # When called by Minarca, we receive a user agent string.
+                if 'rdiff-backup/1.2.8' in ssh_original_command:
+                    rdiff_backup = _find_rdiff_backup(version='1.2')
+                elif 'rdiff-backup/2.0' in ssh_original_command:
+                    rdiff_backup = _find_rdiff_backup(version='2.0')
+                elif 'rdiff-backup/2.2' in ssh_original_command:
+                    rdiff_backup = _find_rdiff_backup(version='2.2')
+                else:
+                    logger.info("unsupported version: %s", ssh_original_command)
+                    print("ERROR: unsupported version: %s" % ssh_original_command, file=sys.stderr)
+                    sys.exit(1)
+            else:
+                # When called by legacy minarca client with rdiff-backup v1.2.8.
+                # the command should be the name of the repository.
+                rdiff_backup = _find_rdiff_backup(version='1.2')
+
+            # Run the server in chroot jail.
+            cmd = [rdiff_backup, '--server'] + _extra_args
+            logger.info("running command [%s] in jail [%s] for: %s", ' '.join(cmd), userroot, ssh_original_command)
+            try:
+                _jail(userroot, cmd)
+                logger.info("rdiff-backup terminated successfully")
+            except PermissionError:
+                logger.error(
+                    "Fail to create rdiff-backup jail. If you are running minarca-shell in Docker, make sure you started the container with `--privileged`. If you are on Debian, make sure to disable userns hardening `echo 1 > /proc/sys/kernel/unprivileged_userns_clone`.",
+                    exc_info=1,
+                )
+    except subprocess.CalledProcessError as e:
+        logger.warning("%s Last output: \n%s" % (e, e.stderr))
+    except Exception:
+        logger.error("unhandled exception in minarca-shell", exc_info=1)
 
 
 if __name__ == '__main__':

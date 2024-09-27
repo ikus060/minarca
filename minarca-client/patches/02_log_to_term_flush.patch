@@ -1,0 +1,10 @@
+--- a/src/rdiff_backup/log.py
++++ b/src/rdiff_backup/log.py
+@@ -123,6 +123,7 @@ class Logger:
+                         width=shutil.get_terminal_size().columns - 1) + "\n")
+             else:
+                 termfp.write(tmpstr)
++        termfp.flush()
+ 
+     def conn(self, direction, result, req_num):
+         """Log some data on the connection

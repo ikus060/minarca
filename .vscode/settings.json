@@ -4,7 +4,6 @@
     "python.testing.autoTestDiscoverOnSaveEnabled": false,
     "editor.suggestSelection": "recentlyUsedByPrefix",
     "python.testing.pytestArgs": [
-        "--ignore=minarca-server",
         "--ignore=minarca-quota-api"
     ]
 }

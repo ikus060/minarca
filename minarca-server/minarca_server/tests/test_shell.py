@@ -15,7 +15,6 @@ import io
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
 import unittest
 from unittest import mock
@@ -29,7 +28,6 @@ from minarca_server.shell import Jail
 USERNAME = 'joe'
 USERROOT = tempfile.gettempdir() + '/backups/joe'
 OUTPUT = tempfile.gettempdir() + '/output.txt'
-PY_VERSION = (sys.version_info.major, sys.version_info.minor)
 
 
 class Test(unittest.TestCase):
@@ -50,11 +48,13 @@ class Test(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             with contextlib.redirect_stderr(f):
                 with self.assertRaises(SystemExit):
+                    os.environ['MINARCA_LOG_FILE'] = tempfile.mktemp(prefix='minarca-shell', suffix='.log')
                     os.environ['MINARCA_USERNAME'] = USERNAME
                     os.environ['MINARCA_USER_ROOT'] = USERROOT
                     try:
                         shell.main([])
                     finally:
+                        del os.environ["MINARCA_LOG_FILE"]
                         del os.environ["MINARCA_USERNAME"]
                         del os.environ["MINARCA_USER_ROOT"]
         self.assertTrue('ERROR no command provided.' in f.getvalue(), msg='%s' % f.getvalue())
@@ -63,12 +63,14 @@ class Test(unittest.TestCase):
         with open(OUTPUT, 'wb') as f:
             with contextlib.redirect_stdout(f):
                 with contextlib.redirect_stderr(f):
+                    os.environ['MINARCA_LOG_FILE'] = tempfile.mktemp(prefix='minarca-shell', suffix='.log')
                     os.environ['MINARCA_USERNAME'] = USERNAME
                     os.environ['MINARCA_USER_ROOT'] = USERROOT
                     os.environ["SSH_ORIGINAL_COMMAND"] = "echo -n 1"
                     try:
                         shell.main([])
                     finally:
+                        del os.environ["MINARCA_LOG_FILE"]
                         del os.environ["MINARCA_USERNAME"]
                         del os.environ["MINARCA_USER_ROOT"]
                         del os.environ["SSH_ORIGINAL_COMMAND"]
@@ -96,12 +98,14 @@ class Test(unittest.TestCase):
     ):
         # Minarca is sending a user agent string containing the rdiff-backup
         # version.
+        os.environ['MINARCA_LOG_FILE'] = tempfile.mktemp(prefix='minarca-shell', suffix='.log')
         os.environ['MINARCA_USERNAME'] = USERNAME
         os.environ['MINARCA_USER_ROOT'] = USERROOT
         os.environ["SSH_ORIGINAL_COMMAND"] = ssh_original_cmd
         try:
             shell.main([])
         finally:
+            del os.environ["MINARCA_LOG_FILE"]
             del os.environ["MINARCA_USERNAME"]
             del os.environ["MINARCA_USER_ROOT"]
             del os.environ["SSH_ORIGINAL_COMMAND"]
@@ -114,7 +118,9 @@ class Test(unittest.TestCase):
     def test_jail(self):
         # Write a file in jail folder
         with open(os.path.join(USERROOT, 'test.txt'), 'w') as f:
-            f.write('coucou')
+            f.write('coucou\n')
+            f.write('foo\n')
+            f.write('bar\n')
         # Run jail and print content of the file.
         shell._jail(USERROOT, ['cat', 'test.txt'])
 
@@ -129,8 +135,19 @@ class Test(unittest.TestCase):
                     f.write('foo')
 
     def test_jail_proc(self):
-        with Jail(USERROOT):
-            subprocess.check_call(['ps'], stdout=subprocess.PIPE)
+        # Given a Jail, it's possible to get access to /proc.
+        shell._jail(USERROOT, ['ps'])
+
+    def test_jail_non_zero_return_code(self):
+        # Given a Jail that return a non-zero return code
+        with self.assertRaises(subprocess.CalledProcessError) as e:
+            shell._jail(USERROOT, ['/bin/bash', '-c', 'echo FOO 1>&2; echo Éric 1>&2; exit 22'])
+        # Then an exception is raised
+        self.assertIsInstance(e.exception, subprocess.CalledProcessError)
+        # The exit code is matching
+        self.assertEqual(e.exception.returncode, 22)
+        # The last lines of logs are logged.
+        self.assertEqual(e.exception.stderr, 'FOO\nÉric\n')
 
     def test_jail_tz(self):
         tz = get_localzone().zone
