@@ -38,6 +38,24 @@ class TestRdiffweb(unittest.TestCase):
         self.tmp.cleanup()
 
     @responses.activate
+    def test_test_redirect(self):
+        # Given the domain name get redirected
+        responses.remove(responses.GET, "http://localhost/api/")
+        responses.add(
+            responses.GET, "http://localhost/api/", status=301, headers={'Location': 'http://new-url.com/api/'}
+        )
+        responses.add(
+            responses.GET,
+            "http://new-url.com/api/",
+            status=200,
+        )
+        # When testing the connection
+        self.rdiffweb._tested = False
+        self.rdiffweb._test()
+        # Then remoteurl get updated
+        self.assertEqual(self.rdiffweb.remoteurl, "http://new-url.com/")
+
+    @responses.activate
     def test_get_current_user_info(self):
         # Give a server returning a response
         responses.add(

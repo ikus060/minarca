@@ -68,9 +68,9 @@ class Rdiffweb:
         if not response.url.endswith('/api/'):
             # If redirection change the path, make it fail.
             raise ConnectionError()
-        elif query_url != response.url:
-            # Check redirection
-            response = self._session.get(urljoin(self.remoteurl + '/', "api/"))
+        if query_url != response.url:
+            # Session was redirected, query using new location.
+            response = self._session.get(response.url)
         response.raise_for_status()
         self.remoteurl = response.url[0:-4]
         self._tested = True
