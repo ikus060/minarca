@@ -249,7 +249,7 @@ def _rdiff_backup(options):
     """
     # Write directly to stdout to check for error.
     try:
-        print('backup starting...')
+        print('backup starting...', flush=True)
     except IOError:
         sys.exit(_EXIT_NO_STDOUT)
     # Start the backup process
