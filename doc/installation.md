@@ -15,7 +15,6 @@ These minimum requirements are solely for evaluation and shall not be used in a 
 ### Recommended server requirement
 
 * Supported Operating System:
-  * Debian Buster
   * Debian Bullseye
   * Debian Bookworm
   * Ubuntu Jammy 22.04 LTS
