@@ -11,7 +11,6 @@ restriction. You are limited to the following operating system.
   * Windows 11 (64 bits)
   * MacOS Catalina (Intel)
   * MacOS BigSur (Intel)
-  * Debian Buster (64bit)
   * Debian Bullseye (64bit)
   * Debian Bookworm (64bit)
   * Ubuntu Jammy (64bit)
