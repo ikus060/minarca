@@ -34,6 +34,13 @@ except Exception:
 DEFAULT_RDIFF_BACKUP_VERSION = '2.0'
 
 
+_EXIT_EXCEPTION = 201
+_EXIT_PERM_ERROR = 202
+_EXIT_UNSUPPORTED_VERSION = 203
+_EXIT_NO_COMMAND = 204
+_EXIT_NO_USER_HOME = 205
+
+
 def _setup_logging(cfg):
     """
     Configure minarca-shell log file.
@@ -122,13 +129,13 @@ def main(args=None):
     if not userroot or not os.path.isdir(userroot):
         logger.info("invalid user home: %s", userroot)
         print("ERROR user home directory is miss configured.", file=sys.stderr)
-        sys.exit(1)
+        sys.exit(_EXIT_NO_USER_HOME)
 
     # Get Original ssh command from environment variable.
     ssh_original_command = os.environ.get("SSH_ORIGINAL_COMMAND", '')
     if not ssh_original_command:
         print("ERROR no command provided.", file=sys.stderr)
-        sys.exit(1)
+        sys.exit(_EXIT_NO_COMMAND)
 
     # Get extra arguments for rdiff-backup.
     _extra_args = cfg.minarca_rdiff_backup_extra_args
@@ -172,7 +179,7 @@ def main(args=None):
                 else:
                     logger.info("unsupported version: %s", ssh_original_command)
                     print("ERROR: unsupported version: %s" % ssh_original_command, file=sys.stderr)
-                    sys.exit(1)
+                    sys.exit(_EXIT_UNSUPPORTED_VERSION)
             else:
                 # When called by legacy minarca client with rdiff-backup v1.2.8.
                 # the command should be the name of the repository.
@@ -189,10 +196,13 @@ def main(args=None):
                     "Fail to create rdiff-backup jail. If you are running minarca-shell in Docker, make sure you started the container with `--privileged`. If you are on Debian, make sure to disable userns hardening `echo 1 > /proc/sys/kernel/unprivileged_userns_clone`.",
                     exc_info=1,
                 )
+                sys.exit(_EXIT_PERM_ERROR)
     except subprocess.CalledProcessError as e:
         logger.warning("%s Last output: \n%s" % (e, e.stderr))
+        sys.exit(e.returncode)
     except Exception:
         logger.error("unhandled exception in minarca-shell", exc_info=1)
+        sys.exit(_EXIT_EXCEPTION)
 
 
 if __name__ == '__main__':
