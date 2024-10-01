@@ -23,7 +23,7 @@
  
  
 +def timeout_handler(signum, frame):
-+    raise OSError("File read operation timed out.")
++    raise RPathException("File read operation timed out.")
 +
 +
 +def read_timeout(self, size, timeout=300):
