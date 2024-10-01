@@ -409,6 +409,11 @@ class Patterns(AbstractConfigFile, MutableSequence):
             data.extend(
                 [
                     Pattern(False, "**/.DS_Store", _("Desktop Services Store")),
+                    Pattern(
+                        False,
+                        "**/OneDrive*/.*[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]",
+                        _("OneDrive GUID File"),
+                    ),
                 ]
             )
         elif IS_LINUX:
