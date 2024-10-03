@@ -27,3 +27,7 @@ Update an existing translation:
 Compile catalog:
 
     python setup.py compile_catalog
+
+## Code Signing
+
+Reference <https://melatonin.dev/blog/code-signing-on-windows-with-azure-trusted-signing/>

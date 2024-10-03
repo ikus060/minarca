@@ -123,6 +123,11 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 6.0.0b10
+
+* Minarca Agent
+  * Update code signing certificate
+
 ## 6.0.0b9
 
 * Minarca Agent
@@ -620,7 +625,7 @@ This new version bring two major features Minarca: A user quota management ready
 ## v3.7.0 (2020-06-24)
 
 This new release officially adds the installation of Minarca using an APT repository for Debian Stretch and Debian Buster.
-Take a look at the updated [installation steps](doc/installation.md). Quickly, the installation become easy as `curl https://www.ikus-soft.com/archive/minarca/get-minarca.sh | sh -`.
+Take a look at the updated [installation steps](doc/installation.md).
 
 * Server: Upgrade to rdiffweb v1.5.0
   * Change formatting of Last Backup date for "Updated 3 weeks ago" to ease the readability

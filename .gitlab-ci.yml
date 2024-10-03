@@ -121,25 +121,14 @@ bdist-client:win32:
     - "./*/xunit*.xml"
     expire_in: 1 day
   before_script:
-  # Install required dependencies for building on Windows
-  # python is used for building
-  # openssl is required to generate certificate
-  # nsis for creating installer
-  # osslsigncode to sign binaries
-  - choco install python3 --no-progress --version=3.10.11 -y -f --source "'https://nexus.ikus-soft.com/repository/choco/'"
-  - choco install openssl --no-progress -y --source "'https://nexus.ikus-soft.com/repository/choco/'"
-  - choco install nsis --no-progress -y --source "'https://nexus.ikus-soft.com/repository/choco/'"
-  - wget.exe -q https://github.com/mtrojnar/osslsigncode/releases/download/2.2/osslsigncode_2.2_windows.zip
-  - 7z x osslsigncode_2.2_windows.zip -aoa -oC:\osslsigncode
-  - $Env:path = ";C:\osslsigncode;C:\Python310\Scripts\;C:\Python310\;C:\Program Files (x86)\kSign\;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files (x86)\NSIS;$Env:path"
-  - $Env:path
+  # Make use of nuget to install our dependencies
+  - Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile nuget.exe
+  - .\nuget.exe install python -Version 3.10.11
+  - $env:PATH = "$(Get-Location)\python.3.10.11\tools;$(Get-Location)\python.3.10.11\tools\Scripts;$env:PATH"
   # Sanity check
   - python.exe -VV
-  - osslsigncode.exe --version
-  - openssl.exe version
-  - makensis.exe /version
   # Install tox
-  - pip.exe install tox
+  - python.exe -m pip install tox
   needs: []  
   script:
   - cd minarca-client
