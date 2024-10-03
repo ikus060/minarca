@@ -155,55 +155,7 @@ coll = COLLECT(
     name='minarca',
 )
 
-# Extract certificate from environment variable.
-cert_file = tempfile.mktemp(suffix='.key')
-key_file = tempfile.mktemp(suffix='.pem')
-passphrase = os.environ.get('AUTHENTICODE_PASSPHRASE')
-if os.environ.get('AUTHENTICODE_CERT'):
-    # Write cert to file
-    with open(cert_file, 'w') as f:
-        f.write(os.environ['AUTHENTICODE_CERT'])
-    # Write key to file
-    with open(key_file, 'w') as f:
-        f.write(os.environ['AUTHENTICODE_KEY'])
-    # Get Common Name from certificate subject
-    cert_subject = subprocess.check_output(
-        ['openssl', 'x509', '-noout', '-subject', '-in', cert_file], text=True
-    ).strip()
-    cert_cn = cert_subject.partition('/CN=')[2]
-    # Code signing on Windows required pfx file.
-    pfx_file = tempfile.mktemp(suffix='.pfx')
-    subprocess.check_call(
-        [
-            'openssl',
-            'pkcs12',
-            '-inkey',
-            key_file,
-            '-in',
-            cert_file,
-            '-passin',
-            'pass:%s' % passphrase,
-            '-passout',
-            'pass:%s' % passphrase,
-            '-export',
-            '-out',
-            pfx_file,
-        ],
-        stderr=subprocess.STDOUT,
-    )
-else:
-    print('AUTHENTICODE_CERT is missing, skip signing')
-
-#
-# Packaging
-#
 if platform.system() == "Darwin":
-    if os.environ.get('AUTHENTICODE_CERT'):
-        # Add certificate to login keychain
-        keychain = os.path.expanduser('~/Library/Keychains/login.keychain')
-        subprocess.check_call(
-            ['security', 'import', pfx_file, '-k', keychain, '-P', passphrase], stderr=subprocess.STDOUT
-        )
 
     # Create app bundle
     app = BUNDLE(
@@ -212,7 +164,6 @@ if platform.system() == "Darwin":
         icon=macos_icon,
         bundle_identifier='com.ikus-soft.minarca',
         version=version,
-        codesign_identity=cert_cn,
     )
     app_file = join(DISTPATH, 'Minarca.app')
 
@@ -228,56 +179,22 @@ if platform.system() == "Darwin":
 
 elif platform.system() == "Windows":
 
-    def sign_exe(path):
-        if not os.path.isfile(path):
-            raise Exception('fail to sign executable: file not found: %s' % path)
-        if not os.environ.get('AUTHENTICODE_CERT'):
-            return
-        # Sign executable.
-        unsigned = tempfile.mktemp(suffix='.exe')
-        os.rename(path, unsigned)
-        subprocess.check_call(
-            [
-                'osslsigncode.exe',
-                'sign',
-                '-certs',
-                cert_file,
-                '-key',
-                key_file,
-                '-pass',
-                passphrase,
-                '-n',
-                'Minarca',
-                '-i',
-                'https://minarca.org',
-                '-h',
-                'sha2',
-                '-t',
-                'http://timestamp.digicert.com',
-                '-in',
-                unsigned,
-                '-out',
-                path,
-            ],
-            stderr=subprocess.STDOUT,
-        )
-        if not os.path.isfile(path):
-            raise Exception('fail to sign executable: output file found: %s' % path)
-
-    # Sign executable
-    sign_exe(join(DISTPATH, 'minarca/minarca.exe'))
+    from exebuild import signexe, makensis
 
     # For NSIS, we need to create a license file with Windows encoding.
     with open(join(DISTPATH, 'minarca/LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
         out.write(license)
 
+    # Sign Minarca executables
+    signexe(join(DISTPATH, 'minarca/minarca.exe'))
+    signexe(join(DISTPATH, 'minarca/minarcaw.exe'))
+
     # Create installer using NSIS
     exe_version = re.search(r'.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
     nsi_file = join(SPECPATH, 'minarca.nsi')
     setup_file = join(DISTPATH, 'minarca-client_%s.exe' % version)
-    subprocess.check_call(
+    makensis(
         [
-            'makensis',
             '-NOCD',
             '-INPUTCHARSET',
             'UTF8',
@@ -290,7 +207,7 @@ elif platform.system() == "Windows":
     )
 
     # Sign installer
-    sign_exe(setup_file)
+    signexe(setup_file)
 
     # Binary smoke test
     subprocess.check_call([join(DISTPATH, 'minarca/minarca.exe'), '--version'], stderr=subprocess.STDOUT)
