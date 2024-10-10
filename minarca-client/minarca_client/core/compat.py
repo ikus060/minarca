@@ -8,6 +8,7 @@ Created on Jun. 7, 2021
 '''
 import asyncio
 import datetime
+import logging
 import os
 import platform
 import shutil
@@ -16,11 +17,11 @@ import sys
 import tempfile
 from importlib.metadata import distribution as get_distribution
 from importlib.resources import files
-from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import aiofiles
+import psutil
 
 from minarca_client.locale import _
 
@@ -97,6 +98,21 @@ def flush(path):
             os.close(fd)
         except IOError:
             pass
+
+
+def nice():
+    """Increase the niceness of the process to below normal."""
+    try:
+        if IS_WINDOWS:
+            # On Windows,
+            p = psutil.Process(os.getpid())
+            p.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS)
+        else:
+            if os.nice(0) == 0:
+                os.nice(10)
+    except Exception:
+        # Just log the error.
+        logging.getLogger(__name__).warning('fail to lower process priority', exc_info=1)
 
 
 def get_is_admin():
@@ -369,7 +385,7 @@ class RobustRotatingFileHandler(RotatingFileHandler):
         except Exception:
             pass
         try:
-            FileHandler.emit(self, record)
+            logging.FileHandler.emit(self, record)
         except Exception:
             self.handleError(record)
 

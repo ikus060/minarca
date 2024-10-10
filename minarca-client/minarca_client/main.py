@@ -18,7 +18,13 @@ import rdiffbackup.run
 
 from minarca_client import __version__
 from minarca_client.core import Backup, InstanceId
-from minarca_client.core.compat import IS_WINDOWS, RobustRotatingFileHandler, get_default_repositoryname, get_log_file
+from minarca_client.core.compat import (
+    IS_WINDOWS,
+    RobustRotatingFileHandler,
+    get_default_repositoryname,
+    get_log_file,
+    nice,
+)
 from minarca_client.core.config import Pattern, Settings
 from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
@@ -249,9 +255,12 @@ def _rdiff_backup(options):
     """
     # Write directly to stdout to check for error.
     try:
-        print('backup starting...', flush=True)
+        version = rdiffbackup.run.Globals.version
+        print(f'rdiff-backup {version}', flush=True)
     except IOError:
         sys.exit(_EXIT_NO_STDOUT)
+    # Set the priority to below normal
+    nice()
     # Start the backup process
     try:
         return rdiffbackup.run.main_run(options)
