@@ -238,7 +238,7 @@ def get_temp():
 
 
 def get_user_agent():
-    from minarca_client.main import __version__
+    from minarca_client import __version__
 
     return "minarca/{minarca_version} rdiff-backup/{rdiff_backup_version} ({os_name} {os_version} {os_arch})".format(
         minarca_version=__version__,
