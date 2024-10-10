@@ -24,6 +24,8 @@ class LatestCheck:
     Responsible to check if current version is up-to-date.
     """
 
+    _latest_version = None
+
     def get_download_url(self):
         """
         Return Minarca download page.
@@ -34,6 +36,9 @@ class LatestCheck:
         """
         Query the latest version of minarca.
         """
+        # Check if the latest version was already queried.
+        if self._latest_version is not None:
+            return self._latest_version
         try:
             # Replace User agent by something meaningful.
             headers = {
@@ -44,7 +49,8 @@ class LatestCheck:
             # Check status
             response.raise_for_status()
             # Parse data as json
-            return response.text
+            self._latest_version = response.text
+            return self._latest_version
         except requests.exceptions.RequestException as e:
             raise LatestCheckFailed(e)
 
