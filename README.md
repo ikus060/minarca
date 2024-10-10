@@ -126,7 +126,18 @@ The Minarca website is <https://minarca.org/>.
 ## 6.0.0b10
 
 * Minarca Agent
+  * Follow URL redirection in Backup settings
   * Update code signing certificate
+  * Drop Debian Buster support #263
+  * Add exclude pattern for OneDrive GUID on MacOS
+  * Add read timeout when file is stored in the cloud (e.g.: OneDrive)
+  * Patch rdiff-backup log_to_term to flush more often
+  * Sign Windows executable with Azure Code Signing
+* Minarca Server
+  * Drop Debian Buster support #263
+  * Upgrade snakeoil fix #262
+  * Display last log lines when rdiff-backup fail
+  * Improve exception handling
 
 ## 6.0.0b9
 
