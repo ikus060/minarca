@@ -1,0 +1,11 @@
+--- a/src/rdiff_backup/robust.py
++++ b/src/rdiff_backup/robust.py
+@@ -115,7 +115,7 @@ def catch_error(exc):
+     """
+     if isinstance(exc, (rpath.SkipFileException, rpath.RPathException,
+                         librsync.librsyncError, C.UnknownFileTypeError,
+-                        zlib.error)):
++                        zlib.error, BlockingIOError, TimeoutError)):
+         return True
+     if (isinstance(exc, OSError)
+             # the invalid mode shows up in backups of /proc for some reason
