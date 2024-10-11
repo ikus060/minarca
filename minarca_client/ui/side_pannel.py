@@ -17,7 +17,7 @@ Builder.load_string(
     orientation: "vertical"
     md_bg_color: self.theme_cls.surfaceContainerColor
     size_hint: (None, 1)
-    width: 390
+    width: "390dp"
     padding: "50dp"
     spacing: "20dp"
 
