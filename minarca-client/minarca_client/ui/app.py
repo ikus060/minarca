@@ -23,6 +23,7 @@ from .backup_restore_custom import BackupRestoreCustom  # noqa
 from .backup_restore_date import BackupRestoreDate  # noqa
 from .backup_restore_full import BackupRestoreFull  # noqa
 from .backup_settings import BackupSettings  # noqa
+from .backup_advance import BackupAdvanceSettings  # noqa
 from .dashboard import DashboardView
 from .side_pannel import SidePanel  # noqa
 

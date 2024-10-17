@@ -234,6 +234,9 @@ class Settings(KeyValueConfigFile):
     WEEKLY = 168
     MONTHLY = 720
 
+    HOOK_ENABLED = 1<<0
+    HOOK_CONTINUE_ON_ERROR = 1<<1
+
     _fields = [
         ('username', str, None),
         ('accesstoken', str, None),
@@ -259,6 +262,7 @@ class Settings(KeyValueConfigFile):
         ('localuuid', str, None),
         ('localrelpath', str, None),
         ('localcaption', str, None),
+        ('hook', int, None),
     ]
 
     @property

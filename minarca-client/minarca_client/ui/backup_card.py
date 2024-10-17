@@ -159,7 +159,19 @@ Builder.load_string(
 
         MDDivider:
 
-        # Backup patterns
+        # Advance Backup patterns
+        CListItem:
+            on_release: root.backup_advance()
+
+            MDListItemSupportingText:
+                text:  _('Advance settings')
+
+            MDListItemTrailingIcon:
+                icon: "chevron-right"
+
+        MDDivider:
+
+        # Backup restore
         CListItem:
             on_release: root.backup_restore()
 
@@ -437,3 +449,6 @@ class BackupCard(CCard):
 
     def backup_restore(self):
         App.get_running_app().set_active_view('BackupRestore', instance=self.instance)
+
+    def backup_advance(self):
+        App.get_running_app().set_active_view('BackupAdvanceSettings', instance=self.instance)
