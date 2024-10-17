@@ -30,6 +30,12 @@ class Settings(KeyValueConfigFile):
     WEEKLY = 168
     MONTHLY = 720
 
+    # List of flags value
+    PRE_ENABLED = 1 << 0
+    PRE_IGNORE_ERROR = 1 << 1
+    POST_ENABLED = 1 << 2
+    POST_IGNORE_ERROR = 1 << 3
+
     _fields = [
         ('username', str, None),
         ('accesstoken', str, None),
@@ -55,6 +61,7 @@ class Settings(KeyValueConfigFile):
         ('localuuid', str, None),
         ('localrelpath', str, None),
         ('localcaption', str, None),
+        ('flags', int, 0),
     ]
 
     @property

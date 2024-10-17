@@ -13,6 +13,7 @@ from kivymd.app import MDApp
 from minarca_client.ui.theme import MinarcaTheme
 
 from .about_menu import AboutMenu  # noqa
+from .backup_advance import BackupAdvanceSettings  # noqa
 from .backup_connection_local import BackupConnectionLocal  # noqa
 from .backup_connection_remote import BackupConnectionRemote  # noqa
 from .backup_create import BackupCreate

@@ -190,10 +190,51 @@ class BackupInstance:
         self.status_file = compat.get_data_home() / f"status{id}.properties"
         self.backup_log_file = compat.get_data_home() / f"backup{id}.log"
         self.restore_log_file = compat.get_data_home() / f"restore{id}.log"
+        self.pre_hooks_dir = compat.get_data_home() / f"pre-hooks{id}.d/"
+        self.post_hooks_dir = compat.get_data_home() / f"post-hooks{id}.d/"
         # Create wrapper around config files.
         self.patterns = Patterns(self.patterns_file)
         self.status = Status(self.status_file)
         self.settings = Settings(self.config_file)
+
+    def create_hooks_dir(self):
+        """Create hooks folder"""
+        # Check if something colide with the creation of the folder.
+        if self.pre_hooks_dir.exists() and not self.pre_hooks_dir.is_dir():
+            raise FileExistsError(self.pre_hooks_dir)
+        if self.post_hooks_dir.exists() and not self.post_hooks_dir.is_dir():
+            raise FileExistsError(self.post_hooks_dir)
+        # Create the folder with proper permissions.
+        self.pre_hooks_dir.mkdir(mode=0o700, exist_ok=True)
+        self.post_hooks_dir.mkdir(mode=0o700, exist_ok=True)
+
+    async def _run_hooks(self, folder, enabled, ignore_error, log_file):
+        name = os.path.basename(folder)
+        hook_enabled = self.settings.flags & enabled
+        hook_ignore_error = self.settings.flags & ignore_error
+        if not hook_enabled:
+            return
+        # TODO Check perm on folder
+        folder_perm = os.lstat(folder).st_mode & 0o777
+        if not IS_WINDOWS and folder_perm != 0o700:
+            if ignore_error:
+                
+            else:
+                raise PermissionError(f"permissions  on {name}")
+        log_file.write(f"execute {name} scripts")
+        for script in folder.iterdir():
+
+            subprocess.run(
+                script,
+                cwd=folder,
+                env={},
+                stdin=None,
+                stdout=log_file,
+                stderr=subprocess.STDOUT,
+                check=not hook_ignore_error,
+                creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
+            )
+        log_file.write(f"{name} scripts completed successfully")
 
     async def backup(self, force=False):
         """
@@ -221,55 +262,75 @@ class BackupInstance:
                         patterns = self.patterns
                         if not patterns:
                             raise NoPatternsError()
+                        # Execute pre-hooks
+                        await self._run_hooks(
+                            folder=self.pre_hooks_dir,
+                            enabled=self.settings.PRE_ENABLED,
+                            ignore_error=self.settings.PRE_IGNORE_ERROR,
+                            log_file=log_file,
+                        )
 
-                        # On Windows operating system, the computer may have multiple Root
-                        # (C:\, D:\, etc). To support this scenario, we need to run
-                        # rdiff-backup multiple time on the same computer. Once for each Root
-                        # to be backup (if required).
+                        # Execute the actual backup with rdiff-backup for each drive.
                         for drive, patterns in patterns.group_by_roots():
-                            args = []
-                            # If required add remote-schema to define how to connect to SSH Server
-                            if self.is_remote():
-                                args.append("--remote-schema")
-                                args.append(self._remote_schema())
-                            args.append("backup")
-                            if IS_WINDOWS:
-                                args.extend(
-                                    [
-                                        "--no-hard-links",
-                                        "--exclude-symbolic-links",
-                                        "--create-full-path",
-                                    ]
-                                )
-                            else:
-                                args.append("--exclude-sockets")
-                            args.append("--no-compression")
-                            # Add Include exclude patterns. Those are already sorted.
-                            for p in patterns:
-                                args.append("--include" if p.include else "--exclude")
-                                args.append(p.pattern)
-                            # Exclude everything else
-                            args.extend(["--exclude", f"{drive}**"])
-                            # Call rdiff-backup
-                            dest = self._backup_path(drive)
-                            await self._rdiff_backup(*args, drive, dest, log_file=log_file)
-                            # For local disk, make sure to "flush" disk cache
-                            if self.is_local():
-                                logger.debug(f"{self.log_id}: flushing changes to disk")
-                                flush(dest)
+                            await self._backup_drive(drive, patterns, log_file=log_file)
 
-                            # # For local disk, we need to manage the retention period too.
-                            if self.is_local() and self.settings.keepdays and self.settings.keepdays > 0:
-                                await self._rdiff_backup(
-                                    '--force',
-                                    'remove',
-                                    'increments',
-                                    '--older-than',
-                                    f"{self.settings.keepdays}D",
-                                    dest,
-                                    log_file=log_file,
-                                )
+                        # Execute post-hooks
+                        await self._run_hooks(
+                            folder=self.pre_hooks_dir,
+                            enabled=self.settings.POST_ENABLED,
+                            ignore_error=self.settings.POST_IGNORE_ERROR,
+                            log_file=log_file,
+                        )
+
         logger.debug(f"{self.log_id}: backup process completed successfully")
+
+    async def _backup_drive(self, drive, patterns, log_file):
+        # On Windows operating system, the computer may have multiple Root
+        # (C:\, D:\, etc). To support this scenario, we need to run
+        # rdiff-backup multiple time on the same computer. Once for each Root
+        # to be backup (if required).
+        args = []
+        # If required add remote-schema to define how to connect to SSH Server
+        if self.is_remote():
+            args.append("--remote-schema")
+            args.append(self._remote_schema())
+        args.append("backup")
+        if IS_WINDOWS:
+            args.extend(
+                [
+                    "--no-hard-links",
+                    "--exclude-symbolic-links",
+                    "--create-full-path",
+                ]
+            )
+        else:
+            args.append("--exclude-sockets")
+        args.append("--no-compression")
+        # Add Include exclude patterns. Those are already sorted.
+        for p in patterns:
+            args.append("--include" if p.include else "--exclude")
+            args.append(p.pattern)
+        # Exclude everything else
+        args.extend(["--exclude", f"{drive}**"])
+        # Call rdiff-backup
+        dest = self._backup_path(drive)
+        await self._rdiff_backup(*args, drive, dest, log_file=log_file)
+        # For local disk, make sure to "flush" disk cache
+        if self.is_local():
+            log_file.write("flushing changes to disk")
+            flush(dest)
+
+        # # For local disk, we need to manage the retention period too.
+        if self.is_local() and self.settings.keepdays and self.settings.keepdays > 0:
+            await self._rdiff_backup(
+                '--force',
+                'remove',
+                'increments',
+                '--older-than',
+                f"{self.settings.keepdays}D",
+                dest,
+                log_file=log_file,
+            )
 
     def get_repo_url(self, page="browse"):
         """
