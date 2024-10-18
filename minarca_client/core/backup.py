@@ -21,7 +21,6 @@ from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, Missi
 
 from minarca_client.core.compat import (
     IS_WINDOWS,
-    Scheduler,
     detach_call,
     file_read_async,
     file_write_async,
@@ -44,6 +43,7 @@ from minarca_client.core.exceptions import (
 )
 from minarca_client.core.instance import BackupInstance
 from minarca_client.core.rdiffweb import Rdiffweb
+from minarca_client.core.scheduler import Scheduler
 
 if IS_WINDOWS:
     import win32api

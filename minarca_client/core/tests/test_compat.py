@@ -16,8 +16,9 @@ from unittest import mock
 from unittest.case import skipUnless
 
 from minarca_client.core import compat
-from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, Scheduler, tail
+from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, tail
 from minarca_client.core.minarcaid import ssh_keygen
+from minarca_client.core.scheduler import Scheduler
 from minarca_client.tests.test import MATCH
 
 _echo_rdiff_backup_version = (
