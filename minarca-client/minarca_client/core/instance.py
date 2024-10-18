@@ -26,7 +26,7 @@ from tzlocal import get_localzone
 
 from minarca_client.core import compat
 from minarca_client.core.compat import IS_WINDOWS, detach_call, file_read, flush, get_minarca_exe
-from minarca_client.core.config import Datetime, Patterns, Settings, Status
+from minarca_client.core.config import Datetime, Settings, Status
 from minarca_client.core.disk import get_location_info, list_disks
 from minarca_client.core.exceptions import (
     CaptureException,
@@ -46,6 +46,7 @@ from minarca_client.core.exceptions import (
 )
 from minarca_client.core.minarcaid import ssh_keygen
 from minarca_client.core.notification import clear_notification, send_notification
+from minarca_client.core.pattern import Patterns
 from minarca_client.core.rdiffweb import Rdiffweb
 from minarca_client.locale import _
 

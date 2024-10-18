@@ -16,8 +16,8 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDListItem
 
 from minarca_client.core import BackupInstance
-from minarca_client.core.config import Patterns
 from minarca_client.core.exceptions import BackupError
+from minarca_client.core.pattern import Patterns
 from minarca_client.dialogs import question_dialog
 from minarca_client.locale import _
 from minarca_client.ui.spinner_overlay import SpinnerOverlay  # noqa

@@ -26,7 +26,7 @@ from minarca_client.core.compat import (
     get_log_file,
     nice,
 )
-from minarca_client.core.config import Pattern, Settings
+from minarca_client.core.config import Settings
 from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
     BackupError,
@@ -36,6 +36,7 @@ from minarca_client.core.exceptions import (
     RepositoryNameExistsError,
 )
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
+from minarca_client.core.pattern import Pattern
 from minarca_client.locale import _
 
 _EXIT_BACKUP_FAIL = 101
