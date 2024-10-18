@@ -10,7 +10,8 @@ from kivy.properties import BooleanProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
 from minarca_client.core import BackupInstance
-from minarca_client.dialogs import question_dialog, warning_dialog
+from minarca_client.core.compat import open_file_with_default_app
+from minarca_client.dialogs import warning_dialog
 from minarca_client.locale import _
 from minarca_client.ui.spinner_overlay import SpinnerOverlay  # noqa
 
@@ -25,7 +26,7 @@ Builder.load_string(
     SidePanel:
         is_remote: root.is_remote
         create: False
-        text: _("Configure your advance backup settings.")
+        text: _("Configure your advanced backup settings to fine-tune your preferences.")
 
     MDFloatLayout:
 
@@ -40,21 +41,41 @@ Builder.load_string(
                 adaptive_height: True
 
                 CLabel:
-                    text: _('Advance backup settings')
+                    text: _('Script hooks')
                     font_style: "Title"
                     role: "small"
                     text_color: self.theme_cls.primaryColor
 
+                CLabel:
+                    text: _("Set up custom scripts to run before or after backups by placing them in designated folders.")
+
                 CCheckbox:
-                    text: _("Execute script(s) before and after backup")
-                    active: root.execute_scripts
-                    on_active: root.execute_scripts = not root.execute_scripts
+                    text: _("Run script(s) before backup")
+                    active: root.pre_enabled
+                    on_active: root.pre_enabled = not root.pre_enabled
 
                 CCheckbox:
                     text: _("Continue the backup if one of the script execution fails")
-                    active: root.continue_on_error
-                    on_active: root.continue_on_error = not root.continue_on_error
-                    disabled: not root.execute_scripts
+                    active: root.pre_ignore_error
+                    on_active: root.pre_ignore_error = not root.pre_ignore_error
+                    disabled: not root.pre_enabled
+
+                CCheckbox:
+                    text: _("Run script(s) after backup")
+                    active: root.post_enabled
+                    on_active: root.post_enabled = not root.post_enabled
+
+                CCheckbox:
+                    text: _("Execute script(s) after backup, even if backup fails")
+                    active: root.post_ignore_error
+                    on_active: root.post_ignore_error = not root.post_ignore_error
+                    disabled: not root.post_enabled
+
+                CButton:
+                    text: _('Open hooks folders')
+                    role: "small"
+                    on_release: root.open_hooks_dir()
+                    disabled: not root.post_enabled and not root.pre_enabled
 
                 MDBoxLayout:
                     orientation: "horizontal"
@@ -83,18 +104,17 @@ Builder.load_string(
 '''
 )
 
-# TODO Add a little info about script permissions and list of supported script.
-# Required mode 644
+# TODO
 # On Window,s will support "vbs", "cmd", "ps1", "bat" ?
 # On Linux/MacOS we support anything ? start with proper shebang
 
-# TODO Add a button to open script folder location.
-# If this location doesn't exists. prompt user to create the folder. Similar to Zim.
 
 class BackupAdvanceSettings(MDBoxLayout):
     is_remote = BooleanProperty(True)
-    execute_scripts = BooleanProperty(False)
-    continue_on_error = BooleanProperty(False)
+    pre_enabled = BooleanProperty(False)
+    pre_ignore_error = BooleanProperty(False)
+    post_enabled = BooleanProperty(False)
+    post_ignore_error = BooleanProperty(False)
     working = StringProperty()
 
     def __init__(self, backup=None, instance=None, create=False):
@@ -108,9 +128,12 @@ class BackupAdvanceSettings(MDBoxLayout):
 
         # Load settings from local values
         settings = self.instance.settings
-        if settings.hook is not None:
-            self.execute_scripts = settings.hook & settings.HOOK_ENABLED
-            self.continue_on_error = settings.hook & settings.HOOK_CONTINUE_ON_ERROR
+        flags = settings.flags
+        if flags is not None:
+            self.pre_enabled = flags & settings.PRE_ENABLED
+            self.pre_ignore_error = flags & settings.PRE_IGNORE_ERROR
+            self.post_enabled = flags & settings.POST_ENABLED
+            self.post_ignore_error = flags & settings.POST_IGNORE_ERROR
 
         # Create the view
         super().__init__()
@@ -130,21 +153,66 @@ class BackupAdvanceSettings(MDBoxLayout):
         try:
             # Save settings
             settings = self.instance.settings
-            hook = 0
-            if self.execute_script:
-                hook |= settings.HOOK_ENABLED
-            if self.continue_on_error:
-                hook |= settings.HOOK_CONTINUE_ON_ERROR
+            flags = settings.flags
+            for value, flag in [
+                (self.pre_enabled, settings.PRE_ENABLED),
+                (self.pre_ignore_error, settings.PRE_IGNORE_ERROR),
+                (self.post_enabled, settings.POST_ENABLED),
+                (self.post_ignore_error, settings.POST_IGNORE_ERROR),
+            ]:
+                if value:
+                    flags |= flag
+                else:
+                    flags &= ~flag
+            settings.flags = flags
             settings.save()
             # Redirect user to dashboard.
             App.get_running_app().set_active_view('DashboardView')
         except Exception as e:
-            logger.exception('problem occured while saving advance backup settings')
+            logger.exception('problem encountered while saving advance backup settings')
             await warning_dialog(
                 parent=self,
                 title=_('Cannot save advance settings'),
                 message=_(
-                    'An unknown problem occured while trying to save the advance backup settings. If the problem persist contact your administrator.'
+                    'An unknown problem encountered while trying to save the advance backup settings. If the problem persist contact your administrator.'
+                ),
+                detail=str(e),
+            )
+        finally:
+            self.working = ''
+
+    def open_hooks_dir(self):
+        if self.working:
+            # Operation should not be accessible if already working.
+            return
+        self.working = _('Please wait. Opening post-hooks folder...')
+        self._save_task = asyncio.create_task(self._open_hook_dir())
+
+    async def _open_hook_dir(self):
+        """Used to create and open the hook folder."""
+        try:
+            self.instance.create_hooks_dir()
+            if self.pre_enabled:
+                open_file_with_default_app(self.instance.pre_hooks_dir)
+            if self.post_enabled:
+                open_file_with_default_app(self.instance.post_hooks_dir)
+        except FileExistsError as e:
+            logger.exception('file already exists')
+            await warning_dialog(
+                parent=self,
+                title=_('Cannot create hook folder'),
+                message=_(
+                    "The location `%s` already exists, but it's not a folder. Please delete this file and try again."
+                )
+                % e[0],
+            )
+        except Exception as e:
+            logger.exception('problem encountered when creating a hook folders')
+            await warning_dialog(
+                parent=self,
+                title=_('Cannot create hook folders'),
+                message=_(
+                    'An unknown problem has been encountered when creating hook folders. If the problem persists, please contact your administrator.'
                 ),
                 detail=str(e),
             )

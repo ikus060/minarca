@@ -34,7 +34,8 @@
             "args": [
                 "backup",
                 "--instance",
-                "2",
+                "0",
+                "--force",
             ],
             "console": "integratedTerminal",
             "justMyCode": false,
