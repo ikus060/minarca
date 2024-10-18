@@ -24,7 +24,7 @@ import responses
 
 from minarca_client.core import Backup, BackupInstance
 from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.config import Datetime, Pattern, Patterns, Settings
+from minarca_client.core.config import Datetime, Settings
 from minarca_client.core.disk import LocationInfo
 from minarca_client.core.exceptions import (
     BackupError,
@@ -41,6 +41,7 @@ from minarca_client.core.exceptions import (
 )
 from minarca_client.core.instance import _sh_quote
 from minarca_client.core.minarcaid import ssh_keygen
+from minarca_client.core.pattern import Pattern, Patterns
 from minarca_client.locale import gettext as _
 from minarca_client.tests.test import MATCH
 

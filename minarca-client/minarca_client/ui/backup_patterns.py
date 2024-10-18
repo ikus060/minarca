@@ -12,7 +12,7 @@ from kivymd.uix.list import MDListItem
 
 from minarca_client.core import BackupInstance
 from minarca_client.core.compat import get_home
-from minarca_client.core.config import Pattern, Patterns
+from minarca_client.core.pattern import Pattern, Patterns
 from minarca_client.dialogs import file_dialog, folder_dialog
 from minarca_client.locale import _
 from minarca_client.ui.utils import alias_property
