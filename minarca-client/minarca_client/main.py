@@ -19,6 +19,7 @@ import rdiffbackup.run
 from minarca_client import __version__
 from minarca_client.core import Backup, InstanceId
 from minarca_client.core.compat import (
+    IS_MAC,
     IS_WINDOWS,
     RobustRotatingFileHandler,
     get_default_repositoryname,
@@ -630,9 +631,13 @@ def _parse_args(args):
     sub.set_defaults(func=_stop)
 
     # scheduler
-    sub = subparsers.add_parser(
-        'schedule', help=_('create the required scheduled task in crontab or Windows Task Scheduler')
-    )
+    if IS_WINDOWS:
+        help = _('create the required scheduled task in Windows Task Scheduler')
+    elif IS_MAC:
+        help = _('create the required scheduled task in launchd')
+    else:
+        help = _('create the required scheduled task in crontab')
+    sub = subparsers.add_parser('schedule', help=help)
     sub.add_argument(
         '--hourly',
         dest='schedule',
