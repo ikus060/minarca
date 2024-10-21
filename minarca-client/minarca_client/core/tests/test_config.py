@@ -14,7 +14,9 @@ import unittest
 from unittest.case import skipIf
 
 from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.config import Datetime, Settings, Status
+from minarca_client.core.config import Datetime
+from minarca_client.core.settings import Settings
+from minarca_client.core.status import Status
 
 
 class SettingsTest(unittest.TestCase):

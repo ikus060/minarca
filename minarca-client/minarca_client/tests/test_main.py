@@ -20,9 +20,9 @@ from parameterized import parameterized
 from minarca_client import main
 from minarca_client.core import Backup, BackupInstance, InstanceId
 from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.config import Settings
 from minarca_client.core.exceptions import HttpAuthenticationError
 from minarca_client.core.pattern import Pattern
+from minarca_client.core.settings import Settings
 from minarca_client.main import _EXIT_BACKUP_FAIL, _EXIT_LINK_ERROR, _backup
 from minarca_client.tests.test import MATCH
 
