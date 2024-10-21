@@ -6,30 +6,41 @@ Created on Jun. 8, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-import ast
 import datetime
-import logging
-import os
 import time
 from functools import total_ordering
 from typing import Any
 
 import javaproperties
-import psutil
-
-logger = logging.getLogger(__name__)
 
 
-def list_from_string(value):
-    """
-    Convert string "[5, 6]" to a real python array.
-    """
-    if isinstance(value, list):
-        return value
-    value = ast.literal_eval(value)
-    if isinstance(value, list):
-        return value
-    return []
+class AbstractConfigFile:
+    def __init__(self, filename: str):
+        assert filename, 'a filename is required'
+        self._fn = filename
+        self._data = None
+        self.reload()
+
+    def reload(self):
+        """
+        Check if the file changed since last loading. If not does nothing. Othersiw will read the file data.
+        """
+        self._data = self._load()
+
+    def _load(self):
+        raise NotImplementedError()
+
+    def save(self):
+        raise NotImplementedError()
+
+    def __enter__(self):
+        # Load file content.
+        self.reload()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Save changes in all cases.
+        self.save()
 
 
 @total_ordering
@@ -74,35 +85,6 @@ class Datetime:
 
     def strftime(self, fmt):
         return time.strftime(fmt, time.localtime(self.epoch_ms / 1000))
-
-
-class AbstractConfigFile:
-    def __init__(self, filename: str):
-        assert filename, 'a filename is required'
-        self._fn = filename
-        self._data = None
-        self.reload()
-
-    def reload(self):
-        """
-        Check if the file changed since last loading. If not does nothing. Othersiw will read the file data.
-        """
-        self._data = self._load()
-
-    def _load(self):
-        raise NotImplementedError()
-
-    def save(self):
-        raise NotImplementedError()
-
-    def __enter__(self):
-        # Load file content.
-        self.reload()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # Save changes in all cases.
-        self.save()
 
 
 class KeyValueConfigFile(AbstractConfigFile):
@@ -166,94 +148,3 @@ class KeyValueConfigFile(AbstractConfigFile):
         Restore defaults.
         """
         self._data = {field: default for field, unused, default in self._fields}
-
-
-LAST_RESULTS = ['SUCCESS', 'FAILURE', 'RUNNING', 'STALE', 'INTERRUPT']
-
-
-def _default(cls, default_value=None):
-    def func(x):
-        if x is None:
-            return default_value
-        else:
-            return cls(x)
-
-    return func
-
-
-class Status(KeyValueConfigFile):
-    RUNNING_DELAY = 5  # When running status file get updated every 5 seconds.
-
-    _fields = [
-        ('details', str, None),
-        ('lastdate', lambda x: Datetime(x) if x else None, None),
-        ('lastresult', lambda x: x if x in LAST_RESULTS else 'UNKNOWN', 'UNKNOWN'),
-        ('lastsuccess', lambda x: Datetime(x) if x else None, None),
-        ('pid', int, None),
-        ('action', lambda x: x if x in ['backup', 'restore'] else None, None),
-        ('lastnotificationid', str, None),
-        ('lastnotificationdate', lambda x: Datetime(x) if x else None, None),
-    ]
-
-    @property
-    def current_status(self):
-        """
-        Return a backup status. Read data from the status file and make
-        interpretation of it.
-        """
-        now = Datetime()
-        # After reading the status file, let determine the real status.
-        data = dict(self._data)
-        if data.get('lastresult') == 'RUNNING':
-            # Get pid and checkif process is running.
-            pid = data.get('pid')
-            if not pid:
-                return 'INTERRUPT'
-            try:
-                psutil.Process(data.get('pid')).is_running()
-            except (ValueError, psutil.NoSuchProcess):
-                return 'INTERRUPT'
-            # Then let check if the status file was updated within the last 10 seconds.
-            lastdate = data.get('lastdate')
-            if lastdate and now - lastdate > datetime.timedelta(seconds=self.RUNNING_DELAY * 2):
-                return 'STALE'
-        # By default return lastresult value.
-        return data.get('lastresult')
-
-
-class Settings(KeyValueConfigFile):
-    DAILY = 24
-    HOURLY = 1
-    WEEKLY = 168
-    MONTHLY = 720
-
-    _fields = [
-        ('username', str, None),
-        ('accesstoken', str, None),
-        ('repositoryname', str, None),
-        ('remotehost', str, None),
-        ('remoteurl', str, None),
-        ('remoterole', int, None),
-        ('schedule', int, DAILY),
-        ('configured', lambda x: x in [True, 'true', 'True', '1'], False),
-        ('pause_until', lambda x: Datetime(x) if x else None, None),
-        ('diskid', str, None),
-        ('maxage', int, None),
-        ('ignore_weekday', list_from_string, None),
-        ('keepdays', int, None),
-        ('maxage', int, None),
-        # Load default value from environment variable to ease unittest
-        (
-            'check_latest_version',
-            lambda x: os.environ.get('MINARCA_CHECK_LATEST_VERSION', str(x)).lower() in ['true', 'True', '1'],
-            True,
-        ),
-        ('localmountpoint', str, None),
-        ('localuuid', str, None),
-        ('localrelpath', str, None),
-        ('localcaption', str, None),
-    ]
-
-    @property
-    def remote(self):
-        return self.diskid is None

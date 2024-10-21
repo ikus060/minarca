@@ -27,7 +27,6 @@ from minarca_client.core.compat import (
     get_config_home,
     get_minarca_exe,
 )
-from minarca_client.core.config import Datetime, Settings
 from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
     DuplicateSettingsError,
@@ -45,6 +44,7 @@ from minarca_client.core.instance import BackupInstance
 from minarca_client.core.pattern import Patterns
 from minarca_client.core.rdiffweb import Rdiffweb
 from minarca_client.core.scheduler import Scheduler
+from minarca_client.core.settings import Datetime, Settings
 
 if IS_WINDOWS:
     import win32api

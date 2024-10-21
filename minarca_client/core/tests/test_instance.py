@@ -24,7 +24,6 @@ import responses
 
 from minarca_client.core import Backup, BackupInstance
 from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.config import Datetime, Settings
 from minarca_client.core.disk import LocationInfo
 from minarca_client.core.exceptions import (
     BackupError,
@@ -42,6 +41,7 @@ from minarca_client.core.exceptions import (
 from minarca_client.core.instance import _sh_quote
 from minarca_client.core.minarcaid import ssh_keygen
 from minarca_client.core.pattern import Pattern, Patterns
+from minarca_client.core.settings import Datetime, Settings
 from minarca_client.locale import gettext as _
 from minarca_client.tests.test import MATCH
 
@@ -1012,7 +1012,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
 
-    @mock.patch('minarca_client.core.instance.send_notification', return_value='12345')
+    @mock.patch('minarca_client.core.status.send_notification', return_value='12345')
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_exit_1_cmd))
     async def test_backup_send_notification(self, mock_popen, mock_get_user_agent, mock_send_notification):
@@ -1035,7 +1035,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         # Then notification was raised to user.
         mock_send_notification.assert_called_once_with(title='Your backup is outdated', body=mock.ANY, replace_id=None)
 
-    @mock.patch('minarca_client.core.instance.clear_notification', return_value='12345')
+    @mock.patch('minarca_client.core.status.clear_notification', return_value='12345')
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     async def test_backup_clear_notification_time(self, mock_popen, mock_get_user_agent, mock_clear_notification):
