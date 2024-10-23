@@ -108,7 +108,7 @@ class MinarcaApp(MDApp, ExceptionHandler):
 
     def _install_settings_keys(self, window):
         # Replace settings view by inspector when debug is enabled.
-        if logger.isEnabledFor(logging.DEBUG):
+        if logging.getLogger('kivy').isEnabledFor(logging.DEBUG):
             inspector.start(window, self)
 
     def on_start(self):
