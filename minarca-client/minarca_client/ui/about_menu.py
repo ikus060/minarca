@@ -75,8 +75,10 @@ Builder.load_string(
 
     Image:
         source: "minarca-72.png"
+        fit_mode: "contain"
         size_hint: None, None
         height: "72dp"
+        width: self.height * self.image_ratio
         pos_hint: {'center_x': .5}
 
     CLabel:

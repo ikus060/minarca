@@ -45,8 +45,10 @@ MDScreen:
 
             Image:
                 source: "header-logo-30.png"
+                fit_mode: "contain"
                 size_hint: None, None
                 height: "30dp"
+                width: self.height * self.image_ratio
                 pos_hint: {'center_y': .5}
 
             Widget:

@@ -34,6 +34,7 @@ Builder.load_string(
 
     Image:
         source: root._icon
+        fit_mode: "contain"
         pos_hint: {"center_x": .5, "center_y": .5}
 
     CBoxLayout:

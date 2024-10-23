@@ -33,6 +33,7 @@ Builder.load_string(
 
         Image:
             source: "remote-backup-64.png" if root.is_remote else "local-backup-64.png"
+            fit_mode: "contain"
             size_hint: None, None
             size: "64dp", "64dp"
 
