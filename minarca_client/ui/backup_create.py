@@ -55,6 +55,7 @@ Builder.load_string(
 
                 Image:
                     source: "remote-backup-128.png"
+                    fit_mode: "contain"
                     height: "128dp"
                     size_hint_y: None
 
@@ -98,6 +99,7 @@ Builder.load_string(
 
                 Image:
                     source: "local-backup-128.png"
+                    fit_mode: "contain"
                     height: "128dp"
                     size_hint_y: None
 
