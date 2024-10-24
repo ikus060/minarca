@@ -29,7 +29,7 @@ setuptools.setup(
     install_requires=[
         "cryptography",
         "cherrypy>=18.0.0",
-        "rdiffweb==2.9.3",
+        "rdiffweb==2.9.4",
         "requests",
         "snakeoil",
         "tzlocal~=2.0",
