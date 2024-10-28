@@ -179,7 +179,7 @@ doc:
   stage: doc
 
 upload:deb:
-  image: python:3
+  image: python:3.10
   needs:
   - bdist-server:deb
   - bdist-client:linux
@@ -215,13 +215,13 @@ upload:deb:
   stage: upload
 
 .upload-file: &upload-file
-  image: python:3
+  image: python:3.10
   script: |
     set -x
     set -e
     # publish to nexus
-    export FILE=$(ls -1d $FILENAME | head -n 1)
-    export VERSION=$(echo ${FILE} | sed -E 's/.*_([0-9a-zA-Z.+]+)\.(exe|dmg|tar.gz)/\1/')
+    export VERSION=$(cd minarca-client; python3 setup.py --version)
+    export FILE=$(ls -1d $FILENAME)
     cd $(dirname $FILE)
     find $(basename $FILE) -type f -exec curl --fail -u "$NEXUS_USR:$NEXUS_PWD" --upload-file "{}" https://nexus.ikus-soft.com/repository/archive/minarca/$VERSION/{} \;
   stage: upload
