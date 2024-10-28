@@ -64,8 +64,6 @@ On a Ubuntu or Debian workstation, download the appropriate installer.
 
 *Debian*
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-buster-latest.deb"><img alt="Minarca Client for Debian Buster" src="https://img.shields.io/badge/Debian-Buster-blue?&logo=debian&style=for-the-badge"></a>
-
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-bullseye-latest.deb"><img alt="Minarca Client for Debian Bullseye" src="https://img.shields.io/badge/Debian-Bullseye-blue?&logo=debian&style=for-the-badge"></a>
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-bookworm-latest.deb"><img alt="Minarca Client for Debian Bookworm" src="https://img.shields.io/badge/Debian-Bookworm-blue?&logo=debian&style=for-the-badge"></a>
