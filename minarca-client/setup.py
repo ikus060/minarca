@@ -23,7 +23,7 @@ setuptools.setup(
     include_package_data=True,
     packages=setuptools.find_packages("."),
     setup_requires=[
-        "setuptools_scm>=3.2,<8",
+        "setuptools_scm>=3.2",
     ],
     # required packages for build process
     extras_require={

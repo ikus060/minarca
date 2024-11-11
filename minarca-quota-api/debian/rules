@@ -21,3 +21,13 @@ execute_after_dh_builddeb:
 	# Run test with pytest
 	$(DH_VENV_DIR)/bin/python -m pip install pytest
 	$(DH_VENV_DIR)/bin/python -m pytest
+
+# For maintainer use only
+# Generate change log with appropriate version.
+changelog: APP_VERSION=$(shell python3 setup.py --version)
+changelog: DEB_ID=$(shell lsb_release -is | sed -e 's/\(.*\)/\L\1/')
+changelog: DEB_VER=$(shell lsb_release -rs)
+changelog: VERSION=${APP_VERSION}+dfsg-1${DEB_ID}${DEB_VER}
+changelog:
+	dch --newversion "$(VERSION)" "Automated build"
+	sed -i 's/UNRELEASED/unstable/' debian/changelog

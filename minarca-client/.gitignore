@@ -12,8 +12,4 @@
 .pydev*
 /.pytest_cache/
 **/.DS_Store
-/debian/.debhelper/
-/debian/changelog
-/debian/debhelper-build-stamp
-/debian/minarca-client/
 .debbuild

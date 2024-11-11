@@ -46,22 +46,23 @@ bdist-server:deb:
   parallel:
     matrix:
     - TARGET: minarca-server
-      DIST: [bullseye, bookworm, jammy, lunar, mantic]
+      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
     - TARGET: minarca-quota-api
       DIST: [bullseye, bookworm]
   script:
+  - cd $TARGET
+  # Install dependencies
   - apt update
   - apt -y --no-install-recommends install devscripts lsb-release
-  - cd $TARGET
   - apt build-dep -y .
-  - export DEB_VERSION=$(lsb_release -is | sed -e 's/\(.*\)/\L\1/')$(lsb_release -rs| sed -e 's/\.//')
-  - export APP_VERSION=$(python3 setup.py --version)
-  - export VERSION=${APP_VERSION}+${DEB_VERSION}
-  - export RELEASE_DATE="$(date '+%a, %d %b %Y %H:%M:%S') +0000"
-  - sed "s/%VERSION%/${VERSION}/" debian/changelog.in | sed "s/%DATE%/${RELEASE_DATE}/" > debian/changelog
+  # Generate change log
+  - export DEBEMAIL=${CI_COMMIT_AUTHOR}
+  - debian/rules changelog
+  # Run build
   - dpkg-buildpackage -b
+  # Move files to archives
   - mkdir -p "./dist/$DIST/"
   - mv ../*.deb "./dist/$DIST/"
   stage: bdist
@@ -149,7 +150,7 @@ test-bdist-server:deb:
     # Ubuntu tzdata is broken https://githubmate.com/repo/regebro/tzlocal/issues/101
     # So we need to make it explicit using environment variable
     - TARGET: minarca-server
-      DIST: [jammy, lunar, mantic]
+      DIST: [jammy, lunar, mantic, noble, oracular]
       TZ: UTC
   script:
   - apt update
@@ -186,10 +187,10 @@ upload:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [bullseye, bookworm, jammy, lunar, mantic]
+      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
       DIST_SPECIFIC: 0
     - TARGET: minarca-server
-      DIST: [bullseye, bookworm, jammy, lunar, mantic]
+      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
       DEPENDS: python3
       DIST_SPECIFIC: 1
     - TARGET: minarca-quota-api
@@ -305,7 +306,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [bullseye, bookworm, jammy, lunar, mantic]
+      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/minarca-client_*_amd64.deb

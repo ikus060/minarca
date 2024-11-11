@@ -123,6 +123,31 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 6.0.1
+
+* Minarca Agent
+  * Disable multiline on custom exclude pattern text input #267
+  * Add support for Ubuntu Noble 24.04 LTS & Oracular 24.10
+* Minarca Server
+  * Upgrade rdiffweb to 2.9.5
+  * Add support for Ubuntu Noble 24.04 LTS & Oracular 24.10
+* Remove obsolsete `theme` target from tox
+* Fix documentation upload
+* Remove link to Debian buster from documentation
+
+## 6.0.0
+
+* Minarca Agent
+  * Disable Kivy inspector by default. Only enable inspector with `--debug` flag
+  * Adjust image resolution on MacOs retina screen #264
+  * Update french translation
+
+## 6.0.0b11
+
+* Minarca Agent
+  * Avoid double query to latest_version URL to reduce load on server #259
+  * Lower the process priority during backup to reduce stress on computers during backup #198
+
 ## 6.0.0b10
 
 * Minarca Agent

@@ -13,10 +13,12 @@ restriction. You are limited to the following operating system.
   * MacOS BigSur (Intel)
   * Debian Bullseye (64bit)
   * Debian Bookworm (64bit)
-  * Ubuntu Jammy (64bit)
-  * Ubuntu Kinetic (64bit)
-  * Ubuntu Lunar (64bit)
-  * Ubuntu Mantic (64bit)
+  * Ubuntu Jammy 22.04 LTS (64bit)
+  * Ubuntu Kinetic 22.10 (64bit)
+  * Ubuntu Lunar 23.04 (64bit)
+  * Ubuntu Mantic 23.10 (64bit)
+  * Ubuntu Noble 24.04 LTS (64bit)
+  * Ubuntu Oracular 24.10 (64bit)
   * Linux (64bit)
 
 ## Installation Steps
@@ -61,6 +63,10 @@ On a Ubuntu or Debian workstation, download the appropriate installer.
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-lunar-latest.deb"><img alt="Minarca Client for Ubuntu Lunar" src="https://img.shields.io/badge/Ubuntu-Lunar-blue?&logo=ubuntu&style=for-the-badge"></a>
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-mantic-latest.deb"><img alt="Minarca Client for Ubuntu Mantic" src="https://img.shields.io/badge/Ubuntu-Mantic-blue?&logo=ubuntu&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-noble-latest.deb"><img alt="Minarca Client for Ubuntu Noble" src="https://img.shields.io/badge/Ubuntu-Noble-blue?&logo=ubuntu&style=for-the-badge"></a>
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-oracular-latest.deb"><img alt="Minarca Client for Ubuntu Oracular" src="https://img.shields.io/badge/Ubuntu-Oracular-blue?&logo=ubuntu&style=for-the-badge"></a>
 
 *Debian*
 

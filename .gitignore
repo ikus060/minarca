@@ -39,7 +39,6 @@ deb_dist
 /*.buildinfo
 /*.changes
 /*.tar.gz
-/minarca-server/debian/changelog
 /minarca-server/debian/minarca-server
 /minarca-server/debian/*debhelper*
 /minarca-server/debian/files
