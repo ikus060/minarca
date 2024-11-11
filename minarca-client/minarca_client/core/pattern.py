@@ -134,12 +134,17 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     Pattern(False, "**/*.pst.tmp", _("Outlook POP temporary files")),
                     Pattern(False, "**/*.ddb.bak", _("Dynacom Backup file")),
                     Pattern(False, "**/.tmp.driveupload", _("Google Drive temporary upload files")),
-                    Pattern(False, "**/.tmp.drivedownload", _("Google Drive temporary download files")),
+                    Pattern(False, "**/.tmp.drivedownload", _("Gogle Drive temporoary download files")),
+                    # Ignore OneDrive special GUID file
                     Pattern(
                         False,
                         "**/OneDrive*/.*[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]",
                         _("OneDrive GUID File"),
                     ),
+                    # Ignore Google Drive special folders
+                    Pattern(False, "**/.shortcut-targets-by-id", _("Google Drive Shortcut Metadata")),
+                    Pattern(False, "**/.file-revisions-by-id", _("Google Drive Revision History")),
+                    Pattern(False, "**/.Encrypted", _("Google Drive Encrypted")),
                 ]
             )
         elif IS_MAC:
