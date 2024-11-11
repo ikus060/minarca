@@ -112,6 +112,7 @@ Builder.load_string(
                     text: root.custom_pattern
                     on_text: root.custom_pattern = self.text
                     hint_text: _("File extention (e.g.: *.txt)")
+                    multiline: False
                     # Change style of TextInput.
                     background_color: app.theme_cls.surfaceColor
                     text_color: app.theme_cls.onSurfaceColor
