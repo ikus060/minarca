@@ -24,26 +24,24 @@ if IS_WINDOWS:
             self.scheduler = win32com.client.Dispatch('Schedule.Service')
             self.scheduler.Connect()
 
-        def exists(self):
+        def _get_task(self):
             # Get reference to the task name and check the executable.
             root_folder = self.scheduler.GetFolder('\\')
             try:
-                root_folder.GetTask('\\' + self.NAME)
-                return True
+                return root_folder.GetTask('\\' + self.NAME)
             except pywintypes.com_error:  # @UndefinedVariable
-                return False
+                return None
+
+        def exists(self):
+            return self._get_task() is not None
 
         @property
         def run_if_logged_out(self):
             """
             Return the current status of `run_if_logged_out`.
             """
-            root_folder = self.scheduler.GetFolder('\\')
-            try:
-                task_def = root_folder.GetTask('\\' + self.NAME)
-                return task_def.Definition.Principal.LogonType == TASK_LOGON_PASSWORD
-            except pywintypes.com_error:  # @UndefinedVariable
-                return False
+            task_def = self._get_task()
+            return task_def and task_def.Definition.Principal.LogonType == TASK_LOGON_PASSWORD
 
         def create(self, run_if_logged_out=None):
             """
@@ -98,6 +96,20 @@ if IS_WINDOWS:
                 )
             except pywintypes.com_error as e:
                 winerror = e.excepinfo[5]
+                if winerror == -2147024891:
+                    # Permissions error when running Minarca as "Administrator" without admin right.
+                    raise PermissionError(
+                        _(
+                            'A problem prevents the scheduling of backup jobs. Try running the application with Administrator rights.'
+                        )
+                    )
+                elif winerror == -2147023570:
+                    # When username or password are invalid, provide a better error message.
+                    raise PermissionError(
+                        _(
+                            'The user account is unknown or the password is incorrect. Be sure to enter your Windows credentials.'
+                        )
+                    )
                 raise OSError(None, win32api.FormatMessage(winerror), None, winerror)
 
         def delete(self):
@@ -106,14 +118,13 @@ if IS_WINDOWS:
 
             This operation might required priviledge escalation.
             """
-            root_folder = self.scheduler.GetFolder('\\')
-            try:
-                task = root_folder.GetTask('\\' + self.NAME)
-            except pywintypes.com_error:  # @UndefinedVariable
+            task = self._get_task()
+            if not task:
                 # Task doesn't exists
                 return
             # Try deleting with current priviledges.
             try:
+                root_folder = self.scheduler.GetFolder('\\')
                 root_folder.DeleteTask(task.Name, 0)
             except pywintypes.com_error as e:
                 # If operation is denied, try deleting the task using runas
@@ -123,7 +134,7 @@ if IS_WINDOWS:
                     retcode = subprocess.call(['SCHTASKS.exe', '/Delete', '/TN', self.NAME, '/F'])
                     if retcode == 0:
                         return
-                    raise OSError(None, win32api.FormatMessage(winerror), None, winerror)
+                raise OSError(None, win32api.FormatMessage(winerror), None, winerror)
 
     Scheduler = WindowsScheduler
 

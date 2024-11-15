@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-24 14:15-0400\n"
-"PO-Revision-Date: 2024-10-24 14:17-0400\n"
+"POT-Creation-Date: 2024-11-15 09:30-0500\n"
+"PO-Revision-Date: 2024-11-15 09:32-0500\n"
 "Last-Translator: \n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -49,7 +49,7 @@ msgstr "erreur inattendue pendant la sauvegarde"
 msgid "Backup Instances:"
 msgstr "Instances de sauvegarde :"
 
-#: minarca_client/main.py:105 minarca_client/main.py:424
+#: minarca_client/main.py:105 minarca_client/main.py:421
 #: minarca_client/ui/backup_card.py:21
 msgid "No name"
 msgstr "Sans nom"
@@ -92,15 +92,7 @@ msgstr "Lié avec succès"
 msgid "Do you want to replace the existing repository? (Yes/No): "
 msgstr "Souhaitez-vous remplacer le dépôt existant ? (Oui/Non) : "
 
-#: minarca_client/main.py:189
-msgid ""
-"A problem prevents the automatic scheduling of backup jobs. As a result, your "
-"backup tasks cannot be executed as planned."
-msgstr ""
-"Un problème empêche la planification automatique des tâches de sauvegarde. Par "
-"conséquent, vos tâches de sauvegarde ne peuvent pas être exécutées comme prévu."
-
-#: minarca_client/main.py:198
+#: minarca_client/main.py:195
 msgid ""
 "To update include or exclude patterns, you must configure at least one backup "
 "instance."
@@ -108,34 +100,34 @@ msgstr ""
 "Pour mettre à jour les modèles d'inclusion ou d'exclusion, vous devez configurer "
 "au moins une instance de sauvegarde."
 
-#: minarca_client/main.py:285
+#: minarca_client/main.py:282
 msgid "From which backup source do you want to restore data from?"
 msgstr ""
 "A partir de quelle source de sauvegarde voulez-vous restaurer les données ?"
 
-#: minarca_client/main.py:297
+#: minarca_client/main.py:294
 msgid "Enter backup instance ID: "
 msgstr "Saisir l'identifiant de l'instance de sauvegarde : "
 
-#: minarca_client/main.py:301
+#: minarca_client/main.py:298
 #, python-format
 msgid "Invalid instance ID: %s"
 msgstr "Identifiant d'instance invalide : %s"
 
-#: minarca_client/main.py:305
+#: minarca_client/main.py:302
 msgid "Your instance value doesn't match any backup instances"
 msgstr "Votre valeur d'instance ne correspond à aucune instance de sauvegarde"
 
-#: minarca_client/main.py:307
+#: minarca_client/main.py:304
 msgid "Your instance value matches too many backup instances"
 msgstr "Votre valeur d'instance correspond à trop d'instances de sauvegarde"
 
-#: minarca_client/main.py:320
+#: minarca_client/main.py:317
 #, python-format
 msgid "Do you want to restore %s? (Yes/No): "
 msgstr "Voulez-vous restaurer %s (Oui/Non) : "
 
-#: minarca_client/main.py:334
+#: minarca_client/main.py:331
 msgid ""
 "Are you sure you want to proceed with the restore operation? Please note that "
 "this will override your current data. (Yes/No): "
@@ -143,82 +135,82 @@ msgstr ""
 "Êtes-vous sûr de vouloir procéder à l'opération de restauration ? Veuillez noter "
 "que cette opération annulera vos données actuelles. (Oui/Non) : "
 
-#: minarca_client/main.py:358
+#: minarca_client/main.py:355
 msgid "backup not running"
 msgstr "la sauvegarde ne s'exécute pas"
 
-#: minarca_client/main.py:424
+#: minarca_client/main.py:421
 #, python-format
 msgid "Backup Instance: %s"
 msgstr "Instance de sauvegarde : %s"
 
-#: minarca_client/main.py:428
+#: minarca_client/main.py:425
 #, python-format
 msgid "Identifier:             %s"
 msgstr "Identifiant:            %s"
 
-#: minarca_client/main.py:430
+#: minarca_client/main.py:427
 #, python-format
 msgid "Remote server:          %s"
 msgstr "Serveur distant :       %s"
 
-#: minarca_client/main.py:432
+#: minarca_client/main.py:429
 #, python-format
 msgid "Local device:           %s"
 msgstr "Destination local :     %s"
 
-#: minarca_client/main.py:433
+#: minarca_client/main.py:430
 #, python-format
 msgid "Connectivity status:    %s"
 msgstr "État de la connectivité : %s"
 
-#: minarca_client/main.py:433
+#: minarca_client/main.py:430
 msgid "Connected"
 msgstr "Connecté"
 
-#: minarca_client/main.py:433
+#: minarca_client/main.py:430
 msgid "Not connected"
 msgstr "Non connecté"
 
-#: minarca_client/main.py:436
+#: minarca_client/main.py:433
 #, python-format
 msgid "Last successful backup: %s"
 msgstr "Dernière sauvegarde réussie : %s"
 
-#: minarca_client/main.py:437 minarca_client/main.py:442 minarca_client/main.py:444
+#: minarca_client/main.py:434 minarca_client/main.py:439 minarca_client/main.py:441
 #: minarca_client/ui/backup_settings.py:253
 msgid "Never"
 msgstr "Jamais"
 
-#: minarca_client/main.py:441
+#: minarca_client/main.py:438
 #, python-format
 msgid "Last backup date:       %s"
 msgstr "Date de la dernière sauvegarde : %s"
 
-#: minarca_client/main.py:444
+#: minarca_client/main.py:441
 #, python-format
 msgid "Last backup status:     %s"
 msgstr "État de la dernière sauvegarde : %s"
 
-#: minarca_client/main.py:446
+#: minarca_client/main.py:443
 #, python-format
 msgid "Details:                %s"
 msgstr "Détails:                %s"
 
-#: minarca_client/main.py:448
+#: minarca_client/main.py:445
 #, python-format
 msgid "Paused until:           %s"
 msgstr "En pause jusqu'à :           %s"
 
-#: minarca_client/main.py:473
+#: minarca_client/main.py:470
 msgid "Minarca"
 msgstr "Minarca"
 
-#: minarca_client/main.py:474
+#: minarca_client/main.py:471
 msgid "Application failed to start"
 msgstr "L'application ne parvient pas à démarrer"
 
-#: minarca_client/main.py:475
+#: minarca_client/main.py:472
 msgid ""
 "If the problem persists, check the logs with your administrator or try "
 "reinstalling the application."
@@ -226,7 +218,7 @@ msgstr ""
 "Si le problème persiste, vérifiez les journaux avec votre administrateur ou "
 "essayez de réinstaller l'application."
 
-#: minarca_client/main.py:496
+#: minarca_client/main.py:493
 msgid ""
 "Minarca manages your computer's backup by linking your computer with a "
 "centralized server and running backups on a given schedule."
@@ -234,62 +226,62 @@ msgstr ""
 "Minarca gère la sauvegarde de votre ordinateur en le reliant à un serveur "
 "centralisé et en exécutant des sauvegardes selon un calendrier donné."
 
-#: minarca_client/main.py:515
+#: minarca_client/main.py:512
 msgid "start a backup in background mode"
 msgstr "démarrer une sauvegarde en arrière-plan"
 
-#: minarca_client/main.py:516 minarca_client/main.py:528
+#: minarca_client/main.py:513 minarca_client/main.py:525
 msgid "force execution of a backup even if it's not time to run"
 msgstr ""
 "forcer l'exécution d'une sauvegarde même s'il n'est pas temps de l'exécuter"
 
-#: minarca_client/main.py:520 minarca_client/main.py:532
+#: minarca_client/main.py:517 minarca_client/main.py:529
 msgid "Limit backup to the given instance(s)."
 msgstr "Limite la sauvegarde à la (aux) instance(s) donnée(s)."
 
-#: minarca_client/main.py:527
+#: minarca_client/main.py:524
 msgid "start a backup in foreground mode"
 msgstr "démarrer une sauvegarde en mode avant-plan"
 
-#: minarca_client/main.py:539
+#: minarca_client/main.py:536
 msgid "exclude files from being backed up"
 msgstr "exclure les fichiers à sauvegarder"
 
-#: minarca_client/main.py:543
+#: minarca_client/main.py:540
 msgid "Add exclude file pattern to the given instance(s)."
 msgstr ""
 "Ajoute un modèle de fichier d'exclusion à l'instance ou aux instances données."
 
-#: minarca_client/main.py:547 minarca_client/main.py:560
+#: minarca_client/main.py:544 minarca_client/main.py:557
 msgid "file pattern to be excluded. May contain `*` or `?` wildcard"
 msgstr ""
 "modèle de fichier à exclure. peut contenir un caractère générique `*` ou `?`"
 
-#: minarca_client/main.py:552
+#: minarca_client/main.py:549
 msgid "include files to be backed up"
 msgstr "inclure les fichiers à sauvegarder"
 
-#: minarca_client/main.py:556
+#: minarca_client/main.py:553
 msgid "Add include file pattern to the given instance(s)."
 msgstr ""
 "Ajoute un modèle de fichier d'inclusion à l'instance (aux instances) donnée(s)."
 
-#: minarca_client/main.py:566
+#: minarca_client/main.py:563
 msgid "configure this agent to backup to a new destination (remote or local)"
 msgstr ""
 "configurer cet agent pour qu'il effectue des sauvegardes vers une nouvelle "
 "destination (distante ou locale)"
 
-#: minarca_client/main.py:568
+#: minarca_client/main.py:565
 msgid "URL to the remote server. e.g.: http://example.com:8080/"
 msgstr "URL du serveur distant, par exemple : http://example.com:8080/"
 
-#: minarca_client/main.py:569
+#: minarca_client/main.py:566
 msgid "username to be used for authentication with the remote server"
 msgstr ""
 "nom d'utilisateur à utiliser pour l'authentification auprès du serveur distant"
 
-#: minarca_client/main.py:573
+#: minarca_client/main.py:570
 msgid ""
 "password or access token to use for authentication. You will be prompted if not "
 "provided"
@@ -297,11 +289,11 @@ msgstr ""
 "mot de passe ou jeton d'accès à utiliser pour l'authentification. Il serait "
 "demandé s'il n'est pas fourni"
 
-#: minarca_client/main.py:575
+#: minarca_client/main.py:572
 msgid "repository name to be used"
 msgstr "nom du dépôt à utiliser"
 
-#: minarca_client/main.py:579
+#: minarca_client/main.py:576
 msgid ""
 "replace existing repository on backup destination if it exists without "
 "confirmation"
@@ -309,29 +301,29 @@ msgstr ""
 "remplacer le dépôt existant sur la destination de la sauvegarde s'il existe sans "
 "confirmation"
 
-#: minarca_client/main.py:581
+#: minarca_client/main.py:578
 msgid "path to local destination"
 msgstr "chemin vers la destination locale"
 
-#: minarca_client/main.py:585
+#: minarca_client/main.py:582
 msgid "list the include/exclude patterns"
 msgstr "liste les modèles d'inclusion/exclusion"
 
-#: minarca_client/main.py:589
+#: minarca_client/main.py:586
 msgid "Show include and exclude patterns only for the given instance(s)."
 msgstr ""
 "Afficher les modèles d'inclusion et d'exclusion uniquement pour la ou les "
 "instances données."
 
-#: minarca_client/main.py:596
+#: minarca_client/main.py:593
 msgid "restore data from backup"
 msgstr "restaurer des données à partir d'une sauvegarde"
 
-#: minarca_client/main.py:600
+#: minarca_client/main.py:597
 msgid "Force the use of a given instance for restore."
 msgstr "Forcer l'utilisation d'une instance donnée pour la restauration."
 
-#: minarca_client/main.py:606
+#: minarca_client/main.py:603
 msgid ""
 "Date and time to be restored. Could be 'now' to restore the latest backup. Could "
 "be an epoch value like '1682367069'. Could be an ISO date format like "
@@ -342,7 +334,7 @@ msgstr ""
 "peut s'agir d'un format de date ISO comme '2023-02-24T04:11:09-04:00'. Il peut "
 "s'agir d'un intervalle comme \"3D\" pour 3 jours."
 
-#: minarca_client/main.py:612
+#: minarca_client/main.py:609
 msgid ""
 "Define an alternate location to restore files or folders instead of restoring "
 "them in place."
@@ -350,92 +342,92 @@ msgstr ""
 "Définir un autre emplacement pour restaurer des fichiers ou des dossiers au lieu "
 "de les restaurer sur place."
 
-#: minarca_client/main.py:617
+#: minarca_client/main.py:614
 msgid "Force execution of restore operation without confirmation from the user."
 msgstr ""
 "Forcer l'exécution d'une opération de restauration sans confirmation de "
 "l'utilisateur."
 
-#: minarca_client/main.py:619
+#: minarca_client/main.py:616
 msgid "files and folders to be restored"
 msgstr "fichiers et dossiers à restaurer"
 
-#: minarca_client/main.py:623
+#: minarca_client/main.py:620
 msgid "stop the backup"
 msgstr "arrêter la sauvegarde"
 
-#: minarca_client/main.py:627
+#: minarca_client/main.py:624
 msgid "Stop only the given instance(s)."
 msgstr "Arrêter uniquement la ou les instances données."
 
-#: minarca_client/main.py:631
+#: minarca_client/main.py:628
 msgid "doesn't fail if the backup is not running."
 msgstr "n'échoue pas si la sauvegarde n'est pas en cours d'exécution."
 
-#: minarca_client/main.py:636
+#: minarca_client/main.py:633
 msgid "create the required scheduled task in Windows Task Scheduler"
 msgstr ""
 "créer la tâche planifiée requise dans le planificateur de tâches de Windows"
 
-#: minarca_client/main.py:638
+#: minarca_client/main.py:635
 msgid "create the required scheduled task in launchd"
 msgstr "créer la tâche programmée requise dans launchd"
 
-#: minarca_client/main.py:640
+#: minarca_client/main.py:637
 msgid "create the required scheduled task in crontab"
 msgstr "créer la tâche programmée requise dans la crontab"
 
-#: minarca_client/main.py:647
+#: minarca_client/main.py:644
 msgid "schedule backup to run hourly"
 msgstr "planifier la sauvegarde pour qu'elle s'exécute toutes les heures"
 
-#: minarca_client/main.py:654
+#: minarca_client/main.py:651
 msgid "schedule backup to run daily"
 msgstr "planifier la sauvegarde pour qu'elle s'exécute quotidiennement"
 
-#: minarca_client/main.py:661
+#: minarca_client/main.py:658
 msgid "schedule backup to run weekly"
 msgstr "planifier la sauvegarde pour qu'elle s'exécute chaque semaine"
 
-#: minarca_client/main.py:666
+#: minarca_client/main.py:663
 msgid "Configure only the given instance(s)."
 msgstr "Configurer uniquement la ou les instance(s) donnée(s)."
 
-#: minarca_client/main.py:671
+#: minarca_client/main.py:668
 msgid "username required to run task when the user is logged out"
 msgstr ""
 "nom d'utilisateur requis pour exécuter la tâche lorsque l'utilisateur est "
 "déconnecté"
 
-#: minarca_client/main.py:672
+#: minarca_client/main.py:669
 msgid "password required to run task when the user is logged out"
 msgstr ""
 "mot de passe requis pour exécuter la tâche lorsque l'utilisateur est déconnecté"
 
-#: minarca_client/main.py:676
+#: minarca_client/main.py:673
 msgid "return the current Minarca status"
 msgstr "retourner l'état actuel de la minarca"
 
-#: minarca_client/main.py:680
+#: minarca_client/main.py:677
 msgid "Show status for the given instance(s)."
 msgstr "Affiche l'état de la ou des instances données."
 
-#: minarca_client/main.py:687
+#: minarca_client/main.py:684
 msgid "forget backup settings"
 msgstr "oublier les paramètres de la sauvegarde"
 
-#: minarca_client/main.py:691
+#: minarca_client/main.py:688
 msgid "Forget settings of the given backup instance(s)."
 msgstr ""
 "Oublie les paramètres de l'instance ou des instances de sauvegarde donnée(s)."
 
-#: minarca_client/main.py:696
+#: minarca_client/main.py:693
 msgid "Force forget operation without confirmation from the user."
 msgstr ""
 "Force l'exécution d'une opération de restauration sans confirmation de "
 "l'utilisateur."
 
-#: minarca_client/main.py:703
+#: minarca_client/main.py:700
 msgid ""
 "temporarily delay the execution of the backup for the given number of hours. "
 "Default is 24 hours."
@@ -443,35 +435,35 @@ msgstr ""
 "retarde temporairement l'exécution de la sauvegarde pendant le nombre d'heures "
 "indiqué. La valeur par défaut est de 24 heures."
 
-#: minarca_client/main.py:708
+#: minarca_client/main.py:705
 msgid "Pause only the given instance(s)."
 msgstr "Mettre en pause uniquement la ou les instances données."
 
-#: minarca_client/main.py:712
+#: minarca_client/main.py:709
 msgid "number of hours"
 msgstr "nombre d'heures"
 
-#: minarca_client/main.py:717
+#: minarca_client/main.py:714
 msgid "clear previously set delay"
 msgstr "efface le délai précédemment défini"
 
-#: minarca_client/main.py:726
+#: minarca_client/main.py:723
 msgid "verify backup integrity"
 msgstr "vérifier l'intégrité de la sauvegarde"
 
-#: minarca_client/main.py:730
+#: minarca_client/main.py:727
 msgid "Verify backup integrity of the given backup instance(s)."
 msgstr ""
 "Vérifier l'intégrité de la sauvegarde de l'instance ou des instances de "
 "sauvegarde donnée(s)."
 
-#: minarca_client/main.py:737
+#: minarca_client/main.py:734
 msgid "open graphical user interface (default when calling minarcaw)"
 msgstr ""
 "ouvrir l'interface utilisateur graphique (par défaut avec l'execution de "
 "minarcaw)"
 
-#: minarca_client/main.py:809
+#: minarca_client/main.py:806
 msgid "Process interrupted by user."
 msgstr "Processus interrompu par l'utilisateur."
 
@@ -879,7 +871,7 @@ msgstr "Fichiers temporaires Vim"
 msgid "Minarca Backup"
 msgstr "Sauvegarde Minarca"
 
-#: minarca_client/core/scheduler.py:75
+#: minarca_client/core/scheduler.py:73
 msgid ""
 "Keeps your Minarca Backup Software running. If this task is disabled or stopped, "
 "your Minarca backup will stop working. This task gets created when linking "
@@ -895,6 +887,22 @@ msgstr ""
 "est préférable de modifier les paramètres de cette tâche et sélectionnez « "
 "Exécuter que l'utilisateur soit connecté ou non » pour vous assurer la "
 "sauvegarde s'exécute même lorsque personne n'utilise le serveur."
+
+#: minarca_client/core/scheduler.py:102
+msgid ""
+"A problem prevents the scheduling of backup jobs. Try running the application "
+"with Administrator rights."
+msgstr ""
+"Un problème empêche la planification des tâches de sauvegarde. Essayez "
+"d'exécuter l'application avec des droits d'administrateur."
+
+#: minarca_client/core/scheduler.py:109
+msgid ""
+"The user account is unknown or the password is incorrect. Be sure to enter your "
+"Windows credentials."
+msgstr ""
+"Le compte utilisateur est inconnu ou le mot de passe est incorrect. Veillez à "
+"saisir vos informations d'identification Windows."
 
 #: minarca_client/core/status.py:152
 msgid "Your backup is outdated"
@@ -1498,7 +1506,7 @@ msgstr "Fichiers inclus"
 msgid "Files excluded"
 msgstr "Fichiers exclus"
 
-#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_patterns.py:265
+#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_patterns.py:266
 msgid "Add file"
 msgstr "Ajouter un fichier"
 
@@ -1506,7 +1514,7 @@ msgstr "Ajouter un fichier"
 msgid "Exclude file"
 msgstr "Exclure un fichier"
 
-#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_patterns.py:254
+#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_patterns.py:255
 msgid "Add folder"
 msgstr "Ajouter un dossier"
 
@@ -1950,27 +1958,19 @@ msgstr ""
 "Un problème inconnu s'est produit lors de l'enregistrement des paramètres de "
 "sauvegarde. Si le problème persiste, contactez votre administrateur."
 
-#: minarca_client/ui/backup_settings.py:453
+#: minarca_client/ui/backup_settings.py:454
 msgid "Windows Credentials"
 msgstr "Informations d'identification Windows"
 
-#: minarca_client/ui/backup_settings.py:453
+#: minarca_client/ui/backup_settings.py:454
 msgid "Enter credentials for local machine:"
 msgstr "Saisir les informations d'identification de la machine locale :"
 
-#: minarca_client/ui/backup_settings.py:462
-msgid "Minarca cannot apply your changes."
-msgstr "Minarca ne peut pas appliquer vos modifications."
+#: minarca_client/ui/backup_settings.py:459
+msgid "Cannot apply your changes."
+msgstr "Impossible d'appliquer les modifications."
 
-#: minarca_client/ui/backup_settings.py:466
-msgid ""
-"The user account is unknown or the password is incorrect. Be sure to enter your "
-"Windows credentials, not your Minarca credentials."
-msgstr ""
-"Le compte utilisateur est inconnu ou le mot de passe est incorrect. Veillez à "
-"saisir vos identifiants Windows et non vos identifiants Minarca."
-
-#: minarca_client/ui/backup_settings.py:471
+#: minarca_client/ui/backup_settings.py:463
 msgid "Backup Configuration"
 msgstr "Configuration de la sauvegarde"
 
@@ -2015,3 +2015,11 @@ msgstr "Restauration locale"
 
 #~ msgid "Select location where to backup your files."
 #~ msgstr "Sélectionnez l'emplacement où vous souhaitez sauvegarder vos fichiers."
+
+#~ msgid ""
+#~ "A problem prevents the automatic scheduling of backup jobs. As a result, your "
+#~ "backup tasks cannot be executed as planned."
+#~ msgstr ""
+#~ "Un problème empêche la planification automatique des tâches de sauvegarde. "
+#~ "Par conséquent, vos tâches de sauvegarde ne peuvent pas être exécutées comme "
+#~ "prévu."
