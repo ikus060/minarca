@@ -97,7 +97,6 @@ class MinarcaApp(MDApp, ExceptionHandler):
         loop.close()
 
     def build(self):
-        # Define default Window size
         self.icon = "minarca-72.png"
         return Builder.load_string(KV)
 

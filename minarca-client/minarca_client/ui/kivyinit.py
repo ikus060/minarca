@@ -15,6 +15,6 @@ minarca_ico_path = files('minarca_client') / 'ui/theme/resources/minarca.ico'
 if minarca_ico_path.is_file():
     Config.set('kivy', 'window_icon', str(minarca_ico_path))
 
-# Define default size
-Config.set('graphics', 'height', '768')
+# Define default size to fit on small screen (1360x768)
+Config.set('graphics', 'height', '675')
 Config.set('graphics', 'width', '1024')
