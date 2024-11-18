@@ -5,6 +5,7 @@ import asyncio
 import contextlib
 import ctypes
 import functools
+import locale
 import os
 from ctypes.wintypes import INT
 
@@ -168,15 +169,15 @@ async def file_dialog(parent, title, filename=None, initial_directory=None, mult
                 return None
             raise IOError from error
 
+    # The return value is separated by NULLL byte
     paths = file_path.split("\0")
 
     if len(paths) == 1:
-        return paths[0]
-
-    for i in range(1, len(paths)):
-        paths[i] = os.path.join(paths[0], paths[i])  # noqa: PTH118
-    paths.pop(0)
-    return paths
+        # User selected a single file.
+        # If multi select, return an array.
+        return paths if multiple_select else paths[0]
+    # User selected multiple file.
+    return [os.path.join(paths[0], p) for p in paths[1:]]
 
 
 async def folder_dialog(
@@ -192,7 +193,7 @@ async def folder_dialog(
 
     def _set_start_folder(hwnd, msg, lp, data):
         if msg == shellcon.BFFM_INITIALIZED and data:
-            data = os.fsencode(str(data))
+            data = str(data).encode(locale.getpreferredencoding(), errors='replace')
             address, _ = PyGetBufferAddressAndLen(data)
             SendMessage(hwnd, shellcon.BFFM_SETSELECTION, 1, address)
 
@@ -219,8 +220,8 @@ async def folder_dialog(
         # Operation cancel by user.
         return None
     if multiple_select:
-        return [os.fsdecode(shell.SHGetPathFromIDList(pidl))]
-    return os.fsdecode(shell.SHGetPathFromIDList(pidl))
+        return [shell.SHGetPathFromIDListW(pidl)]
+    return shell.SHGetPathFromIDListW(pidl)
 
 
 def username_password_dialog(parent, title, message, username=None):
