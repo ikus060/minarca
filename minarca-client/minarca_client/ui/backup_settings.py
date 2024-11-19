@@ -442,30 +442,22 @@ class BackupSettings(MDBoxLayout):
         if not IS_WINDOWS:
             return
         value = self.backup.scheduler.run_if_logged_out
-        if value:
-            # If disable, re-schedule the taks with default settings.
-            self.backup.schedule_job()
-            return
 
         async def _run_if_logged_out():
-            # If enabled, prompt user for password.
-            username, password = username_password_dialog(
-                parent=self, title=_('Windows Credentials'), message=_('Enter credentials for local machine:')
-            )
-            if not username or not password:
-                # Operation cancel by user
-                return
             try:
-                self.backup.schedule_job(run_if_logged_out=(username, password))
-            except Exception as e:
-                self.backup.schedule_job()
-                message = _('Minarca cannot apply your changes.')
-                detail = str(e)
-                # When username or password is invalid, provide a better help message.
-                if getattr(e, 'winerror') == -2147023570:
-                    detail = _(
-                        'The user account is unknown or the password is incorrect. Be sure to enter your Windows credentials, not your Minarca credentials.'
+                if value:
+                    # If disable, re-schedule the taks with default settings.
+                    self.backup.schedule_job()
+                else:
+                    # If enabled, prompt user for password.
+                    username, password = username_password_dialog(
+                        parent=self, title=_('Windows Credentials'), message=_('Enter credentials for local machine:')
                     )
+                    if username and password:
+                        self.backup.schedule_job(run_if_logged_out=(username, password))
+            except Exception as e:
+                message = _('Cannot apply your changes.')
+                detail = str(e)
                 await warning_dialog(
                     parent=self,
                     title=_('Backup Configuration'),
