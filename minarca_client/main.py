@@ -184,12 +184,9 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
     # On windows this step fail for unknown reason with various user priviledge.
     try:
         backup.schedule_job()
-    except OSError:
-        print(
-            _(
-                'A problem prevents the automatic scheduling of backup jobs. As a result, your backup tasks cannot be executed as planned.'
-            )
-        )
+    except Exception as e:
+        print(str(e))
+        sys.exit(_EXIT_SCHEDULE_ERROR)
 
 
 def _pattern(include, pattern, instance_id):
