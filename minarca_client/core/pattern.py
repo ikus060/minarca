@@ -132,6 +132,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     Pattern(False, "**/~$*", _("Office temporary files")),
                     Pattern(False, "**/*.ost.tmp", _("Outlook IMAP temporary files")),
                     Pattern(False, "**/*.pst.tmp", _("Outlook POP temporary files")),
+                    Pattern(False, "**/*.ddb.bak", _("Dynacom Backup file")),
                     Pattern(False, "**/.tmp.driveupload", _("Google Drive temporary upload files")),
                     Pattern(False, "**/.tmp.drivedownload", _("Google Drive temporary download files")),
                     Pattern(
