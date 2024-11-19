@@ -123,7 +123,16 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## 6.0.1
+## 6.0.2 (2024-11-19)
+
+* Minarca Agent
+  * Enforce the use of Unicode functions for Windows folder dialogs to support adding paths with non-ASCII characters through the GUI.  
+  * Exclude Dynacom Backup files by default (`*.ddb.bak`).  
+  * Adjust default window size to ensure compatibility with smaller screens (minimum resolution: 1360 x 768).  
+  * Improve Windows Task Scheduler creation to handle "Access Denied" errors when Minarca is run as an administrator without proper admin rights.  
+  * Exclude Google Drive special folders by default.  
+
+## 6.0.1 (2024-11-12)
 
 * Minarca Agent
   * Disable multiline on custom exclude pattern text input #267
@@ -135,125 +144,65 @@ The Minarca website is <https://minarca.org/>.
 * Fix documentation upload
 * Remove link to Debian buster from documentation
 
-## 6.0.0
+## 6.0.0 (2024-10-24)
 
 * Minarca Agent
-  * Disable Kivy inspector by default. Only enable inspector with `--debug` flag
-  * Adjust image resolution on MacOs retina screen #264
-  * Update french translation
-
-## 6.0.0b11
-
-* Minarca Agent
-  * Avoid double query to latest_version URL to reduce load on server #259
-  * Lower the process priority during backup to reduce stress on computers during backup #198
-
-## 6.0.0b10
-
-* Minarca Agent
-  * Follow URL redirection in Backup settings
-  * Update code signing certificate
-  * Drop Debian Buster support #263
-  * Add exclude pattern for OneDrive GUID on MacOS
-  * Add read timeout when file is stored in the cloud (e.g.: OneDrive)
-  * Patch rdiff-backup log_to_term to flush more often
-  * Sign Windows executable with Azure Code Signing
-* Minarca Server
-  * Drop Debian Buster support #263
-  * Upgrade snakeoil fix #262
-  * Display last log lines when rdiff-backup fail
-  * Improve exception handling
-
-## 6.0.0b9
-
-* Minarca Agent
+  * Disable Kivy inspector by default; enable with `--debug` flag.
+  * Adjust image resolution on macOS Retina screens (#264).
+  * Update French translation.
+  * Avoid double query to the latest_version URL to reduce server load (#259).
+  * Lower process priority during backups to reduce stress on computers (#198).
+  * Follow URL redirection in Backup settings.
+  * Update code signing certificate.
+  * Drop Debian Buster support (#263).
+  * Add exclude pattern for OneDrive GUID on macOS.
+  * Add read timeout when file is stored in the cloud (e.g., OneDrive).
+  * Patch `rdiff-backup` log_to_term to flush more often.
+  * Sign Windows executables with Azure Code Signing.
   * Adjust English and French translations.
   * Fix initial location of folder dialogs on Windows OS.
   * Enforce UTF-8 encoding for `rdiff-backup` stdout.
   * Ensure creation of Scheduled Job in Backup Settings during initial setup (#258).
-  * Utilize `minarca.exe` to prevent exception dialog from being shown by background processes on Windows OS.
+  * Utilize `minarca.exe` to prevent exception dialogs from background processes on Windows OS.
   * Add more default exclusion patterns, including Firefox and Chrome bookmarks.
   * Adjust Kivy log level.
+  * Show Toast Notification using PowerShell instead of WinRT Python binding to reduce dependencies (#250).
+  * Support network mountpoints as backup destinations on Linux, Windows, and macOS (#234).
+  * Upgrade KivyMD.
+  * Exclude OneDrive GUID file by default on Windows (#251).
+  * Rename `--limit` to `--instance` for command-line usage.
+  * Improve parsing of patterns file with invalid lines.
+  * Configure backup to avoid starting before configuration is complete.
+  * Improve and adjust logging for debugging.
+  * Fix layout for repository name in the dashboard (#248).
+  * Add exclude pattern for Google Drive temporary files (.tmp.driveupload & .tmp.drivedownload).
+  * Check if the application is running before proceeding with installation on Windows OS (#249).
+  * Add backup identifier to `minarca status` command-line output.
+  * Upgrade to `rdiff-backup` v2.2.6.
+  * Include `rdiff-backup` patch to improve regression speed.
+  * Fix support for setuptools >= 70.
+  * Raise notification if backup is too old.
+  * Implement retention period for direct backups.
+  * Disable retention period setting if the user lacks permission to modify it.
+  * Support multiple backup sources and targets.
+  * Redesign interface using Kivy.
+  * Support full and partial restores.
+  * Fix display of disk usage.
 * Minarca Server
+  * Drop Debian Buster support (#263).
+  * Upgrade snakeoil fix (#262).
+  * Display last log lines when `rdiff-backup` fails.
+  * Improve exception handling.
+  * Adjust colors in the login screen.
+  * Adjust log verbosity.
+  * Adjust authentication mechanism between server and agent.
   * Define distinct settings for `minarca-home-dir` and `minarca-base-dir`.
   * Update environment variable prefix to `MINARCA_`.
-
-## 6.0.0b8
-
-* Minarca Agent
-  * Adjust english and french translation.
-
-## 6.0.0b7
-
-* Minarca Agent
-  * Fix all typo and translation errors.
-* Minarca Server
-  * Adjust colors in login screen
-  * Adjust log verbosity
-  * Adjust authentication mecanisme between server and agent
-
-## 6.0.0b6
-
-* Minarc Agent
-  * Show Toast Notification using PowerShell instead of WinRT python binding to reduce dependencies #250
-  * Support Network mountpoint as destination on Linux, Windows and MacOS #234
-  * Upgrade KivyMD
-  * Exclude OneDrive GUID file by default on Windows #251
-  * Update French translation
-  * Rename `--limit` to `--instance` for command line usage
-  * Improve parsing of patterns file with invalid lines
-  * Configure backup to avoid backup starting before configuration is complete
-  * Improve and adjust logging to help debug
-* Minarca Server
   * Upgrade Rdiffweb to v2.9.3
-  * Define default encoding value for backward compatibility with older database
-
-## 6.0.0b5
-
-* Minarca Agent
-  * Fix layout for repository name in dashboard #248
-
-## 6.0.0b4
-
-* Minarca Agent
-  * Add exclude pattern for Google Drive temporary files (.tmp.driveupload & .tmp.drivedownload)
-  * Check if application is running before proceeding with installation on Windows OS #249
-  * Fix layout to display repository name
-  * Used fixed version of materialyoucolor for MacOS compatibility
-* Minarca Server:
-  * Upgrade Rdiffweb to v2.9.2
-  * Use default language to send notification if user doesn't have a "Preferred Language" #306
-
-## 6.0.0b3
-
-* Minarca Agent
-  * Add backup identifier to `minarca status` command line output
-  * Uppgrade to rdiff-backup v2.2.6
-  * Include rdiff-backup patch to improve regression speed
-  * Fix support for setuptools >= 70
-  * Upgrade to latest KivyMD version
-  * Raise notification if backup is too old
-  * Implement retention period for direct backup
-  * Disable retention period setting if user lacks permission to modify it
-* Minarca Server
-  * Upgrade rdiffweb to v2.9.1
-* Docs:
-  * Add details regard the path to help troubleshooting
-
-## 6.0.0b2 (2024-04-26)
-
-* Minarca Agent
-  * Support Kivy inspector in debug mode (enabled using CTRL + E)
-  * Fix display of disk usage
-
-## 6.0.0b1 (2024-04-22)
-
-* Minarca Agent
-  * Support multiple backup source and target
-  * Redesign interface using Kivy
-  * Support Full & Partial restor
-* Upgrade rdiffweb version v2.9.0
-* Support `$minarcaid$` authentication for Minarca Agent.
+  * Use default language to send notifications if the user doesn't have a "Preferred Language" (#306).
+  * Define default encoding value for backward compatibility with older databases.
+* Documentation
+  * Add details regarding paths to help with troubleshooting.
 
 ## 5.0.5 (2024-04-16)
 
