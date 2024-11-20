@@ -46,7 +46,7 @@ bdist-server:deb:
   parallel:
     matrix:
     - TARGET: minarca-server
-      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
+      DIST: [bullseye, bookworm, jammy, lunar, noble, oracular]
       PIP_EXTRA_INDEX_URL: https://nexus.ikus-soft.com/repository/pypi-group/simple/
       TZ: UTC
     - TARGET: minarca-quota-api
@@ -150,7 +150,7 @@ test-bdist-server:deb:
     # Ubuntu tzdata is broken https://githubmate.com/repo/regebro/tzlocal/issues/101
     # So we need to make it explicit using environment variable
     - TARGET: minarca-server
-      DIST: [jammy, lunar, mantic, noble, oracular]
+      DIST: [jammy, lunar, noble, oracular]
       TZ: UTC
   script:
   - apt update
@@ -187,10 +187,10 @@ upload:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
+      DIST: [bullseye, bookworm, jammy, lunar, noble, oracular]
       DIST_SPECIFIC: 0
     - TARGET: minarca-server
-      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
+      DIST: [bullseye, bookworm, jammy, lunar, noble, oracular]
       DEPENDS: python3
       DIST_SPECIFIC: 1
     - TARGET: minarca-quota-api
@@ -306,7 +306,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [bullseye, bookworm, jammy, lunar, mantic, noble, oracular]
+      DIST: [bullseye, bookworm, jammy, lunar, noble, oracular]
   script:
     - apt update
     - apt install -y ./minarca-client/dist/minarca-client_*_amd64.deb

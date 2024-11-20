@@ -123,6 +123,8 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+* Remove Ubuntu Mantic support
+
 ## 6.0.2 (2024-11-19)
 
 * Minarca Agent
