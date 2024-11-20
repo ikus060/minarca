@@ -18,9 +18,7 @@ These minimum requirements are solely for evaluation and shall not be used in a 
   * Debian Bullseye
   * Debian Bookworm
   * Ubuntu Jammy 22.04 LTS
-  * Ubuntu Kinetic 22.10
   * Ubuntu Lunar 23.04
-  * Ubuntu Mantic 23.10
   * Ubuntu Noble 24.04 LTS
   * Ubuntu Oracular 24.10
 * Cpu: 64bit x86-64 or amd64, 4 core
