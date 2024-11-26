@@ -20,4 +20,5 @@ This comprehensive resource is designed to assist service providers in harnessin
    settings
    hardening
    faq
+   troubleshooting
    development
