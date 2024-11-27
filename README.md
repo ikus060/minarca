@@ -125,6 +125,12 @@ The Minarca website is <https://minarca.org/>.
 
 * Remove Ubuntu Mantic support
 
+## 6.0.3 (2024-11-27)
+
+* Drop Ubuntu Lunar & Ubuntu Mantic
+* Minarca Agent
+  * Fix run_if_logged_out exception on Windows #269
+
 ## 6.0.2 (2024-11-19)
 
 * Minarca Agent

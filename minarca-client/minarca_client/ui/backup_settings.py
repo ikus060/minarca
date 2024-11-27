@@ -204,7 +204,7 @@ class BackupSettings(MDBoxLayout):
         self.instance = instance
         self.create = create
         self.is_remote = instance.is_remote()
-        self.run_if_logged_out = IS_WINDOWS and self.backup.scheduler.run_if_logged_out
+        self.run_if_logged_out = bool(IS_WINDOWS and self.backup.scheduler.run_if_logged_out)
 
         # Also check user role if user is allowed to change the retention period.
         settings = self.instance.settings
