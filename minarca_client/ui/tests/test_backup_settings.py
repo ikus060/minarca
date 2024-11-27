@@ -159,3 +159,16 @@ class BackupSettingsTest(BaseAppTest):
         await self.pump_events()
         # Then user is redirected to another view and the instance is deleted
         self.assertNotIsInstance(self.view, BackupSettings)
+
+    def test_without_scheduled_task(self):
+        # Given a schedule task doesn't exists
+        self.app.backup.scheduler.delete()
+        # Given a backup configured
+        self.instance.settings.maxage = 1
+        self.instance.settings.keepdays = 2
+        self.instance.settings.ignore_weekday = [5, 6]
+        self.instance.settings.schedule = 12
+        self.instance.settings.save()
+        # When editing the backup settings
+        self.app.set_active_view('BackupSettings', instance=self.instance, create=True)
+        # Then no exception get raised.
