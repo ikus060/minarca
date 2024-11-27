@@ -84,7 +84,7 @@ doc:
     expire_in: 1 day
   before_script:
     - apt update
-    - apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
+    # FIXME - apt -y --no-install-recommends install librsync-dev libacl1-dev
     - pip install tox
   image: python:3.10
   needs: []
@@ -118,6 +118,7 @@ upload:deb:
   script: |
     set -x
     set -e
+    pip install setuptools_scm
     # publish to nexus
     export VERSION=$(python3 -m setuptools_scm)
     export FILE=$(ls -1d $FILENAME)
