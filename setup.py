@@ -12,7 +12,7 @@ import setuptools
 
 setuptools.setup(
     name="minarca_client",
-    use_scm_version={"root": "..", "relative_to": __file__},
+    use_scm_version=True,
     description="Opensource software to backup all your data.",
     long_description="Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage.",
     author="IKUS Software inc.",
@@ -49,7 +49,6 @@ setuptools.setup(
         "tzlocal~=2.0",
         "wakepy==0.6.0",
         "kivy==2.3.0",
-        # TODO We need to define version
         "KivyMD @ git+https://github.com/kivymd/KivyMD@b5bc79fb71312868be86580b7b32f676926ceb80",
         # Fixed version for MacOS compatibility
         "materialyoucolor==2.0.9",
