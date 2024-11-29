@@ -1,0 +1,286 @@
+variables:
+  MINARCA_DEV_REMOTE_URL: https://minarca-dev.ikus-soft.com
+  MINARCA_DEV_USERNAME: admin
+  MINARCA_DEV_PASSWORD: admin123
+
+stages:
+- test
+- bdist
+- doc
+- upload
+- deploy
+- e2e-test
+
+# For Linux, we need to build on a oldest glibc version possible.
+# For us, this is Debian buster.
+bdist-client:linux:
+  artifacts:
+    paths:
+    - "./dist/minarca-client_*.tar.gz"
+    - "./dist/minarca-client_*.deb"
+    - "./coverage*.xml"
+    - "./xunit*.xml"
+    expire_in: 1 day
+  before_script:
+  - apt update
+  - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron zenity
+  - pip3 install tox
+  # Required Python 3.10 for KivyMD
+  image: python:3.10-buster
+  needs: []  
+  script:
+  - tox -e flake8,black,isort,py3-linux
+  - tox -e pyinstaller-linux
+  stage: bdist
+
+bdist-client:macos:
+  artifacts:
+    paths:
+    - "./dist/minarca-client_*.dmg"
+    - "./coverage*.xml"
+    - "./xunit*.xml"
+    expire_in: 1 day
+  variables:
+    # Required because our macos cannot run opengl.
+    KIVY_GL_BACKEND: mock
+  before_script:
+    - pip3 install tox
+  needs: []  
+  tags:
+  - macos
+  script:
+  - tox -e flake8,black,isort,py3-mac
+  - tox -e pyinstaller-mac
+  stage: bdist
+
+bdist-client:win32:
+  artifacts:
+    paths:
+    - "./dist/minarca-client_*.exe"
+    - "./coverage*.xml"
+    - "./xunit*.xml"
+    expire_in: 1 day
+  before_script:
+  # Make use of nuget to install our dependencies
+  - Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile nuget.exe
+  - .\nuget.exe install python -Version 3.10.11
+  - $env:PATH = "$(Get-Location)\python.3.10.11\tools;$(Get-Location)\python.3.10.11\tools\Scripts;$env:PATH"
+  # Sanity check
+  - python.exe -VV
+  # Install tox
+  - python.exe -m pip install tox
+  needs: []  
+  script:
+  - tox.exe -e flake8,black,isort,py3-win
+  - tox.exe -e pyinstaller-win
+  stage: bdist
+  tags:
+  - windows
+
+doc:
+  artifacts:
+    paths:
+    - .tox/doc/tmp
+    expire_in: 1 day
+  before_script:
+    - apt update
+    - apt -y --no-install-recommends install librsync-dev python3-tk libacl1-dev
+    - pip install tox
+  image: python:3.10
+  needs: []
+  script:
+  - tox -e doc
+  stage: doc
+
+upload:deb:
+  image: python:3.10
+  needs:
+  - bdist-client:linux
+  parallel:
+    matrix:
+    - DIST: [bullseye, bookworm, jammy, noble, oracular]
+  script: |
+    set -e
+    set -x
+    if [[ "$CI_COMMIT_TAG" == *.*.? ]]; then
+      APT_URL="https://nexus.ikus-soft.com/repository/apt-release-${DIST}/"
+    else
+      APT_URL="https://nexus.ikus-soft.com/repository/apt-dev-${DIST}/"
+    fi
+    export FILE=$(ls -1 ./dist/minarca-client_*_amd64.deb)
+    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$FILE" "$APT_URL"
+    sleep 2
+    curl --fail ${APT_URL}/dists/$DIST/main/binary-amd64/Packages | grep "$(basename $FILE)"
+  stage: upload
+
+.upload-file: &upload-file
+  image: python:3.10
+  script: |
+    set -x
+    set -e
+    # publish to nexus
+    export VERSION=$(python3 -m setuptools_scm)
+    export FILE=$(ls -1d $FILENAME)
+    cd $(dirname $FILE)
+    find $(basename $FILE) -type f -exec curl --fail -u "$NEXUS_USR:$NEXUS_PWD" --upload-file "{}" https://nexus.ikus-soft.com/repository/archive/minarca/$VERSION/{} \;
+  stage: upload
+
+upload:linux:
+  <<: *upload-file
+  needs:
+  - bdist-client:linux
+  variables:
+    FILENAME: ./dist/minarca-client*.tar.gz
+    
+upload:macos:
+  <<: *upload-file
+  needs:
+  - bdist-client:macos
+  variables:
+    FILENAME: ./dist/minarca-client*.dmg
+
+upload:win32:
+  <<: *upload-file
+  needs:
+  - bdist-client:win32
+  variables:
+    FILENAME: ./dist/minarca-client*.exe
+
+upload:doc:
+  <<: *upload-file
+  before_script:
+    - mv .tox/doc/tmp/html doc
+  needs:
+  - doc
+  variables:
+    FILENAME: doc
+
+upload:sonar:
+  allow_failure: true
+  stage: upload
+  needs:
+  - bdist-client:linux
+  - bdist-client:win32
+  - bdist-client:macos
+  image: sonarsource/sonar-scanner-cli
+  only:
+    variables:
+      - $SONAR_URL
+      - $SONAR_TOKEN
+  variables:
+    SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
+  script:
+  # Patch coverage repport
+  #- sed -i "s|<source>minarca_client|<source>minarca-client/minarca_client|g" minarca-client/coverage-*.xml
+  - sonar-scanner -X -Dsonar.qualitygate.wait=True -Dsonar.python.coverage.reportPaths=coverage*.xml -Dsonar.python.xunit.reportPath=xunit*.xml -Dsonar.host.url=$SONAR_URL -Dsonar.token=$SONAR_TOKEN -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectVersion=$(git describe)
+
+e2e-test:deb:
+  allow_failure: True
+  needs:
+  - bdist-client:linux
+  image: buildpack-deps:$DIST
+  parallel:
+    matrix:
+    - TARGET: minarca-client
+      DIST: [bullseye, bookworm, jammy, noble, oracular]
+  script:
+    - apt update
+    - apt install -y ./dist/minarca-client_*_amd64.deb
+    # Smoke test
+    - minarca --version
+    - /opt/minarca/minarcaw --version
+    # Check translation
+    - LANGUAGE="fr" minarca --help | grep 'démarrer une sauvegarde'
+    # Check backup
+    - minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
+    - minarca -d status
+    - minarca -d include /etc /var /home
+    - minarca -d backup --force
+  stage: e2e-test
+  variables:
+    GIT_STRATEGY: none
+
+e2e-test:linux:
+  allow_failure: True
+  needs:
+  - bdist-client:linux
+  image: buildpack-deps:jammy
+  script:
+    - apt update
+    - apt install -y cron openssh-client locales locales-all
+    - tar -zxvf ./dist/minarca-client*.tar.gz --strip 1
+    # Smoke test
+    - ./minarca --version
+    - ./minarcaw --version
+    # Check translation
+    - LANGUAGE=fr_CA:fr LANG=fr_CA.UTF-8 ./minarca --help | grep 'démarrer une sauvegarde'
+    # Test with space
+    - export MINARCA_CONFIG_HOME="/tmp/My Folder With Space/Minarca/"
+    # Check backup
+    - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
+    - ./minarca -d include /etc /var /home
+    - ./minarca -d status
+    - ./minarca -d backup --force
+  stage: e2e-test
+  variables:
+    GIT_STRATEGY: none
+    LANG: "en_US.UTF-8"
+
+e2e-test:macos:
+  allow_failure: True
+  needs:
+  - bdist-client:macos
+  before_script:
+  - rm -Rf /Applications/Minarca.app
+  - rm -Rf $HOME/Library/Preferences/Minarca
+  script:
+  - "[ ! -e /Volumes/Minarca ] || hdiutil detach /Volumes/Minarca"
+  - hdiutil attach ./dist/minarca-client_*.dmg 
+  - cp -r /Volumes/Minarca/Minarca.app /Applications/
+  # Smoke test
+  - /Applications/Minarca.app/Contents/MacOS/minarca --version
+  - /Applications/Minarca.app/Contents/MacOS/minarcaw --version
+  # Check translation
+  - defaults write -g AppleLocale fr_CA
+  - /Applications/Minarca.app/Contents/MacOS/minarca --help | grep 'démarrer une sauvegarde'
+  - defaults write -g AppleLocale en_CA
+  # Check backup
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d forget --force
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d include "$HOME/Documents"
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d status
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d backup --force
+  stage: e2e-test
+  tags:
+  - macos
+  variables:
+    LC_ALL: "en_US.UTF-8"
+
+e2e-test:win32:
+  allow_failure: True
+  needs:
+  - bdist-client:win32
+  script:
+  # Install minarca
+  - $file=Get-ChildItem ./dist/minarca-client_*.exe
+  - Start-Process -wait "$file" /S
+  - dir "C:\Program Files\Minarca"
+  - $Env:path = "C:\Program Files\Minarca;$Env:path"
+  - $Env:path
+  # Smoke test
+  - minarca.exe --version
+  - minarcaw.exe --version
+  # Check translation
+  - $Env:LANGUAGE="fr"; if (!(minarca.exe --help | Select-String -quiet 'sauvegarde')){ exit 1 }
+  - $Env:LANGUAGE="en"
+  # Test with space 
+  - $Env:MINARCA_CONFIG_HOME="$Env:APPDATA/My Folder With Space/Minarca/"
+  # Check backup
+  - minarca.exe -d forget --force
+  - minarca.exe -d link --force --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"
+  - minarca.exe -d include /etc /var /home
+  - minarca.exe -d status
+  - minarca.exe -d backup --force
+  stage: e2e-test
+  tags:
+  - windows

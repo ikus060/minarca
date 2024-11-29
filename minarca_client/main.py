@@ -630,12 +630,12 @@ def _parse_args(args):
 
     # scheduler
     if IS_WINDOWS:
-        help = _('create the required scheduled task in Windows Task Scheduler')
+        help_msg = _('create the required scheduled task in Windows Task Scheduler')
     elif IS_MAC:
-        help = _('create the required scheduled task in launchd')
+        help_msg = _('create the required scheduled task in launchd')
     else:
-        help = _('create the required scheduled task in crontab')
-    sub = subparsers.add_parser('schedule', help=help)
+        help_msg = _('create the required scheduled task in crontab')
+    sub = subparsers.add_parser('schedule', help=help_msg)
     sub.add_argument(
         '--hourly',
         dest='schedule',
