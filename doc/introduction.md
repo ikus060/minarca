@@ -31,7 +31,7 @@ The last component, named Minarca client, must be installed on the computers to 
 * Compatibility support: allow usability with legacy rdiff-backup v1.2.8 and v2.0.5 agent
 * User repository isolation: incoming request are completely isolated from each other
 * Automated SSH management: no requirement to manually generate SSH identity, SSH authentication is completely automated and doesn't required intervention
-* Open source: no secrets. Rdiffweb is a free open-source software. The source code is licensed under GPL v3.
+* Open source: no secrets. Minarca is a free open-source software. The source code is licensed under GPL v3.
 * Support: business support will be available through [Ikus Software](https://ikus-soft.com).
 * Rdiff-backup: used as the main backup software you benefit from its stability, cross-platform. And you can still use it the way you are used to with the command line.
 
@@ -43,15 +43,9 @@ Aside from the web interface, which uses HTML and JavaScript, everything else is
 
 ## Getting help
 
-### Mailing list
-
-Minarca is open-source, and contributions are welcome. Here is the main communication channel to get help from other users.
-
-[Rdiffweb Google Group](https://groups.google.com/forum/#!forum/rdiffweb)
-
 ### Bug tracker
 
-If you encounter a problem, you should start by asking to be added to the mailing list. Next, you may open a ticket in our issue tracking system.
+If you encounter a problem or have a question, you may open a ticket in our issue tracking system.
 
 [Gitlab Issues](https://gitlab.com/ikus-soft/minarca/-/issues)
 
