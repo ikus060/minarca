@@ -11,22 +11,19 @@ how to translate Minarca. It's not a complete instruction set, it's merely a rem
 
 Extract the strings to be translated:
 
-    cd minarca-client
-    python setup.py extract_messages
+    tox -e babel_extract
 
 Create a new translation:
 
-    cd minarca-client
-    python setup.py init_catalog --local fr --input-file minarca_client/locales/messages.pot --output-dir minarca_client/locales
+    tox -e babel_init -- --local fr
 
 Update an existing translation:
 
-    cd minarca-client
-    python setup.py update_catalog --local fr
+    tox -e babel_update -- --local fr
 
-Compile catalog:
+Compile all existing translation:
 
-    python setup.py compile_catalog
+    tox -e babel_compile
 
 ## Code Signing
 
