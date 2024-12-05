@@ -134,7 +134,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     Pattern(False, "**/*.pst.tmp", _("Outlook POP temporary files")),
                     Pattern(False, "**/*.ddb.bak", _("Dynacom Backup file")),
                     Pattern(False, "**/.tmp.driveupload", _("Google Drive temporary upload files")),
-                    Pattern(False, "**/.tmp.drivedownload", _("Gogle Drive temporoary download files")),
+                    Pattern(False, "**/.tmp.drivedownload", _("Google Drive temporary download files")),
                     # Ignore OneDrive special GUID file
                     Pattern(
                         False,
