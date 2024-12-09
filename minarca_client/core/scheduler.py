@@ -81,6 +81,7 @@ if IS_WINDOWS:
             )
             task_def.Settings.Enabled = True
             task_def.Settings.StopIfGoingOnBatteries = False
+            task_def.Settings.DisallowStartIfOnBatteries = False
             task_def.Settings.ExecutionTimeLimit = "PT0S"  # enable the task to run indefinitely
 
             # Register task
