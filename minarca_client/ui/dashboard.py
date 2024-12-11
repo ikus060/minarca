@@ -21,6 +21,8 @@ Builder.load_string(
     md_bg_color: self.theme_cls.surfaceContainerColor
 
     MDScrollView:
+        bar_width: 10
+
         MDBoxLayout:
             orientation: 'vertical'
             adaptive_height: True
