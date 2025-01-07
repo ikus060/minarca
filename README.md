@@ -97,7 +97,15 @@ Thank you for considering contributing to Minarca Data Backup! There are several
 
 We welcome all contributions to the project and appreciate any help you can provide.
 
-## Professional support
+## You need help?
+
+### Community support
+
+If you have any questions or need assistance, feel free to reach out to the Minarca community:
+
+- Join the [Minarca Google Group](https://groups.google.com/g/minarca) to ask questions, share ideas, or get help from the community.
+
+### Professional support
 
 Professional support for Minarca Data Backup is available by [contacting IKUS Soft](https://minarca.org/contactus).
 
