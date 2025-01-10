@@ -20,7 +20,8 @@ Builder.load_string(
     orientation: 'vertical'
     md_bg_color: self.theme_cls.surfaceContainerColor
 
-    MDScrollView:
+    CScrollView:
+
         MDBoxLayout:
             orientation: 'vertical'
             adaptive_height: True
