@@ -24,6 +24,7 @@ Builder.load_string(
     '''
 <PatternItem>:
     divider: True
+    ripple_effect: False
     -height: "56dp"
 
     MDListItemLeadingIcon:
