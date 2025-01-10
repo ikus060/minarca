@@ -1482,7 +1482,7 @@ msgid "Please wait. Loading backup dates..."
 msgstr ""
 
 #: minarca_client/ui/backup_restore_date.py:181
-msgid "\"Failed to retrieve available backup dates."
+msgid "Failed to retrieve available backup dates."
 msgstr ""
 
 #: minarca_client/ui/backup_restore_date.py:185

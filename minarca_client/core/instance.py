@@ -15,12 +15,10 @@ import os
 import re
 import stat
 import subprocess
-import tempfile
 import time
 from pathlib import Path
 
 import psutil
-import yaml
 from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
 from tzlocal import get_localzone
 
@@ -83,6 +81,25 @@ def _escape_path(path):
     return "'%s'" % path
 
 
+async def _read_stream(stream, capture, callback):
+    """
+    Asynchronously read stream and send result to capture exception and callback function.
+    """
+    while True:
+        try:
+            line = await stream.readline()
+        except ValueError:
+            # Raised by readline when the line doesn't fit in the buffer.
+            # Common case when running rdiff-backup with "-v 9"
+            callback('OUTPUT LOST')
+        if line:
+            capture.parse(line)
+            callback(line)
+        else:
+            # EOF
+            break
+
+
 def handle_http_errors(func):
     """
     Decorator to handle HTTP exception raised when calling rdiffweb server.
@@ -109,45 +126,6 @@ def handle_http_errors(func):
             raise server_error
 
     return wrapper
-
-
-class _Collector:
-    _writing = False
-    file = None
-
-    def __init__(self, start_marker, end_marker) -> None:
-        assert start_marker
-        assert end_marker
-        # Handle line separator
-        self._start_marker = start_marker + os.linesep
-        self._end_marker = end_marker + os.linesep
-
-    def write(self, data):
-        assert self.file
-        if data == self._start_marker:
-            self._writing = True
-        elif data == self._end_marker:
-            self._writing = False
-        if self._writing:
-            self.file.write(data)
-        else:
-            logger.debug(data.rstrip('\r\n'))
-
-    def flush(self):
-        # No need to flush on every call.
-        pass
-
-    def close(self):
-        assert self.file
-        self.file.close()
-
-    def __enter__(self):
-        self.file = tempfile.TemporaryFile(mode='w+', errors='replace', newline='')
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.file.close()
-        self.file = None
 
 
 @contextlib.contextmanager
@@ -216,7 +194,7 @@ class BackupInstance:
         with safe_keepawake():
             with UpdateStatusNotification(instance=self):
                 async with UpdateStatus(instance=self):
-                    with open(self.backup_log_file, 'w', encoding='utf-8', errors='replace', newline='') as log_file:
+                    with open(self.backup_log_file, 'wb') as log_file:
                         # Check patterns
                         patterns = self.patterns
                         if not patterns:
@@ -252,7 +230,7 @@ class BackupInstance:
                             args.extend(["--exclude", f"{drive}**"])
                             # Call rdiff-backup
                             dest = self._backup_path(drive)
-                            await self._rdiff_backup(*args, drive, dest, log_file=log_file)
+                            await self._rdiff_backup(*args, drive, dest, callback=log_file.write)
                             # For local disk, make sure to "flush" disk cache
                             if self.is_local():
                                 logger.debug(f"{self.log_id}: flushing changes to disk")
@@ -267,7 +245,7 @@ class BackupInstance:
                                     '--older-than',
                                     f"{self.settings.keepdays}D",
                                     dest,
-                                    log_file=log_file,
+                                    callback=log_file.write,
                                 )
         logger.debug(f"{self.log_id}: backup process completed successfully")
 
@@ -357,7 +335,7 @@ class BackupInstance:
                 logger.debug(f"{self.log_id}: exchanging new SSH identity with server")
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
 
-    async def _rdiff_backup(self, *extra_args, log_file=None):
+    async def _rdiff_backup(self, *extra_args, callback=None):
         """
         Make a call to rdiff-backup executable.
         """
@@ -365,6 +343,12 @@ class BackupInstance:
         args.extend(extra_args)
 
         capture = CaptureException()
+        if callback is None:
+
+            def callback(line):
+                line = line.decode('utf-8', errors='replace').rstrip('\r\n')
+                logger.debug(f"{self.log_id}: {line}")
+
         logger.debug(f"{self.log_id}: executing command: {_sh_quote(args)}")
         try:
             # Enforce UTF-8 to be used by rdiff-backup stdout.
@@ -377,23 +361,15 @@ class BackupInstance:
                 *args,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                # Enforce use of utf-8 for stdout.
+                stderr=subprocess.PIPE,
                 env=env,
                 creationflags=creationflags,
             )
-            # Stream the output of rdiff-backup to log file and exception capture.
-            while True:
-                line = await process.stdout.readline()
-                if not line:
-                    break
-                line = line.decode('utf-8', errors='replace')
-                if log_file:
-                    log_file.write(line)
-                    log_file.flush()
-                else:
-                    logger.debug(line.rstrip('\r\n'))
-                capture.parse(line)
+            # Stream stdout and stderr
+            await asyncio.tasks.gather(
+                _read_stream(process.stdout, capture, callback),
+                _read_stream(process.stderr, capture, callback),
+            )
             # Check return code
             exit_code = await process.wait()
         except Exception as e:
@@ -417,7 +393,7 @@ class BackupInstance:
             raise RunningError()
         with safe_keepawake():
             async with UpdateStatus(instance=self, action='restore'):
-                with open(self.restore_log_file, 'w', encoding='utf-8', errors='replace', newline='') as log_file:
+                with open(self.restore_log_file, 'wb') as log_file:
                     # Loop on each pattern to be restored and execute rdiff-backup.
                     for path in paths:
                         if destination:
@@ -442,7 +418,7 @@ class BackupInstance:
                         # FIXME For full restore we should add exclude pattern, but rdiff-backup raise an error.
                         await self._rdiff_backup(
                             *args,
-                            log_file=log_file,
+                            callback=log_file.write,
                         )
 
     def start_backup(self, force=False):
@@ -761,7 +737,10 @@ class BackupInstance:
         Return dates
         """
         logger.debug(f"{self.log_id}: listing increments")
+
+        local_tz = get_localzone()
         all_increments = []
+
         # On Windows operating system, the computer may have multiple Root
         # (C:\, D:\, etc). To support this scenario, we need to run
         # rdiff-backup multiple time. Once for each Root.
@@ -779,23 +758,23 @@ class BackupInstance:
             args.append('increments')
             args.append(self._backup_path(drive))
 
-            local_tz = get_localzone()
+            def collect_increments(line):
+                """
+                Collect the increment time from rdiff-backup output.
+                """
+                # The output is in yaml format, but let capture only the `time:` values.
+                if not line.startswith(b'  time: '):
+                    return
+                try:
+                    epoch_value = int(line[8:])
+                except ValueError:
+                    logger.warning(f"{self.log_id}: invalid increment time: {line[8:]}")
+                date_value = datetime.datetime.fromtimestamp(epoch_value, datetime.timezone.utc).astimezone(local_tz)
+                all_increments.append(date_value)
 
-            # Execute command line and pipe result to a file.
-            with _Collector('---', '...') as log_file:
-                await self._rdiff_backup(*args, log_file=log_file)
-                # Then read output as Yaml
-                log_file.file.seek(0)
-                increments = yaml.safe_load(log_file.file)
-                # Extract dateimte as local timezone
-                if increments:
-                    all_increments.extend(
-                        [
-                            datetime.datetime.fromtimestamp(inc.get('time'), datetime.timezone.utc).astimezone(local_tz)
-                            for inc in increments
-                            if 'time' in inc
-                        ]
-                    )
+            # Call rdiff-backup
+            await self._rdiff_backup(*args, callback=collect_increments)
+
         logger.debug(f"{self.log_id}: found {len(all_increments)} increments")
         return all_increments
 
@@ -807,7 +786,9 @@ class BackupInstance:
         """
         assert increment_datetime and isinstance(increment_datetime, datetime.datetime)
         logger.debug(f"{self.log_id}: listing files for increment date: {increment_datetime}")
+
         all_files = []
+
         # On Windows operating system, the computer may have multiple Root
         # (C:\, D:\, etc). To support this scenario, we need to run
         # rdiff-backup multiple time. Once for each Root.
@@ -827,20 +808,24 @@ class BackupInstance:
             args.append(str(int(increment_datetime.timestamp())))
             args.append(self._backup_path(drive))
 
-            # Execute command line and pipe result to a file.
-            with _Collector('.', '*        Cleaning up') as log_file:
-                await self._rdiff_backup(*args, log_file=log_file)
-                # Then read output as Yaml
-                log_file.file.seek(0)
-                for line in log_file.file:
-                    # TODO use proper icons (try to detect folder vs file)
-                    # Remove trailing newline \r\n
-                    line = line.rstrip('\r\n')
-                    # Ignore "."
-                    if line == '.':
-                        continue
-                    # Prefix with drive
+            collect = False
+
+            def collect_files(line, drive=drive):
+                """
+                Collect the file names. Everything between `.` and `*        Cleaning up`
+                """
+                nonlocal collect
+                if b'Cleaning up' in line:
+                    collect = False
+                elif line == b'.\n' or line == b'.\r\n':
+                    collect = True
+                elif collect:
+                    line = line.decode('utf-8', errors='replace').rstrip('\r\n')
                     path = os.path.join(drive, line)
                     all_files.append(path)
+
+            # Execute command line and collect filenames
+            await self._rdiff_backup(*args, callback=collect_files)
+
         logger.debug(f"{self.log_id}: found {len(all_files)} files")
         return all_files
