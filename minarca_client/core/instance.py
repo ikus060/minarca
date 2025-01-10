@@ -616,6 +616,9 @@ class BackupInstance:
 
         unused, unused, remote_port = self.settings.remotehost.partition(":")
         remote_schema = _escape_path(compat.get_ssh())
+        # Enforce a null config file to avoid reading system wide configuration
+        if not IS_WINDOWS:
+            remote_schema += " -F /dev/null"
         remote_schema += " -oBatchMode=yes -oPreferredAuthentications=publickey"
         if os.environ.get("MINARCA_ACCEPT_HOST_KEY", False) in ["true", "1", "True"]:
             remote_schema += " -oStrictHostKeyChecking=no"
