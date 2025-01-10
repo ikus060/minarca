@@ -26,13 +26,13 @@ from minarca_client.core.exceptions import (
 class TestExceptions(unittest.TestCase):
     @parameterized.expand(
         [
-            ('ssh: connect to host test.minarca.net port 8976: Connection refused', ConnectException),
-            ('ssh: Could not resolve hostname', UnknownHostException),
-            ('Host key verification failed.', UnknownHostKeyError),
-            ('Permission denied (publickey)', PermissionDeniedError),
-            ('OSError: [Errno 122] Disk quota exceeded', DiskQuotaExceededError),
-            ('OSError: [Errno 28] No space left on device', DiskFullError),
-            ('Other', None),
+            (b'ssh: connect to host test.minarca.net port 8976: Connection refused', ConnectException),
+            (b'ssh: Could not resolve hostname', UnknownHostException),
+            (b'Host key verification failed.', UnknownHostKeyError),
+            (b'Permission denied (publickey)', PermissionDeniedError),
+            (b'OSError: [Errno 122] Disk quota exceeded', DiskQuotaExceededError),
+            (b'OSError: [Errno 28] No space left on device', DiskFullError),
+            (b'Other', None),
         ]
     )
     def test_capture_exception(self, line, expected_error):

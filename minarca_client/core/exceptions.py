@@ -14,6 +14,7 @@ class CaptureException:
     exception = None
 
     def parse(self, line):
+        assert isinstance(line, bytes)
         for cls in [
             ConnectException,
             DiskFullError,
@@ -233,7 +234,7 @@ class ConnectException(BackupError):
     @staticmethod
     def _matches(line):
         # ssh: connect to host test.minarca.net port 8976: Connection refused
-        return 'ssh: connect to host' in line and 'Connection refused' in line
+        return b'ssh: connect to host' in line and b'Connection refused' in line
 
 
 class PermissionDeniedError(BackupError):
@@ -247,7 +248,7 @@ class PermissionDeniedError(BackupError):
 
     @staticmethod
     def _matches(line):
-        return 'Permission denied (publickey)' in line
+        return b'Permission denied (publickey)' in line
 
 
 class UnknownHostKeyError(BackupError):
@@ -261,7 +262,7 @@ class UnknownHostKeyError(BackupError):
 
     @staticmethod
     def _matches(line):
-        return 'Host key verification failed.' in line
+        return b'Host key verification failed.' in line
 
 
 class DiskQuotaExceededError(BackupError):
@@ -273,7 +274,7 @@ class DiskQuotaExceededError(BackupError):
 
     @staticmethod
     def _matches(line):
-        return 'OSError: [Errno 122] Disk quota exceeded' in line
+        return b'OSError: [Errno 122] Disk quota exceeded' in line
 
 
 class DiskFullError(BackupError):
@@ -285,7 +286,7 @@ class DiskFullError(BackupError):
 
     @staticmethod
     def _matches(line):
-        return 'OSError: [Errno 28] No space left on device' in line
+        return b'OSError: [Errno 28] No space left on device' in line
 
 
 class UnknownHostException(BackupError):
@@ -299,7 +300,7 @@ class UnknownHostException(BackupError):
 
     @staticmethod
     def _matches(line):
-        return 'ssh: Could not resolve hostname' in line
+        return b'ssh: Could not resolve hostname' in line
 
 
 class UnsuportedVersionError(BackupError):
@@ -313,7 +314,7 @@ class UnsuportedVersionError(BackupError):
 
     @staticmethod
     def _matches(line):
-        return 'ERROR unsupported version:' in line or 'ERROR: unsupported version:' in line
+        return b'ERROR unsupported version:' in line or b'ERROR: unsupported version:' in line
 
 
 class RestoreFileNotFound(BackupError):
@@ -321,7 +322,7 @@ class RestoreFileNotFound(BackupError):
 
     @staticmethod
     def _matches(line):
-        return "couldn't be identified as being within an existing backup repository" in line
+        return b"couldn't be identified as being within an existing backup repository" in line
 
 
 class RepositoryLocked(BackupError):
@@ -329,7 +330,7 @@ class RepositoryLocked(BackupError):
 
     @staticmethod
     def _matches(line):
-        return "Fatal Error: It appears that a previous rdiff-backup session" in line
+        return b"Fatal Error: It appears that a previous rdiff-backup session" in line
 
 
 class UnrecognizedArguments(BackupError):
@@ -337,7 +338,7 @@ class UnrecognizedArguments(BackupError):
 
     @staticmethod
     def _matches(line):
-        return "error: unrecognized arguments: " in line
+        return b"error: unrecognized arguments: " in line
 
 
 class LocalDestinationNotEmptyError(ConfigureBackupError):
@@ -379,7 +380,7 @@ class DiskDisconnectedError(BackupError):
 
     @staticmethod
     def _matches(line):
-        return 'OSError: [Errno 5] Input/output error' in line
+        return b'OSError: [Errno 5] Input/output error' in line
 
 
 class RemoteRepositoryNotFound(BackupError):
@@ -398,7 +399,7 @@ class RemoteRepositoryNotFound(BackupError):
     def _matches(line):
         # ERROR:   Path 'pop-os' couldn't be identified as being within an existing
         #          backup repository
-        return "couldn't be identified as being within an existing" in line
+        return b"couldn't be identified as being within an existing" in line
 
 
 class InvalidRepositoryName(ConfigureBackupError):
