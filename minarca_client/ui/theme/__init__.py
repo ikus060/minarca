@@ -137,9 +137,11 @@ Builder.load_string(
         id: checkbox
         active: root.active
         on_active: root.active = self.active
+        pos_hint: {'center_y': .5}
 
     MDLabel:
         text: root.text
+        adaptive_height: True
         # When user click on label, toggle the state.
         on_touch_down:
             if self.collide_point(*args[1].pos) and not root.disabled: \

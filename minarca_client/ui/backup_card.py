@@ -436,4 +436,4 @@ class BackupCard(CCard):
         App.get_running_app().set_active_view('BackupPatterns', instance=self.instance)
 
     def backup_restore(self):
-        App.get_running_app().set_active_view('BackupRestore', instance=self.instance)
+        App.get_running_app().set_active_view('BackupRestoreDate', instance=self.instance)

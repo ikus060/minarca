@@ -242,6 +242,9 @@ class BackupSettings(MDBoxLayout):
         if self._run_if_logged_out_task:
             self._run_if_logged_out_task.cancel()
 
+    # TODO For case when we need to restore. We should add an option for manual execution only.
+    # TODO Also adjust the is_time_to_backup() function.
+
     @alias_property()
     def schedule_choices(self):
         return {1: _("Hourly"), 6: _("Four times a day"), 12: _("Twice a day"), 24: _("Once a day")}

@@ -87,7 +87,7 @@ def _backup(force, instance_id):
                 asyncio.run(instance.backup(force=force))
             except NotScheduleError as e:
                 # If one backup is not schedule to run, continue with next backup.
-                logging.info(str(e))
+                logging.info("%s: %s" % (instance.log_id, e))
     except BackupError as e:
         # Print message to stdout and log file.
         logging.error(str(e))
@@ -431,12 +431,11 @@ def _status(instance_id):
             print(
                 " * "
                 + _("Last successful backup: %s")
-                % (status.lastsuccess.strftime("%Y-%m-%dT%H:%M:%S%z") if status.lastsuccess else _('Never'))
+                % (status.lastsuccess.strftime() if status.lastsuccess else _('Never'))
             )
             print(
                 " * "
-                + _("Last backup date:       %s")
-                % (status.lastdate.strftime("%Y-%m-%dT%H:%M:%S%z") if status.lastdate else _('Never'))
+                + _("Last backup date:       %s") % (status.lastdate.strftime() if status.lastdate else _('Never'))
             )
             print(" * " + _("Last backup status:     %s") % (status.current_status or _('Never')))
             if status.details:
