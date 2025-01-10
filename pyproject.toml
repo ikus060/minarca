@@ -1,3 +1,73 @@
+[build-system]
+requires = ["setuptools>=66", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minarca_client"
+authors = [
+    {name = "Patrik Dufresne", email = "patrik@ikus-soft.com"},
+]
+description = "Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage."
+readme = "README.md"
+requires-python = ">=3.8, <4"
+license = {text = "GPLv3"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Framework :: CherryPy"
+]
+dependencies = [
+    "aiofiles",
+    "cryptography",
+    "humanfriendly",
+    "javaproperties",
+    "packaging",
+    "psutil",
+    "rdiff-backup==2.2.6",
+    "requests>=2.25.1",
+    "tzlocal~=2.0",
+    "wakepy==0.6.0",
+    "kivy==2.3.0",
+    "KivyMD @ git+https://github.com/kivymd/KivyMD@b5bc79fb71312868be86580b7b32f676926ceb80",
+    "materialyoucolor==2.0.9",
+    "pywin32 ; sys_platform=='win32'",
+    "launchd ; sys_platform=='darwin'",
+    "python-crontab ; sys_platform=='linux'",
+    "pylibacl ; sys_platform=='linux'",
+    "pyxattr ; sys_platform=='linux'",
+]
+dynamic = ["version"]
+
+[tool.setuptools]
+packages = ["minarca_client"]
+
+[project.optional-dependencies]
+test = [
+    "parameterized",
+    "responses",
+]
+
+[project.scripts]
+minarca = "minarca_client.main:main"
+
+[project.gui-scripts]
+minarcaw = "minarca_client.main:main"
+
+[project.urls]
+Homepage = "https://minarca.org"
+documentation = "https://ikus-soft.com/archive/minarca/doc/"
+source = "https://gitlab.com/ikus-soft/minarca"
+bug_tracker = "https://gitlab.com/ikus-soft/minarca/-/issues"
+
 [tool.black]
 line-length = 120
 skip-string-normalization = "True"
+
+[tool.setuptools_scm]

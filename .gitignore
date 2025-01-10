@@ -1,5 +1,5 @@
 *.py[co]
-
+.debbuild
 # Packages
 .eggs
 *.egg-info
