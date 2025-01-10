@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-15 09:30-0500\n"
-"PO-Revision-Date: 2024-11-15 09:32-0500\n"
+"POT-Creation-Date: 2024-12-05 14:20-0500\n"
+"PO-Revision-Date: 2024-12-05 14:21-0500\n"
 "Last-Translator: \n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #: minarca_client/main.py:62
@@ -745,13 +745,13 @@ msgstr "Documents de l'utilisateur"
 msgid "Minarca Config"
 msgstr "Configuration Minarca"
 
-#: minarca_client/core/pattern.py:96 minarca_client/core/pattern.py:149
-#: minarca_client/core/pattern.py:170
+#: minarca_client/core/pattern.py:96 minarca_client/core/pattern.py:155
+#: minarca_client/core/pattern.py:176
 msgid "Firefox Bookmark"
 msgstr "Favoris Firefox"
 
-#: minarca_client/core/pattern.py:103 minarca_client/core/pattern.py:156
-#: minarca_client/core/pattern.py:171
+#: minarca_client/core/pattern.py:103 minarca_client/core/pattern.py:162
+#: minarca_client/core/pattern.py:177
 msgid "Chrome Bookmark"
 msgstr "Favoris Chrome"
 
@@ -795,7 +795,7 @@ msgstr "Récupération système"
 msgid "Recycle bin"
 msgstr "Corbeille"
 
-#: minarca_client/core/pattern.py:130 minarca_client/core/pattern.py:177
+#: minarca_client/core/pattern.py:130 minarca_client/core/pattern.py:183
 msgid "Temporary Folder"
 msgstr "Dossier temporaire"
 
@@ -816,54 +816,70 @@ msgid "Outlook POP temporary files"
 msgstr "Fichiers temporaires d'Outlook POP"
 
 #: minarca_client/core/pattern.py:135
+msgid "Dynacom Backup file"
+msgstr "Fichier de sauvegarde Dynacom"
+
+#: minarca_client/core/pattern.py:136
 msgid "Google Drive temporary upload files"
 msgstr "Fichiers de temporaire de Google Drive"
 
-#: minarca_client/core/pattern.py:136
+#: minarca_client/core/pattern.py:137
 msgid "Google Drive temporary download files"
-msgstr "Fichiers de temporaire de Google Drive"
+msgstr "Fichiers de téléchargement temporaire de Google Drive"
 
-#: minarca_client/core/pattern.py:140 minarca_client/core/pattern.py:165
+#: minarca_client/core/pattern.py:142 minarca_client/core/pattern.py:171
 msgid "OneDrive GUID File"
 msgstr "Fichier GUID OneDrive"
 
-#: minarca_client/core/pattern.py:161
+#: minarca_client/core/pattern.py:145
+msgid "Google Drive Shortcut Metadata"
+msgstr "Métadonnées des raccourcis Google Drive"
+
+#: minarca_client/core/pattern.py:146
+msgid "Google Drive Revision History"
+msgstr "Historique des révisions de Google Drive"
+
+#: minarca_client/core/pattern.py:147
+msgid "Google Drive Encrypted"
+msgstr "Google Drive crypté"
+
+#: minarca_client/core/pattern.py:167
 msgid "Desktop Services Store"
 msgstr "Desktop Services Store"
 
-#: minarca_client/core/pattern.py:174
+#: minarca_client/core/pattern.py:180
 msgid "dev filesystem"
 msgstr "système de fichiers /dev"
 
-#: minarca_client/core/pattern.py:175
+#: minarca_client/core/pattern.py:181
 msgid "proc filesystem"
 msgstr "système de fichiers /proc"
 
-#: minarca_client/core/pattern.py:176
+#: minarca_client/core/pattern.py:182
 msgid "sys filesystem"
 msgstr "système de fichiers /sys"
 
-#: minarca_client/core/pattern.py:178
+#: minarca_client/core/pattern.py:184
 msgid "Volatile program files"
 msgstr "Fichiers volatile /run"
 
-#: minarca_client/core/pattern.py:179
+#: minarca_client/core/pattern.py:185
 msgid "Mounted filesystems"
 msgstr "Systèmes de fichiers montés /mnt"
 
-#: minarca_client/core/pattern.py:180
+#: minarca_client/core/pattern.py:186
 msgid "External media"
 msgstr "Médias externes /media"
 
-#: minarca_client/core/pattern.py:181
+#: minarca_client/core/pattern.py:187
 msgid "Ext4 Lost and Found"
 msgstr "Ext4 perdu et trouvé"
 
-#: minarca_client/core/pattern.py:182
+#: minarca_client/core/pattern.py:188
 msgid "Hidden temporary files"
 msgstr "Fichiers temporaires cachés"
 
-#: minarca_client/core/pattern.py:183
+#: minarca_client/core/pattern.py:189
 msgid "Vim temporary files"
 msgstr "Fichiers temporaires Vim"
 
