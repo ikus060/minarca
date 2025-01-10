@@ -62,7 +62,9 @@ class BaseAppTest(unittest.IsolatedAsyncioTestCase):
         remaining_tasks = [
             task
             for task in asyncio.all_tasks()
-            if 'App.async_run' not in str(task._coro) and 'IsolatedAsyncioTestCase' not in str(task._coro)
+            if 'App.async_run' not in str(task._coro)
+            and 'IsolatedAsyncioTestCase' not in str(task._coro)
+            and 'asyncTearDown' not in str(task._coro)
         ]
         self.assertFalse(remaining_tasks, 'some asyncio task are still running')
         # Unschedule all events
