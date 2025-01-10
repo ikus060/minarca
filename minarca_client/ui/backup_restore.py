@@ -27,6 +27,7 @@ Builder.load_string(
     MDScrollView:
         size_hint: 1, 1
         pos_hint: {'right': 1}
+        bar_width: 10
 
         MDBoxLayout:
             orientation: "vertical"
