@@ -296,6 +296,10 @@ class BackupInstance:
         """
         Check if it's time to backup.
         """
+        # Check if manual.
+        if self.settings.schedule <= 0:
+            logger.debug(f"{self.log_id}: backup schedule is manual")
+            return False
         # Check if paused.
         logger.debug(f"{self.log_id}: checking if it's backup time")
         pause_until = self.settings.pause_until
