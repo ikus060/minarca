@@ -12,6 +12,8 @@ var
 sdist
 develop-eggs
 .installed.cfg
+.venv
+.vscode
 
 # Installer logs
 pip-log.txt
