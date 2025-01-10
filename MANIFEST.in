@@ -1,8 +1,0 @@
-# Copyright (C) 2023 IKUS Software. All rights reserved.
-# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
-# Use is subject to license terms.
-
-recursive-include minarca_client/ui/image *.png *.icns *.ico *.svg *.gif
-recursive-include minarca_client/ui/templates *.html
-recursive-include minarca_client/ui/theme *.tcl *.png
-recursive-include minarca_client/locales *.po *.pot *.mo

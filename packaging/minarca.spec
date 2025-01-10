@@ -42,14 +42,12 @@ minarca_client_pkg = files('minarca_client')
 icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.ico')
 macos_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.icns')
 
-# Read pacakage info
+# Read package info
 pkg = get_distribution('minarca_client')
 version = pkg.version
 # Get License file's data
 license = pkg.read_text('LICENSE')
-_metadata = message_from_string(pkg.read_text('PKG-INFO') or pkg.read_text('METADATA'))
-pkg_info = dict(_metadata.items())
-long_description = _metadata._payload
+pkg_info = message_from_string(pkg.read_text('PKG-INFO') or pkg.read_text('METADATA'))
 block_cipher = None
 
 # Include theme resources and locales
@@ -219,6 +217,9 @@ else:
     targz_file = join(DISTPATH, 'minarca-client_%s.tar.gz' % version)
     subprocess.check_call(['tar', '-zcvf', targz_file, 'minarca'], cwd=DISTPATH, stderr=subprocess.STDOUT)
 
+    # Get Project URL
+    project_url = [v.split(', ')[1] for k,v in pkg_info.items() if k =='Project-URL' and v.startswith('Homepage, ')][0]
+
     # Also create a Debian package
     debbuild(
         name='minarca-client',
@@ -230,9 +231,9 @@ else:
             ('/opt/minarca/minarca.svg', join(DISTPATH, 'minarca/minarca_client/ui/theme/resources/minarca.svg')),
         ],
         description=pkg_info['Summary'],
-        long_description=long_description,
-        url=pkg_info['Home-page'],
-        maintainer="%s <%s>" % (pkg_info['Maintainer'], pkg_info['Maintainer-email']),
+        long_description="""Minarca is a **free and open-source** backup software providing end-to-end integration to put you in control of your backup strategy.""",
+        url=project_url,
+        maintainer=pkg_info['Author-email'],
         output=DISTPATH,
         postinst=join(SPECPATH, "minarca.postinst"),
         symlink=[
