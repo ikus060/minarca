@@ -16,11 +16,11 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Framework :: CherryPy"
 ]
 dependencies = [
@@ -34,7 +34,7 @@ dependencies = [
     "requests>=2.25.1",
     "tzlocal~=2.0",
     "wakepy==0.6.0",
-    "kivy==2.3.0",
+    "kivy==2.3.1",
     "KivyMD @ git+https://github.com/kivymd/KivyMD@b5bc79fb71312868be86580b7b32f676926ceb80",
     "materialyoucolor==2.0.9",
     "pywin32 ; sys_platform=='win32'",
