@@ -51,7 +51,7 @@ class DateSelectionTest(BaseAppTest):
     async def asyncSetUp(self):
         self.app = DemoDateSelectionApp()
         self._task = asyncio.create_task(self.app.async_run())
-        await asyncio.sleep(1)
+        await self.pump_events()
         self.assertIsNotNone(self.app.root)
 
     async def test_view(self):

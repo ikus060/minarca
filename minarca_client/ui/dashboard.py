@@ -29,7 +29,7 @@ Builder.load_string(
             MDBoxLayout:
                 orientation: 'horizontal'
                 adaptive_height: True
-                padding: "40dp", "40dp", "40dp", 0
+                padding: "30dp", "30dp", "30dp", 0
 
                 CLabel:
                     text: _('Dashboard')
@@ -44,7 +44,7 @@ Builder.load_string(
                 id: card_list
                 orientation: 'lr-tb'
                 -spacing: "20dp" if len(self.children)>1 else 0
-                padding: "40dp"
+                padding: "30dp"
                 cols: 2
                 adaptive_height: True
 '''
