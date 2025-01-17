@@ -55,6 +55,9 @@ class Settings(KeyValueConfigFile):
         ('localuuid', str, None),
         ('localrelpath', str, None),
         ('localcaption', str, None),
+        ('pre_hook_command', str, None),
+        ('post_hook_command', str, None),
+        ('ignore_hook_errors', bool, False),
     ]
 
     @property

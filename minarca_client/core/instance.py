@@ -187,6 +187,22 @@ class BackupInstance:
         self.status = Status(self.status_file)
         self.settings = Settings(self.config_file)
 
+    async def _run_hooks(self, command, ignore_errors, log_file):
+        # No command, leave function.
+        if not command:
+            return
+        log_file.write(f"execute hook `{command}`")
+        subprocess.run(
+            command,
+            shell=True,
+            stdin=None,
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
+            check=not ignore_errors,
+            creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
+        )        
+        log_file.write(f"hook `{command}` scripts completed successfully")
+
     async def backup(self, force=False):
         """
         Execute the rdiff-backup process.
@@ -215,55 +231,73 @@ class BackupInstance:
                         patterns = self.patterns
                         if not patterns:
                             raise NoPatternsError()
+                        # Execute pre-hooks
+                        await self._run_hooks(
+                            command=self.settings.pre_hook_command,
+                            ignore_error=self.settings.ignore_hook_errors,
+                            log_file=log_file,
+                        )
 
-                        # On Windows operating system, the computer may have multiple Root
-                        # (C:\, D:\, etc). To support this scenario, we need to run
-                        # rdiff-backup multiple time on the same computer. Once for each Root
-                        # to be backup (if required).
+                        # Execute the actual backup with rdiff-backup for each drive.
                         for drive, patterns in patterns.group_by_roots():
-                            args = []
-                            # If required add remote-schema to define how to connect to SSH Server
-                            if self.is_remote():
-                                args.append("--remote-schema")
-                                args.append(self._remote_schema())
-                            args.append("backup")
-                            if IS_WINDOWS:
-                                args.extend(
-                                    [
-                                        "--no-hard-links",
-                                        "--exclude-symbolic-links",
-                                        "--create-full-path",
-                                    ]
-                                )
-                            else:
-                                args.append("--exclude-sockets")
-                            args.append("--no-compression")
-                            # Add Include exclude patterns. Those are already sorted.
-                            for p in patterns:
-                                args.append("--include" if p.include else "--exclude")
-                                args.append(p.pattern)
-                            # Exclude everything else
-                            args.extend(["--exclude", f"{drive}**"])
-                            # Call rdiff-backup
-                            dest = self._backup_path(drive)
-                            await self._rdiff_backup(*args, drive, dest, callback=log_file.write)
-                            # For local disk, make sure to "flush" disk cache
-                            if self.is_local():
-                                logger.debug(f"{self.log_id}: flushing changes to disk")
-                                flush(dest)
+                            await self._backup_drive(drive, patterns, log_file=log_file)
 
-                            # # For local disk, we need to manage the retention period too.
-                            if self.is_local() and self.settings.keepdays and self.settings.keepdays > 0:
-                                await self._rdiff_backup(
-                                    '--force',
-                                    'remove',
-                                    'increments',
-                                    '--older-than',
-                                    f"{self.settings.keepdays}D",
-                                    dest,
-                                    callback=log_file.write,
-                                )
+                        # Execute post-hooks
+                        await self._run_hooks(
+                            command=self.settings.post_hook_command,
+                            ignore_error=self.settings.ignore_hook_errors,
+                            log_file=log_file,
+                        )
+
         logger.debug(f"{self.log_id}: backup process completed successfully")
+
+    async def _backup_drive(self, drive, patterns, log_file):
+        # On Windows operating system, the computer may have multiple Root
+        # (C:\, D:\, etc). To support this scenario, we need to run
+        # rdiff-backup multiple time on the same computer. Once for each Root
+        # to be backup (if required).
+        args = []
+        # If required add remote-schema to define how to connect to SSH Server
+        if self.is_remote():
+            args.append("--remote-schema")
+            args.append(self._remote_schema())
+        args.append("backup")
+        if IS_WINDOWS:
+            args.extend(
+                [
+                    "--no-hard-links",
+                    "--exclude-symbolic-links",
+                    "--create-full-path",
+                ]
+            )
+        else:
+            args.append("--exclude-sockets")
+        args.append("--no-compression")
+        # Add Include exclude patterns. Those are already sorted.
+        for p in patterns:
+            args.append("--include" if p.include else "--exclude")
+            args.append(p.pattern)
+        # Exclude everything else
+        args.extend(["--exclude", f"{drive}**"])
+        # Call rdiff-backup
+        dest = self._backup_path(drive)
+        await self._rdiff_backup(*args, drive, dest, callback=log_file.write)
+        # For local disk, make sure to "flush" disk cache
+        if self.is_local():
+            logger.debug(f"{self.log_id}: flushing changes to disk")
+            flush(dest)
+
+        # # For local disk, we need to manage the retention period too.
+        if self.is_local() and self.settings.keepdays and self.settings.keepdays > 0:
+            await self._rdiff_backup(
+                '--force',
+                'remove',
+                'increments',
+                '--older-than',
+                f"{self.settings.keepdays}D",
+                dest,
+                callback=log_file.write,
+            )
 
     def get_repo_url(self, page="browse"):
         """
