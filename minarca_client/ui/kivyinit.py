@@ -2,6 +2,11 @@
 
 from importlib.resources import files
 
+from kivy.core.window import Window
+
+# Set background to white
+Window.clearcolor = (1, 1, 1, 1) 
+
 from kivy.config import Config  # noqa
 
 # Disable exit on ESC key press
