@@ -151,7 +151,8 @@ upload:win32:
 upload:doc:
   <<: *upload-file
   before_script:
-    - mv .tox/doc/tmp/html doc
+    - mkdir dist
+    - mv .tox/doc/tmp/html dist/doc
   needs:
   - doc
   variables:
