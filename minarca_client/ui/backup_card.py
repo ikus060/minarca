@@ -434,22 +434,26 @@ class BackupCard(CCard):
         self._stop_start_task = asyncio.create_task(_task())
 
     def backup_logs(self):
-        App.get_running_app().set_active_view('BackupLogs', instance=self.instance)
+        App.get_running_app().set_active_view('backup_logs.BackupLogs', instance=self.instance)
 
     def backup_connection(self):
         if self.is_remote:
-            App.get_running_app().set_active_view('BackupConnectionRemote', instance=self.instance)
+            App.get_running_app().set_active_view(
+                'backup_connection_remote.BackupConnectionRemote', instance=self.instance
+            )
         else:
-            App.get_running_app().set_active_view('BackupConnectionLocal', instance=self.instance)
+            App.get_running_app().set_active_view(
+                'backup_connection_local.BackupConnectionLocal', instance=self.instance
+            )
 
     def backup_settings(self):
-        App.get_running_app().set_active_view('BackupSettings', instance=self.instance)
+        App.get_running_app().set_active_view('backup_settings.BackupSettings', instance=self.instance)
 
     def backup_patterns(self):
-        App.get_running_app().set_active_view('BackupPatterns', instance=self.instance)
+        App.get_running_app().set_active_view('backup_patterns.BackupPatterns', instance=self.instance)
 
     def backup_restore(self):
-        App.get_running_app().set_active_view('BackupRestoreDate', instance=self.instance)
+        App.get_running_app().set_active_view('backup_restore_date.BackupRestoreDate', instance=self.instance)
 
     def backup_advance(self):
-        App.get_running_app().set_active_view('BackupAdvanceSettings', instance=self.instance)
+        App.get_running_app().set_active_view('backup_advance.BackupAdvanceSettings', instance=self.instance)

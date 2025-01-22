@@ -3,6 +3,7 @@
 # Use is subject to license terms.
 
 
+import argparse
 import asyncio
 import functools
 import getpass
@@ -11,7 +12,6 @@ import logging.handlers
 import signal
 import sys
 import traceback
-from argparse import ArgumentParser
 from pathlib import Path
 
 import rdiffbackup.run
@@ -452,7 +452,7 @@ def _status(instance_id):
         sys.exit(_EXIT_BACKUP_FAIL)
 
 
-def _ui():
+def _ui(test=False):
     """
     Entry point to start minarca user interface.
     """
@@ -464,20 +464,21 @@ def _ui():
         logger.exception('application startup failed')
         from minarca_client.dialogs import error_dialog
 
-        dlg = error_dialog(
-            parent=None,
-            title=_('Minarca'),
-            message=_('Application failed to start'),
-            detail=_(
-                'If the problem persists, check the logs with your administrator or try reinstalling the application.'
-            ),
-        )
-        asyncio.run(dlg)
+        if not test:
+            dlg = error_dialog(
+                parent=None,
+                title=_('Minarca'),
+                message=_('Application failed to start'),
+                detail=_(
+                    'If the problem persists, check the logs with your administrator or try reinstalling the application.'
+                ),
+            )
+            asyncio.run(dlg)
         sys.exit(_EXIT_KIVY_ERROR)
 
     # Start event loop with backup instance.
     backup = Backup()
-    app = MinarcaApp(backup=backup)
+    app = MinarcaApp(backup=backup, test=test)
     app.mainloop()
 
 
@@ -488,7 +489,7 @@ def _verify(instance_id):
 
 
 def _parse_args(args):
-    parser = ArgumentParser(
+    parser = argparse.ArgumentParser(
         description=_(
             "Minarca manages your computer's backup by linking your computer with a centralized server and running backups on a given schedule."
         ),
@@ -732,6 +733,8 @@ def _parse_args(args):
     # ui
     sub = subparsers.add_parser('ui', help=_('open graphical user interface (default when calling minarcaw)'))
     sub.set_defaults(func=_ui)
+    # ui --test use to test the GUI in CICD.
+    sub.add_argument('--test', help=argparse.SUPPRESS, action='store_true')
 
     # rdiff-backup
     sub = subparsers.add_parser('rdiff-backup')

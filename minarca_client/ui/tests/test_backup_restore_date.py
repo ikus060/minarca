@@ -1,10 +1,11 @@
 from minarca_client.core.backup import BackupInstance
-from minarca_client.ui.app import BackupRestoreDate, DashboardView
+from minarca_client.ui.backup_restore_date import BackupRestoreDate
+from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 
 class BackupRestoreDateTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupRestoreDate'
+    ACTIVE_VIEW = 'backup_restore_date.BackupRestoreDate'
 
     def setUp(self):
         super().setUp()

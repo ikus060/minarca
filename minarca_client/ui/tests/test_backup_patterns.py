@@ -1,10 +1,11 @@
 from minarca_client.core.backup import BackupInstance, Patterns
-from minarca_client.ui.app import BackupCreate, BackupPatterns
+from minarca_client.ui.backup_create import BackupCreate
+from minarca_client.ui.backup_patterns import BackupPatterns
 from minarca_client.ui.tests import BaseAppTest
 
 
 class BackupPatternsTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupPatterns'
+    ACTIVE_VIEW = 'backup_patterns.BackupPatterns'
 
     def setUp(self):
         super().setUp()
