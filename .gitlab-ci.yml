@@ -2,6 +2,7 @@ variables:
   MINARCA_DEV_REMOTE_URL: https://minarca-dev.ikus-soft.com
   MINARCA_DEV_USERNAME: admin
   MINARCA_DEV_PASSWORD: admin123
+  GIT_STRATEGY: clone
 
 stages:
 - test
