@@ -1,4 +1,4 @@
-![Minarca Logo](minarca-client/doc/_static/banner.png)
+![Minarca Logo](doc/_static/banner.png)
 
 <p align="center">
   <strong>
@@ -33,12 +33,12 @@ Based on [rdiffweb](https://rdiffweb.org/), **Minarca Server** may be used to br
 
 | Powerful web interface | Backup to multiple destination | Self Hosted |
 |---|---|---|
-| ![Powerful web interface](minarca-client/doc/_static/feature1.png) | ![Backup to multiple destination](minarca-client/doc/_static/feature3.png) | ![Self Hosted](minarca-client/doc/_static/feature4.png) |
+| ![Powerful web interface](doc/_static/feature1.png) | ![Backup to multiple destination](doc/_static/feature3.png) | ![Self Hosted](doc/_static/feature4.png) |
 
 
 | Windows Agent | Linux Agent | MacOS Agent |
 |---|---|---|
-| ![Windows Agent](minarca-client/doc/_static/feature2-win.png) | ![Linux Agent](minarca-client/doc/_static/feature2-linux.png) | ![MacOS Agent](minarca-client/doc/_static/feature2-mac.png) |
+| ![Windows Agent](doc/_static/feature2-win.png) | ![Linux Agent](doc/_static/feature2-linux.png) | ![MacOS Agent](doc/_static/feature2-mac.png) |
 
 
 ## Getting started
@@ -142,11 +142,11 @@ The Minarca website is <https://minarca.org/>.
 ## 6.0.2 (2024-11-19)
 
 * Minarca Agent
-  * Enforce the use of Unicode functions for Windows folder dialogs to support adding paths with non-ASCII characters through the GUI.  
-  * Exclude Dynacom Backup files by default (`*.ddb.bak`).  
-  * Adjust default window size to ensure compatibility with smaller screens (minimum resolution: 1360 x 768).  
-  * Improve Windows Task Scheduler creation to handle "Access Denied" errors when Minarca is run as an administrator without proper admin rights.  
-  * Exclude Google Drive special folders by default.  
+  * Enforce the use of Unicode functions for Windows folder dialogs to support adding paths with non-ASCII characters through the GUI.
+  * Exclude Dynacom Backup files by default (`*.ddb.bak`).
+  * Adjust default window size to ensure compatibility with smaller screens (minimum resolution: 1360 x 768).
+  * Improve Windows Task Scheduler creation to handle "Access Denied" errors when Minarca is run as an administrator without proper admin rights.
+  * Exclude Google Drive special folders by default.
 
 ## 6.0.1 (2024-11-12)
 
@@ -238,7 +238,7 @@ The Minarca website is <https://minarca.org/>.
 * Upgrade rdiffweb to version 2.8.8
   * Fix usage of `session-idle-timeout` in config file
   * Adjust the session idle and absolute timeouts to 10 and 30 minutes, respectively.
-  * Fix date calculation when generating report in January 
+  * Fix date calculation when generating report in January
 
 ## 5.0.1 (2023-11-24)
 
