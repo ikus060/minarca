@@ -1,12 +1,12 @@
 # Copyleft (C) 2023 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-import contextlib
-
 import objc  # noqa
 from AppKit import NSURL, NSAlert, NSOpenPanel
 
 from minarca_client.locale import gettext as _
+
+from ._common import disable
 
 NSAlertStyleWarning = 0
 NSAlertStyleInformational = 1
@@ -15,21 +15,6 @@ NSAlertStyleCritical = 2
 NSAlertFirstButtonReturn = 1000
 NSAlertSecondButtonReturn = 1001
 NSAlertThirdButtonReturn = 1002
-
-
-@contextlib.contextmanager
-def _disable(parent):
-    try:
-        # Place Window on top of parent
-        if parent and parent.get_root_window():
-            # Disable the Window
-            window = parent.get_root_window()
-            window.children[0].disabled = True
-        yield
-    finally:
-        # Restore state of parent window
-        if parent and parent.get_root_window():
-            window.children[0].disabled = False
 
 
 async def _message_dialog(
@@ -43,7 +28,7 @@ async def _message_dialog(
     if buttons:
         for label in buttons:
             alert.addButtonWithTitle_(label)
-    with _disable(parent):
+    with disable(parent):
         ret = alert.runModal()
         # TODO support beginSheetModalForWindow.
         # Show the dialog and wait for user input
@@ -113,8 +98,8 @@ async def _open_panel(parent, title, filename, initial_directory=None, multiple_
         return panel.filename()
 
 
-async def file_dialog(parent, title, filename=None, initial_directory=None, multiple_select=False):
-    return await _open_panel(parent, title, filename, initial_directory, multiple_select, open_file=True)
+async def file_dialog(parent, title, initial_directory=None, multiple_select=False):
+    return await _open_panel(parent, title, initial_directory, multiple_select, open_file=True)
 
 
 async def folder_dialog(
@@ -124,10 +109,3 @@ async def folder_dialog(
     multiple_select=False,  # Not supported in Window.
 ):
     return await _open_panel(parent, title, None, initial_directory, multiple_select, open_file=False)
-
-
-def username_password_dialog(parent, title, message, username=None):
-    """
-    Display message dialog to ask for username and password.
-    """
-    pass

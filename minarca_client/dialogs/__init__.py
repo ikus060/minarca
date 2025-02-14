@@ -8,14 +8,30 @@ IS_LINUX = sys.platform in ['linux', 'linux2']
 IS_MAC = sys.platform == 'darwin'
 
 if IS_WINDOWS:
-    from ._dialogs_win import *  # noqa
+    from ._dialogs_win import (  # noqa
+        error_dialog,
+        file_dialog,
+        folder_dialog,
+        info_dialog,
+        question_dialog,
+        username_password_dialog,
+        warning_dialog,
+    )
 elif IS_LINUX:
-    # TODO Should check if Zenity is available
-    from ._dialogs_zenity import *  # noqa
-
-    # TODO Should provide a KDE alternative.
+    from ._dialogs_linux import (  # noqa
+        error_dialog,
+        file_dialog,
+        folder_dialog,
+        info_dialog,
+        question_dialog,
+        warning_dialog,
+    )
 elif IS_MAC:
-    from ._dialogs_cocoa import *  # noqa
-else:
-    # TODO provide kivy implementation
-    pass
+    from ._dialogs_cocoa import (  # noqa
+        error_dialog,
+        file_dialog,
+        folder_dialog,
+        info_dialog,
+        question_dialog,
+        warning_dialog,
+    )
