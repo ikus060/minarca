@@ -28,44 +28,6 @@ IS_MAC = sys.platform == 'darwin'
 HAS_DISPLAY = os.environ.get('DISPLAY', None) or IS_WINDOWS or IS_MAC
 
 
-async def tail(filepath, num_lines=1000):
-    """
-    Tails a file asynchronously and yields the last 1000 lines and subsequent additions.
-
-    Args:
-        filepath (str): Path to the text file.
-        block_size (int, optional): Block size for reading the file. Defaults to 4096.
-
-    Yields:
-        str: Line from the tail of the file.
-    """
-    async with aiofiles.open(filepath, mode='rb') as f:
-        # Read the file as fast as possible
-        await f.seek(0, 2)
-        init_pos = pos = await f.tell()
-        block_size = 4096
-        lines_found = 0
-        blocks = []
-        while lines_found <= num_lines and pos > 0:
-            pos -= block_size
-            await f.seek(max(0, pos))
-            block = await f.read(block_size if pos > 0 else (pos + block_size))
-            blocks.append(block)
-            lines_found += block.count(b'\n')
-        lines = b''.join(reversed(blocks)).splitlines()
-        for line in lines:
-            yield line
-
-        # Seek to initial end-of-file
-        await f.seek(init_pos, 0)
-        while True:
-            line = await f.readline()
-            if not line:
-                await asyncio.sleep(0.1)
-                continue
-            yield line
-
-
 def makedirs(func, mode=0o750):
     """
     Function decorator to create the directory if missing.
@@ -322,9 +284,9 @@ async def file_write_async(filepath: Path, text):
         return await f.write(text)
 
 
-def file_stat(self):
+def file_stat(filename):
     try:
-        return os.stat(self._fn)
+        return os.stat(filename)
     except FileNotFoundError:
         # Silently ignore error if file doesn't exists
         return None

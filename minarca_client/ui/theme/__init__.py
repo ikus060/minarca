@@ -31,9 +31,11 @@ from kivy.core.text import LabelBase
 from kivy.lang import Builder
 from kivy.properties import BooleanProperty, ColorProperty, DictProperty, ObjectProperty, OptionProperty, StringProperty
 from kivy.uix.behaviors.focus import FocusBehavior
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 from kivy.utils import get_color_from_hex
 from kivymd.theming import ThemeManager
+from kivymd.uix.behaviors import BackgroundColorBehavior, DeclarativeBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button.button import MDButton
 from kivymd.uix.label.label import MDLabel
@@ -142,6 +144,10 @@ Builder.load_string(
         on_touch_down:
             if self.collide_point(*args[1].pos) and not root.disabled: \
             root.ids.checkbox.active = not root.ids.checkbox.active
+
+<CScrollView>:
+    bar_width: 10
+    scroll_type: ['bars', 'content']
 
 '''
 )
@@ -336,4 +342,8 @@ class CCheckbox(MDBoxLayout, BaseDisplay):
 
 
 class CBoxLayout(MDBoxLayout, BaseDisplay):
+    pass
+
+
+class CScrollView(DeclarativeBehavior, BackgroundColorBehavior, ScrollView):
     pass

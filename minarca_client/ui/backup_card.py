@@ -218,7 +218,7 @@ class BackupCard(CCard):
         """
         try:
             status = instance.status
-            async for unused in watch_file(status, timeout=status.RUNNING_DELAY):
+            async for unused in watch_file(self.instance.status_file, timeout=status.RUNNING_DELAY):
                 self.status.reload()
                 self.in_transition = False
                 self.property('status').dispatch(self)
@@ -228,8 +228,7 @@ class BackupCard(CCard):
     async def _watch_settings(self, instance):
         # Asynchronously watch the status files for changes.
         try:
-            settings = instance.settings
-            async for unused in watch_file(settings):
+            async for unused in watch_file(self.instance.config_file):
                 self.settings.reload()
                 self.property('settings').dispatch(self)
         except Exception:

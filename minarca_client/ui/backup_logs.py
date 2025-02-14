@@ -4,37 +4,27 @@
 import asyncio
 import logging
 
+import aiofiles
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.properties import BooleanProperty, ListProperty, ObjectProperty
+from kivy.properties import BooleanProperty, ObjectProperty
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.textinput import TextInput
 from kivymd.uix.boxlayout import MDBoxLayout
 
 from minarca_client.core import BackupInstance
-from minarca_client.core.compat import open_file_with_default_app, tail, watch_file
+from minarca_client.core.compat import open_file_with_default_app, watch_file
 from minarca_client.dialogs import error_dialog, question_dialog
 from minarca_client.locale import _
 from minarca_client.ui.utils import alias_property
 
 logger = logging.getLogger(__name__)
 
-MAX_LINES = 1000
+MAX_FILE_SIZE = 1024 * 10  # Max size to process (e.g., 10 KB)
+UPDATE_INTERVAL = 1  # Update interval in seconds
 
 Builder.load_string(
     '''
-<LogLine>:
-    padding: 0
-    multiline: False
-    readonly: True
-    theme_font_name: "Custom"
-    font_name: "monospace"
-    background_color: app.theme_cls.surfaceColor
-    text_color: app.theme_cls.onSurfaceColor
-    background_normal: ""
-    background_active: ""
-    background_disabled_normal: ""
-
 <BackupLogs>:
     orientation: "horizontal"
     md_bg_color: self.theme_cls.backgroundColor
@@ -93,6 +83,7 @@ Builder.load_string(
             CLabel:
                 text: root.is_running_text
                 pos_hint: {'center_y': .5}
+                adaptive_size: True
 
             Widget:
 
@@ -109,21 +100,26 @@ Builder.load_string(
             padding: ("15dp", "12dp")
             display: root.error_message
 
-        CCard:
-            padding: "1dp"
+        CScrollView:
+            id: scrollv
+            canvas.after:
+                Color:
+                    rgba: app.theme_cls.onSurfaceColor
+                Line:
+                    rectangle: [self.x, self.y, self.width, self.height]
+                    width: 1
 
-            RecycleView:
+            TextInput:
                 id: logview
-                viewclass: "LogLine"
-                data: root.lines
-
-                RecycleBoxLayout:
-                    padding: "0dp"
-                    default_size: None, "22dp"
-                    default_size_hint: 1, None
-                    orientation: 'vertical'
-                    size_hint_y: None
-                    height: self.minimum_height
+                size_hint: 1, None
+                height: max(self.minimum_height, scrollv.height)
+                font_name: "monospace"
+                readonly: True
+                # Change style of TextInput.
+                background_color: app.theme_cls.surfaceColor
+                text_color: app.theme_cls.onSurfaceColor
+                background_normal: ""
+                background_active: ""
 
         MDBoxLayout:
             orientation: "horizontal"
@@ -166,7 +162,6 @@ class BackupLogs(MDBoxLayout):
     instance = None
     is_remote = BooleanProperty()
     status = ObjectProperty()
-    lines = ListProperty()
     _status_task = None
     _readlogs_task = None
     _stop_task = None
@@ -205,10 +200,9 @@ class BackupLogs(MDBoxLayout):
         """
         try:
             last_action = self.status.action
-            async for unused in watch_file(self.status, timeout=self.status.RUNNING_DELAY):
+            async for unused in watch_file(self.instance.status_file, timeout=self.status.RUNNING_DELAY):
                 self.status.reload()
                 self.property('status').dispatch(self)
-                # When action changes, reload the log file.
                 if last_action != self.status.action:
                     last_action = self.status.action
                     if self._readlogs_task:
@@ -218,24 +212,48 @@ class BackupLogs(MDBoxLayout):
             logger.exception('problem occured while watching status')
 
     async def _readlogs(self, instance):
+        if not self.filename:
+            return
         try:
-            # Get the backup or restore log file.
-            fn = self.filename
-            if not fn:
-                return
-            # Clear log view
-            self.lines = []
-            # Open file content.
-            async for line in tail(fn, num_lines=MAX_LINES):
-                self.lines.append({"text": line.decode('utf-8', errors='replace')})
-                if len(self.lines) >= 24 and self.is_running:
-                    # Move cursor to the end if running.
-                    self.scroll_down()
-                # Limit number of lines to 1000
-                if len(self.lines) >= 1000:
-                    self.lines.pop(0)
+            # Due to Kivy limitation of TextInput updating all the lines at once. We need to
+            # Reload the logs less often and limit the number of lines to keep the interface responsible.
+            logview = self.ids.logview
+            logview.text = await self.read_file_tail(self.filename)
+            logview.parent.scroll_y = 0
+            async for unused in watch_file(self.filename, poll_delay=UPDATE_INTERVAL):
+                logview.text = await self.read_file_tail(self.filename)
         except Exception:
             logger.exception('problem occured while reading backup logs')
+
+    async def read_file_tail(self, file_path):
+        """
+        Read the last part of the file if its size exceeds MAX_FILE_SIZE.
+        """
+        try:
+            async with aiofiles.open(file_path, "rb") as f:
+                await f.seek(0, 2)  # Move to the end of the file
+                file_size = await f.tell()
+
+                if file_size > MAX_FILE_SIZE:
+                    # Read only the last MAX_FILE_SIZE bytes
+                    await f.seek(-MAX_FILE_SIZE, 2)
+                    content = '<Log truncated>\n...'
+                    data = await f.read()
+                    # Try to cut the data at line ending.
+                    try:
+                        idx = data.index(b'\n')
+                        data = data[idx:]
+                    except ValueError:
+                        pass
+                    content += data.decode("utf-8", errors="replace")
+                else:
+                    # Read the entire file
+                    await f.seek(0)
+                    data = await f.read()
+                    content = data.decode("utf-8", errors="replace")
+            return content
+        except FileNotFoundError:
+            return _('No log')
 
     @alias_property(bind=['status'])
     def title_text(self):
@@ -305,7 +323,7 @@ class BackupLogs(MDBoxLayout):
 
     def scroll_down(self):
         # Jump directly to the end of the log file.
-        self.ids.logview.scroll_y = 0
+        self.ids.logview.parent.scroll_y = 0
 
     def stop(self):
         async def _stop():

@@ -32,7 +32,7 @@ Builder.load_string(
 
     MDFloatLayout:
 
-        MDScrollView:
+        CScrollView:
             size_hint: 1, 1
             pos_hint: {'right': 1}
 

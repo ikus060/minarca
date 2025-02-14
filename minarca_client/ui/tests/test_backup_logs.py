@@ -31,7 +31,7 @@ class BackupLogsTest(BaseAppTest):
         # Then the view get updated (within 2 sec) with 2 lines of text.
         await self.pump_events()
         await asyncio.sleep(2)
-        self.assertEqual(len(self.view.lines), 2)
+        self.assertEqual(self.view.ids.logview.text, 'first line of logs\nsecond line of text\n')
         # Cleanup
         _readlogs_task = self.view._readlogs_task
         self.app.set_active_view('DashboardView')

@@ -5,7 +5,8 @@
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.properties import BooleanProperty
-from kivymd.uix.scrollview import MDScrollView
+
+from minarca_client.ui.theme import CScrollView
 
 Builder.load_string(
     '''
@@ -141,7 +142,7 @@ Builder.load_string(
 )
 
 
-class BackupCreate(MDScrollView):
+class BackupCreate(CScrollView):
     backup_exists = BooleanProperty(False)
 
     def __init__(self, backup=None):
