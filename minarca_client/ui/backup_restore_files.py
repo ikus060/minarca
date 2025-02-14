@@ -6,8 +6,9 @@ import datetime
 import logging
 
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy.properties import BooleanProperty, ListProperty, NumericProperty, StringProperty
+from kivy.properties import BooleanProperty, ListProperty, StringProperty
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
@@ -15,10 +16,10 @@ from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDListItem
 
-from minarca_client.core import BackupInstance
 from minarca_client.core.exceptions import BackupError
-from minarca_client.dialogs import folder_dialog
-from minarca_client.locale import _
+from minarca_client.core.instance import BackupInstance, reduce_path
+from minarca_client.dialogs import folder_dialog, question_dialog
+from minarca_client.locale import _, ngettext
 from minarca_client.ui.date_picker import CDatePicker  # noqa
 from minarca_client.ui.spinner_overlay import SpinnerOverlay  # noqa
 from minarca_client.ui.theme import CButton  # noqa
@@ -31,8 +32,7 @@ Builder.load_string(
     '''
 <FileItem>
     divider: True
-    theme_bg_color: "Custom"
-    md_bg_color: self.theme_cls.primaryColor if root.selected else self.theme_cls.transparentColor
+    ripple_effect: False
 
     MDListItemLeadingIcon:
         icon: root.icon
@@ -40,7 +40,14 @@ Builder.load_string(
     MDListItemSupportingText:
         text: root.text
 
-<BackupRestoreCustom>:
+    MDListItemTrailingCheckbox:
+        id: stored_state
+        checkbox_icon_down: 'checkbox-intermediate' if root.parent_selected else 'checkbox-marked'
+        active: root.selected or root.parent_selected
+        disabled: root.parent_selected
+        on_release: root.toggle_checkbox_state()
+
+<BackupRestoreFiles>:
     orientation: "horizontal"
     md_bg_color: self.theme_cls.backgroundColor
 
@@ -85,24 +92,33 @@ Builder.load_string(
                 MDTextFieldTrailingIcon:
                     icon: "magnify"
 
-            CCard:
-                padding: "1dp"
+            RecycleView:
+                id: availables
+                data: root.file_items
+                viewclass: "FileItem"
+                selected_files: root.selected_files
+                canvas.after:
+                    Color:
+                        rgba: app.theme_cls.onSurfaceColor
+                    Line:
+                        rectangle: [self.x, self.y, self.width, self.height]
+                        width: 1
 
-                RecycleView:
-                    id: recycleview
-                    viewclass: "FileItem"
-                    data: root.filtered_files
+                RecycleBoxLayout:
+                    spacing: "1dp"
+                    padding: "0dp"
+                    default_size: None, "56dp"
+                    default_size_hint: 1, None
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    key_selection: 'text'
 
-                    SelectableRecycleBoxLayout:
-                        spacing: "1dp"
-                        padding: "0dp"
-                        default_size: None, "56dp"
-                        default_size_hint: 1, None
-                        orientation: 'vertical'
-                        size_hint_y: None
-                        height: self.minimum_height
-                        key_selection: 'text'
-                        on_selected_nodes: root.on_selected_file_items(*args)
+            CCheckbox:
+                text: _("Restore files in-place, replacing existing files. I understand this may overwrite data if the destination isn't empty.")
+                active: root.in_place
+                on_active: root.in_place = self.active
+                adaptive_height: True
 
             MDBoxLayout:
                 orientation: "horizontal"
@@ -120,7 +136,13 @@ Builder.load_string(
                 CButton:
                     text: _('Restore...')
                     on_release: root.save()
-                    disabled: root.working or not root.selected_file
+                    disabled: root.working or not root.selected_files
+
+                CLabel:
+                    text: root.selected_files_summary
+                    shorten: True
+                    shorten_from: 'right'
+                    pos_hint: {"center_y": .5}
 
         SpinnerOverlay:
             text: root.working
@@ -152,28 +174,39 @@ class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior, Recycle
 
 
 class FileItem(RecycleDataViewBehavior, MDListItem):
-    index = NumericProperty()
+    rv = None
+    data = None
     icon = StringProperty()
     text = StringProperty()
     selected = BooleanProperty(False)
-    selectable = BooleanProperty(True)
-
-    def on_touch_down(self, touch):
-        # Called by user click on item.
-        ret = super().on_touch_down(touch)
-        if self.collide_point(*touch.pos):
-            return self.parent.select_with_touch(self.index, touch)
-        return ret
+    parent_selected = BooleanProperty(False)
 
     def refresh_view_attrs(self, rv, index, data):
-        self.index = index
+        self.rv = rv
+        self.data = data
+        self.parent_selected = any(
+            data['text'].startswith(item.get('text', '') + '/') for item in self.rv.selected_files
+        )
+        self.selected = data in self.rv.selected_files
         return super().refresh_view_attrs(rv, index, data)
 
-    def apply_selection(self, rv, index, is_selected):
-        self.selected = is_selected
+    def toggle_checkbox_state(self):
+        if self.rv is None:
+            return
+        if self.parent_selected:
+            # Do nothing if already included by parent.
+            return
+        # Store selection in selected_files
+        self.selected = not self.selected
+        if self.selected:
+            self.rv.selected_files.append(self.data)
+        elif self.data in self.rv.selected_files:
+            self.rv.selected_files.remove(self.data)
+        # Force refresh to account for parent_selected
+        self.rv.refresh_from_data()
 
 
-class BackupRestoreCustom(MDBoxLayout):
+class BackupRestoreFiles(MDBoxLayout):
     instance = None
     increment = None
     is_remote = BooleanProperty()
@@ -183,7 +216,9 @@ class BackupRestoreCustom(MDBoxLayout):
     search = StringProperty()
     file_items = ListProperty()
     # Item selected by the user.
-    selected_file = StringProperty(allownone=True)
+    selected_files = ListProperty()
+    # True to restore at same location
+    in_place = BooleanProperty(False)
 
     _fetch_files_task = None
 
@@ -200,6 +235,9 @@ class BackupRestoreCustom(MDBoxLayout):
         # Start task to get increments list.
         self.working = _('Please wait. Getting file list...')
         self._fetch_files_task = asyncio.create_task(self._fetch_files(instance))
+
+        # Debounce timer
+        self.filter_event = None
 
     async def _fetch_files(self, instance):
         try:
@@ -224,26 +262,27 @@ class BackupRestoreCustom(MDBoxLayout):
         finally:
             self.working = ''
 
-    @alias_property(bind=['file_items', 'search'])
-    def filtered_files(self):
-        if not self.search:
-            return self.file_items
-        return [item for item in self.file_items if self.search in item['text']]
+    def on_search(self, instance, value):
+        """Debounce the search filter updates."""
+        if self.filter_event:
+            self.filter_event.cancel()  # Cancel the previous scheduled update
+        self.filter_event = Clock.schedule_once(lambda dt: self.on_search_update(value), 0.25)
 
-    def on_search(self, *args):
-        # TODO Need to clear the seletected_nodes index
-        pass
-
-    def on_selected_file_items(self, widget, nodes):
-        """
-        Used to select items.
-        """
-        if not nodes:
-            self.selected_file = None
+    def on_search_update(self, value):
+        # Limit to 100 items
+        if self.search:
+            filtered_files = [item for item in self.file_items if self.search.lower() in item['text'].lower()]
+            self.ids.availables.data = filtered_files[:100]
         else:
-            idx = nodes[0]
-            file_item = widget.recycleview.data[idx]
-            self.selected_file = file_item['text']
+            self.ids.availables.data = self.file_items[:100]
+
+    @alias_property(bind=['selected_files'])
+    def selected_files_summary(self):
+        if self.selected_files:
+            paths = reduce_path([item['text'] for item in self.selected_files])
+            count = len(paths)
+            return ngettext('%s item selected: %s', '%s items selected: %s', count) % (count, ', '.join(paths))
+        return _('No item selected')
 
     def on_parent(self, widget, value):
         if value is None:
@@ -256,20 +295,36 @@ class BackupRestoreCustom(MDBoxLayout):
 
     def cancel(self):
         # Go back to dashboard
-        App.get_running_app().set_active_view(
-            'BackupRestoreDate', instance=self.instance, increment=self.increment, restore_type='custom'
-        )
+        App.get_running_app().set_active_view('BackupRestoreDate', instance=self.instance, increment=self.increment)
 
     def save(self):
-        # Prompt user where to restore files/folder.
+
         async def _save():
-            folder = await folder_dialog(parent=self, title=_('Select a folder where to restore data.'))
-            if not folder:
-                # Operation cancel by user
-                return
+            if self.in_place:
+                # Confirm with user to restore
+                ret = await question_dialog(
+                    parent=self,
+                    title=_('Confirm In-Place Restoration'),
+                    message=_('Are you sure you want to run a full restoration?'),
+                    detail=_(
+                        'This action will overwrite all existing files selected with the previous version present in the backup. This action is irreversible and may result in data loss if the destination is not empty.'
+                    ),
+                )
+                folder = None
+                if not ret:
+                    # Operation cancel by user
+                    return
+            else:
+                # Prompt user where to restore files/folder.
+                folder = await folder_dialog(parent=self, title=_('Select a folder where to restore data.'))
+                if not folder:
+                    # Operation cancel by user
+                    return
             # Trigger restore process of the given file to selected folder.
             self.instance.start_restore(
-                restore_time=int(self.increment.timestamp()), paths=self.selected_file, destination=folder
+                restore_time=int(self.increment.timestamp()),
+                paths=[item['text'] for item in self.selected_files],
+                destination=folder,
             )
             # Go to Logs
             App.get_running_app().set_active_view('BackupLogs', instance=self.instance)

@@ -100,6 +100,20 @@ async def _read_stream(stream, capture, callback):
             break
 
 
+def reduce_path(paths):
+    """
+    Remove already included files from the list.
+    """
+    reduced_paths = []
+
+    for path in paths:
+        # Check if the path is already encompassed by any in reduced_paths
+        if not any(os.path.commonpath([path, included]) == included for included in reduced_paths):
+            reduced_paths.append(path)
+
+    return reduced_paths
+
+
 def handle_http_errors(func):
     """
     Decorator to handle HTTP exception raised when calling rdiffweb server.
@@ -195,6 +209,8 @@ class BackupInstance:
             with UpdateStatusNotification(instance=self):
                 async with UpdateStatus(instance=self):
                     with open(self.backup_log_file, 'wb') as log_file:
+                        now = Datetime()
+                        log_file.write(b'starting backup at %s\n' % now.strftime().encode())
                         # Check patterns
                         patterns = self.patterns
                         if not patterns:
@@ -284,6 +300,7 @@ class BackupInstance:
         logger.debug(f"{self.log_id}: checking if it's backup time")
         pause_until = self.settings.pause_until
         if pause_until and Datetime() < pause_until:
+            logger.debug(f"{self.log_id}: backup paused until {pause_until.strftime()}")
             return False
         # Check if backup ever ran.
         lastsuccess = self.status.lastsuccess
@@ -394,8 +411,10 @@ class BackupInstance:
         with safe_keepawake():
             async with UpdateStatus(instance=self, action='restore'):
                 with open(self.restore_log_file, 'wb') as log_file:
+                    now = Datetime()
+                    log_file.write(b'starting restore at %s\n' % now.strftime().encode())
                     # Loop on each pattern to be restored and execute rdiff-backup.
-                    for path in paths:
+                    for path in reduce_path(paths):
                         if destination:
                             # Restore into different location
                             final_destination = os.path.join(str(destination), os.path.basename(str(path)))
@@ -820,6 +839,8 @@ class BackupInstance:
                 elif line == b'.\n' or line == b'.\r\n':
                     collect = True
                 elif collect:
+                    # TODO Fix handling of invalid encoding. rdiff-backup replace everything by U+FFFD
+                    # Ref.: https://github.com/rdiff-backup/rdiff-backup/issues/1050
                     line = line.decode('utf-8', errors='replace').rstrip('\r\n')
                     path = os.path.join(drive, line)
                     all_files.append(path)
