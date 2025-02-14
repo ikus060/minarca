@@ -245,5 +245,6 @@ else:
             'libc6',
             'libstdc++6',
             'libxcb1',
+            'openssh-client',
         ],
     )
