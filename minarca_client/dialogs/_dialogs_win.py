@@ -11,6 +11,7 @@ from ctypes.wintypes import INT
 import pywintypes
 import win32api
 import win32cred
+import winerror
 from win32com.shell import shell, shellcon
 from win32con import OFN_ALLOWMULTISELECT, OFN_EXPLORER
 from win32gui import GetOpenFileNameW, PyGetBufferAddressAndLen, SendMessage
@@ -227,12 +228,18 @@ def username_password_dialog(parent, title, message, username=None):
     }
     with disable(parent):
         # When excuted in secondary thread, it's not working.
-        target, pwd, _ = win32cred.CredUIPromptForCredentials(
-            TargetName=win32api.GetComputerName(),
-            AuthError=0,
-            UserName=username,
-            Flags=win32cred.CREDUI_FLAGS_DO_NOT_PERSIST,
-            Save=False,
-            UiInfo=uiinfo,
-        )
+        try:
+            target, pwd, _ = win32cred.CredUIPromptForCredentials(
+                TargetName=win32api.GetComputerName(),
+                AuthError=0,
+                UserName=username,
+                Flags=win32cred.CREDUI_FLAGS_DO_NOT_PERSIST,
+                Save=False,
+                UiInfo=uiinfo,
+            )
+        except pywintypes.error as e:
+            # Operation cancel by user.
+            if e.winerror == winerror.ERROR_CANCELLED:
+                return username, None
+            raise
     return target, pwd
