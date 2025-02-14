@@ -20,7 +20,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Minarca documentation'
+project = 'Minarca Docs'
 copyright = 'Copyright (C) 2023 IKUS Software. All rights reserved.'
 author = 'Patrik Dufresne'
 
@@ -55,7 +55,7 @@ exclude_patterns = []
 html_theme = 'alabaster'
 # Ref: https://alabaster.readthedocs.io/en/latest/customization.html#theme-options
 html_theme_options = {
-    'description': 'Minarca, the data backup solution adapted to your reality! Robust and secure, Minarca has proven itself to many clients!',
+    'description': 'Minarca, Your open-source, user-friendly data backup solution !',
     'fixed_sidebar': False,
     'font_size': '18px',
     'font_family': 'Lato,Arial,sans-serif',
