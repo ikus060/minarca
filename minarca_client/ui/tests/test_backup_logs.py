@@ -2,12 +2,13 @@ import asyncio
 import time
 
 from minarca_client.core.backup import BackupInstance
-from minarca_client.ui.app import BackupLogs, DashboardView
+from minarca_client.ui.backup_logs import BackupLogs
+from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 
 class BackupLogsTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupLogs'
+    ACTIVE_VIEW = 'backup_logs.BackupLogs'
 
     def setUp(self):
         super().setUp()
@@ -34,7 +35,7 @@ class BackupLogsTest(BaseAppTest):
         self.assertEqual(self.view.ids.logview.text, 'first line of logs\nsecond line of text\n')
         # Cleanup
         _readlogs_task = self.view._readlogs_task
-        self.app.set_active_view('DashboardView')
+        self.app.set_active_view('dashboard.DashboardView')
         try:
             await _readlogs_task
         except asyncio.CancelledError:

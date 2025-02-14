@@ -3,9 +3,11 @@
 # Use is subject to license terms.
 import asyncio
 import concurrent.futures
+import importlib
 import logging
 
 from kivy.base import ExceptionHandler, ExceptionManager
+from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.modules import inspector
 from kivymd.app import MDApp
@@ -13,16 +15,6 @@ from kivymd.app import MDApp
 from minarca_client.ui.theme import MinarcaTheme
 
 from .about_menu import AboutMenu  # noqa
-from .backup_advance import BackupAdvanceSettings  # noqa
-from .backup_connection_local import BackupConnectionLocal  # noqa
-from .backup_connection_remote import BackupConnectionRemote  # noqa
-from .backup_create import BackupCreate
-from .backup_logs import BackupLogs  # noqa
-from .backup_patterns import BackupPatterns  # noqa
-from .backup_restore_date import BackupRestoreDate  # noqa
-from .backup_restore_files import BackupRestoreFiles  # noqa
-from .backup_settings import BackupSettings  # noqa
-from .dashboard import DashboardView
 from .side_pannel import SidePanel  # noqa
 
 logger = logging.getLogger(__name__)
@@ -77,9 +69,10 @@ MDScreen:
 
 
 class MinarcaApp(MDApp, ExceptionHandler):
-    def __init__(self, *args, backup=None, **kwargs):
+    def __init__(self, *args, backup=None, test=False, **kwargs):
         assert backup is not None
         self.backup = backup
+        self.test = test
         super().__init__(*args, **kwargs)
         self.theme_cls = MinarcaTheme()
 
@@ -94,6 +87,14 @@ class MinarcaApp(MDApp, ExceptionHandler):
         # Start application event loop.
         loop.run_until_complete(self.async_run(async_lib='asyncio'))
         loop.close()
+
+    def load_kv(self, filename=None):
+        """Disable default '*.kv' loading"""
+        pass
+
+    def load_config(self):
+        """Disable default config load."""
+        pass
 
     def build(self):
         self.icon = "minarca-72.png"
@@ -113,25 +114,34 @@ class MinarcaApp(MDApp, ExceptionHandler):
 
     def on_start(self):
         # Show default view.
-        self.set_active_view(DashboardView)
-        super().on_start()
+        self.set_active_view('dashboard.DashboardView')
+        # If testing, application close after 2 sec.
+        if self.test:
+            Clock.schedule_once(self.stop, 1)
+
+    def _find_class(self, view_class):
+        """
+        Load reference to the class.
+        """
+        module_name, class_name = view_class.rsplit('.', 1)
+        module = importlib.import_module('minarca_client.ui.' + module_name)
+        return getattr(module, class_name)
 
     def set_active_view(self, view_class, **kwargs):
         """
         Change the current visible view. URL define the location to be displayed as <view-name>://<backup-instance>
         """
-        assert view_class
-        # Lookup class name
-        if isinstance(view_class, str):
-            assert view_class in globals(), f'view_class {view_class} not found'
-            view_class = globals().get(view_class)
+        assert isinstance(view_class, str)
+        assert '.' in view_class
         # Regirect to Create backup if empty.
-        if view_class is DashboardView and len(self.backup) <= 0:
-            view_class = BackupCreate
+        if view_class == 'dashboard.DashboardView' and len(self.backup) <= 0:
+            view_class = 'backup_create.BackupCreate'
+        class_ref = self._find_class(view_class)
+
         # Forget & Destroy existing children
         self._clear_widgets_recursive(self.root.ids.body)
         # Load new view.
-        widget = view_class(backup=self.backup, **kwargs)
+        widget = class_ref(backup=self.backup, **kwargs)
         self.root.ids.body.add_widget(widget)
 
     def _clear_widgets_recursive(self, widget):

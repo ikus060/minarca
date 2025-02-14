@@ -7,12 +7,13 @@ from minarca_client.core.backup import Backup, BackupInstance
 from minarca_client.core.compat import IS_MAC
 from minarca_client.core.pattern import Pattern
 from minarca_client.core.tests.test_instance import remove_readonly
-from minarca_client.ui.app import BackupRestoreDate, BackupRestoreFiles
+from minarca_client.ui.backup_restore_date import BackupRestoreDate
+from minarca_client.ui.backup_restore_files import BackupRestoreFiles
 from minarca_client.ui.tests import BaseAppTest
 
 
 class BackupRestoreFilesTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupRestoreFiles'
+    ACTIVE_VIEW = 'backup_restore_files.BackupRestoreFiles'
 
     def setUp(self):
         super().setUp()
@@ -51,7 +52,7 @@ class BackupRestoreFilesTest(BaseAppTest):
 
 
 class BackupRestoreFilesTest2(BaseAppTest):
-    ACTIVE_VIEW = 'BackupRestoreFiles'
+    ACTIVE_VIEW = 'backup_restore_files.BackupRestoreFiles'
 
     async def asyncSetUp(self):
         # Given a backup with local destination

@@ -426,9 +426,11 @@ class BackupConnectionLocal(MDBoxLayout):
             self.error_detail = ""
             # On success, go to next step
             if self.create:
-                App.get_running_app().set_active_view('BackupPatterns', instance=self.instance, create=self.create)
+                App.get_running_app().set_active_view(
+                    'backup_patterns.BackupPatterns', instance=self.instance, create=self.create
+                )
             else:
-                App.get_running_app().set_active_view('DashboardView')
+                App.get_running_app().set_active_view('dashboard.DashboardView')
         finally:
             self.working = ''
 
@@ -486,9 +488,9 @@ class BackupConnectionLocal(MDBoxLayout):
         # When operation is cancel by user, redirect it.
 
         if self.create:
-            App.get_running_app().set_active_view('BackupCreate')
+            App.get_running_app().set_active_view('backup_create.BackupCreate')
         else:
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')
 
     def save(self, event=None):
         if not self.repositoryname or not self.selected_location or self.working:
@@ -517,6 +519,6 @@ class BackupConnectionLocal(MDBoxLayout):
                 # Operation cancel by user.
                 return
             self.instance.forget()
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')
 
         self._forget_task = asyncio.create_task(_forget_instance())

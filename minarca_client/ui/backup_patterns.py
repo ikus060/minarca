@@ -296,7 +296,7 @@ class BackupPatterns(MDBoxLayout):
         # In create mode, destroy the configuration and go to dashboard.
         if self.create:
             self.instance.forget()
-        App.get_running_app().set_active_view('DashboardView')
+        App.get_running_app().set_active_view('dashboard.DashboardView')
 
     def save(self):
         # Save Pattern to file
@@ -306,6 +306,6 @@ class BackupPatterns(MDBoxLayout):
         p.save()
         # In create mode, start the backup process and go to backup settings.
         if self.create:
-            App.get_running_app().set_active_view('BackupSettings', instance=self.instance, create=True)
+            App.get_running_app().set_active_view('backup_settings.BackupSettings', instance=self.instance, create=True)
         else:
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')

@@ -232,7 +232,7 @@ class BackupRestoreDate(MDBoxLayout):
 
     def cancel(self):
         # Go back to dashboard
-        App.get_running_app().set_active_view('DashboardView')
+        App.get_running_app().set_active_view('dashboard.DashboardView')
 
     def save(self):
         if not self.selected_increment:
@@ -240,5 +240,7 @@ class BackupRestoreDate(MDBoxLayout):
             return
         # Next step, select files
         App.get_running_app().set_active_view(
-            'BackupRestoreFiles', instance=self.instance, increment=self.selected_increment
+            'backup_restore_files.BackupRestoreFiles',
+            instance=self.instance,
+            increment=self.selected_increment,
         )

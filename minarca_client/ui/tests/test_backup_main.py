@@ -1,5 +1,6 @@
 from minarca_client.core.instance import BackupInstance
-from minarca_client.ui.app import BackupCreate, DashboardView
+from minarca_client.ui.backup_create import BackupCreate
+from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 

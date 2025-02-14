@@ -226,9 +226,9 @@ class BackupConnectionRemote(MDBoxLayout):
         # When operation is cancel by user, redirect it.
         app = App.get_running_app()
         if self.create:
-            app.set_active_view('BackupCreate')
+            app.set_active_view('backup_create.BackupCreate')
         else:
-            app.set_active_view('DashboardView')
+            app.set_active_view('dashboard.DashboardView')
 
     def save(self):
         if not self.valid or self.working:
@@ -258,7 +258,7 @@ class BackupConnectionRemote(MDBoxLayout):
                 # Operation cancel by user.
                 return
             self.instance.forget()
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')
 
         # Prompt in a different thread.
         self._forget_task = asyncio.create_task(_forget_instance())
@@ -311,8 +311,8 @@ class BackupConnectionRemote(MDBoxLayout):
             # On success, go to next step
             app = App.get_running_app()
             if self.create:
-                app.set_active_view('BackupPatterns', instance=self.instance, create=self.create)
+                app.set_active_view('backup_patterns.BackupPatterns', instance=self.instance, create=self.create)
             else:
-                app.set_active_view('DashboardView')
+                app.set_active_view('dashboard.DashboardView')
         finally:
             self.working = ''

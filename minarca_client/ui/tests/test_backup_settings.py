@@ -5,12 +5,14 @@ import responses
 
 from minarca_client.core.backup import BackupInstance
 from minarca_client.core.minarcaid import ssh_keygen
-from minarca_client.ui.app import BackupPatterns, BackupSettings, DashboardView
+from minarca_client.ui.backup_patterns import BackupPatterns
+from minarca_client.ui.backup_settings import BackupSettings
+from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 
 class BackupSettingsTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupSettings'
+    ACTIVE_VIEW = 'backup_settings.BackupSettings'
 
     def setUp(self):
         super().setUp()
@@ -32,7 +34,7 @@ class BackupSettingsTest(BaseAppTest):
         self.instance.settings.schedule = 12
         self.instance.settings.save()
         # When editing the backup settings
-        self.app.set_active_view('BackupSettings', instance=self.instance, create=False)
+        self.app.set_active_view('backup_settings.BackupSettings', instance=self.instance, create=False)
         await self.pump_events()
         # Then the view get displayed
         self.assertIsInstance(self.view, BackupSettings)
@@ -90,7 +92,7 @@ class BackupSettingsTest(BaseAppTest):
         ssh_keygen(self.instance.public_key_file, self.instance.private_key_file)
         self.assertTrue(self.instance.is_remote())
         # When editing the backup settings
-        self.app.set_active_view('BackupSettings', instance=self.instance, create=False)
+        self.app.set_active_view('backup_settings.BackupSettings', instance=self.instance, create=False)
         # Then the view get displayed
         self.assertIsInstance(self.view, BackupSettings)
         # Then a task is started to load settings remotely
@@ -170,5 +172,5 @@ class BackupSettingsTest(BaseAppTest):
         self.instance.settings.schedule = 12
         self.instance.settings.save()
         # When editing the backup settings
-        self.app.set_active_view('BackupSettings', instance=self.instance, create=True)
+        self.app.set_active_view('backup_settings.BackupSettings', instance=self.instance, create=True)
         # Then no exception get raised.

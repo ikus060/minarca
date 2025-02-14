@@ -118,7 +118,7 @@ class BackupAdvanceSettings(MDBoxLayout):
 
     def cancel(self):
         # Go to dashboard view.
-        App.get_running_app().set_active_view('DashboardView')
+        App.get_running_app().set_active_view('dashboard.DashboardView')
 
     def save(self):
         if self.working:
@@ -136,7 +136,7 @@ class BackupAdvanceSettings(MDBoxLayout):
             settings.ignore_hook_errors = self.ignore_hook_errors
             settings.save()
             # Redirect user to dashboard.
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')
         except Exception as e:
             logger.exception('problem encountered while saving advance backup settings')
             await warning_dialog(
