@@ -230,11 +230,9 @@ else:
         architecture='amd64',
         data_src=[
             ('/opt/minarca', join(DISTPATH, 'minarca')),
-            ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
-            ('/opt/minarca/minarca.svg', join(DISTPATH, 'minarca/minarca_client/ui/theme/resources/minarca.svg')),
         ],
-        description=pkg_info['Summary'],
-        long_description="""Minarca is a **free and open-source** backup software providing end-to-end integration to put you in control of your backup strategy.""",
+        description="Secure, self-hosted and automated backup solution",
+        long_description=pkg_info['Summary'],
         url=project_url,
         maintainer=pkg_info['Author-email'],
         output=DISTPATH,
@@ -247,7 +245,28 @@ else:
             'cron',
             'libc6',
             'libstdc++6',
-            'libxcb1',
             'openssh-client',
+        ],
+    )
+
+    # Create a meta-package
+    debbuild(
+        name='minarca-client-gui',
+        version=version,
+        architecture='amd64',
+        data_src=[
+            ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
+            ('/opt/minarca/minarca.svg', join(DISTPATH, 'minarca/minarca_client/ui/theme/resources/minarca.svg')),
+        ],
+        description="Secure, self-hosted and automated backup solution - graphical frontend",
+        long_description=pkg_info['Summary'] + "\nThis package contains the GUI dependencies.",
+        url=project_url,
+        maintainer=pkg_info['Author-email'],
+        output=DISTPATH,
+        depends=[
+            'libxcb1',
+            'minarca-client',
+            'xdg-utils',
+            'zenity|kdialog',
         ],
     )
