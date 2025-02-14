@@ -14,6 +14,7 @@ from minarca_client.core import BackupInstance
 from minarca_client.core.exceptions import BackupError
 from minarca_client.locale import _
 from minarca_client.ui.date_picker import CDatePicker  # noqa
+from minarca_client.ui.spinner_overlay import SpinnerOverlay  # noqa
 from minarca_client.ui.theme import CButton
 from minarca_client.ui.utils import alias_property
 

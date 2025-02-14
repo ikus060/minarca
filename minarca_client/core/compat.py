@@ -19,9 +19,6 @@ from importlib.resources import files
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-import aiofiles
-import psutil
-
 IS_WINDOWS = sys.platform in ['win32']
 IS_LINUX = sys.platform in ['linux', 'linux2']
 IS_MAC = sys.platform == 'darwin'
@@ -61,6 +58,8 @@ def flush(path):
 
 def nice():
     """Increase the niceness of the process to below normal."""
+    import psutil
+
     try:
         if IS_WINDOWS:
             # On Windows,
@@ -270,6 +269,8 @@ def file_read(fn, default=None, maxsize=4096):
 
 
 async def file_read_async(filepath: Path, errors='none'):
+    import aiofiles
+
     try:
         async with aiofiles.open(filepath, 'r') as f:
             return await f.read()
@@ -280,6 +281,8 @@ async def file_read_async(filepath: Path, errors='none'):
 
 
 async def file_write_async(filepath: Path, text):
+    import aiofiles
+
     async with aiofiles.open(filepath, 'w') as f:
         return await f.write(text)
 

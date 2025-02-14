@@ -175,10 +175,11 @@ if IS_MAC:
     Scheduler = MacScheduler
 
 if IS_LINUX:
-    from crontab import CronTab
 
     class CrontabScheduler:
         def __init__(self):
+            from crontab import CronTab
+
             self.cron = CronTab(user=True)
             minarca = get_minarca_exe()
             assert minarca

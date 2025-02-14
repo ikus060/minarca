@@ -11,8 +11,6 @@ import time
 from functools import total_ordering
 from typing import Any
 
-import javaproperties
-
 
 class AbstractConfigFile:
     def __init__(self, filename: str):
@@ -97,6 +95,8 @@ class KeyValueConfigFile(AbstractConfigFile):
         super().__init__(filename)
 
     def _load(self):
+        import javaproperties
+
         data = {field: default for field, unused, default in self._fields}
         try:
             with open(self._fn, 'r', encoding='latin-1') as f:
@@ -117,6 +117,8 @@ class KeyValueConfigFile(AbstractConfigFile):
         return data
 
     def save(self):
+        import javaproperties
+
         values = {
             field: str(self._data.get(field)) for field, *unused in self._fields if self._data.get(field) is not None
         }

@@ -1,20 +1,13 @@
 # Copyright (C) 2023 IKUS Software. All rights reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-
-
 import argparse
 import asyncio
-import functools
-import getpass
 import logging
 import logging.handlers
 import signal
 import sys
-import traceback
 from pathlib import Path
-
-import rdiffbackup.run
 
 from minarca_client import __version__
 from minarca_client.core import Backup, InstanceId
@@ -26,7 +19,6 @@ from minarca_client.core.compat import (
     get_log_file,
     nice,
 )
-from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
     BackupError,
     InstanceNotFoundError,
@@ -34,8 +26,6 @@ from minarca_client.core.exceptions import (
     NotScheduleError,
     RepositoryNameExistsError,
 )
-from minarca_client.core.latest import LatestCheck, LatestCheckFailed
-from minarca_client.core.pattern import Pattern
 from minarca_client.core.settings import Settings
 from minarca_client.locale import _
 
@@ -72,6 +62,8 @@ def _prompt_yes_no(msg):
 
 
 def _backup(force, instance_id):
+    from minarca_client.core.latest import LatestCheck, LatestCheckFailed
+
     signal.signal(signal.SIGINT, signal.default_int_handler)
     # Check version
     try:
@@ -113,6 +105,11 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
     """
     Start the configuration process in command line.
     """
+    import functools
+    import getpass
+
+    from minarca_client.core.disk import get_location_info
+
     backup = Backup()
 
     # Prompt destination type
@@ -190,6 +187,8 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
 
 
 def _pattern(include, pattern, instance_id):
+    from minarca_client.core.pattern import Pattern
+
     backup = Backup()
     if not backup.is_configured():
         print(_('To update include or exclude patterns, you must configure at least one backup instance.'))
@@ -252,6 +251,10 @@ def _rdiff_backup(options):
     """
     Execute rdiff-backup process within minarca.
     """
+    import traceback
+
+    import rdiffbackup.run
+
     # Write directly to stdout to check for error.
     try:
         version = rdiffbackup.run.Globals.version

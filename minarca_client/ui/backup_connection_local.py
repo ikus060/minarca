@@ -9,6 +9,9 @@ import humanfriendly
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.properties import BooleanProperty, ListProperty, NumericProperty, ObjectProperty, StringProperty
+from kivy.uix.behaviors import FocusBehavior
+from kivy.uix.recycleboxlayout import RecycleBoxLayout
+from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDListItem
@@ -202,6 +205,28 @@ Builder.load_string(
             display: bool(root.working)
 '''
 )
+
+
+class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior, RecycleBoxLayout):
+    def keyboard_on_key_down(self, window, keycode, text, modifiers):
+        """Based on FocusBehavior that provides automatic keyboard
+        access, key presses will be used to select children.
+        """
+        if super().keyboard_on_key_down(window, keycode, text, modifiers):
+            return True
+        if self.select_with_key_down(window, keycode, text, modifiers):
+            return True
+        return False
+
+    def keyboard_on_key_up(self, window, keycode):
+        """Based on FocusBehavior that provides automatic keyboard
+        access, key release will be used to select children.
+        """
+        if super().keyboard_on_key_up(window, keycode):
+            return True
+        if self.select_with_key_up(window, keycode):
+            return True
+        return False
 
 
 class LocationItem(MDListItem, RecycleDataViewBehavior):
