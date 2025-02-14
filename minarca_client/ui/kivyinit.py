@@ -1,5 +1,5 @@
 # Define kivy configuration manually
-
+import sys
 from importlib.resources import files
 
 from kivy.config import Config  # noqa
@@ -9,6 +9,10 @@ Config.set('kivy', 'exit_on_escape', 0)
 
 # Disable right click
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
+
+# Disable /dev/mtdev lookup on Linux
+if sys.platform == 'linux':
+    Config.set('input', '%(name)s', '')
 
 # Define default application icons
 minarca_ico_path = files('minarca_client') / 'ui/theme/resources/minarca.ico'
