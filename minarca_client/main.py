@@ -80,6 +80,10 @@ def _backup(force, instance_id):
             except NotScheduleError as e:
                 # If one backup is not schedule to run, continue with next backup.
                 logging.info("%s: %s" % (instance.log_id, e))
+    except RuntimeError as e:
+        # Print warning message is already running.
+        logging.warning(str(e))
+        sys.exit(_EXIT_BACKUP_FAIL)
     except BackupError as e:
         # Print message to stdout and log file.
         logging.error(str(e))
@@ -87,7 +91,6 @@ def _backup(force, instance_id):
     except Exception:
         logging.exception(_("unexpected error during backup"))
         sys.exit(_EXIT_BACKUP_FAIL)
-
 
 def _forget(instance_id, force=False):
     backup = Backup()
@@ -781,11 +784,12 @@ def _configure_logging(debug=False):
         interactive = sys.stdout and sys.stdout.isatty()
     except Exception:
         interactive = False
-    console_level = logging.INFO
-    if not interactive:
-        console_level = logging.ERROR
     if debug:
         console_level = logging.DEBUG
+    elif interactive:
+        console_level = logging.INFO
+    else:
+        console_level = logging.ERROR
     console = logging.StreamHandler(stream=sys.stdout)
     console.setFormatter(logging.Formatter("%(message)s"))
     console.setLevel(console_level)
