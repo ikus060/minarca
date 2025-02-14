@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-12-05 14:20-0500\n"
-"PO-Revision-Date: 2024-12-05 14:21-0500\n"
+"PO-Revision-Date: 2024-12-19 11:30-0500\n"
 "Last-Translator: \n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.16.0\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: minarca_client/main.py:62
 msgid "Operation aborted by the user."
@@ -35,7 +35,7 @@ msgstr "o"
 #: minarca_client/main.py:80
 #, python-format
 msgid "new version %s available"
-msgstr "nouvelle version % s disponible"
+msgstr "nouvelle version %s disponible"
 
 #: minarca_client/main.py:82
 msgid "fail to check for latest version"
@@ -1643,8 +1643,8 @@ msgid "Please wait. Loading backup dates..."
 msgstr "Veuillez patienter. Chargement des dates de sauvegarde ..."
 
 #: minarca_client/ui/backup_restore_date.py:181
-msgid "\"Failed to retrieve available backup dates."
-msgstr "Ne pas retrouver les dates de sauvegarde disponibles."
+msgid "Failed to retrieve available backup dates."
+msgstr "Échec de la récupération des dates de sauvegarde disponibles."
 
 #: minarca_client/ui/backup_restore_date.py:185
 msgid "Unknown problem occurred when collecting backup dates."
