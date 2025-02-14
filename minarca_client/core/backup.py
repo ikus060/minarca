@@ -17,8 +17,6 @@ import uuid
 from collections import namedtuple
 from pathlib import Path
 
-from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
-
 from minarca_client.core.compat import (
     IS_WINDOWS,
     detach_call,
@@ -27,7 +25,6 @@ from minarca_client.core.compat import (
     get_config_home,
     get_minarca_exe,
 )
-from minarca_client.core.disk import get_location_info
 from minarca_client.core.exceptions import (
     DuplicateSettingsError,
     HttpAuthenticationError,
@@ -42,7 +39,6 @@ from minarca_client.core.exceptions import (
 )
 from minarca_client.core.instance import BackupInstance
 from minarca_client.core.pattern import Patterns
-from minarca_client.core.rdiffweb import Rdiffweb
 from minarca_client.core.scheduler import Scheduler
 from minarca_client.core.settings import Datetime, Settings
 
@@ -175,6 +171,8 @@ class Backup:
 
         <mountpoint>/<path>/../.minarca-<localuuid>
         """
+        from minarca_client.core.disk import get_location_info
+
         logger.debug(f"configuring local instance with path: {path}, repositoryname: {repositoryname}, force: {force}")
         assert isinstance(path, (str, Path))
         path = Path(path) if isinstance(path, str) else path
@@ -263,6 +261,10 @@ class Backup:
 
         Set `force` to True to link even if the repository name already exists.
         """
+        from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
+
+        from minarca_client.core.rdiffweb import Rdiffweb
+
         logger.debug(
             f"Configuring remote instance with URL: {remoteurl}, username: {username}, repositoryname: {repositoryname}, force: {force}"
         )

@@ -91,10 +91,9 @@ Builder.load_string(
     MDList:
         padding: 0
 
-        MDDivider:
-
         # Start / Stop backup
         CListItem:
+            divider: True
             on_release: root.stop_start_backup()
             theme_bg_color: "Custom"
             md_bg_color: self.theme_cls.warningContainerColor if root.is_running else self.theme_cls.secondaryContainerColor
@@ -105,10 +104,9 @@ Builder.load_string(
             MDListItemTrailingIcon:
                 icon: "stop" if root.is_running else "play"
 
-        MDDivider:
-
         # Last Backup Status
         CListItem:
+            divider: True
             on_release: root.backup_logs()
             theme_bg_color: "Custom"
             md_bg_color: self.theme_cls.backgroundColor if root.last_backup_success else self.theme_cls.warningContainerColor
@@ -120,10 +118,9 @@ Builder.load_string(
                 icon: "chevron-right" if root.last_backup_success else "alert-circle"
                 icon_color: self.theme_cls.onSurfaceColor if root.last_backup_success else self.theme_cls.warningColor
 
-        MDDivider:
-
         # Server connection
         CListItem:
+            divider: True
             on_release: root.backup_connection()
             theme_bg_color: "Custom"
             md_bg_color: self.theme_cls.backgroundColor if root.test_connection_success else self.theme_cls.warningContainerColor
@@ -135,10 +132,9 @@ Builder.load_string(
                 icon: "chevron-right" if root.test_connection_success else "alert-circle"
                 icon_color: self.theme_cls.onSurfaceColor if root.test_connection_success else self.theme_cls.warningColor
 
-        MDDivider:
-
         # Backup settings
         CListItem:
+            divider: True
             on_release: root.backup_settings()
 
             MDListItemSupportingText:
@@ -147,10 +143,9 @@ Builder.load_string(
             MDListItemTrailingIcon:
                 icon: "chevron-right"
 
-        MDDivider:
-
         # Backup patterns
         CListItem:
+            divider: True
             on_release: root.backup_patterns()
 
             MDListItemSupportingText:
@@ -159,10 +154,9 @@ Builder.load_string(
             MDListItemTrailingIcon:
                 icon: "chevron-right"
 
-        MDDivider:
-
         # Advance Backup patterns
         CListItem:
+            divider: True
             on_release: root.backup_advance()
 
             MDListItemSupportingText:
@@ -171,10 +165,9 @@ Builder.load_string(
             MDListItemTrailingIcon:
                 icon: "chevron-right"
 
-        MDDivider:
-
         # Backup restore
         CListItem:
+            divider: True
             on_release: root.backup_restore()
 
             MDListItemSupportingText:
@@ -182,8 +175,6 @@ Builder.load_string(
 
             MDListItemTrailingIcon:
                 icon: "chevron-right"
-
-        MDDivider:
 
 '''
 )

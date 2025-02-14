@@ -699,8 +699,8 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-    @mock.patch('minarca_client.core.backup.get_location_info')
-    @mock.patch('minarca_client.core.instance.list_disks')
+    @mock.patch('minarca_client.core.disk.get_location_info')
+    @mock.patch('minarca_client.core.disk.list_disks')
     async def test_get_disk_usage_with_local(self, mock_list_disk, mock_disk_info):
         # Given a local backup instance
         tempdir = tempfile.mkdtemp(prefix='minarca-client-test')

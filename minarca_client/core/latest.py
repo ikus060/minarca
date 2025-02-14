@@ -6,8 +6,6 @@ Created on Oct. 22, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
-import requests
-
 from minarca_client.core import compat
 from minarca_client.locale import _
 from packaging import version
@@ -36,6 +34,8 @@ class LatestCheck:
         """
         Query the latest version of minarca.
         """
+        import requests
+
         # Check if the latest version was already queried.
         if self._latest_version is not None:
             return self._latest_version

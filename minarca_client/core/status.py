@@ -12,8 +12,6 @@ import datetime
 import logging
 import os
 
-import psutil
-
 from minarca_client.core.config import Datetime, KeyValueConfigFile
 from minarca_client.core.notification import clear_notification, send_notification
 from minarca_client.locale import _
@@ -43,6 +41,8 @@ class Status(KeyValueConfigFile):
         Return a backup status. Read data from the status file and make
         interpretation of it.
         """
+        import psutil
+
         now = Datetime()
         # After reading the status file, let determine the real status.
         data = dict(self._data)

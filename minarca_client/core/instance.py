@@ -18,13 +18,8 @@ import subprocess
 import time
 from pathlib import Path
 
-import psutil
-from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
-from tzlocal import get_localzone
-
 from minarca_client.core import compat
 from minarca_client.core.compat import IS_WINDOWS, detach_call, file_read, flush, get_minarca_exe
-from minarca_client.core.disk import get_location_info, list_disks
 from minarca_client.core.exceptions import (
     CaptureException,
     HttpAuthenticationError,
@@ -41,9 +36,7 @@ from minarca_client.core.exceptions import (
     RemoteRepositoryNotFound,
     RunningError,
 )
-from minarca_client.core.minarcaid import ssh_keygen
 from minarca_client.core.pattern import Patterns
-from minarca_client.core.rdiffweb import Rdiffweb
 from minarca_client.core.settings import Datetime, Settings
 from minarca_client.core.status import Status, UpdateStatus, UpdateStatusNotification
 
@@ -120,6 +113,8 @@ def handle_http_errors(func):
     """
 
     async def wrapper(self, *args, **kwargs):
+        from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
+
         try:
             return await func(self, *args, **kwargs)
         except ConnectionError:
@@ -383,6 +378,8 @@ class BackupInstance:
         logger.debug(f"{self.log_id}: backup paused for {delay} hours")
 
     async def _push_identity(self, conn, name):
+        from minarca_client.core.minarcaid import ssh_keygen
+
         if not self.public_key_file.exists() and not self.private_key_file.exists():
             logger.debug(f"{self.log_id}: generating new SSH identity")
             ssh_keygen(self.public_key_file, self.private_key_file)
@@ -520,6 +517,8 @@ class BackupInstance:
         """
         Stop the running backup process.
         """
+        import psutil
+
         # Check status for running backup.
         if not self.is_running():
             raise NotRunningError()
@@ -627,6 +626,8 @@ class BackupInstance:
         """
         For local backup, we need to search for our destination since it might change from time to time.
         """
+        from minarca_client.core.disk import list_disks
+
         assert self.settings.localrelpath and self.settings.localuuid, 'only supported for local backup'
         logger.debug(f"{self.log_id}: finding local destination")
 
@@ -693,6 +694,8 @@ class BackupInstance:
         """
         Get disk usage for remote or local backup.
         """
+        from minarca_client.core.disk import get_location_info
+
         logger.debug(f"{self.log_id}: getting disk usage")
         if self.is_remote():
             # Get quota from server - on authentication failure it's
@@ -715,6 +718,8 @@ class BackupInstance:
         """
         Return a new connection to Rdiffweb server.
         """
+        from minarca_client.core.rdiffweb import Rdiffweb
+
         with open(self.private_key_file, 'rb') as f:
             private_key_data = f.read()
         conn = Rdiffweb(self.settings.remoteurl)
@@ -801,6 +806,8 @@ class BackupInstance:
         Raise an error if the disk or remote server is not reachable.
         Return dates
         """
+        from tzlocal import get_localzone
+
         logger.debug(f"{self.log_id}: listing increments")
 
         local_tz = get_localzone()
