@@ -20,10 +20,10 @@ from parameterized import parameterized
 from minarca_client import main
 from minarca_client.core import Backup, BackupInstance, InstanceId
 from minarca_client.core.compat import IS_WINDOWS
-from minarca_client.core.exceptions import HttpAuthenticationError
+from minarca_client.core.exceptions import BackupError, HttpAuthenticationError
 from minarca_client.core.pattern import Pattern
 from minarca_client.core.settings import Settings
-from minarca_client.main import _EXIT_BACKUP_FAIL, _EXIT_LINK_ERROR, _backup
+from minarca_client.main import _backup
 from minarca_client.tests.test import MATCH
 
 
@@ -146,7 +146,8 @@ class TestMainParseArgs(unittest.TestCase):
         # Then an exception is raised
         with self.assertRaises(SystemExit) as context:
             main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
-        self.assertEqual(_EXIT_LINK_ERROR, context.exception.code)
+        self.assertEqual(HttpAuthenticationError.error_code, context.exception.code)
+        self.assertEqual(33, context.exception.code)
 
     @mock.patch('minarca_client.main._configure')
     def test_args_link_force(self, mock_configure):
@@ -298,7 +299,7 @@ class TestMainParseArgs(unittest.TestCase):
         # Then function was called
         mock_main_run.assert_called_once_with(args[1:])
         # Then error code is 1
-        self.assertEqual(_EXIT_BACKUP_FAIL, capture.exception.code)
+        self.assertEqual(BackupError.error_code, capture.exception.code)
 
     def test_exclude(self):
         # Given a backup instance
@@ -504,4 +505,4 @@ class TestMainParseArgs(unittest.TestCase):
         with contextlib.redirect_stdout(f):
             with self.assertRaises(SystemExit) as cm:
                 main.main(['status', '--instance', 'invalid'])
-        self.assertEqual(cm.exception.code, _EXIT_BACKUP_FAIL)
+        self.assertEqual(cm.exception.code, 103)

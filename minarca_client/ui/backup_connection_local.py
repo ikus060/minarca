@@ -440,7 +440,7 @@ class BackupConnectionLocal(MDBoxLayout):
                 await self._create_local(location, repositoryname, force=True)
         except ConfigureBackupError as e:
             logger.warning(str(e))
-            self.error_message = e.message
+            self.error_message = str(e)
             self.error_detail = e.detail
         except Exception as e:
             logger.warning(str(e))

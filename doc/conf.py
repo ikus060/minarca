@@ -10,6 +10,8 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import inspect
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -17,11 +19,15 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import os
+import textwrap
+
+import minarca_client.core.exceptions as exceptions
 
 # -- Project information -----------------------------------------------------
 
 project = 'Minarca Docs'
-copyright = 'Copyright (C) 2023 IKUS Software. All rights reserved.'
+copyright = 'Copyright (C) IKUS Software. All rights reserved.'
 author = 'Patrik Dufresne'
 
 # -- General configuration ---------------------------------------------------
@@ -70,10 +76,10 @@ html_theme_options = {
     'body_text': '#0E2933',
     'extra_nav_links': {
         'Home': 'https://minarca.org/',
-        'News': 'https://minarca.org/en_CA/blog',
+        'Blog': 'https://minarca.org/en_CA/blog',
         'Features': 'https://minarca.org/en_CA/features',
-        'About': 'https://minarca.org/en_CA/about-minarca',
         'Contact Us': 'https://minarca.org/en_CA/contactus',
+        'About': 'https://minarca.org/en_CA/about-minarca',
         'Download': 'https://minarca.org/en_CA/download',
     },
 }
@@ -85,3 +91,30 @@ html_show_sourcelink = False
 html_static_path = ['_static']
 
 html_favicon = '../minarca_client/ui/theme/resources/minarca.ico'
+
+# -- Output file configuration ------------------------------------------------
+# Output directory for Markdown files
+output_dir = os.path.abspath('.')
+
+
+# Function to create the error code markdown table
+def generate_error_code_table():
+    error_code_list = []
+    for name, obj in inspect.getmembers(exceptions):
+        if inspect.isclass(obj) and hasattr(obj, 'error_code'):
+            error_code = getattr(obj, 'error_code')
+            message = obj.message.strip() if getattr(obj, 'message', False) else 'No message available'
+            description = textwrap.dedent(obj.__doc__) if getattr(obj, '__doc__', False) else 'No description available'
+            error_code_list.append((error_code, name, message, description))
+
+    # Write the markdown table
+    with open(os.path.join(output_dir, 'errors-codes-list.md'), 'w') as f:
+        f.write('# Error Codes\n\n')
+        for error_code, name, message, description in sorted(error_code_list):
+            f.write(f'## {name} (Error: {error_code})\n\n')
+            f.write(f'**Message:** {message}\n\n')
+            f.write(f'**Description:**\n{description}\n\n')
+
+
+# Call the function to generate the table before building docs
+generate_error_code_table()

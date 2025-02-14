@@ -1,4 +1,4 @@
-# Configuration
+# Server Configuration
 
 There are several entry points available for administrator to manage the configuration of Minarca. This section aims to outline those configurations and explain each option available and what it does.
 

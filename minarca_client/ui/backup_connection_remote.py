@@ -295,7 +295,7 @@ class BackupConnectionRemote(MDBoxLayout):
                 await self._create_remote(remoteurl, username, password, repositoryname, force=True)
         except ConfigureBackupError as e:
             logger.warning(str(e))
-            self.error_message = e.message
+            self.error_message = str(e)
             self.error_detail = e.detail
         except BackupError as e:
             logger.warning(str(e))

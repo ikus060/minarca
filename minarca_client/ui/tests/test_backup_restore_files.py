@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import os
 import shutil
@@ -86,6 +87,7 @@ class BackupRestoreFilesTest2(BaseAppTest):
         self.assertTrue(self.view.file_items)
         # When user select an item.
         await self.pump_events()
+        await asyncio.sleep(1)
         rv = self.view.ids.availables.children[0]
         # Then an item is selected
         # This part is always failing in CICD pipeline while working on real MacOS.

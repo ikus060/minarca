@@ -17,7 +17,9 @@ from minarca_client.core.exceptions import (
     ConnectException,
     DiskFullError,
     DiskQuotaExceededError,
+    JailCreationError,
     PermissionDeniedError,
+    RemoteServerTruncatedHeader,
     UnknownHostException,
     UnknownHostKeyError,
 )
@@ -32,6 +34,11 @@ class TestExceptions(unittest.TestCase):
             (b'Permission denied (publickey)', PermissionDeniedError),
             (b'OSError: [Errno 122] Disk quota exceeded', DiskQuotaExceededError),
             (b'OSError: [Errno 28] No space left on device', DiskFullError),
+            (
+                b"due to exception 'Truncated header <b''> (problem probably originated remotely)'.",
+                RemoteServerTruncatedHeader,
+            ),
+            (b'ERROR: fail to create rdiff-backup jail', JailCreationError),
             (b'Other', None),
         ]
     )

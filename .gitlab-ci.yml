@@ -84,9 +84,9 @@ doc:
     - .tox/doc/tmp
     expire_in: 1 day
   before_script:
-    - apt update
-    # FIXME - apt -y --no-install-recommends install librsync-dev libacl1-dev
-    - pip install tox
+  - apt update
+  - apt -y --no-install-recommends install librsync-dev libacl1-dev
+  - pip3 install tox
   image: python:3.10
   needs: []
   script:

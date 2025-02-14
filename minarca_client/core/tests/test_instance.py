@@ -42,7 +42,6 @@ from minarca_client.core.instance import _sh_quote
 from minarca_client.core.minarcaid import ssh_keygen
 from minarca_client.core.pattern import Pattern, Patterns
 from minarca_client.core.settings import Datetime, Settings
-from minarca_client.locale import gettext as _
 from minarca_client.tests.test import MATCH
 
 IDENTITY = """[test.minarca.net]:2222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK/Qng4S5d75rtYxklVdIkPiz4paf2pdnCEshUoailQO root@sestican
@@ -635,7 +634,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(status.lastdate > start_time)
         self.assertNotEqual(status.lastdate, status.lastsuccess)
         self.assertEqual('FAILURE', status.lastresult)
-        self.assertEqual(_('No files included in backup. Check configuration.'), status.details)
+        self.assertEqual('No files included in backup. Check configuration. (Error: 29)', status.details)
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)

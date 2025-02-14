@@ -48,3 +48,4 @@ deb_dist
 /.DS_Store
 pytestdebug.log
 xunit.xml
+doc/errors-codes-list.md
