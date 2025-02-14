@@ -131,7 +131,34 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-* Remove Ubuntu Mantic support
+## Next Release
+
+- Update French translation.
+- Update documentation:  
+  - Modify the FAQ section.  
+  - Update screenshots.  
+  - Add more details to the troubleshooting guide.  
+- Schedule backups to run even if the laptop is on battery (Windows-specific) (#273).  
+- Disable use of system-wide SSH client configuration (`/etc/ssh/ssh_config`) (#274).  
+- Adjust log view:  
+  - Improve performance when loading logs.  
+  - Change refresh rate.  
+  - Truncate logs when they are too long to avoid GUI update delays.  
+  - Increase scrollbar width to make it more visible.  
+- Add compatibility with Python 3.11.  
+- Fix issue with subprocess execution losing output when asyncio buffer gets full.  
+- Review GUI for file restore:  
+  - Merge custom and full restore into a single interface.  
+  - Allow users to select one or multiple files or folders.  
+  - Provide options to restore files in-place or to a subfolder.  
+  - Add functionality to search or filter the list of files.  
+- Bump Kivy to version 2.3.1.  
+- Include `rdiff-backup` patch to better handle cross-platform `OSError`.  
+- Allow schedule to be manual only.
+- Add option to configure pre/post command hook for each backup #73
+- Lazy load the view to improve loading speed on application startup
+- Define error code for each exceptions
+- Only install 'release' APT repo
 
 ## 6.0.3 (2024-11-27)
 
