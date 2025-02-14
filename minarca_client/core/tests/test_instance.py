@@ -493,7 +493,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             'any-argument',
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             env=mock.ANY,
             creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
@@ -583,7 +583,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 'C:/**',
                 'C:/',
                 'minarca@remotehost::test-repo/C/',
-                log_file=mock.ANY,
+                callback=mock.ANY,
             )
         else:
             self.instance._rdiff_backup.assert_called_once_with(
@@ -598,7 +598,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 '/**',
                 '/',
                 'minarca@remotehost::test-repo/',
-                log_file=mock.ANY,
+                callback=mock.ANY,
             )
         # Check status
         status = self.instance.status
@@ -656,7 +656,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             'minarca@remotehost::.',
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             env=mock.ANY,
             creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
@@ -781,7 +781,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 '1712944964',
                 'minarca@remotehost::test-repo/C/path/to/file',
                 'C:\\tmp\\file',
-                log_file=mock.ANY,
+                callback=mock.ANY,
             )
         else:
             self.instance._rdiff_backup.assert_called_once_with(
@@ -793,7 +793,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 '1712944964',
                 'minarca@remotehost::test-repo/path/to/file',
                 '/tmp/file',
-                log_file=mock.ANY,
+                callback=mock.ANY,
             )
         # Check status
         status = self.instance.status
@@ -912,7 +912,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             'minarca@remotehost::test-repo/C/' if IS_WINDOWS else 'minarca@remotehost::test-repo/',
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             env=mock.ANY,
             creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
@@ -1009,7 +1009,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             'minarca@remotehost::test-repo/C/' if IS_WINDOWS else 'minarca@remotehost::test-repo/',
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             env=mock.ANY,
             creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
         )
@@ -1137,7 +1137,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 mock.ANY,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
+                stderr=subprocess.PIPE,
                 env=mock.ANY,
                 creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
             )
