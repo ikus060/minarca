@@ -22,22 +22,15 @@ from minarca_client.core.compat import (
 from minarca_client.core.exceptions import (
     BackupError,
     InstanceNotFoundError,
+    KivyError,
+    NotConfiguredError,
     NotRunningError,
     NotScheduleError,
     RepositoryNameExistsError,
+    RunningError,
 )
 from minarca_client.core.settings import Settings
 from minarca_client.locale import _
-
-_EXIT_BACKUP_FAIL = 101
-_EXIT_REPO_EXISTS = 104
-_EXIT_NOT_RUNNING = 105
-_EXIT_LINK_ERROR = 106
-_EXIT_SCHEDULE_ERROR = 107
-_EXIT_KIVY_ERROR = 108
-_EXIT_RESTORE_FAIL = 109
-_EXIT_INTERUPT = 110
-_EXIT_NO_STDOUT = 111
 
 _ARGS_ALIAS = {
     '--backup': 'backup',
@@ -80,17 +73,18 @@ def _backup(force, instance_id):
             except NotScheduleError as e:
                 # If one backup is not schedule to run, continue with next backup.
                 logging.info("%s: %s" % (instance.log_id, e))
-    except RuntimeError as e:
+    except RunningError as e:
         # Print warning message is already running.
         logging.warning(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
     except BackupError as e:
         # Print message to stdout and log file.
         logging.error(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
     except Exception:
         logging.exception(_("unexpected error during backup"))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(BackupError.error_code)
+
 
 def _forget(instance_id, force=False):
     backup = Backup()
@@ -171,22 +165,25 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
             asyncio.run(configure_func())
             print(_('Linked successfully'))
         except RepositoryNameExistsError as e:
-            print(e.message)
+            print(str(e))
             if _prompt_yes_no(_('Do you want to replace the existing repository? (Yes/No): ')):
                 asyncio.run(configure_func(force=True))
                 print(_('Linked successfully'))
             else:
-                sys.exit(_EXIT_REPO_EXISTS)
+                sys.exit(e.error_code)
     except BackupError as e:
-        print(e.message)
-        sys.exit(_EXIT_LINK_ERROR)
+        print(str(e))
+        sys.exit(e.error_code)
+    except Exception as e:
+        print(str(e))
+        sys.exit(BackupError.error_code)
     # If link is success, Schedule job.
     # On windows this step fail for unknown reason with various user priviledge.
     try:
         backup.schedule_job()
     except Exception as e:
         print(str(e))
-        sys.exit(_EXIT_SCHEDULE_ERROR)
+        sys.exit(BackupError.error_code)
 
 
 def _pattern(include, pattern, instance_id):
@@ -195,7 +192,7 @@ def _pattern(include, pattern, instance_id):
     backup = Backup()
     if not backup.is_configured():
         print(_('To update include or exclude patterns, you must configure at least one backup instance.'))
-        sys.exit(1)
+        sys.exit(NotConfiguredError.error_code)
     try:
         for instance in backup[instance_id]:
             patterns = instance.patterns
@@ -211,10 +208,10 @@ def _pattern(include, pattern, instance_id):
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error updating patterns")
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(BackupError.error_code)
 
 
 def _patterns(instance_id):
@@ -227,10 +224,10 @@ def _patterns(instance_id):
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error retrieving patterns")
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(BackupError.error_code)
 
 
 def _pause(delay, instance_id):
@@ -244,10 +241,10 @@ def _pause(delay, instance_id):
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error updating backup config")
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(BackupError.error_code)
 
 
 def _rdiff_backup(options):
@@ -263,7 +260,8 @@ def _rdiff_backup(options):
         version = rdiffbackup.run.Globals.version
         print(f'rdiff-backup {version}', flush=True)
     except IOError:
-        sys.exit(_EXIT_NO_STDOUT)
+        # Broken pipe error
+        sys.exit(141)
     # Set the priority to below normal
     nice()
     # Start the backup process
@@ -273,7 +271,7 @@ def _rdiff_backup(options):
         # Capture any exception and return exitcode.
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback)
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(BackupError.error_code)
 
 
 def _restore(restore_time, force, paths, instance_id, destination):
@@ -346,10 +344,10 @@ def _restore(restore_time, force, paths, instance_id, destination):
     except BackupError as e:
         # Print message to stdout and log file.
         logging.error(str(e))
-        sys.exit(_EXIT_RESTORE_FAIL)
+        sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error during restore")
-        sys.exit(_EXIT_RESTORE_FAIL)
+        sys.exit(BackupError.error_code)
 
 
 def _stop(force, instance_id):
@@ -357,17 +355,17 @@ def _stop(force, instance_id):
     try:
         for instance in backup[instance_id]:
             instance.stop()
-    except NotRunningError:
+    except NotRunningError as e:
         print(_('backup not running'))
         if not force:
-            sys.exit(_EXIT_NOT_RUNNING)
+            sys.exit(e.error_code)
     except BackupError as e:
         # Print message to stdout and log file.
         logging.error(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error stoping backup")
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(BackupError.error_code)
 
 
 def _schedule(schedule, instance_id, username=None, password=None):
@@ -380,9 +378,12 @@ def _schedule(schedule, instance_id, username=None, password=None):
     run_if_logged_out = (username, password) if username or password else None
     try:
         backup.schedule_job(run_if_logged_out)
+    except BackupError as e:
+        logging.info(str(e))
+        sys.exit(e.error_code)
     except Exception as e:
-        print(str(e))
-        sys.exit(_EXIT_SCHEDULE_ERROR)
+        logging.info(str(e))
+        sys.exit(BackupError.error_code)
 
 
 def _start(force, instance_id):
@@ -394,10 +395,18 @@ def _start(force, instance_id):
     except InstanceNotFoundError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
 
     # Trigger backup execution.
-    backup.start_all(force=force, instance_id=instance_id.value)
+    try:
+        backup.start_all(force=force, instance_id=instance_id.value)
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(e.error_code)
+    except Exception as e:
+        logging.info(str(e))
+        sys.exit(BackupError.error_code)
 
 
 def _status(instance_id):
@@ -452,10 +461,10 @@ def _status(instance_id):
     except BackupError as e:
         # Print message to stdout and log file.
         logging.info(str(e))
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error getting backup status")
-        sys.exit(_EXIT_BACKUP_FAIL)
+        sys.exit(BackupError.error_code)
 
 
 def _ui(test=False):
@@ -464,7 +473,7 @@ def _ui(test=False):
     """
     try:
         from minarca_client.ui.app import MinarcaApp
-    except Exception:
+    except KivyError | Exception:
         # This is raised by kivy if it can create a window.
         # In that scenario, we still need to display an error message to the user.
         logger.exception('application startup failed')
@@ -480,7 +489,7 @@ def _ui(test=False):
                 ),
             )
             asyncio.run(dlg)
-        sys.exit(_EXIT_KIVY_ERROR)
+        sys.exit(KivyError.error_code)
 
     # Start event loop with backup instance.
     backup = Backup()
@@ -809,11 +818,7 @@ def main(args=None):
     # Configure logging
     _configure_logging(debug=args.debug)
     # Call appropriate function
-    try:
-        return args.func(**kwargs)
-    except KeyboardInterrupt:
-        print(_('Process interrupted by user.'))
-        sys.exit(_EXIT_INTERUPT)
+    return args.func(**kwargs)
 
 
 if __name__ == "__main__":

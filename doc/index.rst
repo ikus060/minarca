@@ -8,12 +8,8 @@ This comprehensive resource is designed to assist sysadmin in harnessing the pow
    :caption: Contents:
    
    introduction
-   installation
-   minarca-client
-   minarca-client-cli
-   configuration
-   settings
-   hardening
+   index-server
+   index-client
    faq
    troubleshooting
    development

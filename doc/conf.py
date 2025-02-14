@@ -17,6 +17,9 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import os
+import inspect
+import minarca_client.core.exceptions as exceptions
 
 # -- Project information -----------------------------------------------------
 
@@ -70,10 +73,10 @@ html_theme_options = {
     'body_text': '#0E2933',
     'extra_nav_links': {
         'Home': 'https://minarca.org/',
-        'News': 'https://minarca.org/en_CA/blog',
+        'Blog': 'https://minarca.org/en_CA/blog',
         'Features': 'https://minarca.org/en_CA/features',
-        'About': 'https://minarca.org/en_CA/about-minarca',
         'Contact Us': 'https://minarca.org/en_CA/contactus',
+        'About': 'https://minarca.org/en_CA/about-minarca',
         'Download': 'https://minarca.org/en_CA/download',
     },
 }
@@ -85,3 +88,35 @@ html_show_sourcelink = False
 html_static_path = ['_static']
 
 html_favicon = '../minarca_client/ui/theme/resources/minarca.ico'
+
+# -- Output file configuration ------------------------------------------------
+# Output directory for Markdown files
+output_dir = os.path.abspath('.')
+
+# Function to create the error code markdown table
+def generate_error_code_table():
+    error_code_list = []
+    for name, obj in inspect.getmembers(exceptions):
+        if inspect.isclass(obj) and hasattr(obj, 'error_code'):
+            error_code = getattr(obj, 'error_code')
+            message = obj.message.strip() if getattr(obj, 'message', False) else 'No message available'
+            # Strip spaces before and after
+            doc = obj.__doc__.strip() if getattr(obj, '__doc__', False) else 'No description available'
+            # Replace new lines by html newline
+            doc = doc.replace('\n\n', '<br/><br/>')
+            # Replace new lines by space to avoid markdown error
+            doc = doc.replace('\n', ' ')
+
+            description = f"**Name:**<br/>{name}<br/>**Message:** <br/>{message}<br/>**Description:**<br/>{doc}"
+            error_code_list.append((error_code, description))
+    
+    # Write the markdown table
+    with open(os.path.join(output_dir, 'minarca-client-errors.md'), 'w') as f:
+        f.write('# Client Error Codes\n\n')
+        f.write('| Error Code | Description |\n')
+        f.write('|------------|-------------|\n')
+        for code, description in sorted(error_code_list):
+            f.write(f'| {code} | {description} |\n')
+
+# Call the function to generate the table before building docs
+generate_error_code_table()
