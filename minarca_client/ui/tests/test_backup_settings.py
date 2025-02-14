@@ -33,7 +33,7 @@ class BackupSettingsTest(BaseAppTest):
         self.instance.settings.save()
         # When editing the backup settings
         self.app.set_active_view('BackupSettings', instance=self.instance, create=False)
-        await asyncio.sleep(0)
+        await self.pump_events()
         # Then the view get displayed
         self.assertIsInstance(self.view, BackupSettings)
         # When making modification and saving
@@ -127,7 +127,7 @@ class BackupSettingsTest(BaseAppTest):
         # When user click on back or cancel button
         btn_cancel = self.view.ids.btn_cancel
         btn_cancel.dispatch('on_release')
-        await asyncio.sleep(0)
+        await self.pump_events()
         # Then view is updated
         self.assertIsInstance(self.view, BackupPatterns)
 

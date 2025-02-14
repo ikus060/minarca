@@ -17,8 +17,8 @@ Builder.load_string(
     adaptive_height: True
 
     MDBoxLayout:
-        padding: dp(40)
-        spacing: dp(40)
+        padding: "30dp"
+        spacing: "30dp"
         orientation: 'vertical'
         adaptive_height: True
 
