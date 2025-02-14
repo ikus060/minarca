@@ -35,7 +35,7 @@ Then launch the execution of the installer and follow the instructions.
 
 ## Installation on MacOS
 
-On a Windows workstation, download the appropriate installer.
+On a MacOS workstation, download the appropriate installer.
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.dmg"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca-blue?&logo=apple&style=for-the-badge"></a>
 
@@ -45,10 +45,12 @@ Open the disk image and drag-n-drop Minarca to your Applications folder.
 
 Then open Minarca Application !
 
-If you get the following, you might need to right click on Minarca Application and
-click "Open" to skip the certificate validation.
+If you get the following, go in your MacOS **System Settings** --> **Privacy & Security Page** --> **Scroll Down to bottom** --> Click **Open Anyway**. 
 
 ![Minarca can't be open because Apple cannot check it for malicious software.](macos-installation-issue.png)
+
+[Fix 'Apple could not verify app is free of malware' Mac error - bypass Gatekeeper macOS Sequoia](https://www.youtube.com/watch?v=biIvAM94b98) 
+
 
 ## Installation on Ubuntu or Debian
 
@@ -97,89 +99,24 @@ Pre-requisite: You need to have a functional Mianrca Server deployed. You may us
 
     minarca configure -r REMOTEURL -u USERNAME [-p PASSWORD] -n NAME
 
-## Troubleshooting
+### File Locations
 
-When troubleshooting, it is essential to know where to find the logs, settings, and status files. The locations of these files differ depending on the operating system you are using: Windows, Linux, or macOS.
+| **Operating System** | **Log File**                          | **Settings Folder**                   | **Status Folder**                     |
+|-----------------------|---------------------------------------|----------------------------------------|----------------------------------------|
+| **Windows**           | `%LOCALAPPDATA%/minarca/minarca.log` | `%LOCALAPPDATA%/minarca/`             | `%LOCALAPPDATA%/minarca/`             |
+| **Linux**             | `$XDG_DATA_HOME/minarca/minarca.log`<br>*(Default: `$HOME/.local/share`)* | `$XDG_CONFIG_HOME/minarca/`<br>*(Default: `$HOME/.config`)* | `$XDG_DATA_HOME/minarca/`<br>*(Default: `$HOME/.local/share`)* |
+| **Linux (root)**      | `/var/log/minarca.log`               | `/etc/minarca/`                        | `/var/lib/minarca/`                   |
+| **macOS**             | `$HOME/Library/Logs/Minarca/minarca.log` | `$HOME/Library/Preferences/Minarca`   | `$HOME/Library/Minarca`               |
 
-### Windows
 
-#### Windows Log File
-The log file, which is essential for diagnosing issues, can be found at:
-```
-%LOCALAPPDATA%/minarca/minarca.log
-```
-Typically, `%LOCALAPPDATA%` defaults to `%HOME%/AppData/Local`.
+Additional information:
+- On **Windows**, `%LOCALAPPDATA%` typically resolves to `%HOME%/AppData/Local`.  
+- On **Linux**, `$XDG_DATA_HOME` defaults to `$HOME/.local/share` and `$XDG_CONFIG_HOME` defaults to `$HOME/.config`.  
+- On **macOS**, the file paths use standard directories such as `Library/Logs`, `Library/Preferences`, and `Library`.  
 
-#### Windows Settings Folder
-The settings for Minarca are stored in the following directory:
-```
-%LOCALAPPDATA%/minarca/
-```
+On all platforms, it is possible to override the default locations for the settings and status folders using environment variables:
 
-#### Windows Status Folder
-Status files, which help in understanding the current state of backups and other operations, are located at:
-```
-%LOCALAPPDATA%/minarca/
-```
-
-### Linux
-
-#### Linux Log File
-On Linux systems, the log file is generally stored in the following directory:
-```
-$XDG_DATA_HOME/minarca/minarca.log
-```
-`$XDG_DATA_HOME` typically defaults to `$HOME/.local/share`.
-
-#### Linux Settings Folder
-The settings files are found in the configuration directory:
-```
-$XDG_CONFIG_HOME/minarca/
-```
-`$XDG_CONFIG_HOME` typically defaults to `$HOME/.config/`.
-
-#### Linux Status Folder
-Status files are stored in the following directory:
-```
-$XDG_DATA_HOME/minarca/
-```
-`$XDG_DATA_HOME` typically defaults to `$HOME/.local/share`.
-
-#### Running as Root on Linux
-
-If Minarca is running as root, the file locations change as follows:
-
-- **Log File:** `/var/log/minarca.log`
-- **Settings Folder:** `/etc/minarca/`
-- **Status Folder:** `/var/lib/minarca/`
-
-### MacOS
-
-#### MacOS Log File
-On macOS, the log file for Minarca can be found at:
-```
-$HOME/Library/Logs/Minarca/minarca.log
-```
-
-#### MacOS Settings Folder
-The settings files are stored in the preferences directory:
-```
-$HOME/Library/Preferences/Minarca
-```
-
-#### MacOS Status Folder
-Status files are found in the following directory:
-```
-$HOME/Library/Minarca
-```
-
-### Customizing File Locations
-
-On all platforms, it is possible to change the location of the settings and status folders using environment variables:
-
-- **Settings Folder:** Set the `$MINARCA_CONFIG_HOME` environment variable.
-- **Status Folder:** Set the `$MINARCA_DATA_HOME` environment variable.
-
-### Additional Tips
-
-By knowing where to find these essential files, troubleshooting Minarca Data Backup becomes a more straightforward process. If you encounter issues that cannot be resolved through these files, consider reaching out to Minarca support with the log and status files for further assistance.
+| **Folder**           | **Environment Variable**   | **Description**                          |
+|-----------------------|----------------------------|------------------------------------------|
+| **Settings Folder**   | `$MINARCA_CONFIG_HOME`     | Sets a custom path for configuration files. |
+| **Status Folder**     | `$MINARCA_DATA_HOME`       | Sets a custom path for status files.        |

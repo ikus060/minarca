@@ -27,7 +27,7 @@ E.g.:
 
 In addition to configuration files, you may pass environment variables. The options name must be uppercase and prefixed with `MINARCA_`. As an example, if you want to change the port used to listen for HTTP request for 8081, you must define `server-port` option as follow.
 
-    MINARCA_SERVER_PORT=8081
+   MINARCA_SERVER_PORT=8081
 
 ## Command line arguments
 
@@ -78,7 +78,7 @@ Minarca can be configured to send logs to specific location. By default, logs ar
 | log-file | Define the location of the log file. | /var/log/minarca/access.log |
 | log-access-file | Define the location of the access log file. | /var/log/minarca/server.log |
 
-In addition, `minarca-shell` and `minarca-quota-api` are also configure to sent log to the same folder.
+In addition, `minarca-shell` is also configure to sent log to the same folder.
 
 ### Enable Debugging
 
@@ -165,63 +165,95 @@ Note: notifications are not sent if the user doesn't have an email configured in
 
 ## Configure user quota
 
-Since v2.1, it's now possible to customize how user quota is controller for
-your system without a custom plugin. By defining `quota-set-cmd`, `quota-get-cmd`
-and `QuotaUsedCmd` configuration options, you have all the flexibility to
-manage the quota the way you want by providing custom command line to be executed to respectively set the quota, get the quota and get quota usage.
+Since v2.1, it is now possible to customize how user quotas are controlled by Minarca Server.
 
-| Option | Description | Example |
-| --- | --- | --- |
-| quota-set-cmd | Command line to set the user's quota. | Yes. If you want to allow administrators to set quota from the web interface. |
-| quota-get-cmd | Command line to get the user's quota. Should print the size in bytes to console. | No. Default behaviour gets quota using operating system statvfs that should be good if you are using setquota, getquota, etc. For ZFS and other more exotic file system, you may need to define this command. |
-| quota-used-cmd | Command line to get the quota usage. Should print the size in bytes to console. | No. |
+By defining the `quota-set-cmd`, `quota-get-cmd`, and `quota-used-cmd` configuration options, you gain significant flexibility in managing quotas by specifying custom command lines to set, retrieve, and check quota usage.
 
-When Minarca calls the scripts, special environment variables are available. You should make use of this variables in a custom script to get and set the disk quota.
+### Configuration Options
 
-* `RDIFFWEB_USERID`: minarca user id. e.g.: `34`
-* `RDIFFWEB_USERNAME`: minarca username. e.g.: `patrik`
-* `RDIFFWEB_USERROOT`: user's root directory. e.g.: `/backups/patrik/`
-* `RDIFFWEB_ROLE`: user's role e.g.: `10` 1:Admin, 5:Maintainer, 10:User
-* `RDIFFWEB_QUOTA`: only available for `quota-set-cmd`. Define the new quota value in bytes. e.g.: 549755813888  (0.5 TiB)
+| Option            | Description | Required? |
+|------------------|-------------|------------|
+| `quota-set-cmd`  | Command to set a user's quota. | Yes, if you want administrators to set quotas from the web interface. |
+| `quota-get-cmd`  | Command to retrieve a user's quota. Should print the size in bytes to the console. | No, the default behavior uses the operating system’s `statvfs`, which works well with `setquota`, `getquota`, etc. However, for ZFS or other advanced filesystems, you may need to define this command manually. |
+| `quota-used-cmd` | Command to retrieve the user's quota usage. Should print the size in bytes to the console. | No |
 
-Continue reading about how to configure quotas for EXT4. We generally
-recommend making use of project quotas with Minarca to simplify the management of permission and avoid running Minarca with root privileges.  The next section
-presents how to configure project quota. Keep in mind it's also possible to
-configure quota using either user's quota or project quota.
+When Minarca executes these commands, special environment variables are available. You should use these variables in custom scripts to get and set disk quotas:
 
-### Configure prjquota
+- `RDIFFWEB_USERID`: Minarca user ID (e.g., `34`).
+- `RDIFFWEB_USERNAME`: Minarca username (e.g., `patrik`).
+- `RDIFFWEB_USERROOT`: User’s root directory (e.g., `/backups/patrik/`).
+- `RDIFFWEB_ROLE`: User’s role (e.g., `10`, where `1`=Admin, `5`=Maintainer, `10`=User).
+- `RDIFFWEB_QUOTA`: Only available for `quota-set-cmd`. Defines the new quota value in bytes (e.g., `549755813888` for `0.5 TiB`).
 
-#### For EXT4
+### Recommended Configuration for EXT4
 
-This section is not a full documentation about how to configure ext4 project quota,
-but provide enough guidance to help you.
+We generally recommend using **project quotas** with Minarca to simplify permission management and avoid running Minarca with root privileges. The next section explains how to configure project quotas.
 
-1. Enabled project quota feature  
-   You must enable project quota feature for the EXT4 partition where your backup resides using:  
-   `tune2fs -O project -Q prjquota /dev/sdaX`  
-   The file system must be unmounted to change this setting and may require you
-   to boot your system with a live-cd if your backups reside on root file system (`/`).  
-   Also, add `prjquota` options to your mount point configuration `/etc/fstab`.
-   Something like `/dev/sdaX   /   ext4    errors=remount-ro,prjquota     0    1`
-2. Turn on the project quota after reboot  
-   `quotaon -Pv -F vfsv1 /`
-3. Check if the quota is working  
-   `repquota -Ps /`
-4. Add `+P` attribute on directories to enabled project quotas  
-   `chattr -R +P /backups/admin`
-5. Then set the project id on directories  
-   `chattr -R -p 1 /backups/admin` where `1` is the Minarca user's id
+This section is not a full guide on configuring EXT4 project quotas but provides enough information to help you set them up.
 
-Next, you may configure Minarca quota command line for your need. For EXT4
-project quotas, you only need to define `quota-set-cmd` with something similar
-to the following. `quota-get-cmd` and `quota-used-cmd` should not be required
-with EXT4 quota management.
+#### Enable Project Quotas on Your Storage
 
-    quota-set-cmd=setquota -P $RDIFFWEB_USERID $((RDIFFWEB_QUOTA / 1024)) $((RDIFFWEB_QUOTA / 1024)) 0 0 /
+These instructions assume your partition `/dev/sdbX` is mounted at `/backups`.
 
-This effectively, makes use of Minarca user's id as project id.
+1. Install the required dependencies:  
+   ```bash
+   apt install quota sudo
+   ```
+2. Unmount the partition:  
+   ```bash
+   umount /backups
+   ```
+3. Enable the project quota feature:  
+   ```bash
+   tune2fs -O project -Q prjquota /dev/sdbX
+   ```
+   > The filesystem **must be unmounted** to apply this setting. If your backups are stored on the root filesystem (`/`), you may need to boot using a live CD.
 
-### EXT4
+4. Add the `prjquota` option to your `/etc/fstab` configuration:  
+   ```
+   /dev/sdbX   /backups   ext4    defaults,relatime,prjquota     0    1
+   ```
+5. Reload the systemd daemon and remount the partition:  
+   ```bash
+   systemctl daemon-reload
+   mount /backups
+   ```
+6. Verify that quotas are working:  
+   ```bash
+   repquota -Ps /backups
+   ```
+
+#### Configure Minarca to Use Quotas
+
+1. Allow Minarca to Manage Quotas Using `sudo`
+
+   Create a file named `/etc/sudoers.d/minarca-quota` and add the following lines:  
+   ```
+   minarca ALL=(ALL) NOPASSWD: /usr/sbin/setquota
+   minarca ALL=(ALL) NOPASSWD: /usr/bin/quota
+   ```
+
+2. Edit the Minarca Configuration File
+
+   Add the following lines to the Minarca configuration file (`/etc/minarca/minarca-server.conf`):  
+   ```
+   quota-set-cmd=chattr +P -p $RDIFFWEB_USERID "$RDIFFWEB_USERROOT"; sudo setquota -P $RDIFFWEB_USERID "$((RDIFFWEB_QUOTA / 1024))" "$((RDIFFWEB_QUOTA / 1024))" 0 0 $(df --output=source "$RDIFFWEB_USERROOT" | tail -n 1); nohup chattr -R +P -p $RDIFFWEB_USERID "$RDIFFWEB_USERROOT" >/dev/null 2>&1 &
+   quota-get-cmd=sudo quota --no-wrap --local-only -P $RDIFFWEB_USERID | awk -v dev=$(df --output=source "$RDIFFWEB_USERROOT" | tail -n 1) '$1 == dev {printf "%.0f\n", $3 * 1024; found=1} END {if (!found) print 0}'
+   quota-used-cmd=sudo quota --no-wrap --local-only -P $RDIFFWEB_USERID | awk -v dev=$(df --output=source "$RDIFFWEB_USERROOT" | tail -n 1) '$1 == dev {printf "%.0f\n", $2 * 1024; found=1} END {if (!found) print 0}'
+   ```
+
+3. Apply the Changes
+   Restart the Minarca server to apply the new settings:  
+   ```bash
+   systemctl restart minarca-server
+   ```
+
+4. Verify in the Web Interface
+   - Log in to the Minarca **Admin Area**.  
+   - Go to **Add User** → **Disk Space**.  
+   - Enter a valid quota size, such as `"500 GiB"`.
+
+### Recommended configuration for ZFS
 
 This section is not a full documentation about how to configure ZFS project quotas,
 but provide enough guidance to help you. This documentation uses `tank/backups`
@@ -280,7 +312,6 @@ need. Most likely, you will want to make it closer to your business brand.
 | --- | --- | --- |
 | welcome-msg | Replace the headline displayed in the login page. It may contains HTML. | Custom message displayed on login page.|
 | brand-header-name | Define the application name displayed in the title bar and header menu. | My Backup |
-| brand-default-theme | Define the theme. Either: `default`, `blue` or `orange`. Define the css file to be loaded in the web interface. | orange |
 | brand-favicon | Define the FavIcon to be displayed in the browser title | /etc/minarca/my-fav.ico |
 | brand-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca logo displayed in Login page. | /etc/minarca/logo2.png |
 | brand-header-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca header logo displayed in navigation bar. | /etc/minarca/logo1.png |
@@ -336,30 +367,6 @@ the default Minarca web site.
 | --- | --- | --- |
 | minarca-help-url | Define URL where to redirect users| <https://my-company.com/support> |
 
-## Quota Management
-
-Minarca provide user based quota management. This allow you to define fixed
-amount of disk space for each user. If a user backup reach the quota, the
-backup will fail.
-
-This feature might be used by service provider to define the maximum disk space
-allocated to a user based on the price of the service.
-
-Default implementation of users quota support only ZFS storage. But you may
-customize this to fit your file system and deployment by configure the command
-line to be executed.
-
-First, install `minarca-quota-api` on the storage server. This might be the
-same server as Minarca Web Server or a different one depending on your setup.
-
-In Minarca web server configuration file `/etc/minarca/minarca-server.conf`,
-you must define the location of the quota API service to be used to set and
-fetch the disk usage.
-
-| Parameter | Description | Example |
-| --- | --- | --- |
-| minarca-quota-api-url | URL to access `minarca-quota-api` service either. | <http://minarca:secret@localhost:8081/> |
-
 ## Configure Storage
 
 ```{toctree}
@@ -393,5 +400,5 @@ recommanded to change any of these settings.
 | minarca-restricted-to-based-dir | Used to enforce security by limiting the user's home directories to inside `UserBaseDir`. It's highly recommended to keep this feature enabled. (Default: True) | True |
 | minarca-shell | Location of `minarca-shell` used to limit SSH server access. (Default: /opt/minarca-server/minarca-shell) | /opt/minarca-server/minarca-shell |
 | minarca-auth-options | Default SSH auth options. This is used to limit the user's permission on the SSH Server, effectively disabling X11 forwarding, port forwarding and PTY. | default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' |
-| minarca-remote-host | URL defining the remote SSH identity. This value is queried by Minarca Client to link and back up to the server. If not provided, the HTTP URL is used as a base. You may need to change this value if the SSH server is accessible using a different IP address or if not running on port 22. | ssh.example.com:2222 |
+| minarca-remote-host | URL defining the remote SSH identity. This value is queried by Minarca Client to link and back up to the server. If not provided, the HTTP URL is used as a base. You may need to change this value if the SSH server is accessible using a different IP address or if not running on port 22. | backups.example.com:6022 |
 | minarca-remote-host-identity | Location of SSH server identity. This value is queried by Minarca Client to authenticate the server. You may need to change this value if SSH service and the Web service are not running on the same server. (Default: /etc/ssh) | /etc/ssh |

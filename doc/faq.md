@@ -2,7 +2,7 @@
 
 ## Is Minarca compatible with…?
 
-The Minarca client application works with Windows and Linux
+The Minarca client works with Windows and Linux
 operating systems. We recommend the following configuration:
 
 * Windows 10 and 11
@@ -18,75 +18,75 @@ To access your data on the Minarca Web interface, we recommend the following bro
 * Firefox 3+
 * Android devices
 
-## What is Minarca.net SaaS ?
-
-[Minarca.net SaaS](https://www.minarca.net) (Software as a service) allows you to backup your data using Minarca without the trouble of installing Minarca Server. This solution is perfect to Small Business or non-technical customer. You will benefits from Minarca without the burden of maintaining the hardware architecture.
-
-## How do I sign up for Minarca.net SaaS ?
-
-You may subscribe to our [Minarca.net SaaS](https://www.minarca.net) (Software as a service) which allow you to benefit from Minarca without installing a server. To subscribe, you may fill the [subscription form](https://minarca.org/en_CA/contactus) or send an email to [support@ikus-soft.com](mailto:support@ikus-soft.com). We will contact you to finalize your subscription, either by email or phone, depending on your preference.
-
 ## How do I install Minarca Client?
 
 ### 1. Download
 
-You can download the Minarca application and follow the [**installation procedures**](https://ikus-soft.com/en/minarca/download/).
+You can download the Minarca client and follow the [**installation procedures**](https://minarca.org/download).
 
 ![Minarca installation - Accept license agreement.](4terms.png)
 
 ![Minarca installation - Select installation directory.](fenetre-installation.png)
 
-### 2. Subscribe
+### 2. Configure a backup
 
-Enter the username and temporary password assigned to you, and then create a name to link your computer to Minarca.
+Configure a local or online backup destination.
 
 ![Minarca Setup - Sign in with your username and password.](5connect.png)
 
-### 3. Enjoy Minarca
-
- Once the application is installed, you can access the Minarca web interface by clicking on the **View my account online** in the application itself. You will have to sign in again.
+For online backup destination, you need to install Minarca Server.
 
 ## How do I change the automatic backup frequency?
 
 To change the automatic backup frequency in Minarca Data Backup software, you can follow these steps:
 
-1. Open the Minarca application on your computer.
-2. Look for the "Schedule backup" option within the application's interface and click on it. It is located in the top menu or toolbar.
+1. Open the Minarca client on your computer.
+2. Look for the **Backup configuration** option within the client's interface and click on it.
 3. Click on the backup frequency option to modify it. You may have the choice to select from predefined options such as hourly, daily or bi-daily backups.
 
 Your data will be backed up accordingly at the specified intervals.
 
+![Minarca Setup - Sign in with your username and password.](6settings.png)
+
 ## How do I perform a manual backup?
 
-Minarca automatically backs up data according to frequency settings. However, it is possible to manually backup data. To do this, open your Minarca application, and click **Start backup**.
+Minarca automatically backs up data according to frequency settings. However, it is possible to manually backup data. To do this, open your Minarca client, and click **Start Backup Now**.
 
 ## How do I access my data backups?
 
-To access your data backups, you can open your Minarca application and click the icon in the **View my account online** section.
+To access your data backups, you can open your Minarca client and click the icon in top-right corner to show a side pannel. Then click **Browse**.
+
+![Minarca Browse data backup online](7browse.png)
 
 ## How do I select the folders I would like to back up?
 
-The Minarca application lets you select which folders or files you do or do not want to back up. Open your Minarca application and, in the **Select files** section. You can then choose the folders or files you want to back up.
+The Minarca client lets you select which folders or files you do or do not want to back up. Open your Minarca client and, in the **File selection** section. You can then choose the folders or files you want to back up.
+
+![Minarca Data Backup file selection](8patterns.png)
 
 ## There is a folder I would like to back up, but it is not on the list
 
-When you access **Select files**, there is a predefined list of files. However, it is possible to customize your choice by adding folders. Click **Add Folder**, and select one of your existing folders. Follow the same steps to add only one file by clicking **Add File**.
+When you access **File selection**, there is a predefined list of files and folders included. However, it is possible to customize your choice by adding folders. Click **Add folder**, and select one of your existing folders. Follow the same steps to add only one file by clicking **Add file**.
 
 ## How do I restore one or more file(s)?
 
-You can restore a complete backup or specific files only by accessing your data using the web interface. In the **Repository** section, choose the device you would like to back up.
+You may restore your data using the Minarca Client or the web interface.
 
-![Minarca Web Interface - Repository list.](10acceuil.png)
+**Restore using Minarca Client**
 
-**For a complete backup:** select the **Restore Directory** tab, and download the desired version of the backup.
+You can restore your data using the Minarca Client by cliking on **Restore backup**. You will then be prompted to select between a full restore or a custom restore.
 
-**To restore a directory:** stay in the **Browse Directory** tab, and select the file you want to restore. Once the file has been selected, go to the **Restore Directory** tab, and download. Only the selected file will be downloaded.
+![Minarca Data Backup restore options](9restore.png)
 
-![Minarca Web Interface - Restore a folder.](12repositories.png)
+**Restore using Web interface**
+
+You can also restore your data from any devices using the web interface. You need to login to the web interface. If you know the URL, simply browser directly to it. Otherwise, you can open your Minarca client and click the icon in top-right corner to show a side pannel. Then click **Browse**.
+
+![Minarca Data Backup restore data using web interface](11restore.png)
 
 ## How do I link a second device to my account?
 
-With Minarca, you can link several devices to the same account. Simply install the application on your selected devices, and give each device its own name. When you connect to the web interface, you will have access to all your devices in the **Repository** section.
+With Minarca, you can link several devices to the same account. Simply install the client on your other device, and give each device its own name. When you connect to the web interface, you will have access to all your devices in the **Repository** section.
 
 ## How do I delete a backup from one of my devices?
 
@@ -94,13 +94,15 @@ It is possible to completely delete one of your device backups. In the **Reposit
 
 **Warning! The deletion of a device backup is permanent!**
 
-## There is a new version of the Minarca application online. How do I get the update?
+## There is a new version of the Minarca client online. How do I get the update?
 
-Simply reinstall the application to get the new version online.
+Simply reinstall the client to get the new version online.
+
+[Download Minarca](https://minarca.org/download)
 
 ## How do I change my password?
 
-Change your password in the *User Profile* Top-Right corner in the web application. For security reasons, we recommend that you choose a secure password. You may also enabled multi-factor authentication for better security.
+Change your password in the **User Profile** Top-Right corner in the web interface. For security reasons, we recommend that you choose a secure password. You may also enabled multi-factor authentication for better security.
 
 ![Minarca Web Interfaces - User profile to change your password.](15usersettings.png)
 
@@ -110,7 +112,7 @@ It's not possible for you to recover you password. You must contact your system 
 
 ## How do I change my email address?
 
-You can change your email address in the *User Profile* Top-Right corner in web application.
+You can change your email address in the **User Profile** Top-Right corner in web interface.
 
 ## Can I change my username?
 
@@ -119,10 +121,6 @@ Your username cannot be changed.
 ## Can I change the names of my repository?
 
 The names of your repository cannot be changed by the user. You must ask a system administrator to rename a repository. To do so, the system administrator could manually rename the folder directly on the server. Any configuration settings such as notification preference defined on the repository will be lost.
-
-## How much space do my backups use?
-
-As soon as you connect to the Minarca web interface, you can see the space used and the space available in the **Repository** section.
 
 ## Why are rdiff-backup packages downloaded from custom repository when rdiff-backup is in Debian?
 
