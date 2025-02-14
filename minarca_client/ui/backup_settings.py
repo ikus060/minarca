@@ -75,7 +75,7 @@ Builder.load_string(
                     text: _("Run whether the user's session is open or not")
                     display: root.show_run_if_logged_out
                     active: root.run_if_logged_out
-                    on_active: root.toggle_run_if_logged_out()
+                    on_active: root.run_if_logged_out = self.active
 
                 CLabel:
                     text: _('Excluded Days of the Week')
@@ -438,19 +438,23 @@ class BackupSettings(MDBoxLayout):
         # Prompt in a different thread.
         self._forget_task = asyncio.create_task(_forget_instance())
 
-    def toggle_run_if_logged_out(self):
+    def on_run_if_logged_out(self, widget, value):
         """
         Called to toggle the "run_if_logged_out" settings.
         """
         # This is only applicable to Windows scheduler.
         if not IS_WINDOWS:
             return
-        value = self.backup.scheduler.run_if_logged_out
+
+        # Do nothing is values are the same
+        current_value = self.backup.scheduler.run_if_logged_out
+        if value == current_value:
+            return
 
         async def _run_if_logged_out():
             try:
-                if value:
-                    # If disable, re-schedule the taks with default settings.
+                if not value:
+                    # If disable, re-schedule the tasks with default settings.
                     self.backup.schedule_job()
                 else:
                     # If enabled, prompt user for password.
@@ -468,6 +472,7 @@ class BackupSettings(MDBoxLayout):
                     message=message,
                     detail=detail,
                 )
-                self.run_if_logged_out = self.backup.scheduler.run_if_logged_out
+            finally:
+                self.run_if_logged_out = bool(self.backup.scheduler.run_if_logged_out)
 
         self._run_if_logged_out_task = asyncio.create_task(_run_if_logged_out())
