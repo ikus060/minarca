@@ -12,6 +12,12 @@ import os
 from minarca_client.core.config import Datetime, KeyValueConfigFile
 
 
+def _bool(x):
+    if isinstance(x, bool):
+        return x
+    return str(x).lower() in [True, 'true', 'yes', '1']
+
+
 def list_from_string(value):
     """
     Convert string "[5, 6]" to a real python array.
@@ -38,7 +44,7 @@ class Settings(KeyValueConfigFile):
         ('remoteurl', str, None),
         ('remoterole', int, None),
         ('schedule', int, DAILY),
-        ('configured', lambda x: x in [True, 'true', 'True', '1'], False),
+        ('configured', _bool, False),
         ('pause_until', lambda x: Datetime(x) if x else None, None),
         ('diskid', str, None),
         ('maxage', int, None),
@@ -55,6 +61,9 @@ class Settings(KeyValueConfigFile):
         ('localuuid', str, None),
         ('localrelpath', str, None),
         ('localcaption', str, None),
+        ('pre_hook_command', str, None),
+        ('post_hook_command', str, None),
+        ('ignore_hook_errors', _bool, False),
     ]
 
     @property

@@ -1189,3 +1189,28 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     def test_sh_quote(self):
         self.assertEqual(_sh_quote(['a', 'b', 'c']), "a b c")
         self.assertEqual(_sh_quote(['path with space', 'b', 'c']), '"path with space" b c')
+
+    async def test_pre_post_command(self):
+        # Given a backup with local destination
+        tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        pre_file = os.path.join(self.tmp.name, 'foo.txt')
+        post_file = os.path.join(self.tmp.name, 'bar.txt')
+        try:
+            # Given backup with pre/post hook command
+            self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+            self.instance.settings.pre_hook_command = "echo foo > %s" % pre_file
+            self.instance.settings.post_hook_command = "echo bar > %s" % post_file
+            self.instance.settings.ignore_hook_errors = True
+            self.instance.settings.save()
+            # Given a backup with patterns
+            patterns = self.instance.patterns
+            patterns.clear()
+            patterns.append(Pattern(True, self.tmp.name, None))
+            patterns.save()
+            # When running backup
+            await self.instance.backup(force=True)
+            # Then pre/post command was executed
+            self.assertTrue(os.path.isfile(pre_file))
+            self.assertTrue(os.path.isfile(post_file))
+        finally:
+            shutil.rmtree(tempdir, onerror=remove_readonly)
