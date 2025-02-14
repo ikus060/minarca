@@ -2,7 +2,6 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import asyncio
-import contextlib
 import ctypes
 import functools
 import locale
@@ -15,6 +14,8 @@ import win32cred
 from win32com.shell import shell, shellcon
 from win32con import OFN_ALLOWMULTISELECT, OFN_EXPLORER
 from win32gui import GetOpenFileNameW, PyGetBufferAddressAndLen, SendMessage
+
+from ._common import disable
 
 # Icons
 PWSTR = ctypes.c_wchar_p
@@ -57,21 +58,6 @@ def task_dialog(owner, title, main_instr, content, buttons, icon, inst=None):
     return res.value
 
 
-@contextlib.contextmanager
-def _disable(parent):
-    try:
-        # Place Window on top of parent
-        if parent and parent.get_root_window():
-            # Disable the Window
-            window = parent.get_root_window()
-            window.children[0].disabled = True
-        yield
-    finally:
-        # Restore state of parent window
-        if parent and parent.get_root_window():
-            window.children[0].disabled = False
-
-
 async def _message_dialog(parent, title, message, detail, icon, buttons, success_result=None):
     owner = None
     if parent and parent.get_root_window():
@@ -85,7 +71,7 @@ async def _message_dialog(parent, title, message, detail, icon, buttons, success
         buttons=buttons,
         icon=icon,
     )
-    with _disable(parent):
+    with disable(parent):
         # Show the dialog and wait for user input
         response = await asyncio.get_event_loop().run_in_executor(None, func)
     # Return response.
@@ -137,7 +123,7 @@ async def warning_dialog(parent, title, message, detail=None):
     )
 
 
-async def file_dialog(parent, title, filename=None, initial_directory=None, multiple_select=False):
+async def file_dialog(parent, title, initial_directory=None, multiple_select=False):
     if initial_directory is None:
         initial_directory = os.getcwd()  # noqa: PTH109
 
@@ -152,7 +138,7 @@ async def file_dialog(parent, title, filename=None, initial_directory=None, mult
         GetOpenFileNameW,
         hwndOwner=owner,
         InitialDir=str(initial_directory),
-        File=filename,
+        File=None,
         Flags=flags,
         Title=title,
         MaxFile=2**16,
@@ -160,7 +146,7 @@ async def file_dialog(parent, title, filename=None, initial_directory=None, mult
         DefExt=None,
     )
 
-    with _disable(parent):
+    with disable(parent):
         try:
             file_path, _, _ = await asyncio.get_event_loop().run_in_executor(None, func)
         except pywintypes.error as error:
@@ -208,7 +194,7 @@ async def folder_dialog(
         initial_directory,  # 'data' param for the callback
     )
 
-    with _disable(parent):
+    with disable(parent):
         try:
             pidl, _, _ = await asyncio.get_event_loop().run_in_executor(None, func)
         except pywintypes.error as error:
@@ -239,7 +225,7 @@ def username_password_dialog(parent, title, message, username=None):
         "MessageText": message,
         "CaptionText": title,
     }
-    with _disable(parent):
+    with disable(parent):
         # When excuted in secondary thread, it's not working.
         target, pwd, _ = win32cred.CredUIPromptForCredentials(
             TargetName=win32api.GetComputerName(),

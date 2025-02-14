@@ -23,7 +23,7 @@ bdist-client:linux:
     expire_in: 1 day
   before_script:
   - apt update
-  - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron zenity
+  - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron zenity kdialog
   - pip3 install tox
   # Required Python 3.10 for KivyMD
   image: python:3.10-buster
