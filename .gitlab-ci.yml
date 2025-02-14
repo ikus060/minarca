@@ -18,6 +18,7 @@ bdist-client:linux:
     paths:
     - "./dist/minarca-client_*.tar.gz"
     - "./dist/minarca-client_*.deb"
+    - "./dist/minarca-client-gui_*.deb"
     - "./coverage*.xml"
     - "./xunit*.xml"
     expire_in: 1 day
@@ -92,7 +93,7 @@ doc:
   - tox -e doc
   stage: doc
 
-upload:deb:
+upload:apt:
   image: python:3.10
   needs:
   - bdist-client:linux
@@ -107,10 +108,14 @@ upload:deb:
     else
       APT_URL="https://nexus.ikus-soft.com/repository/apt-dev-${DIST}/"
     fi
-    export FILE=$(ls -1 ./dist/minarca-client_*_amd64.deb)
-    curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$FILE" "$APT_URL"
-    sleep 2
-    curl --fail ${APT_URL}/dists/$DIST/main/binary-amd64/Packages | grep "$(basename $FILE)"
+    find ./dist/minarca-client_*_amd64.deb ./dist/minarca-client-gui_*_amd64.deb -type f | while read -r FILE
+    do
+      # Publish to nexus
+      curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$FILE" "$APT_URL"
+      sleep 2
+      # Because Nexus server fail, make sure the file is accessible.
+      curl --fail ${APT_URL}/dists/$DIST/main/binary-amd64/Packages | grep "$(basename $FILE)"
+    done
   stage: upload
 
 .upload-file: &upload-file
@@ -119,11 +124,16 @@ upload:deb:
     set -x
     set -e
     pip install setuptools_scm
-    # publish to nexus
     export VERSION=$(python3 -m setuptools_scm)
-    export FILE=$(ls -1d $FILENAME)
-    cd $(dirname $FILE)
-    find $(basename $FILE) -type f -exec curl --fail -u "$NEXUS_USR:$NEXUS_PWD" --upload-file "{}" https://nexus.ikus-soft.com/repository/archive/minarca/$VERSION/{} \;
+    cd "./dist"
+    find $FILENAME -type f | while read -r FILE
+    do
+      # Publish to nexus
+      curl --fail -u "$NEXUS_USR:$NEXUS_PWD" --upload-file "$FILE" "https://nexus.ikus-soft.com/repository/archive/minarca/$VERSION/$FILE"
+      sleep 2
+      # Because Nexus server fail, make sure the file is accessible.
+      curl --fail "https://nexus.ikus-soft.com/service/rest/repository/browse/archive/minarca/$VERSION/$(dirname $FILE)/" | grep "$(basename $FILE)"
+    done
   stage: upload
 
 upload:linux:
@@ -131,21 +141,28 @@ upload:linux:
   needs:
   - bdist-client:linux
   variables:
-    FILENAME: ./dist/minarca-client*.tar.gz
+    FILENAME: ./minarca-client*.tar.gz
     
 upload:macos:
   <<: *upload-file
   needs:
   - bdist-client:macos
   variables:
-    FILENAME: ./dist/minarca-client*.dmg
+    FILENAME: ./minarca-client*.dmg
 
 upload:win32:
   <<: *upload-file
   needs:
   - bdist-client:win32
   variables:
-    FILENAME: ./dist/minarca-client*.exe
+    FILENAME: ./minarca-client*.exe
+
+upload:deb:
+  <<: *upload-file
+  needs:
+  - bdist-client:linux
+  variables:
+    FILENAME: ./minarca-client*.deb
 
 upload:doc:
   <<: *upload-file
@@ -155,7 +172,7 @@ upload:doc:
   needs:
   - doc
   variables:
-    FILENAME: doc
+    FILENAME: ./doc
 
 upload:sonar:
   allow_failure: true
