@@ -414,6 +414,12 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         # Then backup could start
         self.assertTrue(self.instance.is_backup_time())
 
+    def test_is_backup_time_with_manual(self):
+        # Given a backup with Manual schedule.
+        self.instance.settings.schedule = -1
+        # Then backup should never start
+        self.assertFalse(self.instance.is_backup_time())
+
     def test_is_running_no_pid(self):
         status = self.instance.status
         status.lastresult = 'SUCCESS'
