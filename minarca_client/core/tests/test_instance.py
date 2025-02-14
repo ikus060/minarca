@@ -641,6 +641,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         config.save()
         await self.instance.test_connection()
         # Validate
+        nul = "" if IS_WINDOWS else " -F /dev/null"
         mock_rdiff_backup.assert_called_once_with(
             mock.ANY,
             'rdiff-backup',
@@ -649,7 +650,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             '--remote-schema',
             MATCH(
                 _ssh
-                + " -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile=*known_hosts? -oIdentitiesOnly=yes -i *id_rsa? %s 'minarca/* rdiff-backup/2.0.0 (*)'"
+                + f"{nul} -oBatchMode=yes -oPreferredAuthentications=publickey -oUserKnownHostsFile=*known_hosts? -oIdentitiesOnly=yes -i *id_rsa? %s 'minarca/* rdiff-backup/2.0.0 (*)'"
             ),
             'test',
             'minarca@remotehost::.',
@@ -683,11 +684,12 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         # Then when generating the remote schema
         value = self.instance._remote_schema()
         # Then the port is defined in the value
+        nul = "" if IS_WINDOWS else " -F /dev/null"
         self.assertEqual(
             value,
             MATCH(
                 _ssh
-                + " -oBatchMode=yes -oPreferredAuthentications=publickey -p 2222 -oUserKnownHostsFile=*known_hosts? -oIdentitiesOnly=yes -i *id_rsa? %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
+                + f"{nul} -oBatchMode=yes -oPreferredAuthentications=publickey -p 2222 -oUserKnownHostsFile=*known_hosts? -oIdentitiesOnly=yes -i *id_rsa? %s 'minarca/DEV rdiff-backup/2.0.0 (os info)'"
             ),
         )
 
