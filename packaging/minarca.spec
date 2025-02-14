@@ -65,6 +65,9 @@ if platform.system() == "Windows":
 
 extras = get_deps_minimal(video=None, audio=None, spelling=None, camera=None)
 
+# Make sure to collect all Lazy loaded view
+extras['hiddenimports'].extend(collect_submodules("minarca_client"))
+
 # Make sure to collect all the files from rdiffbackup (namely the actions)
 extras['hiddenimports'].extend(collect_submodules("rdiffbackup"))
 

@@ -7,7 +7,10 @@ from unittest import mock
 from minarca_client.core.disk import LocationInfo, get_location_info
 from minarca_client.core.instance import BackupInstance
 from minarca_client.core.tests.test_instance import remove_readonly
-from minarca_client.ui.app import BackupConnectionLocal, BackupCreate, BackupPatterns, DashboardView
+from minarca_client.ui.backup_connection_local import BackupConnectionLocal
+from minarca_client.ui.backup_create import BackupCreate
+from minarca_client.ui.backup_patterns import BackupPatterns
+from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 DISK_INFO = LocationInfo(
@@ -23,7 +26,7 @@ DISK_INFO = LocationInfo(
 
 
 class BackupConnectionLocalTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupConnectionLocal'
+    ACTIVE_VIEW = 'backup_connection_local.BackupConnectionLocal'
 
     async def test_backup_connection_local(self):
         # Then the view get displayed.

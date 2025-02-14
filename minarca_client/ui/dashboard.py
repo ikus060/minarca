@@ -89,4 +89,4 @@ class DashboardView(MDBoxLayout):
             logger.exception('problem occur while watching backup instances')
 
     def create_backup(self):
-        App.get_running_app().set_active_view('BackupCreate')
+        App.get_running_app().set_active_view('backup_create.BackupCreate')

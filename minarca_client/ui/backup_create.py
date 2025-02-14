@@ -151,10 +151,10 @@ class BackupCreate(CScrollView):
         self.backup_exists = len(backup) > 0
 
     def _create_remote(self):
-        App.get_running_app().set_active_view('BackupConnectionRemote', create=True)
+        App.get_running_app().set_active_view('backup_connection_remote.BackupConnectionRemote', create=True)
 
     def _create_local(self):
-        App.get_running_app().set_active_view('BackupConnectionLocal', create=True)
+        App.get_running_app().set_active_view('backup_connection_local.BackupConnectionLocal', create=True)
 
     def cancel(self):
-        App.get_running_app().set_active_view('DashboardView')
+        App.get_running_app().set_active_view('dashboard.DashboardView')

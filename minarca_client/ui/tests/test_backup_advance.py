@@ -1,10 +1,11 @@
 from minarca_client.core.backup import BackupInstance
-from minarca_client.ui.app import BackupAdvanceSettings, DashboardView
+from minarca_client.ui.backup_advance import BackupAdvanceSettings
+from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 
 class BackupAdvanceSettingsTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupAdvanceSettings'
+    ACTIVE_VIEW = 'backup_advance.BackupAdvanceSettings'
 
     def setUp(self):
         super().setUp()

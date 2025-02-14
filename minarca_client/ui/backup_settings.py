@@ -334,10 +334,10 @@ class BackupSettings(MDBoxLayout):
     def cancel(self):
         if self.create:
             # In create mode, return backup to pattern view.
-            App.get_running_app().set_active_view('BackupPatterns', instance=self.instance, create=True)
+            App.get_running_app().set_active_view('backup_patterns.BackupPatterns', instance=self.instance, create=True)
         else:
             # Otherwise, go to dashboard view.
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')
 
     def save(self):
         if self.working:
@@ -367,7 +367,7 @@ class BackupSettings(MDBoxLayout):
             # Make sure a task scheduler is created at this point.
             self.backup.schedule_job(replace=False)
             # Redirect user to dashboard.
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')
 
         except RemoteRepositoryNotFound as e:
             logger.warning('fail to save settings remotely', exc_info=1)
@@ -390,7 +390,7 @@ class BackupSettings(MDBoxLayout):
                 # Finnaly save the changes.
                 t.save()
                 # Redirect user to dashboard.
-                App.get_running_app().set_active_view('DashboardView')
+                App.get_running_app().set_active_view('dashboard.DashboardView')
         except TimeoutError:
             logger.warning('fail to save settings remotely', exc_info=1)
             await warning_dialog(
@@ -429,7 +429,7 @@ class BackupSettings(MDBoxLayout):
                 # Operation cancel by user.
                 return
             self.instance.forget()
-            App.get_running_app().set_active_view('DashboardView')
+            App.get_running_app().set_active_view('dashboard.DashboardView')
 
         # Prompt in a different thread.
         self._forget_task = asyncio.create_task(_forget_instance())

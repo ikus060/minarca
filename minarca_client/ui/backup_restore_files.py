@@ -295,7 +295,9 @@ class BackupRestoreFiles(MDBoxLayout):
 
     def cancel(self):
         # Go back to dashboard
-        App.get_running_app().set_active_view('BackupRestoreDate', instance=self.instance, increment=self.increment)
+        App.get_running_app().set_active_view(
+            'backup_restore_date.BackupRestoreDate', instance=self.instance, increment=self.increment
+        )
 
     def save(self):
 
@@ -327,6 +329,6 @@ class BackupRestoreFiles(MDBoxLayout):
                 destination=folder,
             )
             # Go to Logs
-            App.get_running_app().set_active_view('BackupLogs', instance=self.instance)
+            App.get_running_app().set_active_view('backup_logs.BackupLogs', instance=self.instance)
 
         self._select_custom_location_task = asyncio.create_task(_save())

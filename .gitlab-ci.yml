@@ -187,12 +187,15 @@ e2e-test:deb:
       DIST: [bullseye, bookworm, jammy, noble, oracular]
   script:
     - apt update
+    - apt install -y xvfb
     - apt install -y ./dist/minarca-client_*_amd64.deb
     # Smoke test
     - minarca --version
     - /opt/minarca/minarcaw --version
     # Check translation
     - LANGUAGE="fr" minarca --help | grep 'démarrer une sauvegarde'
+    # Check GUI
+    - xvfb-run minarca -d ui --test
     # Check backup
     - minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-${DIST}-${CI_JOB_ID}"
     - minarca -d status
@@ -209,7 +212,7 @@ e2e-test:linux:
   image: buildpack-deps:jammy
   script:
     - apt update
-    - apt install -y cron openssh-client locales locales-all
+    - apt install -y cron openssh-client locales locales-all xvfb
     - tar -zxvf ./dist/minarca-client*.tar.gz --strip 1
     # Smoke test
     - ./minarca --version
@@ -218,6 +221,8 @@ e2e-test:linux:
     - LANGUAGE=fr_CA:fr LANG=fr_CA.UTF-8 ./minarca --help | grep 'démarrer une sauvegarde'
     # Test with space
     - export MINARCA_CONFIG_HOME="/tmp/My Folder With Space/Minarca/"
+    # Check GUI
+    - xvfb-run ./minarca -d ui --test
     # Check backup
     - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
     - ./minarca -d include /etc /var /home
@@ -246,6 +251,8 @@ e2e-test:macos:
   - defaults write -g AppleLocale fr_CA
   - /Applications/Minarca.app/Contents/MacOS/minarca --help | grep 'démarrer une sauvegarde'
   - defaults write -g AppleLocale en_CA
+  # Check GUI
+  - /Applications/Minarca.app/Contents/MacOS/minarca -d ui --test
   # Check backup
   - /Applications/Minarca.app/Contents/MacOS/minarca -d forget --force
   - /Applications/Minarca.app/Contents/MacOS/minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-macos-${CI_JOB_ID}"
@@ -257,6 +264,8 @@ e2e-test:macos:
   - macos
   variables:
     LC_ALL: "en_US.UTF-8"
+    # Required because our macos cannot run opengl.
+    KIVY_GL_BACKEND: mock
 
 e2e-test:win32:
   allow_failure: True
@@ -277,6 +286,8 @@ e2e-test:win32:
   - $Env:LANGUAGE="en"
   # Test with space 
   - $Env:MINARCA_CONFIG_HOME="$Env:APPDATA/My Folder With Space/Minarca/"
+  # Check GUI
+  - minarca.exe -d ui --test
   # Check backup
   - minarca.exe -d forget --force
   - minarca.exe -d link --force --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-win32-${CI_JOB_ID}"

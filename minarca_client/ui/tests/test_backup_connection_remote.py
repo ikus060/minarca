@@ -1,12 +1,15 @@
 from unittest import mock
 
 from minarca_client.core.instance import BackupInstance
-from minarca_client.ui.app import BackupConnectionRemote, BackupCreate, BackupPatterns, DashboardView
+from minarca_client.ui.backup_connection_remote import BackupConnectionRemote
+from minarca_client.ui.backup_create import BackupCreate
+from minarca_client.ui.backup_patterns import BackupPatterns
+from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 
 class BackupConnectionRemoteTest(BaseAppTest):
-    ACTIVE_VIEW = 'BackupConnectionRemote'
+    ACTIVE_VIEW = 'backup_connection_remote.BackupConnectionRemote'
     ACTIVE_VIEW_KWARGS = {'create': True}
 
     async def test_backup_connection_remote(self):

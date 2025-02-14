@@ -352,4 +352,4 @@ class BackupLogs(MDBoxLayout):
 
     def cancel(self):
         # Go back to dashboard
-        App.get_running_app().set_active_view('DashboardView')
+        App.get_running_app().set_active_view('dashboard.DashboardView')
