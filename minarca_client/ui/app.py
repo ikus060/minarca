@@ -18,10 +18,8 @@ from .backup_connection_remote import BackupConnectionRemote  # noqa
 from .backup_create import BackupCreate
 from .backup_logs import BackupLogs  # noqa
 from .backup_patterns import BackupPatterns  # noqa
-from .backup_restore import BackupRestore  # noqa
-from .backup_restore_custom import BackupRestoreCustom  # noqa
 from .backup_restore_date import BackupRestoreDate  # noqa
-from .backup_restore_full import BackupRestoreFull  # noqa
+from .backup_restore_files import BackupRestoreFiles  # noqa
 from .backup_settings import BackupSettings  # noqa
 from .dashboard import DashboardView
 from .side_pannel import SidePanel  # noqa

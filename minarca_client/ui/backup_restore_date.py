@@ -149,16 +149,14 @@ class BackupRestoreDate(MDBoxLayout):
 
     _fetch_increment_task = None
 
-    def __init__(self, backup=None, instance=None, increment=None, restore_type=None):
+    def __init__(self, backup=None, instance=None, increment=None):
         assert backup
         assert instance and isinstance(instance, BackupInstance)
         assert increment is None or isinstance(increment, datetime.datetime)
-        assert restore_type in ['full', 'custom']
         # Initialise the state.
         self.instance = instance
         self.is_remote = self.instance.is_remote()
         self.selected_increment = increment
-        self.restore_type = restore_type
         # Create the view
         super().__init__()
         # Sync calendar with selected day & selected increment.
@@ -234,18 +232,13 @@ class BackupRestoreDate(MDBoxLayout):
 
     def cancel(self):
         # Go back to dashboard
-        App.get_running_app().set_active_view('BackupRestore', instance=self.instance)
+        App.get_running_app().set_active_view('DashboardView')
 
     def save(self):
         if not self.selected_increment:
             # Should never get here.
             return
         # Next step, select files
-        if self.restore_type == 'full':
-            App.get_running_app().set_active_view(
-                'BackupRestoreFull', instance=self.instance, increment=self.selected_increment
-            )
-        else:
-            App.get_running_app().set_active_view(
-                'BackupRestoreCustom', instance=self.instance, increment=self.selected_increment
-            )
+        App.get_running_app().set_active_view(
+            'BackupRestoreFiles', instance=self.instance, increment=self.selected_increment
+        )

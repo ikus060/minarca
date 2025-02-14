@@ -1,7 +1,7 @@
 import asyncio
 
 from minarca_client.core.backup import BackupInstance
-from minarca_client.ui.app import BackupRestore, BackupRestoreDate
+from minarca_client.ui.app import BackupRestoreDate, DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 
@@ -18,7 +18,7 @@ class BackupRestoreDateTest(BaseAppTest):
         self.instance.settings.username = 'username'
         self.instance.settings.configured = True
         self.instance.settings.save()
-        self.ACTIVE_VIEW_KWARGS = {'instance': instance, 'restore_type': 'full'}
+        self.ACTIVE_VIEW_KWARGS = {'instance': instance}
 
     async def test_view(self):
         # Then the view get displayed.
@@ -31,7 +31,7 @@ class BackupRestoreDateTest(BaseAppTest):
         btn_cancel.dispatch('on_release')
         await asyncio.sleep(0)
         # Then view is updated
-        self.assertIsInstance(self.view, BackupRestore)
+        self.assertIsInstance(self.view, DashboardView)
 
     async def test_disable(self):
         # Given a view.

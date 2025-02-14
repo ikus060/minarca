@@ -83,7 +83,7 @@ class Datetime:
             return Datetime(epoch_ms=self.epoch_ms + (other.total_seconds() * 1000))
         raise ValueError()
 
-    def strftime(self, fmt):
+    def strftime(self, fmt='%Y-%m-%dT%H:%M:%S%z'):
         return time.strftime(fmt, time.localtime(self.epoch_ms / 1000))
 
 
