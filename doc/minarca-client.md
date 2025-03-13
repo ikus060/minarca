@@ -54,23 +54,9 @@ If you get the following, go in your MacOS **System Settings** --> **Privacy & S
 
 ## Installation on Ubuntu or Debian
 
-On a Ubuntu or Debian workstation, download the appropriate installer.
+On a Debian or Ubuntu workstation, download the appropriate installer.
 
-*Ubuntu*
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-jammy-latest.deb"><img alt="Minarca Client for Ubuntu Jammy" src="https://img.shields.io/badge/Ubuntu-Jammy-blue?&logo=ubuntu&style=for-the-badge"></a>
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-mantic-latest.deb"><img alt="Minarca Client for Ubuntu Mantic" src="https://img.shields.io/badge/Ubuntu-Mantic-blue?&logo=ubuntu&style=for-the-badge"></a>
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-noble-latest.deb"><img alt="Minarca Client for Ubuntu Noble" src="https://img.shields.io/badge/Ubuntu-Noble-blue?&logo=ubuntu&style=for-the-badge"></a>
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-oracular-latest.deb"><img alt="Minarca Client for Ubuntu Oracular" src="https://img.shields.io/badge/Ubuntu-Oracular-blue?&logo=ubuntu&style=for-the-badge"></a>
-
-*Debian*
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-bullseye-latest.deb"><img alt="Minarca Client for Debian Bullseye" src="https://img.shields.io/badge/Debian-Bullseye-blue?&logo=debian&style=for-the-badge"></a>
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-bookworm-latest.deb"><img alt="Minarca Client for Debian Bookworm" src="https://img.shields.io/badge/Debian-Bookworm-blue?&logo=debian&style=for-the-badge"></a>
+<a href="https://ikus-soft.com/archive/minarca/minarca-client-latest.deb"><img alt="Minarca Client for Ubuntu/Debian (.deb)" src="https://img.shields.io/badge/Debian-Minarca-blue?&logo=debian&style=for-the-badge"></a>
 
 On Debian workstation, it's preferable to install the packages using Gdebi.
 
