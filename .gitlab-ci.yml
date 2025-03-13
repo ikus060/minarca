@@ -100,7 +100,7 @@ upload:apt:
   - bdist-client:linux
   parallel:
     matrix:
-    - DIST: [bullseye, bookworm, jammy, noble, oracular]
+    - DIST: [bullseye, bookworm, trixie, jammy, noble, oracular]
   script: |
     set -e
     set -x
@@ -202,7 +202,7 @@ e2e-test:deb:
   parallel:
     matrix:
     - TARGET: minarca-client
-      DIST: [bullseye, bookworm, jammy, noble, oracular]
+      DIST: [bullseye, bookworm, trixie, jammy, noble, oracular]
   script:
     - apt update
     - apt install -y xvfb

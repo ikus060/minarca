@@ -159,6 +159,7 @@ The Minarca website is <https://minarca.org/>.
 - Lazy load the view to improve loading speed on application startup
 - Define error code for each exceptions
 - Only install 'release' APT repo
+- Add support for Debian Trixie
 
 ## 6.0.3 (2024-11-27)
 

@@ -13,6 +13,7 @@ restriction. You are limited to the following operating system.
   * MacOS BigSur (Intel)
   * Debian Bullseye (64bit)
   * Debian Bookworm (64bit)
+  * Debian Trixie (64bit)
   * Ubuntu Jammy 22.04 LTS (64bit)
   * Ubuntu Lunar 23.04 (64bit)
   * Ubuntu Noble 24.04 LTS (64bit)
