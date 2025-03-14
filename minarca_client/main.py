@@ -2,12 +2,13 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import argparse
-import asyncio
+import trio
 import logging
 import logging.handlers
 import signal
 import sys
 from pathlib import Path
+import functools
 
 from minarca_client import __version__
 from minarca_client.core import Backup, InstanceId
@@ -69,7 +70,7 @@ def _backup(force, instance_id):
     try:
         for instance in backup[instance_id]:
             try:
-                asyncio.run(instance.backup(force=force))
+                trio.run(instance.backup, force)
             except NotScheduleError as e:
                 # If one backup is not schedule to run, continue with next backup.
                 logging.info("%s: %s" % (instance.log_id, e))
@@ -102,7 +103,6 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
     """
     Start the configuration process in command line.
     """
-    import functools
     import getpass
 
     from minarca_client.core.disk import get_location_info
@@ -162,12 +162,12 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
     # Start linking process.
     try:
         try:
-            asyncio.run(configure_func())
+            trio.run(configure_func)
             print(_('Linked successfully'))
         except RepositoryNameExistsError as e:
             print(str(e))
             if _prompt_yes_no(_('Do you want to replace the existing repository? (Yes/No): ')):
-                asyncio.run(configure_func(force=True))
+                trio.run(configure_func, True)
                 print(_('Linked successfully'))
             else:
                 sys.exit(e.error_code)
@@ -340,7 +340,8 @@ def _restore(restore_time, force, paths, instance_id, destination):
             _abort()
     # Execute restore operation.
     try:
-        asyncio.run(instance.restore(restore_time=restore_time, paths=paths, destination=destination))
+        func = functools.partial(instance.restore, restore_time=restore_time, paths=paths, destination=destination)
+        trio.run(func)
     except BackupError as e:
         # Print message to stdout and log file.
         logging.error(str(e))
@@ -423,7 +424,7 @@ def _status(instance_id):
             status = instance.status
             settings = instance.settings
             try:
-                asyncio.run(instance.test_connection())
+                trio.run(instance.test_connection)
                 connected = True
             except BackupError:
                 connected = False
@@ -488,7 +489,7 @@ def _ui(test=False):
                     'If the problem persists, check the logs with your administrator or try reinstalling the application.'
                 ),
             )
-            asyncio.run(dlg)
+            trio.run(dlg)
         sys.exit(KivyError.error_code)
 
     # Start event loop with backup instance.

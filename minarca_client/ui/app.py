@@ -1,7 +1,7 @@
 # Copyleft (C) 2023 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-import asyncio
+import trio
 import concurrent.futures
 import importlib
 import logging
@@ -77,16 +77,18 @@ class MinarcaApp(MDApp, ExceptionHandler):
         self.theme_cls = MinarcaTheme()
 
     def mainloop(self):
-        # Start the main even loop.
-        loop = asyncio.get_event_loop()
-        # Configure default executor.
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=2, thread_name_prefix='AsyncioExecutor')
-        loop.set_default_executor(executor)
-        # Configure exception handling.
-        ExceptionManager.add_handler(self)
-        # Start application event loop.
-        loop.run_until_complete(self.async_run(async_lib='asyncio'))
-        loop.close()
+        
+        async def _loop():
+            async with trio.open_nursery() as nursery:
+
+                async def run_wrapper():
+                    await self.async_run(async_lib='trio')
+                    logger.info('App done')
+                    nursery.cancel_scope.cancel()
+                
+                nursery.start_soon(run_wrapper)
+
+        trio.run(_loop)
 
     def load_kv(self, filename=None):
         """Disable default '*.kv' loading"""

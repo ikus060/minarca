@@ -1,7 +1,7 @@
 # Copyleft (C) 2023 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-import asyncio
+import trio
 import logging
 
 from kivy.lang import Builder
@@ -173,6 +173,8 @@ class AboutMenu(MDNavigationDrawer):
         self.latest_check = LatestCheck()
         super().__init__(*args, **kwargs)
         # Trigger check for update on startup.
+        self.nursery = trio.open_nursery()
+        self.nursery.start
         self._check_update_task = asyncio.create_task(self._check_latest_version_task())
 
     def on_parent(self, widget, value):
