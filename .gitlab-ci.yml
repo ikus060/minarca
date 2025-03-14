@@ -19,7 +19,6 @@ bdist-client:linux:
     paths:
     - "./dist/minarca-client_*.tar.gz"
     - "./dist/minarca-client_*.deb"
-    - "./dist/minarca-client-gui_*.deb"
     - "./coverage*.xml"
     - "./xunit*.xml"
     expire_in: 1 day
@@ -109,7 +108,7 @@ upload:apt:
     else
       APT_URL="https://nexus.ikus-soft.com/repository/apt-dev-${DIST}/"
     fi
-    find ./dist/minarca-client_*_amd64.deb ./dist/minarca-client-gui_*_amd64.deb -type f | while read -r FILE
+    find ./dist/minarca-client_*_amd64.deb -type f | while read -r FILE
     do
       # Publish to nexus
       curl --fail -u "$NEXUS_USR:$NEXUS_PWD" -H "Content-Type: multipart/form-data" --data-binary "@$FILE" "$APT_URL"
