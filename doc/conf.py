@@ -118,3 +118,58 @@ def generate_error_code_table():
 
 # Call the function to generate the table before building docs
 generate_error_code_table()
+
+# Did not find an alternative to generate markdown or rst from my spec file.
+# Either the solution is obsolete or failing
+# So let use this quick and simple solution.
+import json
+
+def generate_markdown_from_openapi(openapi_json, output_file):
+    """
+    Generate a Markdown file from an OpenAPI JSON specification.
+    
+    :param openapi_json: Path to the OpenAPI JSON file.
+    :param output_file: Path to the output Markdown file.
+    """
+    with open(openapi_json, "r", encoding="utf-8") as f:
+        spec = json.load(f)
+    
+    md_content = []
+    
+    # Iterate over sorted paths
+    md_content.append("# Endpoints")
+    for path in sorted(spec.get("paths", {})):
+        methods = spec["paths"][path]
+        for method, details in methods.items():
+            md_content.append(f"\n## {method.upper()} {path}")
+            if "description" in details:
+                md_content.append(f"**Description:**\n{details['description']}\n")
+            
+            # Parameters
+            parameters = details.get("parameters", [])
+            if parameters:
+                md_content.append("**Parameters:**")
+                for param in parameters:
+                    param_name = param.get('name', 'Unnamed')
+                    param_in = param.get('in', 'unknown')
+                    param_required = " Required" if param.get('required', False) else ""
+                    param_default = f" Default: {param.get('default')}" if "default" in param else ""
+                    md_content.append(f"- **{param_name}** (in {param_in}){param_required}{param_default}")
+                md_content.append("")
+            
+            # Responses
+            md_content.append("**Responses:**")
+            for status, response in details.get("responses", {}).items():
+                md_content.append(f"- **{status}**: {response.get('description', 'No description')}")
+                content = response.get("content", {})
+                if content:
+                    md_content.append("  - **Content:** " + ", ".join(content.keys()))
+    
+    # Write to file
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(md_content))
+    
+    print(f"Markdown documentation generated: {output_file}")
+
+# Example usage
+generate_markdown_from_openapi("openapi.json", "endpoints.md")

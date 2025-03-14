@@ -9,3 +9,4 @@ Minarca Server
    configuration
    settings
    hardening
+   api
