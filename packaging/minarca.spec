@@ -230,6 +230,9 @@ else:
         architecture='amd64',
         data_src=[
             ('/opt/minarca', join(DISTPATH, 'minarca')),
+            # For GUI
+            ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
+            ('/opt/minarca/minarca.svg', join(DISTPATH, 'minarca/minarca_client/ui/theme/resources/minarca.svg')),
         ],
         description="Secure, self-hosted and automated backup solution",
         long_description=pkg_info['Summary'],
@@ -247,26 +250,10 @@ else:
             'libstdc++6',
             'openssh-client',
         ],
-    )
-
-    # Create a meta-package
-    debbuild(
-        name='minarca-client-gui',
-        version=version,
-        architecture='amd64',
-        data_src=[
-            ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
-            ('/opt/minarca/minarca.svg', join(DISTPATH, 'minarca/minarca_client/ui/theme/resources/minarca.svg')),
-        ],
-        description="Secure, self-hosted and automated backup solution - graphical frontend",
-        long_description=pkg_info['Summary'] + "\nThis package contains the GUI dependencies.",
-        url=project_url,
-        maintainer=pkg_info['Author-email'],
-        output=DISTPATH,
-        depends=[
+        # For GUI
+        recommends=[
             'libxcb1',
-            'minarca-client',
             'xdg-utils',
             'zenity|kdialog',
-        ],
+        ]
     )

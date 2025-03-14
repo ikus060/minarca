@@ -2,8 +2,7 @@
 
 ## System requirements
 
-Minarca client could be installed on almost any hardware without
-restriction. You are limited to the following operating system.
+Minarca client could be installed the following operating system and architectures:
 
 * Supported Operating System:
   * Windows 7 (64bits) - best effort support
@@ -24,11 +23,43 @@ restriction. You are limited to the following operating system.
 
 Installation steps mostly depends on your operating system. Follow the step appropriate for your system.
 
+## Installation on Debian (or Ubuntu)
+
+To install Minarca Client on a Debian or Ubuntu workstation, download the latest installer:
+
+<a href="https://ikus-soft.com/archive/minarca/minarca-client-latest.deb">
+  <img alt="Minarca Client for Ubuntu/Debian (.deb)" src="https://img.shields.io/badge/Debian-Minarca_Client-blue?&logo=debian&style=for-the-badge">
+</a>
+
+Use `apt` to install the package:
+
+```
+sudo apt install ./minarca-client-latest.deb
+```
+
+For a headless installation (without unnecessary graphical dependencies), install it without recommended packages:
+
+```
+sudo apt install --no-install-recommends ./minarca-client-latest.deb
+```
+
+Once installed, a shortcut to Minarca should appear in your desktop environment's application menu or on your desktop. Use it to launch and configure Minarca.
+
+## Installation on Linux
+
+For other Linux distribution, you may download a portable package.
+
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.tar.gz"><img alt="Minarca Client for Linux" src="https://img.shields.io/badge/download-Minarca_Client-blue?&logo=linux&style=for-the-badge"></a>
+
+Extract it's content to a folder and launch `minarcaw` executable or `minarca` from command line.
+
+You may need to install additional dependencies manually like `openssh-client`, `zenity` or `kdialogs`.
+
 ## Installation on Windows
 
 On a Windows workstation, download the appropriate installer.
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca-blue?&logo=windows&style=for-the-badge"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.exe"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca_Client-blue?&logo=windows&style=for-the-badge"></a>
 
 Then launch the execution of the installer and follow the instructions.
 
@@ -38,7 +69,7 @@ Then launch the execution of the installer and follow the instructions.
 
 On a MacOS workstation, download the appropriate installer.
 
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.dmg"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca-blue?&logo=apple&style=for-the-badge"></a>
+<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.dmg"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca_Client-blue?&logo=apple&style=for-the-badge"></a>
 
 Open the disk image and drag-n-drop Minarca to your Applications folder.
 
@@ -52,24 +83,6 @@ If you get the following, go in your MacOS **System Settings** --> **Privacy & S
 
 [Fix 'Apple could not verify app is free of malware' Mac error - bypass Gatekeeper macOS Sequoia](https://www.youtube.com/watch?v=biIvAM94b98) 
 
-
-## Installation on Ubuntu or Debian
-
-On a Debian or Ubuntu workstation, download the appropriate installer.
-
-<a href="https://ikus-soft.com/archive/minarca/minarca-client-latest.deb"><img alt="Minarca Client for Ubuntu/Debian (.deb)" src="https://img.shields.io/badge/Debian-Minarca-blue?&logo=debian&style=for-the-badge"></a>
-
-On Debian workstation, it's preferable to install the packages using Gdebi.
-
-Once installed, a shortcut to Minarca should be available on your desktop or start menu. Use it to start and configure Minarca.
-
-## Installation on Linux
-
-For other Linux distribution, you may download a portable package.
-
-<a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.tar.gz"><img alt="Minarca Client for Linux" src="https://img.shields.io/badge/download-Minarca-blue?&logo=linux&style=for-the-badge"></a>
-
-Extract it's content to a folder and launch `minarcaw` executable or `minarca` from command line.
 
 ## Link your client with Minarca Server
 
