@@ -172,4 +172,4 @@ def generate_markdown_from_openapi(openapi_json, output_file):
     print(f"Markdown documentation generated: {output_file}")
 
 # Example usage
-generate_markdown_from_openapi("openapi.json", "endpoints.md")
+generate_markdown_from_openapi("_static/openapi.json", "endpoints.md")

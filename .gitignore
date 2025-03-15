@@ -14,7 +14,7 @@ develop-eggs
 .installed.cfg
 .venv
 .vscode
-doc/openapi.json
+doc/_static/openapi.json
 doc/endpoints.md
 
 # Installer logs

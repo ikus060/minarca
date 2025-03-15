@@ -21,6 +21,14 @@ The Minarca Server RESTful API supports input payloads in two commonly used form
 
 Please ensure that the appropriate `Content-Type` header is set in your API requests to match the payload format being used.
 
+## Rate limits
+
+REST API requests are subject to rate limit settings. These settings reduce the risk of Minarca Server instance being overloaded.
+
+Minarca Server returns HTTP status code 429 for 1 hour, if 20 failed authentication requests were received in the same period of time from a single IP address. The same limit also applied to most POST method in the RESTful API.
+
+This limit is configurable trought the `rate-limit` settings.
+
 ### Example using cURL
 
 Here's an example of using cURL to make a request to the Minarca Server API with a JSON payload:
