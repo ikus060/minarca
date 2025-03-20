@@ -1,5 +1,5 @@
-Minarca Server
-==============
+Server
+======
 
 .. toctree::
    :maxdepth: 2

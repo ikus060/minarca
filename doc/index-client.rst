@@ -1,5 +1,5 @@
-Minarca Client
-==============
+Client
+======
 
 .. toctree::
    :maxdepth: 2

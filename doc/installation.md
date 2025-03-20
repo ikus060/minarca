@@ -120,6 +120,10 @@ If it works as root but not as a normal user, the issue is likely due to restric
 
 After installing Debian, configure your storage to be mounted at `/backups`, the default location for Minarca's backup data.
 
+::::{tab-set}
+
+:::{tab-item} EXT4
+
 ### Configure Storage for ext4
 
 It's recommended to use ext4 only if you are using reliable hardware, such as hardware RAID, to ensure data integrity. If you don't have a reliable hardware setup, consider using ZFS for higher data protection.
@@ -175,6 +179,11 @@ It's recommended to use ext4 only if you are using reliable hardware, such as ha
     ```
 Now your ext4 partition is ready at the `/backups` location for use by Minarca.
 
+:::
+
+:::{tab-item} ZFS
+
+
 ### Configure Storage for ZFS
 
 #### Steps to install ZFS:
@@ -214,6 +223,10 @@ Ensure the `embedded_data` feature is active for ZFS:
 ```
 zpool get feature@embedded_data rpool
 ```
+
+:::
+
+::::
 
 ## Install Minarca Server
 

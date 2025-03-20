@@ -22,13 +22,15 @@ import inspect
 import os
 import textwrap
 
+import minarca_client
 import minarca_client.core.exceptions as exceptions
 
 # -- Project information -----------------------------------------------------
 
 project = 'Minarca Docs'
-copyright = 'Copyright (C) IKUS Software. All rights reserved.'
+copyright = '(C) IKUS Software. All rights reserved.'
 author = 'Patrik Dufresne'
+version = minarca_client.__version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -38,7 +40,10 @@ author = 'Patrik Dufresne'
 extensions = [
     'myst_parser',
     'sphinx.ext.autosectionlabel',
+    'sphinx_design',  # Required for {tab-set}
 ]
+
+myst_enable_extensions = ["colon_fence"]  # Required for :::{tab-set}
 
 autosectionlabel_prefix_document = True
 
@@ -58,31 +63,27 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = "pydata_sphinx_theme"
 # Ref: https://alabaster.readthedocs.io/en/latest/customization.html#theme-options
+
 html_theme_options = {
-    'description': 'Minarca, Your open-source, user-friendly data backup solution !',
-    'fixed_sidebar': False,
-    'font_size': '18px',
-    'font_family': 'Lato,Arial,sans-serif',
-    'head_font_family': 'Lato,Arial,sans-serif',
-    'link': '#1C4062',
-    'narrow_sidebar_bg': '#1C4062',
-    'narrow_sidebar_fg': '#fff',
-    'narrow_sidebar_link': '#fff',
-    'sidebar_header': '#1C4062',
-    'show_powered_by': False,
-    'page_width': '1170px',
-    'body_text': '#0E2933',
-    'extra_nav_links': {
-        'Home': 'https://minarca.org/',
-        'Blog': 'https://minarca.org/en_CA/blog',
-        'Features': 'https://minarca.org/en_CA/features',
-        'Contact Us': 'https://minarca.org/en_CA/contactus',
-        'About': 'https://minarca.org/en_CA/about-minarca',
-        'Download': 'https://minarca.org/en_CA/download',
+    "logo": {
+        "text": project,
     },
+    "footer_start": ["copyright"],
+    "footer_end": ["version"],
+    'use_edit_page_button': True,
 }
+
+# Allow edit in Gitlab.
+html_context = {
+    "gitlab_user": "ikus-soft",
+    "gitlab_repo": "minarca",
+    "gitlab_version": "master",
+    "doc_path": "doc",
+}
+
+# Hide source code.
 html_show_sourcelink = False
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -90,7 +91,8 @@ html_show_sourcelink = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_favicon = '../minarca_client/ui/theme/resources/minarca.ico'
+html_logo = "_static/favicon-128x128px.png"
+html_favicon = "_static/favicon-128x128px.png"
 
 # -- Output file configuration ------------------------------------------------
 # Output directory for Markdown files
