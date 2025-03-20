@@ -103,8 +103,9 @@ class TestMainParseArgs(unittest.TestCase):
         # GUI get started with mainloop
         mock_app.return_value.mainloop.assert_called_once()
 
-    @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
+    @mock.patch('minarca_client.main.Backup')
     def test_configure_remote(self, mock_backup):
+        mock_backup.return_value.configure_remote = mock.AsyncMock()
         main.main(
             ['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar', '--name', 'repo']
         )
@@ -113,8 +114,9 @@ class TestMainParseArgs(unittest.TestCase):
         )
 
     @mock.patch('getpass.getpass')
-    @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
+    @mock.patch('minarca_client.main.Backup')
     def test_configure_remote_prompt_password(self, mock_backup, mock_getpass):
+        mock_backup.return_value.configure_remote = mock.AsyncMock()
         mock_getpass.return_value = 'bar'
         main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
         mock_backup.return_value.configure_remote.assert_called_once_with(
@@ -122,14 +124,15 @@ class TestMainParseArgs(unittest.TestCase):
         )
 
     @mock.patch('getpass.getpass')
-    @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
+    @mock.patch('minarca_client.main.Backup')
     def test_configure_remote_prompt_password_null(self, mock_backup, mock_getpass):
         mock_getpass.return_value = ''
         with self.assertRaises(SystemExit):
             main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
 
-    @mock.patch('minarca_client.main.Backup', return_value=mock.AsyncMock())
+    @mock.patch('minarca_client.main.Backup')
     def test_configure_local(self, mock_backup):
+        mock_backup.return_value.configure_local = mock.AsyncMock()
         main.main(['configure', '--localdest', self.tmp.name, '--name', 'repo'])
         mock_backup.return_value.configure_local.assert_called_once_with(
             path=Path(self.tmp.name), repositoryname='repo', force=False
