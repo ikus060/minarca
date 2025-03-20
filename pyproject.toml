@@ -10,7 +10,7 @@ authors = [
 description = "Minarca is a self-hosted open source data backup software that allows you to manage your computer and server backups for free from a direct online accessible centralized view of your data with easy retrieval in case of displacement, loss or breakage."
 readme = "README.md"
 requires-python = ">=3.8, <4"
-license = {text = "GPLv3"}
+license = { file = "LICENSE" }
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: System Administrators",

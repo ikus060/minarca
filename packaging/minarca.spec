@@ -42,12 +42,19 @@ minarca_client_pkg = files('minarca_client')
 icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.ico')
 macos_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.icns')
 
+#
 # Read package info
+#
 pkg = get_distribution('minarca_client')
 version = pkg.version
-# Get License file's data
-license = pkg.read_text('LICENSE')
-pkg_info = message_from_string(pkg.read_text('PKG-INFO') or pkg.read_text('METADATA'))
+pkg_info = pkg.metadata
+assert pkg_info['License']
+assert pkg_info['Summary']
+assert pkg_info['Author-email']
+# Get Project URL
+project_url = [v.split(', ')[1] for k,v in pkg_info.items() if k =='Project-URL' and v.startswith('Homepage, ')][0]
+assert project_url
+
 block_cipher = None
 
 # Include theme resources and locales
@@ -184,7 +191,7 @@ elif platform.system() == "Windows":
 
     # For NSIS, we need to create a license file with Windows encoding.
     with open(join(DISTPATH, 'minarca/LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
-        out.write(license)
+        out.write(pkg_info['License'])
 
     # Sign Minarca executables
     signexe(join(DISTPATH, 'minarca/minarca.exe'))
@@ -219,9 +226,6 @@ else:
     # For linux simply create a tar.gz with the folder
     targz_file = join(DISTPATH, 'minarca-client_%s.tar.gz' % version)
     subprocess.check_call(['tar', '-zcvf', targz_file, 'minarca'], cwd=DISTPATH, stderr=subprocess.STDOUT)
-
-    # Get Project URL
-    project_url = [v.split(', ')[1] for k,v in pkg_info.items() if k =='Project-URL' and v.startswith('Homepage, ')][0]
 
     # Also create a Debian package
     debbuild(
