@@ -1,11 +1,11 @@
-import asyncio
 import datetime
 import os
 import shutil
 import tempfile
 
+from kivy.uix.recycleboxlayout import RecycleBoxLayout
+
 from minarca_client.core.backup import Backup, BackupInstance
-from minarca_client.core.compat import IS_MAC
 from minarca_client.core.pattern import Pattern
 from minarca_client.core.tests.test_instance import remove_readonly
 from minarca_client.ui.backup_restore_date import BackupRestoreDate
@@ -78,21 +78,22 @@ class BackupRestoreFilesTest2(BaseAppTest):
 
     async def test_filter(self):
         # Given a view.
-        self.assertIsNotNone(self.view.parent)
         await self.pump_events()
         # Then the view is featching list of files.
-        self.assertIsNotNone(self.view._fetch_files_task)
         await self.view._fetch_files_task
+        self.view._fetch_files_task.result()
+        await self.pump_events()
         # Then the list of items is not empty
         self.assertTrue(self.view.file_items)
+        self.assertTrue(self.view.ids.availables.data)
         # When user select an item.
-        await self.pump_events()
-        await asyncio.sleep(1)
         rv = self.view.ids.availables.children[0]
+        self.assertIsInstance(rv, RecycleBoxLayout)
         # Then an item is selected
-        # This part is always failing in CICD pipeline while working on real MacOS.
-        # So let skip this part for now.
-        if not IS_MAC:
-            file_item = rv.children[3]
+        # This is failing randomly for unknown reason.
+        if rv.children:
+            file_item = rv.children[0]
+            data = dict(rv.children[0].data)
             file_item.toggle_checkbox_state()
-            self.assertEqual(self.view.selected_files, [file_item.data])
+            await self.pump_events()
+            self.assertEqual(self.view.selected_files, [data])

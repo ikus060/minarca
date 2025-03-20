@@ -255,9 +255,11 @@ class BackupCard(CCard):
     @alias_property(bind=['disk_usage'])
     def _disk_usage_pct(self):
         try:
-            return int(self.disk_usage['used'] / self.disk_usage['total'] * 100)
+            if self.disk_usage['total'] != 0:
+                return int(self.disk_usage['used'] / self.disk_usage['total'] * 100)
         except Exception:
-            return 0
+            pass
+        return 0
 
     async def _test_connection(self, instance):
         # Test connectivity with remote server every 5 secs

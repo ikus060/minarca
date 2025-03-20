@@ -52,6 +52,11 @@ class BaseAppTest(unittest.IsolatedAsyncioTestCase):
         await self.pump_events()
 
     async def asyncTearDown(self):
+        # Consume existing events before closing everything.
+        await self.pump_events()
+        # Unschedule all events
+        for event in list(Clock.get_events()):
+            Clock.unschedule(event)
         # Stop application
         self.app.stop()
         # Destroy windows content
@@ -67,9 +72,6 @@ class BaseAppTest(unittest.IsolatedAsyncioTestCase):
             and 'asyncTearDown' not in str(task._coro)
         ]
         self.assertFalse(remaining_tasks, 'some asyncio task are still running')
-        # Unschedule all events
-        for event in list(Clock.get_events()):
-            Clock.unschedule(event)
 
     async def pump_events(self):
         """Wait until all scheduled event are processed."""
