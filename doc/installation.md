@@ -4,7 +4,7 @@
 
 1. Prepare the System:
 
-    ```
+    ```sh
     apt update
     apt upgrade
     apt install ca-certificates curl lsb-release gpg
@@ -12,19 +12,26 @@
 
 2. Add Minarca Repository Key:
 
-    ```
-    curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
+    ```sh
+    curl -L -o /etc/apt/keyrings/minarca-keyring.asc https://www.ikus-soft.com/archive/public.asc
     ```
 
 3. Add Minarca Repository:
 
-    ```
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
+    ```sh
+    cat <<EOF > /etc/apt/sources.list.d/minarca.sources
+    Types: deb
+    URIs: https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/
+    Suites: $(lsb_release -sc)
+    Components: main
+    Architectures: amd64
+    Signed-By: /etc/apt/keyrings/minarca-keyring.asc
+    EOF
     ```
 
 4. Install Minarca Server:
 
-    ```
+    ```sh
     apt update
     apt install minarca-server
     ```
@@ -234,19 +241,32 @@ zpool get feature@embedded_data rpool
 
 On a Debian Linux server:
 1. Update and install necessary dependencies:
-   ```
+
+   ```sh
    apt update
    apt upgrade
    apt install ca-certificates curl lsb-release gpg
    ```
+
 2. Add Minarca repository and key:
+
+   ```sh
+   curl -L -o /etc/apt/keyrings/minarca-keyring.asc https://www.ikus-soft.com/archive/public.asc
+
+   cat <<EOF > /etc/apt/sources.list.d/minarca.sources
+   Types: deb
+   URIs: https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/
+   Suites: $(lsb_release -sc)
+   Components: main
+   Architectures: amd64
+   Signed-By: /etc/apt/keyrings/minarca-keyring.asc
+   EOF
    ```
-   curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
-   echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
-   apt update
-   ```
+
 3. Install Minarca Server:
-   ```
+
+   ```sh
+   apt update
    apt install minarca-server
    ```
 
