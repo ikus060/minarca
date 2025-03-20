@@ -62,9 +62,19 @@ We provide the ability to easily test future versions without having to compilin
 **Minarca Server** can be install using our APT Dev repository:
 
 ```sh
-curl -L https://www.ikus-soft.com/archive/minarca/public.key | gpg --dearmor > /usr/share/keyrings/minarca-keyring.gpg
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/minarca-keyring.gpg] https://nexus.ikus-soft.com/repository/apt-dev-$(lsb_release -sc)/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/minarca.list
+curl -L -o /etc/apt/keyrings/minarca-keyring.asc https://www.ikus-soft.com/archive/public.asc
+
+cat <<EOF > /etc/apt/sources.list.d/minarca.sources
+Types: deb
+URIs: https://nexus.ikus-soft.com/repository/apt-release-$(lsb_release -sc)/
+Suites: $(lsb_release -sc)
+Components: main
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/minarca-keyring.asc
+EOF
+
 apt update
+
 apt install minarca-server
 ```
 
