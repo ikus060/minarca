@@ -330,9 +330,9 @@ class BackupConnectionLocal(MDBoxLayout):
         self.refresh_locations()
         if self.instance is None:
             # Define default repo name on creation
-            self.repositoryname = get_default_repositoryname()
+            self.repositoryname = get_default_repositoryname() or "default"
         else:
-            self.repositoryname = instance.settings.repositoryname
+            self.repositoryname = instance.settings.repositoryname or "none"
 
     def on_parent(self, widget, value):
         if value is None:

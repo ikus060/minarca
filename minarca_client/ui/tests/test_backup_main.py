@@ -1,3 +1,5 @@
+from parameterized import parameterized
+
 from minarca_client.core.instance import BackupInstance
 from minarca_client.ui.backup_create import BackupCreate
 from minarca_client.ui.dashboard import DashboardView
@@ -31,6 +33,25 @@ class MainDialogWithBackupTest(BaseAppTest):
     async def test_default_dialog(self):
         # When backup is configure. Then BackupCreate is displayed by default.
         self.assertIsInstance(self.view, DashboardView)
+
+    @parameterized.expand(
+        [
+            ('backup_logs', 'BackupLogs'),
+            ('backup_connection', 'BackupConnectionLocal'),
+            ('backup_settings', 'BackupSettings'),
+            ('backup_patterns', 'BackupPatterns'),
+            ('backup_restore', 'BackupRestoreDate'),
+            ('backup_advance', 'BackupAdvanceSettings'),
+        ]
+    )
+    async def test_switch_view(self, fname, expected_view):
+        # Given user click on buttons (simulated by function call)
+        card_view = self.view.ids.card_list.children[0]
+        func = getattr(card_view, fname)
+        func()
+        await self.pump_events()
+        # Then view is updated
+        self.assertEqual(self.view.__class__.__name__, expected_view)
 
     async def test_disable(self):
         # Given a view.

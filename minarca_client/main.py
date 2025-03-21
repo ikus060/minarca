@@ -66,24 +66,12 @@ def _backup(force, instance_id):
     except LatestCheckFailed:
         logging.info(_('fail to check for latest version'))
     backup = Backup()
-    try:
-        for instance in backup[instance_id]:
-            try:
-                asyncio.run(instance.backup(force=force))
-            except NotScheduleError as e:
-                # If one backup is not schedule to run, continue with next backup.
-                logging.info("%s: %s" % (instance.log_id, e))
-    except RunningError as e:
-        # Print warning message is already running.
-        logging.warning(str(e))
-        sys.exit(e.error_code)
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.error(str(e))
-        sys.exit(e.error_code)
-    except Exception:
-        logging.exception(_("unexpected error during backup"))
-        sys.exit(BackupError.error_code)
+    for instance in backup[instance_id]:
+        try:
+            asyncio.run(instance.backup(force=force))
+        except NotScheduleError as e:
+            # If one backup is not schedule to run, continue with next backup.
+            logging.info("%s: %s" % (instance.log_id, e))
 
 
 def _forget(instance_id, force=False):
@@ -161,29 +149,19 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
 
     # Start linking process.
     try:
-        try:
-            asyncio.run(configure_func())
+        asyncio.run(configure_func())
+        print(_('Linked successfully'))
+    except RepositoryNameExistsError as e:
+        print(str(e))
+        if _prompt_yes_no(_('Do you want to replace the existing repository? (Yes/No): ')):
+            asyncio.run(configure_func(force=True))
             print(_('Linked successfully'))
-        except RepositoryNameExistsError as e:
-            print(str(e))
-            if _prompt_yes_no(_('Do you want to replace the existing repository? (Yes/No): ')):
-                asyncio.run(configure_func(force=True))
-                print(_('Linked successfully'))
-            else:
-                sys.exit(e.error_code)
-    except BackupError as e:
-        print(str(e))
-        sys.exit(e.error_code)
-    except Exception as e:
-        print(str(e))
-        sys.exit(BackupError.error_code)
+        else:
+            sys.exit(e.error_code)
+
     # If link is success, Schedule job.
     # On windows this step fail for unknown reason with various user priviledge.
-    try:
-        backup.schedule_job()
-    except Exception as e:
-        print(str(e))
-        sys.exit(BackupError.error_code)
+    backup.schedule_job()
 
 
 def _pattern(include, pattern, instance_id):
@@ -193,41 +171,25 @@ def _pattern(include, pattern, instance_id):
     if not backup.is_configured():
         print(_('To update include or exclude patterns, you must configure at least one backup instance.'))
         sys.exit(NotConfiguredError.error_code)
-    try:
-        for instance in backup[instance_id]:
-            patterns = instance.patterns
-            for path in pattern:
+    for instance in backup[instance_id]:
+        patterns = instance.patterns
+        for path in pattern:
+            p = Pattern(include, path, None)
+            if not p.is_wildcard():
+                # Resolve relative path
+                path = (Path.cwd() / path).resolve()
                 p = Pattern(include, path, None)
-                if not p.is_wildcard():
-                    # Resolve relative path
-                    path = (Path.cwd() / path).resolve()
-                    p = Pattern(include, path, None)
-                # Add new pattern
-                patterns.append(p)
-            patterns.save()
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.info(str(e))
-        sys.exit(e.error_code)
-    except Exception:
-        logging.exception("unexpected error updating patterns")
-        sys.exit(BackupError.error_code)
+            # Add new pattern
+            patterns.append(p)
+        patterns.save()
 
 
 def _patterns(instance_id):
     backup = Backup()
-    try:
-        for instance in backup[instance_id]:
-            for p in instance.patterns:
-                line = ('+%s' if p.include else '-%s') % p.pattern
-                print(line)
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.info(str(e))
-        sys.exit(e.error_code)
-    except Exception:
-        logging.exception("unexpected error retrieving patterns")
-        sys.exit(BackupError.error_code)
+    for instance in backup[instance_id]:
+        for p in instance.patterns:
+            line = ('+%s' if p.include else '-%s') % p.pattern
+            print(line)
 
 
 def _pause(delay, instance_id):
@@ -235,16 +197,8 @@ def _pause(delay, instance_id):
     Pause backup for the given number of hours.
     """
     backup = Backup()
-    try:
-        for instance in backup[instance_id]:
-            instance.pause(delay=delay)
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.info(str(e))
-        sys.exit(e.error_code)
-    except Exception:
-        logging.exception("unexpected error updating backup config")
-        sys.exit(BackupError.error_code)
+    for instance in backup[instance_id]:
+        instance.pause(delay=delay)
 
 
 def _rdiff_backup(options):
@@ -339,15 +293,7 @@ def _restore(restore_time, force, paths, instance_id, destination):
         if not confirm:
             _abort()
     # Execute restore operation.
-    try:
-        asyncio.run(instance.restore(restore_time=restore_time, paths=paths, destination=destination))
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.error(str(e))
-        sys.exit(e.error_code)
-    except Exception:
-        logging.exception("unexpected error during restore")
-        sys.exit(BackupError.error_code)
+    asyncio.run(instance.restore(restore_time=restore_time, paths=paths, destination=destination))
 
 
 def _stop(force, instance_id):
@@ -356,16 +302,9 @@ def _stop(force, instance_id):
         for instance in backup[instance_id]:
             instance.stop()
     except NotRunningError as e:
-        print(_('backup not running'))
+        logger.warning(str(e))
         if not force:
             sys.exit(e.error_code)
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.error(str(e))
-        sys.exit(e.error_code)
-    except Exception:
-        logging.exception("unexpected error stoping backup")
-        sys.exit(BackupError.error_code)
 
 
 def _schedule(schedule, instance_id, username=None, password=None):
@@ -376,37 +315,18 @@ def _schedule(schedule, instance_id, username=None, password=None):
         instance.settings.save()
     # Make sure to schedule job in OS too.
     run_if_logged_out = (username, password) if username or password else None
-    try:
-        backup.schedule_job(run_if_logged_out)
-    except BackupError as e:
-        logging.info(str(e))
-        sys.exit(e.error_code)
-    except Exception as e:
-        logging.info(str(e))
-        sys.exit(BackupError.error_code)
+    backup.schedule_job(run_if_logged_out)
 
 
 def _start(force, instance_id):
     signal.signal(signal.SIGINT, signal.default_int_handler)
     backup = Backup()
+
     # Check if instance_id is valid.
-    try:
-        list(backup[instance_id])
-    except InstanceNotFoundError as e:
-        # Print message to stdout and log file.
-        logging.info(str(e))
-        sys.exit(e.error_code)
+    list(backup[instance_id])
 
     # Trigger backup execution.
-    try:
-        backup.start_all(force=force, instance_id=instance_id.value)
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.info(str(e))
-        sys.exit(e.error_code)
-    except Exception as e:
-        logging.info(str(e))
-        sys.exit(BackupError.error_code)
+    backup.start_all(force=force, instance_id=instance_id.value)
 
 
 def _status(instance_id):
@@ -414,57 +334,44 @@ def _status(instance_id):
     Return status for each backup.
     """
     backup = Backup()
-    try:
-        # Test connection for all backup.
-        if len(backup):
-            print('Verifying connection...')
-        entries = []
-        for instance in backup[instance_id]:
-            status = instance.status
-            settings = instance.settings
-            try:
-                asyncio.run(instance.test_connection())
-                connected = True
-            except BackupError:
-                connected = False
-            entries.append((instance, connected))
+    # Test connection for all backup.
+    if len(backup):
+        print('Verifying connection...')
+    entries = []
+    for instance in backup[instance_id]:
+        status = instance.status
+        settings = instance.settings
+        try:
+            asyncio.run(instance.test_connection())
+            connected = True
+        except BackupError:
+            connected = False
+        entries.append((instance, connected))
 
-        # Print result.
-        for instance, connected in entries:
-            status = instance.status
-            settings = instance.settings
-            title = _("Backup Instance: %s") % (settings.repositoryname or _("No name"))
-            print(title)
-            print('=' * len(title))
+    # Print result.
+    for instance, connected in entries:
+        status = instance.status
+        settings = instance.settings
+        title = _("Backup Instance: %s") % (settings.repositoryname or _("No name"))
+        print(title)
+        print('=' * len(title))
 
-            print(" * " + _("Identifier:             %s") % instance.id)
-            if instance.is_remote():
-                print(" * " + _("Remote server:          %s") % settings.remotehost)
-            elif instance.is_local():
-                print(" * " + _("Local device:           %s") % settings.localcaption)
-            print(" * " + _("Connectivity status:    %s") % (_("Connected") if connected else _("Not connected")))
-            print(
-                " * "
-                + _("Last successful backup: %s")
-                % (status.lastsuccess.strftime() if status.lastsuccess else _('Never'))
-            )
-            print(
-                " * "
-                + _("Last backup date:       %s") % (status.lastdate.strftime() if status.lastdate else _('Never'))
-            )
-            print(" * " + _("Last backup status:     %s") % (status.current_status or _('Never')))
-            if status.details:
-                print(" * " + _("Details:                %s") % status.details or '')
-            if settings.pause_until:
-                print(_("Paused until:           %s") % settings.pause_until)
-
-    except BackupError as e:
-        # Print message to stdout and log file.
-        logging.info(str(e))
-        sys.exit(e.error_code)
-    except Exception:
-        logging.exception("unexpected error getting backup status")
-        sys.exit(BackupError.error_code)
+        print(" * " + _("Identifier:             %s") % instance.id)
+        if instance.is_remote():
+            print(" * " + _("Remote server:          %s") % settings.remotehost)
+        elif instance.is_local():
+            print(" * " + _("Local device:           %s") % settings.localcaption)
+        print(" * " + _("Connectivity status:    %s") % (_("Connected") if connected else _("Not connected")))
+        print(
+            " * "
+            + _("Last successful backup: %s") % (status.lastsuccess.strftime() if status.lastsuccess else _('Never'))
+        )
+        print(" * " + _("Last backup date:       %s") % (status.lastdate.strftime() if status.lastdate else _('Never')))
+        print(" * " + _("Last backup status:     %s") % (status.current_status or _('Never')))
+        if status.details:
+            print(" * " + _("Details:                %s") % status.details or '')
+        if settings.pause_until:
+            print(_("Paused until:           %s") % settings.pause_until)
 
 
 def _ui(test=False):
@@ -817,8 +724,20 @@ def main(args=None):
     kwargs = {k: v for k, v in args._get_kwargs() if k not in ['func', 'subcommand', 'debug']}
     # Configure logging
     _configure_logging(debug=args.debug)
-    # Call appropriate function
-    return args.func(**kwargs)
+    try:
+        # Call appropriate function
+        return args.func(**kwargs)
+    except RunningError as e:
+        # Print warning message is already running.
+        logging.warning(str(e))
+        sys.exit(e.error_code)
+    except BackupError as e:
+        # Print message to stdout and log file.
+        logging.info(str(e))
+        sys.exit(e.error_code)
+    except Exception:
+        logging.exception("unexpected error retrieving patterns")
+        sys.exit(BackupError.error_code)
 
 
 if __name__ == "__main__":

@@ -25,9 +25,11 @@ if 'DBUS_SESSION_BUS_ADDRESS' not in os.environ:
 
 
 def send_notification(title, body, replace_id=None):
-    assert isinstance(title, str)
-    assert isinstance(body, str)
-    assert replace_id is None or isinstance(replace_id, int) or (isinstance(replace_id, str) and replace_id.isdigit())
+    assert isinstance(title, str), f"Expected 'title' to be a string, got {type(title).__name__} instead."
+    assert isinstance(body, str), f"Expected 'body' to be a string, got {type(body).__name__} instead."
+    assert (
+        replace_id is None or isinstance(replace_id, int) or (isinstance(replace_id, str) and replace_id.isdigit())
+    ), f"Expected 'replace_id' to be None, an integer, or a string containing digits, but got {type(replace_id).__name__}: {replace_id}"
     # Convert string to integer
     if isinstance(replace_id, str):
         replace_id = int(replace_id)
@@ -70,7 +72,7 @@ def clear_notification(notification_id):
         notification_id is None
         or isinstance(notification_id, int)
         or (isinstance(notification_id, str) and notification_id.isdigit())
-    )
+    ), f"Expected 'notification_id' to be None, an integer, or a string containing digits, but got {type(notification_id).__name__}: {notification_id}"
     # Convert string to integer
     if isinstance(notification_id, str):
         notification_id = int(notification_id)

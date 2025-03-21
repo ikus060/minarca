@@ -30,6 +30,7 @@ bdist-client:linux:
   image: python:3.10-buster
   needs: []  
   script:
+  # Start testing
   - tox -e flake8,black,isort,py3-linux
   - tox -e pyinstaller-linux
   stage: bdist
