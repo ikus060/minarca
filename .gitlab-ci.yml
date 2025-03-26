@@ -26,8 +26,7 @@ bdist-client:linux:
   - apt update
   - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron zenity kdialog
   - pip3 install tox
-  # Required Python 3.10 for KivyMD
-  image: python:3.10-buster
+  image: python:3.12-bullseye
   needs: []  
   script:
   # Start testing
@@ -46,13 +45,13 @@ bdist-client:macos:
     # Required because our macos cannot run opengl.
     KIVY_GL_BACKEND: mock
   before_script:
-    - pip3 install tox
+    - python3.12 -m pip install tox
   needs: []  
   tags:
   - macos
   script:
-  - tox -e flake8,black,isort,py3-mac
-  - tox -e pyinstaller-mac
+  - python3.12 -m tox -e flake8,black,isort,py3-mac
+  - python3.12 -m tox -e pyinstaller-mac
   stage: bdist
 
 bdist-client:win32:
@@ -65,10 +64,16 @@ bdist-client:win32:
   before_script:
   # Make use of nuget to install our dependencies
   - Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile nuget.exe
-  - .\nuget.exe install python -Version 3.10.11
-  - $env:PATH = "$(Get-Location)\python.3.10.11\tools;$(Get-Location)\python.3.10.11\tools\Scripts;$env:PATH"
+  - .\nuget.exe install python -Version 3.12.9
+  - $env:PATH = "$(Get-Location)\python.3.12.9\tools;$(Get-Location)\python.3.12.9\tools\Scripts;$env:PATH"
   # Sanity check
   - python.exe -VV
+  # Download & extract librsync v2.3.4
+  - Invoke-WebRequest -Uri https://github.com/librsync/librsync/releases/download/v2.3.4/librsync-win64-2.3.4.zip -OutFile librsync.zip
+  - New-Item -ItemType Directory -Force -Path librsync.2.3.4
+  - Expand-Archive -Path librsync.zip -DestinationPath librsync.2.3.4 -Force
+  # LIBRSYNC_DIR is used by rdiff-backup setup.py
+  - $env:LIBRSYNC_DIR = "$(Get-Location)\librsync.2.3.4"
   # Install tox
   - python.exe -m pip install tox
   needs: []  
@@ -88,14 +93,14 @@ doc:
   - apt update
   - apt -y --no-install-recommends install librsync-dev libacl1-dev
   - pip3 install tox
-  image: python:3.10
+  image: python:3.12
   needs: []
   script:
   - tox -e doc
   stage: doc
 
 upload:apt:
-  image: python:3.10
+  image: python:3.12
   needs:
   - bdist-client:linux
   parallel:
@@ -120,7 +125,7 @@ upload:apt:
   stage: upload
 
 .upload-file: &upload-file
-  image: python:3.10
+  image: python:3.12
   script: |
     set -x
     set -e
