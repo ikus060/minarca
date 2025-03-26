@@ -201,7 +201,7 @@ def _pause(delay, instance_id):
         instance.pause(delay=delay)
 
 
-def _rdiff_backup(options):
+def _rdiff_backup(args):
     """
     Execute rdiff-backup process within minarca.
     """
@@ -220,7 +220,7 @@ def _rdiff_backup(options):
     nice()
     # Start the backup process
     try:
-        return rdiffbackup.run.main_run(options)
+        return rdiffbackup.run.main_run(args)
     except Exception:
         # Capture any exception and return exitcode.
         exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -410,8 +410,9 @@ def _verify(instance_id):
         asyncio.run(instance.verify())
 
 
-def _parse_args(args):
+def _parse_args():
     parser = argparse.ArgumentParser(
+        prog='minarca',
         description=_(
             "Minarca manages your computer's backup by linking your computer with a centralized server and running backups on a given schedule."
         ),
@@ -659,17 +660,11 @@ def _parse_args(args):
     sub.add_argument('--test', help=argparse.SUPPRESS, action='store_true')
 
     # rdiff-backup
-    sub = subparsers.add_parser('rdiff-backup')
-    sub.add_argument('options', nargs='*')
+    sub = subparsers.add_parser('rdiff-backup', help=_('For internal use'))
+    sub.add_argument('args', nargs='*')
     sub.set_defaults(func=_rdiff_backup)
 
-    # Quick hack to support previous `--backup`, `--stop`
-    args = [_ARGS_ALIAS.get(a, a) for a in args]
-    # Quick hack to accept any arguments for rdiff-backup sub command
-    if args and args[0] == 'rdiff-backup':
-        args = args.copy()
-        args.insert(1, '--')
-    return parser.parse_args(args)
+    return parser
 
 
 def _configure_logging(debug=False):
@@ -719,7 +714,17 @@ def main(args=None):
     # Parse the arguments
     if args is None:
         args = sys.argv[1:]
-    args = _parse_args(args)
+
+    # Parse arguments
+    parser = _parse_args()
+    # Quick hack to support previous `--backup`, `--stop`
+    args = [_ARGS_ALIAS.get(a, a) for a in args]
+    # Quick hack to accept any arguments for rdiff-backup sub command
+    if args and args[0] == 'rdiff-backup':
+        args = args.copy()
+        args.insert(1, '--')
+    args = parser.parse_args(args)
+
     # Remove func from args
     kwargs = {k: v for k, v in args._get_kwargs() if k not in ['func', 'subcommand', 'debug']}
     # Configure logging

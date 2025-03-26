@@ -41,6 +41,7 @@ extensions = [
     'myst_parser',
     'sphinx.ext.autosectionlabel',
     'sphinx_design',  # Required for {tab-set}
+    'sphinx_argparse_cli',  # Required to generate doc from argparse.
 ]
 
 myst_enable_extensions = ["colon_fence"]  # Required for :::{tab-set}
