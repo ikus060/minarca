@@ -227,7 +227,7 @@ class BackupRestoreFiles(MDBoxLayout):
                 )
             self.file_items = file_items
         except BackupError as e:
-            logger.warning(str(e))
+            logger.warning(str(e), exc_info=1)
             self.error_message = _('Failed to retrieve available files.')
             self.error_detail = str(e)
         except Exception as e:

@@ -176,7 +176,7 @@ class BackupRestoreDate(MDBoxLayout):
         try:
             self.increments = await instance.list_increments()
         except BackupError as e:
-            logger.warning(str(e))
+            logger.warning(str(e), exc_info=1)
             self.error_message = _('Failed to retrieve available backup dates.')
             self.error_detail = str(e)
         except Exception as e:

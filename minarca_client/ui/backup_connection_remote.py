@@ -294,11 +294,11 @@ class BackupConnectionRemote(MDBoxLayout):
             if ret:
                 await self._create_remote(remoteurl, username, password, repositoryname, force=True)
         except ConfigureBackupError as e:
-            logger.warning(str(e))
+            logger.warning(str(e), exc_info=1)
             self.error_message = str(e)
             self.error_detail = e.detail
         except BackupError as e:
-            logger.warning(str(e))
+            logger.warning(str(e), exc_info=1)
             self.error_message = _('Failed to establish connectivity with remote server.')
             self.error_detail = str(e)
         except Exception as e:

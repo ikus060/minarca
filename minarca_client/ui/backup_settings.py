@@ -323,7 +323,7 @@ class BackupSettings(MDBoxLayout):
                 "This issue may arise due to the remote server being out-of-date. You may edit the settings, however, some settings will not be synchronized with the remote server. If this problem persists, we recommend contacting your administrator for further assistance."
             )
         except BackupError as e:
-            logger.warning(str(e))
+            logger.warning(str(e), exc_info=1)
             self.error_message = str(e)
         except Exception as e:
             logger.exception('unknown exception')
