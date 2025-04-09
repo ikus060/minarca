@@ -1,4 +1,4 @@
-# Copyleft (C) 2023 IKUS Software. All right reserved.
+# Copyright (C) 2025 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import asyncio
@@ -105,7 +105,7 @@ Builder.load_string(
         pos_hint: {'center_x': 0.5}
 
     CLabel:
-        text: _('Copyright © 2024 IKUS Software')
+        text: _('Copyright © 2025 IKUS Software')
         halign: "center"
         padding: 0,30,0,0
         role: "small"

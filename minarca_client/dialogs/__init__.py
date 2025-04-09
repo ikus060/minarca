@@ -1,4 +1,4 @@
-# Copyleft (C) 2023 IKUS Software. All right reserved.
+# Copyright (C) 2025 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import sys

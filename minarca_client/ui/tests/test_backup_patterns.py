@@ -1,3 +1,6 @@
+# Copyright (C) 2025 IKUS Software. All right reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
 from minarca_client.core.backup import BackupInstance, Patterns
 from minarca_client.ui.backup_create import BackupCreate
 from minarca_client.ui.backup_patterns import BackupPatterns

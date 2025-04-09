@@ -874,7 +874,7 @@ msgid "Update now"
 msgstr ""
 
 #: minarca_client/ui/about_menu.py:20
-msgid "Copyright © 2024 IKUS Software"
+msgid "Copyright © 2025 IKUS Software"
 msgstr ""
 
 #: minarca_client/ui/about_menu.py:128 minarca_client/ui/about_menu.py:130

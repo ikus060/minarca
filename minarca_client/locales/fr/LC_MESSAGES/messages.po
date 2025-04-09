@@ -1,23 +1,24 @@
 # French translations for minarca_client.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2025 IKUS Software
 # This file is distributed under the same license as the minarca_client
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# Patrik Dufresne <patrik@ikus-soft.com>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: minarca_client 3.9.1.dev11+g4d5317c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-03-07 15:36-0500\n"
-"PO-Revision-Date: 2025-03-07 15:35-0500\n"
+"PO-Revision-Date: 2025-04-09 16:05-0400\n"
 "Last-Translator: \n"
-"Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.16.0\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: minarca_client/main.py:45
 msgid "Operation aborted by the user."
@@ -56,16 +57,16 @@ msgstr "Sans nom"
 #: minarca_client/main.py:96
 msgid "Are you sure you want to forget the above backup settings? (Yes/No): "
 msgstr ""
-"Êtes-vous sûr de vouloir oublier les paramètres de sauvegarde ci-dessus ?"
-" (Oui/Non) : "
+"Êtes-vous sûr de vouloir oublier les paramètres de sauvegarde ci-dessus ? (Oui/"
+"Non) : "
 
 #: minarca_client/main.py:119
 msgid ""
-"Do you want to backup to a local device (external disk or network share)?"
-" (Yes/No): "
+"Do you want to backup to a local device (external disk or network share)? (Yes/"
+"No): "
 msgstr ""
-"Souhaitez-vous effectuer une sauvegarde sur un périphérique local (disque"
-" externe ou partage de réseau) ? (Oui/Non) : "
+"Souhaitez-vous effectuer une sauvegarde sur un périphérique local (disque "
+"externe ou partage de réseau) ? (Oui/Non) : "
 
 #: minarca_client/main.py:125
 msgid "Enter the local destination path: "
@@ -93,17 +94,16 @@ msgstr "Souhaitez-vous remplacer le dépôt existant ? (Oui/Non) : "
 
 #: minarca_client/main.py:194
 msgid ""
-"To update include or exclude patterns, you must configure at least one "
-"backup instance."
+"To update include or exclude patterns, you must configure at least one backup "
+"instance."
 msgstr ""
-"Pour mettre à jour les modèles d'inclusion ou d'exclusion, vous devez "
-"configurer au moins une instance de sauvegarde."
+"Pour mettre à jour les modèles d'inclusion ou d'exclusion, vous devez configurer "
+"au moins une instance de sauvegarde."
 
 #: minarca_client/main.py:286
 msgid "From which backup source do you want to restore data from?"
 msgstr ""
-"A partir de quelle source de sauvegarde voulez-vous restaurer les données"
-" ?"
+"A partir de quelle source de sauvegarde voulez-vous restaurer les données ?"
 
 #: minarca_client/main.py:298
 msgid "Enter backup instance ID: "
@@ -129,12 +129,11 @@ msgstr "Voulez-vous restaurer %s (Oui/Non) : "
 
 #: minarca_client/main.py:335
 msgid ""
-"Are you sure you want to proceed with the restore operation? Please note "
-"that this will override your current data. (Yes/No): "
+"Are you sure you want to proceed with the restore operation? Please note that "
+"this will override your current data. (Yes/No): "
 msgstr ""
-"Êtes-vous sûr de vouloir procéder à l'opération de restauration ? "
-"Veuillez noter que cette opération annulera vos données actuelles. "
-"(Oui/Non) : "
+"Êtes-vous sûr de vouloir procéder à l'opération de restauration ? Veuillez noter "
+"que cette opération annulera vos données actuelles. (Oui/Non) : "
 
 #: minarca_client/main.py:359
 msgid "backup not running"
@@ -178,8 +177,8 @@ msgstr "Non connecté"
 msgid "Last successful backup: %s"
 msgstr "Dernière sauvegarde réussie : %s"
 
-#: minarca_client/main.py:449 minarca_client/main.py:453
-#: minarca_client/main.py:455 minarca_client/ui/backup_settings.py:257
+#: minarca_client/main.py:449 minarca_client/main.py:453 minarca_client/main.py:455
+#: minarca_client/ui/backup_settings.py:257
 msgid "Never"
 msgstr "Jamais"
 
@@ -216,16 +215,16 @@ msgid ""
 "If the problem persists, check the logs with your administrator or try "
 "reinstalling the application."
 msgstr ""
-"Si le problème persiste, vérifiez les journaux avec votre administrateur "
-"ou essayez de réinstaller l'application."
+"Si le problème persiste, vérifiez les journaux avec votre administrateur ou "
+"essayez de réinstaller l'application."
 
 #: minarca_client/main.py:508
 msgid ""
 "Minarca manages your computer's backup by linking your computer with a "
 "centralized server and running backups on a given schedule."
 msgstr ""
-"Minarca gère la sauvegarde de votre ordinateur en le reliant à un serveur"
-" centralisé et en exécutant des sauvegardes selon un calendrier donné."
+"Minarca gère la sauvegarde de votre ordinateur en le reliant à un serveur "
+"centralisé et en exécutant des sauvegardes selon un calendrier donné."
 
 #: minarca_client/main.py:527
 msgid "start a backup in background mode"
@@ -234,8 +233,7 @@ msgstr "démarrer une sauvegarde en arrière-plan"
 #: minarca_client/main.py:528 minarca_client/main.py:540
 msgid "force execution of a backup even if it's not time to run"
 msgstr ""
-"forcer l'exécution d'une sauvegarde même s'il n'est pas temps de "
-"l'exécuter"
+"forcer l'exécution d'une sauvegarde même s'il n'est pas temps de l'exécuter"
 
 #: minarca_client/main.py:532 minarca_client/main.py:544
 msgid "Limit backup to the given instance(s)."
@@ -252,14 +250,12 @@ msgstr "exclure les fichiers à sauvegarder"
 #: minarca_client/main.py:555
 msgid "Add exclude file pattern to the given instance(s)."
 msgstr ""
-"Ajoute un modèle de fichier d'exclusion à l'instance ou aux instances "
-"données."
+"Ajoute un modèle de fichier d'exclusion à l'instance ou aux instances données."
 
 #: minarca_client/main.py:559 minarca_client/main.py:572
 msgid "file pattern to be excluded. May contain `*` or `?` wildcard"
 msgstr ""
-"modèle de fichier à exclure. peut contenir un caractère générique `*` ou "
-"`?`"
+"modèle de fichier à exclure. peut contenir un caractère générique `*` ou `?`"
 
 #: minarca_client/main.py:564
 msgid "include files to be backed up"
@@ -268,14 +264,13 @@ msgstr "inclure les fichiers à sauvegarder"
 #: minarca_client/main.py:568
 msgid "Add include file pattern to the given instance(s)."
 msgstr ""
-"Ajoute un modèle de fichier d'inclusion à l'instance (aux instances) "
-"donnée(s)."
+"Ajoute un modèle de fichier d'inclusion à l'instance (aux instances) donnée(s)."
 
 #: minarca_client/main.py:578
 msgid "configure this agent to backup to a new destination (remote or local)"
 msgstr ""
-"configurer cet agent pour qu'il effectue des sauvegardes vers une "
-"nouvelle destination (distante ou locale)"
+"configurer cet agent pour qu'il effectue des sauvegardes vers une nouvelle "
+"destination (distante ou locale)"
 
 #: minarca_client/main.py:580
 msgid "URL to the remote server. e.g.: http://example.com:8080/"
@@ -284,16 +279,15 @@ msgstr "URL du serveur distant, par exemple : http://example.com:8080/"
 #: minarca_client/main.py:581
 msgid "username to be used for authentication with the remote server"
 msgstr ""
-"nom d'utilisateur à utiliser pour l'authentification auprès du serveur "
-"distant"
+"nom d'utilisateur à utiliser pour l'authentification auprès du serveur distant"
 
 #: minarca_client/main.py:585
 msgid ""
-"password or access token to use for authentication. You will be prompted "
-"if not provided"
+"password or access token to use for authentication. You will be prompted if not "
+"provided"
 msgstr ""
-"mot de passe ou jeton d'accès à utiliser pour l'authentification. Il "
-"serait demandé s'il n'est pas fourni"
+"mot de passe ou jeton d'accès à utiliser pour l'authentification. Il serait "
+"demandé s'il n'est pas fourni"
 
 #: minarca_client/main.py:587
 msgid "repository name to be used"
@@ -304,8 +298,8 @@ msgid ""
 "replace existing repository on backup destination if it exists without "
 "confirmation"
 msgstr ""
-"remplacer le dépôt existant sur la destination de la sauvegarde s'il "
-"existe sans confirmation"
+"remplacer le dépôt existant sur la destination de la sauvegarde s'il existe sans "
+"confirmation"
 
 #: minarca_client/main.py:593
 msgid "path to local destination"
@@ -318,8 +312,8 @@ msgstr "liste les modèles d'inclusion/exclusion"
 #: minarca_client/main.py:601
 msgid "Show include and exclude patterns only for the given instance(s)."
 msgstr ""
-"Afficher les modèles d'inclusion et d'exclusion uniquement pour la ou les"
-" instances données."
+"Afficher les modèles d'inclusion et d'exclusion uniquement pour la ou les "
+"instances données."
 
 #: minarca_client/main.py:608
 msgid "restore data from backup"
@@ -331,24 +325,22 @@ msgstr "Forcer l'utilisation d'une instance donnée pour la restauration."
 
 #: minarca_client/main.py:618
 msgid ""
-"Date and time to be restored. Could be 'now' to restore the latest "
-"backup. Could be an epoch value like '1682367069'. Could be an ISO date "
-"format like '2023-02-24T04:11:09-04:00'. Could be an interval like '3D' "
-"for 3 days ago."
+"Date and time to be restored. Could be 'now' to restore the latest backup. Could "
+"be an epoch value like '1682367069'. Could be an ISO date format like "
+"'2023-02-24T04:11:09-04:00'. Could be an interval like '3D' for 3 days ago."
 msgstr ""
-"Date et heure de la restauration. Il peut s'agir de \"now\" pour "
-"restaurer la dernière sauvegarde. Il peut s'agir d'une valeur d'époque "
-"comme '1682367069'. Il peut s'agir d'un format de date ISO comme "
-"'2023-02-24T04:11:09-04:00'. Il peut s'agir d'un intervalle comme \"3D\" "
-"pour 3 jours."
+"Date et heure de la restauration. Il peut s'agir de \"now\" pour restaurer la "
+"dernière sauvegarde. Il peut s'agir d'une valeur d'époque comme '1682367069'. Il "
+"peut s'agir d'un format de date ISO comme '2023-02-24T04:11:09-04:00'. Il peut "
+"s'agir d'un intervalle comme \"3D\" pour 3 jours."
 
 #: minarca_client/main.py:624
 msgid ""
-"Define an alternate location to restore files or folders instead of "
-"restoring them in place."
+"Define an alternate location to restore files or folders instead of restoring "
+"them in place."
 msgstr ""
-"Définir un autre emplacement pour restaurer des fichiers ou des dossiers "
-"au lieu de les restaurer sur place."
+"Définir un autre emplacement pour restaurer des fichiers ou des dossiers au lieu "
+"de les restaurer sur place."
 
 #: minarca_client/main.py:629
 msgid "Force execution of restore operation without confirmation from the user."
@@ -375,8 +367,7 @@ msgstr "n'échoue pas si la sauvegarde n'est pas en cours d'exécution."
 #: minarca_client/main.py:648
 msgid "create the required scheduled task in Windows Task Scheduler"
 msgstr ""
-"créer la tâche planifiée requise dans le planificateur de tâches de "
-"Windows"
+"créer la tâche planifiée requise dans le planificateur de tâches de Windows"
 
 #: minarca_client/main.py:650
 msgid "create the required scheduled task in launchd"
@@ -405,14 +396,13 @@ msgstr "Configurer uniquement la ou les instance(s) donnée(s)."
 #: minarca_client/main.py:683
 msgid "username required to run task when the user is logged out"
 msgstr ""
-"nom d'utilisateur requis pour exécuter la tâche lorsque l'utilisateur est"
-" déconnecté"
+"nom d'utilisateur requis pour exécuter la tâche lorsque l'utilisateur est "
+"déconnecté"
 
 #: minarca_client/main.py:684
 msgid "password required to run task when the user is logged out"
 msgstr ""
-"mot de passe requis pour exécuter la tâche lorsque l'utilisateur est "
-"déconnecté"
+"mot de passe requis pour exécuter la tâche lorsque l'utilisateur est déconnecté"
 
 #: minarca_client/main.py:688
 msgid "return the current Minarca status"
@@ -429,8 +419,7 @@ msgstr "oublier les paramètres de la sauvegarde"
 #: minarca_client/main.py:703
 msgid "Forget settings of the given backup instance(s)."
 msgstr ""
-"Oublie les paramètres de l'instance ou des instances de sauvegarde "
-"donnée(s)."
+"Oublie les paramètres de l'instance ou des instances de sauvegarde donnée(s)."
 
 #: minarca_client/main.py:708
 msgid "Force forget operation without confirmation from the user."
@@ -440,11 +429,11 @@ msgstr ""
 
 #: minarca_client/main.py:715
 msgid ""
-"temporarily delay the execution of the backup for the given number of "
-"hours. Default is 24 hours."
+"temporarily delay the execution of the backup for the given number of hours. "
+"Default is 24 hours."
 msgstr ""
-"retarde temporairement l'exécution de la sauvegarde pendant le nombre "
-"d'heures indiqué. La valeur par défaut est de 24 heures."
+"retarde temporairement l'exécution de la sauvegarde pendant le nombre d'heures "
+"indiqué. La valeur par défaut est de 24 heures."
 
 #: minarca_client/main.py:720
 msgid "Pause only the given instance(s)."
@@ -487,106 +476,100 @@ msgstr "La destination `%s` existe déjà."
 #: minarca_client/core/exceptions.py:90
 msgid "cannot stop process when it's not running."
 msgstr ""
-"impossible d'arrêter le processus puisqu'il n'est pas en cours "
-"d'exécution."
+"impossible d'arrêter le processus puisqu'il n'est pas en cours d'exécution."
 
 #: minarca_client/core/exceptions.py:150
 #, python-format
 msgid "process terminated with an exception. Check logs for more details: %s"
 msgstr ""
-"le processus de sauvegarde s'est terminé avec une exception, vérifiez les"
-" journaux pour plus de détails : %s"
+"le processus de sauvegarde s'est terminé avec une exception, vérifiez les "
+"journaux pour plus de détails : %s"
 
 #: minarca_client/core/exceptions.py:165
 #, python-format
 msgid "process returned a non-zero exit status (%s). Check logs for more details"
 msgstr ""
-"le processus de sauvegarde a renvoyé un état de sortie non nul (%s), "
-"consultez les journaux pour plus de détails"
+"le processus de sauvegarde a renvoyé un état de sortie non nul (%s), consultez "
+"les journaux pour plus de détails"
 
 #: minarca_client/core/exceptions.py:183
 msgid "cannot start process when it's already running."
 msgstr ""
-"impossible de démarrer le processus puisqu'il est déjà en cours "
-"d'exécution."
+"impossible de démarrer le processus puisqu'il est déjà en cours d'exécution."
 
 #: minarca_client/core/exceptions.py:195
 msgid "backup not yet scheduled to run. You may force execution using `--force`"
 msgstr ""
-"sauvegarde n'est pas encore planifiée pour s'exécuter, vous pouvez forcer"
-" l'exécution en utilisant `--force`"
+"sauvegarde n'est pas encore planifiée pour s'exécuter, vous pouvez forcer "
+"l'exécution en utilisant `--force`"
 
 #: minarca_client/core/exceptions.py:211
 msgid ""
-"Unable to connect to the remote server. The problem may be with the "
-"remote server. If the problem persists, contact your system administrator"
-" to check the SSH server configuration and a possible firewall blocking "
-"the connection."
+"Unable to connect to the remote server. The problem may be with the remote "
+"server. If the problem persists, contact your system administrator to check the "
+"SSH server configuration and a possible firewall blocking the connection."
 msgstr ""
-"Impossible de se connecter au serveur distant. Le problème peut provenir "
-"du serveur distant. Si le problème persiste, contactez votre "
-"administrateur système pour vérifier la configuration du serveur SSH et "
-"un éventuel pare-feu bloquant la connexion."
+"Impossible de se connecter au serveur distant. Le problème peut provenir du "
+"serveur distant. Si le problème persiste, contactez votre administrateur système "
+"pour vérifier la configuration du serveur SSH et un éventuel pare-feu bloquant "
+"la connexion."
 
 #: minarca_client/core/exceptions.py:234
 msgid ""
-"The connection to the remote server failed because our identity was "
-"refused. The problem may lie with the remote server. If the problem "
-"persists, contact your system administrator to check your SSH identity."
+"The connection to the remote server failed because our identity was refused. The "
+"problem may lie with the remote server. If the problem persists, contact your "
+"system administrator to check your SSH identity."
 msgstr ""
-"La sauvegarde a échoué parce que votre identité a été refusée par le "
-"serveur distant. Le problème peut provenir du serveur distant. Si le "
-"problème persiste, contactez votre administrateur système pour vérifier "
-"votre identité SSH."
+"La sauvegarde a échoué parce que votre identité a été refusée par le serveur "
+"distant. Le problème peut provenir du serveur distant. Si le problème persiste, "
+"contactez votre administrateur système pour vérifier votre identité SSH."
 
 #: minarca_client/core/exceptions.py:252
 msgid ""
-"The connection to the remote server cannot be established securely "
-"because the server's identity has changed. If the problem persists, "
-"contact your system administrator to verify the server's identity."
+"The connection to the remote server cannot be established securely because the "
+"server's identity has changed. If the problem persists, contact your system "
+"administrator to verify the server's identity."
 msgstr ""
-"La sauvegarde a échoué en raison de l'identité inconnue du serveur "
-"distant. Si le problème persiste, contactez votre administrateur système "
-"pour vérifier l'identité du serveur."
+"La sauvegarde a échoué en raison de l'identité inconnue du serveur distant. Si "
+"le problème persiste, contactez votre administrateur système pour vérifier "
+"l'identité du serveur."
 
 #: minarca_client/core/exceptions.py:268
 msgid ""
-"Backup failed due to disk quota exceeded. Please free up disk space to "
-"ensure successful backup."
+"Backup failed due to disk quota exceeded. Please free up disk space to ensure "
+"successful backup."
 msgstr ""
-"La sauvegarde a échoué en raison d'un dépassement du quota de disque. "
-"Veuillez libérer de l'espace disque pour assurer la réussite de la "
-"sauvegarde."
+"La sauvegarde a échoué en raison d'un dépassement du quota de disque. Veuillez "
+"libérer de l'espace disque pour assurer la réussite de la sauvegarde."
 
 #: minarca_client/core/exceptions.py:280
 msgid ""
-"Backup failed due to disk being full. Please clear space on the disk to "
-"proceed with the backup."
+"Backup failed due to disk being full. Please clear space on the disk to proceed "
+"with the backup."
 msgstr ""
-"La sauvegarde a échoué car le disque est plein. Veuillez libérer de "
-"l'espace sur le disque pour poursuivre la sauvegarde."
+"La sauvegarde a échoué car le disque est plein. Veuillez libérer de l'espace sur "
+"le disque pour poursuivre la sauvegarde."
 
 #: minarca_client/core/exceptions.py:293
 msgid ""
-"The connection to the remote server has failed due to an unresolvable "
-"host name. Please check your network connection and ensure that the host "
-"name is still valid. If the problem persists, contact your system "
-"administrator to check the host name."
+"The connection to the remote server has failed due to an unresolvable host name. "
+"Please check your network connection and ensure that the host name is still "
+"valid. If the problem persists, contact your system administrator to check the "
+"host name."
 msgstr ""
 "La connexion au serveur distant a échoué en raison d'un nom d'hôte non "
-"résoluble. Veuillez vérifier votre connexion réseau et vous assurer que "
-"le nom d'hôte est toujours valide. Si le problème persiste, contactez "
-"votre administrateur système pour vérifier le nom d'hôte."
+"résoluble. Veuillez vérifier votre connexion réseau et vous assurer que le nom "
+"d'hôte est toujours valide. Si le problème persiste, contactez votre "
+"administrateur système pour vérifier le nom d'hôte."
 
 #: minarca_client/core/exceptions.py:310
 msgid ""
-"The connection to the remote server has failed due to an unsupported "
-"version of the Minarca agent on the remote server. Consider updating your"
-" agent or server."
+"The connection to the remote server has failed due to an unsupported version of "
+"the Minarca agent on the remote server. Consider updating your agent or server."
 msgstr ""
-"La sauvegarde a échoué en raison d'une version non prise en charge de "
-"l'agent Minarca sur le serveur distant. Pensez à mettre à jour votre "
-"agent ou votre serveur."
+"La sauvegarde a échoué en raison d'une version non prise en charge de l'agent "
+"Minarca sur le serveur distant. Pensez à mettre à jour votre agent ou votre "
+"serveur."
 
 #: minarca_client/core/exceptions.py:324
 msgid "The path you are trying to restore from backup does not exist."
@@ -598,30 +581,28 @@ msgstr "Une autre session de sauvegarde est en cours sur le serveur distant."
 
 #: minarca_client/core/exceptions.py:350
 msgid ""
-"An internal error was raised by an unknown operation sent to the "
-"background process."
+"An internal error was raised by an unknown operation sent to the background "
+"process."
 msgstr ""
 "Une erreur interne a été soulevée par une opération inconnue envoyée au "
 "processus d'arrière-plan."
 
 #: minarca_client/core/exceptions.py:363
 msgid ""
-"Backup Destination Not Found. Please ensure that your external disk or "
-"network share is properly connected and accessible."
+"Backup Destination Not Found. Please ensure that your external disk or network "
+"share is properly connected and accessible."
 msgstr ""
-"Destination de la sauvegarde introuvable. Veuillez vous assurer que votre"
-" disque externe ou votre partage de réseau est correctement connecté et "
-"accessible."
+"Destination de la sauvegarde introuvable. Veuillez vous assurer que votre disque "
+"externe ou votre partage de réseau est correctement connecté et accessible."
 
 #: minarca_client/core/exceptions.py:370
 msgid ""
-"Backup unsuccessful due to a copy operation encountering an issue, "
-"potentially because the device is disconnected. Ensure your device is "
-"properly connected."
+"Backup unsuccessful due to a copy operation encountering an issue, potentially "
+"because the device is disconnected. Ensure your device is properly connected."
 msgstr ""
-"Échec de la sauvegarde en raison d'un problème rencontré lors d'une "
-"opération de copie, peut-être parce que l'appareil est déconnecté. "
-"Assurez-vous que votre appareil est correctement connecté."
+"Échec de la sauvegarde en raison d'un problème rencontré lors d'une opération de "
+"copie, peut-être parce que l'appareil est déconnecté. Assurez-vous que votre "
+"appareil est correctement connecté."
 
 #: minarca_client/core/exceptions.py:385
 msgid "Repository cannot be found on remote server"
@@ -634,23 +615,23 @@ msgstr "Le dépôt `%s` est introuvable sur le serveur distant"
 
 #: minarca_client/core/exceptions.py:415
 msgid ""
-"The connection was terminated unexpectedly, which may indicate an issue "
-"with the remote server. If the problem persists, contact your system "
-"administrator to review the server logs and diagnose the cause."
+"The connection was terminated unexpectedly, which may indicate an issue with the "
+"remote server. If the problem persists, contact your system administrator to "
+"review the server logs and diagnose the cause."
 msgstr ""
-"La connexion a été interrompue de manière inattendue, ce qui peut "
-"indiquer un problème avec le serveur distant. Si le problème persiste, "
-"contactez votre administrateur système pour consulter les journaux du "
-"serveur et diagnostiquer la cause du problème."
+"La connexion a été interrompue de manière inattendue, ce qui peut indiquer un "
+"problème avec le serveur distant. Si le problème persiste, contactez votre "
+"administrateur système pour consulter les journaux du serveur et diagnostiquer "
+"la cause du problème."
 
 #: minarca_client/core/exceptions.py:432
 #, python-format
 msgid ""
-"your file specification [%s] doesn't match any of the base directories of"
-" your system"
+"your file specification [%s] doesn't match any of the base directories of your "
+"system"
 msgstr ""
-"votre spécification de fichier [%s] ne correspond à aucun des répertoires"
-" de base de votre système"
+"votre spécification de fichier [%s] ne correspond à aucun des répertoires de "
+"base de votre système"
 
 #: minarca_client/core/exceptions.py:453
 msgid "No files included in backup. Check configuration."
@@ -667,13 +648,13 @@ msgstr "Échec de l'établissement de la connectivité avec le serveur distant."
 #: minarca_client/core/exceptions.py:481
 #, python-format
 msgid ""
-"Your computer cannot establish a connection to the remote server. Make "
-"sure your Internet connection is working and that the following URL is "
-"accessible with a Web browser: %s"
+"Your computer cannot establish a connection to the remote server. Make sure your "
+"Internet connection is working and that the following URL is accessible with a "
+"Web browser: %s"
 msgstr ""
 "Votre ordinateur ne parvient pas à établir une connexion avec le serveur "
-"distant. Assurez-vous que votre connexion Internet fonctionne et que "
-"l'URL suivante est accessible avec un navigateur Web : %s"
+"distant. Assurez-vous que votre connexion Internet fonctionne et que l'URL "
+"suivante est accessible avec un navigateur Web : %s"
 
 #: minarca_client/core/exceptions.py:497
 #, python-format
@@ -682,13 +663,13 @@ msgstr "L'URL du serveur distant n'est pas valide : %s"
 
 #: minarca_client/core/exceptions.py:498
 msgid ""
-"The remote server URL you entered for the connection is not valid. Check "
-"that you have entered the correct value. The URL must begin with "
-"`http://` or `https://` followed by a domain name."
+"The remote server URL you entered for the connection is not valid. Check that "
+"you have entered the correct value. The URL must begin with `http://` or "
+"`https://` followed by a domain name."
 msgstr ""
-"L'URL du serveur distant que vous avez saisi pour la connexion n'est pas "
-"valide. Vérifiez que vous avez saisi la bonne valeur. L'URL doit "
-"commencer par `http://` ou `https://` suivi d'un nom de domaine."
+"L'URL du serveur distant que vous avez saisi pour la connexion n'est pas valide. "
+"Vérifiez que vous avez saisi la bonne valeur. L'URL doit commencer par `http://` "
+"ou `https://` suivi d'un nom de domaine."
 
 #: minarca_client/core/exceptions.py:515
 msgid "Invalid username or password"
@@ -696,14 +677,13 @@ msgstr "Nom d'utilisateur ou mot de passe invalide"
 
 #: minarca_client/core/exceptions.py:516
 msgid ""
-"The username or password you entered to connect to the remote server is "
-"not valid. If you have enabled multi-factor authentication, you need to "
-"use an access token."
+"The username or password you entered to connect to the remote server is not "
+"valid. If you have enabled multi-factor authentication, you need to use an "
+"access token."
 msgstr ""
-"Le nom d'utilisateur ou le mot de passe que vous avez saisi pour vous "
-"connecter au serveur distant n'est pas valide. Si vous avez activé "
-"l'authentification multifactorielle, vous devez utiliser un jeton "
-"d'accès."
+"Le nom d'utilisateur ou le mot de passe que vous avez saisi pour vous connecter "
+"au serveur distant n'est pas valide. Si vous avez activé l'authentification "
+"multifactorielle, vous devez utiliser un jeton d'accès."
 
 #: minarca_client/core/exceptions.py:533
 msgid "The remote server returned an error. You may try again later."
@@ -715,13 +695,13 @@ msgstr "Destination de sauvegarde occupée"
 
 #: minarca_client/core/exceptions.py:546
 msgid ""
-"Unable to proceed with the selected destination as it contains existing "
-"data. If you intend to use this location, kindly empty the directory of "
-"any files and folders."
+"Unable to proceed with the selected destination as it contains existing data. If "
+"you intend to use this location, kindly empty the directory of any files and "
+"folders."
 msgstr ""
-"Impossible d'utiliser la destination sélectionnée car elle contient des "
-"données existantes. Si vous avez l'intention d'utiliser cet emplacement, "
-"veuillez vider le répertoire de tous les fichiers et dossiers."
+"Impossible d'utiliser la destination sélectionnée car elle contient des données "
+"existantes. Si vous avez l'intention d'utiliser cet emplacement, veuillez vider "
+"le répertoire de tous les fichiers et dossiers."
 
 #: minarca_client/core/exceptions.py:557
 msgid "Destination Not Suitable"
@@ -729,50 +709,47 @@ msgstr "Destination inadaptée"
 
 #: minarca_client/core/exceptions.py:558
 msgid ""
-"Unable to proceed with the selected destination as it cannot be "
-"initialized. Make sure the external device is connected and operational."
+"Unable to proceed with the selected destination as it cannot be initialized. "
+"Make sure the external device is connected and operational."
 msgstr ""
-"Impossible de poursuivre avec la destination sélectionnée car elle ne "
-"peut pas être initialisée. Assurez-vous que l'appareil externe est "
-"connecté et opérationnel."
+"Impossible de poursuivre avec la destination sélectionnée car elle ne peut pas "
+"être initialisée. Assurez-vous que l'appareil externe est connecté et "
+"opérationnel."
 
 #: minarca_client/core/exceptions.py:569
 msgid ""
-"Repository name must contain only letters, numbers, dashes (-), and dots "
-"(.)"
+"Repository name must contain only letters, numbers, dashes (-), and dots (.)"
 msgstr ""
-"Le nom du dépôt ne doit contenir que des lettres, des chiffres, des "
-"tirets (-) et des points (.)."
+"Le nom du dépôt ne doit contenir que des lettres, des chiffres, des tirets (-) "
+"et des points (.)."
 
 #: minarca_client/core/exceptions.py:583
 msgid ""
-"These settings conflict with an existing backup and therefore cannot be "
-"created."
+"These settings conflict with an existing backup and therefore cannot be created."
 msgstr ""
-"Ces paramètres entrent en conflit avec une sauvegarde existante et ne "
-"peuvent donc pas être créés."
+"Ces paramètres entrent en conflit avec une sauvegarde existante et ne peuvent "
+"donc pas être créés."
 
 #: minarca_client/core/exceptions.py:584
 msgid ""
-"It is not possible to create two backups with the same destination "
-"settings. These will conflict during backup. Be sure to define a "
-"different destination for this backup."
+"It is not possible to create two backups with the same destination settings. "
+"These will conflict during backup. Be sure to define a different destination for "
+"this backup."
 msgstr ""
-"Il n'est pas possible de créer deux sauvegardes avec les mêmes paramètres"
-" de destination. Ceux-ci entreront en conflit lors de la sauvegarde. "
-"Veillez à définir une destination différente pour cette sauvegarde."
+"Il n'est pas possible de créer deux sauvegardes avec les mêmes paramètres de "
+"destination. Ceux-ci entreront en conflit lors de la sauvegarde. Veillez à "
+"définir une destination différente pour cette sauvegarde."
 
 #: minarca_client/core/exceptions.py:605
 msgid ""
-"The remote server could not create the necessary security context, which "
-"may indicate an issue with the server. If the problem persists, please "
-"contact your system administrator to review the server logs and diagnose "
-"the cause."
+"The remote server could not create the necessary security context, which may "
+"indicate an issue with the server. If the problem persists, please contact your "
+"system administrator to review the server logs and diagnose the cause."
 msgstr ""
-"Le serveur distant n'a pas pu créer le contexte de sécurité nécessaire, "
-"ce qui peut indiquer un problème avec le serveur. Si le problème "
-"persiste, veuillez contacter votre administrateur système pour qu'il "
-"examine les journaux du serveur et en diagnostique la cause."
+"Le serveur distant n'a pas pu créer le contexte de sécurité nécessaire, ce qui "
+"peut indiquer un problème avec le serveur. Si le problème persiste, veuillez "
+"contacter votre administrateur système pour qu'il examine les journaux du "
+"serveur et en diagnostique la cause."
 
 #: minarca_client/core/latest.py:31
 msgid "https://minarca.org/download/"
@@ -930,37 +907,36 @@ msgstr "Sauvegarde Minarca"
 
 #: minarca_client/core/scheduler.py:73
 msgid ""
-"Keeps your Minarca Backup Software running. If this task is disabled or "
-"stopped, your Minarca backup will stop working. This task gets created "
-"when linking Minarca with a central backup server. When installing "
-"Minarca on a Windows Server, it's preferable to change the settings of "
-"this task and select 'Run whether user is logged on or not' to make sure "
-"the backup is running even when nobody is using the server."
+"Keeps your Minarca Backup Software running. If this task is disabled or stopped, "
+"your Minarca backup will stop working. This task gets created when linking "
+"Minarca with a central backup server. When installing Minarca on a Windows "
+"Server, it's preferable to change the settings of this task and select 'Run "
+"whether user is logged on or not' to make sure the backup is running even when "
+"nobody is using the server."
 msgstr ""
-"Maintient le fonctionnement de votre logiciel de sauvegarde Minarca. Si "
-"cette tâche est désactivée ou arrêté, votre sauvegarde Minarca cessera de"
-" fonctionner. Cette tâche est créée lors de la liaison de Minarca avec un"
-" serveur de sauvegarde central. Lors de l'installation Minarca sur un "
-"serveur Windows, il est préférable de modifier les paramètres de cette "
-"tâche et sélectionnez « Exécuter que l'utilisateur soit connecté ou non »"
-" pour vous assurer la sauvegarde s'exécute même lorsque personne "
-"n'utilise le serveur."
+"Maintient le fonctionnement de votre logiciel de sauvegarde Minarca. Si cette "
+"tâche est désactivée ou arrêté, votre sauvegarde Minarca cessera de fonctionner. "
+"Cette tâche est créée lors de la liaison de Minarca avec un serveur de "
+"sauvegarde central. Lors de l'installation Minarca sur un serveur Windows, il "
+"est préférable de modifier les paramètres de cette tâche et sélectionnez « "
+"Exécuter que l'utilisateur soit connecté ou non » pour vous assurer la "
+"sauvegarde s'exécute même lorsque personne n'utilise le serveur."
 
 #: minarca_client/core/scheduler.py:103
 msgid ""
-"A problem prevents the scheduling of backup jobs. Try running the "
-"application with Administrator rights."
+"A problem prevents the scheduling of backup jobs. Try running the application "
+"with Administrator rights."
 msgstr ""
 "Un problème empêche la planification des tâches de sauvegarde. Essayez "
 "d'exécuter l'application avec des droits d'administrateur."
 
 #: minarca_client/core/scheduler.py:110
 msgid ""
-"The user account is unknown or the password is incorrect. Be sure to "
-"enter your Windows credentials."
+"The user account is unknown or the password is incorrect. Be sure to enter your "
+"Windows credentials."
 msgstr ""
-"Le compte utilisateur est inconnu ou le mot de passe est incorrect. "
-"Veillez à saisir vos informations d'identification Windows."
+"Le compte utilisateur est inconnu ou le mot de passe est incorrect. Veillez à "
+"saisir vos informations d'identification Windows."
 
 #: minarca_client/core/status.py:152
 msgid "Your backup is outdated"
@@ -969,11 +945,11 @@ msgstr "Votre sauvegarde est obsolète"
 #: minarca_client/core/status.py:153
 #, python-format
 msgid ""
-"Your backup %s is outdated by over %s days. Please plug in your local "
-"device and run the backup."
+"Your backup %s is outdated by over %s days. Please plug in your local device and "
+"run the backup."
 msgstr ""
-"Votre sauvegarde %s est périmée de plus de %s jours. Veuillez brancher "
-"votre appareil local et exécuter la sauvegarde."
+"Votre sauvegarde %s est périmée de plus de %s jours. Veuillez brancher votre "
+"appareil local et exécuter la sauvegarde."
 
 #: minarca_client/core/notification/_notification_win.py:127
 msgid "Show details"
@@ -1022,8 +998,8 @@ msgid "Update now"
 msgstr "Mettre à jour maintenant"
 
 #: minarca_client/ui/about_menu.py:20
-msgid "Copyright © 2024 IKUS Software"
-msgstr "Copyright © 2024 IKUS Software"
+msgid "Copyright © 2025 IKUS Software"
+msgstr "Copyright © 2025 IKUS Software"
 
 #: minarca_client/ui/about_menu.py:128 minarca_client/ui/about_menu.py:130
 #: minarca_client/ui/backup_connection_local.py:262
@@ -1051,8 +1027,7 @@ msgstr "Version actuelle à jour"
 #: minarca_client/ui/backup_advance.py:19
 msgid "Configure your advanced backup settings to fine-tune your preferences."
 msgstr ""
-"Configurez vos paramètres de sauvegarde avancés pour affiner vos "
-"préférences."
+"Configurez vos paramètres de sauvegarde avancés pour affiner vos préférences."
 
 #: minarca_client/ui/backup_advance.py:19
 msgid "Script hooks"
@@ -1060,11 +1035,11 @@ msgstr "Commandes"
 
 #: minarca_client/ui/backup_advance.py:19
 msgid ""
-"Set up custom scripts to run before or after backups by defining the "
-"command line to be executed."
+"Set up custom scripts to run before or after backups by defining the command "
+"line to be executed."
 msgstr ""
-"Configurez des scripts personnalisés à exécuter avant ou après les "
-"sauvegardes en définissant la ligne de commande à exécuter."
+"Configurez des scripts personnalisés à exécuter avant ou après les sauvegardes "
+"en définissant la ligne de commande à exécuter."
 
 #: minarca_client/ui/backup_advance.py:19
 msgid "Pre-backup command"
@@ -1081,21 +1056,18 @@ msgstr "Poursuivre la sauvegarde si l'une des commandes échoue"
 #: minarca_client/ui/backup_advance.py:19
 #: minarca_client/ui/backup_connection_local.py:30
 #: minarca_client/ui/backup_connection_remote.py:21
-#: minarca_client/ui/backup_patterns.py:23
-#: minarca_client/ui/backup_settings.py:26
+#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_settings.py:26
 msgid "Cancel"
 msgstr "Annuler"
 
 #: minarca_client/ui/backup_advance.py:19
 #: minarca_client/ui/backup_connection_local.py:30
 #: minarca_client/ui/backup_connection_remote.py:21
-#: minarca_client/ui/backup_patterns.py:23
-#: minarca_client/ui/backup_settings.py:26
+#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_settings.py:26
 msgid "Save"
 msgstr "Sauvegarder"
 
-#: minarca_client/ui/backup_advance.py:127
-#: minarca_client/ui/backup_settings.py:350
+#: minarca_client/ui/backup_advance.py:127 minarca_client/ui/backup_settings.py:350
 msgid "Please wait. Saving settings..."
 msgstr "Veuillez patienter. Enregistrement des paramètres..."
 
@@ -1105,12 +1077,11 @@ msgstr "Impossible d'enregistrer les paramètres avancés"
 
 #: minarca_client/ui/backup_advance.py:145
 msgid ""
-"An unknown problem encountered while trying to save the advance backup "
-"settings. If the problem persist contact your administrator."
+"An unknown problem encountered while trying to save the advance backup settings. "
+"If the problem persist contact your administrator."
 msgstr ""
-"Un problème inconnu a été rencontré lors de l'enregistrement des "
-"paramètres de la sauvegarde avancée. Si le problème persiste, contactez "
-"votre administrateur."
+"Un problème inconnu a été rencontré lors de l'enregistrement des paramètres de "
+"la sauvegarde avancée. Si le problème persiste, contactez votre administrateur."
 
 #: minarca_client/ui/backup_card.py:21 minarca_client/ui/backup_create.py:11
 #: minarca_client/ui/side_pannel.py:102
@@ -1134,8 +1105,7 @@ msgstr "Actif"
 msgid "Backup configuration"
 msgstr "Configuration de la sauvegarde"
 
-#: minarca_client/ui/backup_card.py:21
-#: minarca_client/ui/backup_restore_files.py:28
+#: minarca_client/ui/backup_card.py:21 minarca_client/ui/backup_restore_files.py:28
 msgid "File selection"
 msgstr "Sélection de fichiers"
 
@@ -1226,16 +1196,16 @@ msgstr "Êtes-vous sûr de vouloir mettre en pause la tâche de sauvegarde ?"
 
 #: minarca_client/ui/backup_card.py:385
 msgid ""
-"Pausing the backup job will temporarily suspend the ongoing backup "
-"process for the next 24 hours. This action may affect the availability of"
-" recent data restore points and introduce delays in the backup schedule. "
-"Please confirm your intention before proceeding."
+"Pausing the backup job will temporarily suspend the ongoing backup process for "
+"the next 24 hours. This action may affect the availability of recent data "
+"restore points and introduce delays in the backup schedule. Please confirm your "
+"intention before proceeding."
 msgstr ""
-"La mise en pause de la tâche de sauvegarde suspend temporairement le "
-"processus de sauvegarde en cours pour les 24 heures à venir. Cette action"
-" peut affecter la disponibilité des points de restauration des données "
-"récentes et entraîner des retards dans le calendrier de sauvegarde. "
-"Veuillez confirmer votre intention avant de poursuivre."
+"La mise en pause de la tâche de sauvegarde suspend temporairement le processus "
+"de sauvegarde en cours pour les 24 heures à venir. Cette action peut affecter la "
+"disponibilité des points de restauration des données récentes et entraîner des "
+"retards dans le calendrier de sauvegarde. Veuillez confirmer votre intention "
+"avant de poursuivre."
 
 #: minarca_client/ui/backup_card.py:404
 msgid "Start Backup"
@@ -1247,11 +1217,11 @@ msgstr "Un problème s'est produit lors du lancement du processus de sauvegarde.
 
 #: minarca_client/ui/backup_card.py:406
 msgid ""
-"This usually indicate a problem with the installation. Try re-installing "
-"Minarca Backup."
+"This usually indicate a problem with the installation. Try re-installing Minarca "
+"Backup."
 msgstr ""
-"Cela indique généralement un problème d'installation. Essayez de "
-"réinstaller Minarca Backup."
+"Cela indique généralement un problème d'installation. Essayez de réinstaller "
+"Minarca Backup."
 
 #: minarca_client/ui/backup_card.py:420 minarca_client/ui/backup_logs.py:346
 msgid "Stop process"
@@ -1284,15 +1254,14 @@ msgstr "Rafraîchir"
 
 #: minarca_client/ui/backup_connection_local.py:30
 msgid ""
-"No external drive has been detected for data backup. Plug in your "
-"external drive and click on the refresh button to update this list. If "
-"your device is not on the list, check its connectivity and make sure it's"
-" switched on."
+"No external drive has been detected for data backup. Plug in your external drive "
+"and click on the refresh button to update this list. If your device is not on "
+"the list, check its connectivity and make sure it's switched on."
 msgstr ""
-"Aucun lecteur externe n'a été détecté pour la sauvegarde des données. "
-"Branchez votre disque externe et cliquez sur le bouton d'actualisation "
-"pour mettre à jour cette liste. Si votre appareil ne figure pas dans la "
-"liste, vérifiez sa connectivité et assurez-vous qu'il est allumé."
+"Aucun lecteur externe n'a été détecté pour la sauvegarde des données. Branchez "
+"votre disque externe et cliquez sur le bouton d'actualisation pour mettre à jour "
+"cette liste. Si votre appareil ne figure pas dans la liste, vérifiez sa "
+"connectivité et assurez-vous qu'il est allumé."
 
 #: minarca_client/ui/backup_connection_local.py:30
 #: minarca_client/ui/backup_connection_remote.py:21
@@ -1329,19 +1298,19 @@ msgstr " • Format %s"
 
 #: minarca_client/ui/backup_connection_local.py:286
 msgid ""
-"Detected as a fixed device. Prefer using removable or network storage to "
-"avoid data loss."
+"Detected as a fixed device. Prefer using removable or network storage to avoid "
+"data loss."
 msgstr ""
-"Détecté comme un appareil fixe. Préférez l'utilisation d'un support de "
-"stockage amovible ou en réseau pour éviter toute perte de données."
+"Détecté comme un appareil fixe. Préférez l'utilisation d'un support de stockage "
+"amovible ou en réseau pour éviter toute perte de données."
 
 #: minarca_client/ui/backup_connection_local.py:288
 msgid ""
-"Ensure this network location is configured to automatically reconnect to "
-"avoid data loss."
+"Ensure this network location is configured to automatically reconnect to avoid "
+"data loss."
 msgstr ""
-"Assurez-vous que cet emplacement réseau est configuré pour se reconnecter"
-" automatiquement afin d'éviter toute perte de données."
+"Assurez-vous que cet emplacement réseau est configuré pour se reconnecter "
+"automatiquement afin d'éviter toute perte de données."
 
 #: minarca_client/ui/backup_connection_local.py:290
 msgid "FAT32 file system is not recommended for backup."
@@ -1350,16 +1319,15 @@ msgstr "Le système de fichiers FAT32 n'est pas recommandé pour la sauvegarde."
 #: minarca_client/ui/backup_connection_local.py:292
 msgid "Samba share over Gnome Virtual File system is not compatible."
 msgstr ""
-"Le partage de Samba sur le système de fichiers virtuels de Gnome n'est "
-"pas compatible."
+"Le partage de Samba sur le système de fichiers virtuels de Gnome n'est pas "
+"compatible."
 
 #: minarca_client/ui/backup_connection_local.py:294
 msgid ""
-"NTFS isn't recommended on Linux due to remount issues after improper "
-"unmounting."
+"NTFS isn't recommended on Linux due to remount issues after improper unmounting."
 msgstr ""
-"NTFS n'est pas recommandé sous Linux en raison de problèmes de remontage "
-"après un démontage incorrect."
+"NTFS n'est pas recommandé sous Linux en raison de problèmes de remontage après "
+"un démontage incorrect."
 
 #: minarca_client/ui/backup_connection_local.py:297
 msgid "Available disk space at this location is limited."
@@ -1380,11 +1348,11 @@ msgstr "Vous souhaitez remplacer le dépôt existant ?"
 
 #: minarca_client/ui/backup_connection_local.py:433
 msgid ""
-"The selected destination already exists at this location. If you continue"
-" with this repository, you will replace its content using this computer. "
+"The selected destination already exists at this location. If you continue with "
+"this repository, you will replace its content using this computer. "
 msgstr ""
-"La destination sélectionnée existe déjà à cet endroit. Si vous continuez "
-"avec ce dépôt, vous remplacerez son contenu en utilisant cet ordinateur. "
+"La destination sélectionnée existe déjà à cet endroit. Si vous continuez avec ce "
+"dépôt, vous remplacerez son contenu en utilisant cet ordinateur. "
 
 #: minarca_client/ui/backup_connection_local.py:447
 msgid "Unknown problem occurred when trying to configure the destination."
@@ -1396,8 +1364,7 @@ msgstr "Veuillez patienter. Recherche d'un disque amovible..."
 
 #: minarca_client/ui/backup_connection_local.py:488
 msgid ""
-"Please choose an external device or network share as your backup "
-"destination."
+"Please choose an external device or network share as your backup destination."
 msgstr ""
 "Veuillez choisir un périphérique externe ou un partage de réseau comme "
 "destination de la sauvegarde."
@@ -1406,18 +1373,17 @@ msgstr ""
 #: minarca_client/ui/backup_connection_local.py:500
 msgid "Unable to retrieve information from selected location"
 msgstr ""
-"Impossible de récupérer des informations à partir de l'emplacement "
-"sélectionné"
+"Impossible de récupérer des informations à partir de l'emplacement sélectionné"
 
 #: minarca_client/ui/backup_connection_local.py:501
 msgid ""
-"Unable to obtain detailed information on the selected location. Please "
-"ensure that this location is accessible and valid. If the problem "
-"persists, consult the application log with your administrator."
+"Unable to obtain detailed information on the selected location. Please ensure "
+"that this location is accessible and valid. If the problem persists, consult the "
+"application log with your administrator."
 msgstr ""
-"Impossible d'obtenir des informations détaillées sur le lieu sélectionné."
-" Veuillez vous assurer que cet emplacement est accessible et valide. Si "
-"le problème persiste, consultez le journal de l'application avec votre "
+"Impossible d'obtenir des informations détaillées sur le lieu sélectionné. "
+"Veuillez vous assurer que cet emplacement est accessible et valide. Si le "
+"problème persiste, consultez le journal de l'application avec votre "
 "administrateur."
 
 #: minarca_client/ui/backup_connection_local.py:525
@@ -1436,18 +1402,16 @@ msgstr "Êtes-vous sûr de vouloir supprimer cette configuration de sauvegarde ?
 
 #: minarca_client/ui/backup_connection_local.py:539
 msgid ""
-"If you delete this backup configuration, this Minarca agent will erase "
-"its identity and will no longer run backup on schedule."
+"If you delete this backup configuration, this Minarca agent will erase its "
+"identity and will no longer run backup on schedule."
 msgstr ""
-"Si vous supprimez cette configuration de sauvegarde, l'agent Minarca "
-"perdra son identité et n'exécutera plus de sauvegarde selon le calendrier"
-" prévu."
+"Si vous supprimez cette configuration de sauvegarde, l'agent Minarca perdra son "
+"identité et n'exécutera plus de sauvegarde selon le calendrier prévu."
 
 #: minarca_client/ui/backup_connection_remote.py:21
 msgid "Provide your login details to configure remote backup."
 msgstr ""
-"Indiquez vos données de connexion pour configurer la sauvegarde à "
-"distance."
+"Indiquez vos données de connexion pour configurer la sauvegarde à distance."
 
 #: minarca_client/ui/backup_connection_remote.py:21
 msgid "Edit server connection"
@@ -1468,8 +1432,7 @@ msgstr "Mot de passe"
 #: minarca_client/ui/backup_connection_remote.py:243
 msgid "Please wait. Initializing backup on remote server..."
 msgstr ""
-"Veuillez patienter. Initialisation de la sauvegarde sur le serveur "
-"distant..."
+"Veuillez patienter. Initialisation de la sauvegarde sur le serveur distant..."
 
 #: minarca_client/ui/backup_connection_remote.py:254
 #: minarca_client/ui/backup_settings.py:429
@@ -1480,8 +1443,8 @@ msgstr "Êtes-vous sûr de vouloir oublier ces paramètres de sauvegarde ?"
 #: minarca_client/ui/backup_settings.py:430
 msgid "If you forget these settings, the backup will no longer run on schedule."
 msgstr ""
-"Si vous oubliez ces paramètres, la sauvegarde ne s'exécutera plus selon "
-"le calendrier prévu."
+"Si vous oubliez ces paramètres, la sauvegarde ne s'exécutera plus selon le "
+"calendrier prévu."
 
 #: minarca_client/ui/backup_connection_remote.py:285
 msgid "Repository name already exists"
@@ -1489,13 +1452,13 @@ msgstr "Le nom du dépôt existe déjà"
 
 #: minarca_client/ui/backup_connection_remote.py:287
 msgid ""
-"The repository name you have entered already exists on the remote server."
-" If you continue with this repository, you will replace its content using"
-" this computer. Otherwise, you must enter a different repository name."
+"The repository name you have entered already exists on the remote server. If you "
+"continue with this repository, you will replace its content using this computer. "
+"Otherwise, you must enter a different repository name."
 msgstr ""
-"Le nom de dépôt que vous avez entré existe déjà sur le serveur distant. "
-"Si vous continuez avec ce nom, vous remplacerez son contenu avec celui de"
-" cet ordinateur. Sinon, vous devez entrer un autre nom de dépôt."
+"Le nom de dépôt que vous avez entré existe déjà sur le serveur distant. Si vous "
+"continuez avec ce nom, vous remplacerez son contenu avec celui de cet "
+"ordinateur. Sinon, vous devez entrer un autre nom de dépôt."
 
 #: minarca_client/ui/backup_connection_remote.py:302
 msgid "Failed to establish connectivity with remote server."
@@ -1551,8 +1514,8 @@ msgstr "Sauvegarde autonome"
 #: minarca_client/ui/backup_logs.py:26
 msgid "Get detailed information about your last backup or restore operation."
 msgstr ""
-"Obtenez des informations détaillées sur votre dernière opération de "
-"sauvegarde ou de restauration."
+"Obtenez des informations détaillées sur votre dernière opération de sauvegarde "
+"ou de restauration."
 
 #: minarca_client/ui/backup_logs.py:26
 msgid "Open file in text editor..."
@@ -1601,8 +1564,8 @@ msgstr "Confirmation requise"
 #: minarca_client/ui/backup_logs.py:333
 msgid "Are you sure you want to stop the ongoing backup/restore process?"
 msgstr ""
-"Êtes-vous sûr de vouloir arrêter le processus de sauvegarde/restauration "
-"en cours ?"
+"Êtes-vous sûr de vouloir arrêter le processus de sauvegarde/restauration en "
+"cours ?"
 
 #: minarca_client/ui/backup_logs.py:334
 msgid ""
@@ -1610,8 +1573,7 @@ msgid ""
 "prematurely. Please confirm your decision before proceeding."
 msgstr ""
 "Vos données peuvent être incomplètes ou corrompues si l'opération est "
-"interrompue prématurément. Veuillez confirmer votre décision avant de "
-"poursuivre."
+"interrompue prématurément. Veuillez confirmer votre décision avant de poursuivre."
 
 #: minarca_client/ui/backup_patterns.py:23
 msgid "Select the files and folders you want to back up."
@@ -1629,8 +1591,7 @@ msgstr "Fichiers inclus"
 msgid "Files excluded"
 msgstr "Fichiers exclus"
 
-#: minarca_client/ui/backup_patterns.py:23
-#: minarca_client/ui/backup_patterns.py:267
+#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_patterns.py:267
 msgid "Add file"
 msgstr "Ajouter un fichier"
 
@@ -1638,8 +1599,7 @@ msgstr "Ajouter un fichier"
 msgid "Exclude file"
 msgstr "Exclure un fichier"
 
-#: minarca_client/ui/backup_patterns.py:23
-#: minarca_client/ui/backup_patterns.py:256
+#: minarca_client/ui/backup_patterns.py:23 minarca_client/ui/backup_patterns.py:256
 msgid "Add folder"
 msgstr "Ajouter un dossier"
 
@@ -1678,16 +1638,15 @@ msgstr "Échec de la récupération des dates de sauvegarde disponibles."
 #: minarca_client/ui/backup_restore_date.py:184
 msgid "Unknown problem occurred when collecting backup dates."
 msgstr ""
-"Un problème inconnu s'est produit lors de la collecte des dates de "
-"sauvegarde."
+"Un problème inconnu s'est produit lors de la collecte des dates de sauvegarde."
 
 #: minarca_client/ui/backup_restore_files.py:28
 msgid ""
-"When you perform a custom restore, the selected item is restored to a "
-"different location selected by you."
+"When you perform a custom restore, the selected item is restored to a different "
+"location selected by you."
 msgstr ""
-"Lorsque vous effectuez une restauration personnalisée, l'élément "
-"sélectionné est restauré à un emplacement différent que vous avez choisi."
+"Lorsque vous effectuez une restauration personnalisée, l'élément sélectionné est "
+"restauré à un emplacement différent que vous avez choisi."
 
 #: minarca_client/ui/backup_restore_files.py:28
 msgid "Search for files or folders..."
@@ -1698,9 +1657,8 @@ msgid ""
 "Restore files in-place, replacing existing files. I understand this may "
 "overwrite data if the destination isn't empty."
 msgstr ""
-"Restaurer les fichiers sur place, en remplaçant les fichiers existants. "
-"Je comprends que cela peut écraser des données si la destination n'est "
-"pas vide."
+"Restaurer les fichiers sur place, en remplaçant les fichiers existants. Je "
+"comprends que cela peut écraser des données si la destination n'est pas vide."
 
 #: minarca_client/ui/backup_restore_files.py:28
 msgid "Restore..."
@@ -1717,8 +1675,7 @@ msgstr "Échec de la récupération des fichiers disponibles."
 #: minarca_client/ui/backup_restore_files.py:235
 msgid "Unknown problem occurred when collecting file list."
 msgstr ""
-"Un problème inconnu s'est produit lors de la collecte de la liste des "
-"fichiers."
+"Un problème inconnu s'est produit lors de la collecte de la liste des fichiers."
 
 #: minarca_client/ui/backup_restore_files.py:259
 #, python-format
@@ -1741,14 +1698,13 @@ msgstr "Êtes-vous sûr de vouloir effectuer une restauration complète ?"
 
 #: minarca_client/ui/backup_restore_files.py:286
 msgid ""
-"This action will overwrite all existing files selected with the previous "
-"version present in the backup. This action is irreversible and may result"
-" in data loss if the destination is not empty."
+"This action will overwrite all existing files selected with the previous version "
+"present in the backup. This action is irreversible and may result in data loss "
+"if the destination is not empty."
 msgstr ""
-"Cette action écrasera tous les fichiers existants sélectionnés avec la "
-"version précédente présente dans la sauvegarde. Cette action est "
-"irréversible et peut entraîner une perte de données si la destination "
-"n'est pas vide."
+"Cette action écrasera tous les fichiers existants sélectionnés avec la version "
+"précédente présente dans la sauvegarde. Cette action est irréversible et peut "
+"entraîner une perte de données si la destination n'est pas vide."
 
 #: minarca_client/ui/backup_restore_files.py:296
 msgid "Select a folder where to restore data."
@@ -1757,8 +1713,8 @@ msgstr "Sélectionner le dossier dans lequel restaurer les données."
 #: minarca_client/ui/backup_settings.py:26
 msgid "Configure your backup settings for personalized data protection."
 msgstr ""
-"Configurez vos paramètres de sauvegarde pour une protection personnalisée"
-" des données."
+"Configurez vos paramètres de sauvegarde pour une protection personnalisée des "
+"données."
 
 #: minarca_client/ui/backup_settings.py:26
 msgid "Backup frequency"
@@ -1956,16 +1912,15 @@ msgstr "Impossible de récupérer les paramètres du serveur distant."
 
 #: minarca_client/ui/backup_settings.py:322
 msgid ""
-"This issue may arise due to the remote server being out-of-date. You may "
-"edit the settings, however, some settings will not be synchronized with "
-"the remote server. If this problem persists, we recommend contacting your"
-" administrator for further assistance."
+"This issue may arise due to the remote server being out-of-date. You may edit "
+"the settings, however, some settings will not be synchronized with the remote "
+"server. If this problem persists, we recommend contacting your administrator for "
+"further assistance."
 msgstr ""
-"Ce problème peut être dû au fait que le serveur distant n'est pas à jour."
-" Vous pouvez modifier les paramètres, mais certains d'entre eux ne seront"
-" pas synchronisés avec le serveur distant. Si ce problème persiste, nous "
-"vous recommandons de contacter votre administrateur pour obtenir de "
-"l'aide."
+"Ce problème peut être dû au fait que le serveur distant n'est pas à jour. Vous "
+"pouvez modifier les paramètres, mais certains d'entre eux ne seront pas "
+"synchronisés avec le serveur distant. Si ce problème persiste, nous vous "
+"recommandons de contacter votre administrateur pour obtenir de l'aide."
 
 #: minarca_client/ui/backup_settings.py:330
 msgid "Unable to retrieve configuration from remote server."
@@ -1990,8 +1945,7 @@ msgstr "Dépôt non trouvé"
 #: minarca_client/ui/backup_settings.py:403
 msgid "A problem occured while trying to save the backup settings."
 msgstr ""
-"Un problème s'est produit lors de l'enregistrement des paramètres de "
-"sauvegarde."
+"Un problème s'est produit lors de l'enregistrement des paramètres de sauvegarde."
 
 #: minarca_client/ui/backup_settings.py:387
 msgid "Authentication failed"
@@ -1999,24 +1953,22 @@ msgstr "Échec de l'authentification"
 
 #: minarca_client/ui/backup_settings.py:388
 msgid ""
-"Your settings could not be saved to remote server. Do you want to "
-"continue ?"
+"Your settings could not be saved to remote server. Do you want to continue ?"
 msgstr ""
-"Vos paramètres n'ont pas pu être enregistrés sur le serveur distant. "
-"Voulez-vous continuer ?"
+"Vos paramètres n'ont pas pu être enregistrés sur le serveur distant. Voulez-vous "
+"continuer ?"
 
 #: minarca_client/ui/backup_settings.py:389
 msgid ""
-"This issue may arise due to the remote server being out-of-date. You have"
-" the option to proceed, however, some settings will not be synchronized "
-"with the remote server. If this problem persists, we recommend contacting"
-" your administrator for further assistance."
+"This issue may arise due to the remote server being out-of-date. You have the "
+"option to proceed, however, some settings will not be synchronized with the "
+"remote server. If this problem persists, we recommend contacting your "
+"administrator for further assistance."
 msgstr ""
-"Ce problème peut être dû au fait que le serveur distant n'est pas à jour."
-" Vous avez la possibilité de continuer, mais certains paramètres ne "
-"seront pas synchronisés avec le serveur distant. Si ce problème persiste,"
-" nous vous recommandons de contacter votre administrateur pour obtenir de"
-" l'aide."
+"Ce problème peut être dû au fait que le serveur distant n'est pas à jour. Vous "
+"avez la possibilité de continuer, mais certains paramètres ne seront pas "
+"synchronisés avec le serveur distant. Si ce problème persiste, nous vous "
+"recommandons de contacter votre administrateur pour obtenir de l'aide."
 
 #: minarca_client/ui/backup_settings.py:402
 msgid "Save Settings timeout"
@@ -2024,13 +1976,12 @@ msgstr "Délai d'enregistrement des paramètres est dépassé"
 
 #: minarca_client/ui/backup_settings.py:404
 msgid ""
-"The operation timeout. Check your internet connection and verify if the "
-"remote server is online. If the problem persist contact your "
-"administrator."
+"The operation timeout. Check your internet connection and verify if the remote "
+"server is online. If the problem persist contact your administrator."
 msgstr ""
-"Le délai d'exécution de l'opération est dépassé. Vérifiez votre connexion"
-" internet et vérifiez que le serveur distant est en ligne. Si le problème"
-" persiste, contactez votre administrateur."
+"Le délai d'exécution de l'opération est dépassé. Vérifiez votre connexion "
+"internet et vérifiez que le serveur distant est en ligne. Si le problème "
+"persiste, contactez votre administrateur."
 
 #: minarca_client/ui/backup_settings.py:412
 msgid "Cannot save settings"
@@ -2038,11 +1989,11 @@ msgstr "Impossible d'enregistrer les paramètres"
 
 #: minarca_client/ui/backup_settings.py:413
 msgid ""
-"An unknown problem occured while trying to save the backup settings. If "
-"the problem persist contact your administrator."
+"An unknown problem occured while trying to save the backup settings. If the "
+"problem persist contact your administrator."
 msgstr ""
-"Un problème inconnu s'est produit lors de l'enregistrement des paramètres"
-" de sauvegarde. Si le problème persiste, contactez votre administrateur."
+"Un problème inconnu s'est produit lors de l'enregistrement des paramètres de "
+"sauvegarde. Si le problème persiste, contactez votre administrateur."
 
 #: minarca_client/ui/backup_settings.py:462
 msgid "Windows Credentials"
@@ -2103,29 +2054,22 @@ msgstr "Restauration locale"
 #~ msgstr "Sélectionnez l'emplacement où vous souhaitez sauvegarder vos fichiers."
 
 #~ msgid ""
-#~ "A problem prevents the automatic "
-#~ "scheduling of backup jobs. As a "
-#~ "result, your backup tasks cannot be "
-#~ "executed as planned."
+#~ "A problem prevents the automatic scheduling of backup jobs. As a result, your "
+#~ "backup tasks cannot be executed as planned."
 #~ msgstr ""
-#~ "Un problème empêche la planification "
-#~ "automatique des tâches de sauvegarde. "
-#~ "Par conséquent, vos tâches de sauvegarde"
-#~ " ne peuvent pas être exécutées comme"
-#~ " prévu."
+#~ "Un problème empêche la planification automatique des tâches de sauvegarde. "
+#~ "Par conséquent, vos tâches de sauvegarde ne peuvent pas être exécutées comme "
+#~ "prévu."
 
 #~ msgid "Process interrupted by user."
 #~ msgstr "Processus interrompu par l'utilisateur."
 
 #~ msgid ""
-#~ "Choose between restoring all files in"
-#~ " place or selecting specific files "
-#~ "for restoration."
+#~ "Choose between restoring all files in place or selecting specific files for "
+#~ "restoration."
 #~ msgstr ""
-#~ "Vous pouvez choisir de restaurer tous"
-#~ " les fichiers en place ou de "
-#~ "sélectionner des fichiers spécifiques à "
-#~ "restaurer."
+#~ "Vous pouvez choisir de restaurer tous les fichiers en place ou de "
+#~ "sélectionner des fichiers spécifiques à restaurer."
 
 #~ msgid "Restore Options"
 #~ msgstr "Options de restauration"
@@ -2155,33 +2099,23 @@ msgstr "Restauration locale"
 #~ msgstr "Idéal en cas de défaillance matérielle"
 
 #~ msgid ""
-#~ "When you perform a full restore, "
-#~ "the selected items will be restored "
-#~ "to their original location on your "
-#~ "device."
+#~ "When you perform a full restore, the selected items will be restored to their "
+#~ "original location on your device."
 #~ msgstr ""
-#~ "Lorsque vous effectuez une restauration "
-#~ "complète, les éléments sélectionnés sont "
-#~ "restaurés à leur emplacement d'origine "
-#~ "sur votre appareil."
+#~ "Lorsque vous effectuez une restauration complète, les éléments sélectionnés "
+#~ "sont restaurés à leur emplacement d'origine sur votre appareil."
 
 #~ msgid ""
-#~ "I understand that full restore replaces"
-#~ " existing files on my device and "
-#~ "may result in data loss if the "
-#~ "destination is not empty."
+#~ "I understand that full restore replaces existing files on my device and may "
+#~ "result in data loss if the destination is not empty."
 #~ msgstr ""
-#~ "Je comprends que la restauration "
-#~ "complète remplace les fichiers existants "
-#~ "sur mon appareil et peut entraîner "
-#~ "une perte de données si la "
-#~ "destination n'est pas vide."
+#~ "Je comprends que la restauration complète remplace les fichiers existants sur "
+#~ "mon appareil et peut entraîner une perte de données si la destination n'est "
+#~ "pas vide."
 
 #~ msgid "Restore"
 #~ msgstr "Restaurer"
 
 #~ msgid "No files included in backup. Check configuration. (Error: 29)"
 #~ msgstr ""
-#~ "Aucun fichier n'est inclus dans la "
-#~ "sauvegarde. Vérifier la configuration."
-
+#~ "Aucun fichier n'est inclus dans la sauvegarde. Vérifier la configuration."

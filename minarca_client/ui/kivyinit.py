@@ -1,3 +1,7 @@
+# Copyright (C) 2025 IKUS Software. All right reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
+
 # Define kivy configuration manually
 import sys
 from importlib.resources import files

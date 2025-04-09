@@ -1,3 +1,6 @@
+# Copyright (C) 2025 IKUS Software. All right reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
 from kivy.properties import AliasProperty
 
 

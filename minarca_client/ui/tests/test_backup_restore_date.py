@@ -1,3 +1,6 @@
+# Copyright (C) 2025 IKUS Software. All right reserved.
+# IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
+# Use is subject to license terms.
 from minarca_client.core.backup import BackupInstance
 from minarca_client.ui.backup_restore_date import BackupRestoreDate
 from minarca_client.ui.dashboard import DashboardView
