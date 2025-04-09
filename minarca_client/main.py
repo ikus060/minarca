@@ -5,6 +5,7 @@ import argparse
 import asyncio
 import logging
 import logging.handlers
+import os
 import signal
 import sys
 from pathlib import Path
@@ -419,7 +420,7 @@ def _parse_args():
         add_help=True,
     )
     # Check if the application should default to GUI mode.
-    is_ui = parser.prog in ['minarcaw', 'minarcaw.exe']
+    is_ui = os.path.basename(sys.executable) in ['minarcaw', 'minarcaw.exe']
 
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument('-d', '--debug', action='store_true')
