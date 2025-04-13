@@ -140,6 +140,11 @@ class MinarcaApp(MDApp, ExceptionHandler):
 
         # Forget & Destroy existing children
         self._clear_widgets_recursive(self.root.ids.body)
+        # Since KivyMD is not taking care to cancel ClockEvent when widget get removed,
+        # Here we take the time to delete them.
+        for event in Clock.get_events():
+            if not event.loop and event.timeout > 0:
+                event.cancel()
         # Load new view.
         widget = class_ref(backup=self.backup, **kwargs)
         self.root.ids.body.add_widget(widget)

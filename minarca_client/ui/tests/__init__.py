@@ -75,6 +75,8 @@ class BaseAppTest(unittest.IsolatedAsyncioTestCase):
             and 'asyncTearDown' not in str(task._coro)
         ]
         self.assertFalse(remaining_tasks, 'some asyncio task are still running')
+        # Finally let await for the Kivy app to raise exception if any.
+        await self._task
 
     async def pump_events(self):
         """Wait until all scheduled event are processed."""
