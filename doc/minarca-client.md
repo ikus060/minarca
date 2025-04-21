@@ -17,6 +17,7 @@ Minarca client could be installed the following operating system and architectur
   * Ubuntu Lunar 23.04 (64bit)
   * Ubuntu Noble 24.04 LTS (64bit)
   * Ubuntu Oracular 24.10 (64bit)
+  * Ubuntu Plucky 25.04 (64bit)
   * Linux (64bit)
 
 ## Installation Steps

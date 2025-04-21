@@ -170,6 +170,7 @@ The Minarca website is <https://minarca.org/>.
 - Define error code for each exceptions
 - Only install 'release' APT repo
 - Add support for Debian Trixie
+- Add support for Ubuntu Plucky 25.04
 
 ## 6.0.3 (2024-11-27)
 
