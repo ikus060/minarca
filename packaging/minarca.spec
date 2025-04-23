@@ -17,13 +17,11 @@ import platform
 import re
 import shutil
 import subprocess
-import tempfile
-from email import message_from_string
 from importlib.metadata import distribution as get_distribution
 from importlib.resources import files
 from os.path import join
 
-from PyInstaller.utils.hooks import collect_submodules, copy_metadata
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 # Use Mock OpenGL to avoid issue on headless
 os.environ['KIVY_GL_BACKEND'] = 'mock'
@@ -32,8 +30,6 @@ os.environ['KIVY_NO_CONFIG'] = '1'
 # Disable Kivy logging
 os.environ['KIVY_NO_FILELOG'] = '1'
 os.environ['KIVY_LOG_MODE'] = 'PYTHON'
-
-from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, hookspath  # noqa
 
 #
 # Common values
@@ -52,111 +48,95 @@ assert pkg_info['License']
 assert pkg_info['Summary']
 assert pkg_info['Author-email']
 # Get Project URL
-project_url = [v.split(', ')[1] for k,v in pkg_info.items() if k =='Project-URL' and v.startswith('Homepage, ')][0]
+project_url = [v.split(', ')[1] for k, v in pkg_info.items() if k == 'Project-URL' and v.startswith('Homepage, ')][0]
 assert project_url
 
 block_cipher = None
 
 # Include theme resources and locales
-datas = (
-    copy_metadata('minarca_client')
-    + copy_metadata('rdiff-backup')
-    + [
-        (minarca_client_pkg / 'ui/theme/resources', 'minarca_client/ui/theme/resources'),
-        (minarca_client_pkg / 'locales', 'minarca_client/locales'),
-    ]
-)
-# Include openssh client for windows
-if platform.system() == "Windows":
-    datas.append((minarca_client_pkg / 'core/openssh', 'minarca_client/core/openssh'))
+datas = collect_data_files('minarca_client')
 
-extras = get_deps_minimal(video=None, audio=None, spelling=None, camera=None)
+# Keep openssh client only for windows
+if platform.system() != "Windows":
+    datas = [(src, dest) for src, dest in datas if '/minarca_client/core/openssh/' not in src]
 
-# Make sure to collect all Lazy loaded view
-extras['hiddenimports'].extend(collect_submodules("minarca_client"))
+hiddenimports = []
+
+# Collect all lazy loaded view in Minarca, but exclude tests.
+hiddenimports.extend(collect_submodules("minarca_client", lambda name: '.tests' not in name))
 
 # Make sure to collect all the files from rdiffbackup (namely the actions)
-extras['hiddenimports'].extend(collect_submodules("rdiffbackup"))
+hiddenimports.extend(collect_submodules("rdiffbackup"))
 
 # Do the same for Kivymd
-extras['hiddenimports'].extend(collect_submodules("kivymd"))
+hiddenimports.extend(collect_submodules("kivymd"))
 
 # To work arround a bug with setuptools>=70.0.0 and pyinstaller<6
 # See https://github.com/pyinstaller/pyinstaller/issues/8554
-extras['hiddenimports'].append('pkg_resources.extern')
+hiddenimports.append('pkg_resources.extern')
 
 # On MacOS, make sure to include librsync.2.dylib because @rpath is not working properly in PyInstaller<6
+binaries = []
 if platform.system() == "Darwin":
     librsync_path = shutil.which(
         'librsync.2.dylib', path='/usr/lib:/usr/local/lib:/System/Library/Frameworks:/Library/Frameworks'
     )
-    extras['binaries'].append((librsync_path, '.'))
+    binaries.append((librsync_path, '.'))
 
-main_py = minarca_client_pkg / 'main.py'
-a = Analysis(
-    [main_py],
-    pathex=[],
-    datas=datas,
-    hookspath=[],
-    runtime_hooks=[],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
-    noarchive=False,
-    **extras,
-)
+exes = []
+analyses = []
+executables = [
+    ("minarcaw", minarca_client_pkg / 'main.py'),
+    ("minarca", minarca_client_pkg / 'main.py'),
+]
+for exe_name, script in executables:
+    a = Analysis(
+        [script],
+        hiddenimports=hiddenimports,
+        datas=datas,
+        binaries=binaries,
+        win_no_prefer_redirects=False,
+        win_private_assemblies=False,
+        cipher=block_cipher,
+        noarchive=False,
+    )
+    # To avoid issue on Linux with mixed version, make sure to exclude libstdc++ to use the one provided by the system.
+    if platform.system() == 'Linux':
+        a.binaries = [entry for entry in a.binaries if 'libstdc++' not in entry[0]]
+    pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+    exe = EXE(
+        pyz,
+        a.scripts,
+        [],
+        exclude_binaries=True,
+        name=exe_name,
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=False,
+        icon=icon,
+        options=[
+            # Suppress warnings
+            ('W ignore', None, 'OPTION'),
+        ],
+        console=exe_name != 'minarcaw',
+    )
+    analyses.append(a)
+    exes.append(exe)
 
-# To avoid issue on Linux with mixed version, make sure to exclude libstdc++ to use the one provided by the system.
-if platform.system() == 'Linux':
-    a.binaries = [entry for entry in a.binaries if 'libstdc++' not in entry[0]]
-
-pyz = PYZ(a.pure, cipher=block_cipher)
-
-# First executable for windowed mode.
-exe_w = EXE(
-    pyz,
-    a.scripts,
-    [],
-    exclude_binaries=True,
-    name='minarcaw',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=False,
-    icon=icon,
-    console=False,
-)
-
-# Another executable on for console mode.
-exe_c = EXE(
-    pyz,
-    a.scripts,
-    [],
-    exclude_binaries=True,
-    name='minarca',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=False,
-    icon=icon,
-    console=True,
-)
-
-extras = []
+# On Windows, extra dependencies are required for SDL2 & Angle
+kivy_extras = []
 if platform.system() == "Windows":
-    # On Windows extra dependencies must be collected.
-    from kivy_deps import angle, glew, sdl2
+    from kivy_deps import angle, sdl2
 
-    extras = [Tree(p) for p in (sdl2.dep_bins + glew.dep_bins + angle.dep_bins)]
+    kivy_extras = [Tree(p) for p in (sdl2.dep_bins + angle.dep_bins)]
 
 coll = COLLECT(
-    exe_w,
-    exe_c,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    a.zipped_data,
-    *extras,
+    *exes,
+    *[a.binaries for a in analyses],
+    *[a.zipfiles for a in analyses],
+    *[a.datas for a in analyses],
+    *kivy_extras,
     strip=False,
     upx=False,
     upx_exclude=[],
@@ -187,7 +167,7 @@ if platform.system() == "Darwin":
 
 elif platform.system() == "Windows":
 
-    from exebuild import signexe, makensis
+    from exebuild import makensis, signexe
 
     # For NSIS, we need to create a license file with Windows encoding.
     with open(join(DISTPATH, 'minarca/LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
@@ -259,5 +239,5 @@ else:
             'libxcb1',
             'xdg-utils',
             'zenity|kdialog',
-        ]
+        ],
     )
