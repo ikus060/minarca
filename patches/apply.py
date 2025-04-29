@@ -17,6 +17,6 @@ print('applying patches...')
 
 # Loop on each patch
 for fn in glob.glob(os.path.join(patches_dir, '*.patch')):
-    subprocess.check_call([sys.executable, '-m', 'patch', '-p2', '-d', site_packages, fn])
+    subprocess.check_call([sys.executable, '-m', 'patch', '--verbose', '-p2', '-d', site_packages, fn])
 
 print('apply patches: done')
