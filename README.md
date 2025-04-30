@@ -141,36 +141,54 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## Next Release
+## 6.1.0 (soon-to-be release)
 
-- Update French translation.
-- Update documentation:  
-  - Modify the FAQ section.  
-  - Update screenshots.  
-  - Add more details to the troubleshooting guide.  
-- Schedule backups to run even if the laptop is on battery (Windows-specific) (#273).  
-- Disable use of system-wide SSH client configuration (`/etc/ssh/ssh_config`) (#274).  
-- Adjust log view:  
-  - Improve performance when loading logs.  
-  - Change refresh rate.  
-  - Truncate logs when they are too long to avoid GUI update delays.  
-  - Increase scrollbar width to make it more visible.  
-- Add compatibility with Python 3.11.  
-- Fix issue with subprocess execution losing output when asyncio buffer gets full.  
-- Review GUI for file restore:  
-  - Merge custom and full restore into a single interface.  
-  - Allow users to select one or multiple files or folders.  
-  - Provide options to restore files in-place or to a subfolder.  
-  - Add functionality to search or filter the list of files.  
-- Bump Kivy to version 2.3.1.  
-- Include `rdiff-backup` patch to better handle cross-platform `OSError`.  
-- Allow schedule to be manual only.
-- Add option to configure pre/post command hook for each backup #73
-- Lazy load the view to improve loading speed on application startup
-- Define error code for each exceptions
-- Only install 'release' APT repo
-- Add support for Debian Trixie
-- Add support for Ubuntu Plucky 25.04
+* Update French translation.
+* Update documentation:
+  * Modify the FAQ section.
+  * Update screenshots.
+  * Add more details to the troubleshooting guide.
+  * Improve CLI documentation (auto-generated with argparse).
+  * Include REST API endpoints.
+  * Use `pydata-theme` with tabbed interface.
+  * Update Minarca Server documentation.
+  * Improve installation:
+    * Add support for `.sources` files.
+    * Only install 'release' APT repo.
+* OS Support:
+  * Add support for Debian Trixie.
+  * Add support for Ubuntu Plucky 25.04.
+  * Add support for Python 3.11 and 3.12.
+* GUI Improvements:
+  * Review file restore interface:
+    * Merge custom and full restore.
+    * Support multi-file/folder selection.
+    * Restore in-place or to subfolder.
+    * Add search/filter functionality.
+  * Adjust log view:
+    * Improve log loading performance.
+    * Change refresh rate.
+    * Truncate overly long logs to prevent delays.
+    * Increase scrollbar width.
+  * Lazy-load views to improve startup time.
+  * Cancel KivyMD clock events to avoid memory leaks.
+  * Bump Kivy to version 2.3.1.
+* Backup behavior:
+  * Schedule backups even on battery (Windows) (#273).
+  * Allow manual-only backup schedule.
+  * Add pre/post command hook support per backup job (#73).
+  * Handle cross-platform `OSError` (e.g., `EDEADLK` from macOS to Linux).
+  * Avoid using system-wide SSH config (`/etc/ssh/ssh_config`) (#274).
+  * Fix subprocess output loss when asyncio buffer fills.
+  * Assign error codes to all exceptions and generate related documentation (#207).
+  * Improve exception logging (e.g., `BackupError`).
+* Packaging:
+  * Reduce package size by avoiding archive.
+  * Suppress warnings.
+  * Avoid Kivy hook.
+  * Fix license file creation on Windows.
+  * Remove deprecated `minarca-client-gui` package.
+* Update copyright.
 
 ## 6.0.3 (2024-11-27)
 
