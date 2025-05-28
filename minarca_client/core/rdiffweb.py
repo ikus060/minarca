@@ -7,12 +7,27 @@ Created on Oct. 13, 2023
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 
+import ssl
+
 import requests
+from requests.adapters import HTTPAdapter
 from requests.compat import urljoin
 from requests.exceptions import ConnectionError
 
 from minarca_client.core import compat
 from minarca_client.core.minarcaid import gen_minarcaid_v1
+
+
+class SystemCertsAdapter(HTTPAdapter):
+    """
+    Custom HTTP Adapter to make use of Operating System certificate instead of certifi.
+    """
+
+    def init_poolmanager(self, *args, **kwargs):
+        # Uses system certs
+        context = ssl.create_default_context()
+        kwargs['ssl_context'] = context
+        return super().init_poolmanager(*args, **kwargs)
 
 
 class MinarcaidAuth:
@@ -34,9 +49,10 @@ class Rdiffweb:
     def __init__(self, remoteurl):
         assert remoteurl, 'require a remote url'
         self.remoteurl = remoteurl
-        # Create HTTP Session using authentication
+        # Create HTTP(s) Session using authentication
         self._session = requests.Session()
         self._session.allow_redirects = False
+        self._session.mount('https://', SystemCertsAdapter())
         self._session.headers['User-Agent'] = compat.get_user_agent()
 
     @property
