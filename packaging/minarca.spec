@@ -229,6 +229,7 @@ else:
             ("/opt/minarca/bin/minarca", "../minarca"),
         ],
         depends=[
+            'ca-certificates',
             'cron',
             'libc6',
             'libstdc++6',
