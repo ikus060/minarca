@@ -151,6 +151,20 @@ class Patterns(AbstractConfigFile, MutableSequence):
             _append(
                 Pattern(
                     True,
+                    str(get_home() / '/Library/Messages/chat.db*'),
+                    _("Message SMS"),
+                )
+            )
+            _append(
+                Pattern(
+                    True,
+                    str(get_home() / '/Library/Mail/'),
+                    _("Mail Inbox"),
+                )
+            )
+            _append(
+                Pattern(
+                    True,
                     str(get_home() / 'Library/Application Support/Firefox/Profiles/*/places.sqlite'),
                     _("Firefox Bookmark"),
                 )
@@ -165,11 +179,13 @@ class Patterns(AbstractConfigFile, MutableSequence):
             data.extend(
                 [
                     Pattern(False, "**/.DS_Store", _("Desktop Services Store")),
+                    Pattern(False, "**/com~apple~CloudDocs/.DS_Store", _("iCloud Trash")),
                     Pattern(
                         False,
                         "**/OneDrive*/.*[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]",
                         _("OneDrive GUID File"),
                     ),
+                    Pattern(False, "**/~$*", _("Office temporary files")),
                 ]
             )
         elif IS_LINUX:
