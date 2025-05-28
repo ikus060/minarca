@@ -95,25 +95,7 @@ Minarca use SQL database to store user preferences. The embedded SQLite database
 
 | Option | Description | Example |
 | --- | --- | --- |
-| database-uri | Location of the database used for persistence. SQLite and PostgreSQL database are supported officially. To use a SQLite database, you may define the location using a file path or a URI. e.g.: `/srv/minarca/file.db` or `sqlite:///srv/minarca/file.db`. To use PostgreSQL server, you must provide a URI similar to `postgresql://user:pass@10.255.1.34/dbname` and you must install required dependencies. By default, Minarca uses a SQLite embedded database located at `/etc/minarca/rdw.db`. | postgresql://user:pass@10.255.1.34/dbname | 
-
-### SQLite
-
-To use embedded SQLite database, pass the option `database-uri` with a URI similar to `sqlite:///etc/minarca/rdw.db` or `/etc/minarca/rdw.db`.
-
-### PostgreSQL
-
-To use an external PostgreSQL database, pass the option `database-uri` with a URI similar to `postgresql://user:pass@10.255.1.34/dbname`.
-
-You may need to install additional dependencies to connect to PostgreSQL. Step to install dependencies might differ according to the way you installed Minarca.
-
-**Using Debian repository:**
-
-    apt install python3-psycopg2
-
-**Using Pypi repository:**
-
-    pip install psycopg2-binary
+| database-uri | Location of the database used for persistence. SQLite and PostgreSQL database are supported officially. To use a SQLite database, you may define the location using a file path or a URI. e.g.: `/srv/minarca/file.db` or `sqlite:///srv/minarca/file.db`. To use PostgreSQL server, you must provide a URI similar to `postgresql://user:pass@10.255.1.34/dbname`. By default, Minarca uses a SQLite embedded database located at `/etc/minarca/rdw.db`. | /etc/minarca/rdw.db<br/><br/>sqlite:///etc/minarca/rdw.db<br/><br/>postgresql://user:pass@10.255.1.34/dbname |
 
 ## Configure LDAP Authentication
 
