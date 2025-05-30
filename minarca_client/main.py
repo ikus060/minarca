@@ -735,11 +735,13 @@ def main(args=None):
         return args.func(**kwargs)
     except RunningError as e:
         # Print warning message is already running.
-        logging.warning(str(e))
+        logging.info(e.message)
+        logging.info(e.detail)
         sys.exit(e.error_code)
     except BackupError as e:
         # Print message to stdout and log file.
-        logging.info(str(e))
+        logging.info(e.message)
+        logging.info(e.detail)
         sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error retrieving patterns")
