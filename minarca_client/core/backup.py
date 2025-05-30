@@ -27,15 +27,12 @@ from minarca_client.core.compat import (
 )
 from minarca_client.core.exceptions import (
     DuplicateSettingsError,
-    HttpAuthenticationError,
-    HttpConnectionError,
-    HttpInvalidUrlError,
-    HttpServerError,
     InitDestinationError,
     InstanceNotFoundError,
     InvalidRepositoryName,
     LocalDestinationNotEmptyError,
     RepositoryNameExistsError,
+    handle_http_errors,
 )
 from minarca_client.core.instance import BackupInstance
 from minarca_client.core.pattern import Patterns
@@ -255,14 +252,13 @@ class Backup:
         logger.debug(f"local instance configured: {instance.id}")
         return instance
 
+    @handle_http_errors
     async def configure_remote(self, remoteurl, username, password, repositoryname, force=False, instance=None):
         """
         Use to configure new or existing instance for remote backup
 
         Set `force` to True to link even if the repository name already exists.
         """
-        from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
-
         from minarca_client.core.rdiffweb import Rdiffweb
 
         logger.debug(
@@ -271,88 +267,78 @@ class Backup:
         # Validate the repository name
         _check_repositoryname(repositoryname)
 
-        try:
-            # Connect to remote server to get more information.
-            conn = Rdiffweb(remoteurl)
-            conn.auth = (username, password)
-            current_user = await asyncio.get_running_loop().run_in_executor(None, conn.get_current_user_info)
+        # Connect to remote server to get more information.
+        conn = Rdiffweb(remoteurl)
+        conn.auth = (username, password)
+        current_user = await asyncio.get_running_loop().run_in_executor(None, conn.get_current_user_info)
 
-            # Check if the settings already exist.
-            others = [
-                other
-                for other in self
-                if other.is_remote()
-                and other.settings.remoteurl == conn.remoteurl
-                and other.settings.repositoryname == repositoryname
-                and other.settings.username == username
-            ]
-            if others:
-                raise DuplicateSettingsError(others[0])
+        # Check if the settings already exist.
+        others = [
+            other
+            for other in self
+            if other.is_remote()
+            and other.settings.remoteurl == conn.remoteurl
+            and other.settings.repositoryname == repositoryname
+            and other.settings.username == username
+        ]
+        if others:
+            raise DuplicateSettingsError(others[0])
 
-            # Then check if the repo name already exists remotely.
-            exists = [
-                r
-                for r in current_user.get('repos', [])
-                if repositoryname == r.get('name') or r.get('name').startswith(repositoryname + '/')
-            ]
-            if not force and exists:
-                raise RepositoryNameExistsError(repositoryname)
+        # Then check if the repo name already exists remotely.
+        exists = [
+            r
+            for r in current_user.get('repos', [])
+            if repositoryname == r.get('name') or r.get('name').startswith(repositoryname + '/')
+        ]
+        if not force and exists:
+            raise RepositoryNameExistsError(repositoryname)
 
-            # Create or update instance
-            instance = self._new_instance() if instance is None else instance
+        # Create or update instance
+        instance = self._new_instance() if instance is None else instance
 
-            # Generate SSH Keys
-            await instance._push_identity(conn, repositoryname)
+        # Generate SSH Keys
+        await instance._push_identity(conn, repositoryname)
 
-            # Store minarca identity
-            minarca_info = await asyncio.get_running_loop().run_in_executor(None, conn.get_minarca_info)
-            await file_write_async(instance.known_hosts, minarca_info['identity'])
+        # Store minarca identity
+        minarca_info = await asyncio.get_running_loop().run_in_executor(None, conn.get_minarca_info)
+        await file_write_async(instance.known_hosts, minarca_info['identity'])
 
-            # Create default config
-            instance.settings.username = username
-            instance.settings.repositoryname = repositoryname
-            instance.settings.remotehost = minarca_info['remotehost']
-            instance.settings.remoteurl = remoteurl
-            instance.settings.schedule = Settings.DAILY
+        # Create default config
+        instance.settings.username = username
+        instance.settings.repositoryname = repositoryname
+        instance.settings.remotehost = minarca_info['remotehost']
+        instance.settings.remoteurl = remoteurl
+        instance.settings.schedule = Settings.DAILY
 
-            # Only test the connection
-            await instance.test_connection()
+        # Only test the connection
+        await instance.test_connection()
 
-            # Define default patterns if none are defined.
-            if len(list(instance.patterns.group_by_roots())) == 0:
-                instance.patterns.extend(Patterns.defaults())
+        # Define default patterns if none are defined.
+        if len(list(instance.patterns.group_by_roots())) == 0:
+            instance.patterns.extend(Patterns.defaults())
 
-            # Clear previous status file
-            instance.status.clear()
+        # Clear previous status file
+        instance.status.clear()
 
-            # For data consistency. Also store existing configuration if repo exists.
-            if exists:
-                data = exists[0]
-                if 'maxage' in data:
-                    instance.settings.maxage = int(data['maxage'])
-                if 'keepdays' in data:
-                    instance.settings.keepdays = int(data['keepdays'])
-                if 'ignore_weekday' in data and isinstance(data['ignore_weekday'], list):
-                    instance.settings.ignore_weekday = data['ignore_weekday']
-                if 'role' in current_user:
-                    instance.settings.remoterole = int(current_user['role'])
+        # For data consistency. Also store existing configuration if repo exists.
+        if exists:
+            data = exists[0]
+            if 'maxage' in data:
+                instance.settings.maxage = int(data['maxage'])
+            if 'keepdays' in data:
+                instance.settings.keepdays = int(data['keepdays'])
+            if 'ignore_weekday' in data and isinstance(data['ignore_weekday'], list):
+                instance.settings.ignore_weekday = data['ignore_weekday']
+            if 'role' in current_user:
+                instance.settings.remoterole = int(current_user['role'])
 
-            # Pause 1 hour to avoid getting started while configuring.
-            instance.settings.pause_until = Datetime() + datetime.timedelta(hours=1)
-            # Save configuration
-            instance.settings.configured = True
-            instance.settings.save()
-            logger.debug(f"remote instance configured: {instance.id}")
-        except ConnectionError:
-            # Raised with invalid URL or port
-            raise HttpConnectionError(remoteurl)
-        except (MissingSchema, InvalidSchema):
-            raise HttpInvalidUrlError(remoteurl)
-        except HTTPError as e:
-            # Raise for invalid status code.
-            if e.response.status_code in [401, 403]:
-                raise HttpAuthenticationError(e)
-            raise HttpServerError(e)
+        # Pause 1 hour to avoid getting started while configuring.
+        instance.settings.pause_until = Datetime() + datetime.timedelta(hours=1)
+        # Save configuration
+        instance.settings.configured = True
+        instance.settings.save()
+        logger.debug(f"remote instance configured: {instance.id}")
+
         return instance
 
     def _new_instance(self):

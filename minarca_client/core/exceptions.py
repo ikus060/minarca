@@ -23,7 +23,61 @@ Created on Jun. 27, 2021
 # 200-205: Reserved for Minaca shell
 #
 
+import re
+
 from minarca_client.locale import _
+
+
+def _find_exception_with(exc, attrname):
+    """
+    Recursively search through the exception's __cause__ and __context__
+    to find an exception that has a the given attribute name.
+
+    :param exc: The exception to start the search from.
+    :param attrname: The attribute name to search for..
+    :return: The first exception found that has a 'reason' attribute, or None if not found.
+    """
+    visited = set()
+
+    def _search(e):
+        if e in visited or e is None:
+            return None
+        visited.add(e)
+        if getattr(e, attrname, False):
+            return e
+        return _search(getattr(e, '__cause__', None)) or _search(getattr(e, '__context__', None))
+
+    return _search(exc)
+
+
+def handle_http_errors(func):
+    """
+    Decorator to handle HTTP exception raised when calling rdiffweb server.
+    """
+
+    async def wrapper(self, *args, **kwargs):
+        from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
+
+        try:
+            return await func(self, *args, **kwargs)
+        except ConnectionError as e:
+            cause = _find_exception_with(e, 'strerror')
+            raise HttpConnectionError(cause or str(e)) from e
+        except (MissingSchema, InvalidSchema) as e:
+            raise HttpInvalidUrlError(str(e)) from e
+        except HTTPError as e:
+            # Raise for invalid status code.
+            if e.response.status_code in [401, 403]:
+                raise HttpAuthenticationError(e)
+            # Special case to extract error message from HTML body.
+            server_error = HttpServerError(e)
+            if e.response.status_code == 400 and e.response.text.startswith('<'):
+                m = re.search(r'<p>(.*)</p>', e.response.text)
+                if m and m[1]:
+                    server_error.message = m[1]
+            raise server_error
+
+    return wrapper
 
 
 class BackupError(Exception):
@@ -469,21 +523,24 @@ class NotConfiguredError(ConfigureBackupError):
 
 class HttpConnectionError(ConfigureBackupError):
     """
-    Raised if the HTTP connection fails.
+    Raised when a secure (HTTPS) or regular HTTP connection fails.
 
-    Connection to the provided URL is not working. Double check if the URL is valid and verify
-    if the URL is reachable using a web browser. You may also need to check if you Internet
-    connection is working.
+    This exception generalizes connection errors, including plain HTTP errors
+    and SSL/TLS handshake failures. The specific cause is indicated by the
+    'connection_type' parameter and can be 'http' or 'ssl'.
+
+    Suggested actions include verifying the URL, checking your Internet connection,
+    or ensuring that SSL certificates are valid and trusted.
     """
 
     error_code = 31
-    message = _('Cannot establish connection to remote server.')
+    message = _('Cannot connect to the server.')
     detail = _(
-        "Your computer cannot establish a connection to the remote server. Make sure your Internet connection is working and that the following URL is accessible with a Web browser: %s"
+        "Your computer cannot establish a connection to the remote server. Make sure your Internet connection is working and that the following URL is accessible with a Web browser:\n%s"
     )
 
-    def __init__(self, url):
-        self.detail = HttpConnectionError.detail % url
+    def __init__(self, reason):
+        self.detail = HttpConnectionError.detail % reason
 
 
 class HttpInvalidUrlError(ConfigureBackupError):
@@ -494,13 +551,13 @@ class HttpInvalidUrlError(ConfigureBackupError):
     """
 
     error_code = 32
-    message = _('Invalid remote server URL: %s')
+    message = _('Invalid URL')
     detail = _(
-        "The remote server URL you entered for the connection is not valid. Check that you have entered the correct value. The URL must begin with `http://` or `https://` followed by a domain name."
+        "The remote server URL you entered for the connection is not valid. Check that you have entered the correct value. The URL must begin with `http://` or `https://` followed by a domain name.\n%s"
     )
 
     def __init__(self, url):
-        self.message = HttpInvalidUrlError.message % url
+        self.message = HttpInvalidUrlError.detail % url
 
 
 class HttpAuthenticationError(ConfigureBackupError):
