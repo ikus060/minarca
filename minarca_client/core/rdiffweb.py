@@ -83,7 +83,7 @@ class Rdiffweb:
 
         if not response.url.endswith('/api/'):
             # If redirection change the path, make it fail.
-            raise ConnectionError()
+            raise ConnectionError('Invalid Backup Server')
         if query_url != response.url:
             # Session was redirected, query using new location.
             response = self._session.get(response.url)
