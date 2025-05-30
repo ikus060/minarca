@@ -12,7 +12,6 @@ import datetime
 import functools
 import logging
 import os
-import re
 import stat
 import subprocess
 import time
@@ -22,10 +21,6 @@ from minarca_client.core import compat
 from minarca_client.core.compat import IS_WINDOWS, detach_call, file_read, flush, get_minarca_exe
 from minarca_client.core.exceptions import (
     CaptureException,
-    HttpAuthenticationError,
-    HttpConnectionError,
-    HttpInvalidUrlError,
-    HttpServerError,
     LocalDestinationNotFound,
     NoPatternsError,
     NotConfiguredError,
@@ -35,6 +30,7 @@ from minarca_client.core.exceptions import (
     RdiffBackupExitError,
     RemoteRepositoryNotFound,
     RunningError,
+    handle_http_errors,
 )
 from minarca_client.core.pattern import Patterns
 from minarca_client.core.settings import Datetime, Settings
@@ -105,36 +101,6 @@ def reduce_path(paths):
             reduced_paths.append(path)
 
     return reduced_paths
-
-
-def handle_http_errors(func):
-    """
-    Decorator to handle HTTP exception raised when calling rdiffweb server.
-    """
-
-    async def wrapper(self, *args, **kwargs):
-        from requests.exceptions import ConnectionError, HTTPError, InvalidSchema, MissingSchema
-
-        try:
-            return await func(self, *args, **kwargs)
-        except ConnectionError:
-            # Raised with invalid url or port
-            raise HttpConnectionError(self.settings.remoteurl)
-        except (MissingSchema, InvalidSchema):
-            raise HttpInvalidUrlError(self.settings.remoteurl)
-        except HTTPError as e:
-            # Raise for invalid status code.
-            if e.response.status_code in [401, 403]:
-                raise HttpAuthenticationError(e)
-            # Special case to extract error message from HTML body.
-            server_error = HttpServerError(e)
-            if e.response.status_code == 400 and e.response.text.startswith('<'):
-                m = re.search(r'<p>(.*)</p>', e.response.text)
-                if m and m[1]:
-                    server_error.message = m[1]
-            raise server_error
-
-    return wrapper
 
 
 @contextlib.contextmanager
