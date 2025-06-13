@@ -141,54 +141,90 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
-## 6.1.0 (soon-to-be release)
+## 6.1.0 (2025-06-13)
 
-* Update French translation.
-* Update documentation:
-  * Modify the FAQ section.
-  * Update screenshots.
-  * Add more details to the troubleshooting guide.
-  * Improve CLI documentation (auto-generated with argparse).
-  * Include REST API endpoints.
-  * Use `pydata-theme` with tabbed interface.
-  * Update Minarca Server documentation.
-  * Improve installation:
-    * Add support for `.sources` files.
-    * Only install 'release' APT repo.
-* OS Support:
-  * Add support for Debian Trixie.
-  * Add support for Ubuntu Plucky 25.04.
-  * Add support for Python 3.11 and 3.12.
-* GUI Improvements:
-  * Review file restore interface:
+**New Features**
+
+* Add support for Debian Trixie.
+* Add support for Ubuntu Plucky 25.04.
+* Add support for Python 3.11 and 3.12.
+* Allow manual-only backup schedule.
+* Add pre/post command hook support per backup job (#73).
+* Add support for kdialog to support KDE (#292).
+* Include pattern to backup MacOS Mail.
+* Include pattern to backup MacOS Messages (SMS).
+* Assign error codes to all exceptions and generate related documentation (#207).
+* Include REST API endpoints documentation.
+* Generate CLI documentation automatically using argparse.
+
+**Improvements**
+
+* Review file restore interface:
     * Merge custom and full restore.
     * Support multi-file/folder selection.
     * Restore in-place or to subfolder.
     * Add search/filter functionality.
-  * Adjust log view:
+* Adjust log view:
     * Improve log loading performance.
     * Change refresh rate.
     * Truncate overly long logs to prevent delays.
-    * Increase scrollbar width.
-  * Lazy-load views to improve startup time.
-  * Cancel KivyMD clock events to avoid memory leaks.
-  * Bump Kivy to version 2.3.1.
-* Backup behavior:
-  * Schedule backups even on battery (Windows) (#273).
-  * Allow manual-only backup schedule.
-  * Add pre/post command hook support per backup job (#73).
-  * Handle cross-platform `OSError` (e.g., `EDEADLK` from macOS to Linux).
-  * Avoid using system-wide SSH config (`/etc/ssh/ssh_config`) (#274).
-  * Fix subprocess output loss when asyncio buffer fills.
-  * Assign error codes to all exceptions and generate related documentation (#207).
-  * Improve exception logging (e.g., `BackupError`).
-* Packaging:
-  * Reduce package size by avoiding archive.
-  * Suppress warnings.
-  * Avoid Kivy hook.
-  * Fix license file creation on Windows.
-  * Remove deprecated `minarca-client-gui` package.
-* Update copyright.
+    * Increase scrollbar width for better usability.
+* Backup Behavior:
+    * Schedule backups even on battery (Windows) (#273).
+    * Improve exception logging (e.g., `BackupError`).
+    * Provide error message details on command line.
+    * Exclude iCloud Trash by default #314.
+    * Exclude Office temporary files by default.
+* Security/Connectivity:
+    * Use OS Certificate for HTTPS #309.
+
+**Bug Fixes**
+
+* Fix error handling of `EDEADLK` for backup from MacOS to Linux (Handle Cross-Platform OSError.errno Mismatch).
+* Provide details on SSL Error #309.
+* Fix state of "Run whether the user's session is open or not" when user cancel crendential #290.
+* Cancel clock event when switching to new view, because KivyMD is not taking care to cancel them when widget get deleted (Handle weakref left over by KivyMD).
+* Fix `minarcaw` startup.
+* Avoid "cannot start process when it's already running" when running as cronjob #291.
+* Fix subprocess streaming to prevent losing output.
+* Fix license file creation on Windows pyinstaller.
+
+**Internal Changes**
+
+* Lazy-load views to improve startup time.
+* Use lazy import to reduce memory footprint and improve loading time.
+* Upgrade Kivy to version 2.3.1.
+* Remove coding header.
+* Update copyright year to 2025.
+* Add missing copyright.
+* Add check to tox.ini to verify copyright.
+* Make unit test more stable.
+* Add `openssh-client` as dependency on Linux.
+* Disable `mtdev` lookup on Linux.
+* Disable use of system wide ssh config file on Linux and MacOS #274.
+* Ignore .venv & .vscode.
+* Migrate from setup.py to pyproject.toml.
+* Split repo.
+* Only install APT repo for releases.
+* Optimize pyinstaller:
+    * Avoid archive to reduce package size.
+    * Suppress warnings.
+    * Avoid Kivy hook.
+* Update installation to provide ".sources" on Debian Linux (#303).
+
+**Documentation**
+
+* Update French translation.
+* Modify the FAQ section.
+* Update screenshots.
+* Add more details to the troubleshooting guide.
+* Use `pydata-theme` with tabbed interface.
+* Update Minarca Server documentation to 6.1.0b4.
+* Improve documentation about deployment behind router and reverse proxy #281.
+* Improve quota configuration for ext4.
+* Update MacOS installation steps.
+* Update Minarca download link.
+* Improve documentation for CLI (#282).
 
 ## 6.0.3 (2024-11-27)
 
