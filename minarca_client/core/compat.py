@@ -25,6 +25,48 @@ IS_MAC = sys.platform == 'darwin'
 HAS_DISPLAY = os.environ.get('DISPLAY', None) or IS_WINDOWS or IS_MAC
 
 
+def check_secure_file(filepath):
+    """
+    Check if the given file is properly protected.
+    """
+    if IS_WINDOWS:
+        import win32security
+
+        sd = win32security.GetFileSecurity(
+            filepath, win32security.DACL_SECURITY_INFORMATION | win32security.OWNER_SECURITY_INFORMATION
+        )
+
+        # Get the file owner
+        owner_sid = sd.GetSecurityDescriptorOwner()
+
+        # Get the current user SID
+        current_user = win32security.LookupAccountName(None, win32security.GetUserName())
+        current_user_sid = current_user[0]
+
+        if owner_sid != current_user_sid:
+            raise PermissionError(f"File '{filepath}' must be owned by the current user.")
+
+        # Get the DACL (discretionary access control list)
+        dacl = sd.GetSecurityDescriptorDacl()
+        if dacl is None:
+            raise PermissionError("No DACL found; file may be accessible by anyone.")
+
+        for i in range(dacl.GetAceCount()):
+            ace = dacl.GetAce(i)
+            ace_sid = ace[2]
+
+            # Disallow access to everyone, administrators, etc.
+            sid_name, _, _ = win32security.LookupAccountSid(None, ace_sid)
+            if sid_name.lower() in ("everyone", "users", "administrators"):
+                raise PermissionError(f"File '{filepath}' grants access to '{sid_name}', which is insecure.")
+    else:
+        st = os.stat(filepath)
+        if st.st_uid != os.getuid():
+            raise PermissionError(f"File '{filepath}' must be owned by the current user.")
+        if (st.st_mode & 0o777) != 0o600:
+            raise PermissionError(f"File '{filepath}' must have permissions 0600.")
+
+
 def makedirs(func, mode=0o750):
     """
     Function decorator to create the directory if missing.
@@ -320,6 +362,50 @@ def open_file_with_default_app(path):
         subprocess.Popen(["open", path])
     else:
         subprocess.Popen(["xdg-open", path])
+
+
+
+def stop_process(pid):
+    """
+    Gently terminate a process and all it's children.
+    """
+    import psutil
+    import signal
+
+    try:
+        parent = psutil.Process(pid)
+    except psutil.NoSuchProcess:
+        return True
+
+    try:
+        # Step 1: Try a gentle shutdown with SIGINT
+        parent.send_signal(signal.SIGINT)
+
+        # Step 2: Wait up to 3 seconds for the process to exit
+        try:
+            parent.wait(timeout=3)
+            return True
+        except psutil.TimeoutExpired:
+            # Step 3: Terminate children
+            children = parent.children(recursive=True)
+            for child in children:
+                if child.is_running():
+                    child.terminate()
+            gone, alive = psutil.wait_procs(children, timeout=1)
+            for child in alive:
+                child.kill()
+
+            # Step 4: Terminate main process
+            if parent.is_running():
+                parent.terminate()
+
+            try:
+                parent.wait(timeout=1)
+            except psutil.TimeoutExpired:
+                parent.kill()
+
+    except (psutil.NoSuchProcess, SystemError):
+        return False
 
 
 class RobustRotatingFileHandler(RotatingFileHandler):

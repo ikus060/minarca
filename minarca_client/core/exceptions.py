@@ -668,6 +668,20 @@ class JailCreationError(BackupError):
         return b'ERROR: fail to create rdiff-backup jail' in line
 
 
+class IMAPListFolderError(BackupError):
+    """
+    Raised by `minarca imap-backup ...` when IMAP error occur during backup.
+    """
+
+    error_code = 40
+
+    message = _("Fail to list IMAP folders.")
+
+    @staticmethod
+    def _matches(line):
+        return b'ERROR: fail to create rdiff-backup jail' in line
+
+
 class CaptureException:
     """
     Parse log line to search for known exception.
