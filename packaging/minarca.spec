@@ -37,6 +37,7 @@ os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 minarca_client_pkg = files('minarca_client')
 icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.ico')
 macos_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.icns')
+svg_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.svg')
 
 #
 # Read package info
@@ -70,10 +71,6 @@ hiddenimports.extend(collect_submodules("rdiffbackup"))
 
 # Do the same for Kivymd
 hiddenimports.extend(collect_submodules("kivymd"))
-
-# To work arround a bug with setuptools>=70.0.0 and pyinstaller<6
-# See https://github.com/pyinstaller/pyinstaller/issues/8554
-hiddenimports.append('pkg_resources.extern')
 
 # On MacOS, make sure to include librsync.2.dylib because @rpath is not working properly in PyInstaller<6
 binaries = []
@@ -212,7 +209,7 @@ else:
             ('/opt/minarca', join(DISTPATH, 'minarca')),
             # For GUI
             ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
-            ('/opt/minarca/minarca.svg', join(DISTPATH, 'minarca/minarca_client/ui/theme/resources/minarca.svg')),
+            ('/opt/minarca/minarca.svg', svg_icon),
         ],
         description="Secure, self-hosted and automated backup solution",
         long_description=pkg_info['Summary'],
