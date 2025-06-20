@@ -141,6 +141,17 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 6.1.1 (2025-06-20)
+
+**Bug Fixes**
+
+* Improved warning handling:
+
+  * Warnings are no longer ignored
+  * Warnings are now captured and logged
+  * Downgraded `setuptools` to suppress `pkg_resources` warnings
+
+
 ## 6.1.0 (2025-06-13)
 
 **New Features**
