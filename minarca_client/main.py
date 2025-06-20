@@ -680,6 +680,8 @@ def _configure_logging(debug=False):
     logging.getLogger('asyncio').setLevel(logging.WARNING)
     # Avoid kivy logs by default.
     logging.getLogger('kivy').setLevel(logging.DEBUG if debug else logging.WARNING)
+    # Capture warning
+    logging.captureWarnings(True)
     #
     # Configure default logging for the whole application. e.g.: minarca.log
     #

@@ -115,10 +115,6 @@ for exe_name, script in executables:
         strip=False,
         upx=False,
         icon=icon,
-        options=[
-            # Suppress warnings
-            ('W ignore', None, 'OPTION'),
-        ],
         console=exe_name != 'minarcaw',
     )
     analyses.append(a)
