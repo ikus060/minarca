@@ -11,14 +11,12 @@ Reusable module to generate and validate minarcaid
 
 import base64
 import hashlib
-import os
-import stat
 import time
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.asymmetric import padding
 
 
 def _fingerprint(public_key):
@@ -56,22 +54,6 @@ def _read_private_key(value):
     # Try defaul PEM format
     #
     return serialization.load_pem_private_key(value, password=None)
-
-
-def ssh_keygen(public_key, private_key, length=2048):
-    key = rsa.generate_private_key(backend=default_backend(), public_exponent=65537, key_size=length)
-    private_key_bytes = key.private_bytes(
-        serialization.Encoding.PEM, serialization.PrivateFormat.TraditionalOpenSSL, serialization.NoEncryption()
-    )
-    public_key_bytes = key.public_key().public_bytes(serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH)
-    if os.path.isfile(private_key):
-        os.chmod(private_key, stat.S_IWUSR)
-    with open(private_key, 'wb') as f:
-        f.write(private_key_bytes)
-    # Set proper permissions on private key.
-    os.chmod(private_key, 0o400)
-    with open(public_key, 'wb') as f:
-        f.write(public_key_bytes)
 
 
 def gen_minarcaid_v1(private_key_data, epoch=None):

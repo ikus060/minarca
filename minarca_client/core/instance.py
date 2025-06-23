@@ -344,11 +344,9 @@ class BackupInstance:
         logger.debug(f"{self.log_id}: backup paused for {delay} hours")
 
     async def _push_identity(self, conn, name):
-        from minarca_client.core.minarcaid import ssh_keygen
-
         if not self.public_key_file.exists() and not self.private_key_file.exists():
             logger.debug(f"{self.log_id}: generating new SSH identity")
-            ssh_keygen(self.public_key_file, self.private_key_file)
+            compat.ssh_keygen(self.public_key_file, self.private_key_file)
 
         try:
             with open(self.public_key_file, encoding='latin-1') as f:
@@ -356,7 +354,7 @@ class BackupInstance:
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())
         except Exception:
             logger.debug(f"{self.log_id}: generating new SSH identity after failure")
-            ssh_keygen(self.public_key_file, self.private_key_file)
+            compat.ssh_keygen(self.public_key_file, self.private_key_file)
             with open(self.public_key_file, encoding='latin-1') as f:
                 logger.debug(f"{self.log_id}: exchanging new SSH identity with server")
                 await asyncio.get_running_loop().run_in_executor(None, conn.post_ssh_key, name, f.read())

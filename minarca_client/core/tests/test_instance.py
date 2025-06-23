@@ -23,7 +23,7 @@ from unittest.mock import MagicMock
 import responses
 
 from minarca_client.core import Backup, BackupInstance
-from minarca_client.core.compat import IS_WINDOWS
+from minarca_client.core.compat import IS_WINDOWS, ssh_keygen
 from minarca_client.core.disk import LocationInfo
 from minarca_client.core.exceptions import (
     BackupError,
@@ -39,7 +39,6 @@ from minarca_client.core.exceptions import (
     UnknownHostException,
 )
 from minarca_client.core.instance import _sh_quote
-from minarca_client.core.minarcaid import ssh_keygen
 from minarca_client.core.pattern import Pattern, Patterns
 from minarca_client.core.settings import Datetime, Settings
 from minarca_client.tests.test import MATCH

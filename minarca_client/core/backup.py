@@ -24,6 +24,7 @@ from minarca_client.core.compat import (
     file_write_async,
     get_config_home,
     get_minarca_exe,
+    secure_file,
 )
 from minarca_client.core.exceptions import (
     DuplicateSettingsError,
@@ -38,10 +39,6 @@ from minarca_client.core.instance import BackupInstance
 from minarca_client.core.pattern import Patterns
 from minarca_client.core.scheduler import Scheduler
 from minarca_client.core.settings import Datetime, Settings
-
-if IS_WINDOWS:
-    import win32api
-    import win32con
 
 _REPOSITORY_NAME_PATTERN = "^[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*$"
 
@@ -217,12 +214,7 @@ class Backup:
                 # Create uuid file
                 await file_write_async(uuid_fn, localuuid)
                 # Hide the file and make it readonly.
-                if IS_WINDOWS:
-                    win32api.SetFileAttributes(
-                        str(uuid_fn), win32con.FILE_ATTRIBUTE_READONLY | win32con.FILE_ATTRIBUTE_HIDDEN
-                    )
-                else:
-                    os.chmod(uuid_fn, 0o444)
+                secure_file(uuid_fn, 0o444)
             except OSError:
                 raise InitDestinationError()
 

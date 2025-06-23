@@ -7,7 +7,7 @@ from unittest import mock
 import responses
 
 from minarca_client.core.backup import BackupInstance
-from minarca_client.core.minarcaid import ssh_keygen
+from minarca_client.core.compat import ssh_keygen
 from minarca_client.ui.backup_patterns import BackupPatterns
 from minarca_client.ui.backup_settings import BackupSettings
 from minarca_client.ui.dashboard import DashboardView
