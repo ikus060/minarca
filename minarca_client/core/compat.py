@@ -11,6 +11,7 @@ import logging
 import os
 import platform
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -28,59 +29,112 @@ IS_LINUX = sys.platform in ['linux', 'linux2']
 IS_MAC = sys.platform == 'darwin'
 HAS_DISPLAY = os.environ.get('DISPLAY', None) or IS_WINDOWS or IS_MAC
 
+if IS_WINDOWS:
+    import ntsecuritycon
+    import pywintypes
+    import win32api
+    import win32con
+    import win32security
 
-def check_secure_file(filepath):
+    def get_sid(name):
+        try:
+            sid, _domain, _account_type = win32security.LookupAccountName(None, name)
+            return sid
+        except pywintypes.error:
+            return None
+
+    def build_access_mask(mode):
+        """
+        Convert a Unix chmod-style mode (e.g., 0o644) into corresponding Windows ACL masks
+        for owner, group, and others.
+
+        Returns:
+            (owner_mask, group_mask, other_mask)
+        """
+        masks = []
+        for shift in (6, 3, 0):  # owner, group, other
+            bits = (mode >> shift) & 0b111
+            mask = 0
+            if bits & 0b100:
+                mask |= ntsecuritycon.FILE_GENERIC_READ
+            if bits & 0b010:
+                mask |= ntsecuritycon.FILE_GENERIC_WRITE
+            if bits & 0b001:
+                mask |= ntsecuritycon.FILE_GENERIC_EXECUTE
+            masks.append(mask)
+        # owner: add ACL-safe extras
+        masks[0] |= win32con.WRITE_DAC | win32con.WRITE_OWNER | ntsecuritycon.DELETE
+        return tuple(masks)
+
+
+def check_secure_file(filepath, mode=0o400):
     """
-    Check if the given file is properly protected with chmod 400.
+    Check if the given file is properly protected with the specified chmod mode.
+    Supports both Unix and Windows.
     """
-    if IS_WINDOWS:
-        import ntsecuritycon
-        import win32api
-        import win32security
-
-        # Get current user SID
-        current_user = win32security.LookupAccountName(None, win32api.GetUserName())
-        current_user_sid = current_user[0]
-
-        # Get the file security descriptor
-        sd = win32security.GetFileSecurity(
-            filepath, win32security.DACL_SECURITY_INFORMATION | win32security.OWNER_SECURITY_INFORMATION
-        )
-
-        # Check ownership
-        owner_sid = sd.GetSecurityDescriptorOwner()
-        if owner_sid != current_user_sid:
-            raise PermissionError(f"File '{filepath}' must be owned by the current user.")
-
-        # Check DACL (discretionary ACL)
-        dacl = sd.GetSecurityDescriptorDacl()
-        if dacl is None:
-            raise PermissionError("No DACL found; file may be accessible by anyone.")
-
-        for i in range(dacl.GetAceCount()):
-            ace = dacl.GetAce(i)
-            ace_sid = ace[2]
-            access_mask = ace[1]
-
-            # Skip ACEs not for the current user
-            if ace_sid != current_user_sid:
-                sid_name, _, _ = win32security.LookupAccountSid(None, ace_sid)
-                raise PermissionError(f"File '{filepath}' grants access to '{sid_name}', which is insecure.")
-
-            # Check that current user has ONLY read access
-            if access_mask & ~(ntsecuritycon.FILE_GENERIC_READ):
-                raise PermissionError(
-                    f"File '{filepath}' grants too many permissions to the owner (expected read-only)."
-                )
-    else:
+    if not IS_WINDOWS:
         st = os.stat(filepath)
         if st.st_uid != os.getuid():
             raise PermissionError(f"File '{filepath}' must be owned by the current user.")
-        if (st.st_mode & 0o777) != 0o400:
-            raise PermissionError(f"File '{filepath}' must have permissions 0400.")
+
+        actual = st.st_mode & 0o777
+        if actual != mode:
+            raise PermissionError(f"File '{filepath}' has permissions {oct(actual)}, expected {oct(mode)}.")
+        return
+
+    # Get current user SID
+    current_user = win32security.LookupAccountName(None, win32api.GetUserName())
+    current_user_sid = current_user[0]
+
+    # Get the file security descriptor
+    sd = win32security.GetFileSecurity(
+        filepath,
+        win32security.DACL_SECURITY_INFORMATION | win32security.OWNER_SECURITY_INFORMATION,
+    )
+
+    # Check ownership
+    owner_sid = sd.GetSecurityDescriptorOwner()
+    if owner_sid != current_user_sid:
+        raise PermissionError(f"File '{filepath}' must be owned by the current user.")
+
+    # Lookup well-known SIDs
+    system_sid = get_sid("SYSTEM")
+    admin_sid = get_sid("Administrators")
+    everyone_sid = get_sid("Everyone")
+
+    # Track permission expectations
+    owner_bits, group_bits, other_bits = build_access_mask(mode)
+    expected = {
+        str(current_user_sid): owner_bits,
+        str(system_sid): group_bits,
+        str(admin_sid): group_bits,
+        str(everyone_sid): other_bits,
+    }
+
+    # Check DACL
+    dacl = sd.GetSecurityDescriptorDacl()
+    if dacl is None:
+        raise PermissionError(f"No DACL on '{filepath}', may be world-accessible.")
+
+    # Check all ACEs
+    for i in range(dacl.GetAceCount()):
+        ace = dacl.GetAce(i)
+        ace_sid = ace[2]
+        access_mask = ace[1]
+
+        expected_mask = expected.get(str(ace_sid), 0)
+        if access_mask != expected_mask:
+            try:
+                sid_name, _, _ = win32security.LookupAccountSid(None, ace_sid)
+            except Exception:
+                sid_name = "UNKNOWN"
+            raise PermissionError(
+                f"File '{filepath}' grants incorrect permissions to '{sid_name}': "
+                f"{oct(access_mask)} instead of {oct(expected_mask)}"
+            )
 
 
-def secure_file(filepath, chmod_value=0o400):
+def secure_file(filepath, mode=0o400):
     """
     Adjust file permissions using Unix-style chmod value.
     On Windows, emulate with:
@@ -88,84 +142,66 @@ def secure_file(filepath, chmod_value=0o400):
     - FILE_ATTRIBUTE_READONLY if owner can't write
     - FILE_ATTRIBUTE_HIDDEN if filename starts with "."
     """
-    if IS_WINDOWS:
-        import ntsecuritycon
-        import pywintypes
-        import win32api
-        import win32con
-        import win32security
+    #
 
-        def get_sid(name):
-            try:
-                sid, unused_domain, unused_account_type = win32security.LookupAccountName(None, name)
-                return sid
-            except pywintypes.error:
-                return None
+    if not IS_WINDOWS:
+        os.chmod(filepath, mode)
+        return
 
-        def build_access_mask(perms):
-            mask = 0
-            if perms & 0b100:
-                mask |= ntsecuritycon.FILE_GENERIC_READ
-            if perms & 0b010:
-                mask |= ntsecuritycon.FILE_GENERIC_WRITE
-            if perms & 0b001:
-                mask |= ntsecuritycon.FILE_GENERIC_EXECUTE
-            return mask
+    # Extract permission bits
+    owner_bits, group_bits, other_bits = build_access_mask(mode)
 
-        # Extract permission bits
-        owner_bits = (chmod_value >> 6) & 0b111
-        group_bits = (chmod_value >> 3) & 0b111
-        other_bits = chmod_value & 0b111
+    # Get current file attributes
+    attrs = win32api.GetFileAttributes(str(filepath))
 
-        # Get SIDs
-        token = win32security.OpenProcessToken(win32api.GetCurrentProcess(), win32security.TOKEN_QUERY)
-        owner_sid = win32security.GetTokenInformation(token, win32security.TokenUser)[0]
-        system_sid = get_sid("SYSTEM")
-        admin_sid = get_sid("Administrators")
-        everyone_sid = get_sid("Everyone")
-
-        # Build DACL
-        dacl = win32security.ACL()
-        if owner_bits:
-            dacl.AddAccessAllowedAce(win32security.ACL_REVISION, build_access_mask(owner_bits), owner_sid)
-        if group_bits:
-            mask = build_access_mask(group_bits)
-            if system_sid:
-                dacl.AddAccessAllowedAce(win32security.ACL_REVISION, mask, system_sid)
-            if admin_sid:
-                dacl.AddAccessAllowedAce(win32security.ACL_REVISION, mask, admin_sid)
-        if other_bits and everyone_sid:
-            dacl.AddAccessAllowedAce(win32security.ACL_REVISION, build_access_mask(other_bits), everyone_sid)
-
-        # Apply security descriptor
-        sd = win32security.SECURITY_DESCRIPTOR()
-        sd.SetSecurityDescriptorOwner(owner_sid, False)
-        sd.SetSecurityDescriptorDacl(1, dacl, 0)
-
-        win32security.SetFileSecurity(
-            str(filepath), win32security.DACL_SECURITY_INFORMATION | win32security.OWNER_SECURITY_INFORMATION, sd
-        )
-
-        # Get current file attributes
-        attrs = win32api.GetFileAttributes(str(filepath))
-
-        # Adjust read-only
-        if not (owner_bits & 0b010):
-            attrs |= win32con.FILE_ATTRIBUTE_READONLY
-        else:
-            attrs &= ~win32con.FILE_ATTRIBUTE_READONLY
-
-        # Adjust hidden
-        filename = os.path.basename(filepath)
-        if filename.startswith("."):
-            attrs |= win32con.FILE_ATTRIBUTE_HIDDEN
-        else:
-            attrs &= ~win32con.FILE_ATTRIBUTE_HIDDEN
-
-        win32api.SetFileAttributes(str(filepath), attrs)
-
+    # Try to adjust hidden flag before updating permissions
+    filename = os.path.basename(filepath)
+    if filename.startswith("."):
+        attrs |= win32con.FILE_ATTRIBUTE_HIDDEN
     else:
-        os.chmod(filepath, chmod_value)
+        attrs &= ~win32con.FILE_ATTRIBUTE_HIDDEN
+    if not (mode & stat.S_IRUSR):
+        attrs |= win32con.FILE_ATTRIBUTE_READONLY
+    else:
+        attrs &= ~win32con.FILE_ATTRIBUTE_READONLY
+    # Try to write file attributes.
+    try:
+        win32api.SetFileAttributes(str(filepath), attrs)
+    except pywintypes.error:
+        pass
+
+    # Get SIDs
+    token = win32security.OpenProcessToken(win32api.GetCurrentProcess(), win32security.TOKEN_QUERY)
+    owner_sid = win32security.GetTokenInformation(token, win32security.TokenUser)[0]
+    system_sid = get_sid("SYSTEM")
+    admin_sid = get_sid("Administrators")
+    everyone_sid = get_sid("Everyone")
+
+    # Build DACL
+    dacl = win32security.ACL()
+    if owner_bits:
+        dacl.AddAccessAllowedAce(win32security.ACL_REVISION, owner_bits, owner_sid)
+    if group_bits:
+        if system_sid:
+            dacl.AddAccessAllowedAce(win32security.ACL_REVISION, group_bits, system_sid)
+        if admin_sid:
+            dacl.AddAccessAllowedAce(win32security.ACL_REVISION, group_bits, admin_sid)
+    if other_bits and everyone_sid:
+        dacl.AddAccessAllowedAce(win32security.ACL_REVISION, other_bits, everyone_sid)
+
+    # Apply security descriptor
+    sd = win32security.SECURITY_DESCRIPTOR()
+    sd.SetSecurityDescriptorOwner(owner_sid, False)
+    sd.SetSecurityDescriptorDacl(1, dacl, 0)
+
+    win32security.SetFileSecurity(
+        str(filepath), win32security.DACL_SECURITY_INFORMATION | win32security.OWNER_SECURITY_INFORMATION, sd
+    )
+    # Try to write file attributes.
+    try:
+        win32api.SetFileAttributes(str(filepath), attrs)
+    except pywintypes.error:
+        pass
 
 
 def ssh_keygen(public_key, private_key, length=2048):
@@ -480,6 +516,50 @@ def open_file_with_default_app(path):
         subprocess.Popen(["open", path])
     else:
         subprocess.Popen(["xdg-open", path])
+
+
+def stop_process(pid):
+    """
+    Gently terminate a process and all it's children.
+    """
+    import signal
+
+    import psutil
+
+    try:
+        parent = psutil.Process(pid)
+    except psutil.NoSuchProcess:
+        return True
+
+    try:
+        # Step 1: Try a gentle shutdown with SIGINT
+        parent.send_signal(signal.SIGINT)
+
+        # Step 2: Wait up to 3 seconds for the process to exit
+        try:
+            parent.wait(timeout=3)
+            return True
+        except psutil.TimeoutExpired:
+            # Step 3: Terminate children
+            children = parent.children(recursive=True)
+            for child in children:
+                if child.is_running():
+                    child.terminate()
+            _gone, alive = psutil.wait_procs(children, timeout=1)
+            for child in alive:
+                child.kill()
+
+            # Step 4: Terminate main process
+            if parent.is_running():
+                parent.terminate()
+
+            try:
+                parent.wait(timeout=1)
+            except psutil.TimeoutExpired:
+                parent.kill()
+
+    except (psutil.NoSuchProcess, SystemError):
+        return False
 
 
 class RobustRotatingFileHandler(RotatingFileHandler):

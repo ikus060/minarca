@@ -51,3 +51,4 @@ deb_dist
 pytestdebug.log
 xunit.xml
 doc/errors-codes-list.md
+imap-backup.log

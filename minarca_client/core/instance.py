@@ -12,13 +12,12 @@ import datetime
 import functools
 import logging
 import os
-import stat
 import subprocess
 import time
 from pathlib import Path
 
 from minarca_client.core import compat
-from minarca_client.core.compat import IS_WINDOWS, detach_call, file_read, flush, get_minarca_exe
+from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.exceptions import (
     CaptureException,
     LocalDestinationNotFound,
@@ -135,14 +134,16 @@ class BackupInstance:
         self.id = id
         self.log_id = f'instance {self.id}' if str(self.id) else 'instance default'
         # Get file locations.
-        self.public_key_file = compat.get_config_home() / f"id_rsa{id}.pub"
-        self.private_key_file = compat.get_config_home() / f"id_rsa{id}"
-        self.known_hosts = compat.get_config_home() / f"known_hosts{id}"
-        self.config_file = compat.get_config_home() / f"minarca{id}.properties"
-        self.patterns_file = compat.get_config_home() / f"patterns{id}"
-        self.status_file = compat.get_data_home() / f"status{id}.properties"
-        self.backup_log_file = compat.get_data_home() / f"backup{id}.log"
-        self.restore_log_file = compat.get_data_home() / f"restore{id}.log"
+        config_home = compat.get_config_home()
+        self.public_key_file = config_home / f"id_rsa{id}.pub"
+        self.private_key_file = config_home / f"id_rsa{id}"
+        self.known_hosts = config_home / f"known_hosts{id}"
+        self.config_file = config_home / f"minarca{id}.properties"
+        self.patterns_file = config_home / f"patterns{id}"
+        data_home = compat.get_data_home()
+        self.status_file = data_home / f"status{id}.properties"
+        self.backup_log_file = data_home / f"backup{id}.log"
+        self.restore_log_file = data_home / f"restore{id}.log"
         # Create wrapper around config files.
         self.patterns = Patterns(self.patterns_file)
         self.status = Status(self.status_file)
@@ -153,24 +154,31 @@ class BackupInstance:
         if not command:
             return
         log_file.write(b"executing command: " + command.encode(errors='replace') + b"\n")
-        process = await asyncio.create_subprocess_shell(
-            command,
-            shell=True,
-            stdin=subprocess.DEVNULL,
-            stdout=log_file,
-            stderr=subprocess.STDOUT,
-            creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
-        )
-        # Check return code
-        exit_code = await process.wait()
-        if exit_code == 0:
-            log_file.write(b'command completed successfully with exit code: %d\n' % exit_code)
-        elif ignore_errors:
-            log_file.write(b'command failed with exit code: %d, but continuing execution\n' % exit_code)
-        else:
-            log_file.write(b'command failed with exit code: %d\n' % exit_code)
-            log_file.write(b'stopping further execution\n')
-            raise subprocess.CalledProcessError(exit_code, command)
+        try:
+            process = await asyncio.create_subprocess_shell(
+                command,
+                shell=True,
+                stdin=subprocess.DEVNULL,
+                stdout=log_file,
+                stderr=subprocess.STDOUT,
+                creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
+                cwd=compat.get_home(),
+                env={'PATH': compat._get_path()},
+            )
+            # Check return code
+            exit_code = await process.wait()
+            if exit_code == 0:
+                log_file.write(b'command completed successfully with exit code: %d\n' % exit_code)
+            elif ignore_errors:
+                log_file.write(b'command failed with exit code: %d, but continuing execution\n' % exit_code)
+            else:
+                log_file.write(b'command failed with exit code: %d\n' % exit_code)
+                log_file.write(b'stopping further execution\n')
+                raise subprocess.CalledProcessError(exit_code, command)
+        finally:
+            # Make sure to terminate the process and it's children !
+            if process and process.pid:
+                compat.stop_process(process.pid)
 
     async def backup(self, force=False):
         """
@@ -254,7 +262,7 @@ class BackupInstance:
         # For local disk, make sure to "flush" disk cache
         if self.is_local():
             logger.debug(f"{self.log_id}: flushing changes to disk")
-            flush(dest)
+            compat.flush(dest)
 
         # # For local disk, we need to manage the retention period too.
         if self.is_local() and self.settings.keepdays and self.settings.keepdays > 0:
@@ -381,7 +389,7 @@ class BackupInstance:
             # Do not create a window
             creationflags = subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0
             process = await asyncio.create_subprocess_exec(
-                get_minarca_exe(),
+                compat.get_minarca_exe(),
                 *args,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
@@ -405,6 +413,9 @@ class BackupInstance:
                 raise capture.exception
             if exit_code not in [0, 2, 8]:
                 raise RdiffBackupExitError(exit_code)
+        finally:
+            if process and process.pid:
+                compat.stop_process(process.pid)
 
     async def restore(self, restore_time=None, paths=[], destination=None):
         """
@@ -451,11 +462,11 @@ class BackupInstance:
         """
         Trigger execution of minarca in detach mode.
         """
-        args = [get_minarca_exe(), 'backup']
+        args = [compat.get_minarca_exe(), 'backup']
         if force:
             args += ['--force']
         args += ['--instance', str(self.id)]
-        child = detach_call(args)
+        child = compat.detach_call(args)
         logger.debug(f"{self.log_id}: subprocess {child.pid} started for backup: {_sh_quote(args)}")
 
     def start_restore(self, restore_time=None, paths=[], destination=None):
@@ -466,7 +477,7 @@ class BackupInstance:
         assert paths
         assert destination is None or isinstance(destination, str)
 
-        args = [get_minarca_exe(), 'restore']
+        args = [compat.get_minarca_exe(), 'restore']
         args += ['--force']
         args += ['--instance', str(self.id)]
         if restore_time:
@@ -474,15 +485,13 @@ class BackupInstance:
         if destination:
             args += ['--destination', str(destination)]
         args += paths
-        child = detach_call(args)
+        child = compat.detach_call(args)
         logger.debug(f"{self.log_id}: subprocess {child.pid} started for restore: {args}")
 
     def stop(self):
         """
         Stop the running backup process.
         """
-        import psutil
-
         # Check status for running backup.
         if not self.is_running():
             raise NotRunningError()
@@ -490,29 +499,12 @@ class BackupInstance:
         # Get pid and check if process is running.
         pid = self.status.pid
         logger.debug(f"{self.log_id}: stopping backup process with PID: {pid}")
-        p = psutil.Process(pid)
-        if not p.is_running():
-            raise NotRunningError()
+        if compat.stop_process(pid):
+            logger.debug(f"{self.log_id}: process interrupted successfully")
+        else:
+            logger.error(f"{self.log_id}: error trying to stop process")
 
-        # Send appropriate signal
-        logger.debug(f"{self.log_id}: terminating process {pid}")
-        try:
-            # To terminate the backup, the best is to kill the SSH connection.
-            for child in p.children(recursive=True):
-                if 'ssh.exe' in child.name() or 'ssh' in child.name():
-                    child.terminate()
-            p.terminate()
-        except SystemError:
-            logger.error(f"{self.log_id}: error trying to stop process", exc_info=True)
-
-        # Wait until process gets killed
-        count = 1
-        while p.is_running() and count < 10:
-            time.sleep(0.1)
-            count += 1
-
-        # Replace status by INTERRUPT
-        logger.debug(f"{self.log_id}: process interrupted successfully")
+        # Final state update
         with self.status as t:
             t.lastresult = 'INTERRUPT'
             t.lastdate = Datetime()
@@ -549,10 +541,14 @@ class BackupInstance:
             self.status_file,
             self.config_file,
         ]:
-            if fn.is_file():
-                fn.chmod(stat.S_IWUSR)
+            if not fn.is_file():
+                continue
+            try:
+                compat.secure_file(fn, mode=0o600)
                 fn.unlink()
                 logger.debug(f"{self.log_id}: deleted file: {fn}")
+            except OSError:
+                logger.warning(f"{self.log_id}: cannot delete file: {fn}", exc_info=1)
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, BackupInstance) and self.id == other.id
@@ -598,7 +594,7 @@ class BackupInstance:
         # Let start by searching our previous location (if any)
         if self.settings.localmountpoint:
             uuid_fn = Path(self.settings.localmountpoint) / self.settings.localrelpath / '..' / '.minarca-id'
-            if file_read(uuid_fn) == self.settings.localuuid:
+            if compat.file_read(uuid_fn) == self.settings.localuuid:
                 destination = Path(self.settings.localmountpoint) / self.settings.localrelpath
                 logger.debug(f"{self.log_id}: found local destination: {destination}")
                 return destination
@@ -606,7 +602,7 @@ class BackupInstance:
         # Otherwise look on all disks and search our UUID.
         for disk in list_disks():
             uuid_fn = disk / self.settings.localrelpath / '..' / '.minarca-id'
-            if file_read(uuid_fn) == self.settings.localuuid:
+            if compat.file_read(uuid_fn) == self.settings.localuuid:
                 destination = Path(disk) / self.settings.localrelpath
                 logger.debug(f"{self.log_id}: found local destination: {destination}")
                 return destination

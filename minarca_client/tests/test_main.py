@@ -509,3 +509,12 @@ class TestMainParseArgs(unittest.TestCase):
             with self.assertRaises(SystemExit) as cm:
                 main.main(['status', '--instance', 'invalid'])
         self.assertEqual(cm.exception.code, 103)
+
+    @mock.patch('minarca_client.core.imap_backup.main_run', return_value=0)
+    def test_imap_backup(self, mock_main_run):
+        # Given multiple arguments pass to rdiff-backup subcommand
+        args = ['imap-backup', '--test']
+        # When calling rdiff-backup subcommand
+        main.main(args)
+        # Then all arguments are passed to rdiff-backup function.
+        mock_main_run.assert_called_once_with(args[1:])

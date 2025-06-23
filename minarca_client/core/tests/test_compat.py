@@ -7,6 +7,7 @@ Created on Jun. 7, 2021
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
 import os
+import stat
 import subprocess
 import tempfile
 import unittest
@@ -14,8 +15,10 @@ from pathlib import Path
 from unittest import mock
 from unittest.case import skipUnless
 
+from parameterized import parameterized
+
 from minarca_client.core import compat
-from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, ssh_keygen
+from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, check_secure_file, secure_file, ssh_keygen
 from minarca_client.core.scheduler import Scheduler
 from minarca_client.tests.test import MATCH
 
@@ -58,6 +61,23 @@ class TestCompat(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(f.read().startswith("ssh-rsa "))
         with open('private.key') as f:
             self.assertEqual(MATCH('-----BEGIN * PRIVATE KEY-----*'), f.read())
+
+    @parameterized.expand([0o400, 0o444, 0o600])
+    def test_secure_file(self, mode):
+        # Given a file
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as f:
+            f.write('test\n')
+            f.flush()
+            filepath = f.name
+            # When file get secured
+            secure_file(filepath, mode=mode)
+        # Then is pass security checks.
+        try:
+            check_secure_file(filepath, mode=mode)
+        finally:
+            secure_file(filepath, mode=0o600)
+            os.chmod(filepath, stat.S_IWUSR)
+            os.remove(filepath)
 
 
 @skipUnless(IS_LINUX, 'Only for Unix')

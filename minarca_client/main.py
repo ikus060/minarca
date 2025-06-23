@@ -8,6 +8,7 @@ import logging.handlers
 import os
 import signal
 import sys
+import traceback
 from pathlib import Path
 
 from minarca_client import __version__
@@ -63,7 +64,7 @@ def _backup(force, instance_id):
     try:
         latest_check = LatestCheck()
         if not latest_check.is_latest():
-            logging.info(_('new version %s available') % latest_check.get_latest_version())
+            logging.info(_('new version %s available'), latest_check.get_latest_version())
     except LatestCheckFailed:
         logging.info(_('fail to check for latest version'))
     backup = Backup()
@@ -72,7 +73,7 @@ def _backup(force, instance_id):
             asyncio.run(instance.backup(force=force))
         except NotScheduleError as e:
             # If one backup is not schedule to run, continue with next backup.
-            logging.info("%s: %s" % (instance.log_id, e))
+            logging.info("%s: %s", instance.log_id, e)
 
 
 def _forget(instance_id, force=False):
@@ -206,8 +207,6 @@ def _rdiff_backup(args):
     """
     Execute rdiff-backup process within minarca.
     """
-    import traceback
-
     import rdiffbackup.run
 
     # Write directly to stdout to check for error.
@@ -227,6 +226,27 @@ def _rdiff_backup(args):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback)
         sys.exit(BackupError.error_code)
+
+
+_rdiff_backup.configure_log = False
+
+
+def _imap_backup(args):
+    from minarca_client.core.imap_backup import main_run
+
+    # Set the priority to below normal
+    nice()
+    # Start the IMAP backup.
+    try:
+        return main_run(args)
+    except Exception:
+        # Capture any exception and return exitcode.
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback)
+        sys.exit(BackupError.error_code)
+
+
+_imap_backup.configure_log = False
 
 
 def _restore(restore_time, force, paths, instance_id, destination):
@@ -665,6 +685,11 @@ def _parse_args():
     sub.add_argument('args', nargs='*')
     sub.set_defaults(func=_rdiff_backup)
 
+    # imap-backup
+    sub = subparsers.add_parser('imap-backup', help=_('For internal use'))
+    sub.add_argument('args', nargs='*')
+    sub.set_defaults(func=_imap_backup)
+
     return parser
 
 
@@ -687,7 +712,7 @@ def _configure_logging(debug=False):
     #
     default_file_handler = RobustRotatingFileHandler(get_log_file(), maxBytes=(1048576 * 5), backupCount=5)
     default_file_handler.setFormatter(
-        logging.Formatter("%(asctime)s [%(process)d][%(levelname)-5.5s][%(threadName)-12.12s] %(message)s")
+        logging.Formatter("%(asctime)s [%(process)d][%(levelname)-8s][%(threadName)-12.12s] %(message)s")
     )
     default_file_handler.setLevel(logging.DEBUG)
     root.addHandler(default_file_handler)
@@ -723,27 +748,30 @@ def main(args=None):
     # Quick hack to support previous `--backup`, `--stop`
     args = [_ARGS_ALIAS.get(a, a) for a in args]
     # Quick hack to accept any arguments for rdiff-backup sub command
-    if args and args[0] == 'rdiff-backup':
+    if args and args[0] in ['rdiff-backup', 'imap-backup']:
         args = args.copy()
         args.insert(1, '--')
     args = parser.parse_args(args)
 
     # Remove func from args
     kwargs = {k: v for k, v in args._get_kwargs() if k not in ['func', 'subcommand', 'debug']}
-    # Configure logging
-    _configure_logging(debug=args.debug)
+    # Configure logging if required.
+    if getattr(args.func, 'configure_log', True):
+        _configure_logging(debug=args.debug)
     try:
         # Call appropriate function
         return args.func(**kwargs)
     except RunningError as e:
         # Print warning message is already running.
-        logging.info(e.message)
-        logging.info(e.detail)
+        logging.error(e.message)
+        if e.detail:
+            logging.error(e.detail)
         sys.exit(e.error_code)
     except BackupError as e:
         # Print message to stdout and log file.
-        logging.info(e.message)
-        logging.info(e.detail)
+        logging.error(e.message)
+        if e.detail:
+            logging.error(e.detail)
         sys.exit(e.error_code)
     except Exception:
         logging.exception("unexpected error retrieving patterns")

@@ -173,7 +173,7 @@ class RestoreFail(BackupError):
     Reserved for future use.
     """
 
-    exit_code = 109
+    error_code = 109
 
 
 class InterruptedError(Exception):
@@ -181,7 +181,7 @@ class InterruptedError(Exception):
     Raised when interupted by user. DEPRECATED replace by generic status code 130.
     """
 
-    exit_code = 110
+    error_code = 110
 
 
 class NoStdoutError(Exception):
@@ -189,7 +189,7 @@ class NoStdoutError(Exception):
     Raised when terminal output is not available.DEPRECATED replace by generic status code 141 Broken Pipe.
     """
 
-    exit_code = 111
+    error_code = 111
 
 
 class RdiffBackupException(BackupError):
@@ -662,6 +662,20 @@ class JailCreationError(BackupError):
     message = _(
         "The remote server could not create the necessary security context, which may indicate an issue with the server. If the problem persists, please contact your system administrator to review the server logs and diagnose the cause."
     )
+
+    @staticmethod
+    def _matches(line):
+        return b'ERROR: fail to create rdiff-backup jail' in line
+
+
+class IMAPListFolderError(BackupError):
+    """
+    Raised by `minarca imap-backup ...` when IMAP error occur during backup.
+    """
+
+    error_code = 40
+
+    message = _("Fail to list IMAP folders.")
 
     @staticmethod
     def _matches(line):

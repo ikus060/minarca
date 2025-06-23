@@ -228,11 +228,21 @@ e2e-test:deb:
   variables:
     GIT_STRATEGY: none
 
-e2e-test:linux:
+e2e-test:linux-with-imap-backup:
   allow_failure: True
   needs:
   - bdist-client:linux
   image: buildpack-deps:jammy
+  # Mock a IMAP Server
+  variables:
+    GIT_STRATEGY: none
+    LANG: "en_US.UTF-8"
+    # Config IMAP Service
+    GREENMAIL_OPTS: "-Dgreenmail.verbose=true -Dgreenmail.setup.test.all -Dgreenmail.hostname=0.0.0.0"
+    IMAP_USERS: "myuser:mypass"
+  services:
+    - name: greenmail/standalone:latest
+      alias: greenmail
   script:
     - apt update
     - apt install -y cron openssh-client locales locales-all xvfb
@@ -251,10 +261,11 @@ e2e-test:linux:
     - ./minarca -d include /etc /var /home
     - ./minarca -d status
     - ./minarca -d backup --force
+    # Check IMAP backup (greenmail IMAP default port 3143)
+    - ./minarca imap-backup --no-ssl --output /tmp/mailbox --server greenmail --port 3143 --username "myuser" --password "mypass"
   stage: e2e-test
   variables:
-    GIT_STRATEGY: none
-    LANG: "en_US.UTF-8"
+
 
 e2e-test:macos:
   allow_failure: True
@@ -320,3 +331,29 @@ e2e-test:win32:
   stage: e2e-test
   tags:
   - windows
+
+e2e-test:imap-backup:
+  allow_failure: True
+  needs:
+  - bdist-client:linux
+  image: buildpack-deps:jammy
+
+  script:
+    - apt update
+    - apt install -y cron openssh-client locales locales-all xvfb
+    - tar -zxvf ./dist/minarca-client*.tar.gz --strip 1
+    # Check translation
+    - LANGUAGE=fr_CA:fr LANG=fr_CA.UTF-8 ./minarca --help | grep 'démarrer une sauvegarde'
+    # Test with space
+    - export MINARCA_CONFIG_HOME="/tmp/My Folder With Space/Minarca/"
+    # Check GUI
+    - xvfb-run ./minarca -d ui --test
+    # Check backup
+    - ./minarca -d link --remoteurl "$MINARCA_DEV_REMOTE_URL" --username "$MINARCA_DEV_USERNAME" --password "$MINARCA_DEV_PASSWORD" --name "e2e-test-linux-${CI_JOB_ID}"
+    - ./minarca -d include /etc /var /home
+    - ./minarca -d status
+    - ./minarca -d backup --force
+  stage: e2e-test
+  variables:
+    GIT_STRATEGY: none
+    LANG: "en_US.UTF-8"
