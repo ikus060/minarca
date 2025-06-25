@@ -141,6 +141,12 @@ The Minarca website is <https://minarca.org/>.
 
 # Changelog
 
+## 6.1.2 (2025-06-25)
+
+**Bug Fixes**
+
+* fix(macOS): prevent duplicate entries when adding a file
+
 ## 6.1.1 (2025-06-20)
 
 **Bug Fixes**

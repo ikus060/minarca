@@ -71,12 +71,11 @@ async def warning_dialog(parent, title, message, detail=None):
     )
 
 
-async def _open_panel(parent, title, filename, initial_directory=None, multiple_select=False, open_file=True):
+async def _open_panel(parent, title, initial_directory=None, multiple_select=False, open_file=True):
     panel = NSOpenPanel.openPanel()
     panel.setCanChooseDirectories_(not open_file)
     panel.setCanChooseFiles_(open_file)
     panel.setCanCreateDirectories_(True)
-    # panel.setShowsHiddenFiles_(self.show_hidden)
 
     if title:
         panel.setTitle_(title)
@@ -99,13 +98,17 @@ async def _open_panel(parent, title, filename, initial_directory=None, multiple_
 
 
 async def file_dialog(parent, title, initial_directory=None, multiple_select=False):
-    return await _open_panel(parent, title, initial_directory, multiple_select, open_file=True)
+    return await _open_panel(
+        parent, title, initial_directory=initial_directory, multiple_select=multiple_select, open_file=True
+    )
 
 
 async def folder_dialog(
     parent,
     title,
     initial_directory=None,
-    multiple_select=False,  # Not supported in Window.
+    multiple_select=False,
 ):
-    return await _open_panel(parent, title, None, initial_directory, multiple_select, open_file=False)
+    return await _open_panel(
+        parent, title, initial_directory=initial_directory, multiple_select=multiple_select, open_file=False
+    )
