@@ -249,6 +249,9 @@ class BackupInstance:
             )
         else:
             args.append("--exclude-sockets")
+        # Disable MacOS deprecated resource-forks which are not stored as xattr.
+        args.append("--no-resource-forks")
+        # Disable compression.
         args.append("--no-compression")
         # Add Include exclude patterns. Those are already sorted.
         for p in patterns:
