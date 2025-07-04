@@ -68,7 +68,7 @@ Edit your Apache configuration file (e.g., `/etc/apache2/sites-available/minarca
     
     ProxyRequests Off
     ProxyPreserveHost On
-    ProxyPass / http://localhost:8080/ retry=5
+    ProxyPass / http://localhost:8080/ connectiontimeout=5 keepalive=on
     ProxyPassReverse / http://localhost:8080/
     RequestHeader set X-Forwarded-Proto https
     RequestHeader set X-Real-IP %{REMOTE_ADDR}s
