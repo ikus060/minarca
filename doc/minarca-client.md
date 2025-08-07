@@ -85,7 +85,7 @@ If you get the following, go in your MacOS **System Settings** --> **Privacy & S
 [Fix 'Apple could not verify app is free of malware' Mac error - bypass Gatekeeper macOS Sequoia](https://www.youtube.com/watch?v=biIvAM94b98) 
 
 
-## Link your client with Minarca Server
+## Configure your client with Minarca Server
 
 Pre-requisite: You need to have a functional Mianrca Server deployed. You may use <https://test.minarca.net> which is made available for testing purpose.
 
@@ -100,7 +100,34 @@ Pre-requisite: You need to have a functional Mianrca Server deployed. You may us
 
     minarca configure -r REMOTEURL -u USERNAME [-p PASSWORD] -n NAME
 
-### File Locations
+## Silent or Unattended Installation of Minarca Client on Windows
+
+Minarca client can be installed silently on Windows, enabling easy automation and scripted deployments. You can also configure it in unattended mode using the command-line interface (CLI).
+
+**1. Silent Installation**  
+  To install Minarca client without user interaction, use the `/S` switch in the installer:
+  ```shell
+  minarca-client_6.1.2.exe /S
+  ```
+  This command installs Minarca client in silent mode, with no dialogs or prompts.
+
+**2. Automated Registration and Configuration**  
+  After installation, you can register and configure the Minarca client automatically via the CLI. Use the following command to set up the connection to your Minarca server and provide authentication details:
+
+  ```shell
+  "C:\Program Files\Minarca\minarca.exe" configure --remoteurl https://example.com --username USERNAME --password CHANGEME
+  ```
+
+  Replace `https://example.com`, `USERNAME`, and `CHANGEME` with your actual Minarca server URL, username, and password.
+
+**Additional CLI Options:** Minarca offers more configuration options through its command-line interface. To explore all available CLI commands and options, refer to the official minarca client CLI documentation:  
+[Minarca Client CLI Documentation](minarca-client-cli.md)
+
+**Tip:**  
+Always ensure your credentials and sensitive information are secured when scripting unattended setups and configuration!
+
+
+## File Locations
 
 | **Operating System** | **Log File**                          | **Settings Folder**                   | **Status Folder**                     |
 |-----------------------|---------------------------------------|----------------------------------------|----------------------------------------|
@@ -121,3 +148,4 @@ On all platforms, it is possible to override the default locations for the setti
 |-----------------------|----------------------------|------------------------------------------|
 | **Settings Folder**   | `$MINARCA_CONFIG_HOME`     | Sets a custom path for configuration files. |
 | **Status Folder**     | `$MINARCA_DATA_HOME`       | Sets a custom path for status files.        |
+
