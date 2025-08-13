@@ -275,7 +275,7 @@ def _restore(restore_time, force, paths, instance_id, destination):
                 and not p.is_wildcard()
                 and _prompt_yes_no(_('Do you want to restore %s? (Yes/No): ') % p.pattern)
             ):
-                paths.append(p)
+                paths.append(p.pattern)
     else:
         # Convert specific path to be restored.
         paths = [(Path.cwd() / path).resolve() for path in paths]
