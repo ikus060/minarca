@@ -11,7 +11,7 @@
 !define AppName "Minarca"
 ; Used for paths
 !define ShortName "minarca"
-!define Vendor "Ikus Soft inc."
+!define Vendor "Ikus Software"
 !define AppExeFile "minarcaw.exe"
 
 ; The following should be overide by pyinstaller script.
@@ -34,9 +34,9 @@ SetCompressor bzip2
 ;Configuration
  
   ;General
-  Name "${AppName}"
+  Name "FOO APP NAME"
   VIProductVersion "${AppVersion}"
-  VIAddVersionKey "ProductName" "${AppName}"
+  VIAddVersionKey "ProductName" "PRODUCT NAME BAR"
   VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
   VIAddVersionKey "CompanyName" "${Vendor}"
   VIAddVersionKey "LegalCopyright" "© ${Vendor}"
