@@ -46,8 +46,8 @@ SetCompressor bzip2
   
   ; Define icon
   !define FAVICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
-  !define MUI_ICON "setup.ico"
-  !define MUI_UNICON "setup.ico"
+  !define MUI_ICON "${FILEDIR}\setup.ico"
+  !define MUI_UNICON "${FILEDIR}\setup.ico"
  
   ;Folder selection page
   InstallDir "$PROGRAMFILES64\Minarca"
