@@ -45,6 +45,8 @@ from kivymd.uix.progressindicator.progressindicator import MDCircularProgressInd
 from kivymd.uix.selectioncontrol.selectioncontrol import MDSwitch
 from kivymd.uix.textfield.textfield import MDTextField
 
+from minarca_client import btn_bg_color, btn_fg_color, navbar_color
+
 # Make sure to lookup for resources.
 resources_path = str(files('minarca_client.ui.theme') / 'resources')
 kivy.resources.resource_add_path(resources_path)
@@ -165,15 +167,19 @@ class Theme(ThemeManager):
     warningContainerColor = ColorProperty()
     onWarningColor = ColorProperty()
 
-    _primary = get_color_from_hex("#009FB9")
-    _dark = get_color_from_hex("#0E2933")
+    # Customizable colors
+    _navbar_color = get_color_from_hex(navbar_color)
+    _btn_bg_color = get_color_from_hex(btn_bg_color)
+    _btn_fg_color = get_color_from_hex(btn_fg_color)
+
+    # Static colors
+    _dark = get_color_from_hex("#212529")
     _white = get_color_from_hex("#ffffff")
     _gray_10 = get_color_from_hex("#EEF0F1")
     _gray_20 = get_color_from_hex("#CFD4D6")
     _gray_50 = get_color_from_hex("#7E8D92")
     _danger = get_color_from_hex("#CA393C")
     _secondary = get_color_from_hex("#B6DDE2")
-    _secondary_50 = get_color_from_hex("#DBEEF0")
     _warning = get_color_from_hex("#D88C46")
     _warning_20 = get_color_from_hex("#FFF0D9")
 
@@ -186,7 +192,7 @@ class Theme(ThemeManager):
     def set_colors(self, *args) -> None:
         super().set_colors(*args)
         # Enforce some default colors on top of the scheme.
-        self.primaryColor = self._primary
+        self.primaryColor = self._btn_bg_color
         self.backgroundColor = self._white
         self.errorColor = self._danger
         self.surfaceColor = self._white
@@ -196,7 +202,7 @@ class Theme(ThemeManager):
         self.surfaceContainerColor = self._gray_10
         self.surfaceContainerHighColor = self._gray_20
         self.onSurfaceVariantColor = self._dark
-        self.inverseSurfaceColor = self._dark
+        self.inverseSurfaceColor = self._navbar_color
         self.inverseOnSurfaceColor = self._white
         # Custom color name
         self.warningColor = self._warning
