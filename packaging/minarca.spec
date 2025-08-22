@@ -166,7 +166,7 @@ elif platform.system() == "Windows":
     with open(join(DISTPATH, 'minarca/LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
         out.write(pkg_info['License'])
 
-    # Sign Minarca executables
+    # Sign executables
     signexe(join(DISTPATH, 'minarca/minarca.exe'))
     signexe(join(DISTPATH, 'minarca/minarcaw.exe'))
 

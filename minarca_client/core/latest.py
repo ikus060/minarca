@@ -6,8 +6,8 @@ Created on Oct. 22, 2021
 
 @author: Patrik Dufresne <patrik@ikus-soft.com>
 '''
+from minarca_client import download_url
 from minarca_client.core import compat
-from minarca_client.locale import _
 from packaging import version
 
 LATEST_VERSION_URL = 'https://latest.ikus-soft.com/minarca/latest_version'
@@ -26,9 +26,9 @@ class LatestCheck:
 
     def get_download_url(self):
         """
-        Return Minarca download page.
+        Return download page.
         """
-        return _("https://minarca.org/download/")
+        return download_url
 
     def get_latest_version(self, timeout=0.5):
         """

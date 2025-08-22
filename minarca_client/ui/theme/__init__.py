@@ -155,7 +155,7 @@ Builder.load_string(
 )
 
 
-class MinarcaTheme(ThemeManager):
+class Theme(ThemeManager):
     """
     Custom implementation of theme manager to have better control over the colors generated.
     """

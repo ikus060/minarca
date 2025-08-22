@@ -12,7 +12,7 @@ from kivy.lang import Builder
 from kivy.modules import inspector
 from kivymd.app import MDApp
 
-from minarca_client.ui.theme import MinarcaTheme
+from minarca_client.ui.theme import Theme
 
 from .about_menu import AboutMenu  # noqa
 from .side_pannel import SidePanel  # noqa
@@ -74,7 +74,7 @@ class MinarcaApp(MDApp, ExceptionHandler):
         self.backup = backup
         self.test = test
         super().__init__(*args, **kwargs)
-        self.theme_cls = MinarcaTheme()
+        self.theme_cls = Theme()
 
     def mainloop(self):
         # Start the main even loop.
