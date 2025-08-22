@@ -21,13 +21,15 @@
 ;--------------------------------
 ;Includes
 
-  Unicode True
-  SetCompressor bzip2
+Unicode True
+SetCompressor bzip2
 
 !include "MUI2.nsh"
 !include "Sections.nsh"
 !include "x64.nsh"
- 
+!include "WinMessages.nsh"
+!include "LogicLib.nsh"
+
 ;--------------------------------
 ;Configuration
  
@@ -44,8 +46,8 @@
   
   ; Define icon
   !define FAVICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
-  ;!define MUI_ICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
-  ;!define MUI_UNICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
+  !define MUI_ICON "_internal\minarca_client\ui\theme\resources\setup.ico"
+  !define MUI_UNICON "_internal\minarca_client\ui\theme\resources\setup.ico"
  
   ;Folder selection page
   InstallDir "$PROGRAMFILES64\Minarca"
@@ -184,26 +186,54 @@ Section "Installation of $(DisplayName)" SecAppFiles
   CreateShortCut "$SMPROGRAMS\$(DisplayName)\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\${FAVICON}" 0
 
 SectionEnd
- 
- 
+
 ;--------------------------------
 ;Installer Functions
- 
+
+!define IMAGE_ICON     1
+!define LR_LOADFROMFILE 0x0010
+!define WM_SETICON     0x0080
+!define ICON_SMALL     0
+!define ICON_BIG       1
+
+Var hIconBig
+Var hIconSmall
+
 Function .onInit
 
   ; When running 64bits, read and write to 64bits registry.
   SetRegView 64
-  
-  ; Install for current user
-  SetShellVarContext current
 
   ; Set installation directory according to bitness
   ${If} $InstDir == ""
     StrCpy $InstDir "$LOCALAPPDATA\${SHORTNAME}"
   ${EndIf}
-  
+
+  ; Replace title bar & taskbar icons.
+  ${If} ${FileExists} "$EXEDIR\favicon.ico"
+    ; BIG
+    System::Call 'user32::LoadImage(p0, t "$EXEDIR\favicon.ico", i ${IMAGE_ICON}, i 32, i 32, i ${LR_LOADFROMFILE}) p.r0'
+    ${If} $0 <> 0
+      StrCpy $hIconBig $0
+      System::Call 'user32::SendMessage(p $hwndparent, i ${WM_SETICON}, p ${ICON_BIG}, p r0) p.r1'
+    ${EndIf}
+
+    ; SMALL
+    System::Call 'user32::LoadImage(p0, t "$EXEDIR\favicon.ico", i ${IMAGE_ICON}, i 16, i 16, i ${LR_LOADFROMFILE}) p.r0'
+    ${If} $0 <> 0
+      StrCpy $hIconSmall $0
+      System::Call 'user32::SendMessage(p $hwndparent, i ${WM_SETICON}, p ${ICON_SMALL}, p r0) p.r1'
+    ${EndIf}
+  ${EndIf}
+
   !insertmacro MUI_LANGDLL_DISPLAY
 
+FunctionEnd
+
+Function .onGUIEnd
+  ; Clean up icon handles
+  System::Call 'user32::DestroyIcon(p $hIconBig)'
+  System::Call 'user32::DestroyIcon(p $hIconSmall)'
 FunctionEnd
 
 ;--------------------------------
