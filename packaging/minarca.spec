@@ -35,9 +35,9 @@ os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 # Common values
 #
 minarca_client_pkg = files('minarca_client')
-icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.ico')
-macos_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.icns')
-svg_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.svg')
+icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.ico')
+macos_icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.icns')
+svg_icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.svg')
 
 #
 # Read package info
@@ -209,7 +209,7 @@ else:
             ('/opt/minarca', join(DISTPATH, 'minarca')),
             # For GUI
             ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
-            ('/opt/minarca/minarca.svg', svg_icon),
+            ('/opt/minarca/app.svg', svg_icon),
         ],
         description="Secure, self-hosted and automated backup solution",
         long_description=pkg_info['Summary'],

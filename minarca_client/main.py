@@ -410,7 +410,7 @@ def _ui(test=False):
         if not test:
             dlg = error_dialog(
                 parent=None,
-                title=_('Minarca'),
+                title=_('COUCOU'),
                 message=_('Application failed to start'),
                 detail=_(
                     'If the problem persists, check the logs with your administrator or try reinstalling the application.'

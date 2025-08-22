@@ -97,7 +97,7 @@ class MinarcaApp(MDApp, ExceptionHandler):
         pass
 
     def build(self):
-        self.icon = "minarca-72.png"
+        self.icon = "favicon-72.png"
         return Builder.load_string(KV)
 
     def handle_exception(self, exception):

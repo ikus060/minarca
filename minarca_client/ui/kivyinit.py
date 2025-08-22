@@ -19,7 +19,7 @@ if sys.platform == 'linux':
     Config.set('input', '%(name)s', '')
 
 # Define default application icons
-minarca_ico_path = files('minarca_client') / 'ui/theme/resources/minarca.ico'
+minarca_ico_path = files('minarca_client') / 'ui/theme/resources/favicon.ico'
 if minarca_ico_path.is_file():
     Config.set('kivy', 'window_icon', str(minarca_ico_path))
 

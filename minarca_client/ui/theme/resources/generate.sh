@@ -28,7 +28,7 @@ function svg_color_to_png() {
 }
 
 # Android icons
-svg_to_png "minarca.svg" "72x72"   minarca-72.png
+svg_to_png "favicon.svg" "72x72"   favicon-72.png
 
 # Application Header Logo
 svg_to_png "header-logo.svg" "x30"   "header-logo-30.png"

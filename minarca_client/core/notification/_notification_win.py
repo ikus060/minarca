@@ -112,7 +112,7 @@ def _clear(tag=None, group=None):
 
 
 def send_notification(title, body, replace_id=None):
-    icon_path = files('minarca_client') / 'ui/theme/resources/minarca.ico'
+    icon_path = files('minarca_client') / 'ui/theme/resources/favicon.ico'
     icon_def = None
     if icon_path.is_file():
         icon_def = {'src': str(icon_path), 'placement': 'appLogoOverride'}

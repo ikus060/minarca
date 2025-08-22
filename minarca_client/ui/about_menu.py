@@ -74,7 +74,7 @@ Builder.load_string(
                 icon: "chevron-right"
 
     Image:
-        source: "minarca-72.png"
+        source: "favicon-72.png"
         fit_mode: "contain"
         size_hint: None, None
         height: "72dp"
