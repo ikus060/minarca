@@ -43,8 +43,9 @@
   OutFile "${OutFile}"
   
   ; Define icon
-  !define MUI_ICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
-  !define MUI_UNICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
+  !define FAVICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
+  ;!define MUI_ICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
+  ;!define MUI_UNICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
  
   ;Folder selection page
   InstallDir "$PROGRAMFILES64\Minarca"
@@ -160,14 +161,14 @@ Section "Installation of $(DisplayName)" SecAppFiles
   DeleteRegKey HKCR "minarca"
   WriteRegStr HKCR "minarca" "" "URL:minarca"
   WriteRegStr HKCR "minarca" "URL Protocol" ""
-  WriteRegStr HKCR "minarca\DefaultIcon" "" "$INSTDIR\${MUI_ICON}"
+  WriteRegStr HKCR "minarca\DefaultIcon" "" "$INSTDIR\${FAVICON}"
   WriteRegStr HKCR "minarca\shell" "" ""
   WriteRegStr HKCR "minarca\shell\Open" "" ""
   WriteRegStr HKCR "minarca\shell\Open\command" "" "$INSTDIR\minarcaw.exe ui"
 
   !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$(DisplayName)"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\${MUI_ICON}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\${FAVICON}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${AppVersion}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${Vendor}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "UninstallString" '"$INSTDIR\uninstall.exe"'
@@ -179,8 +180,8 @@ Section "Installation of $(DisplayName)" SecAppFiles
 
   ; Create startup menu
   CreateDirectory "$SMPROGRAMS\$(DisplayName)"
-  CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\${MUI_ICON}" 0
-  CreateShortCut "$SMPROGRAMS\$(DisplayName)\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\${MUI_ICON}" 0
+  CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\${FAVICON}" 0
+  CreateShortCut "$SMPROGRAMS\$(DisplayName)\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\${FAVICON}" 0
 
 SectionEnd
  
