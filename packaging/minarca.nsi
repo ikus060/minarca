@@ -46,8 +46,8 @@ SetCompressor bzip2
   
   ; Define icon
   !define FAVICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
-  !define MUI_ICON "_internal\minarca_client\ui\theme\resources\setup.ico"
-  !define MUI_UNICON "_internal\minarca_client\ui\theme\resources\setup.ico"
+  !define MUI_ICON "setup.ico"
+  !define MUI_UNICON "setup.ico"
  
   ;Folder selection page
   InstallDir "$PROGRAMFILES64\Minarca"
@@ -230,10 +230,15 @@ Function .onInit
 
 FunctionEnd
 
+
+; Clean up icon handles
 Function .onGUIEnd
-  ; Clean up icon handles
-  System::Call 'user32::DestroyIcon(p $hIconBig)'
-  System::Call 'user32::DestroyIcon(p $hIconSmall)'
+  ${If} $hIconBig <> 0
+    System::Call 'user32::DestroyIcon(p $hIconBig)'
+  ${EndIf}
+  ${If} $hIconSmall <> 0
+    System::Call 'user32::DestroyIcon(p $hIconSmall)'
+  ${EndIf}
 FunctionEnd
 
 ;--------------------------------
