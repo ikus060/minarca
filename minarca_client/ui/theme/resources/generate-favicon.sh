@@ -50,6 +50,7 @@ fi
 OUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
 OUTPUT_ICNS="$OUT_DIR/favicon.icns"
 OUTPUT_ICO="$OUT_DIR/favicon.ico"
+OUTPUT_PNG="$OUT_DIR/favicon-72.png"
 
 # Create PNGs in /tmp and delete after processing.
 TEMP_DIR="$(mktemp -d /tmp/icns.XXXXXXXX)"
@@ -59,8 +60,7 @@ cleanup() {
 trap cleanup EXIT
 
 # macOS icns needs up to 1024; Windows ico uses up to 256.
-SIZES_ALL=(16 24 32 48 64 128 256 512 1024)
-SIZES_ICO=(16 24 32 48 64 128 256)
+SIZES_ALL=(16 24 32 48 64 72 128 256 512 1024)
 
 # Optional: remove existing outputs to avoid confusion.
 for f in "$OUTPUT_ICNS" "$OUTPUT_ICO"; do
@@ -90,6 +90,9 @@ magick "$TEMP_DIR"/icon_16.png  "$TEMP_DIR"/icon_24.png  "$TEMP_DIR"/icon_32.png
        "$TEMP_DIR"/icon_48.png  "$TEMP_DIR"/icon_64.png  "$TEMP_DIR"/icon_128.png \
        "$TEMP_DIR"/icon_256.png -strip "$OUTPUT_ICO"
 
+cp "$TEMP_DIR/icon_72.png" "$OUTPUT_PNG"
+
 echo "Success:"
 echo "  $OUTPUT_ICNS"
 echo "  $OUTPUT_ICO"
+echo "  $OUTPUT_PNG"

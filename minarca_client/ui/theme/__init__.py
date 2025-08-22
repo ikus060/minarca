@@ -1,6 +1,8 @@
 # Copyright (C) 2025 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
+from importlib.resources import files
+
 import kivy.utils
 from kivymd.font_definitions import theme_font_styles
 
@@ -24,8 +26,6 @@ theme_font_styles["Title"] = {
     },
 }
 
-import os
-
 import kivy.resources
 from kivy.core.text import LabelBase
 from kivy.lang import Builder
@@ -45,7 +45,8 @@ from kivymd.uix.progressindicator.progressindicator import MDCircularProgressInd
 from kivymd.uix.selectioncontrol.selectioncontrol import MDSwitch
 from kivymd.uix.textfield.textfield import MDTextField
 
-resources_path = os.path.abspath(os.path.join(__file__, '../resources'))
+# Make sure to lookup for resources.
+resources_path = str(files('minarca_client.ui.theme') / 'resources')
 kivy.resources.resource_add_path(resources_path)
 
 # https://fonts.google.com/specimen/Overpass+Mono

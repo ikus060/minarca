@@ -10,6 +10,7 @@ from kivy.base import ExceptionHandler, ExceptionManager
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.modules import inspector
+from kivy.properties import StringProperty
 from kivymd.app import MDApp
 
 from minarca_client.ui.theme import Theme
@@ -35,10 +36,10 @@ MDScreen:
             md_bg_color: self.theme_cls.inverseSurfaceColor
 
             Image:
-                source: "header-logo-30.png"
+                source: "header-logo-32.png"
                 fit_mode: "contain"
                 size_hint: None, None
-                height: "30dp"
+                height: "32dp"
                 width: self.height * self.image_ratio
                 pos_hint: {'center_y': .5}
 
@@ -69,6 +70,10 @@ MDScreen:
 
 
 class MinarcaApp(MDApp, ExceptionHandler):
+    use_kivy_settings = False
+
+    icon = StringProperty("favicon-72.png")
+
     def __init__(self, *args, backup=None, test=False, **kwargs):
         assert backup is not None
         self.backup = backup
@@ -97,7 +102,6 @@ class MinarcaApp(MDApp, ExceptionHandler):
         pass
 
     def build(self):
-        self.icon = "favicon-72.png"
         return Builder.load_string(KV)
 
     def handle_exception(self, exception):
