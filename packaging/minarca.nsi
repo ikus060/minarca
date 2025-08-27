@@ -18,6 +18,9 @@
 ;!define AppVersion "1.1.1.1"
 ;!define OutFile "minarca-installer-dev.exe"
 
+; Constant values
+!define CFG_FILENAME "setup.cfg"
+
 ;--------------------------------
 ;Includes
 
@@ -132,47 +135,148 @@ SetCompressor bzip2
 ;--------------------------------
 ;Global Variables
 Var ShortcutIconPath ; Variable to hold the actual icon path used for shortcuts/registry
-Var HeaderLinkName   ; Variable to store the value read from setup.cfg for link names
+Var HeaderName       ; Variable to store the value read from setup.cfg for link names
 
 ;--------------------------------
 ;Functions
 
-; Function to read 'header_name' from setup.cfg
-Function ReadHeaderName
-  StrCpy $HeaderLinkName ""
+; Macro wrapper to make calling convenient:
+;   ${ReadPropertyFromFile} "C:\path\file.cfg" "header_name" $VarToReceive
+!macro ReadPropertyFromFile FILE KEY OUTVAR
+  Push "${KEY}"
+  Push "${FILE}"
+  Call ReadProperty_Impl
+  Pop ${OUTVAR}
+!macroend
 
-  FileOpen $0 "$EXEDIR\setup.cfg" r
-  ${If} $0 <> ""
-    loop:
-      FileRead $0 $1
-      ${If} ${Errors}
-        Goto done_read_header
-      ${EndIf}
+; Returns value on the stack (empty if not found or on error)
+Function ReadProperty_Impl
+  ; Stack in: top=$FILE, below=$KEY
+  Exch $1             ; $1 = file path
+  Exch
+  Exch $0             ; $0 = key to find
+  Push $2
+  Push $3
+  Push $4
+  Push $5
+  Push $6
+  Push $7
+  Push $8
 
-      ${TrimNewLines} $1 $1       ; remove trailing CR/LF from FileRead
-      ${Trim} $1 $1               ; trim leading/trailing spaces & tabs
+  StrLen $7 $0        ; $7 = key length
+  StrCpy $8 ""        ; $8 = result (empty by default)
 
-      ; Check if the line starts with "header_name = "
-      StrCpy $R2 $1 14
-      StrCmp $R2 "header_name = " 0 skip_line_check_header
+  FileOpen $2 $1 r
+  IfErrors +3
+    Goto +2
+    Goto done         ; cannot open file, return empty
 
-      ; Extract the value and trim again
-      StrCpy $R3 $1 "" 14
-      ${Trim} $R3 $R3
-      StrCpy $HeaderLinkName $R3
-      Goto done_read_header
+loop_lines:
+  FileRead $2 $3
+  IfErrors close      ; EOF
 
-    skip_line_check_header:
-      Goto loop
-  done_read_header:
-    FileClose $0
+  ; Remove trailing CR/LF
+  ; (If the line doesn't end with CR/LF this is harmless)
+  StrCpy $3 $3 -2
+
+  ; Trim leading whitespace (spaces or tabs)
+  ${Do}
+    StrCpy $4 $3 1 0
+    StrCmp $4 " " 0 +3
+      StrCpy $3 $3 "" 1
+      ${Continue}
+    StrCmp $4 "$\t" 0 +3
+      StrCpy $3 $3 "" 1
+      ${Continue}
+    ${Break}
+  ${Loop}
+
+  ; Skip empty or comment lines (# or ;)
+  StrCmp $3 "" loop_lines
+  StrCpy $4 $3 1 0
+  StrCmp $4 "#" loop_lines
+  StrCmp $4 ";" loop_lines
+
+  ; Does the line start with the key?
+  StrCpy $5 $3 $7 0
+  StrCmp $5 $0 0 loop_lines
+
+  ; After the key, skip whitespace before '='
+  StrCpy $6 $3 "" $7        ; $6 = remainder after key
+  ${Do}
+    StrCpy $4 $6 1 0
+    StrCmp $4 " " 0 +3
+      StrCpy $6 $6 "" 1
+      ${Continue}
+    StrCmp $4 "$\t" 0 +3
+      StrCpy $6 $6 "" 1
+      ${Continue}
+    ${Break}
+  ${Loop}
+
+  ; Expect '='
+  StrCpy $4 $6 1 0
+  StrCmp $4 "=" 0 loop_lines
+
+  ; Value is after '='
+  StrCpy $8 $6 "" 1
+
+  ; Trim leading whitespace of value
+  ${Do}
+    StrCpy $4 $8 1 0
+    StrCmp $4 " " 0 +3
+      StrCpy $8 $8 "" 1
+      ${Continue}
+    StrCmp $4 "$\t" 0 +3
+      StrCpy $8 $8 "" 1
+      ${Continue}
+    ${Break}
+  ${Loop}
+
+  ; Trim trailing whitespace (spaces/tabs)
+  StrLen $5 $8
+  ${If} $5 > 0
+    ${Do}
+      StrLen $5 $8
+      ${IfThen} $5 = 0 ${|} ${Break} ${|}
+      StrCpy $4 $8 1 -1
+      StrCmp $4 " " 0 +3
+        StrCpy $8 $8 -1
+        ${Continue}
+      StrCmp $4 "$\t" 0 +3
+        StrCpy $8 $8 -1
+        ${Continue}
+      ${Break}
+    ${Loop}
   ${EndIf}
+
+  ; Found the key once; stop reading
+  Goto close
+
+close:
+  FileClose $2
+done:
+  ; Return value (possibly empty) on the stack
+  Push $8
+
+  Pop $8
+  Pop $7
+  Pop $6
+  Pop $5
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Pop $0
 FunctionEnd
 
 ;--------------------------------
 ;Installer Sections
 
 Section "Installation of $(DisplayName)" SecAppFiles
+  
+  ; Install for all
+  SetShellVarContext all
 
   ; Check if minarca is running
   retry_label:
@@ -185,9 +289,6 @@ Section "Installation of $(DisplayName)" SecAppFiles
       Abort
   ${EndIf}
   ignore_label:
-
-  ; Install for all
-  SetShellVarContext all
 
   ; Remove previous files
   RMDir /r "$INSTDIR"
@@ -228,7 +329,7 @@ Section "Installation of $(DisplayName)" SecAppFiles
 
   ; --- Determine the display name ---
   ; Read header_name from setup.cfg
-  Call ReadHeaderName
+  ${ReadPropertyFromFile} "$EXEDIR\${CFG_FILENAME}" "header_name" $HeaderName
 
   ; Define Custom Protocol for Toast Notification
   DeleteRegKey HKCR "minarca"
@@ -254,13 +355,13 @@ Section "Installation of $(DisplayName)" SecAppFiles
   ; Create startup menu
   CreateDirectory "$SMPROGRAMS\$(DisplayName)"
   
-  ; Use HeaderLinkName for shortcuts if available, otherwise fall back to DisplayName
-  ${If} $HeaderLinkName != ""
-    CreateShortCut "$DESKTOP\$HeaderLinkName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
-    CreateShortCut "$SMPROGRAMS\$HeaderLinkName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+  ; Use HeaderName for shortcuts if available, otherwise fall back to DisplayName
+  ${If} $HeaderName != ""
+    CreateShortCut "$DESKTOP\$HeaderName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+    CreateShortCut "$SMPROGRAMS\$HeaderName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
   ${Else}
     CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
-    CreateShortCut "$SMPROGRAMS\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+    CreateShortCut "$SMPROGRAMS\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
   ${EndIf}
 
 SectionEnd
