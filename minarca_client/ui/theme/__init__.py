@@ -1,11 +1,15 @@
 # Copyright (C) 2025 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
+from importlib.resources import files
+
 import kivy.utils
 from kivymd.font_definitions import theme_font_styles
 
+PRIMARY_PALETTE = 'Mycustomcolors'
+
 # Need to replace font definition.
-kivy.utils.hex_colormap['minarca'] = "#009FB9"
+kivy.utils.hex_colormap[PRIMARY_PALETTE.lower()] = "#009FB9"
 theme_font_styles["Title"] = {
     "large": {
         "line-height": 1.28,
@@ -23,8 +27,6 @@ theme_font_styles["Title"] = {
         "font-size": "16sp",
     },
 }
-
-import os
 
 import kivy.resources
 from kivy.core.text import LabelBase
@@ -45,7 +47,10 @@ from kivymd.uix.progressindicator.progressindicator import MDCircularProgressInd
 from kivymd.uix.selectioncontrol.selectioncontrol import MDSwitch
 from kivymd.uix.textfield.textfield import MDTextField
 
-resources_path = os.path.abspath(os.path.join(__file__, '../resources'))
+from minarca_client.core.appconfig import appconfig
+
+# Make sure to lookup for resources.
+resources_path = str(files('minarca_client.ui.theme') / 'resources')
 kivy.resources.resource_add_path(resources_path)
 
 # https://fonts.google.com/specimen/Overpass+Mono
@@ -155,7 +160,7 @@ Builder.load_string(
 )
 
 
-class MinarcaTheme(ThemeManager):
+class Theme(ThemeManager):
     """
     Custom implementation of theme manager to have better control over the colors generated.
     """
@@ -164,28 +169,32 @@ class MinarcaTheme(ThemeManager):
     warningContainerColor = ColorProperty()
     onWarningColor = ColorProperty()
 
-    _primary = get_color_from_hex("#009FB9")
-    _dark = get_color_from_hex("#0E2933")
+    # Customizable colors
+    _navbar_color = get_color_from_hex(appconfig.navbar_color)
+    _btn_bg_color = get_color_from_hex(appconfig.btn_bg_color)
+    _btn_fg_color = get_color_from_hex(appconfig.btn_fg_color)
+
+    # Static colors
+    _dark = get_color_from_hex("#212529")
     _white = get_color_from_hex("#ffffff")
     _gray_10 = get_color_from_hex("#EEF0F1")
     _gray_20 = get_color_from_hex("#CFD4D6")
     _gray_50 = get_color_from_hex("#7E8D92")
     _danger = get_color_from_hex("#CA393C")
     _secondary = get_color_from_hex("#B6DDE2")
-    _secondary_50 = get_color_from_hex("#DBEEF0")
     _warning = get_color_from_hex("#D88C46")
     _warning_20 = get_color_from_hex("#FFF0D9")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.dynamic_scheme_name = "TONAL_SPOT"
-        self.primary_palette = 'Minarca'
+        self.primary_palette = PRIMARY_PALETTE
         self.theme_style_switch_animation = False
 
     def set_colors(self, *args) -> None:
         super().set_colors(*args)
         # Enforce some default colors on top of the scheme.
-        self.primaryColor = self._primary
+        self.primaryColor = self._btn_bg_color
         self.backgroundColor = self._white
         self.errorColor = self._danger
         self.surfaceColor = self._white
@@ -195,7 +204,7 @@ class MinarcaTheme(ThemeManager):
         self.surfaceContainerColor = self._gray_10
         self.surfaceContainerHighColor = self._gray_20
         self.onSurfaceVariantColor = self._dark
-        self.inverseSurfaceColor = self._dark
+        self.inverseSurfaceColor = self._navbar_color
         self.inverseOnSurfaceColor = self._white
         # Custom color name
         self.warningColor = self._warning

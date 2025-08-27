@@ -74,13 +74,9 @@ if IS_WINDOWS:
 
             # Set parameters
             task_def.RegistrationInfo.Description = _(
-                "Keeps your Minarca Backup Software running. If this task is disabled "
-                "or stopped, your Minarca backup will stop working. This task gets "
-                "created when linking Minarca with a central backup server. When "
-                "installing Minarca on a Windows Server, it's preferable to change "
-                "the settings of this task and select 'Run whether user is logged "
-                "on or not' to make sure the backup is running even when nobody is "
-                "using the server."
+                "Keeps your backup application running. If this task is disabled or stopped, "
+                "backups will no longer run. This task is created when the application is "
+                "linked to a backup server."
             )
             task_def.Settings.Enabled = True
             task_def.Settings.StopIfGoingOnBatteries = False
@@ -101,7 +97,7 @@ if IS_WINDOWS:
             except pywintypes.com_error as e:
                 winerror = e.excepinfo[5]
                 if winerror == -2147024891:
-                    # Permissions error when running Minarca as "Administrator" without admin right.
+                    # Permissions error when running agent as "Administrator" without admin right.
                     raise PermissionError(
                         _(
                             'A problem prevents the scheduling of backup jobs. Try running the application with Administrator rights.'

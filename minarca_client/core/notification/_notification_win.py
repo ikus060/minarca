@@ -4,11 +4,9 @@
 import subprocess
 import time
 import xml.etree.ElementTree as et
-from importlib.resources import files
 
+from minarca_client.core.appconfig import appconfig
 from minarca_client.locale import _
-
-APP_ID = 'Minarca'
 
 __all__ = ['send_notification', 'clear_notification']
 
@@ -100,7 +98,11 @@ def _notify(
             _add_button(button, toast)
     if icon:
         _add_icon(icon, toast)
-    _run(NOTIFY_PS1.format(app_id=APP_ID, tag=tag, group=group, xml=et.tostring(toast, encoding='unicode')))
+    _run(
+        NOTIFY_PS1.format(
+            app_id=appconfig.header_name, tag=tag, group=group, xml=et.tostring(toast, encoding='unicode')
+        )
+    )
     return tag
 
 
@@ -108,11 +110,11 @@ def _clear(tag=None, group=None):
     """
     Clear notification identified by app_id, tag & group using PowerShell script.
     """
-    _run(REMOVE_PS1.format(app_id=APP_ID, tag=tag, group=group))
+    _run(REMOVE_PS1.format(app_id=appconfig.header_name, tag=tag, group=group))
 
 
 def send_notification(title, body, replace_id=None):
-    icon_path = files('minarca_client') / 'ui/theme/resources/minarca.ico'
+    icon_path = appconfig.favicon
     icon_def = None
     if icon_path.is_file():
         icon_def = {'src': str(icon_path), 'placement': 'appLogoOverride'}

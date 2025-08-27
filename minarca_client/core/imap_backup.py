@@ -24,14 +24,14 @@ logger = logging.getLogger(__name__)
 CHAR_MAP = str.maketrans(
     {
         '<': '\u2039',
-        '>': '\u203A',
-        ':': '\uA789',
-        '"': '\u201C',
+        '>': '\u203a',
+        ':': '\ua789',
+        '"': '\u201c',
         '/': '\u2044',
-        '\\': '\u29F5',
-        '|': '\u01C0',
-        '?': '\uFF1F',
-        '*': '\u204E',
+        '\\': '\u29f5',
+        '|': '\u01c0',
+        '?': '\uff1f',
+        '*': '\u204e',
         '\x00': '',  # remove NULL
         '\r': '',  # remove Return
         '\n': '',  # remove Newline
@@ -180,7 +180,7 @@ def parse_args(args):
     """
     Configure imap-backup parser.
     """
-    parser = argparse.ArgumentParser(description='Minarca IMAP Backup used to archive mailbox.')
+    parser = argparse.ArgumentParser(description='IMAP Backup used to archive mailbox.')
 
     def _not_empty(value):
         if not value.strip():

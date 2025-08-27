@@ -35,9 +35,8 @@ os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 # Common values
 #
 minarca_client_pkg = files('minarca_client')
-icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.ico')
-macos_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.icns')
-svg_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.svg')
+macos_icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.icns')
+svg_icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.svg')
 
 #
 # Read package info
@@ -111,7 +110,7 @@ for exe_name, script in executables:
         bootloader_ignore_signals=False,
         strip=False,
         upx=False,
-        icon=icon,
+        icon="NONE",
         console=exe_name != 'minarcaw',
     )
     analyses.append(a)
@@ -163,24 +162,35 @@ elif platform.system() == "Windows":
     from exebuild import makensis, signexe
 
     # For NSIS, we need to create a license file with Windows encoding.
-    with open(join(DISTPATH, 'minarca/LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
+    with open(join(DISTPATH, 'LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
         out.write(pkg_info['License'])
 
-    # Sign Minarca executables
-    signexe(join(DISTPATH, 'minarca/minarca.exe'))
-    signexe(join(DISTPATH, 'minarca/minarcaw.exe'))
+    # Sign executables
+    if 'AZURE_TENANT_ID' in os.environ:
+        signexe(join(DISTPATH, 'minarca/minarca.exe'))
+        signexe(join(DISTPATH, 'minarca/minarcaw.exe'))
+
+    # Create a x.x.x.x version for windows
+    m = re.match(r'^\s*(\d+(?:\.\d+)*)', version)
+    parts = m.group(1).split('.')[:3] if m else []
+    parts += ['0'] * (3 - len(parts))
+    fixed_version = '.'.join(map(str, map(int, parts))) + '.0' if parts else '0.0.0.0'
 
     # Create installer using NSIS
-    exe_version = re.search(r'.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
     nsi_file = join(SPECPATH, 'minarca.nsi')
     setup_file = join(DISTPATH, 'minarca-client_%s.exe' % version)
+
     makensis(
         [
             '-NOCD',
             '-INPUTCHARSET',
             'UTF8',
-            '-DAppVersion=' + exe_version,
-            '-DOutFile=' + setup_file,
+            '-DAPP_VERSION=' + version,
+            '-DAPP_DESCRIPTION=' + pkg_info['Summary'],
+            '-DFIXED_VERSION=' + fixed_version,
+            '-DOUT_FILE=' + setup_file,
+            '-DDISTPATH=' + DISTPATH,
+            '-DSPECPATH=' + SPECPATH,
             nsi_file,
         ],
         cwd=join(DISTPATH, 'minarca'),
@@ -188,7 +198,8 @@ elif platform.system() == "Windows":
     )
 
     # Sign installer
-    signexe(setup_file)
+    if 'AZURE_TENANT_ID' in os.environ:
+        signexe(setup_file)
 
     # Binary smoke test
     subprocess.check_call([join(DISTPATH, 'minarca/minarca.exe'), '--version'], stderr=subprocess.STDOUT)
@@ -208,8 +219,8 @@ else:
         data_src=[
             ('/opt/minarca', join(DISTPATH, 'minarca')),
             # For GUI
-            ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
-            ('/opt/minarca/minarca.svg', svg_icon),
+            ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca-client.desktop')),
+            ('/opt/minarca/favicon.svg', svg_icon),
         ],
         description="Secure, self-hosted and automated backup solution",
         long_description=pkg_info['Summary'],

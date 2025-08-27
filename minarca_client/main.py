@@ -13,6 +13,7 @@ from pathlib import Path
 
 from minarca_client import __version__
 from minarca_client.core import Backup, InstanceId
+from minarca_client.core.appconfig import appconfig
 from minarca_client.core.compat import (
     IS_MAC,
     IS_WINDOWS,
@@ -410,7 +411,7 @@ def _ui(test=False):
         if not test:
             dlg = error_dialog(
                 parent=None,
-                title=_('Minarca'),
+                title=appconfig.header_name,
                 message=_('Application failed to start'),
                 detail=_(
                     'If the problem persists, check the logs with your administrator or try reinstalling the application.'
@@ -435,7 +436,7 @@ def _parse_args():
     parser = argparse.ArgumentParser(
         prog='minarca',
         description=_(
-            "Minarca manages your computer's backup by linking your computer with a centralized server and running backups on a given schedule."
+            "Manages your computer's backup by linking your computer with a centralized server and running backups on a given schedule."
         ),
         add_help=True,
     )
@@ -614,7 +615,7 @@ def _parse_args():
     sub.set_defaults(func=_schedule, schedule=Settings.DAILY)
 
     # Status
-    sub = subparsers.add_parser('status', help=_('return the current Minarca status'))
+    sub = subparsers.add_parser('status', help=_('return the current backup status'))
     sub.add_argument(
         '--instance',
         dest='instance_id',

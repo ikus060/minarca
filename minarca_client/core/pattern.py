@@ -85,8 +85,8 @@ class Patterns(AbstractConfigFile, MutableSequence):
 
         # Add user's documents
         _append(Pattern(True, str(get_home() / 'Documents'), _("User's Documents")))
-        # Add Minarca config
-        _append(Pattern(True, str(get_config_home() / 'patterns*'), _("Minarca Config")))
+        # Add backup config
+        _append(Pattern(True, str(get_config_home() / 'patterns*'), _("Backup Config")))
 
         if IS_WINDOWS:
             _append(

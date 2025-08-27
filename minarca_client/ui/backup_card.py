@@ -406,7 +406,7 @@ class BackupCard(CCard):
                         title=_("Start Backup"),
                         message=_("A problem occurred when trying to start the backup process."),
                         detail=_(
-                            "This usually indicate a problem with the installation. Try re-installing Minarca Backup."
+                            "This usually indicate a problem with the installation. Try re-installing the application."
                         )
                         + '\n'
                         + str(e),

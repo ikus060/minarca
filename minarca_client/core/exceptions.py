@@ -241,7 +241,7 @@ class NotScheduleError(BackupError):
     """
     Raised when it's not yet time to run a backup.
 
-    Minarca determined it's not required to executed a backup according to the previous backup status and the configure frequency.
+    The application determined it's not required to executed a backup according to the previous backup status and the configure frequency.
     """
 
     error_code = 13
@@ -277,7 +277,7 @@ class PermissionDeniedError(BackupError):
     Raised by SSH when the remote server refuses the identity.
 
     The remove server refused our identity. This usually indicate an issue with the remove server
-    configuration. Double check the server log. Check Minarca's server logs, to make sure the public
+    configuration. Double check the server log. Check server logs, to make sure the public
     key get writte to the `/backup/.ssh/authorized_keys` and also check the SSH server
     authentication logs `/var/log/auth.log` to verify why the SSH server is refusing our
     identity.
@@ -362,7 +362,7 @@ class UnsuportedVersionError(BackupError):
     error_code = 20
 
     message = _(
-        'The connection to the remote server has failed due to an unsupported version of the Minarca agent on the remote server. Consider updating your agent or server.'
+        'The connection to the remote server failed because your agent version isn’t supported. Please update your client or server.'
     )
 
     @staticmethod

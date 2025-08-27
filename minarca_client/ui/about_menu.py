@@ -9,6 +9,7 @@ from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
 from kivymd.uix.navigationdrawer.navigationdrawer import MDNavigationDrawer, MDNavigationDrawerDivider
 
 from minarca_client import __version__
+from minarca_client.core.appconfig import appconfig
 from minarca_client.core.compat import open_file_with_default_app
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
 from minarca_client.locale import _
@@ -74,7 +75,7 @@ Builder.load_string(
                 icon: "chevron-right"
 
     Image:
-        source: "minarca-72.png"
+        source: app.icon
         fit_mode: "contain"
         size_hint: None, None
         height: "72dp"
@@ -82,7 +83,7 @@ Builder.load_string(
         pos_hint: {'center_x': .5}
 
     CLabel:
-        text: _('Minarca Agent')
+        text: _('%s power by Minarca') % app.title if app.title != 'Minarca' else 'Minarca'
         halign: "center"
         font_style: "Title"
         padding: 0,20,0,0
@@ -235,7 +236,7 @@ class AboutMenu(MDNavigationDrawer):
 
     def download_latest(self):
         """Called when user click to update."""
-        url = self.latest_check.get_download_url()
+        url = appconfig.download_url
         open_file_with_default_app(url)
 
     async def _check_latest_version_task(self):
