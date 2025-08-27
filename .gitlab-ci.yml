@@ -12,9 +12,36 @@ stages:
 - deploy
 - e2e-test
 
+.tox: &tox
+  image: python:3.12-bullseye
+  stage: test
+  variables:
+    TOXENV: $CI_JOB_NAME
+  before_script:
+    - pip3 install tox
+  script:
+    - export TOXENV=${TOXENV:-$CI_JOB_NAME}
+    - echo TOXENV=$TOXENV
+    - tox
+  artifacts:
+    paths:
+      - coverage-*.xml
+      - xunit-*.xml
+    expire_in: 1 day
+
+flake8:
+  <<: *tox
+
+black:
+  <<: *tox
+
+isort:
+  <<: *tox
+
 # For Linux, we need to build on a oldest glibc version possible.
 # For us, this is Debian buster.
 bdist-client:linux:
+  <<: *tox
   artifacts:
     paths:
     - "./dist/minarca-client_*.tar.gz"
@@ -26,11 +53,10 @@ bdist-client:linux:
   - apt update
   - apt -y --no-install-recommends install librsync-dev libacl1-dev git xvfb xauth cron zenity kdialog
   - pip3 install tox
-  image: python:3.12-bullseye
   needs: []  
   script:
   # Start testing
-  - tox -e flake8,black,isort,py3-linux
+  - tox -e py3-linux
   - tox -e pyinstaller-linux
   stage: bdist
 
@@ -50,7 +76,7 @@ bdist-client:macos:
   tags:
   - macos
   script:
-  - python3.12 -m tox -e flake8,black,isort,py3-mac
+  - python3.12 -m tox -e py3-mac
   - python3.12 -m tox -e pyinstaller-mac
   stage: bdist
 
@@ -78,7 +104,7 @@ bdist-client:win32:
   - python.exe -m pip install tox
   needs: []  
   script:
-  - tox.exe -e flake8,black,isort,py3-win
+  - tox.exe -e py3-win
   - tox.exe -e pyinstaller-win
   stage: bdist
   tags:
