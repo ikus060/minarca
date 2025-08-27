@@ -4,9 +4,10 @@
 
 # Define kivy configuration manually
 import sys
-from importlib.resources import files
 
 from kivy.config import Config  # noqa
+
+from minarca_client.core.appconfig import appconfig
 
 # Disable exit on ESC key press
 Config.set('kivy', 'exit_on_escape', 0)
@@ -19,9 +20,7 @@ if sys.platform == 'linux':
     Config.set('input', '%(name)s', '')
 
 # Define default application icons
-minarca_ico_path = files('minarca_client') / 'ui/theme/resources/minarca.ico'
-if minarca_ico_path.is_file():
-    Config.set('kivy', 'window_icon', str(minarca_ico_path))
+Config.set('kivy', 'window_icon', str(appconfig.favicon))
 
 # Define default size to fit on small screen (1360x768)
 Config.set('graphics', 'height', '675')

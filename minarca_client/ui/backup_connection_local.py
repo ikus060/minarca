@@ -536,9 +536,7 @@ class BackupConnectionLocal(MDBoxLayout):
                 parent=self,
                 title=_('Are you sure?'),
                 message=_('Are you sure you want to delete this backup configuration?'),
-                detail=_(
-                    'If you delete this backup configuration, this Minarca agent will erase its identity and will no longer run backup on schedule.'
-                ),
+                detail=_('Deleting this backup configuration removes its identity and stops its scheduled backups.'),
             )
             if not ret:
                 # Operation cancel by user.

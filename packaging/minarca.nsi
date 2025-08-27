@@ -21,13 +21,16 @@
 ;--------------------------------
 ;Includes
 
-  Unicode True
-  SetCompressor bzip2
+Unicode True
+SetCompressor bzip2
 
 !include "MUI2.nsh"
 !include "Sections.nsh"
 !include "x64.nsh"
- 
+!include "WinMessages.nsh"
+!include "LogicLib.nsh"
+!include "StrFunc.nsh"
+
 ;--------------------------------
 ;Configuration
  
@@ -43,8 +46,9 @@
   OutFile "${OutFile}"
   
   ; Define icon
-  !define MUI_ICON "_internal\minarca_client\ui\theme\resources\minarca.ico"
-  !define MUI_UNICON "_internal\minarca_client\ui\theme\resources\minarca.ico"
+  !define DEFAULT_FAVICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
+  !define MUI_ICON "${SPECPATH}\setup.ico"
+  !define MUI_UNICON "${SPECPATH}\setup.ico"
  
   ;Folder selection page
   InstallDir "$PROGRAMFILES64\Minarca"
@@ -98,8 +102,8 @@
   !insertmacro MUI_LANGUAGE "English"
   !insertmacro MUI_LANGUAGE "French"
 
-  LicenseLangString license ${LANG_ENGLISH} "LICENSE.txt"
-  LicenseLangString license ${LANG_FRENCH} "LICENSE.txt"
+  LicenseLangString license ${LANG_ENGLISH} "${DISTPATH}\LICENSE.txt"
+  LicenseLangString license ${LANG_FRENCH} "${DISTPATH}\LICENSE.txt"
   
 ;--------------------------------
 ;Reserve Files
@@ -123,10 +127,50 @@
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
   LangString DESC_SecAppFiles ${LANG_FRENCH} "Copie des fichiers"
-  
+
+;--------------------------------
+;Global Variables
+Var ShortcutIconPath ; Variable to hold the actual icon path used for shortcuts/registry
+Var HeaderLinkName   ; Variable to store the value read from setup.cfg for link names
+
+;--------------------------------
+;Functions
+
+; Function to read 'header_name' from setup.cfg
+Function ReadHeaderName
+  StrCpy $HeaderLinkName ""
+
+  FileOpen $0 "$EXEDIR\setup.cfg" r
+  ${If} $0 <> ""
+    loop:
+      FileRead $0 $1
+      ${If} ${Errors}
+        Goto done_read_header
+      ${EndIf}
+
+      ${TrimNewLines} $1 $1       ; remove trailing CR/LF from FileRead
+      ${Trim} $1 $1               ; trim leading/trailing spaces & tabs
+
+      ; Check if the line starts with "header_name = "
+      StrCpy $R2 $1 14
+      StrCmp $R2 "header_name = " 0 skip_line_check_header
+
+      ; Extract the value and trim again
+      StrCpy $R3 $1 "" 14
+      ${Trim} $R3 $R3
+      StrCpy $HeaderLinkName $R3
+      Goto done_read_header
+
+    skip_line_check_header:
+      Goto loop
+  done_read_header:
+    FileClose $0
+  ${EndIf}
+FunctionEnd
+
 ;--------------------------------
 ;Installer Sections
- 
+
 Section "Installation of $(DisplayName)" SecAppFiles
 
   ; Check if minarca is running
@@ -134,75 +178,142 @@ Section "Installation of $(DisplayName)" SecAppFiles
   DetailPrint "Check if application is running..."
   nsExec::ExecToLog `cmd /c "%SystemRoot%\System32\tasklist.exe /FI $\"IMAGENAME eq ${AppExeFile}$\" | %SystemRoot%\System32\find /I $\"${AppExeFile}$\" "`
   Pop $0  ; Get the exit code of the command
-
-  # Check if the exit code is zero using ${If}
+  ; Check if the exit code is zero using ${If}
   ${If} $0 == 0
       MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION "$(APP_IS_RUNNING)" IDRETRY retry_label IDIGNORE ignore_label
       Abort
   ${EndIf}
   ignore_label:
 
+  ; Install for all
+  SetShellVarContext all
+
   ; Remove previous files
   RMDir /r "$INSTDIR"
-  
+
   ; Add files
   SetOutPath $INSTDIR
   SetOverwrite on
   File /r ".\"
-  
-  ;Store install folder
-  WriteRegStr HKLM "SOFTWARE\${Vendor}\${ShortName}" "" $INSTDIR
+
+  ; Add installer info to registry
+  WriteRegStr HKLM "SOFTWARE\${Vendor}\${ShortName}" "" "$INSTDIR"
 
   ; Enable Long file path support by default.
   WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Control\FileSystem" "LongPathsEnabled" "1"
 
-   ; Define Custom Protocol for Toast Notification
+  ; --- Determine the icon path to be used for shortcuts and registry entries ---
+  ; Initialize with the path to the default internal favicon
+  StrCpy $ShortcutIconPath "$INSTDIR\${DEFAULT_FAVICON}"
+
+  ; Copy custom config
+  ${If} ${FileExists} "$EXEDIR\setup.cfg"
+    CopyFiles "$EXEDIR\setup.cfg" "$INSTDIR\minarca.cfg"
+  ${EndIf}
+  
+  ; If a sidecar favicon.ico exists, copy it to $INSTDIR\favicon.ico and update the icon path
+  ${If} ${FileExists} "$EXEDIR\favicon.ico"
+    CopyFiles "$EXEDIR\favicon.ico" "$INSTDIR\favicon.ico" ; Copy sidecar to root of install dir
+    StrCpy $ShortcutIconPath "$INSTDIR\favicon.ico"        ; Use sidecar for shortcuts and registry
+  ${EndIf}
+  ; Other sidecar files
+  ${If} ${FileExists} "$EXEDIR\favicon.png"
+    CopyFiles "$EXEDIR\favicon.png" "$INSTDIR"
+  ${EndIf}
+  ${If} ${FileExists} "$EXEDIR\header_logo.png"
+    CopyFiles "$EXEDIR\header_logo.png" "$INSTDIR"
+  ${EndIf}
+  ; --- End icon path determination ---
+
+  ; --- Determine the display name ---
+  ; Read header_name from setup.cfg
+  Call ReadHeaderName
+
+  ; Define Custom Protocol for Toast Notification
   DeleteRegKey HKCR "minarca"
   WriteRegStr HKCR "minarca" "" "URL:minarca"
   WriteRegStr HKCR "minarca" "URL Protocol" ""
-  WriteRegStr HKCR "minarca\DefaultIcon" "" "$INSTDIR\${MUI_ICON}"
+  WriteRegStr HKCR "minarca\DefaultIcon" "" "$ShortcutIconPath" ; Use the determined icon path
   WriteRegStr HKCR "minarca\shell" "" ""
   WriteRegStr HKCR "minarca\shell\Open" "" ""
   WriteRegStr HKCR "minarca\shell\Open\command" "" "$INSTDIR\minarcaw.exe ui"
 
   !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$(DisplayName)"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$INSTDIR\${MUI_ICON}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$ShortcutIconPath" ; Use the determined icon path
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${AppVersion}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${Vendor}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteRegDWORD HKLM "${REG_UNINSTALL}" "NoModify" "1"
   WriteRegDWORD HKLM "${REG_UNINSTALL}" "NoRepair" "1"
  
-  ;Create uninstaller
+  ; Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   ; Create startup menu
   CreateDirectory "$SMPROGRAMS\$(DisplayName)"
-  CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\${MUI_ICON}" 0
-  CreateShortCut "$SMPROGRAMS\$(DisplayName)\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$INSTDIR\${MUI_ICON}" 0
+  
+  ; Use HeaderLinkName for shortcuts if available, otherwise fall back to DisplayName
+  ${If} $HeaderLinkName != ""
+    CreateShortCut "$DESKTOP\$HeaderLinkName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+    CreateShortCut "$SMPROGRAMS\$HeaderLinkName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+  ${Else}
+    CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+    CreateShortCut "$SMPROGRAMS\${AppName}.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+  ${EndIf}
 
 SectionEnd
- 
- 
+
 ;--------------------------------
 ;Installer Functions
- 
+
+
+!define ICON_SMALL     0
+!define ICON_BIG       1
+
+Var hIconBig
+Var hIconSmall
+
 Function .onInit
 
   ; When running 64bits, read and write to 64bits registry.
   SetRegView 64
-  
-  ; Install for current user
-  SetShellVarContext current
 
   ; Set installation directory according to bitness
   ${If} $InstDir == ""
     StrCpy $InstDir "$LOCALAPPDATA\${SHORTNAME}"
   ${EndIf}
-  
+
+  ; Replace title bar & taskbar icons with sidecar favicon if it exists (for the installer window)
+  ${If} ${FileExists} "$EXEDIR\favicon.ico"
+    ; BIG
+    System::Call 'user32::LoadImage(p0, t "$EXEDIR\favicon.ico", i ${IMAGE_ICON}, i 32, i 32, i ${LR_LOADFROMFILE}) p.r0'
+    ${If} $0 <> 0
+      StrCpy $hIconBig $0
+      System::Call 'user32::SendMessage(p $hwndparent, i ${WM_SETICON}, p ${ICON_BIG}, p r0) p.r1'
+    ${EndIf}
+
+    ; SMALL
+    System::Call 'user32::LoadImage(p0, t "$EXEDIR\favicon.ico", i ${IMAGE_ICON}, i 16, i 16, i ${LR_LOADFROMFILE}) p.r0'
+    ${If} $0 <> 0
+      StrCpy $hIconSmall $0
+      System::Call 'user32::SendMessage(p $hwndparent, i ${WM_SETICON}, p ${ICON_SMALL}, p r0) p.r1'
+    ${EndIf}
+  ${EndIf}
+
   !insertmacro MUI_LANGDLL_DISPLAY
 
+FunctionEnd
+
+
+; Clean up icon handles
+Function .onGUIEnd
+  ${If} $hIconBig <> 0
+    System::Call 'user32::DestroyIcon(p $hIconBig)'
+  ${EndIf}
+  ${If} $hIconSmall <> 0
+    System::Call 'user32::DestroyIcon(p $hIconSmall)'
+  ${EndIf}
 FunctionEnd
 
 ;--------------------------------
@@ -231,7 +342,7 @@ Function un.onInit
   SetRegView 64
   
   ; Uninstall for all user
-  SetShellVarContext current
+  SetShellVarContext all
 
   !insertmacro MUI_UNGETLANGUAGE
   

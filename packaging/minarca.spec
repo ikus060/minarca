@@ -35,9 +35,9 @@ os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 # Common values
 #
 minarca_client_pkg = files('minarca_client')
-icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.ico')
-macos_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.icns')
-svg_icon = str(minarca_client_pkg / 'ui/theme/resources/minarca.svg')
+icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.ico')
+macos_icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.icns')
+svg_icon = str(minarca_client_pkg / 'ui/theme/resources/favicon.svg')
 
 #
 # Read package info
@@ -163,12 +163,13 @@ elif platform.system() == "Windows":
     from exebuild import makensis, signexe
 
     # For NSIS, we need to create a license file with Windows encoding.
-    with open(join(DISTPATH, 'minarca/LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
+    with open(join(DISTPATH, 'LICENSE.txt'), 'w', encoding='ISO-8859-1') as out:
         out.write(pkg_info['License'])
 
-    # Sign Minarca executables
-    signexe(join(DISTPATH, 'minarca/minarca.exe'))
-    signexe(join(DISTPATH, 'minarca/minarcaw.exe'))
+    # Sign executables
+    if 'AZURE_TENANT_ID' in os.environ:
+        signexe(join(DISTPATH, 'minarca/minarca.exe'))
+        signexe(join(DISTPATH, 'minarca/minarcaw.exe'))
 
     # Create installer using NSIS
     exe_version = re.search(r'.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)', '0.0.0.' + version).group(1)
@@ -181,6 +182,8 @@ elif platform.system() == "Windows":
             'UTF8',
             '-DAppVersion=' + exe_version,
             '-DOutFile=' + setup_file,
+            '-DDISTPATH=' + DISTPATH,
+            '-DSPECPATH=' + SPECPATH,
             nsi_file,
         ],
         cwd=join(DISTPATH, 'minarca'),
@@ -188,7 +191,8 @@ elif platform.system() == "Windows":
     )
 
     # Sign installer
-    signexe(setup_file)
+    if 'AZURE_TENANT_ID' in os.environ:
+        signexe(setup_file)
 
     # Binary smoke test
     subprocess.check_call([join(DISTPATH, 'minarca/minarca.exe'), '--version'], stderr=subprocess.STDOUT)
@@ -209,7 +213,7 @@ else:
             ('/opt/minarca', join(DISTPATH, 'minarca')),
             # For GUI
             ('/usr/share/applications/minarca-client.desktop', join(SPECPATH, 'minarca.desktop')),
-            ('/opt/minarca/minarca.svg', svg_icon),
+            ('/opt/minarca/app.svg', svg_icon),
         ],
         description="Secure, self-hosted and automated backup solution",
         long_description=pkg_info['Summary'],

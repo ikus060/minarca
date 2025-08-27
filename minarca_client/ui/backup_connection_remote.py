@@ -268,7 +268,7 @@ class BackupConnectionRemote(MDBoxLayout):
         remoteurl = remoteurl if remoteurl.startswith('http') else 'https://' + remoteurl
         try:
             # Create new instance if none exists yet.
-            # Asynchronously link to Minarca Server
+            # Asynchronously link to server
             self.instance = await self.backup.configure_remote(
                 remoteurl=remoteurl,
                 username=username,
