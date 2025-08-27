@@ -6,7 +6,7 @@ import subprocess
 import sys
 import sysconfig
 
-import patch  # noqa
+import patch_ng  # noqa
 
 # Get location of all the patch file
 patches_dir = os.path.dirname(os.path.realpath(__file__))
@@ -17,6 +17,6 @@ print('applying patches...')
 
 # Loop on each patch
 for fn in glob.glob(os.path.join(patches_dir, '*.patch')):
-    subprocess.check_call([sys.executable, '-m', 'patch', '--verbose', '-p2', '-d', site_packages, fn])
+    subprocess.check_call([sys.executable, '-m', 'patch_ng', '--verbose', '-p2', '-d', site_packages, fn])
 
 print('apply patches: done')
