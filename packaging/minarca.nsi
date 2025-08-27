@@ -30,6 +30,7 @@ SetCompressor bzip2
 !include "WinMessages.nsh"
 !include "LogicLib.nsh"
 !include "StrFunc.nsh"
+!include "TextFunc.nsh"
 
 ;--------------------------------
 ;Configuration
