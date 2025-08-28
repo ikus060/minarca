@@ -329,7 +329,7 @@ Section "Installation of $(DisplayName)" SecAppFiles
 
   ; --- Determine the display name ---
   ; Read header_name from setup.cfg
-  ${ReadPropertyFromFile} "$EXEDIR\${CFG_FILENAME}" "header_name" $HeaderName
+  !insertmacro ReadPropertyFromFile "$EXEDIR\${CFG_FILENAME}" "header_name" $HeaderName
 
   ; Define Custom Protocol for Toast Notification
   DeleteRegKey HKCR "minarca"
