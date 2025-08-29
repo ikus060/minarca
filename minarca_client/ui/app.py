@@ -72,9 +72,9 @@ MDScreen:
 
 class MinarcaApp(MDApp, ExceptionHandler):
 
-    header_logo = StringProperty(appconfig.header_logo)
+    header_logo = StringProperty(str(appconfig.header_logo))
 
-    icon = StringProperty(appconfig.favicon)
+    icon = StringProperty(str(appconfig.favicon))
 
     title = StringProperty(appconfig.header_name)
 
