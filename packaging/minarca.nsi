@@ -261,9 +261,6 @@ FunctionEnd
  
 Section "Uninstall"
 
-  ; Read header_name from minarca.cfg
-  ${ConfigRead} "$EXEDIR\${MINARCA_CFG}" "header_name=" $HeaderName
-
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_CODE_NAME}"
   DeleteRegKey HKLM  "SOFTWARE\${APP_VENDOR}\${APP_CODE_NAME}"
@@ -292,4 +289,14 @@ Function un.onInit
 
   !insertmacro MUI_UNGETLANGUAGE
   
+  ; Read header_name from minarca.cfg
+  ${ConfigRead} "$EXEDIR\${MINARCA_CFG}" "header_name=" $HeaderName
+  
+  ${If} $HeaderName != ""
+    StrCpy $InstallerDisplayName "${HeaderName} $(PowerBy)"
+  ${Else}
+    StrCpy $InstallerDisplayName "$(DisplayName)"
+    StrCpy $HeaderName "$APP_NAME"
+  ${EndIf}
+
 FunctionEnd
