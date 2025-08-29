@@ -51,7 +51,7 @@ SetCompressor bzip2
   VIAddVersionKey "LegalCopyright" "© ${APP_VENDOR}"
   VIAddVersionKey "FileDescription" "${APP_NAME} ${APP_VERSION} Installer"
   VIAddVersionKey "FileVersion" "${APP_VERSION}"
-  OutFile "${OutFile}"
+  OutFile "${OUT_FILE}"
   
   ; Define icon
   !define DEFAULT_FAVICON "_internal\minarca_client\ui\theme\resources\favicon.ico"
