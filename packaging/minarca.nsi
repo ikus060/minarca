@@ -35,6 +35,8 @@ SetCompressor bzip2
 !include "StrFunc.nsh"
 !include "TextFunc.nsh"
 
+!insertmacro ConfigRead
+
 ;--------------------------------
 ;Configuration
  
@@ -138,139 +140,6 @@ Var ShortcutIconPath ; Variable to hold the actual icon path used for shortcuts/
 Var HeaderName       ; Variable to store the value read from setup.cfg for link names
 
 ;--------------------------------
-;Functions
-
-; Macro wrapper to make calling convenient:
-;   ${ReadPropertyFromFile} "C:\path\file.cfg" "header_name" $VarToReceive
-!macro ReadPropertyFromFile FILE KEY OUTVAR
-  Push "${KEY}"
-  Push "${FILE}"
-  Call ReadProperty_Impl
-  Pop ${OUTVAR}
-!macroend
-
-; Returns value on the stack (empty if not found or on error)
-Function ReadProperty_Impl
-  ; Stack in: top=$FILE, below=$KEY
-  Exch $1             ; $1 = file path
-  Exch
-  Exch $0             ; $0 = key to find
-  Push $2
-  Push $3
-  Push $4
-  Push $5
-  Push $6
-  Push $7
-  Push $8
-
-  StrLen $7 $0        ; $7 = key length
-  StrCpy $8 ""        ; $8 = result (empty by default)
-
-  FileOpen $2 $1 r
-  IfErrors +3
-    Goto +2
-    Goto done         ; cannot open file, return empty
-
-loop_lines:
-  FileRead $2 $3
-  IfErrors close      ; EOF
-
-  ; Remove trailing CR/LF
-  ; (If the line doesn't end with CR/LF this is harmless)
-  StrCpy $3 $3 -2
-
-  ; Trim leading whitespace (spaces or tabs)
-  ${Do}
-    StrCpy $4 $3 1 0
-    StrCmp $4 " " 0 +3
-      StrCpy $3 $3 "" 1
-      ${Continue}
-    StrCmp $4 "$\t" 0 +3
-      StrCpy $3 $3 "" 1
-      ${Continue}
-    ${Break}
-  ${Loop}
-
-  ; Skip empty or comment lines (# or ;)
-  StrCmp $3 "" loop_lines
-  StrCpy $4 $3 1 0
-  StrCmp $4 "#" loop_lines
-  StrCmp $4 ";" loop_lines
-
-  ; Does the line start with the key?
-  StrCpy $5 $3 $7 0
-  StrCmp $5 $0 0 loop_lines
-
-  ; After the key, skip whitespace before '='
-  StrCpy $6 $3 "" $7        ; $6 = remainder after key
-  ${Do}
-    StrCpy $4 $6 1 0
-    StrCmp $4 " " 0 +3
-      StrCpy $6 $6 "" 1
-      ${Continue}
-    StrCmp $4 "$\t" 0 +3
-      StrCpy $6 $6 "" 1
-      ${Continue}
-    ${Break}
-  ${Loop}
-
-  ; Expect '='
-  StrCpy $4 $6 1 0
-  StrCmp $4 "=" 0 loop_lines
-
-  ; Value is after '='
-  StrCpy $8 $6 "" 1
-
-  ; Trim leading whitespace of value
-  ${Do}
-    StrCpy $4 $8 1 0
-    StrCmp $4 " " 0 +3
-      StrCpy $8 $8 "" 1
-      ${Continue}
-    StrCmp $4 "$\t" 0 +3
-      StrCpy $8 $8 "" 1
-      ${Continue}
-    ${Break}
-  ${Loop}
-
-  ; Trim trailing whitespace (spaces/tabs)
-  StrLen $5 $8
-  ${If} $5 > 0
-    ${Do}
-      StrLen $5 $8
-      ${IfThen} $5 = 0 ${|} ${Break} ${|}
-      StrCpy $4 $8 1 -1
-      StrCmp $4 " " 0 +3
-        StrCpy $8 $8 -1
-        ${Continue}
-      StrCmp $4 "$\t" 0 +3
-        StrCpy $8 $8 -1
-        ${Continue}
-      ${Break}
-    ${Loop}
-  ${EndIf}
-
-  ; Found the key once; stop reading
-  Goto close
-
-close:
-  FileClose $2
-done:
-  ; Return value (possibly empty) on the stack
-  Push $8
-
-  Pop $8
-  Pop $7
-  Pop $6
-  Pop $5
-  Pop $4
-  Pop $3
-  Pop $2
-  Pop $1
-  Pop $0
-FunctionEnd
-
-;--------------------------------
 ;Installer Sections
 
 Section "Installation of $(DisplayName)" SecAppFiles
@@ -329,7 +198,7 @@ Section "Installation of $(DisplayName)" SecAppFiles
 
   ; --- Determine the display name ---
   ; Read header_name from setup.cfg
-  !insertmacro ReadPropertyFromFile "$EXEDIR\${CFG_FILENAME}" "header_name" $HeaderName
+  ${ConfigRead} "$EXEDIR\${CFG_FILENAME}" "header_name" $HeaderName
 
   ; Define Custom Protocol for Toast Notification
   DeleteRegKey HKCR "minarca"
@@ -426,10 +295,11 @@ Section "Uninstall"
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
   DeleteRegKey HKLM  "SOFTWARE\${Vendor}\${AppName}"
+  
   ; remove shortcuts, if any.
-  Delete "$SMPROGRAMS\${AppName}\*.*"
-  RMDir /r "$SMPROGRAMS\${AppName}"
   Delete "$DESKTOP\$(DisplayName).lnk"
+  Delete "$SMPROGRAMS\$(DisplayName).lnk"
+  
   ; remove files
   RMDir /r "$INSTDIR"
  
