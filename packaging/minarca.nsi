@@ -40,10 +40,16 @@ SetCompressor bzip2
 !insertmacro ConfigRead
 
 ;--------------------------------
+;Global Variables
+Var ShortcutIconPath ; Variable to hold the actual icon path used for shortcuts/registry
+Var HeaderName       ; Variable to store the value read from setup.cfg for link names
+Var InstallerDisplayName  ; Variable to store the installer name.
+
+;--------------------------------
 ;Configuration
  
   ;General
-  Name ${InstallerDisplayName}
+  Name $InstallerDisplayName
   VIProductVersion "${APP_VERSION}"
   VIAddVersionKey "ProductName" "${APP_NAME}"
   VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
@@ -138,12 +144,6 @@ SetCompressor bzip2
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
   LangString DESC_SecAppFiles ${LANG_FRENCH} "Copie des fichiers"
-
-;--------------------------------
-;Global Variables
-Var ShortcutIconPath ; Variable to hold the actual icon path used for shortcuts/registry
-Var HeaderName       ; Variable to store the value read from setup.cfg for link names
-Var InstallerDisplayName  ; Variable to store the installer name.
 
 ;--------------------------------
 ;Installer Sections
