@@ -8,18 +8,20 @@
 ;
 
 ; Displayed to the user
-!define AppName "Minarca"
-; Used for paths
-!define ShortName "minarca"
-!define Vendor "Ikus Soft inc."
+!define APP_NAME "Minarca"
+
+; Used for paths and registry.
+!define APP_CODE_NAME "minarca"
+!define APP_VENDOR "Ikus Soft inc."
 !define AppExeFile "minarcaw.exe"
 
 ; The following should be overide by pyinstaller script.
-;!define AppVersion "1.1.1.1"
+;!define APP_VERSION "1.1.1.1"
 ;!define OutFile "minarca-installer-dev.exe"
 
 ; Constant values
-!define CFG_FILENAME "setup.cfg"
+!define SETUP_CFG "setup.cfg"
+!define MINARCA_CFG "minarca.cfg"
 
 ;--------------------------------
 ;Includes
@@ -41,13 +43,14 @@ SetCompressor bzip2
 ;Configuration
  
   ;General
-  VIProductVersion "${AppVersion}"
-  VIAddVersionKey "ProductName" "${AppName}"
+  Name "${InstallerDisplayName}"
+  VIProductVersion "${APP_VERSION}"
+  VIAddVersionKey "ProductName" "${APP_NAME}"
   VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
-  VIAddVersionKey "CompanyName" "${Vendor}"
-  VIAddVersionKey "LegalCopyright" "© ${Vendor}"
-  VIAddVersionKey "FileDescription" "${AppName} ${AppVersion} Installer"
-  VIAddVersionKey "FileVersion" "${AppVersion}"
+  VIAddVersionKey "CompanyName" "${APP_VENDOR}"
+  VIAddVersionKey "LegalCopyright" "© ${APP_VENDOR}"
+  VIAddVersionKey "FileDescription" "${APP_NAME} ${APP_VERSION} Installer"
+  VIAddVersionKey "FileVersion" "${APP_VERSION}"
   OutFile "${OutFile}"
   
   ; Define icon
@@ -59,9 +62,9 @@ SetCompressor bzip2
   InstallDir "$PROGRAMFILES64\Minarca"
  
   ;Get install folder from registry if available
-  InstallDirRegKey HKLM "SOFTWARE\${Vendor}\${ShortName}" ""
+  InstallDirRegKey HKLM "SOFTWARE\${APP_VENDOR}\${APP_CODE_NAME}" ""
  
-  ;Request application privileges for Windows Vista
+  ;Request application privileges
   RequestExecutionLevel admin
   
 ;--------------------------------
@@ -77,7 +80,7 @@ SetCompressor bzip2
 
   ;Remember the installer language
   !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
-  !define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\${Vendor}\${ShortName}" 
+  !define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\${APP_VENDOR}\${APP_CODE_NAME}" 
   !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
 
 ;--------------------------------
@@ -126,8 +129,11 @@ SetCompressor bzip2
   LangString DisplayName ${LANG_ENGLISH} "Minarca Backup"
   LangString DisplayName ${LANG_FRENCH} "Sauvegarde Minarca"
 
-  LangString APP_IS_RUNNING ${LANG_ENGLISH} "$(DisplayName) is currently running. To continue with the installation, verify that no backup is currently in progress and close $(DisplayName) application."
-  LangString APP_IS_RUNNING ${LANG_FRENCH} "$(DisplayName) est en cours d'exécution. Pour poursuivre l'installation, vérifiez qu'aucune sauvegarde n'est en cours et fermez l'application $(DisplayName)."
+  LangString PowerBy ${LANG_ENGLISH} "power by Minarca"
+  LangString PowerBy ${LANG_FRENCH} "propulsé par Minarca"
+
+  LangString APP_IS_RUNNING ${LANG_ENGLISH} "${HeaderName} is currently running. To continue with the installation, verify that no backup is currently in progress and close ${HeaderName} application."
+  LangString APP_IS_RUNNING ${LANG_FRENCH} "${HeaderName} est en cours d'exécution. Pour poursuivre l'installation, vérifiez qu'aucune sauvegarde n'est en cours et fermez l'application ${HeaderName}."
  
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
@@ -137,11 +143,12 @@ SetCompressor bzip2
 ;Global Variables
 Var ShortcutIconPath ; Variable to hold the actual icon path used for shortcuts/registry
 Var HeaderName       ; Variable to store the value read from setup.cfg for link names
+Var InstallerDisplayName  ; Variable to store the installer name.
 
 ;--------------------------------
 ;Installer Sections
 
-Section "Installation of $(DisplayName)" SecAppFiles
+Section "Installation of ${InstallerDisplayName}" SecAppFiles
   
   ; Install for all
   SetShellVarContext all
@@ -167,7 +174,7 @@ Section "Installation of $(DisplayName)" SecAppFiles
   File /r ".\"
 
   ; Add installer info to registry
-  WriteRegStr HKLM "SOFTWARE\${Vendor}\${ShortName}" "" "$INSTDIR"
+  WriteRegStr HKLM "SOFTWARE\${APP_VENDOR}\${APP_CODE_NAME}" "" "$INSTDIR"
 
   ; Enable Long file path support by default.
   WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Control\FileSystem" "LongPathsEnabled" "1"
@@ -204,11 +211,11 @@ Section "Installation of $(DisplayName)" SecAppFiles
   WriteRegStr HKCR "minarca\shell\Open" "" ""
   WriteRegStr HKCR "minarca\shell\Open\command" "" "$INSTDIR\minarcaw.exe ui"
 
-  !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$(DisplayName)"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$ShortcutIconPath" ; Use the determined icon path
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${AppVersion}"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${Vendor}"
+  !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_CODE_NAME}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "${InstallerDisplayName}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$ShortcutIconPath"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${APP_VERSION}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${APP_VENDOR}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteRegDWORD HKLM "${REG_UNINSTALL}" "NoModify" "1"
   WriteRegDWORD HKLM "${REG_UNINSTALL}" "NoRepair" "1"
@@ -216,17 +223,9 @@ Section "Installation of $(DisplayName)" SecAppFiles
   ; Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-  ; Create startup menu
-  CreateDirectory "$SMPROGRAMS\$(DisplayName)"
-  
-  ; Use HeaderName for shortcuts if available, otherwise fall back to DisplayName
-  ${If} $HeaderName != ""
-    CreateShortCut "$DESKTOP\$HeaderName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
-    CreateShortCut "$SMPROGRAMS\$HeaderName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
-  ${Else}
-    CreateShortCut "$DESKTOP\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
-    CreateShortCut "$SMPROGRAMS\$(DisplayName).lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
-  ${EndIf}
+  ; Create Shortcuts
+  CreateShortCut "$DESKTOP\$HeaderName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
+  CreateShortCut "$SMPROGRAMS\$HeaderName.lnk" "$INSTDIR\minarcaw.exe" "" "$ShortcutIconPath" 0
 
 SectionEnd
 
@@ -247,17 +246,17 @@ Function .onInit
 
   ; Set installation directory according to bitness
   ${If} $InstDir == ""
-    StrCpy $InstDir "$LOCALAPPDATA\${SHORTNAME}"
+    StrCpy $InstDir "$LOCALAPPDATA\${APP_CODE_NAME}"
   ${EndIf}
 
-  ; --- Determine the display name ---
   ; Read header_name from setup.cfg
-  ${ConfigRead} "$EXEDIR\${CFG_FILENAME}" "header_name=" $HeaderName
+  ${ConfigRead} "$EXEDIR\${SETUP_CFG}" "header_name=" $HeaderName
 
   ${If} $HeaderName != ""
-    Name "${HeaderName} power by Minarca"
+    StrCpy $InstallerDisplayName "${HeaderName} $(PowerBy)"
   ${Else}
-    Name "${AppName}"
+    StrCpy $InstallerDisplayName "$(DisplayName)"
+    StrCpy $HeaderName "$APP_NAME"
   ${EndIf}
 
   !insertmacro MUI_LANGDLL_DISPLAY
@@ -280,13 +279,18 @@ FunctionEnd
  
 Section "Uninstall"
 
+  ; Read header_name from minarca.cfg
+  ${ConfigRead} "$EXEDIR\${MINARCA_CFG}" "header_name=" $HeaderName
+
   ; remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ShortName}"
-  DeleteRegKey HKLM  "SOFTWARE\${Vendor}\${AppName}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_CODE_NAME}"
+  DeleteRegKey HKLM  "SOFTWARE\${APP_VENDOR}\${APP_CODE_NAME}"
   
-  ; remove shortcuts, if any.
+  ; remove default and custom shortcuts
   Delete "$DESKTOP\$(DisplayName).lnk"
+  Delete "$DESKTOP\${HeaderName}.lnk"
   Delete "$SMPROGRAMS\$(DisplayName).lnk"
+  Delete "$SMPROGRAMS\${HeaderName}.lnk"
   
   ; remove files
   RMDir /r "$INSTDIR"
