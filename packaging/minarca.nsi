@@ -138,8 +138,8 @@ Var InstallerDisplayName  ; Variable to store the installer name.
   LangString PowerBy ${LANG_ENGLISH} "power by Minarca"
   LangString PowerBy ${LANG_FRENCH} "propulsé par Minarca"
 
-  LangString APP_IS_RUNNING ${LANG_ENGLISH} "${HeaderName} is currently running. To continue with the installation, verify that no backup is currently in progress and close ${HeaderName} application."
-  LangString APP_IS_RUNNING ${LANG_FRENCH} "${HeaderName} est en cours d'exécution. Pour poursuivre l'installation, vérifiez qu'aucune sauvegarde n'est en cours et fermez l'application ${HeaderName}."
+  LangString APP_IS_RUNNING ${LANG_ENGLISH} "$HeaderName is currently running. To continue with the installation, verify that no backup is currently in progress and close $HeaderName application."
+  LangString APP_IS_RUNNING ${LANG_FRENCH} "$HeaderName est en cours d'exécution. Pour poursuivre l'installation, vérifiez qu'aucune sauvegarde n'est en cours et fermez l'application $HeaderName."
  
   ;Description
   LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
@@ -148,7 +148,7 @@ Var InstallerDisplayName  ; Variable to store the installer name.
 ;--------------------------------
 ;Installer Sections
 
-Section "Installation of ${InstallerDisplayName}" SecAppFiles
+Section "Installation of $InstallerDisplayName" SecAppFiles
   
   ; Install for all
   SetShellVarContext all
@@ -212,7 +212,7 @@ Section "Installation of ${InstallerDisplayName}" SecAppFiles
   WriteRegStr HKCR "minarca\shell\Open\command" "" "$INSTDIR\minarcaw.exe ui"
 
   !define REG_UNINSTALL "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_CODE_NAME}"
-  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "${InstallerDisplayName}"
+  WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayName" "$InstallerDisplayName"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayIcon" "$ShortcutIconPath"
   WriteRegStr HKLM "${REG_UNINSTALL}" "DisplayVersion" "${APP_VERSION}"
   WriteRegStr HKLM "${REG_UNINSTALL}" "Publisher" "${APP_VENDOR}"
@@ -246,10 +246,10 @@ Function .onInit
   ${ConfigRead} "$EXEDIR\${SETUP_CFG}" "header_name=" $HeaderName
 
   ${If} $HeaderName != ""
-    StrCpy $InstallerDisplayName "${HeaderName} $(PowerBy)"
+    StrCpy $InstallerDisplayName "$HeaderName $(PowerBy)"
   ${Else}
     StrCpy $InstallerDisplayName "$(DisplayName)"
-    StrCpy $HeaderName "$APP_NAME"
+    StrCpy $HeaderName "${APP_NAME}"
   ${EndIf}
 
   !insertmacro MUI_LANGDLL_DISPLAY
@@ -267,9 +267,9 @@ Section "Uninstall"
   
   ; remove default and custom shortcuts
   Delete "$DESKTOP\$(DisplayName).lnk"
-  Delete "$DESKTOP\${HeaderName}.lnk"
+  Delete "$DESKTOP\$HeaderName.lnk"
   Delete "$SMPROGRAMS\$(DisplayName).lnk"
-  Delete "$SMPROGRAMS\${HeaderName}.lnk"
+  Delete "$SMPROGRAMS\$HeaderName.lnk"
   
   ; remove files
   RMDir /r "$INSTDIR"
