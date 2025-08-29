@@ -26,15 +26,33 @@ def _file(value):
     """Coerse string into Path only if file exists."""
     p = branding_root / value
     if not p.is_file():
-        print('FOO: %s' % p)
         raise ValueError('not a file')
     return p
 
 
+def _str(value):
+    """Check if valid string"""
+    if not isinstance(value, str):
+        raise TypeError('required a string')
+    if len(value) <= 0:
+        raise ValueError('empty string')
+    if len(value) > 255:
+        raise ValueError('too long')
+    return value
+
+
+def _url(value):
+    """Check if valid URL."""
+    if not value.startswith('http://') and not value.startswith('https://'):
+        raise ValueError('invalid url scheme')
+    return value
+
+
 class AppConfig(KeyValueConfigFile):
     _fields = [
-        ('header_name', str, 'Minarca'),
-        ('download_url', str, 'https://minarca.org/download/'),
+        ('header_name', _str, 'Minarca'),
+        ('download_url', _url, 'https://minarca.org/download/'),
+        ('remote_url', _url, ''),
         ('link_color', _css_color, '#1C4062'),
         ('navbar_color', _css_color, '#0E2933'),
         ('btn_fg_color', _css_color, '#FFFFFF'),

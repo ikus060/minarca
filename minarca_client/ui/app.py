@@ -72,11 +72,11 @@ MDScreen:
 
 class MinarcaApp(MDApp, ExceptionHandler):
 
-    header_logo = StringProperty(str(appconfig.header_logo))
+    header_logo = StringProperty(appconfig.header_logo)
 
-    icon = StringProperty(str(appconfig.favicon))
+    icon = StringProperty(appconfig.favicon)
 
-    title = StringProperty(str(appconfig.header_name))
+    title = StringProperty(appconfig.header_name)
 
     use_kivy_settings = False
 

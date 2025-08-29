@@ -9,6 +9,7 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
+from minarca_client.core.appconfig import appconfig
 from minarca_client.core.compat import get_default_repositoryname
 from minarca_client.core.exceptions import BackupError, ConfigureBackupError, RepositoryNameExistsError
 from minarca_client.dialogs import question_dialog
@@ -156,7 +157,7 @@ class BackupConnectionRemote(MDBoxLayout):
     edit = BooleanProperty(True)
     create = BooleanProperty(False)
     repositoryname = StringProperty("")
-    remoteurl = StringProperty("")
+    remoteurl = StringProperty(appconfig.remote_url)
     username = StringProperty("")
     password = StringProperty("")
     working = StringProperty()
