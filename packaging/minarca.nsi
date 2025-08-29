@@ -138,13 +138,9 @@ Var InstallerDisplayName  ; Variable to store the installer name.
   LangString PowerBy ${LANG_ENGLISH} "power by Minarca"
   LangString PowerBy ${LANG_FRENCH} "propulsé par Minarca"
 
-  LangString APP_IS_RUNNING ${LANG_ENGLISH} "$HeaderName is currently running. To continue with the installation, verify that no backup is currently in progress and close $HeaderName application."
-  LangString APP_IS_RUNNING ${LANG_FRENCH} "$HeaderName est en cours d'exécution. Pour poursuivre l'installation, vérifiez qu'aucune sauvegarde n'est en cours et fermez l'application $HeaderName."
+  LangString AppIsRunning ${LANG_ENGLISH} "$HeaderName is currently running. To continue with the installation, verify that no backup is currently in progress and close $HeaderName application."
+  LangString AppIsRunning ${LANG_FRENCH} "$HeaderName est en cours d'exécution. Pour poursuivre l'installation, vérifiez qu'aucune sauvegarde n'est en cours et fermez l'application $HeaderName."
  
-  ;Description
-  LangString DESC_SecAppFiles ${LANG_ENGLISH} "Application files copy"
-  LangString DESC_SecAppFiles ${LANG_FRENCH} "Copie des fichiers"
-
 ;--------------------------------
 ;Installer Sections
 
@@ -160,7 +156,7 @@ Section "Installation of $InstallerDisplayName" SecAppFiles
   Pop $0  ; Get the exit code of the command
   ; Check if the exit code is zero using ${If}
   ${If} $0 == 0
-      MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION "$(APP_IS_RUNNING)" IDRETRY retry_label IDIGNORE ignore_label
+      MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION "$(AppIsRunning)" IDRETRY retry_label IDIGNORE ignore_label
       Abort
   ${EndIf}
   ignore_label:
@@ -290,7 +286,7 @@ Function un.onInit
   !insertmacro MUI_UNGETLANGUAGE
   
   ; Read header_name from minarca.cfg
-  ${ConfigRead} "$EXEDIR\${MINARCA_CFG}" "header_name=" $HeaderName
+  ${ConfigRead} "$INSTDIR\${MINARCA_CFG}" "header_name=" $HeaderName
   
   ${If} $HeaderName != ""
     StrCpy $InstallerDisplayName "${HeaderName} $(PowerBy)"
