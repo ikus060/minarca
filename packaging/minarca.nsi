@@ -41,7 +41,6 @@ SetCompressor bzip2
 ;Configuration
  
   ;General
-  Name "${AppName}"
   VIProductVersion "${AppVersion}"
   VIAddVersionKey "ProductName" "${AppName}"
   VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
@@ -196,10 +195,6 @@ Section "Installation of $(DisplayName)" SecAppFiles
   ${EndIf}
   ; --- End icon path determination ---
 
-  ; --- Determine the display name ---
-  ; Read header_name from setup.cfg
-  ${ConfigRead} "$EXEDIR\${CFG_FILENAME}" "header_name=" $HeaderName
-
   ; Define Custom Protocol for Toast Notification
   DeleteRegKey HKCR "minarca"
   WriteRegStr HKCR "minarca" "" "URL:minarca"
@@ -255,21 +250,14 @@ Function .onInit
     StrCpy $InstDir "$LOCALAPPDATA\${SHORTNAME}"
   ${EndIf}
 
-  ; Replace title bar & taskbar icons with sidecar favicon if it exists (for the installer window)
-  ${If} ${FileExists} "$EXEDIR\favicon.ico"
-    ; BIG
-    System::Call 'user32::LoadImage(p0, t "$EXEDIR\favicon.ico", i ${IMAGE_ICON}, i 32, i 32, i ${LR_LOADFROMFILE}) p.r0'
-    ${If} $0 <> 0
-      StrCpy $hIconBig $0
-      System::Call 'user32::SendMessage(p $hwndparent, i ${WM_SETICON}, p ${ICON_BIG}, p r0) p.r1'
-    ${EndIf}
+  ; --- Determine the display name ---
+  ; Read header_name from setup.cfg
+  ${ConfigRead} "$EXEDIR\${CFG_FILENAME}" "header_name=" $HeaderName
 
-    ; SMALL
-    System::Call 'user32::LoadImage(p0, t "$EXEDIR\favicon.ico", i ${IMAGE_ICON}, i 16, i 16, i ${LR_LOADFROMFILE}) p.r0'
-    ${If} $0 <> 0
-      StrCpy $hIconSmall $0
-      System::Call 'user32::SendMessage(p $hwndparent, i ${WM_SETICON}, p ${ICON_SMALL}, p r0) p.r1'
-    ${EndIf}
+  ${If} $HeaderName != ""
+    Name "${HeaderName} power by Minarca"
+  ${Else}
+    Name "${AppName}"
   ${EndIf}
 
   !insertmacro MUI_LANGDLL_DISPLAY
