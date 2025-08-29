@@ -43,7 +43,7 @@ SetCompressor bzip2
 ;Configuration
  
   ;General
-  Name "${InstallerDisplayName}"
+  Name ${InstallerDisplayName}
   VIProductVersion "${APP_VERSION}"
   VIAddVersionKey "ProductName" "${APP_NAME}"
   VIAddVersionKey "Comments" "Automatically saves your data online for easy access at any time while travelling or in case of equipment loss or breakage."
@@ -232,13 +232,6 @@ SectionEnd
 ;--------------------------------
 ;Installer Functions
 
-
-!define ICON_SMALL     0
-!define ICON_BIG       1
-
-Var hIconBig
-Var hIconSmall
-
 Function .onInit
 
   ; When running 64bits, read and write to 64bits registry.
@@ -261,17 +254,6 @@ Function .onInit
 
   !insertmacro MUI_LANGDLL_DISPLAY
 
-FunctionEnd
-
-
-; Clean up icon handles
-Function .onGUIEnd
-  ${If} $hIconBig <> 0
-    System::Call 'user32::DestroyIcon(p $hIconBig)'
-  ${EndIf}
-  ${If} $hIconSmall <> 0
-    System::Call 'user32::DestroyIcon(p $hIconSmall)'
-  ${EndIf}
 FunctionEnd
 
 ;--------------------------------
