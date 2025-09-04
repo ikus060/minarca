@@ -1064,7 +1064,70 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         # Then notification was raised to user.
         mock_clear_notification.assert_called_once_with('previous-id')
 
-    async def test_local_backup(self):
+    @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
+    async def test_local_backup_mock(self, mock_popen):
+        # Given a backup with local destination
+        tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
+        self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
+        patterns = self.instance.patterns
+        patterns.clear()
+        patterns.append(Pattern(True, self.tmp.name, None))
+        patterns.save()
+        # Then backup is created in pause mode.
+        self.assertIsNotNone(self.instance.settings.pause_until)
+        # when running backup
+        await self.instance.backup(force=True)
+        # then rdiff-backup get called.
+        if IS_WINDOWS:
+            mock_popen.assert_called_once_with(
+                mock.ANY,
+                'rdiff-backup',
+                '-v',
+                '5',
+                'backup',
+                '--no-hard-links',
+                '--exclude-symbolic-links',
+                '--create-full-path',
+                '--no-compression',
+                '--exclude',
+                tempdir.replace('\\', '/'),  # Exclude local destination
+                '--include',
+                self.tmp.name.replace('\\', '/'),  # Include source
+                '--exclude',
+                'C:/**',
+                'C:/',
+                Path(tempdir) / 'C',
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=mock.ANY,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            )
+        else:
+            mock_popen.assert_called_once_with(
+                mock.ANY,
+                'rdiff-backup',
+                '-v',
+                '5',
+                'backup',
+                '--exclude-sockets',
+                '--no-compression',
+                '--exclude',
+                tempdir,  # Exclude local destination
+                '--include',
+                self.tmp.name,  # Include source
+                '--exclude',
+                '/**',
+                '/',
+                Path(tempdir),
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=mock.ANY,
+                creationflags=0,
+            )
+
+    async def test_local_backup_real(self):
         # Given a backup with local destination
         tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
         try:

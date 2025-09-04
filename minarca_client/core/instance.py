@@ -31,7 +31,7 @@ from minarca_client.core.exceptions import (
     RunningError,
     handle_http_errors,
 )
-from minarca_client.core.pattern import Patterns
+from minarca_client.core.pattern import Pattern, Patterns
 from minarca_client.core.settings import Datetime, Settings
 from minarca_client.core.status import Status, UpdateStatus, UpdateStatusNotification
 
@@ -204,8 +204,8 @@ class BackupInstance:
                     with open(self.backup_log_file, 'wb', buffering=0) as log_file:
                         now = Datetime()
                         log_file.write(b'starting backup at %s\n' % now.strftime().encode())
-                        # Check patterns
-                        patterns = self.patterns
+                        # Copy patterns
+                        patterns = list(self.patterns)
                         if not patterns:
                             raise NoPatternsError()
                         # Execute pre-hooks
@@ -215,9 +215,14 @@ class BackupInstance:
                             log_file=log_file,
                         )
 
+                        # If Local, exclude destination to avoid infinite recursion.
+                        if self.is_local():
+                            dest = self._backup_path(None)
+                            patterns.append(Pattern(False, dest, None))
+
                         # Execute the actual backup with rdiff-backup for each drive.
-                        for drive, patterns in patterns.group_by_roots():
-                            await self._backup_drive(drive, patterns, log_file=log_file)
+                        for drive, drive_patterns in Patterns.group_by_roots(patterns):
+                            await self._backup_drive(drive, drive_patterns, log_file=log_file)
 
                         # Execute post-hooks
                         await self._run_hooks(

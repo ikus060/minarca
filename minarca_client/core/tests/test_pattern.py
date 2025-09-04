@@ -139,6 +139,7 @@ class PatternsTest(unittest.TestCase):
         # should be ignored, because everything is included by default.
         patterns.append(Pattern(True, '**/*.include', None))
         self.assertEqual(
+            list(patterns.group_by_roots()),
             [
                 (
                     '/',
@@ -152,7 +153,6 @@ class PatternsTest(unittest.TestCase):
                     ],
                 )
             ],
-            list(patterns.group_by_roots()),
         )
 
     @skipIf(not IS_WINDOWS, 'only for windows')

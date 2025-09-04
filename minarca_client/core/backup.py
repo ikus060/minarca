@@ -222,7 +222,7 @@ class Backup:
         instance = self._new_instance() if instance is None else instance
 
         # Define default patterns if none are defined.
-        if len(list(instance.patterns.group_by_roots())) == 0:
+        if len(instance.patterns) == 0:
             instance.patterns.extend(Patterns.defaults())
 
         # Clear previous status file
@@ -306,7 +306,7 @@ class Backup:
         await instance.test_connection()
 
         # Define default patterns if none are defined.
-        if len(list(instance.patterns.group_by_roots())) == 0:
+        if len(instance.patterns) == 0:
             instance.patterns.extend(Patterns.defaults())
 
         # Clear previous status file

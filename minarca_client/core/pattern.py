@@ -8,19 +8,36 @@ Created on Oct 18, 2024
 '''
 import glob
 import os
-import re
 from collections import namedtuple
 from collections.abc import MutableSequence
+from pathlib import PurePath
 
 from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, get_config_home, get_home, get_temp
 from minarca_client.core.config import AbstractConfigFile
 from minarca_client.locale import _
 
-Pattern = namedtuple('Pattern', ['include', 'pattern', 'comment'])
-Pattern.is_wildcard = lambda self: '*' in self.pattern or '?' in self.pattern or '[' in self.pattern
+
+class Pattern(namedtuple('Pattern', ['include', 'pattern', 'comment'], defaults=[None])):
+    __slots__ = ()
+
+    def __new__(cls, include, pattern, comment):
+        # Convert PurePath to string
+        if isinstance(pattern, PurePath):
+            pattern = str(pattern)
+        pattern = pattern.replace(os.sep, '/')
+        return super().__new__(cls, include, pattern, comment)
+
+    def is_wildcard(self):
+        return '*' in self.pattern or '?' in self.pattern or '[' in self.pattern
+
+    @property
+    def anchor(self):
+        """Return the pattern anchor. i.e. the root."""
+        return PurePath(self.pattern).anchor.replace(os.sep, '/')
 
 
 class Patterns(AbstractConfigFile, MutableSequence):
+
     def _load(self):
         data = []
         try:
@@ -225,41 +242,31 @@ class Patterns(AbstractConfigFile, MutableSequence):
         Return the list of patterns for each root. On linux, we have a single root. On Windows,
         we might have multiple if the computer has multiple disk, like C:, D:, etc.
         """
-        # Determine each prefix.
+        # Get list of all anchors
         if IS_WINDOWS:
-            # On Windows, Find list of drives from patterns
-            prefixes = list()
-            for p in self:
-                m = re.match(r'^[A-Z]:[\\/]', p.pattern)
-                if p.include and m:
-                    drive = m.group(0).replace('\\', '/')
-                    if drive not in prefixes:
-                        prefixes.append(drive)
+            anchors = sorted({p.anchor for p in self if p.anchor and p.include})
         else:
-            # On Unix, simply use '/'
-            prefixes = ['/']
+            anchors = ['/']
 
-        # Organize patterns
-        if len(self):
-            for prefix in prefixes:
-                sublist = []
-                for p in self:
-                    pattern = p.pattern.replace('\\', '/') if IS_WINDOWS else p.pattern
-                    if pattern.startswith(prefix):
-                        sublist.append(Pattern(p.include, pattern, None))
-                    elif pattern.startswith('**') and not p.include:
-                        sublist.append(Pattern(p.include, pattern, None))
-                    elif p.is_wildcard() and not p.include:
-                        sublist.append(Pattern(p.include, '**/' + pattern, None))
-                # Then sort include / exclude from most precise to least precise
-                # absolute path first, then longuer path, then exclude value.
-                sublist = sorted(
-                    sublist,
-                    key=lambda p: (
-                        not p.pattern.startswith('**'),  # exclude wildcard pattern, should be first.
-                        -len(p.pattern.split('/')),  # Longuer path define before shorter path.
-                        p.include,  # Exclude define before includes
-                        p.pattern,
-                    ),
-                )
-                yield (prefix, sublist)
+        # Organize patterns for drive
+        for anchor in anchors:
+            sublist = []
+            for p in self:
+                if p.anchor == anchor:
+                    sublist.append(Pattern(p.include, p.pattern, None))
+                elif p.pattern.startswith('**') and not p.include:
+                    sublist.append(Pattern(p.include, p.pattern, None))
+                elif p.is_wildcard() and not p.include:
+                    sublist.append(Pattern(p.include, '**/' + p.pattern, None))
+            # Then sort include / exclude from most precise to least precise
+            # absolute path first, then longuer path, then exclude value.
+            sublist = sorted(
+                sublist,
+                key=lambda p: (
+                    not p.pattern.startswith('**'),  # exclude wildcard pattern, should be first.
+                    -len(p.pattern.split('/')),  # Longuer path define before shorter path.
+                    p.include,  # Exclude define before includes
+                    p.pattern,
+                ),
+            )
+            yield (anchor, sublist)

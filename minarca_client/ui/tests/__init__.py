@@ -73,6 +73,7 @@ class BaseAppTest(unittest.IsolatedAsyncioTestCase):
             if 'App.async_run' not in str(task._coro)
             and 'IsolatedAsyncioTestCase' not in str(task._coro)
             and 'asyncTearDown' not in str(task._coro)
+            and not task.cancelling()
         ]
         self.assertFalse(remaining_tasks, 'some asyncio task are still running')
         # Finally let await for the Kivy app to raise exception if any.
