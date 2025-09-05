@@ -85,20 +85,86 @@ If you get the following, go in your MacOS **System Settings** --> **Privacy & S
 [Fix 'Apple could not verify app is free of malware' Mac error - bypass Gatekeeper macOS Sequoia](https://www.youtube.com/watch?v=biIvAM94b98) 
 
 
-## Configure your client with Minarca Server
+## Configure the Minarca Backup Client
+Here’s a clearer, step‑by‑step version you can drop into your docs.
 
-Pre-requisite: You need to have a functional Mianrca Server deployed. You may use <https://test.minarca.net> which is made available for testing purpose.
+Title: Configure the Minarca Backup Client
 
-**From User Interface:**
+**Prerequisites:**
 
-1. Simply open `minarcaw`. If you have installed Minarca client you should be able to launch the client from your start menu.
-2. If Minarca is not yet linked to a server, a Setup dialog will be shown to allow you to configure Minarca with you server.
-3. You must provide the URL to you Minarca server, a username and password.
-4. You must also provide a repository name.
+- You must have access to a running Minarca Server.
+- For testing only, you can use: https://test.minarca.net
 
-**From Command line:**
+**Option A — Configure from the command line**
 
-    minarca configure -r REMOTEURL -u USERNAME [-p PASSWORD] -n NAME
+Run the configure command with your server details:
+
+```bash
+minarca configure -r REMOTE_URL -u USERNAME [-p PASSWORD] -n REPOSITORY_NAME
+```
+
+- REMOTE_URL: Your Minarca server URL, for example https://backup.example.com
+- USERNAME: Your Minarca account name
+- PASSWORD: Optional. If omitted, you’ll be prompted securely
+- REPOSITORY_NAME: A friendly name for this computer’s backup (e.g., “Alice‑Laptop”)
+
+**Option B — Configure from the desktop app**
+
+1) Launch Minarca
+- Open Minarca from your Start menu or application launcher.
+- If the client isn’t linked to a server yet, the Setup wizard opens automatically.
+
+2) Choose Online backup
+- Click Setup under Online backup to connect to a Minarca Server.
+
+![Minarca setup wizard](minarca-client-config.png)
+
+3) Enter server connection details
+
+- Backup name
+  - What it is: A friendly name for this computer’s backup repository.
+  - How to choose: Use something you’ll recognize later (e.g., “Alice‑Laptop”, “Finance‑PC‑01”).
+  - Tips: Keep it short; avoid special characters like slashes or backslashes.
+
+- Address (IP or domain)
+  - What it is: The full URL of your Minarca Server.
+  - Format: Include `https://` (for example, https://backup.example.com).
+  - For testing: You may use https://test.minarca.net.
+  - If your admin provided a path, include it (e.g., https://backup.example.com/minarca).
+
+- Username
+  - What it is: Your Minarca account name provided by your administrator (often your email or network username).
+  - Enter it exactly as given.
+
+- Password or Access Token 
+  - What it is: Your Minarca account password. If Multi‑Factor Authentication (MFA) is enabled on your account, you must use an access token instead of the regular password.
+  - If you received a temporary password, change it after your first successful backup.
+  - If the Autofill link inserts a password, you can overwrite it before proceeding.
+
+![Minarca server connection](minarca-client-config-remote.png)
+
+4) Select what to back up
+- Files included: Add files or folders you want protected (e.g., Documents, Outlook data, browser profiles).
+- Files excluded: Add any paths or patterns you don’t want backed up.
+- Click Next to finish. You can adjust selections later.
+
+![Minarca server connection](minarca-client-config-file-selection.png)
+
+5) Set backup schedule and policies
+- Backup frequency: Choose how often to run backups (e.g., Once a day).
+- Run whether the user’s session is open or not: Enable if you want backups even when not logged in.
+- Excluded days of the week: Pick days to skip, if any.
+- Data retention duration: How long to keep old versions.
+- Inactivity notification period: When to alert you if no backups run.
+- Click Next. All of these settings can be changed later in Settings.
+
+
+![Minarca backup configuration](minarca-client-config-settings.png)
+
+Notes
+- You can revisit all settings at any time from the Minarca client menu.
+- If you’re testing, replace your server URL with https://test.minarca.net. For production, always use your own server.
+
 
 ## Silent or Unattended Installation of Minarca Client on Windows
 
@@ -126,6 +192,91 @@ Minarca client can be installed silently on Windows, enabling easy automation an
 **Tip:**  
 Always ensure your credentials and sensitive information are secured when scripting unattended setups and configuration!
 
+## Customize Minarca Client branding
+
+Minarca lets you tailor a few visual elements and helpful links so the app matches your organization’s look and onboarding flow.
+
+### What you can customize
+- Product name shown in shortcut, application title bar and about menu.
+- Header logo shown in application navbar
+- Favicon show in shortcut and application title bar
+- Link and button colors (foreground/background)
+- Navigation bar color
+- Helpful URLs (download page, default server URL, and the “Where do I find these details?” link in the setup wizard)
+
+### Configuration file
+Place a text file named `minarca.cfg` in the same directory as the Minarca executable (that is, next to `minarca.exe` on Windows, or the client binary on other platforms). The file uses simple `key=value` pairs:
+
+```ini
+# Display name in the app header
+header_name=Your Company Name
+
+# Brand assets (PNG recommended)
+header_logo=header_logo.png
+favicon=favicon.png
+
+# Colors (hex CSS notation; 6-digit)
+link_color=#00ADEE
+btn_fg_color=#ffffff
+btn_bg_color=#00ADEE
+navbar_color=#081E3E
+
+# Helpful links
+# Shown on the “Download” entry in about screen
+download_url=https://example.com/download/
+# Pre-fills the server address field in the setup wizard
+remote_url=https://backup.example.com/
+# Opens from the “Where do I find these details?” link in the setup wizard
+config_help_url=https://example.com/help/
+```
+
+Keep the image files (`header_logo.png`, `favicon.png`) in the same folder as `minarca.cfg` and the executable.
+
+### Asset guidelines
+- Header logo
+  - Format: PNG with transparent background
+  - Recommended size: up to 240×32 px (the UI scales down as needed); keep text legible at small sizes
+- Favicon
+  - Formats: PNG for in‑app use; ICO optional for the Windows installer (see below)
+  - Recommended sizes: 1024×1024 px
+- Filenames are case‑sensitive on some systems; match the names exactly as written in `minarca.cfg`.
+
+### Color guidelines
+- Use standard hex color notation: `#RRGGBB` (e.g., `#081E3E`).
+- Ensure sufficient contrast for accessibility:
+  - Buttons: `btn_bg_color` vs `btn_fg_color`
+  - Links: `link_color` against light/dark backgrounds
+
+### What each setting does
+- header_name: Text displayed on the top bar.
+- header_logo: Path (relative to the executable folder) to your logo shown in the header.
+- favicon: In‑app small icon (e.g., window/taskbar).
+- link_color: Color for clickable links in the UI.
+- btn_fg_color / btn_bg_color: Button text and background colors.
+- navbar_color: Background color of the top navigation bar.
+- download_url: Where users are sent to download installers or updates.
+- remote_url: Default server URL prefilled in “Address (domain)” during setup.
+- config_help_url: Target for the “Where do I find these details?” link; use this to explain username format, tokens for MFA, naming conventions, etc.
+
+### Apply and verify
+1) Place `minarca.cfg`, `header_logo.png`, and `favicon.png` next to the Minarca executable.
+2) Restart the Minarca client.
+3) Verify:
+   - Header shows your name and logo
+   - Colors update across links, buttons, and navbar
+   - Download/help links open your pages
+   - The server address field is prefilled with `remote_url`
+
+To revert, remove or rename `minarca.cfg` and restart the app.
+
+## Customize the Windows installer (sidecar files)
+
+You can ship branding alongside the Windows installer so the installed app is branded on first launch. Place the following files in the same folder as the installer before running it:
+
+- setup.cfg       → Will be copied and renamed to `minarca.cfg` in the installation directory
+- favicon.ico     → Windows icon for shortcuts
+- favicon.png     → Copied for in‑app favicon
+- header_logo.png → Copied for in-app header logo
 
 ## File Locations
 
