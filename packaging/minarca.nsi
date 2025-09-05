@@ -8,7 +8,8 @@
 
 !define APP_NAME         "Minarca"
 !define APP_CODE_NAME    "minarca"
-!define APP_EXE_FILE     "minarcaw.exe"
+!define APP_WINDOWED_EXE "minarcaw.exe"
+!define APP_CONSOLE_EXE  "minarca.exe"
 !define APP_VENDOR       "Ikus Soft inc."
 
 ; These are expected to be overridden externally (e.g., by pyinstaller)
@@ -59,11 +60,12 @@ InstallDirRegKey ${REG_APP_ROOT} "${REG_APP_KEY}" ""
 ; Global Vars
 Var ShortcutIconPath         ; path to icon used for shortcuts/registry
 Var HeaderName               ; value from setup/minarca.cfg for link names
-Var InstallerDisplayName     ; visible product name ("HeaderName power by Minarca" or fallback)
+Var InstallerCaption         ; visible product name ("HeaderName power by Minarca" or fallback)
 
 ;--------------------------------
 ; Version Info / Binary Output
-Name $InstallerDisplayName
+Name $HeaderName
+Caption $InstallerCaption
 VIProductVersion "${FIXED_VERSION}"
 VIAddVersionKey "ProductName"     "${APP_NAME}"
 VIAddVersionKey "Comments"        "${APP_DESCRIPTION}"
@@ -111,7 +113,7 @@ LicenseLangString license ${LANG_FRENCH}  "${DISTPATH}\LICENSE.txt"
 LangString DisplayName ${LANG_ENGLISH} "Minarca Backup"
 LangString DisplayName ${LANG_FRENCH}  "Sauvegarde Minarca"
 
-LangString PowerBy ${LANG_ENGLISH} "power by Minarca"
+LangString PowerBy ${LANG_ENGLISH} "powered by Minarca"
 LangString PowerBy ${LANG_FRENCH}  "propulsé par Minarca"
 
 LangString AppIsRunning ${LANG_ENGLISH} "$HeaderName is currently running. To continue with the installation, verify that no backup is currently in progress and close $HeaderName application."
@@ -123,8 +125,14 @@ LangString AppIsRunning ${LANG_FRENCH}  "$HeaderName est en cours d'exécution. 
 ; Ensure app not running; offer Retry/Ignore/Abort
 Function EnsureAppNotRunning
   retry_check:
-    DetailPrint "Checking if ${APP_EXE_FILE} is running..."
-    nsExec::ExecToLog `cmd /c "%SystemRoot%\System32\tasklist.exe /FI $\"IMAGENAME eq ${APP_EXE_FILE}$\" | %SystemRoot%\System32\find /I $\"${APP_EXE_FILE}$\" "`
+    DetailPrint "Checking if $HeaderName is running..."
+    nsExec::ExecToLog `cmd /c "%SystemRoot%\System32\tasklist.exe /FI $\"IMAGENAME eq ${APP_WINDOWED_EXE}$\" | %SystemRoot%\System32\find /I $\"${APP_WINDOWED_EXE}$\" "`
+    Pop $0
+    ${If} $0 == 0
+      MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION "$(AppIsRunning)" IDRETRY retry_check IDIGNORE continue_install
+      Abort
+    ${EndIf}
+    nsExec::ExecToLog `cmd /c "%SystemRoot%\System32\tasklist.exe /FI $\"IMAGENAME eq ${APP_CONSOLE_EXE}$\" | %SystemRoot%\System32\find /I $\"${APP_CONSOLE_EXE}$\" "`
     Pop $0
     ${If} $0 == 0
       MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION "$(AppIsRunning)" IDRETRY retry_check IDIGNORE continue_install
@@ -141,12 +149,12 @@ Function RegisterProtocol
   WriteRegStr ${PROTOCOL_ROOT} "${PROTOCOL_NAME}\DefaultIcon" "" "$ShortcutIconPath"
   WriteRegStr ${PROTOCOL_ROOT} "${PROTOCOL_NAME}\shell" "" ""
   WriteRegStr ${PROTOCOL_ROOT} "${PROTOCOL_NAME}\shell\Open" "" ""
-  WriteRegStr ${PROTOCOL_ROOT} "${PROTOCOL_NAME}\shell\Open\command" "" "$INSTDIR\${APP_EXE_FILE} ui"
+  WriteRegStr ${PROTOCOL_ROOT} "${PROTOCOL_NAME}\shell\Open\command" "" "$INSTDIR\${APP_WINDOWED_EXE} ui"
 FunctionEnd
 
 ; Register uninstaller metadata
 Function RegisterUninstall
-  WriteRegStr   ${REG_UNINSTALL_ROOT} "${REG_UNINSTALL_KEY}" "DisplayName"   "$InstallerDisplayName"
+  WriteRegStr   ${REG_UNINSTALL_ROOT} "${REG_UNINSTALL_KEY}" "DisplayName"    "$HeaderName"
   WriteRegStr   ${REG_UNINSTALL_ROOT} "${REG_UNINSTALL_KEY}" "DisplayIcon"    "$ShortcutIconPath"
   WriteRegStr   ${REG_UNINSTALL_ROOT} "${REG_UNINSTALL_KEY}" "DisplayVersion" "${APP_VERSION}"
   WriteRegStr   ${REG_UNINSTALL_ROOT} "${REG_UNINSTALL_KEY}" "Publisher"      "${APP_VENDOR}"
@@ -157,8 +165,8 @@ FunctionEnd
 
 ; Create common shortcuts
 Function CreateAppShortcuts
-  CreateShortCut "$DESKTOP\$HeaderName.lnk"    "$INSTDIR\${APP_EXE_FILE}" "" "$ShortcutIconPath" 0
-  CreateShortCut "$SMPROGRAMS\$HeaderName.lnk" "$INSTDIR\${APP_EXE_FILE}" "" "$ShortcutIconPath" 0
+  CreateShortCut "$DESKTOP\$HeaderName.lnk"    "$INSTDIR\${APP_WINDOWED_EXE}" "" "$ShortcutIconPath" 0
+  CreateShortCut "$SMPROGRAMS\$HeaderName.lnk" "$INSTDIR\${APP_WINDOWED_EXE}" "" "$ShortcutIconPath" 0
 FunctionEnd
 
 ;--------------------------------
@@ -169,13 +177,13 @@ Function .onInit
   SetShellVarContext all ; Install for all users
 
   ; First attempt: read header_name from sidecar setup.cfg (next to installer)
-  ${ConfigRead} "$INSTDIR\${MINARCA_CFG}" "header_name=" $HeaderName
+  ${ConfigRead} "$EXEDIR\${SETUP_CFG}" "header_name=" $HeaderName
   
   ${If} $HeaderName != ""
-    StrCpy $InstallerDisplayName "$HeaderName $(PowerBy)"
+    StrCpy $InstallerCaption "$HeaderName $(PowerBy)"
   ${Else}
-    StrCpy $InstallerDisplayName "$(DisplayName)"
-    StrCpy $HeaderName "${APP_NAME}"
+    StrCpy $InstallerCaption "$(DisplayName)"
+    StrCpy $HeaderName "$(DisplayName)"
   ${EndIf}
   
   !insertmacro MUI_LANGDLL_DISPLAY
@@ -271,10 +279,10 @@ Function un.onInit
   ${ConfigRead} "$INSTDIR\${MINARCA_CFG}" "header_name=" $HeaderName
   
   ${If} $HeaderName != ""
-    StrCpy $InstallerDisplayName "$HeaderName $(PowerBy)"
+    StrCpy $InstallerCaption "$HeaderName $(PowerBy)"
   ${Else}
-    StrCpy $InstallerDisplayName "$(DisplayName)"
-    StrCpy $HeaderName "${APP_NAME}"
+    StrCpy $InstallerCaption ""
+    StrCpy $HeaderName "$(DisplayName)"
   ${EndIf}
 
 FunctionEnd
