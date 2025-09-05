@@ -35,7 +35,7 @@ Builder.load_string(
         text: _("Configure your backup settings for personalized data protection.")
         step: 3
 
-    MDFloatLayout:
+    MDRelativeLayout:
 
         CScrollView:
             size_hint: 1, 1

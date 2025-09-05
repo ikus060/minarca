@@ -83,7 +83,7 @@ Builder.load_string(
         pos_hint: {'center_x': .5}
 
     CLabel:
-        text: _('%s power by Minarca') % app.title if app.title != 'Minarca' else 'Minarca'
+        text: _('%s powered by Minarca') % app.title if app.title != 'Minarca' else 'Minarca'
         halign: "center"
         font_style: "Title"
         padding: 0,20,0,0

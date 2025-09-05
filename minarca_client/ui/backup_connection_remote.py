@@ -10,7 +10,7 @@ from kivy.properties import BooleanProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
 from minarca_client.core.appconfig import appconfig
-from minarca_client.core.compat import get_default_repositoryname
+from minarca_client.core.compat import get_default_repositoryname, open_file_with_default_app
 from minarca_client.core.exceptions import BackupError, ConfigureBackupError, RepositoryNameExistsError
 from minarca_client.dialogs import question_dialog
 from minarca_client.locale import _
@@ -31,7 +31,7 @@ Builder.load_string(
         text: _("Provide your login details to configure remote backup.")
         step: 1
 
-    MDFloatLayout:
+    MDRelativeLayout:
 
         CScrollView:
             size_hint: 1, 1
@@ -100,7 +100,7 @@ Builder.load_string(
 
                 CTextField:
                     id: password
-                    name: _("Password")
+                    name: _("Password or Access Token")
                     text: root.password
                     password: True
                     password_mask: "\u2022"
@@ -145,6 +145,21 @@ Builder.load_string(
                             theme_icon_color: "Custom"
                             icon_color: self.theme_cls.errorColor
                             icon: "trash-can-outline"
+
+                    CButton:
+                        id: btn_config_help
+                        style: "text"
+                        text: _("Where do I find these details?")
+                        theme_text_color: "Custom"
+                        text_color: self.theme_cls.primaryColor
+                        md_bg_color: self.theme_cls.backgroundColor
+                        on_release: root.open_config_help()
+                        display: root.create
+
+                        MDButtonIcon:
+                            theme_icon_color: "Custom"
+                            icon_color: self.theme_cls.primaryColor
+                            icon: "information-outline"
 
         SpinnerOverlay:
             text: root.working
@@ -230,6 +245,10 @@ class BackupConnectionRemote(MDBoxLayout):
             app.set_active_view('backup_create.BackupCreate')
         else:
             app.set_active_view('dashboard.DashboardView')
+
+    def open_config_help(self):
+        """Open web browser to provide help"""
+        open_file_with_default_app(appconfig.config_help_url)
 
     def save(self):
         if not self.valid or self.working:

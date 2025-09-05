@@ -27,7 +27,7 @@ Builder.load_string(
         create: False
         text: _("Configure your advanced backup settings to fine-tune your preferences.")
 
-    MDFloatLayout:
+    MDRelativeLayout:
 
         MDScrollView:
             size_hint: 1, 1

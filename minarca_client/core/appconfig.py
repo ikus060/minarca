@@ -59,6 +59,11 @@ class AppConfig(KeyValueConfigFile):
         ('btn_bg_color', _css_color, '#009FB9'),
         ('favicon', _file, resources.files('minarca_client') / 'ui/theme/resources/favicon.png'),
         ('header_logo', _file, resources.files('minarca_client') / 'ui/theme/resources/header-logo-32.png'),
+        (
+            'config_help_url',
+            _url,
+            'https://www.ikus-soft.com/archive/minarca/doc/minarca-client.html#link-your-client-with-minarca-server',
+        ),
     ]
 
 
