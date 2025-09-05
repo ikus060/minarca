@@ -2,6 +2,8 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 
+import os
+
 # Define kivy configuration manually
 import sys
 
@@ -23,5 +25,12 @@ if sys.platform == 'linux':
 Config.set('kivy', 'window_icon', str(appconfig.favicon))
 
 # Define default size to fit on small screen (1360x768)
-Config.set('graphics', 'height', '675')
-Config.set('graphics', 'width', '1024')
+size = (1024, 675)
+density = os.environ.get('KIVY_METRICS_DENSITY', '1')
+try:
+    density = float(density)
+    size = [int(x * density) for x in size]
+except ValueError:
+    pass  # ignore invalid density value
+Config.set('graphics', 'width', str(size[0]))
+Config.set('graphics', 'height', str(size[1]))
