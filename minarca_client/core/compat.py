@@ -528,36 +528,41 @@ def stop_process(pid):
 
     try:
         parent = psutil.Process(pid)
+        children = parent.children(recursive=True)
     except psutil.NoSuchProcess:
         return True
 
+    # Step 1: Try a gentle shutdown with SIGINT / CTRL_BREAK_EVENT
     try:
-        # Step 1: Try a gentle shutdown with SIGINT
-        parent.send_signal(signal.SIGINT)
+        parent.send_signal(signal.CTRL_BREAK_EVENT if IS_WINDOWS else signal.SIGINT)
+    except Exception:
+        pass
 
-        # Step 2: Wait up to 3 seconds for the process to exit
+    # Step 2: Wait up to 3 seconds for the process to exit
+    try:
+        parent.wait(timeout=3)
+        return True
+    except psutil.NoSuchProcess:
+        return True
+    except psutil.TimeoutExpired:
+        pass
+
+    # Step 3: Terminate children
+    try:
+        for child in children:
+            if child.is_running():
+                child.terminate()
+        _gone, alive = psutil.wait_procs(children, timeout=1)
+        for child in alive:
+            child.kill()
+
+        # Step 4: Terminate main process
+        if parent.is_running():
+            parent.terminate()
         try:
-            parent.wait(timeout=3)
-            return True
+            parent.wait(timeout=1)
         except psutil.TimeoutExpired:
-            # Step 3: Terminate children
-            children = parent.children(recursive=True)
-            for child in children:
-                if child.is_running():
-                    child.terminate()
-            _gone, alive = psutil.wait_procs(children, timeout=1)
-            for child in alive:
-                child.kill()
-
-            # Step 4: Terminate main process
-            if parent.is_running():
-                parent.terminate()
-
-            try:
-                parent.wait(timeout=1)
-            except psutil.TimeoutExpired:
-                parent.kill()
-
+            parent.kill()
     except (psutil.NoSuchProcess, SystemError):
         return False
 

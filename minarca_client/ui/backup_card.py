@@ -413,12 +413,22 @@ class BackupCard(CCard):
                     )
             else:
                 self.in_transition = True
+                ret = await question_dialog(
+                    parent=self,
+                    title=_('Confirmation Required'),
+                    message=_('Are you sure you want to stop the ongoing backup/restore process?'),
+                    detail=_(
+                        'Your data may be incomplete or corrupted if the operation is terminated prematurely. Please confirm your decision before proceeding.'
+                    ),
+                )
+                if not ret:
+                    # Operation cancel by user
+                    return
                 try:
                     self.instance.stop()
                 except Exception as e:
                     logger.exception('fail to stop')
                     await error_dialog(
-                        parent=self,
                         title=_("Stop process"),
                         message=_("A problem occurred when trying to stop the process."),
                         detail=str(e),
