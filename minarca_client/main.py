@@ -393,7 +393,7 @@ def _status(instance_id):
         if status.details:
             print(" * " + _("Details:                %s") % status.details or '')
         if settings.pause_until:
-            print(_("Paused until:           %s") % settings.pause_until)
+            print(_("Paused until:           %s") % settings.pause_until.strftime())
 
 
 def _ui(test=False):
