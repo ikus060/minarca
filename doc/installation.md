@@ -68,7 +68,7 @@ These are for evaluation purposes only and should not be used in production:
 ### Recommended Server Requirements
 - **Operating System**:
   - Debian Bullseye, Debian Bookworm
-  - Ubuntu Jammy 22.04 LTS, Ubuntu Lunar 23.04, Ubuntu Noble 24.04 LTS, Ubuntu Oracular 24.10, Ubuntu Plucky 25.04
+  - Ubuntu Jammy 22.04 LTS, Ubuntu Lunar 23.04, Ubuntu Noble 24.04 LTS, Ubuntu Plucky 25.04
 - **CPU**: 64bit x86-64 or amd64, 4 cores
 - **Memory**: Minimum 32 GiB
 - **Storage**: Sufficient space based on your backup needs (typically multiple terabytes for long-term storage). For enhanced reliability, it is recommended to use hardware RAID or ZFS.
