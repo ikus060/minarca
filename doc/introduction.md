@@ -1,10 +1,10 @@
 # Introduction
 
-## What is Minarca ?
+## What is Minarca?
 
 Minarca is a data backup solution allowing to centralize the management of your backups. This solution has the advantage of being easy to install on a dedicated server and also allows you to easily install an agent called minarca-client on the computers to back up. 
 
-Minarca is a hassle-free backup solution, including all the features you need to better serve your users. The minarca agent is available for all major platforms such as Windows Mac OS and Linux. This allows you to use a single solution to backup your entire computer system.
+Minarca is a hassle-free backup solution, including all the features you need to better serve your users. The Minarca agent is available for all major platforms such as Windows macOS and Linux. This allows you to use a single solution to backup your entire computer system.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ First, on the server side, a web application allows you to manage the backups of
 
 In addition to this web application, we also install another component called Minarca-shell that takes care of receiving incoming connections via the SSH protocol, validating the authentication and authorization of the user to make a backup, and also isolating each user and their repository.
 
-The last component, named Minarca client, must be installed on the computers to be backed up. This component acts as an agent on the computer and takes care of coordinating the data backup to the Minarca server. Using this agent it is possible to select the files and directories to be backed up and the frequency of the backup.  The Minarca agent can be used via a user interface or command line.
+The last component, named Minarca client, must be installed on the computers to be backed up. This component acts as an agent on the computer and takes care of coordinating the data backup to the Minarca server. Using this agent, it is possible to select the files and directories to be backed up and the frequency of the backup.  The Minarca agent can be used via a user interface or command line.
 
 ![Minarca Architecture overview](architecture-overview.png)
 
@@ -33,7 +33,7 @@ The last component, named Minarca client, must be installed on the computers to 
 * Automated SSH management: no requirement to manually generate SSH identity, SSH authentication is completely automated and doesn't required intervention
 * Open source: no secrets. Minarca is a free open-source software. The source code is licensed under GPL v3.
 * Support: business support will be available through [Ikus Software](https://ikus-soft.com).
-* Rdiff-backup: used as the main backup software you benefit from its stability, cross-platform. And you can still use it the way you are used to with the command line.
+* Rdiff-backup: used as the main backup software, you benefit from its stability, cross-platform. And you can still use it the way you are used to with the command line.
 
 ## Software stack
 
@@ -54,3 +54,4 @@ If you encounter a problem or have a question, you may open a ticket in our issu
 If you need professional support or custom development, you should contact Ikus Software directly.
 
 [Support Form](https://minarca.org/contactus)
+

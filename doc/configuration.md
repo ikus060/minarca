@@ -6,7 +6,7 @@ Since version 4.0.0, Minarca configuration is more flexible. You may configure e
 
 Take note that configuration options are distinct from the runtime setting, available from the web interface. The configuration options here usually meant to be static and set before starting the server. You may get the list of configuration options by calling `minarca-server --help`.
 
-Note: If an option is specified in more than one place, the command line arguments override the environment variable, environment variables override config files, and config files override default value.
+Note: If an option is specified in more than one place, the command line arguments override the environment variables, environment variables override config files, and config files override the default values.
 
 ## Configuration file
 
@@ -15,7 +15,7 @@ To use configuration files, you may call `minarca-server` with `-f` or `--config
 * /etc/minarca/minarca-server.conf
 * /etc/minarca/conf.d/*.conf
 
-Configuration file syntax must define a key and a value. The key is case-sensitive, and you may use underscore (_) or dash (-) seemlessly. All lines beginning with '#' are comments and are intended for you to read. All other lines are configuration for Minarca.
+Configuration file syntax must define a key and a value. The key is case-sensitive, and you may use underscore (_) or dash (-) seamlessly. All lines beginning with '#' are comments and are intended for you to read. All other lines are the configuration for Minarca.
 
 E.g.:
 
@@ -25,7 +25,7 @@ E.g.:
 
 ## Environment variables
 
-In addition to configuration files, you may pass environment variables. The options name must be uppercase and prefixed with `MINARCA_`. As an example, if you want to change the port used to listen for HTTP request for 8081, you must define `server-port` option as follow.
+In addition to configuration files, you may pass environment variables. The option's name must be uppercase and prefixed with `MINARCA_`. As an example, if you want to change the port used to listen for HTTP request for 8081, you must define `server-port` option as follows.
 
    MINARCA_SERVER_PORT=8081
 
@@ -57,7 +57,7 @@ You can use the IP of your server, but a Fully Qualified Domain Name (FQDN) is p
 
 ## Configure administrator username and password
 
-Using configuration file, you may setup a special administrator which cannot be
+Using a configuration file, you may setup a special administrator which cannot be
 deleted or renamed from the web interface. You may also configure a specific
 password for this user that cannot be updated from the web interface either.
 
@@ -66,11 +66,11 @@ In addition, you may also create other administrator users to manage Minarca.
 | Parameter | Description | Example |
 | --- | --- | --- | 
 | admin-user | Define the name of the default admin user to be created | admin |
-| admin-password | administrator encrypted password as SSHA. Read online documentation to know more about how to encrypt your password into SSHA or use <http://projects.marsching.org/weave4j/util/genpassword.php> When defined, administrator password cannot be updated using the web interface. When undefined, default administrator password is `admin123` and it can be updated using the web interface. | modification |
+| admin-password | administrator encrypted password as SSHA. Read online documentation to know more about how to encrypt your password into SSHA or use <http://projects.marsching.org/weave4j/util/genpassword.php> When defined, administrator password cannot be updated using the web interface. When undefined, the default administrator password is `admin123` and it can be updated using the web interface. | modification |
 
 ## Configure logging
 
-Minarca can be configured to send logs to specific location. By default, logs are sent to `/var/log/minarca` folder.
+Minarca can be configured to send logs to a specific location. By default, logs are sent to `/var/log/minarca` folder.
 
 | Option | Description | Example |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ In addition, `minarca-shell` is also configure to sent log to the same folder.
 
 ### Enable Debugging
 
-A specific option is also available if you want to enable the debugging log. We do not recommend to enable this option in production as it may leak information to the user whenever an exception is raised.
+A specific option is also available if you want to enable the debugging log. We do not recommend enabling this option in production as it may leak information to the user whenever an exception is raised.
 
 | Option | Description | Example |
 | --- | --- | --- |
@@ -99,7 +99,7 @@ Minarca use SQL database to store user preferences. The embedded SQLite database
 
 ## Configure LDAP Authentication
 
-Minarca may integrates with LDAP server to support user authentication.
+Minarca may integrate with LDAP server to support user authentication.
 
 ```{toctree}
 ---
@@ -114,8 +114,8 @@ A user session is a sequence of request and response transactions associated wit
 
 | Option | Description | Example |
 | --- | --- | --- |
-| session-idle-timeout | This timeout defines the amount of time a session will remain active in case there is no activity in the session. User Session will be revoke after this period of inactivity, unless the user selected "remember me". Default 10 minutes. | 5 |
-| session-absolute-timeout | This timeout defines the maximum amount of time a session can be active. After this period, user is forced to (re)authenticate, unless the user selected "remember me". Default 20 minutes. | 30 |
+| session-idle-timeout | This timeout defines the amount of time a session will remain active in case there is no activity in the session. User Session will be revoked after this period of inactivity, unless the user selected "remember me". Default 10 minutes. | 5 |
+| session-absolute-timeout | This timeout defines the maximum amount of time a session can be active. After this period, the user is forced to (re)authenticate, unless the user selected "remember me". Default 20 minutes. | 30 |
 | session-persistent-timeout | This timeout defines the maximum amount of time to remember and trust a user device. This timeout is used when user select "remember me". Default 30 days | 43200 |
 
 ## Configure email notifications
@@ -131,7 +131,7 @@ When enabled, Minarca will also send email notification for security reason when
 | email-notification-time | time when the email notification should be sent for inactive backups. | 22:00 |
 | email-username | username used for authentication with the SMTP server. | example@gmail.com |
 | email-password | password used for authentication with the SMTP server. | CHANGEME |
-| email-send-changed-notification | True to send notification when sensitive information get change in user profile. Default: false | True |
+| email-send-changed-notification | True to send notification when sensitive information changed in user profile. Default: false | True |
 | email-catch-all | When defined, all notification email will be sent to this email address using Blind carbon copy (Bcc) |
 
 To configure the notification, you need a valid SMTP server. In this example, you are making use of a Gmail account to send emails.
@@ -292,11 +292,11 @@ need. Most likely, you will want to make it closer to your business brand.
 
 | Option | Description | Example |
 | --- | --- | --- |
-| welcome-msg | Replace the headline displayed in the login page. It may contains HTML. | Custom message displayed on login page.|
+| welcome-msg | Replace the headline displayed in the login page. It may contain HTML. | Custom message displayed on login page.|
 | brand-header-name | Define the application name displayed in the title bar and header menu. | My Backup |
 | brand-favicon | Define the FavIcon to be displayed in the browser title | /etc/minarca/my-fav.ico |
 | brand-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca logo displayed in Login page. | /etc/minarca/logo2.png |
-| brand-header-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca header logo displayed in navigation bar. | /etc/minarca/logo1.png |
+| brand-header-logo | location of an image (preferably a .png) to be used as a replacement for the Minarca header logo displayed in the navigation bar. | /etc/minarca/logo1.png |
 | brand-link-color | define a CSS color to be used for link. | #eeffee |
 | brand-btn-fg-color | define a CSS color to use for the button text. Default to white if undefined | #ffffff |
 | brand-btn-bg-color | define a CSS color to use for the background of the button. Default to `link-color` if undefined | #eeeeff |
@@ -304,9 +304,9 @@ need. Most likely, you will want to make it closer to your business brand.
 
 ## Configure repositories clean-up job
 
-Using the web interface, users may configure a retention period on individual repository to keep only a fixed number of days in backup. This is useful to control the growth of a repository disk usage.
+Using the web interface, users may configure a retention period on an individual repository to keep only a fixed number of days in backup. This is useful to control the growth of a repository disk usage.
 
-To support this feature, Minarca schedule a job to clean-up the repositories in backup. This job is ran once a day. You may change the default time when this schedule job is running by defining another value for option `remove-older-time`.
+To support this feature, Minarca schedule a job to clean-up the repositories in backup. This job runs once a day. You may change the default time when this schedule job is running by defining another value for option `remove-older-time`.
 
 | Parameter | Description | Example |
 | --- | --- | --- |
@@ -314,21 +314,21 @@ To support this feature, Minarca schedule a job to clean-up the repositories in 
 
 ## Configure temporary folder location
 
-To restore file or folder, Minarca needs a temporary directory to create the file to be downloaded. By default, Minarca will use your default temporary folder defined using environment variable `TMPDIR`, `TEMP` or `TMP`. If none of these environment variables are defined, Minarca fallback to use `/tmp`.
+To restore a file or folder, Minarca needs a temporary directory to create the file to be downloaded. By default, Minarca will use your default temporary folder defined using environment variable `TMPDIR`, `TEMP` or `TMP`. If none of these environment variables are defined, Minarca fallback to use `/tmp`.
 
-If you want to enforce a different location for the temporary directory, you may define the option `tempdir` with a different value. Take note, this directory must be created with the right ownership and permissions to allow Minarca to use it. Also make sure enough disk space is available. Usually, a 32GiB is enough.
+If you want to enforce a different location for the temporary directory, you may define the option `tempdir` with a different value. Take note, this directory must be created with the right ownership and permissions to allow Minarca to use it. Also, make sure enough disk space is available. Usually, a 32GiB is enough.
 
 | Parameter | Description | Example |
 | --- | --- | --- |
-| tempdir | alternate temporary folder to be used when restoring files. Might be useful if the default location has limited disk space| /tmp/minarca/ |
+| tempdir | alternate temporary folder to be used when restoring files. It might be useful if the default location has limited disk space| /tmp/minarca/ |
 
 ## Configure repository lookup depthness
 
-When defining the UserRoot value for a user, Minarca will scan the content of this directory recursively to lookups for rdiff-backup repositories. For performance reason, Minarca limits the recursiveness to 3 subdirectories. This default value should suit most use cases. If you have a particular use case, it's possible to allow Minarca to scan for more subdirectories by defining a greater value for the option `max-depth`. Make sure to pick a reasonable value for your use case as it may impact the performance.
+When defining the UserRoot value for a user, Minarca will scan the content of this directory recursively to lookups for rdiff-backup repositories. For performance reason, Minarca limits the recursiveness to 3 subdirectories. This default value should suit most use cases. If you have a particular use case, it's possible to allow Minarca to scan for more subdirectories by defining a greater value for the option `max-depth`. Make sure to pick a reasonable value for your use case, as it may impact the performance.
 
 | Parameter | Description | Example |
 | --- | --- | --- |
-| --max-depth | Define the maximum folder depthness to search into the user's root directory to find repositories. This is commonly used if your repositories are organised with multiple sub-folders. Default: 3 | 10 |
+| --max-depth | Define the maximum folder depth to search into the user's root directory to find repositories. This is commonly used if your repositories are organised with multiple sub-folders. Default: 3 | 10 |
 
 ## Configure default language
 
@@ -342,8 +342,8 @@ By default, the web application uses the HTTP Accept-Language headers to determi
 
 It's also possible to customized how the users are reaching your company by
 defining a custom web page. By defining this option, users needing your help
-from the Minarca client application will be redirect to this page instead of
-the default Minarca web site.
+from the Minarca client application will be redirected to this page instead of
+the default Minarca website.
 
 | Parameter | Description | Example |
 | --- | --- | --- |
@@ -372,13 +372,13 @@ configuration-latest
 ## Advance Minarca Configuration
 
 Minarca automatically configure where user's backups get stored. You may customize this
-by using the following settings. Unless you know what you are doing it's not
-recommanded to change any of these settings.
+by using the following settings. Unless you know what you are doing, it's not
+recommended to change any of these settings.
 
 | Parameter | Description | Example |
 | --- | --- | --- |
 | minarca-user-setup-dir-mode | Permission to be set on the user's folder created by Minarca. (Default: 0700) | 448 (equals to 0700) |
-| minarca-user-base-dir | Folder where users repositories should be created. You may need to change this value if you already have your repositories created in a different location or if you are migrating from rdiffweb. Otherwise it's recommended to keep the default value. (Default: /backups/) | /backups/ |
+| minarca-user-base-dir | Folder where users repositories should be created. You may need to change this value if you already have your repositories created in a different location or if you are migrating from rdiffweb. Otherwise, it's recommended to keep the default value. (Default: /backups/) | /backups/ |
 | minarca-restricted-to-based-dir | Used to enforce security by limiting the user's home directories to inside `UserBaseDir`. It's highly recommended to keep this feature enabled. (Default: True) | True |
 | minarca-shell | Location of `minarca-shell` used to limit SSH server access. (Default: /opt/minarca-server/minarca-shell) | /opt/minarca-server/minarca-shell |
 | minarca-auth-options | Default SSH auth options. This is used to limit the user's permission on the SSH Server, effectively disabling X11 forwarding, port forwarding and PTY. | default='no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty' |

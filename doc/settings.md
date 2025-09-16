@@ -28,10 +28,11 @@ The following table lists permissions available for each role:
 | Delete the history of a file or folder from his repositories |   | ✓ | ✓ |
 | Modify the retention period of one of his repositories       |   | ✓ | ✓ |
 | View system logs                                             |   |   | ✓ |
-| View system informations (ram, cpu, version, dependencies)   |   |   | ✓ |
+| View system information (RAM, CPU, version, dependencies)   |   |   | ✓ |
 | Create new users                                             |   |   | ✓ |
 | Modify other user's email, password and role                 |   |   | ✓ |
 | Define other user's quota                                    |   |   | ✓ |
 | Delete other user's repository                               |   |   | ✓ |
 | Delete the history of a file or folder from other users      |   |   | ✓ |
 | Browse other user's repository                               |   |   | ✓ |
+

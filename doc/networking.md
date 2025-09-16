@@ -33,7 +33,7 @@ Refer to your router's documentation or online resources for instructions on set
 
 While Minarca Server supports SSL, it is recommended to use a robust HTTP server like Apache for SSL termination. Apache offers better performance, flexibility, and security than Minarca's built-in Python implementation.
 
-[Reference: How to configure letencrypt](https://wiki.debian.org/LetsEncrypt)
+[Reference: How to configure letsencrypt](https://wiki.debian.org/LetsEncrypt)
 
 ### Install Apache and Required Modules
 
@@ -168,3 +168,4 @@ sudo systemctl reload nginx
 - Check your logs (`/var/log/apache2/error.log` or `/var/log/nginx/error.log`) if you encounter issues.
 
 This setup ensures that Minarca is securely accessible via HTTPS and properly configured behind a router and a reverse proxy.
+

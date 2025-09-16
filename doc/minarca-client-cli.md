@@ -5,7 +5,7 @@
    :group_title_prefix:
    :title: Usage
 
-# Minarca CLI interface
+# Minarca CLI
 
 ## Quick reference
 

@@ -54,13 +54,13 @@ Minarca automatically backs up data according to frequency settings. However, it
 
 ## How do I access my data backups?
 
-To access your data backups, you can open your Minarca client and click the icon in top-right corner to show a side pannel. Then click **Browse**.
+To access your data backups, you can open your Minarca client and click the icon in the top-right corner to show a side panel. Then click **Browse**.
 
 ![Minarca Browse data backup online](7browse.png)
 
 ## How do I select the folders I would like to back up?
 
-The Minarca client lets you select which folders or files you do or do not want to back up. Open your Minarca client and, in the **File selection** section. You can then choose the folders or files you want to back up.
+The Minarca client lets you select which folders or files you do or do not want to back up. Open your Minarca client, and in the **File selection** section. You can then choose the folders or files you want to back up.
 
 ![Minarca Data Backup file selection](8patterns.png)
 
@@ -74,13 +74,13 @@ You may restore your data using the Minarca Client or the web interface.
 
 **Restore using Minarca Client**
 
-You can restore your data using the Minarca Client by cliking on **Restore backup**. You will then be prompted to select between a full restore or a custom restore.
+You can restore your data using the Minarca Client by clicking on **Restore backup**. You will then be prompted to select between a full restore or a custom restore.
 
 ![Minarca Data Backup restore options](9restore.png)
 
 **Restore using Web interface**
 
-You can also restore your data from any devices using the web interface. You need to login to the web interface. If you know the URL, simply browser directly to it. Otherwise, you can open your Minarca client and click the icon in top-right corner to show a side pannel. Then click **Browse**.
+You can also restore your data from any devices using the web interface. You need to login to the web interface. If you know the URL, simply browser directly to it. Otherwise, you can open your Minarca client and click the icon in the top-right corner to show a side panel. Then click **Browse**.
 
 ![Minarca Data Backup restore data using web interface](11restore.png)
 
@@ -102,17 +102,17 @@ Simply reinstall the client to get the new version online.
 
 ## How do I change my password?
 
-Change your password in the **User Profile** Top-Right corner in the web interface. For security reasons, we recommend that you choose a secure password. You may also enabled multi-factor authentication for better security.
+Change your password in the **User Profile** Top-Right corner of the web interface. For security reasons, we recommend that you choose a secure password. You may also enable multi-factor authentication for better security.
 
 ![Minarca Web Interfaces - User profile to change your password.](15usersettings.png)
 
 ## I forgot my password. What should I do?
 
-It's not possible for you to recover you password. You must contact your system administrator to recover the password.
+It's not possible for you to recover your password. You must contact your system administrator to recover the password.
 
 ## How do I change my email address?
 
-You can change your email address in the **User Profile** Top-Right corner in web interface.
+You can change your email address in the **User Profile** Top-Right corner in the web interface.
 
 ## Can I change my username?
 
@@ -131,3 +131,4 @@ Moreover, the packages distributed within Minarca are pre-compiled with a specif
 Additionally, there are occasions when we need to apply additional patches to the original source code for compatibility reasons. While most of these patches are eventually merged upstream within a few months, we apply them directly to the packages distributed by Minarca to avoid any disruption for our end-users.
 
 In summary, the rdiff-backup packages distributed by Minarca are specifically tailored and known to work seamlessly with Minarca, whereas the packages provided by Debian may not fulfill these requirements.
+

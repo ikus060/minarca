@@ -27,7 +27,7 @@ REST API requests are subject to rate limit settings. These settings reduce the 
 
 Minarca Server returns HTTP status code 429 for 1 hour, if 20 failed authentication requests were received in the same period of time from a single IP address. The same limit also applied to most POST method in the RESTful API.
 
-This limit is configurable trought the `rate-limit` settings.
+This limit is configurable through the `rate-limit` settings.
 
 ### Example using cURL
 
@@ -57,3 +57,4 @@ maxdepth: 3
 ---
 endpoints
 ```
+

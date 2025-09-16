@@ -2,14 +2,14 @@
 
 ## System requirements
 
-Minarca client could be installed the following operating system and architectures:
+Minarca client could be installed in the following operating system and architectures:
 
 * Supported Operating System:
-  * Windows 7 (64bits) - best effort support
+  * Windows 7 (64bit) - best effort support
   * Windows 10 (64bit)
-  * Windows 11 (64 bits)
-  * MacOS Catalina (Intel)
-  * MacOS BigSur (Intel)
+  * Windows 11 (64bit)
+  * macOS Catalina (Intel)
+  * macOS BigSur (Intel)
   * Debian Bullseye (64bit)
   * Debian Bookworm (64bit)
   * Debian Trixie (64bit)
@@ -21,7 +21,7 @@ Minarca client could be installed the following operating system and architectur
 
 ## Installation Steps
 
-Installation steps mostly depends on your operating system. Follow the step appropriate for your system.
+Installation steps mostly depend on your operating system. Follow the step appropriate for your system.
 
 ## Installation on Debian (or Ubuntu)
 
@@ -65,9 +65,9 @@ Then launch the execution of the installer and follow the instructions.
 
 **Windows7**: Your installation must be up-to-date or manually install [VC 2015 Redistributable](https://www.microsoft.com/en-US/download/details.aspx?id=48145).
 
-## Installation on MacOS
+## Installation on macOS
 
-On a MacOS workstation, download the appropriate installer.
+On a macOS workstation, download the appropriate installer.
 
 <a href="https://www.ikus-soft.com/archive/minarca/minarca-client-latest.dmg"><img alt="Minarca Client for Windows" src="https://img.shields.io/badge/download-Minarca_Client-blue?&logo=apple&style=for-the-badge"></a>
 
@@ -75,9 +75,9 @@ Open the disk image and drag-n-drop Minarca to your Applications folder.
 
 ![Open Minarca Disk image with Finder](minarca-macos-disk-image.png)
 
-Then open Minarca Application !
+Then open Minarca Application!
 
-If you get the following, go in your MacOS **System Settings** --> **Privacy & Security Page** --> **Scroll Down to bottom** --> Click **Open Anyway**. 
+If you get the following, go to your macOS **System Settings** --> **Privacy & Security Page** --> **Scroll Down to bottom** --> Click **Open Anyway**. 
 
 ![Minarca can't be open because Apple cannot check it for malicious software.](macos-installation-issue.png)
 
@@ -90,7 +90,6 @@ Here’s a clearer, step‑by‑step version you can drop into your docs.
 Title: Configure the Minarca Backup Client
 
 **Prerequisites:**
-
 - You must have access to a running Minarca Server.
 - For testing only, you can use: https://test.minarca.net
 
@@ -298,4 +297,5 @@ On all platforms, it is possible to override the default locations for the setti
 |-----------------------|----------------------------|------------------------------------------|
 | **Settings Folder**   | `$MINARCA_CONFIG_HOME`     | Sets a custom path for configuration files. |
 | **Status Folder**     | `$MINARCA_DATA_HOME`       | Sets a custom path for status files.        |
+
 

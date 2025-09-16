@@ -76,7 +76,7 @@ These are for evaluation purposes only and should not be used in production:
 
 ## Hardware Configuration
 
-**Note:** Configuring storage at the hardware or hypervisor level is outside the scope of this document but is essential for ensuring the system's viability.
+**Note:** Configuring storage at the hardware or hypervisor level is outside the scope of this document, but is essential for ensuring the system's viability.
 
 ### RAID Configuration
 For production environments, ensure your storage is configured correctly at the hardware level or in your hypervisor (e.g., RAID). If using ZFS, it is essential to configure your RAID controller in JBOD (Just a Bunch of Disks) mode to maximize ZFS's performance.
@@ -184,7 +184,7 @@ It's recommended to use ext4 only if you are using reliable hardware, such as ha
     # OR
     mount -a
     ```
-Now your ext4 partition is ready at the `/backups` location for use by Minarca.
+Now, your ext4 partition is ready at the `/backups` location for use by Minarca.
 
 :::
 
@@ -284,7 +284,7 @@ After installation, the Minarca server will be available at `http://127.0.0.1:80
 
 ## Deployment behind Router with Reverse Proxy (Optional)
 
-If you server it deployed in a private network behind a router, after the installation of Minarca, you have some extra steps to complete to accomodate the networking.
+If you server it deployed in a private network behind a router, after the installation of Minarca, you have some extra steps to complete the networking.
 
 ```{toctree}
 ---
@@ -313,3 +313,4 @@ hardening
 If you want to enforce disk quotas on the backup storage, ensure the file system supports quotas (e.g., ext4 or ZFS). You can configure quotas on the `/backups` directory.
 
 [Configure Storage Quota](configuration.md#configure-user-quota)
+
