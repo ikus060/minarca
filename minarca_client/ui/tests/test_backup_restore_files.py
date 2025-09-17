@@ -3,14 +3,13 @@
 # Use is subject to license terms.
 import datetime
 import os
-import shutil
 import tempfile
 
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
 
 from minarca_client.core.backup import Backup, BackupInstance
+from minarca_client.core.compat import rmtree
 from minarca_client.core.pattern import Pattern
-from minarca_client.core.tests.test_instance import remove_readonly
 from minarca_client.ui.backup_restore_date import BackupRestoreDate
 from minarca_client.ui.backup_restore_files import BackupRestoreFiles
 from minarca_client.ui.tests import BaseAppTest
@@ -76,7 +75,7 @@ class BackupRestoreFilesTest2(BaseAppTest):
         await super().asyncSetUp()
 
     def tearDown(self):
-        shutil.rmtree(self.tempdir, onerror=remove_readonly)
+        rmtree(self.tempdir)
         return super().tearDown()
 
     async def test_filter(self):

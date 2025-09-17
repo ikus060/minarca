@@ -567,6 +567,19 @@ def stop_process(pid):
         return False
 
 
+def _remove_readonly(func, path, exc_info):
+    """Special handler to remove readonly file on Windows."""
+    if isinstance(exc_info, PermissionError):
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise exc_info
+
+
+def rmtree(path, ignore_errors=False, onexc=_remove_readonly):
+    return shutil.rmtree(path, ignore_errors=ignore_errors, onexc=onexc)
+
+
 class RobustRotatingFileHandler(RotatingFileHandler):
     """
     Robust logging rotating file handler for Windows.

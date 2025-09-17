@@ -89,7 +89,9 @@ def _forget(instance_id, force=False):
             instance.forget()
 
 
-def _configure(remoteurl=None, username=None, name=None, force=False, password=None, localdest=None):
+def _configure(
+    remoteurl=None, username=None, name=None, force=False, purge_destination=False, password=None, localdest=None
+):
     """
     Start the configuration process in command line.
     """
@@ -130,6 +132,7 @@ def _configure(remoteurl=None, username=None, name=None, force=False, password=N
             path=path,
             repositoryname=name,
             force=force,
+            purge_destination=purge_destination,
         )
     else:
         # Prompt remoteurl
@@ -519,6 +522,11 @@ def _parse_args():
         '--force',
         action='store_true',
         help=_("replace existing repository on backup destination if it exists without confirmation"),
+    )
+    sub.add_argument(
+        '--purge-destination',
+        action='store_true',
+        help=_("delete all contents of destination, then initialize/configure it -- only work for local destination"),
     )
     sub.add_argument('-d', '--localdest', help=_('path to local destination'))
     sub.set_defaults(func=_configure)

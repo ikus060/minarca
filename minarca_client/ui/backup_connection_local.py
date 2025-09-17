@@ -18,7 +18,12 @@ from kivymd.uix.list import MDListItem
 
 from minarca_client.core.compat import IS_LINUX, get_default_repositoryname
 from minarca_client.core.disk import LocationInfo, get_location_info, list_disk_with_location_info
-from minarca_client.core.exceptions import ConfigureBackupError, LocalDestinationNotFound, RepositoryNameExistsError
+from minarca_client.core.exceptions import (
+    ConfigureBackupError,
+    LocalDestinationNotEmptyError,
+    LocalDestinationNotFound,
+    RepositoryNameExistsError,
+)
 from minarca_client.dialogs import folder_dialog, question_dialog, warning_dialog
 from minarca_client.locale import _
 from minarca_client.ui.spinner_overlay import SpinnerOverlay  # noqa
@@ -400,7 +405,7 @@ class BackupConnectionLocal(MDBoxLayout):
         finally:
             self.working = ''
 
-    async def _create_local(self, location, repositoryname, force=False):
+    async def _create_local(self, location, repositoryname, force=False, purge_destination=False):
         assert location
         assert repositoryname
 
@@ -418,17 +423,37 @@ class BackupConnectionLocal(MDBoxLayout):
                 path=path,
                 repositoryname=repositoryname,
                 force=force,
+                purge_destination=purge_destination,
                 instance=self.instance,
             )
         except PermissionError as e:
             logger.warning(str(e))
             self.error_message = _("You don't have permissions to write at this location.")
             self.error_detail = str(e)
+        except LocalDestinationNotEmptyError as e:
+            logger.warning(str(e))
+            path, content = e.args
+            item_count = len(content)
+            preview_list = ', '.join([file.name for file in content[0:4]])
+            more_suffix = (_(" and %s more") % item_count - 4) if item_count > 4 else ""
+            ret = await question_dialog(
+                parent=self,
+                title=e.message,
+                message=_('Do you want to empty the selected destination and continue?'),
+                detail=_(
+                    "This will permanently delete all files and folders in "
+                    "the selected directory. It currently contains %s "
+                    "item(s): %s%s."
+                )
+                % (item_count, preview_list, more_suffix),
+            )
+            if ret:
+                await self._create_local(location, repositoryname, purge_destination=True)
         except RepositoryNameExistsError as e:
             logger.warning(str(e))
             ret = await question_dialog(
                 parent=self,
-                title=_('Destination already exists'),
+                title=str(e),
                 message=_('Do you want to replace the existing repository?'),
                 detail=_(
                     "The selected destination already exists at this "

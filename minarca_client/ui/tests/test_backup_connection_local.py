@@ -2,14 +2,13 @@
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
 import asyncio
-import shutil
 import tempfile
 from pathlib import Path
 from unittest import mock
 
+from minarca_client.core.compat import rmtree
 from minarca_client.core.disk import LocationInfo, get_location_info
 from minarca_client.core.instance import BackupInstance
-from minarca_client.core.tests.test_instance import remove_readonly
 from minarca_client.ui.backup_connection_local import BackupConnectionLocal
 from minarca_client.ui.backup_create import BackupCreate
 from minarca_client.ui.backup_patterns import BackupPatterns
@@ -101,6 +100,7 @@ class BackupConnectionLocalTest(BaseAppTest):
             path=DISK_INFO.mountpoint / DISK_INFO.relpath,
             repositoryname=repositoryname,
             force=False,
+            purge_destination=False,
             instance=None,
         )
         # Then user is redirected to Dashboard
@@ -127,7 +127,7 @@ class BackupConnectionLocalTest(BaseAppTest):
             # Then a backup is configured
             self.assertIsNotNone(self.view.instance)
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     async def test_disable(self):
         # Given a view.
@@ -176,7 +176,7 @@ class BackupConnectionLocalTest(BaseAppTest):
             self.assertIsNotNone(self.view.selected_location.used)
             self.assertIsNotNone(self.view.selected_location.size)
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     @mock.patch(
         'minarca_client.ui.backup_connection_local.question_dialog', new_callable=mock.AsyncMock, return_value=True

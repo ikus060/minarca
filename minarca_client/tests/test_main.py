@@ -73,14 +73,85 @@ class TestMainParseArgs(unittest.TestCase):
             include=True, pattern=['*.bak', '$~*', '/proc'], instance_id=InstanceId(None)
         )
 
+    @parameterized.expand(
+        [
+            (
+                'no_force',
+                [
+                    'link',
+                    '--remoteurl',
+                    'https://localhost',
+                    '--username',
+                    'foo',
+                    '--password',
+                    'bar',
+                    '--name',
+                    'repo',
+                ],
+                {
+                    'remoteurl': 'https://localhost',
+                    'username': 'foo',
+                    'password': 'bar',
+                    'name': 'repo',
+                    'force': False,
+                    'purge_destination': False,
+                    'localdest': None,
+                },
+            ),
+            (
+                'force',
+                [
+                    'link',
+                    '--remoteurl',
+                    'https://localhost',
+                    '--username',
+                    'foo',
+                    '--password',
+                    'bar',
+                    '--name',
+                    'repo',
+                    '--force',
+                ],
+                {
+                    'remoteurl': 'https://localhost',
+                    'username': 'foo',
+                    'password': 'bar',
+                    'name': 'repo',
+                    'force': True,
+                    'purge_destination': False,
+                    'localdest': None,
+                },
+            ),
+            (
+                'purge_destination',
+                [
+                    'link',
+                    '--remoteurl',
+                    'https://localhost',
+                    '--username',
+                    'foo',
+                    '--password',
+                    'bar',
+                    '--name',
+                    'repo',
+                    '--purge-destination',
+                ],
+                {
+                    'remoteurl': 'https://localhost',
+                    'username': 'foo',
+                    'password': 'bar',
+                    'name': 'repo',
+                    'force': False,
+                    'purge_destination': True,
+                    'localdest': None,
+                },
+            ),
+        ]
+    )
     @mock.patch('minarca_client.main._configure')
-    def test_args_link(self, mock_configure):
-        main.main(
-            ['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--password', 'bar', '--name', 'repo']
-        )
-        mock_configure.assert_called_once_with(
-            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=False, localdest=None
-        )
+    def test_args_link(self, _name_unused, args, expected_kwargs, mock_configure):
+        main.main(args)
+        mock_configure.assert_called_once_with(**expected_kwargs)
 
     @mock.patch('minarca_client.main.Backup')
     def test_args_debug(self, mock_backup):
@@ -135,7 +206,7 @@ class TestMainParseArgs(unittest.TestCase):
         mock_backup.return_value.configure_local = mock.AsyncMock()
         main.main(['configure', '--localdest', self.tmp.name, '--name', 'repo'])
         mock_backup.return_value.configure_local.assert_called_once_with(
-            path=Path(self.tmp.name), repositoryname='repo', force=False
+            path=Path(self.tmp.name), repositoryname='repo', force=False, purge_destination=False
         )
 
     @mock.patch('getpass.getpass')
@@ -151,26 +222,6 @@ class TestMainParseArgs(unittest.TestCase):
             main.main(['link', '--remoteurl', 'https://localhost', '--username', 'foo', '--name', 'repo'])
         self.assertEqual(HttpAuthenticationError.error_code, context.exception.code)
         self.assertEqual(33, context.exception.code)
-
-    @mock.patch('minarca_client.main._configure')
-    def test_args_link_force(self, mock_configure):
-        main.main(
-            [
-                'link',
-                '--remoteurl',
-                'https://localhost',
-                '--username',
-                'foo',
-                '--password',
-                'bar',
-                '--name',
-                'repo',
-                '--force',
-            ]
-        )
-        mock_configure.assert_called_once_with(
-            remoteurl='https://localhost', username='foo', password='bar', name='repo', force=True, localdest=None
-        )
 
     @mock.patch('minarca_client.main._patterns')
     def test_args_patterns(self, mock_patterns):

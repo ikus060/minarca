@@ -24,6 +24,7 @@ from minarca_client.core.compat import (
     file_write_async,
     get_config_home,
     get_minarca_exe,
+    rmtree,
     secure_file,
 )
 from minarca_client.core.exceptions import (
@@ -156,7 +157,7 @@ class Backup:
         logger.debug("checking if any backup instance is configured")
         return any(instance.settings.configured for instance in self)
 
-    async def configure_local(self, path, repositoryname, force=False, instance=None):
+    async def configure_local(self, path, repositoryname, force=False, purge_destination=False, instance=None):
         """
         Used to configure this new or existing instance with a local disk.
 
@@ -167,7 +168,9 @@ class Backup:
         """
         from minarca_client.core.disk import get_location_info
 
-        logger.debug(f"configuring local instance with path: {path}, repositoryname: {repositoryname}, force: {force}")
+        logger.debug(
+            f"configuring local instance with path: {path}, repositoryname: {repositoryname}, force: {force}, purge_destination: {purge_destination}"
+        )
         assert isinstance(path, (str, Path))
         path = Path(path) if isinstance(path, str) else path
         # Validate the repository name
@@ -194,16 +197,19 @@ class Backup:
         # Make sure the destination is an empty folder or an existing backup.
         content = list(path.iterdir())
         if content:
-            if IS_WINDOWS:
-                # Take into account Windows Drive letter
-                existing_backup = all([[len(f.name) == 1 and (f / 'rdiff-backup-data').exists for f in path.iterdir()]])
+            if purge_destination:
+                rmtree(path)
             else:
-                existing_backup = (path / 'rdiff-backup-data').exists()
-            if not existing_backup:
-                raise LocalDestinationNotEmptyError(path)
-            elif not force:
-                reponame = path.name
-                raise RepositoryNameExistsError(reponame)
+                if IS_WINDOWS:
+                    # On Windows, take into account Windows Drive letter
+                    existing_backup = all([(file / 'rdiff-backup-data').exists() for file in content])
+                else:
+                    existing_backup = (path / 'rdiff-backup-data').exists()
+                if not existing_backup:
+                    raise LocalDestinationNotEmptyError(path, content)
+                elif not force:
+                    reponame = path.name
+                    raise RepositoryNameExistsError(reponame)
 
         # Generate a diskuuid if missing
         if localuuid is None:

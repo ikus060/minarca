@@ -595,7 +595,9 @@ class HttpServerError(ConfigureBackupError):
 
 class LocalDestinationNotEmptyError(ConfigureBackupError):
     """
-    Raised when the specified local backup destination is not empty and does not contain rdiff-backup-data.
+    Raised when the specified local backup destination is not empty and does not contain `rdiff-backup-data`.
+
+    It's possible to force the operation by using "--purge-destination".
     """
 
     error_code = 35

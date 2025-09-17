@@ -9,8 +9,6 @@ Created on Jun. 7, 2021
 import asyncio
 import datetime
 import os
-import shutil
-import stat
 import subprocess
 import tempfile
 import unittest
@@ -23,7 +21,7 @@ from unittest.mock import MagicMock
 import responses
 
 from minarca_client.core import Backup, BackupInstance
-from minarca_client.core.compat import IS_WINDOWS, ssh_keygen
+from minarca_client.core.compat import IS_WINDOWS, rmtree, ssh_keygen
 from minarca_client.core.disk import LocationInfo
 from minarca_client.core.exceptions import (
     BackupError,
@@ -84,15 +82,6 @@ def mock_subprocess_popen(replace_cmd):
         return await _original_create_subprocess_exec(*replace_cmd, *args, **kwargs)
 
     return mock_call
-
-
-def remove_readonly(func, path, excinfo):
-    """Special handler to remove readonly file on Windows."""
-    if excinfo[0].__name__ == 'PermissionError':
-        os.chmod(path, stat.S_IWUSR)
-        func(path)
-    else:
-        raise
 
 
 class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
@@ -728,7 +717,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(used)
             self.assertTrue(size)
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     @responses.activate
     async def test_get_disk_usage_with_remote(self):
@@ -1147,7 +1136,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             else:
                 self.assertTrue(os.path.isdir(os.path.join(tempdir, 'rdiff-backup-data')))
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     async def test_local_backup_with_special_encoding(self):
         # Given a backup with local destination
@@ -1173,7 +1162,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             # then backup logs contains our filename with special char.
             self.assertIn('my \u20ac income', Path(self.instance.backup_log_file).read_text(encoding='utf-8'))
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     async def test_local_backup_with_keepdays(self, mock_popen):
@@ -1209,7 +1198,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 creationflags=subprocess.CREATE_NO_WINDOW if IS_WINDOWS else 0,
             )
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     async def test_configure_local_with_existing_repository_name(self):
         # Given a local backup
@@ -1227,7 +1216,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(RepositoryNameExistsError):
                 self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     async def test_configure_local_with_existing_repository_name_forced(self):
         # Given a local backup
@@ -1245,7 +1234,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             # Then backup is paused
             self.assertIsNotNone(self.instance.settings.pause_until)
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
 
     def test_sh_quote(self):
         self.assertEqual(_sh_quote(['a', 'b', 'c']), "a b c")
@@ -1274,4 +1263,4 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(os.path.isfile(pre_file))
             self.assertTrue(os.path.isfile(post_file))
         finally:
-            shutil.rmtree(tempdir, onerror=remove_readonly)
+            rmtree(tempdir)
