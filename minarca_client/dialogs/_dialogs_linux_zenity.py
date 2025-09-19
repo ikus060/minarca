@@ -29,12 +29,12 @@ async def _message_dialog(
     if title:
         cmd.append('--title=%s' % title)
     if message and detail:
-        cmd.append('--text=<b>%s</b>\n%s' % (message, detail))
+        cmd.append('--text=<b>%s</b>\n\n%s' % (message, detail))
+        cmd.append('--width=520')
     else:
         cmd.append('--text=%s' % message)
     if parent and parent.get_parent_window():
-        winfo = parent.get_parent_window().get_window_info().window
-        cmd.append('--attach=%s' % winfo)
+        cmd.append('--modal')
     with disable(parent):
         proc = await asyncio.create_subprocess_exec(cmd[0], *cmd[1:])
         response = await proc.wait()
