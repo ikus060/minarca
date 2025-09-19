@@ -14,6 +14,8 @@ from kivy.properties import StringProperty
 from kivymd.app import MDApp
 
 from minarca_client.core.appconfig import appconfig
+from minarca_client.dialogs import error_dialog
+from minarca_client.locale import _
 from minarca_client.ui.theme import Theme
 
 from .about_menu import AboutMenu  # noqa
@@ -110,12 +112,30 @@ class MinarcaApp(MDApp, ExceptionHandler):
     def build(self):
         return Builder.load_string(KV)
 
+    async def async_handle_exception(self, window, exception):
+        await error_dialog(
+            parent=window,
+            title=_('Unhandled Exception Detected'),
+            message=_('The application encountered an unexpected error and needs to close.'),
+            detail=_(
+                'Please check the logs for more information. If this problem '
+                'occurs again, report it to support.\n\n'
+                'Details: %s\n\n'
+                'The application will now quit.'
+            )
+            % str(exception),
+        )
+        self.stop()
+
     def handle_exception(self, exception):
         # Handle the exception globally
         logger.exception('an error occurred')
-        # FIXME Optionally, you can display an error message to the user
-        # I'm not sure this is working.
-        return ExceptionManager.RAISE
+        # If window still open, display an error.
+        if self._app_window:
+            asyncio.create_task(self.async_handle_exception(self._app_window, exception))
+            return ExceptionManager.PASS
+        else:
+            return ExceptionManager.RAISE
 
     def _install_settings_keys(self, window):
         # Replace settings view by inspector when debug is enabled.
