@@ -11,7 +11,9 @@ from kivymd.uix.navigationdrawer.navigationdrawer import MDNavigationDrawer, MDN
 from minarca_client import __version__
 from minarca_client.core.appconfig import appconfig
 from minarca_client.core.compat import open_file_with_default_app
+from minarca_client.core.exceptions import LocalDestinationNotFound
 from minarca_client.core.latest import LatestCheck, LatestCheckFailed
+from minarca_client.dialogs import warning_dialog
 from minarca_client.locale import _
 from minarca_client.ui.theme import CLabel, CListItem
 from minarca_client.ui.utils import alias_property
@@ -138,8 +140,18 @@ class RepositoriesItem(CListItem):
     def on_release(self):
         if self.instance is None:
             return
-        url = self.instance.get_repo_url("browse")
-        open_file_with_default_app(url)
+        try:
+            url = self.instance.get_repo_url("browse")
+            open_file_with_default_app(url)
+        except LocalDestinationNotFound as e:
+            asyncio.create_task(
+                warning_dialog(
+                    parent=self,
+                    title=_("Unable to Browse Backup"),
+                    message=_('Can’t open the selected backup. Check the path or connection, then try again.'),
+                    detail=str(e),
+                )
+            )
 
 
 class SettingsItem(CListItem):

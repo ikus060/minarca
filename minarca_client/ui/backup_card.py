@@ -402,7 +402,7 @@ class BackupCard(CCard):
                 except Exception as e:
                     logger.exception('fail to start backup')
                     await error_dialog(
-                        paremt=self,
+                        parent=self,
                         title=_("Start Backup"),
                         message=_("A problem occurred when trying to start the backup process."),
                         detail=_(
