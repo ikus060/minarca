@@ -209,6 +209,7 @@ class BackupPatterns(MDBoxLayout):
         assert backup
         assert instance and isinstance(instance, BackupInstance)
         # Initialise the state.
+        self.backup = backup
         self.instance = instance
         self.create = create
         self.is_remote = self.instance.is_remote()
@@ -295,7 +296,7 @@ class BackupPatterns(MDBoxLayout):
     def cancel(self):
         # In create mode, destroy the configuration and go to dashboard.
         if self.create:
-            self.instance.forget()
+            self.backup.delete_instance(self.instance)
         App.get_running_app().set_active_view('dashboard.DashboardView')
 
     def save(self):

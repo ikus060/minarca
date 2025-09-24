@@ -10,10 +10,9 @@ import glob
 import os
 from collections import namedtuple
 from collections.abc import MutableSequence
-from pathlib import PurePath
+from pathlib import Path, PurePath
 
 from minarca_client.core.compat import IS_LINUX, IS_MAC, IS_WINDOWS, get_config_home, get_home, get_temp
-from minarca_client.core.config import AbstractConfigFile
 from minarca_client.locale import _
 
 
@@ -36,12 +35,17 @@ class Pattern(namedtuple('Pattern', ['include', 'pattern', 'comment'], defaults=
         return PurePath(self.pattern).anchor.replace(os.sep, '/')
 
 
-class Patterns(AbstractConfigFile, MutableSequence):
+class Patterns(MutableSequence):
 
-    def _load(self):
+    def __init__(self, data=[]):
+        super().__init__()
+        self._data = data
+
+    @classmethod
+    def from_file(self, path: Path):
         data = []
         try:
-            with open(self._fn, 'r', encoding='utf-8', errors='replace') as f:
+            with open(path, 'r', encoding='utf-8', errors='replace') as f:
                 comment = None
                 for line in f.readlines():
                     line = line.rstrip()
@@ -61,7 +65,7 @@ class Patterns(AbstractConfigFile, MutableSequence):
                     comment = None
         except FileNotFoundError:
             data = []
-        return data
+        return Patterns(data)
 
     def __getitem__(self, idx):
         return self._data[idx]
@@ -225,17 +229,21 @@ class Patterns(AbstractConfigFile, MutableSequence):
 
         return data
 
-    def save(self):
+    def save_file(self, path):
         """
         Write all the pattern to the file.
         """
-        with open(self._fn, 'w', encoding='utf-8') as f:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(path.suffix + '.tmp')
+        with tmp.open('w', encoding='latin-1') as f:
             for pattern in self._data:
                 # Write comments if any
                 if pattern.comment:
                     f.write("# %s\n" % pattern.comment.strip())
                 # Write patterns
                 f.write(('+%s\n' if pattern.include else '-%s\n') % pattern.pattern)
+        tmp.replace(path)
 
     def group_by_roots(self):
         """

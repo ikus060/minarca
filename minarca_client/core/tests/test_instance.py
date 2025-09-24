@@ -20,7 +20,7 @@ from unittest.mock import MagicMock
 
 import responses
 
-from minarca_client.core import Backup, BackupInstance
+from minarca_client.core import Backup
 from minarca_client.core.compat import IS_WINDOWS, rmtree, ssh_keygen
 from minarca_client.core.disk import LocationInfo
 from minarca_client.core.exceptions import (
@@ -93,7 +93,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         os.environ['MINARCA_DATA_HOME'] = self.tmp.name
         self.backup = Backup()
         self.backup.scheduler = MagicMock()
-        self.instance = BackupInstance('1')
+        self.instance = self.backup._new_instance()
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -271,11 +271,10 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_link)
     async def test_configure_remote(self, mock_popen):
         # Define a status
-        status = self.instance.status
-        status.lastresult = 'SUCCESS'
-        status.save()
-        status.reload()
-        self.assertEqual('SUCCESS', status.lastresult)
+        self.instance.status.lastresult = 'SUCCESS'
+        self.instance.save_status()
+        self.instance.load_status()
+        self.assertEqual('SUCCESS', self.instance.status.lastresult)
 
         # Mock some https stuff
         responses.add(responses.GET, "http://localhost/api/")
@@ -310,35 +309,32 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     @skipIf(IS_WINDOWS, 'linux/macos specific test')
     def test_get_repo_url_linux(self):
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.remoteurl = 'http://remotehost'
-        config.repositoryname = 'test-repo'
-        config.username = 'username'
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.remoteurl = 'http://remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.username = 'username'
+        self.instance.save_settings()
         # Get value
         self.assertEqual('http://remotehost/browse/username/test-repo', self.instance.get_repo_url())
 
     @skipUnless(IS_WINDOWS, 'windows specific test')
     def test_get_repo_url_windows(self):
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.remoteurl = 'http://remotehost'
-        config.repositoryname = 'test-repo'
-        config.username = 'username'
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.remoteurl = 'http://remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.username = 'username'
+        self.instance.save_settings()
         self.instance.patterns.extend(Patterns.defaults())
-        self.instance.patterns.save()
+        self.instance.save_patterns()
         # Get value
         self.assertEqual('http://remotehost/browse/username/test-repo/C', self.instance.get_repo_url())
 
     def test_get_help_url(self):
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.remoteurl = 'http://remotehost'
-        config.repositoryname = 'test-repo'
-        config.username = 'username'
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.remoteurl = 'http://remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.username = 'username'
+        self.instance.save_settings()
         # Get value
         self.assertEqual('http://remotehost/help', self.instance.get_help_url())
 
@@ -356,12 +352,11 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     def test_get_status_with_running(self):
         # Mock the status file.
-        status = self.instance.status
-        status.lastresult = 'RUNNING'
-        status.lastdate = Datetime()
-        status.pid = os.getpid()
+        self.instance.status.lastresult = 'RUNNING'
+        self.instance.status.lastdate = Datetime()
+        self.instance.status.pid = os.getpid()
         # Check status
-        self.assertEqual('RUNNING', status.current_status)
+        self.assertEqual('RUNNING', self.instance.status.current_status)
 
     def test_get_status_with_stale(self):
         # Mock the status file.
@@ -448,14 +443,12 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     async def test_pause_with_backup_force(self, unused):
         # Provide default config
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.configured = True
-        config.save()
-        patterns = self.instance.patterns
-        patterns.append(Pattern(True, _home, None))
-        patterns.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.save_settings()
+        self.instance.patterns.append(Pattern(True, _home, None))
+        self.instance.save_patterns()
         self.instance._rdiff_backup = mock.AsyncMock()
         # Given a backup pause for 24 hours
         self.instance.pause(24)
@@ -470,10 +463,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     async def test_rdiff_backup(self, mock_rdiff_backup, *unused):
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         # When calling rdiff_backup with any argument
         await self.instance._rdiff_backup('backup', 'any-argument')
         # Then is trigger a call to rdiff_backup function with the same arguments
@@ -495,10 +487,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_exit_1_cmd))
     async def test_rdiff_backup_return_error(self, mock_popen, *unused):
         # Given a configured backup instance
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         # When executing rdiff-backup return exit-code 1 (see mock)
         # Then an exception is raised.
         with self.assertRaises(BackupError):
@@ -507,35 +498,32 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     async def test_rdiff_backup_unknown_host(self):
         # Given rdiff-backup started in a separate thread
         # With invalid remote host.
-        config = self.instance.settings
-        config.remotehost = 'invalid-remotehost:2222'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remotehost = 'invalid-remotehost:2222'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         self.instance.patterns.extend(Patterns.defaults())
-        self.instance.patterns.save()
+        self.instance.save_patterns()
         # When rdiff-backup isrunning
         # Then it should exit with error code 1
         with self.assertRaises(UnknownHostException):
             await self.instance.backup()
 
     async def test_backup_not_configured_remotehost(self):
-        config = self.instance.settings
-        config.remotehost = ''
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remotehost = ''
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         self.instance.patterns.extend(Patterns.defaults())
-        self.instance.patterns.save()
+        self.instance.save_patterns()
         # Make the call
         with self.assertRaises(NotConfiguredError):
             await self.instance.backup()
 
     async def test_backup_not_configured_repositoryname(self):
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = ''
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = ''
+        self.instance.save_patterns()
         self.instance.patterns.extend(Patterns.defaults())
-        self.instance.patterns.save()
+        self.instance.save_patterns()
         # Make the call
         with self.assertRaises(NotConfiguredError):
             await self.instance.backup()
@@ -551,14 +539,12 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         # Mock call to rdiff-backup
         self.instance._rdiff_backup = mock.AsyncMock()
         # Provide default config
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.configured = True
-        config.save()
-        patterns = self.instance.patterns
-        patterns.append(Pattern(True, _home, None))
-        patterns.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.save_patterns()
+        self.instance.patterns.append(Pattern(True, _home, None))
+        self.instance.save_patterns()
         await self.instance.backup()
         # Check if rdiff-backup is called.
         if IS_WINDOWS:
@@ -594,8 +580,8 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 callback=mock.ANY,
             )
         # Check status
+        self.instance.load_status()
         status = self.instance.status
-        status.reload()
         self.assertEqual('SUCCESS', status.lastresult)
         self.assertTrue(status.lastsuccess > start_time)
         self.assertEqual(status.lastdate, status.lastsuccess)
@@ -609,16 +595,17 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     async def test_start_without_patterns(self):
         start_time = Datetime()
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.configured = True
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.save_settings()
+        self.instance.patterns.clear()
+        self.instance.save_patterns()
         with self.assertRaises(NoPatternsError):
             await self.instance.backup()
         # Check status
+        self.instance.load_status()
         status = self.instance.status
-        status.reload()
         self.assertTrue(status.lastdate > start_time)
         self.assertNotEqual(status.lastdate, status.lastsuccess)
         self.assertEqual('FAILURE', status.lastresult)
@@ -628,10 +615,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     async def test_test_connection(self, mock_rdiff_backup, *unused):
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         await self.instance.test_connection()
         # Validate
         nul = "" if IS_WINDOWS else " -F /dev/null"
@@ -656,24 +642,23 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
 
     def test_forget(self):
         # Mock a configuration
-        config = Settings(self.instance.config_file)
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.configured = True
-        config.save()
+        settings = Settings()
+        settings.remotehost = 'remotehost'
+        settings.repositoryname = 'test-repo'
+        settings.configured = True
+        settings.save_file(self.instance.settings_file)
         # forget
-        self.instance.forget()
-        config = self.instance.settings
-        self.assertEqual(False, config.configured)
+        self.backup.delete_instance(self.instance)
+        settings = self.instance.settings
+        self.assertEqual(False, settings.configured)
 
     @mock.patch('minarca_client.core.compat.get_ssh', return_value=_ssh)
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     def test_remote_schema(self, *unused):
         # Given a backup instance configured with a remote port
-        config = self.instance.settings
-        config.remotehost = 'remotehost:2222'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remotehost = 'remotehost:2222'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         # Then when generating the remote schema
         value = self.instance._remote_schema()
         # Then the port is defined in the value
@@ -736,12 +721,11 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         )
         # Given a remote backup instance
         ssh_keygen(self.instance.public_key_file, self.instance.private_key_file)
-        config = self.instance.settings
-        config.remoteurl = 'http://localhost/'
-        config.username = 'admin'
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remoteurl = 'http://localhost/'
+        self.instance.settings.username = 'admin'
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         # When get getting disk usage
         used, size = await self.instance.get_disk_usage()
         # Then disk usage is returned
@@ -755,11 +739,10 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         # Mock call to rdiff-backup
         self.instance._rdiff_backup = mock.AsyncMock()
         # Provide default config
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.configured = True
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.save_settings()
         path_to_restore = 'C:/path/to/file' if IS_WINDOWS else '/path/to/file'
         destination = 'C:\\tmp' if IS_WINDOWS else '/tmp'
         await self.instance.restore(restore_time='1712944964', paths=[path_to_restore], destination=destination)
@@ -789,8 +772,8 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
                 callback=mock.ANY,
             )
         # Check status
+        self.instance.load_status()
         status = self.instance.status
-        status.reload()
         self.assertEqual('SUCCESS', status.lastresult)
         self.assertTrue(status.lastsuccess > start_time)
         self.assertEqual(status.lastdate, status.lastsuccess)
@@ -818,15 +801,14 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         )
         # Given a remote backup instance
         ssh_keygen(self.instance.public_key_file, self.instance.private_key_file)
-        config = self.instance.settings
-        config.remoteurl = 'http://localhost/'
-        config.username = 'admin'
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remoteurl = 'http://localhost/'
+        self.instance.settings.username = 'admin'
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         # When updating the settings and saving them remotely
-        config.keepdays = 15
-        config.save()
+        self.instance.settings.keepdays = 15
+        self.instance.save_settings()
         await self.instance.save_remote_settings()
         # Then the settings are push to the remote server.
         responses.assert_call_count("http://localhost/api/currentuser/repos/test-repo", 1)
@@ -853,31 +835,29 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         )
         # Given a remote backup instance
         ssh_keygen(self.instance.public_key_file, self.instance.private_key_file)
-        config = self.instance.settings
-        config.remoteurl = 'http://localhost/'
-        config.username = 'admin'
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.save()
+        self.instance.settings.remoteurl = 'http://localhost/'
+        self.instance.settings.username = 'admin'
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.save_settings()
         # When loading the settings
         await self.instance.load_remote_settings()
         # Then the settings are push to the remote server.
         responses.assert_call_count("http://localhost/api/currentuser/repos/test-repo", 1)
-        self.assertEqual(config.maxage, 12)
-        self.assertEqual(config.keepdays, 34)
-        self.assertEqual(config.ignore_weekday, [5, 6])
+        self.assertEqual(self.instance.settings.maxage, 12)
+        self.assertEqual(self.instance.settings.keepdays, 34)
+        self.assertEqual(self.instance.settings.ignore_weekday, [5, 6])
 
     @mock.patch('minarca_client.core.compat.get_user_agent', return_value='minarca/DEV rdiff-backup/2.0.0 (os info)')
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_list_increments))
     async def test_list_increments(self, mock_popen, *unused):
         # Given a backup settings
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.configured = True
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.save_settings()
         self.instance.patterns.extend(Patterns.defaults())
-        self.instance.patterns.save()
+        self.instance.save_patterns()
         # When querying the list of increments
         data = await self.instance.list_increments()
         # Then list of increment is returned
@@ -914,13 +894,12 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_list_files))
     async def test_list_files(self, mock_popen, *unused):
         # Given a backup settings
-        config = self.instance.settings
-        config.remotehost = 'remotehost'
-        config.repositoryname = 'test-repo'
-        config.configured = True
-        config.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.save_settings()
         self.instance.patterns.extend(Patterns.defaults())
-        self.instance.patterns.save()
+        self.instance.save_patterns()
         # When querying the list of increments
         data = await self.instance.list_files(datetime.datetime.fromtimestamp(1713195267, tz=datetime.timezone.utc))
         # Then list of increment is returned
@@ -1012,20 +991,18 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_exit_1_cmd))
     async def test_backup_send_notification(self, mock_popen, mock_get_user_agent, mock_send_notification):
         # Given a repository defined with a maxage value.
-        settings = self.instance.settings
-        settings.remotehost = 'remotehost'
-        settings.repositoryname = 'test-repo'
-        settings.configured = True
-        settings.maxage = 3
-        settings.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.settings.maxage = 3
+        self.instance.save_settings()
         # Given a repository configured with some patterns.
-        patterns = self.instance.patterns
-        patterns.append(Pattern(True, _home, None))
-        patterns.save()
+        self.instance.patterns.append(Pattern(True, _home, None))
+        self.instance.save_patterns()
         # When backup fail.
         with self.assertRaises(BackupError):
             await self.instance.backup()
-        self.instance.status.reload()
+        self.instance.load_status()
         self.assertEqual('FAILURE', self.instance.status.lastresult)
         # Then notification was raised to user.
         mock_send_notification.assert_called_once_with(title='Your backup is outdated', body=mock.ANY, replace_id=None)
@@ -1035,20 +1012,18 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
     @mock.patch('asyncio.create_subprocess_exec', side_effect=mock_subprocess_popen(_echo_foo_cmd))
     async def test_backup_clear_notification_time(self, mock_popen, mock_get_user_agent, mock_clear_notification):
         # Given a repository defined with a maxage value.
-        settings = self.instance.settings
-        settings.remotehost = 'remotehost'
-        settings.repositoryname = 'test-repo'
-        settings.configured = True
-        settings.maxage = 3
-        settings.save()
+        self.instance.settings.remotehost = 'remotehost'
+        self.instance.settings.repositoryname = 'test-repo'
+        self.instance.settings.configured = True
+        self.instance.settings.maxage = 3
+        self.instance.save_settings()
         self.instance.status.lastnotificationid = 'previous-id'
         # Given a repository configured with some patterns.
-        patterns = self.instance.patterns
-        patterns.append(Pattern(True, _home, None))
-        patterns.save()
+        self.instance.patterns.append(Pattern(True, _home, None))
+        self.instance.save_patterns()
         # When backup success.
         await self.instance.backup()
-        self.instance.status.reload()
+        self.instance.load_status()
         self.assertEqual('SUCCESS', self.instance.status.lastresult)
         # Then notification was raised to user.
         mock_clear_notification.assert_called_once_with('previous-id')
@@ -1058,10 +1033,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         # Given a backup with local destination
         tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
         self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
-        patterns = self.instance.patterns
-        patterns.clear()
-        patterns.append(Pattern(True, self.tmp.name, None))
-        patterns.save()
+        self.instance.patterns.clear()
+        self.instance.patterns.append(Pattern(True, self.tmp.name, None))
+        self.instance.save_patterns()
         # Then backup is created in pause mode.
         self.assertIsNotNone(self.instance.settings.pause_until)
         # when running backup
@@ -1121,10 +1095,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
         try:
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
-            patterns = self.instance.patterns
-            patterns.clear()
-            patterns.append(Pattern(True, self.tmp.name, None))
-            patterns.save()
+            self.instance.patterns.clear()
+            self.instance.patterns.append(Pattern(True, self.tmp.name, None))
+            self.instance.save_patterns()
             # Then backup is created in pause mode.
             self.assertIsNotNone(self.instance.settings.pause_until)
             # when running backup
@@ -1143,10 +1116,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
         try:
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
-            patterns = self.instance.patterns
-            patterns.clear()
-            patterns.append(Pattern(True, os.path.realpath(self.tmp.name), None))
-            patterns.save()
+            self.instance.patterns.clear()
+            self.instance.patterns.append(Pattern(True, os.path.realpath(self.tmp.name), None))
+            self.instance.save_patterns()
             # Create a file with special char (Euro sign €)
             Path(self.tmp.name, 'my \u20ac income').write_text('some data')
             # Then backup is created in pause mode.
@@ -1171,10 +1143,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         try:
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
             self.instance.settings.keepdays = 3
-            patterns = self.instance.patterns
-            patterns.clear()
-            patterns.append(Pattern(True, self.tmp.name, None))
-            patterns.save()
+            self.instance.patterns.clear()
+            self.instance.patterns.append(Pattern(True, self.tmp.name, None))
+            self.instance.save_patterns()
             # when running backup
             await self.instance.backup(force=True)
             # then rdiff-backup is called twice.
@@ -1207,9 +1178,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
             self.instance.patterns.clear()
             self.instance.patterns.append(Pattern(True, self.tmp.name, None))
-            self.instance.patterns.save()
+            self.instance.save_patterns()
             await self.instance.backup(force=True)
-            self.instance.forget()
+            self.backup.delete_instance(self.instance)
 
             # When trying to configure a local backup at the same destination
             # Then an exception is raised
@@ -1225,9 +1196,9 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo')
             self.instance.patterns.clear()
             self.instance.patterns.append(Pattern(True, self.tmp.name, None))
-            self.instance.patterns.save()
+            self.instance.save_patterns()
             await self.instance.backup(force=True)
-            self.instance.forget()
+            self.backup.delete_instance(self.instance)
             # When trying to configure a local backup at the same destination with Force mode
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo', force=True)
             # Then the backup get configured.
@@ -1251,12 +1222,11 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.instance.settings.pre_hook_command = "echo foo > %s" % pre_file
             self.instance.settings.post_hook_command = "echo bar > %s" % post_file
             self.instance.settings.ignore_hook_errors = True
-            self.instance.settings.save()
+            self.instance.save_settings()
             # Given a backup with patterns
-            patterns = self.instance.patterns
-            patterns.clear()
-            patterns.append(Pattern(True, self.tmp.name, None))
-            patterns.save()
+            self.instance.patterns.clear()
+            self.instance.patterns.append(Pattern(True, self.tmp.name, None))
+            self.instance.save_patterns()
             # When running backup
             await self.instance.backup(force=True)
             # Then pre/post command was executed

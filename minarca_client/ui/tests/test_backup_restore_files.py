@@ -7,7 +7,7 @@ import tempfile
 
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
 
-from minarca_client.core.backup import Backup, BackupInstance
+from minarca_client.core.backup import Backup
 from minarca_client.core.compat import rmtree
 from minarca_client.core.pattern import Pattern
 from minarca_client.ui.backup_restore_date import BackupRestoreDate
@@ -18,18 +18,19 @@ from minarca_client.ui.tests import BaseAppTest
 class BackupRestoreFilesTest(BaseAppTest):
     ACTIVE_VIEW = 'backup_restore_files.BackupRestoreFiles'
 
-    def setUp(self):
-        super().setUp()
+    def setup_backup(self):
+        backup = super().setup_backup()
         # Given a local backup
-        self.instance = instance = BackupInstance('1')
+        self.instance = instance = backup._new_instance()
         self.instance.settings.remotehost = 'remotehost'
         self.instance.settings.remoteurl = 'http://localhost'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.username = 'username'
         self.instance.settings.configured = True
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         self.ACTIVE_VIEW_KWARGS = {'instance': instance, 'increment': datetime.datetime.now()}
+        return backup
 
     async def test_view(self):
         # Then the view get displayed.
@@ -61,10 +62,9 @@ class BackupRestoreFilesTest2(BaseAppTest):
         # Given a backup with local destination
         self.tempdir = tempfile.mkdtemp(prefix='minarca-client-test')
         self.instance = await Backup().configure_local(self.tempdir, repositoryname='test-repo')
-        patterns = self.instance.patterns
-        patterns.clear()
-        patterns.append(Pattern(True, os.path.realpath(self.tmp.name), None))
-        patterns.save()
+        self.instance.patterns.clear()
+        self.instance.patterns.append(Pattern(True, os.path.realpath(self.tmp.name), None))
+        self.instance.save_patterns()
         # when running backup
         await self.instance.backup(force=True)
 

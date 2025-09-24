@@ -1,7 +1,6 @@
 # Copyright (C) 2025 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-from minarca_client.core.backup import BackupInstance
 from minarca_client.ui.backup_restore_date import BackupRestoreDate
 from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
@@ -10,17 +9,18 @@ from minarca_client.ui.tests import BaseAppTest
 class BackupRestoreDateTest(BaseAppTest):
     ACTIVE_VIEW = 'backup_restore_date.BackupRestoreDate'
 
-    def setUp(self):
-        super().setUp()
+    def setup_backup(self):
+        backup = super().setup_backup()
         # Given a local backup
-        self.instance = instance = BackupInstance('1')
+        self.instance = instance = backup._new_instance()
         self.instance.settings.remotehost = 'remotehost'
         self.instance.settings.remoteurl = 'http://localhost'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.username = 'username'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         self.ACTIVE_VIEW_KWARGS = {'instance': instance}
+        return backup
 
     async def test_view(self):
         # Then the view get displayed.

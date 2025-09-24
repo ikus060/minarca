@@ -18,7 +18,7 @@ from unittest import mock
 from parameterized import parameterized
 
 from minarca_client import main
-from minarca_client.core import Backup, BackupInstance, InstanceId
+from minarca_client.core import Backup, InstanceId
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.exceptions import BackupError, HttpAuthenticationError
 from minarca_client.core.pattern import Pattern
@@ -33,6 +33,7 @@ class TestMainParseArgs(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         os.chdir(self.tmp.name)
         os.environ['MINARCA_CONFIG_HOME'] = self.tmp.name
+        self.backup = Backup()
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -357,37 +358,37 @@ class TestMainParseArgs(unittest.TestCase):
 
     def test_exclude(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # Calling exclude
         main.main(['exclude', '*.bak'])
         # Then pattern get updated.
-        instance.patterns.reload()
+        instance.load_patterns()
         self.assertEqual([Pattern(False, '*.bak', None)], list(instance.patterns))
 
     def test_include(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # When calling include
         main.main(['include', '*.bak'])
         # Then patterns get updated.
-        instance.patterns.reload()
+        instance.load_patterns()
         self.assertEqual([Pattern(True, '*.bak', None)], list(instance.patterns))
 
     def test_include_duplicate(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # When calling include multiple time with the same value
         # Not using real path for the test since those get resolve differently on Linux and windows.
         main.main(['include', '*.bak'])
         main.main(['include', '*.bak'])
         # Then we don't have duplicate pattern in config file.
-        instance.patterns.reload()
+        instance.load_patterns()
         self.assertEqual(
             list(instance.patterns),
             [Pattern(include=True, pattern='*.bak', comment=None)],
@@ -395,16 +396,16 @@ class TestMainParseArgs(unittest.TestCase):
 
     def test_include_exclude(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # When galling include multiple time with the same value
         # Not using real path for the test since those get resolve differently on Linux and windows.
         main.main(['include', '*.bak'])
         # Then an error is raised
         main.main(['exclude', '*.bak'])
         # Then we kept the include pattern.
-        instance.patterns.reload()
+        instance.load_patterns()
         self.assertEqual(
             list(instance.patterns),
             [Pattern(include=False, pattern='*.bak', comment=None)],
@@ -412,24 +413,24 @@ class TestMainParseArgs(unittest.TestCase):
 
     def test_include_relative_path(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # When add include pattern with relative path.
         main.main(['include', '.'])
         # Then pattern get updated
-        instance.patterns.reload()
+        instance.load_patterns()
         self.assertEqual([Pattern(True, os.getcwd(), None)], list(instance.patterns))
 
     def test_patterns(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
-        p = instance.patterns
-        p.append(Pattern(True, '/home', None))
-        p.append(Pattern(False, '*.bak', None))
-        p.save()
+        instance.save_settings()
+        instance.patterns.clear()
+        instance.patterns.append(Pattern(True, '/home', None))
+        instance.patterns.append(Pattern(False, '*.bak', None))
+        instance.save_patterns()
         # When shoing patterns list.
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
@@ -440,14 +441,14 @@ class TestMainParseArgs(unittest.TestCase):
 
     def test_pause(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         self.assertIsNone(instance.settings.pause_until)
         # When pausing backups
         main.main(['pause', '--delay', '123'])
         # Then Backup is paused
-        instance.settings.reload()
+        instance.load_settings()
         self.assertIsNotNone(instance.settings.pause_until)
 
     @mock.patch('minarca_client.main.Backup')
@@ -492,12 +493,13 @@ class TestMainParseArgs(unittest.TestCase):
 
     def test_schedule(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # When calling schedule
         main.main(['schedule', '--daily'])
         # Then schedule is define and job get create
+        instance.load_settings()
         self.assertEqual(instance.settings.schedule, Settings.DAILY)
 
     @parameterized.expand(
@@ -509,20 +511,20 @@ class TestMainParseArgs(unittest.TestCase):
     )
     def test_schedule_hourly(self, arg, value):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # When calling schedule
         main.main(['schedule', arg])
         # Then schedule is define and job get create
-        instance.settings.reload()
+        instance.load_settings()
         self.assertEqual(instance.settings.schedule, value)
 
     def test_status(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # When calling status
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
@@ -536,21 +538,22 @@ class TestMainParseArgs(unittest.TestCase):
 
     def test_forget(self):
         # Given a backup instance
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         backup = Backup()
         self.assertEqual(1, len(backup))
         # When calling forget
         main.main(['forget', '--force'])
         # Then backup instance get removed
+        backup.rescan()
         self.assertEqual(0, len(backup))
 
     def test_invalid_instance(self):
         # Given a backup instances
-        instance = BackupInstance('')
+        instance = self.backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         backup = Backup()
         self.assertEqual(1, len(backup))
         # When trying to list status with invalid instance_id

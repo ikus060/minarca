@@ -85,8 +85,7 @@ def _forget(instance_id, force=False):
         title = instance.settings.repositoryname or _("No name")
         print('* %s' % title)
     if force or _prompt_yes_no(_('Are you sure you want to forget the above backup settings? (Yes/No): ')):
-        for instance in backup[instance_id]:
-            instance.forget()
+        backup.delete_instance(instance_id)
 
 
 def _configure(
@@ -187,7 +186,7 @@ def _pattern(include, pattern, instance_id):
                 p = Pattern(include, path, None)
             # Add new pattern
             patterns.append(p)
-        patterns.save()
+        instance.save_patterns()
 
 
 def _patterns(instance_id):
@@ -337,7 +336,7 @@ def _schedule(schedule, instance_id, username=None, password=None):
     # Define frequency
     for instance in backup[instance_id]:
         instance.settings.schedule = schedule
-        instance.settings.save()
+        instance.save_settings()
     # Make sure to schedule job in OS too.
     run_if_logged_out = (username, password) if username or password else None
     backup.schedule_job(run_if_logged_out)
@@ -714,6 +713,8 @@ def _configure_logging(debug=False):
     logging.getLogger('asyncio').setLevel(logging.WARNING)
     # Avoid kivy logs by default.
     logging.getLogger('kivy').setLevel(logging.DEBUG if debug else logging.WARNING)
+    # Avoid rust notify
+    logging.getLogger('watchfiles.main').setLevel(logging.INFO)
     # Capture warning
     logging.captureWarnings(True)
     #

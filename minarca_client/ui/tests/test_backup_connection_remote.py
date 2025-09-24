@@ -3,7 +3,6 @@
 # Use is subject to license terms.
 from unittest import mock
 
-from minarca_client.core.instance import BackupInstance
 from minarca_client.ui.backup_connection_remote import BackupConnectionRemote
 from minarca_client.ui.backup_create import BackupCreate
 from minarca_client.ui.backup_patterns import BackupPatterns
@@ -36,7 +35,7 @@ class BackupConnectionRemoteTest(BaseAppTest):
             instance.settings.username = 'admin'
             instance.settings.repositoryname = 'test'
             instance.settings.configured = True
-            instance.settings.save()
+            instance.save_settings()
             return instance
 
         # Given a mock to configure backup
@@ -65,13 +64,13 @@ class BackupConnectionRemoteTest(BaseAppTest):
 
     async def test_edit_instance(self):
         # Given a remote backup instance
-        self.instance = BackupInstance('1')
+        self.instance = self.app.backup._new_instance()
         self.instance.settings.remotehost = 'remotehost'
         self.instance.settings.remoteurl = 'http://localhost'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.username = 'username'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the settings
         self.app.set_active_view(self.ACTIVE_VIEW, create=False, instance=self.instance)
         # Then a test connection is running
@@ -93,13 +92,13 @@ class BackupConnectionRemoteTest(BaseAppTest):
     )
     async def test_forget_instance(self, mock_question_dialog):
         # Given a remote backup instance
-        self.instance = BackupInstance('1')
+        self.instance = self.app.backup._new_instance()
         self.instance.settings.remotehost = 'remotehost'
         self.instance.settings.remoteurl = 'http://localhost'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.username = 'username'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the settings
         self.app.set_active_view(self.ACTIVE_VIEW, create=False, instance=self.instance)
         # When user click on  forget instance button

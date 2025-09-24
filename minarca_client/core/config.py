@@ -9,38 +9,10 @@ Created on Jun. 8, 2021
 import datetime
 import time
 from functools import total_ordering
+from pathlib import Path
 from typing import Any
 
 import javaproperties
-
-
-class AbstractConfigFile:
-    def __init__(self, filename: str):
-        assert filename, 'a filename is required'
-        self._fn = filename
-        self._data = None
-        self.reload()
-
-    def reload(self):
-        """
-        Check if the file changed since last loading. If not does nothing. Othersiw will read the file data.
-        """
-        self._data = self._load()
-
-    def _load(self):
-        raise NotImplementedError()
-
-    def save(self):
-        raise NotImplementedError()
-
-    def __enter__(self):
-        # Load file content.
-        self.reload()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # Save changes in all cases.
-        self.save()
 
 
 @total_ordering
@@ -87,43 +59,46 @@ class Datetime:
         return time.strftime(fmt, time.localtime(self.epoch_ms / 1000))
 
 
-class KeyValueConfigFile(AbstractConfigFile):
+class KeyValueConfigFile:
     """
     Configurated with key value supporting getter and setter.
     """
 
-    def __init__(self, filename: str):
-        assert self._fields, 'subclass must define list of fields'
-        super().__init__(filename)
-
-    def _load(self):
+    def __init__(self, raw_data={}):
         data = {field: default for field, unused, default in self._fields}
+        # Then read values field by field, use default if not defined otherwise try to coerse the value.
+        for field, coerse, default in self._fields:
+            value = raw_data.get(field, None)
+            if value is None:
+                data[field] = default
+            else:
+                try:
+                    data[field] = coerse(value)
+                except (ValueError, KeyError):
+                    data[field] = default
+        self._data = data
+
+    @classmethod
+    def from_file(cls, path: Path):
+        raw_data = {}
         try:
-            with open(self._fn, 'r', encoding='latin-1') as f:
+            with open(path, 'r', encoding='latin-1') as f:
                 # Read raw data from java properties files.
                 raw_data = javaproperties.load(f)
-                # Then read values field by field, use default if not defined otherwise try to coerse the value.
-                for field, coerse, default in self._fields:
-                    value = raw_data.get(field, None)
-                    if value is None:
-                        data[field] = default
-                    else:
-                        try:
-                            data[field] = coerse(value)
-                        except (ValueError, KeyError):
-                            data[field] = default
         except FileNotFoundError:
             pass
-        return data
+        return cls(raw_data)
 
-    def save(self):
-        import javaproperties
-
+    def save_file(self, path):
         values = {
             field: str(self._data.get(field)) for field, *unused in self._fields if self._data.get(field) is not None
         }
-        with open(self._fn, 'w', encoding='latin-1') as f:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(path.suffix + '.tmp')
+        with tmp.open('w', encoding='latin-1') as f:
             javaproperties.dump(values, f)
+        tmp.replace(path)
 
     def __getattr__(self, name: str) -> Any:
         # Check if name is valid

@@ -273,6 +273,7 @@ class AboutMenu(MDNavigationDrawer):
         """
         try:
             async for unused in backup.awatch():
+                backup.rescan()
                 self.refresh_menu_items()
         except Exception:
             logger.exception('problem occur while watching backup instances')

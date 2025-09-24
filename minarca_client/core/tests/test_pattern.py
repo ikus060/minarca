@@ -37,7 +37,7 @@ class PatternsTest(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_defaults(self):
-        patterns = Patterns('patterns')
+        patterns = Patterns()
         self.assertEqual(0, len(patterns))
         data = patterns.defaults()
         self.assertNotEqual(0, len(data))
@@ -49,7 +49,7 @@ class PatternsTest(unittest.TestCase):
             f.write("# AutoCad Backup file\n")
             f.write("-*.bak\n")
         # When reading the pattern file
-        patterns = Patterns('patterns')
+        patterns = Patterns.from_file('patterns')
         # Then we have 2 patterns
         self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
@@ -61,12 +61,12 @@ class PatternsTest(unittest.TestCase):
             f.write("\n")
             f.write("# AutoCad Backup file\n")
             f.write("-*.bak\n")
-        patterns = Patterns('patterns')
+        patterns = Patterns.from_file('patterns')
         self.assertEqual(Pattern(True, 'somefilename.txt', 'comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', 'AutoCad Backup file'), patterns[1])
 
     def test_load_with_missing_file(self):
-        patterns = Patterns('invalid')
+        patterns = Patterns.from_file('invalid')
         self.assertEqual(0, len(patterns))
 
     def test_load_wrong_encoding(self):
@@ -77,7 +77,7 @@ class PatternsTest(unittest.TestCase):
             f.write("# Ignore Backup file\n")
             f.write("-*.bak\n")
         # When reading the pattern file
-        patterns = Patterns('patterns')
+        patterns = Patterns.from_file('patterns')
         # Then we have 2 patterns sorted
         self.assertEqual(Pattern(include=True, pattern='�ric_file.txt', comment='comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', 'Ignore Backup file'), patterns[1])
@@ -90,7 +90,7 @@ class PatternsTest(unittest.TestCase):
             f.write("invalid-line\n")
             f.write("-*.bak\n")
         # When reading the pattern file
-        patterns = Patterns('patterns')
+        patterns = Patterns.from_file('patterns')
         # Then we have 2 patterns sorted
         self.assertEqual(Pattern(include=True, pattern='/this-is-a-set', comment='comments'), patterns[0])
         self.assertEqual(Pattern(False, '*.bak', comment=None), patterns[1])
@@ -98,29 +98,10 @@ class PatternsTest(unittest.TestCase):
     def test_save(self):
         with open('patterns', 'w') as f:
             f.write("")
-        patterns = Patterns('patterns')
+        patterns = Patterns()
         patterns.append(Pattern(True, '*.bak', 'AutoCAD Backup file'))
         patterns.append(Pattern(True, '$~*', 'Office Temporary files'))
-        patterns.save()
-        with open('patterns', 'r') as f:
-            data = f.read()
-        self.assertEqual("# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
-
-    def test_transaction(self):
-        # Given a pattern file
-        with open('patterns', 'w') as f:
-            f.write("")
-        patterns = Patterns('patterns')
-        # When starting a transaction
-        with patterns as t:
-            t.append(Pattern(True, '*.bak', 'AutoCAD Backup file'))
-            t.append(Pattern(True, '$~*', 'Office Temporary files'))
-
-            # Then changes are not saved to file.
-            with open('patterns', 'r') as f:
-                data = f.read()
-            self.assertEqual("", data)
-        # Then after transaction, changes are saved.
+        patterns.save_file('patterns')
         with open('patterns', 'r') as f:
             data = f.read()
         self.assertEqual("# AutoCAD Backup file\n+*.bak\n# Office Temporary files\n+$~*\n", data)
@@ -129,7 +110,7 @@ class PatternsTest(unittest.TestCase):
     def test_group_by_roots_unix_wildcard(self, *unused):
         with open('patterns', 'w') as f:
             f.write("")
-        patterns = Patterns('patterns')
+        patterns = Patterns.from_file('patterns')
         patterns.append(Pattern(True, '/home/', None))
         patterns.append(Pattern(False, '**/*.bak', None))
         patterns.append(Pattern(False, '*.tmp', None))
@@ -159,7 +140,7 @@ class PatternsTest(unittest.TestCase):
     def test_group_by_roots_win(self, *unused):
         with open('p', 'w') as f:
             f.write("")
-        p = Patterns('p')
+        p = Patterns()
         p.append(Pattern(True, 'C:/foo', None))
         p.append(Pattern(False, '**/*.bak', None))
         p.append(Pattern(True, 'C:\\bar', None))
@@ -194,7 +175,7 @@ class PatternsTest(unittest.TestCase):
 
     @skipIf(not IS_WINDOWS, 'only for windows')
     def test_group_by_roots_win_exclude_other_root(self, *unused):
-        p = Patterns('p')
+        p = Patterns()
         p.append(Pattern(True, 'C:/foo', None))
         p.append(Pattern(False, '**/*.bak', None))
         # should be ignored, because everything is included by default.

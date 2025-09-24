@@ -30,7 +30,7 @@ class SettingsTest(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_load_without_file(self):
-        config = Settings('test.properties')
+        config = Settings.from_file('test.properties')
         self.assertEqual(None, config.username)
         self.assertEqual(None, config.repositoryname)
         self.assertEqual(False, config.configured)
@@ -44,7 +44,7 @@ class SettingsTest(unittest.TestCase):
             f.write("repositoryname=bar\n")
             f.write("configured=true\n")
             f.write("schedule=24\n")
-        config = Settings('test.properties')
+        config = Settings.from_file('test.properties')
         self.assertEqual('foo', config.username)
         self.assertEqual('bar', config.repositoryname)
         self.assertEqual(True, config.configured)
@@ -59,48 +59,29 @@ class SettingsTest(unittest.TestCase):
             f.write("configured=true\n")
             f.write("schedule=24\n")
             f.write("check_latest_version=False")
-        config = Settings('test.properties')
+        config = Settings.from_file('test.properties')
         self.assertEqual(False, config.check_latest_version)
 
     def test_configured(self):
         for text in ['true', 'True', '1']:
             with open('test.properties', 'w') as f:
                 f.write("configured=%s\n" % text)
-            config = Settings('test.properties')
+            config = Settings.from_file('test.properties')
             self.assertEqual(True, config.configured)
 
         for text in ['False', 'false', '0']:
             with open('test.properties', 'w') as f:
                 f.write("configured=%s\n" % text)
-            config = Settings('test.properties')
+            config = Settings.from_file('test.properties')
             self.assertEqual(False, config.configured)
 
     def test_save(self):
         with open('test.properties', 'w') as f:
             f.write("\n")
-        config = Settings('test.properties')
+        config = Settings.from_file('test.properties')
         config.username = 'foo'
         config.repositoryname = 'bar'
-        config.save()
-        with open('test.properties', 'r') as f:
-            data = f.read()
-        self.assertTrue("username=foo" in data)
-        self.assertTrue("repositoryname=bar" in data)
-
-    def test_transaction(self):
-        # Given a config file
-        with open('test.properties', 'w') as f:
-            f.write("\n")
-        config = Settings('test.properties')
-        # When starting a transaction
-        with config as c:
-            c.username = 'foo'
-            c.repositoryname = 'bar'
-            # Then within transaction, changes are not saved
-            with open('test.properties', 'r') as f:
-                data = f.read()
-            self.assertEqual('\n', data)
-        # Then after transaction, changes are saved
+        config.save_file('test.properties')
         with open('test.properties', 'r') as f:
             data = f.read()
         self.assertTrue("username=foo" in data)
@@ -108,7 +89,7 @@ class SettingsTest(unittest.TestCase):
 
     def test_set_value_invalid(self):
         # Given a config file
-        config = Settings('test.properties')
+        config = Settings.from_file('test.properties')
         # When trying to set an invalid value type
         # Then an exception is raised
         with self.assertRaises(ValueError):
@@ -120,7 +101,7 @@ class SettingsTest(unittest.TestCase):
 
     def test_pause_until(self):
         # Given an empty status file
-        config = Settings('test.properties')
+        config = Settings.from_file('test.properties')
         # Then pause_until is None
         self.assertIsNone(config.pause_until)
         # When setting value
@@ -146,7 +127,7 @@ class StatusTest(unittest.TestCase):
 
     def test_load_without_file(self):
         # Given an invalid invalid.
-        status = Status('invalid.properties')
+        status = Status.from_file('invalid.properties')
         # Then default value are used
         self.assertEqual(None, status.details)
         self.assertEqual(None, status.lastdate)
@@ -160,7 +141,7 @@ class StatusTest(unittest.TestCase):
             f.write("lastdate=1623094810348\n")
             f.write("lastresult=FAILURE\n")
             f.write("lastsuccess=1622832320569\n")
-        status = Status('status.properties')
+        status = Status.from_file('status.properties')
         self.assertEqual('nothing to backup, make sure you have at least one valid include patterns', status.details)
         self.assertEqual(Datetime(1623094810348), status.lastdate)
         self.assertEqual('FAILURE', status.lastresult)
@@ -169,34 +150,16 @@ class StatusTest(unittest.TestCase):
     def test_save(self):
         with open('status.properties', 'w') as f:
             f.write("\n")
-        status = Status('status.properties')
+        status = Status.from_file('status.properties')
         status.lastresult = 'SUCCESS'
         status.lastsuccess = Datetime(1622832320000)
-        status.save()
+        status.save_file('status.properties')
         with open('status.properties', 'r') as f:
             data = f.read()
         self.assertTrue("lastresult=SUCCESS" in data)
         self.assertTrue("lastsuccess=1622832320000" in data)
         self.assertTrue("lastdate=" not in data)
         self.assertTrue("details=" not in data)
-
-    def test_transaction(self):
-        # Given a status
-        status = Status('status.properties')
-        self.assertNotEqual('RUNNING', status.current_status)
-        with status as t:
-            t.pid = os.getpid()
-            t.lastresult = 'RUNNING'
-            t.lastdate = Datetime()
-            t.details = ''
-            t.action = 'backup'
-        with status as t:
-            t.lastresult = 'SUCCESS'
-            self.assertEqual('SUCCESS', status.lastresult)
-            t.lastsuccess = Datetime()
-            t.lastdate = status.lastsuccess
-            t.details = ''
-        self.assertEqual('SUCCESS', status.lastresult)
 
 
 class DatetimeTest(unittest.TestCase):

@@ -223,7 +223,7 @@ class BackupCard(CCard):
         try:
             status = instance.status
             async for unused in watch_file(self.instance.status_file, timeout=status.RUNNING_DELAY):
-                self.status.reload()
+                self.instance.load_status()
                 self.in_transition = False
                 self.property('status').dispatch(self)
         except Exception:
@@ -233,7 +233,7 @@ class BackupCard(CCard):
         # Asynchronously watch the status files for changes.
         try:
             async for unused in watch_file(self.instance.config_file):
-                self.settings.reload()
+                self.load_settings()
                 self.property('settings').dispatch(self)
         except Exception:
             logger.exception('problem while watching settings')

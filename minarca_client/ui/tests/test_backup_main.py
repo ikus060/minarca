@@ -6,7 +6,6 @@ import datetime
 
 from parameterized import parameterized
 
-from minarca_client.core.instance import BackupInstance
 from minarca_client.core.status import Datetime
 from minarca_client.ui.backup_card import BackupCard
 from minarca_client.ui.backup_create import BackupCreate
@@ -30,13 +29,15 @@ class MainDialogTest(BaseAppTest):
 
 
 class MainDialogWithBackupTest(BaseAppTest):
-    def setUp(self):
-        super().setUp()
+
+    def setup_backup(self):
+        backup = super().setup_backup()
         # Given a local backup
-        self.instance = instance = BackupInstance('1')
+        self.instance = instance = backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         self.ACTIVE_VIEW_KWARGS = {'instance': instance}
+        return backup
 
     async def test_default_dialog(self):
         # When backup is configure. Then BackupCreate is displayed by default.
@@ -49,11 +50,10 @@ class MainDialogWithBackupTest(BaseAppTest):
         self.assertIsInstance(card, BackupCard)
         initial_status = dict(card.status._data)
         # When Status of instance get updated
-        t = self.instance.status
-        t.lastresult = 'SUCCESS'
-        t.lastsuccess = Datetime()
-        t.lastdate = t.lastsuccess
-        t.save()
+        self.instance.status.lastresult = 'SUCCESS'
+        self.instance.status.lastsuccess = Datetime()
+        self.instance.status.lastdate = self.instance.status.lastsuccess
+        self.instance.save_status()
         await asyncio.sleep(1)
         await self.pump_events()
         # Then status get reloaded
@@ -67,9 +67,8 @@ class MainDialogWithBackupTest(BaseAppTest):
         self.assertIsInstance(card, BackupCard)
         initial_settings = dict(card.settings._data)
         # When Status of instance get updated
-        t = self.instance.settings
-        t.pause_until = Datetime() + datetime.timedelta(hours=1)
-        t.save()
+        self.instance.settings.pause_until = Datetime() + datetime.timedelta(hours=1)
+        self.instance.save_settings()
         await asyncio.sleep(1)
         await self.pump_events()
         # Then settings get reloaded

@@ -1,7 +1,7 @@
 # Copyright (C) 2025 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-from minarca_client.core.backup import BackupInstance, Patterns
+from minarca_client.core.backup import Patterns
 from minarca_client.ui.backup_create import BackupCreate
 from minarca_client.ui.backup_patterns import BackupPatterns
 from minarca_client.ui.tests import BaseAppTest
@@ -10,16 +10,17 @@ from minarca_client.ui.tests import BaseAppTest
 class BackupPatternsTest(BaseAppTest):
     ACTIVE_VIEW = 'backup_patterns.BackupPatterns'
 
-    def setUp(self):
-        super().setUp()
+    def setup_backup(self):
+        backup = super().setup_backup()
         # Given a local backup
-        self.instance = instance = BackupInstance('1')
+        self.instance = instance = backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         # With patterns
         instance.patterns.extend(Patterns.defaults())
-        instance.patterns.save()
+        instance.save_patterns()
         self.ACTIVE_VIEW_KWARGS = {'instance': instance, 'create': True}
+        return backup
 
     async def test_view(self):
         # Then the view get displayed.

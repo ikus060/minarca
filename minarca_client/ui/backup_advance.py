@@ -134,7 +134,7 @@ class BackupAdvanceSettings(MDBoxLayout):
             settings.pre_hook_command = self.pre_hook_command
             settings.post_hook_command = self.post_hook_command
             settings.ignore_hook_errors = self.ignore_hook_errors
-            settings.save()
+            self.instance.save_settings()
             # Redirect user to dashboard.
             App.get_running_app().set_active_view('dashboard.DashboardView')
         except Exception as e:

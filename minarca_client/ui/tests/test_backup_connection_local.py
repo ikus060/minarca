@@ -8,7 +8,6 @@ from unittest import mock
 
 from minarca_client.core.compat import rmtree
 from minarca_client.core.disk import LocationInfo, get_location_info
-from minarca_client.core.instance import BackupInstance
 from minarca_client.ui.backup_connection_local import BackupConnectionLocal
 from minarca_client.ui.backup_create import BackupCreate
 from minarca_client.ui.backup_patterns import BackupPatterns
@@ -46,14 +45,14 @@ class BackupConnectionLocalTest(BaseAppTest):
 
     async def test_btn_refresh(self):
         # Given a local backup instance that doesn't exists
-        self.instance = BackupInstance('1')
+        self.instance = self.app.backup._new_instance()
         self.instance.settings.localuuid = 'e347e062-0912-48f9-a211-12dbe97b1f13'
         self.instance.settings.localrelpath = 'minarca/my-desktop'
         self.instance.settings.localmountpoint = '/media/7DBC7A0C46439F04'
         self.instance.settings.localcaption = 'Generic Mass Storage'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the settings
         self.app.set_active_view(self.ACTIVE_VIEW, create=False, instance=self.instance)
         # When user click on refresh, then disk list get refreshed.
@@ -75,14 +74,14 @@ class BackupConnectionLocalTest(BaseAppTest):
 
     async def test_btn_save(self):
         # Given a local backup instance already exists.
-        self.instance = BackupInstance('1')
+        self.instance = self.app.backup._new_instance()
         self.instance.settings.localuuid = 'e347e062-0912-48f9-a211-12dbe97b1f13'
         self.instance.settings.localrelpath = 'minarca/my-desktop'
         self.instance.settings.localmountpoint = '/media/7DBC7A0C46439F04'
         self.instance.settings.localcaption = 'Generic Mass Storage'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         await self.view._refresh_locations_task
         # Mock Backup instance
         self.view.backup = backup = mock.AsyncMock()
@@ -141,14 +140,14 @@ class BackupConnectionLocalTest(BaseAppTest):
 
     async def test_with_local_destination_not_found(self):
         # Given a local backup instance that doesn't exists
-        self.instance = BackupInstance('1')
+        self.instance = self.app.backup._new_instance()
         self.instance.settings.localuuid = 'e347e062-0912-48f9-a211-12dbe97b1f13'
         self.instance.settings.localrelpath = 'minarca/my-desktop'
         self.instance.settings.localmountpoint = '/media/7DBC7A0C46439F04'
         self.instance.settings.localcaption = 'Generic Mass Storage'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the settings
         self.app.set_active_view(self.ACTIVE_VIEW, create=False, instance=self.instance)
         await self.pump_events()
@@ -183,14 +182,14 @@ class BackupConnectionLocalTest(BaseAppTest):
     )
     async def test_forget_instance(self, mock_question_dialog):
         # Given a local backup instance
-        self.instance = BackupInstance('1')
+        self.instance = self.app.backup._new_instance()
         self.instance.settings.localuuid = 'e347e062-0912-48f9-a211-12dbe97b1f13'
         self.instance.settings.localrelpath = 'minarca/my-desktop'
         self.instance.settings.localmountpoint = '/media/7DBC7A0C46439F04'
         self.instance.settings.localcaption = 'Generic Mass Storage'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the settings
         self.app.set_active_view(self.ACTIVE_VIEW, create=False, instance=self.instance)
         await self.pump_events()

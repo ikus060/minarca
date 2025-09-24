@@ -120,10 +120,11 @@ class MinarcaApp(MDApp, ExceptionHandler):
             detail=_(
                 'Please check the logs for more information. If this problem '
                 'occurs again, report it to support.\n\n'
-                'Details: %s\n\n'
+                'Details: %s\n'
+                '%s\n\n'
                 'The application will now quit.'
             )
-            % str(exception),
+            % (exception.__class__.__name__, str(exception)),
         )
         self.stop()
 

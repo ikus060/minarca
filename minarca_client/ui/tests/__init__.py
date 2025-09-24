@@ -38,12 +38,15 @@ class BaseAppTest(unittest.IsolatedAsyncioTestCase):
         # Clear the temporary working directory
         self.tmp.cleanup()
 
+    def setup_backup(self):
+        return Backup()
+
     async def asyncSetUp(self):
         # Make sure the app is not running.
         self.assertIsNone(MinarcaApp.get_running_app())
 
         # Starting Minarca application using asyncio.
-        self.app = MinarcaApp(backup=Backup())
+        self.app = MinarcaApp(backup=self.setup_backup())
         self._task = asyncio.create_task(self.app.async_run())
         await self.pump_events()
 

@@ -4,7 +4,6 @@
 import asyncio
 import time
 
-from minarca_client.core.backup import BackupInstance
 from minarca_client.ui.backup_logs import BackupLogs
 from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
@@ -13,22 +12,22 @@ from minarca_client.ui.tests import BaseAppTest
 class BackupLogsTest(BaseAppTest):
     ACTIVE_VIEW = 'backup_logs.BackupLogs'
 
-    def setUp(self):
-        super().setUp()
+    def setup_backup(self):
+        backup = super().setup_backup()
         # Given a local backup
-        self.instance = instance = BackupInstance('1')
+        self.instance = instance = backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         self.ACTIVE_VIEW_KWARGS = {'instance': instance}
+        return backup
 
     async def test_update_logs(self):
         # Given user display backup logs
         self.assertIsInstance(self.view, BackupLogs)
         # When backup action get trigger and write to logs
-        status = self.instance.status
-        status.action = 'backup'
-        status.lastdate = int(time.time())
-        status.save()
+        self.instance.status.action = 'backup'
+        self.instance.status.lastdate = int(time.time())
+        self.instance.save_status()
         with open(self.instance.backup_log_file, 'w+') as f:
             f.write('first line of logs\n')
             f.write('second line of text\n')

@@ -353,11 +353,11 @@ class BackupSettings(MDBoxLayout):
     async def _save(self):
         try:
             # In create mode, save change and go to backup settings.
-            t = self.instance.settings
-            t.schedule = self.schedule
-            t.ignore_weekday = [idx for idx, value in enumerate(self.ignore_weekday) if value]
-            t.maxage = self.maxage
-            t.keepdays = self.keepdays
+            s = self.instance.settings
+            s.schedule = self.schedule
+            s.ignore_weekday = [idx for idx, value in enumerate(self.ignore_weekday) if value]
+            s.maxage = self.maxage
+            s.keepdays = self.keepdays
             # Asynchronously start backup when creating.
             if self.create:
                 self.instance.start_backup(force=True)
@@ -367,7 +367,7 @@ class BackupSettings(MDBoxLayout):
                 wait = self.create
                 await self.instance.save_remote_settings(wait=wait)
             # Finnaly save the changes.
-            t.save()
+            self.instance.save_settings()
             # Make sure a task scheduler is created at this point.
             self.backup.schedule_job(replace=False)
             # Redirect user to dashboard.
@@ -392,7 +392,7 @@ class BackupSettings(MDBoxLayout):
             )
             if ret:
                 # Finnaly save the changes.
-                t.save()
+                s.save()
                 # Redirect user to dashboard.
                 App.get_running_app().set_active_view('dashboard.DashboardView')
         except TimeoutError:
@@ -432,7 +432,7 @@ class BackupSettings(MDBoxLayout):
             if not ret:
                 # Operation cancel by user.
                 return
-            self.instance.forget()
+            self.backup.delete_instance(self.instance)
             App.get_running_app().set_active_view('dashboard.DashboardView')
 
         # Prompt in a different thread.

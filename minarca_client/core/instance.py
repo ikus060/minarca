@@ -12,6 +12,7 @@ import datetime
 import functools
 import logging
 import os
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -34,6 +35,8 @@ from minarca_client.core.exceptions import (
 from minarca_client.core.pattern import Pattern, Patterns
 from minarca_client.core.settings import Datetime, Settings
 from minarca_client.core.status import Status, UpdateStatus, UpdateStatusNotification
+
+STATUS_RE = re.compile(r"^status(\d+)\.properties$")
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +129,7 @@ def safe_keepawake():
 
 
 class BackupInstance:
-    def __init__(self, id):
+    def __init__(self, config_home, data_home, id):
         """
         Create a new minarca backup instance.
         """
@@ -134,20 +137,36 @@ class BackupInstance:
         self.id = id
         self.log_id = f'instance {self.id}' if str(self.id) else 'instance default'
         # Get file locations.
-        config_home = compat.get_config_home()
         self.public_key_file = config_home / f"id_rsa{id}.pub"
         self.private_key_file = config_home / f"id_rsa{id}"
         self.known_hosts = config_home / f"known_hosts{id}"
-        self.config_file = config_home / f"minarca{id}.properties"
+        self.settings_file = config_home / f"minarca{id}.properties"
         self.patterns_file = config_home / f"patterns{id}"
-        data_home = compat.get_data_home()
         self.status_file = data_home / f"status{id}.properties"
         self.backup_log_file = data_home / f"backup{id}.log"
         self.restore_log_file = data_home / f"restore{id}.log"
         # Create wrapper around config files.
-        self.patterns = Patterns(self.patterns_file)
-        self.status = Status(self.status_file)
-        self.settings = Settings(self.config_file)
+        self.patterns = Patterns()
+        self.status = Status()
+        self.settings = Settings()
+
+    def load_patterns(self) -> None:
+        self.patterns = Patterns.from_file(self.patterns_file)
+
+    def load_status(self) -> None:
+        self.status = Status.from_file(self.status_file)
+
+    def load_settings(self) -> None:
+        self.settings = Settings.from_file(self.settings_file)
+
+    def save_patterns(self) -> None:
+        self.patterns.save_file(self.patterns_file)
+
+    def save_status(self) -> None:
+        self.status.save_file(self.status_file)
+
+    def save_settings(self) -> None:
+        self.settings.save_file(self.settings_file)
 
     async def _run_hooks(self, command, ignore_errors, log_file):
         # No command, leave function.
@@ -196,7 +215,7 @@ class BackupInstance:
         if self.settings.pause_until is not None:
             logger.debug(f"{self.log_id}: clearing pause setting as backup started with force")
             self.settings.pause_until = None
-            self.settings.save()
+            self.save_settings()
 
         with safe_keepawake():
             with UpdateStatusNotification(instance=self):
@@ -353,7 +372,7 @@ class BackupInstance:
             self.settings.pause_until = Datetime() + datetime.timedelta(hours=delay)
         else:
             self.settings.pause_until = None
-        self.settings.save()
+        self.save_settings()
         logger.debug(f"{self.log_id}: backup paused for {delay} hours")
 
     async def _push_identity(self, conn, name):
@@ -531,32 +550,6 @@ class BackupInstance:
             await self._rdiff_backup(*args)
         elif self.is_local():
             self.find_local_destination()
-
-    def forget(self):
-        """
-        Disconnect this client from server.
-        """
-        logger.debug(f"{self.log_id}: forgetting this instance from server")
-        # Delete configuration file (support deleting readonly file).
-        for fn in [
-            self.public_key_file,
-            self.private_key_file,
-            self.known_hosts,
-            self.patterns_file,
-            self.status_file,
-            self.config_file,
-        ]:
-            if not fn.is_file():
-                continue
-            try:
-                compat.secure_file(fn, mode=0o600)
-                fn.unlink()
-                logger.debug(f"{self.log_id}: deleted file: {fn}")
-            except OSError:
-                logger.warning(f"{self.log_id}: cannot delete file: {fn}", exc_info=1)
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, BackupInstance) and self.id == other.id
 
     def _backup_path(self, path):
         """

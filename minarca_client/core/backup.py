@@ -9,13 +9,12 @@ Created on Oct. 13, 2023, 2021
 
 import asyncio
 import datetime
-import fnmatch
 import logging
-import os
 import re
 import uuid
 from collections import namedtuple
 from pathlib import Path
+from typing import Dict
 
 from minarca_client.core.compat import (
     IS_WINDOWS,
@@ -23,6 +22,7 @@ from minarca_client.core.compat import (
     file_read_async,
     file_write_async,
     get_config_home,
+    get_data_home,
     get_minarca_exe,
     rmtree,
     secure_file,
@@ -47,6 +47,8 @@ logger = logging.getLogger(__name__)
 
 InstanceId = namedtuple('InstanceId', 'value')
 
+INSTANCE_RE = re.compile(r"^minarca(\d*)\.properties$")
+
 
 def _check_repositoryname(name):
     if not re.match(_REPOSITORY_NAME_PATTERN, name):
@@ -64,54 +66,73 @@ class Backup:
         """
         self.scheduler = Scheduler()
         self._config_home = get_config_home()
+        self._data_home = get_data_home()
+        self._instances: Dict[str, BackupInstance] = {}
+        self.rescan()
 
-    def _entries(self):
-        """Return list of config files"""
-        return [fn for fn in os.listdir(self._config_home) if fnmatch.fnmatch(fn, "minarca*.properties")]
+    # Discover minarcaN.properties; statusN.properties are optional.
+    def rescan(self) -> None:
+        found_ids = {
+            m.group(1) for p in self._config_home.iterdir() if p.is_file() and (m := INSTANCE_RE.match(p.name))
+        }
+        # Remove deleted
+        for id in set(self._instances) - found_ids:
+            self._instances.pop(id, None)
+        # Add new and refresh props+status for all
+        for id in sorted(found_ids):
+            inst = self._instances.get(id) or BackupInstance(self._config_home, self._data_home, id)
+            inst.load_status()
+            inst.load_settings()
+            inst.load_patterns()
+            self._instances[id] = inst
 
     def __iter__(self):
         """
         Return an iterator on backup instances.
         """
-        filenames = sorted(self._entries())
-        return iter([BackupInstance(fn[7:-11]) for fn in filenames])
+        return iter(self._instances.values())
 
     def __len__(self):
-        return len(self._entries())
+        return len(self._instances)
 
     def __bool__(self):
         # Required for assert
         return True
 
     def __getitem__(self, key):
-        assert isinstance(key, int) or isinstance(key, InstanceId) or isinstance(key, str)
+        assert (
+            isinstance(key, int)
+            or isinstance(key, InstanceId)
+            or isinstance(key, str)
+            or isinstance(key, BackupInstance)
+        )
         if isinstance(key, int):
             # If key is an integer, this is the index value
-            filenames = sorted(self._entries())
-            fn = filenames[key]
-            num = fn[7:-11]
-            return BackupInstance(num)
+            ids = sorted(set(self._instances))
+            id = ids[key]
+            return self._instances[id]
         if isinstance(key, str):
             # If key is a string, this is the "num"
-            instance = BackupInstance(key)
-            if instance not in self:
+            if key not in self._instances:
                 raise InstanceNotFoundError(key)
-            return instance
+            return self._instances[key]
         # If key is a list, return list of corresponding instances.
         if isinstance(key, InstanceId):
             if key.value is None:
                 return list(self)
             criterias = key.value.split(',')
             # TODO Add more matching criteria. e.g.: remoteurl
-            instances = [instance for instance in self if str(instance.id) in criterias]
+            instances = [instance for instance in self._instances.values() if str(instance.id) in criterias]
             # Raise error if nothing matches our instance_id.
             if not instances:
                 raise InstanceNotFoundError(key.value)
             return instances
+        if isinstance(key, BackupInstance):
+            return self._instances[key.id]
 
     def __contains__(self, other):
         assert isinstance(other, BackupInstance)
-        return ("minarca%s.properties" % other.id) in self._entries()
+        return other.id in self._instances
 
     def start_all(self, action='backup', force=False, patterns=None, instance_id=None):
         logger.debug(
@@ -235,17 +256,21 @@ class Backup:
         instance.status.clear()
 
         # Save configuration
-        with instance.settings as t:
-            t.repositoryname = repositoryname
-            t.localuuid = localuuid
-            t.localrelpath = disk_info.relpath
-            t.localmountpoint = disk_info.mountpoint
-            t.localcaption = disk_info.caption
-            t.schedule = Settings.DAILY
-            # Pause 1 hour to avoid getting started while configuring.
-            t.pause_until = Datetime() + datetime.timedelta(hours=1)
-            # Save configuration
-            t.configured = True
+        s = instance.settings
+        s.repositoryname = repositoryname
+        s.localuuid = localuuid
+        s.localrelpath = disk_info.relpath
+        s.localmountpoint = disk_info.mountpoint
+        s.localcaption = disk_info.caption
+        s.schedule = Settings.DAILY
+        # Pause 1 hour to avoid getting started while configuring.
+        s.pause_until = Datetime() + datetime.timedelta(hours=1)
+        # Save configuration
+        s.configured = True
+
+        instance.save_status()
+        instance.save_patterns()
+        instance.save_settings()
 
         logger.debug(f"local instance configured: {instance.id}")
         return instance
@@ -314,9 +339,11 @@ class Backup:
         # Define default patterns if none are defined.
         if len(instance.patterns) == 0:
             instance.patterns.extend(Patterns.defaults())
+        instance.save_patterns()
 
         # Clear previous status file
         instance.status.clear()
+        instance.save_status()
 
         # For data consistency. Also store existing configuration if repo exists.
         if exists:
@@ -334,36 +361,77 @@ class Backup:
         instance.settings.pause_until = Datetime() + datetime.timedelta(hours=1)
         # Save configuration
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         logger.debug(f"remote instance configured: {instance.id}")
 
         return instance
 
-    def _new_instance(self):
+    def _next_free_id(self) -> int:
+        n = 0
+        while n in self._instances:
+            n += 1
+        return n
+
+    def _new_instance(self) -> BackupInstance:
+        iid = self._next_free_id()
+        inst = BackupInstance(self._config_home, self._data_home, iid)
+        self._instances[iid] = inst
+        return inst
+
+    def delete_instance(self, key) -> None:
+        instances = self.__getitem__(key)
+        instances = instances if hasattr(instances, '__iter__') else [instances]
+        for inst in instances:
+            for p in (
+                inst.status_file,
+                inst.patterns_file,
+                inst.backup_log_file,
+                inst.restore_log_file,
+                inst.settings_file,
+                inst.public_key_file,
+                inst.private_key_file,
+                inst.known_hosts,
+            ):
+                try:
+                    secure_file(p, mode=0o600)
+                    p.unlink(missing_ok=True)
+                except Exception:
+                    pass
+            self._instances.pop(inst.id)
+
+    def forget(self):
         """
-        Create a new instance of Backup without configuration.
+        Disconnect this client from server.
         """
-        try:
-            idx = int(self[-1].id) if len(self) else 0
-        except ValueError:
-            idx = 0
-        while True:
-            instance = BackupInstance(idx)
-            if instance in self:
-                idx += 1
+        logger.debug(f"{self.log_id}: forgetting this instance from server")
+        # Delete configuration file (support deleting readonly file).
+        for fn in [
+            self.public_key_file,
+            self.private_key_file,
+            self.known_hosts,
+            self.patterns_file,
+            self.status_file,
+            self.settings_file,
+        ]:
+            if not fn.is_file():
                 continue
-            return instance
+            try:
+                secure_file(fn, mode=0o600)
+                fn.unlink()
+                logger.debug(f"{self.log_id}: deleted file: {fn}")
+            except OSError:
+                logger.warning(f"{self.log_id}: cannot delete file: {fn}", exc_info=1)
 
     async def awatch(self, poll_delay_ms=250):
         """
         Return changes whenever the file gets updated.
         """
         logger.debug(f"starting async watch with poll delay: {poll_delay_ms} ms")
-        prev_entries = self._entries()
+        files = set(self._config_home.iterdir())
         while True:
             await asyncio.sleep(poll_delay_ms / 1000)
-            new_entries = self._entries()
-            if prev_entries != new_entries:
+            new_files = set(self._config_home.iterdir())
+            if files != new_files:
                 logger.debug("backup instances updated")
                 yield "changed"
-            prev_entries = new_entries
+            files = new_files

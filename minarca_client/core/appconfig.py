@@ -67,4 +67,4 @@ class AppConfig(KeyValueConfigFile):
     ]
 
 
-appconfig = AppConfig(branding_fn)
+appconfig = AppConfig.from_file(branding_fn)

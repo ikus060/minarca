@@ -12,11 +12,17 @@ import datetime
 import logging
 import os
 
+import psutil
+
 from minarca_client.core.config import Datetime, KeyValueConfigFile
 from minarca_client.core.notification import clear_notification, send_notification
 from minarca_client.locale import _
 
 logger = logging.getLogger(__name__)
+
+
+RUNNING_DELAY = 5  # When running status file get updated every 5 seconds.
+
 
 LAST_RESULTS = ['SUCCESS', 'FAILURE', 'RUNNING', 'STALE', 'INTERRUPT']
 
@@ -41,26 +47,24 @@ class Status(KeyValueConfigFile):
         Return a backup status. Read data from the status file and make
         interpretation of it.
         """
-        import psutil
 
         now = Datetime()
         # After reading the status file, let determine the real status.
-        data = dict(self._data)
-        if data.get('lastresult') == 'RUNNING':
+        if self._data.get('lastresult') == 'RUNNING':
             # Get pid and checkif process is running.
-            pid = data.get('pid')
+            pid = self._data.get('pid')
             if not pid:
                 return 'INTERRUPT'
             try:
-                psutil.Process(data.get('pid')).is_running()
+                psutil.Process(self._data.get('pid')).is_running()
             except (ValueError, psutil.NoSuchProcess):
                 return 'INTERRUPT'
             # Then let check if the status file was updated within the last 10 seconds.
-            lastdate = data.get('lastdate')
+            lastdate = self._data.get('lastdate')
             if lastdate and now - lastdate > datetime.timedelta(seconds=self.RUNNING_DELAY * 2):
                 return 'STALE'
         # By default return lastresult value.
-        return data.get('lastresult')
+        return self._data.get('lastresult')
 
 
 class UpdateStatus:
@@ -71,17 +75,17 @@ class UpdateStatus:
     def __init__(self, instance, action='backup'):
         assert action in ['backup', 'restore']
         self.instance = instance
-        self.status = instance.status
         self.action = action
         self.running = False
 
     def _write_status(self):
-        self.status.pid = os.getpid()
-        self.status.lastresult = 'RUNNING'
-        self.status.lastdate = Datetime()
-        self.status.details = ''
-        self.status.action = self.action
-        self.status.save()
+        s = self.instance.status
+        s.pid = os.getpid()
+        s.lastresult = 'RUNNING'
+        s.lastdate = Datetime()
+        s.details = ''
+        s.action = self.action
+        self.instance.save_status()
 
     async def _task(self):
         """Update the status file continiously with new data."""
@@ -99,19 +103,20 @@ class UpdateStatus:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         self.running = False
         await self.task
+        s = self.instance.status
         if exc_type is None:
             logger.info(f"{self.instance.log_id}: {self.action} SUCCESS")
-            with self.status as t:
-                t.lastresult = 'SUCCESS'
-                t.lastsuccess = Datetime()
-                t.lastdate = self.status.lastsuccess
-                t.details = ''
+            s.lastresult = 'SUCCESS'
+            s.lastsuccess = Datetime()
+            s.lastdate = s.lastsuccess
+            s.details = ''
+            self.instance.save_status()
         else:
             logger.error(f"{self.instance.log_id}: {self.action} FAILED")
-            with self.status as t:
-                t.lastresult = 'FAILURE'
-                t.lastdate = Datetime()
-                t.details = str(exc_val)
+            s.lastresult = 'FAILURE'
+            s.lastdate = Datetime()
+            s.details = str(exc_val)
+            self.instance.save_status()
 
 
 class UpdateStatusNotification:
@@ -160,7 +165,7 @@ class UpdateStatusNotification:
                     status.lastnotificationdate = Datetime()
                 except Exception:
                     logger.warning(f"{self.instance.id}: problem while sending new notification", exc_info=1)
-        status.save()
+        self.instance.save_status()
 
     def is_notification_time(self):
         """

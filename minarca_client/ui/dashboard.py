@@ -84,6 +84,7 @@ class DashboardView(MDBoxLayout):
         """
         try:
             async for unused in backup.awatch():
+                backup.rescan()
                 self.instances = list(backup)
         except Exception:
             logger.exception('problem occur while watching backup instances')

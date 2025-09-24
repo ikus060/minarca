@@ -201,7 +201,7 @@ class BackupLogs(MDBoxLayout):
         try:
             last_action = self.status.action
             async for unused in watch_file(self.instance.status_file, timeout=self.status.RUNNING_DELAY):
-                self.status.reload()
+                self.instance.load_status()
                 self.property('status').dispatch(self)
                 if last_action != self.status.action:
                     last_action = self.status.action

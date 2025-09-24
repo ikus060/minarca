@@ -6,7 +6,6 @@ from unittest import mock
 
 import responses
 
-from minarca_client.core.backup import BackupInstance
 from minarca_client.core.compat import ssh_keygen
 from minarca_client.ui.backup_patterns import BackupPatterns
 from minarca_client.ui.backup_settings import BackupSettings
@@ -17,13 +16,14 @@ from minarca_client.ui.tests import BaseAppTest
 class BackupSettingsTest(BaseAppTest):
     ACTIVE_VIEW = 'backup_settings.BackupSettings'
 
-    def setUp(self):
-        super().setUp()
+    def setup_backup(self):
+        backup = super().setup_backup()
         # Given a local backup
-        self.instance = instance = BackupInstance('1')
+        self.instance = instance = backup._new_instance()
         instance.settings.configured = True
-        instance.settings.save()
+        instance.save_settings()
         self.ACTIVE_VIEW_KWARGS = {'instance': instance, 'create': True}
+        return backup
 
     async def test_view(self):
         # Then the view get displayed.
@@ -35,7 +35,7 @@ class BackupSettingsTest(BaseAppTest):
         self.instance.settings.keepdays = 2
         self.instance.settings.ignore_weekday = [5, 6]
         self.instance.settings.schedule = 12
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the backup settings
         self.app.set_active_view('backup_settings.BackupSettings', instance=self.instance, create=False)
         await self.pump_events()
@@ -91,7 +91,7 @@ class BackupSettingsTest(BaseAppTest):
         self.instance.settings.keepdays = 2
         self.instance.settings.ignore_weekday = [5, 6]
         self.instance.settings.schedule = 12
-        self.instance.settings.save()
+        self.instance.save_settings()
         ssh_keygen(self.instance.public_key_file, self.instance.private_key_file)
         self.assertTrue(self.instance.is_remote())
         # When editing the backup settings
@@ -149,13 +149,13 @@ class BackupSettingsTest(BaseAppTest):
     @mock.patch('minarca_client.ui.backup_settings.question_dialog', new_callable=mock.AsyncMock, return_value=True)
     async def test_forget_instance(self, mock_question_dialog):
         # Given a remote backup instance
-        self.instance = BackupInstance('1')
+        self.instance = self.app.backup._new_instance()
         self.instance.settings.remotehost = 'remotehost'
         self.instance.settings.remoteurl = 'http://localhost'
         self.instance.settings.repositoryname = 'test-repo'
         self.instance.settings.username = 'username'
         self.instance.settings.configured = True
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the settings
         self.app.set_active_view(self.ACTIVE_VIEW, create=False, instance=self.instance)
         # When user click on  forget instance button
@@ -173,7 +173,7 @@ class BackupSettingsTest(BaseAppTest):
         self.instance.settings.keepdays = 2
         self.instance.settings.ignore_weekday = [5, 6]
         self.instance.settings.schedule = 12
-        self.instance.settings.save()
+        self.instance.save_settings()
         # When editing the backup settings
         self.app.set_active_view('backup_settings.BackupSettings', instance=self.instance, create=True)
         # Then no exception get raised.
