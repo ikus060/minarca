@@ -60,7 +60,7 @@ class DashboardView(MDBoxLayout):
         assert backup is not None
         super().__init__()
         # Initialize the instance list
-        self.instances = list(backup)
+        self.instances = list(backup.instances.values())
         # Keep the view up-to-date by refreshing the instances
         self._task = asyncio.create_task(self._watch_instances(backup))
 
@@ -85,7 +85,7 @@ class DashboardView(MDBoxLayout):
         try:
             async for unused in backup.awatch():
                 backup.rescan()
-                self.instances = list(backup)
+                self.instances = list(backup.instances.values())
         except Exception:
             logger.exception('problem occur while watching backup instances')
 

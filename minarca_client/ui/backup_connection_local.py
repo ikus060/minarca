@@ -566,7 +566,7 @@ class BackupConnectionLocal(MDBoxLayout):
             if not ret:
                 # Operation cancel by user.
                 return
-            self.backup.delete_instance(self.instance)
+            self.backup.delete_instance(self.instance.id)
             App.get_running_app().set_active_view('dashboard.DashboardView')
 
         self._forget_task = asyncio.create_task(_forget_instance())

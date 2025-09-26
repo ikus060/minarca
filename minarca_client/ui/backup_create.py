@@ -148,7 +148,7 @@ class BackupCreate(CScrollView):
     def __init__(self, backup=None):
         super().__init__()
         assert backup is not None
-        self.backup_exists = len(backup) > 0
+        self.backup_exists = len(backup.instances) > 0
 
     def _create_remote(self):
         App.get_running_app().set_active_view('backup_connection_remote.BackupConnectionRemote', create=True)

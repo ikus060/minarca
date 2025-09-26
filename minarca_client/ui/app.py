@@ -165,7 +165,7 @@ class MinarcaApp(MDApp, ExceptionHandler):
         assert isinstance(view_class, str)
         assert '.' in view_class
         # Regirect to Create backup if empty.
-        if view_class == 'dashboard.DashboardView' and len(self.backup) <= 0:
+        if view_class == 'dashboard.DashboardView' and len(self.backup.instances) <= 0:
             view_class = 'backup_create.BackupCreate'
         class_ref = self._find_class(view_class)
 

@@ -296,7 +296,7 @@ class BackupPatterns(MDBoxLayout):
     def cancel(self):
         # In create mode, destroy the configuration and go to dashboard.
         if self.create:
-            self.backup.delete_instance(self.instance)
+            self.backup.delete_instance(self.instance.id)
         App.get_running_app().set_active_view('dashboard.DashboardView')
 
     def save(self):

@@ -18,7 +18,7 @@ from unittest import mock
 from parameterized import parameterized
 
 from minarca_client import main
-from minarca_client.core import Backup, InstanceId
+from minarca_client.core import Backup
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.exceptions import BackupError, HttpAuthenticationError
 from minarca_client.core.pattern import Pattern
@@ -43,36 +43,32 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._backup')
     def test_args_backup(self, mock_backup):
         main.main(['backup'])
-        mock_backup.assert_called_once_with(force=False, instance_id=InstanceId(None))
+        mock_backup.assert_called_once_with(force=False, instance_id='all')
 
     @mock.patch('minarca_client.main._backup')
     def test_args_backup_force(self, mock_backup):
         main.main(['backup', '--force'])
-        mock_backup.assert_called_once_with(force=True, instance_id=InstanceId(None))
+        mock_backup.assert_called_once_with(force=True, instance_id='all')
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_exclude(self, mock_pattern):
         main.main(['exclude', '*.bak'])
-        mock_pattern.assert_called_once_with(include=False, pattern=['*.bak'], instance_id=InstanceId(None))
+        mock_pattern.assert_called_once_with(include=False, pattern=['*.bak'], instance_id='all')
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_exclude_multiple(self, mock_pattern):
         main.main(['exclude', '*.bak', '$~*', '/proc'])
-        mock_pattern.assert_called_once_with(
-            include=False, pattern=['*.bak', '$~*', '/proc'], instance_id=InstanceId(None)
-        )
+        mock_pattern.assert_called_once_with(include=False, pattern=['*.bak', '$~*', '/proc'], instance_id='all')
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_include(self, mock_pattern):
         main.main(['include', '*.bak'])
-        mock_pattern.assert_called_once_with(include=True, pattern=['*.bak'], instance_id=InstanceId(None))
+        mock_pattern.assert_called_once_with(include=True, pattern=['*.bak'], instance_id='all')
 
     @mock.patch('minarca_client.main._pattern')
     def test_args_include_multiple(self, mock_pattern):
         main.main(['include', '*.bak', '$~*', '/proc'])
-        mock_pattern.assert_called_once_with(
-            include=True, pattern=['*.bak', '$~*', '/proc'], instance_id=InstanceId(None)
-        )
+        mock_pattern.assert_called_once_with(include=True, pattern=['*.bak', '$~*', '/proc'], instance_id='all')
 
     @parameterized.expand(
         [
@@ -227,7 +223,7 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._patterns')
     def test_args_patterns(self, mock_patterns):
         main.main(['patterns'])
-        mock_patterns.assert_called_once_with(instance_id=InstanceId(None))
+        mock_patterns.assert_called_once_with(instance_id='all')
 
     @parameterized.expand(
         [
@@ -242,7 +238,7 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._pause')
     def test_args_pause(self, args, expected_call, mock_pause):
         main.main(['pause'] + args)
-        mock_pause.assert_called_once_with(**expected_call, instance_id=InstanceId(None))
+        mock_pause.assert_called_once_with(**expected_call, instance_id='all')
 
     @parameterized.expand(
         [
@@ -267,50 +263,50 @@ class TestMainParseArgs(unittest.TestCase):
     @mock.patch('minarca_client.main._restore')
     def test_args_restore(self, args, expected_call, mock_restore):
         main.main(['restore'] + args)
-        mock_restore.assert_called_once_with(**expected_call, instance_id=InstanceId(None))
+        mock_restore.assert_called_once_with(**expected_call, instance_id='all')
 
     @mock.patch('minarca_client.main._stop')
     def test_args_stop(self, mock_stop):
         main.main(['stop'])
-        mock_stop.assert_called_once_with(force=False, instance_id=InstanceId(None))
+        mock_stop.assert_called_once_with(force=False, instance_id='all')
 
     @mock.patch('minarca_client.main._stop')
     def test_args_stop_force(self, mock_stop):
         main.main(['stop', '--force'])
-        mock_stop.assert_called_once_with(force=True, instance_id=InstanceId(None))
+        mock_stop.assert_called_once_with(force=True, instance_id='all')
 
     @mock.patch('minarca_client.main._schedule')
     def test_args_schedule(self, mock_schedule):
         main.main(['schedule'])
         if IS_WINDOWS:
             mock_schedule.assert_called_once_with(
-                schedule=Settings.DAILY, username=None, password=None, instance_id=InstanceId(None)
+                schedule=Settings.DAILY, username=None, password=None, instance_id='all'
             )
         else:
-            mock_schedule.assert_called_once_with(schedule=Settings.DAILY, instance_id=InstanceId(None))
+            mock_schedule.assert_called_once_with(schedule=Settings.DAILY, instance_id='all')
 
     @mock.patch('minarca_client.main._status')
     def test_args_status(self, mock_status):
         main.main(['status'])
-        mock_status.assert_called_once_with(instance_id=InstanceId(None))
+        mock_status.assert_called_once_with(instance_id='all')
 
     @mock.patch('minarca_client.main._forget')
     def test_args_forget(self, mock_forget):
         main.main(['forget'])
-        mock_forget.assert_called_once_with(instance_id=InstanceId(None), force=False)
+        mock_forget.assert_called_once_with(instance_id='all', force=False)
 
     @mock.patch('minarca_client.main._forget')
     def test_args_unlink(self, mock_forget):
         main.main(['unlink'])
-        mock_forget.assert_called_once_with(instance_id=InstanceId(None), force=False)
+        mock_forget.assert_called_once_with(instance_id='all', force=False)
 
     @mock.patch('minarca_client.main.Backup')
     def test_backup(self, mock_backup):
         # Given a backup instance
         instance = mock.AsyncMock()
-        mock_backup.return_value.__getitem__.return_value = [instance]
+        mock_backup.return_value.find_all.return_value = [instance]
         # Calling backup with arguments.
-        _backup(force=False, instance_id=InstanceId(None))
+        _backup(force=False, instance_id='all')
         # Then backup get triggered with force=false
         instance.backup.assert_called_once_with(force=False)
 
@@ -318,9 +314,9 @@ class TestMainParseArgs(unittest.TestCase):
     def test_backup_force(self, mock_backup):
         # Given a backup instance
         instance = mock.AsyncMock()
-        mock_backup.return_value.__getitem__.return_value = [instance]
+        mock_backup.return_value.find_all.return_value = [instance]
         # Calling backup with --force
-        _backup(force=True, instance_id=InstanceId(None))
+        _backup(force=True, instance_id='all')
         # Then backup get triggered with force=false
         instance.backup.assert_called_once_with(force=True)
 
@@ -455,7 +451,7 @@ class TestMainParseArgs(unittest.TestCase):
     def test_restore(self, mock_backup):
         # Given a backup instance
         instance = mock.AsyncMock()
-        mock_backup.return_value.__getitem__.return_value = [instance]
+        mock_backup.return_value.find_all.return_value = [instance]
         # When calling restore
         main.main(['restore', '--force', './test'])
         # Then the first instance is used for restore.
@@ -465,7 +461,7 @@ class TestMainParseArgs(unittest.TestCase):
     def test_restore_with_destination(self, mock_backup):
         # Given a backup instance
         instance = mock.AsyncMock()
-        mock_backup.return_value.__getitem__.return_value = [instance]
+        mock_backup.return_value.find_all.return_value = [instance]
         # When calling restore
         main.main(['restore', '--force', '--destination', '/tmp', './test'])
         # Then the first instance is used for restore.
@@ -475,7 +471,7 @@ class TestMainParseArgs(unittest.TestCase):
     def test_start(self, mock_backup):
         # Given a backup instance
         instance = mock.MagicMock()
-        mock_backup.return_value.__getitem__.return_value = [instance]
+        mock_backup.return_value.find_all.return_value = [instance]
         # When calling start
         main.main(['start'])
         # Then start is triggered
@@ -485,7 +481,7 @@ class TestMainParseArgs(unittest.TestCase):
     def test_stop(self, mock_backup):
         # Given a backup instance
         instance = mock.MagicMock()
-        mock_backup.return_value.__getitem__.return_value = [instance]
+        mock_backup.return_value.find_all.return_value = [instance]
         # When calling stop
         main.main(['stop'])
         # Then all instances get stop
@@ -542,12 +538,12 @@ class TestMainParseArgs(unittest.TestCase):
         instance.settings.configured = True
         instance.save_settings()
         backup = Backup()
-        self.assertEqual(1, len(backup))
+        self.assertEqual(1, len(backup.instances))
         # When calling forget
         main.main(['forget', '--force'])
         # Then backup instance get removed
         backup.rescan()
-        self.assertEqual(0, len(backup))
+        self.assertEqual(0, len(backup.instances))
 
     def test_invalid_instance(self):
         # Given a backup instances
@@ -555,7 +551,7 @@ class TestMainParseArgs(unittest.TestCase):
         instance.settings.configured = True
         instance.save_settings()
         backup = Backup()
-        self.assertEqual(1, len(backup))
+        self.assertEqual(1, len(backup.instances))
         # When trying to list status with invalid instance_id
         # Then application raise an exception.
         f = io.StringIO()

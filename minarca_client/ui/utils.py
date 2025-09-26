@@ -4,7 +4,7 @@
 from kivy.properties import AliasProperty
 
 
-def alias_property(setter=None, bind=[], cache=False, rebind=False, watch_before_use=True):
+def alias_property(setter=None, bind=[], cache=False, rebind=False, watch_before_use=False):
     """
     Alias property decorator.
     """

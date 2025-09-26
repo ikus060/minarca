@@ -648,7 +648,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
         settings.configured = True
         settings.save_file(self.instance.settings_file)
         # forget
-        self.backup.delete_instance(self.instance)
+        self.backup.delete_instance(self.instance.id)
         settings = self.instance.settings
         self.assertEqual(False, settings.configured)
 
@@ -1180,7 +1180,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.instance.patterns.append(Pattern(True, self.tmp.name, None))
             self.instance.save_patterns()
             await self.instance.backup(force=True)
-            self.backup.delete_instance(self.instance)
+            self.backup.delete_instance(self.instance.id)
 
             # When trying to configure a local backup at the same destination
             # Then an exception is raised
@@ -1198,7 +1198,7 @@ class TestBackupInstance(unittest.IsolatedAsyncioTestCase):
             self.instance.patterns.append(Pattern(True, self.tmp.name, None))
             self.instance.save_patterns()
             await self.instance.backup(force=True)
-            self.backup.delete_instance(self.instance)
+            self.backup.delete_instance(self.instance.id)
             # When trying to configure a local backup at the same destination with Force mode
             self.instance = await self.backup.configure_local(tempdir, repositoryname='test-repo', force=True)
             # Then the backup get configured.

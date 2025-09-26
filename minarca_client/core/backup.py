@@ -12,7 +12,7 @@ import datetime
 import logging
 import re
 import uuid
-from collections import namedtuple
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Dict
 
@@ -45,14 +45,29 @@ _REPOSITORY_NAME_PATTERN = "^[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*$"
 
 logger = logging.getLogger(__name__)
 
-InstanceId = namedtuple('InstanceId', 'value')
-
 INSTANCE_RE = re.compile(r"^minarca(\d*)\.properties$")
+
+from typing import List
 
 
 def _check_repositoryname(name):
     if not re.match(_REPOSITORY_NAME_PATTERN, name):
         raise InvalidRepositoryName(name)
+
+
+class DictWrapper(Mapping):
+
+    def __init__(self, data):
+        self._data = data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return iter(self._data)
 
 
 class Backup:
@@ -70,6 +85,31 @@ class Backup:
         self._instances: Dict[str, BackupInstance] = {}
         self.rescan()
 
+    @property
+    def instances(self):
+        return DictWrapper(self._instances)
+
+    def find_all(self, ids: str) -> List["BackupInstance"]:
+        """
+        Return a list of backup instances.
+
+        ids:
+          - "all" to return every instance,
+          - a single id (int|str),
+          - a comma-separated string of ids,
+          - or an iterable of ids.
+        """
+        if not isinstance(ids, str):
+            raise TypeError("ids must be a string")
+        if ids == 'all':
+            return list(self._instances.values())
+        criterias = {p.strip() for p in ids.split(",")}
+        instances = [inst for inst in self._instances.values() if str(inst.id) in criterias]
+        # Raise error if nothing matches our instance_id.
+        if not instances:
+            raise InstanceNotFoundError(ids)
+        return instances
+
     # Discover minarcaN.properties; statusN.properties are optional.
     def rescan(self) -> None:
         found_ids = {
@@ -85,54 +125,6 @@ class Backup:
             inst.load_settings()
             inst.load_patterns()
             self._instances[id] = inst
-
-    def __iter__(self):
-        """
-        Return an iterator on backup instances.
-        """
-        return iter(self._instances.values())
-
-    def __len__(self):
-        return len(self._instances)
-
-    def __bool__(self):
-        # Required for assert
-        return True
-
-    def __getitem__(self, key):
-        assert (
-            isinstance(key, int)
-            or isinstance(key, InstanceId)
-            or isinstance(key, str)
-            or isinstance(key, BackupInstance)
-        )
-        if isinstance(key, int):
-            # If key is an integer, this is the index value
-            ids = sorted(set(self._instances))
-            id = ids[key]
-            return self._instances[id]
-        if isinstance(key, str):
-            # If key is a string, this is the "num"
-            if key not in self._instances:
-                raise InstanceNotFoundError(key)
-            return self._instances[key]
-        # If key is a list, return list of corresponding instances.
-        if isinstance(key, InstanceId):
-            if key.value is None:
-                return list(self)
-            criterias = key.value.split(',')
-            # TODO Add more matching criteria. e.g.: remoteurl
-            instances = [instance for instance in self._instances.values() if str(instance.id) in criterias]
-            # Raise error if nothing matches our instance_id.
-            if not instances:
-                raise InstanceNotFoundError(key.value)
-            return instances
-        if isinstance(key, BackupInstance):
-            return self._instances[key.id]
-
-    def __contains__(self, other):
-        assert isinstance(other, BackupInstance)
-        return other.id in self._instances
 
     def start_all(self, action='backup', force=False, patterns=None, instance_id=None):
         logger.debug(
@@ -176,7 +168,7 @@ class Backup:
         Return true if any of the backup instances is properly configured.
         """
         logger.debug("checking if any backup instance is configured")
-        return any(instance.settings.configured for instance in self)
+        return any(inst.settings.configured for inst in self._instances.values())
 
     async def configure_local(self, path, repositoryname, force=False, purge_destination=False, instance=None):
         """
@@ -205,12 +197,12 @@ class Backup:
         localuuid = await file_read_async(uuid_fn)
         if localuuid:
             others = [
-                other
-                for other in self
-                if other.is_local()
-                and other.settings.localuuid == localuuid
-                and other.settings.localrelpath == disk_info.relpath
-                and other.settings.repositoryname == repositoryname
+                other_inst
+                for other_inst in self._instances.values()
+                if other_inst.is_local()
+                and other_inst.settings.localuuid == localuuid
+                and other_inst.settings.localrelpath == disk_info.relpath
+                and other_inst.settings.repositoryname == repositoryname
             ]
             if others:
                 raise DuplicateSettingsError(others[0])
@@ -297,12 +289,12 @@ class Backup:
 
         # Check if the settings already exist.
         others = [
-            other
-            for other in self
-            if other.is_remote()
-            and other.settings.remoteurl == conn.remoteurl
-            and other.settings.repositoryname == repositoryname
-            and other.settings.username == username
+            other_inst
+            for other_inst in self._instances.values()
+            if other_inst.is_remote()
+            and other_inst.settings.remoteurl == conn.remoteurl
+            and other_inst.settings.repositoryname == repositoryname
+            and other_inst.settings.username == username
         ]
         if others:
             raise DuplicateSettingsError(others[0])
@@ -370,7 +362,7 @@ class Backup:
         n = 0
         while n in self._instances:
             n += 1
-        return n
+        return str(n)
 
     def _new_instance(self) -> BackupInstance:
         iid = self._next_free_id()
@@ -378,8 +370,12 @@ class Backup:
         self._instances[iid] = inst
         return inst
 
-    def delete_instance(self, key) -> None:
-        instances = self.__getitem__(key)
+    def delete_instance(self, id) -> None:
+        if not isinstance(id, str):
+            raise TypeError("id must be a string")
+        if id not in self._instances:
+            raise InstanceNotFoundError(id)
+        instances = self._instances[id]
         instances = instances if hasattr(instances, '__iter__') else [instances]
         for inst in instances:
             for p in (
@@ -398,29 +394,6 @@ class Backup:
                 except Exception:
                     pass
             self._instances.pop(inst.id)
-
-    def forget(self):
-        """
-        Disconnect this client from server.
-        """
-        logger.debug(f"{self.log_id}: forgetting this instance from server")
-        # Delete configuration file (support deleting readonly file).
-        for fn in [
-            self.public_key_file,
-            self.private_key_file,
-            self.known_hosts,
-            self.patterns_file,
-            self.status_file,
-            self.settings_file,
-        ]:
-            if not fn.is_file():
-                continue
-            try:
-                secure_file(fn, mode=0o600)
-                fn.unlink()
-                logger.debug(f"{self.log_id}: deleted file: {fn}")
-            except OSError:
-                logger.warning(f"{self.log_id}: cannot delete file: {fn}", exc_info=1)
 
     async def awatch(self, poll_delay_ms=250):
         """

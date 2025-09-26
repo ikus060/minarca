@@ -232,7 +232,7 @@ class BackupCard(CCard):
     async def _watch_settings(self, instance):
         # Asynchronously watch the status files for changes.
         try:
-            async for unused in watch_file(self.instance.config_file):
+            async for unused in watch_file(self.instance.settings_file):
                 self.load_settings()
                 self.property('settings').dispatch(self)
         except Exception:

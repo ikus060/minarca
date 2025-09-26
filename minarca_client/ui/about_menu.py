@@ -214,7 +214,7 @@ class AboutMenu(MDNavigationDrawer):
         if self.backup is None:
             return
         # Aka, refresh the button list.
-        for instance in self.backup:
+        for instance in self.backup.instances.values():
             # Label
             label = BackupInstanceLabel()
             label.instance = instance

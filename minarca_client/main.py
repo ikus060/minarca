@@ -12,7 +12,7 @@ import traceback
 from pathlib import Path
 
 from minarca_client import __version__
-from minarca_client.core import Backup, InstanceId
+from minarca_client.core import Backup
 from minarca_client.core.appconfig import appconfig
 from minarca_client.core.compat import (
     IS_MAC,
@@ -69,7 +69,7 @@ def _backup(force, instance_id):
     except LatestCheckFailed:
         logging.info(_('fail to check for latest version'))
     backup = Backup()
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         try:
             asyncio.run(instance.backup(force=force))
         except NotScheduleError as e:
@@ -81,11 +81,12 @@ def _forget(instance_id, force=False):
     backup = Backup()
     # Start by listing the backup
     print(_("Backup Instances:"))
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         title = instance.settings.repositoryname or _("No name")
         print('* %s' % title)
     if force or _prompt_yes_no(_('Are you sure you want to forget the above backup settings? (Yes/No): ')):
-        backup.delete_instance(instance_id)
+        for instance in backup.find_all(instance_id):
+            backup.delete_instance(instance.id)
 
 
 def _configure(
@@ -176,7 +177,7 @@ def _pattern(include, pattern, instance_id):
     if not backup.is_configured():
         print(_('To update include or exclude patterns, you must configure at least one backup instance.'))
         sys.exit(NotConfiguredError.error_code)
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         patterns = instance.patterns
         for path in pattern:
             p = Pattern(include, path, None)
@@ -191,7 +192,7 @@ def _pattern(include, pattern, instance_id):
 
 def _patterns(instance_id):
     backup = Backup()
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         for p in instance.patterns:
             line = ('+%s' if p.include else '-%s') % p.pattern
             print(line)
@@ -202,7 +203,7 @@ def _pause(delay, instance_id):
     Pause backup for the given number of hours.
     """
     backup = Backup()
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         instance.pause(delay=delay)
 
 
@@ -260,7 +261,7 @@ def _restore(restore_time, force, paths, instance_id, destination):
     #
     # Prompt user to define the backup source.
     #
-    if instance_id.value is None and len(backup) >= 2:
+    if instance_id == 'all' and len(backup.instances) >= 2:
         print(_('From which backup source do you want to restore data from?'))
         for instance in backup:
             if instance.is_remote():
@@ -279,7 +280,7 @@ def _restore(restore_time, force, paths, instance_id, destination):
         except InstanceNotFoundError:
             _abort(_('Invalid instance ID: %s') % instance_id)
     else:
-        instances = backup[instance_id]
+        instances = backup.find_all(instance_id)
         if len(instances) == 0:
             _abort(_("Your instance value doesn't match any backup instances"))
         elif len(instances) >= 2:
@@ -323,7 +324,7 @@ def _restore(restore_time, force, paths, instance_id, destination):
 def _stop(force, instance_id):
     backup = Backup()
     try:
-        for instance in backup[instance_id]:
+        for instance in backup.find_all(instance_id):
             instance.stop()
     except NotRunningError as e:
         logger.warning(str(e))
@@ -334,7 +335,7 @@ def _stop(force, instance_id):
 def _schedule(schedule, instance_id, username=None, password=None):
     backup = Backup()
     # Define frequency
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         instance.settings.schedule = schedule
         instance.save_settings()
     # Make sure to schedule job in OS too.
@@ -347,10 +348,10 @@ def _start(force, instance_id):
     backup = Backup()
 
     # Check if instance_id is valid.
-    list(backup[instance_id])
+    list(backup.find_all(instance_id))
 
     # Trigger backup execution.
-    backup.start_all(force=force, instance_id=instance_id.value)
+    backup.start_all(force=force, instance_id=instance_id)
 
 
 def _status(instance_id):
@@ -359,10 +360,10 @@ def _status(instance_id):
     """
     backup = Backup()
     # Test connection for all backup.
-    if len(backup):
+    if len(backup.instances):
         print('Verifying connection...')
     entries = []
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         status = instance.status
         settings = instance.settings
         try:
@@ -430,7 +431,7 @@ def _ui(test=False):
 
 def _verify(instance_id):
     backup = Backup()
-    for instance in backup[instance_id]:
+    for instance in backup.find_all(instance_id):
         asyncio.run(instance.verify())
 
 
@@ -462,8 +463,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Limit backup to the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.set_defaults(func=_start)
 
@@ -474,8 +474,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Limit backup to the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.set_defaults(func=_backup)
 
@@ -485,8 +484,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Add exclude file pattern to the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.add_argument('pattern', nargs='+', help=_('file pattern to be excluded. May contain `*` or `?` wildcard'))
     sub.set_defaults(func=_pattern)
@@ -498,8 +496,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Add include file pattern to the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.add_argument('pattern', nargs='+', help=_('file pattern to be excluded. May contain `*` or `?` wildcard'))
     sub.set_defaults(func=_pattern)
@@ -536,8 +533,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Show include and exclude patterns only for the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.set_defaults(func=_patterns)
 
@@ -547,8 +543,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Force the use of a given instance for restore."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.add_argument(
         '--restore-time',
@@ -574,8 +569,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Stop only the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.add_argument('--force', action='store_true', help=_("doesn't fail if the backup is not running."))
     sub.set_defaults(func=_stop)
@@ -613,8 +607,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Configure only the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     if IS_WINDOWS:
         sub.add_argument('-u', '--username', help=_("username required to run task when the user is logged out"))
@@ -627,8 +620,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Show status for the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.set_defaults(func=_status)
 
@@ -638,8 +630,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Forget settings of the given backup instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.add_argument(
         '--force', action='store_true', help=_("Force forget operation without confirmation from the user.")
@@ -655,8 +646,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Pause only the given instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.add_argument('-d', '--delay', help=_("number of hours"), type=int, default=24)
     sub.add_argument(
@@ -677,8 +667,7 @@ def _parse_args():
         '--instance',
         dest='instance_id',
         help=_("Verify backup integrity of the given backup instance(s)."),
-        default=InstanceId(None),
-        type=InstanceId,
+        default='all',
     )
     sub.set_defaults(func=_verify)
 

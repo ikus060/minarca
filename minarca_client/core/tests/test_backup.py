@@ -13,7 +13,7 @@ from unittest import mock
 from unittest.case import skipUnless
 from unittest.mock import MagicMock
 
-from minarca_client.core import Backup, InstanceId
+from minarca_client.core import Backup
 from minarca_client.core.compat import IS_WINDOWS
 
 
@@ -33,17 +33,17 @@ class TestBackup(unittest.TestCase):
         del os.environ['MINARCA_CONFIG_HOME']
         del os.environ['MINARCA_DATA_HOME']
 
-    def test_getitem_single(self):
+    def test_find_all_single(self):
         # Given a single minarca.properties
         with open(os.path.join(self.tmp.name, 'minarca.properties'), 'w') as f:
             f.write('')
         # Then a single instance is return by Backup()
         self.backup.rescan()
-        self.assertEqual(1, len(self.backup))
-        self.assertIsNotNone(self.backup[0])
-        self.assertEqual([''], [inst.id for inst in self.backup])
+        self.assertEqual(1, len(self.backup.instances))
+        self.assertIsNotNone(self.backup.instances[''])
+        self.assertEqual('', self.backup.instances[''].id)
 
-    def test_getitem_multiple(self):
+    def test_find_all_multiple(self):
         # Given a single minarca.properties
         with open(os.path.join(self.tmp.name, 'minarca.properties'), 'w') as f:
             f.write('')
@@ -52,12 +52,12 @@ class TestBackup(unittest.TestCase):
             f.write('')
         # Then a single instance is return by Backup()
         self.backup.rescan()
-        self.assertEqual(2, len(self.backup))
-        self.assertIsNotNone('', self.backup[0].id)
-        self.assertIsNotNone('1', self.backup[1].id)
-        self.assertEqual(['', '1'], [inst.id for inst in self.backup])
+        self.assertEqual(2, len(self.backup.instances))
+        self.assertIsNotNone('', self.backup.instances[''].id)
+        self.assertIsNotNone('1', self.backup.instances['1'].id)
+        self.assertEqual(['', '1'], [id for id in self.backup.instances])
 
-    def test_getitem_instance(self):
+    def test_find_all_instance(self):
         # Given a single minarca.properties
         with open(os.path.join(self.tmp.name, 'minarca.properties'), 'w') as f:
             f.write('')
@@ -67,13 +67,13 @@ class TestBackup(unittest.TestCase):
         # With limit(None)
         # Then all instances are returned
         self.backup.rescan()
-        self.assertEqual(2, len(self.backup[InstanceId(None)]))
+        self.assertEqual(2, len(self.backup.find_all('all')))
         # With limit(0)
         # Then first instance is returned
-        self.assertEqual('', self.backup[InstanceId('')][0].id)
+        self.assertEqual('', self.backup.find_all('')[0].id)
         # With limit(1)
         # Then second instances is returned
-        self.assertEqual('1', self.backup[InstanceId('1')][0].id)
+        self.assertEqual('1', self.backup.find_all('1')[0].id)
 
     @mock.patch('minarca_client.core.compat.get_minarca_exe', return_value='minarca.exe' if IS_WINDOWS else 'minarca')
     def test_schedule_job(self, *unused):

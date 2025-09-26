@@ -133,7 +133,8 @@ class BackupInstance:
         """
         Create a new minarca backup instance.
         """
-        assert (isinstance(id, int) and id >= 0) or isinstance(id, str)
+        if not isinstance(id, str):
+            raise TypeError("id must be a string")
         self.id = id
         self.log_id = f'instance {self.id}' if str(self.id) else 'instance default'
         # Get file locations.
