@@ -9,7 +9,6 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, ListProperty, NumericProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
-from minarca_client.core import BackupInstance
 from minarca_client.core.compat import IS_WINDOWS
 from minarca_client.core.exceptions import BackupError, HttpAuthenticationError, RemoteRepositoryNotFound
 from minarca_client.dialogs import question_dialog, warning_dialog
@@ -202,7 +201,7 @@ class BackupSettings(MDBoxLayout):
     def __init__(self, backup=None, instance=None, create=False):
         """Edit or create backup configuration for the given instance"""
         assert backup
-        assert instance and isinstance(instance, BackupInstance)
+        assert instance
         # Initialise the state.
         self.backup = backup
         self.instance = instance

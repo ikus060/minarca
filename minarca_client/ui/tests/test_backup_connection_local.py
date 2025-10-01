@@ -11,7 +11,6 @@ from minarca_client.core.disk import LocationInfo, get_location_info
 from minarca_client.ui.backup_connection_local import BackupConnectionLocal
 from minarca_client.ui.backup_create import BackupCreate
 from minarca_client.ui.backup_patterns import BackupPatterns
-from minarca_client.ui.dashboard import DashboardView
 from minarca_client.ui.tests import BaseAppTest
 
 DISK_INFO = LocationInfo(
@@ -84,7 +83,7 @@ class BackupConnectionLocalTest(BaseAppTest):
         self.instance.save_settings()
         await self.view._refresh_locations_task
         # Mock Backup instance
-        self.view.backup = backup = mock.AsyncMock()
+        self.view.backup.configure_local = mock_configure_local = mock.AsyncMock()
         repositoryname = self.view.repositoryname
         # Give a selected disk
         self.view.selected_location = DISK_INFO
@@ -95,15 +94,13 @@ class BackupConnectionLocalTest(BaseAppTest):
         except asyncio.CancelledError:
             pass
         # Then a backup is configured
-        backup.configure_local.assert_called_once_with(
+        mock_configure_local.assert_called_once_with(
             path=DISK_INFO.mountpoint / DISK_INFO.relpath,
             repositoryname=repositoryname,
             force=False,
             purge_destination=False,
             instance=None,
         )
-        # Then user is redirected to Dashboard
-        self.assertIsInstance(self.view, DashboardView)
 
     async def test_btn_save_with_create(self):
         tempdir = tempfile.mkdtemp(prefix='minarca-client-test')

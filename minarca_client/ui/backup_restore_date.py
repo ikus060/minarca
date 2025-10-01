@@ -10,7 +10,6 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, ListProperty, ObjectProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
-from minarca_client.core import BackupInstance
 from minarca_client.core.exceptions import BackupError
 from minarca_client.locale import _
 from minarca_client.ui.date_picker import CDatePicker  # noqa
@@ -152,7 +151,7 @@ class BackupRestoreDate(MDBoxLayout):
 
     def __init__(self, backup=None, instance=None, increment=None):
         assert backup
-        assert instance and isinstance(instance, BackupInstance)
+        assert instance
         assert increment is None or isinstance(increment, datetime.datetime)
         # Initialise the state.
         self.instance = instance

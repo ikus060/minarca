@@ -9,7 +9,6 @@ from kivy.lang import Builder
 from kivy.properties import BooleanProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
-from minarca_client.core import BackupInstance
 from minarca_client.dialogs import warning_dialog
 from minarca_client.locale import _
 from minarca_client.ui.spinner_overlay import SpinnerOverlay  # noqa
@@ -101,7 +100,7 @@ class BackupAdvanceSettings(MDBoxLayout):
     def __init__(self, backup=None, instance=None, create=False):
         """Edit or create backup configuration for the given instance"""
         assert backup
-        assert instance and isinstance(instance, BackupInstance)
+        assert instance
         # Initialise the state.
         self.backup = backup
         self.instance = instance

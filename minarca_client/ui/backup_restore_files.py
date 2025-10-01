@@ -14,7 +14,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDListItem
 
 from minarca_client.core.exceptions import BackupError
-from minarca_client.core.instance import BackupInstance, reduce_path
+from minarca_client.core.instance import reduce_path
 from minarca_client.dialogs import folder_dialog, question_dialog
 from minarca_client.locale import _, ngettext
 from minarca_client.ui.date_picker import CDatePicker  # noqa
@@ -199,7 +199,7 @@ class BackupRestoreFiles(MDBoxLayout):
 
     def __init__(self, backup=None, instance=None, increment=None):
         assert backup
-        assert instance and isinstance(instance, BackupInstance)
+        assert instance
         assert increment and isinstance(increment, datetime.datetime)
         # Initialise the state.
         self.instance = instance

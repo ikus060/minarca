@@ -7,12 +7,11 @@ import logging
 import aiofiles
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.properties import BooleanProperty, ObjectProperty
+from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.textinput import TextInput
 from kivymd.uix.boxlayout import MDBoxLayout
 
-from minarca_client.core import BackupInstance
 from minarca_client.core.compat import open_file_with_default_app, watch_file
 from minarca_client.dialogs import error_dialog, question_dialog
 from minarca_client.locale import _
@@ -29,6 +28,10 @@ Builder.load_string(
     orientation: "horizontal"
     md_bg_color: self.theme_cls.backgroundColor
 
+    # Bind instance view model
+    status: root.instance.status if root.instance else None
+    is_remote: self.instance.is_remote() if root.instance else True
+
     SidePanel:
         is_remote: root.is_remote
         create: False
@@ -38,26 +41,6 @@ Builder.load_string(
         orientation: "vertical"
         padding: "50dp"
         spacing: "15dp"
-
-        MDBoxLayout:
-            orientation: "horizontal"
-            spacing: "15dp"
-            adaptive_height: True
-
-
-            CLabel:
-                text: root.title_text
-                font_style: "Title"
-                role: "small"
-                text_color: self.theme_cls.primaryColor
-                adaptive_size: True
-
-            Widget:
-
-            CLabel:
-                text: root.last_status_text
-                halign: "right"
-                adaptive_size: True
 
         CBoxLayout:
             orientation: 'horizontal'
@@ -92,6 +75,32 @@ Builder.load_string(
                 on_release: root.stop()
                 theme_icon_color: "Custom"
                 icon_color: app.theme_cls.onSurfaceColor
+
+        MDTabsSecondary:
+            id: tabs
+            indicator_height: "3dp"
+
+            MDTabsItemSecondary:
+                id: log_tab
+                on_release: root.tab = 'backup'
+
+                MDTabsItemIcon:
+                    icon: "content-copy"
+
+                MDTabsItemText:
+                    text: _('Backup logs')
+
+            MDTabsItemSecondary:
+                id: exclude_tab
+                on_release: root.tab = 'restore'
+
+                MDTabsItemIcon:
+                    icon: "restore"
+
+                MDTabsItemText:
+                    text: _('Restore logs')
+
+            MDDivider:
 
         CLabel:
             text: root.error_message
@@ -159,26 +168,25 @@ class LogLine(TextInput, RecycleDataViewBehavior):
 
 
 class BackupLogs(MDBoxLayout):
-    instance = None
+    instance = ObjectProperty(None, rebind=True)
+    status = ObjectProperty(None, allownone=True, rebind=True)
     is_remote = BooleanProperty()
-    status = ObjectProperty()
-    _status_task = None
+    tab = StringProperty()
     _readlogs_task = None
     _stop_task = None
 
-    def __init__(self, backup=None, instance=None):
+    def __init__(self, backup=None, instance=None, tab='backup'):
         assert backup
-        assert instance and isinstance(instance, BackupInstance)
+        assert instance
         # Initialise the state.
         self.instance = instance
-        self.is_remote = self.instance.is_remote()
-        self.status = self.instance.status
+        self.tab = tab
         # Create the view
         super().__init__()
-        # Register task to update status.
-        self._status_task = asyncio.create_task(self._watch_status(instance))
+        # Make the default tabs active
+        self.ids['log_tab'].on_release()
         # Load log file
-        self._readlogs_task = asyncio.create_task(self._readlogs(instance))
+        self._readlogs_task = asyncio.create_task(self._readlogs())
 
     def on_parent(self, widget, value):
         if value is None:
@@ -188,30 +196,10 @@ class BackupLogs(MDBoxLayout):
         """On destroy, make sure to delete task."""
         if self._readlogs_task:
             self._readlogs_task.cancel()
-        if self._status_task:
-            self._status_task.cancel()
         if self._stop_task:
             self._stop_task.cancel()
 
-    async def _watch_status(self, instance):
-        # Asynchronously watch the status files for changes.
-        """
-        Special implementation of awatch forcing update after 5 seconds of inativity when running.
-        """
-        try:
-            last_action = self.status.action
-            async for unused in watch_file(self.instance.status_file, timeout=self.status.RUNNING_DELAY):
-                self.instance.load_status()
-                self.property('status').dispatch(self)
-                if last_action != self.status.action:
-                    last_action = self.status.action
-                    if self._readlogs_task:
-                        self._readlogs_task.cancel()
-                    self._readlogs_task = asyncio.create_task(self._readlogs(instance))
-        except Exception:
-            logger.exception('problem occured while watching status')
-
-    async def _readlogs(self, instance):
+    async def _readlogs(self):
         if not self.filename:
             return
         try:
@@ -276,46 +264,31 @@ class BackupLogs(MDBoxLayout):
     def is_running(self):
         return self.status and self.status.current_status in ['RUNNING', 'STALE']
 
-    @alias_property(bind=['status'])
-    def last_status_text(self):
-        """Return the last backup description."""
-        is_running = self.is_running
-        if self.status and self.status.lastdate:
-            value = self.status.lastdate.strftime("%a, %d %b %Y %H:%M")
-        else:
-            return _('No backup yet')
-        if not is_running:
-            action = self.status.action
-            if action == 'backup':
-                return _('Last backup: %s') % value
-            elif action == 'restore':
-                return _('Last restore: %s') % value
-        return ""
-
-    @alias_property(bind=['status'])
-    def last_status_success(self):
-        """Return corresponding icon depending of the last backup status."""
-        return self.status and self.status.current_status in ['SUCCESS', 'RUNNING']
-
-    @alias_property(bind=['status'])
+    @alias_property(bind=['status', 'tab'])
     def error_message(self):
         if self.status is None:
             return ""
         if self.status.details:
             action = self.status.action
-            if action == 'backup':
+            if action == 'backup' and self.tab == 'backup':
                 return _('The last backup ended with the following error: %s') % self.status.details
-            elif action == 'restore':
+            elif action == 'restore' and self.tab == 'restore':
                 return _('The last restoration ended with the following error: %s') % self.status.details
         return ""
 
-    @alias_property(bind=['status'])
+    @alias_property(bind=['tab'])
     def filename(self):
-        action = self.status.action
-        if action == 'backup':
+        if self.tab == 'backup':
             return self.instance.backup_log_file
-        elif action == 'restore':
+        elif self.tab == 'restore':
             return self.instance.restore_log_file
+
+    def on_filename(self, *args, **kwargs):
+        # Reload log view when filename get updated.
+        if self._readlogs_task:
+            self._readlogs_task.cancel()
+        self.ids.logview.text = ""
+        self._readlogs_task = asyncio.create_task(self._readlogs())
 
     def open_log_file(self):
         if self.filename:

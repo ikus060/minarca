@@ -10,7 +10,6 @@ from kivy.properties import BooleanProperty, ListProperty, ObjectProperty, Strin
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import MDListItem
 
-from minarca_client.core import BackupInstance
 from minarca_client.core.compat import get_home
 from minarca_client.core.pattern import Pattern, Patterns
 from minarca_client.dialogs import file_dialog, folder_dialog
@@ -207,7 +206,7 @@ class BackupPatterns(MDBoxLayout):
     def __init__(self, backup=None, instance=None, create=False):
         """Edit or create backup configuration for the given instance"""
         assert backup
-        assert instance and isinstance(instance, BackupInstance)
+        assert instance
         # Initialise the state.
         self.backup = backup
         self.instance = instance

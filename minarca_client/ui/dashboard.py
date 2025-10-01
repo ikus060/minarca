@@ -1,13 +1,11 @@
 # Copyright (C) 2025 IKUS Software. All right reserved.
 # IKUS Software inc. PROPRIETARY/CONFIDENTIAL.
 # Use is subject to license terms.
-import asyncio
 import itertools
 import logging
 
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.properties import ListProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
 from .backup_card import BackupCard  # noqa
@@ -52,42 +50,24 @@ Builder.load_string(
 
 
 class DashboardView(MDBoxLayout):
-    instances = ListProperty()
-
-    _task = None
 
     def __init__(self, backup=None):
         assert backup is not None
         super().__init__()
-        # Initialize the instance list
-        self.instances = list(backup.instances.values())
-        # Keep the view up-to-date by refreshing the instances
-        self._task = asyncio.create_task(self._watch_instances(backup))
+        self.refresh_cards(backup, backup.instances)
+        backup.bind(instances=self.refresh_cards)
 
-    def on_parent(self, instance, value):
-        if value is None and self._task:
-            self._task.cancel()
-
-    def on_instances(self, widget, value):
-        children = self.ids.card_list.children
-        for instance, backup_card in itertools.zip_longest(value, children):
+    def refresh_cards(self, widget, instances):
+        parent = self.ids.card_list
+        children = parent.children
+        for instance, backup_card in itertools.zip_longest(instances.values(), children):
             if backup_card is None:
                 backup_card = BackupCard()
-                self.ids.card_list.add_widget(backup_card)
-            backup_card.instance = instance
+                parent.add_widget(backup_card)
             if instance is None:
-                backup_card.parent.remove_widget(backup_card)
-
-    async def _watch_instances(self, backup):
-        """
-        Watch changes to instances.
-        """
-        try:
-            async for unused in backup.awatch():
-                backup.rescan()
-                self.instances = list(backup.instances.values())
-        except Exception:
-            logger.exception('problem occur while watching backup instances')
+                parent.remove_widget(backup_card)
+            else:
+                backup_card.instance = instance
 
     def create_backup(self):
         App.get_running_app().set_active_view('backup_create.BackupCreate')

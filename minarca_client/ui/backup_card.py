@@ -9,8 +9,6 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.properties import BooleanProperty, DictProperty, ObjectProperty
 
-from minarca_client.core import BackupInstance
-from minarca_client.core.compat import watch_file
 from minarca_client.dialogs import error_dialog, question_dialog
 from minarca_client.locale import _
 from minarca_client.ui.theme import CCard
@@ -25,6 +23,11 @@ Builder.load_string(
     spacing: "20dp"
     focus_behavior: False
     adaptive_height: True
+
+    # Bind instance view model
+    status: root.instance.status if root.instance else None
+    settings: root.instance.settings if root.instance else None
+    is_remote: self.instance.is_remote() if root.instance else True
 
     MDBoxLayout:
         orientation: "horizontal"
@@ -181,16 +184,14 @@ Builder.load_string(
 
 
 class BackupCard(CCard):
-    instance = ObjectProperty(None)
-    settings = ObjectProperty(None)
-    status = ObjectProperty(None)
+    instance = ObjectProperty(None, rebind=True)
+    settings = ObjectProperty(None, allownone=True, rebind=True)
+    status = ObjectProperty(None, allownone=True, rebind=True)
     is_remote = BooleanProperty(True)
     disk_usage = DictProperty({'used': 0, 'total': -1})
     test_connection = ObjectProperty(None)
     in_transition = BooleanProperty(False)
 
-    _status_task = None
-    _settings_task = None
     _disk_usage_task = None
     _test_connection_task = None
     _pause_task = None
@@ -202,10 +203,6 @@ class BackupCard(CCard):
 
     def _cancel_tasks(self):
         """On destroy, make sure to delete task."""
-        if self._status_task:
-            self._status_task.cancel()
-        if self._settings_task:
-            self._settings_task.cancel()
         if self._disk_usage_task:
             self._disk_usage_task.cancel()
         if self._test_connection_task:
@@ -214,29 +211,6 @@ class BackupCard(CCard):
             self._pause_task.cancel()
         if self._stop_start_task:
             self._stop_start_task.cancel()
-
-    async def _watch_status(self, instance):
-        # Asynchronously watch the status files for changes.
-        """
-        Special implementation of awatch forcing update after 5 seconds of inativity when running.
-        """
-        try:
-            status = instance.status
-            async for unused in watch_file(self.instance.status_file, timeout=status.RUNNING_DELAY):
-                self.instance.load_status()
-                self.in_transition = False
-                self.property('status').dispatch(self)
-        except Exception:
-            logger.exception('problem occured while watching status')
-
-    async def _watch_settings(self, instance):
-        # Asynchronously watch the status files for changes.
-        try:
-            async for unused in watch_file(self.instance.settings_file):
-                self.load_settings()
-                self.property('settings').dispatch(self)
-        except Exception:
-            logger.exception('problem while watching settings')
 
     async def _get_disk_usage(self, instance):
         # Get disk usage in different thread since connection error might block request.
@@ -271,19 +245,12 @@ class BackupCard(CCard):
             self.test_connection = e
 
     def on_instance(self, widget, instance):
-        assert isinstance(instance, BackupInstance)
+        assert instance
         # Destroy previous task
         self._cancel_tasks()
         # Schedule update asynchronously.
-        self._status_task = asyncio.create_task(self._watch_status(instance))
-        self._settings_task = asyncio.create_task(self._watch_settings(instance))
         self._disk_usage_task = asyncio.create_task(self._get_disk_usage(instance))
         self._test_connection_task = asyncio.create_task(self._test_connection(instance))
-        # Update status
-        self.instance = instance
-        self.is_remote = self.instance.is_remote()
-        self.status = instance.status
-        self.settings = instance.settings
 
     @alias_property(bind=['disk_usage'])
     def disk_used_text(self):

@@ -394,17 +394,3 @@ class Backup:
                 except Exception:
                     pass
             self._instances.pop(inst.id)
-
-    async def awatch(self, poll_delay_ms=250):
-        """
-        Return changes whenever the file gets updated.
-        """
-        logger.debug(f"starting async watch with poll delay: {poll_delay_ms} ms")
-        files = set(self._config_home.iterdir())
-        while True:
-            await asyncio.sleep(poll_delay_ms / 1000)
-            new_files = set(self._config_home.iterdir())
-            if files != new_files:
-                logger.debug("backup instances updated")
-                yield "changed"
-            files = new_files

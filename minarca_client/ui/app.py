@@ -10,12 +10,14 @@ from kivy.base import ExceptionHandler, ExceptionManager
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.modules import inspector
-from kivy.properties import StringProperty
+from kivy.properties import ObjectProperty, StringProperty
 from kivymd.app import MDApp
 
+from minarca_client.core import Backup
 from minarca_client.core.appconfig import appconfig
 from minarca_client.dialogs import error_dialog
 from minarca_client.locale import _
+from minarca_client.ui.observable import BackupViewModel
 from minarca_client.ui.theme import Theme
 
 from .about_menu import AboutMenu  # noqa
@@ -80,11 +82,13 @@ class MinarcaApp(MDApp, ExceptionHandler):
 
     title = StringProperty(appconfig.header_name)
 
+    backup = ObjectProperty(rebind=True)
+
     use_kivy_settings = False
 
     def __init__(self, *args, backup=None, test=False, **kwargs):
-        assert backup is not None
-        self.backup = backup
+        assert isinstance(backup, Backup)
+        self.backup = BackupViewModel(backup)
         self.test = test
         super().__init__(*args, **kwargs)
         self.theme_cls = Theme()
@@ -144,11 +148,15 @@ class MinarcaApp(MDApp, ExceptionHandler):
             inspector.start(window, self)
 
     def on_start(self):
+        self.backup.start_watching()
         # Show default view.
         self.set_active_view('dashboard.DashboardView')
         # If testing, application close after 2 sec.
         if self.test:
             Clock.schedule_once(self.stop, 1)
+
+    def on_stop(self):
+        self.backup.stop_watching()
 
     def _find_class(self, view_class):
         """
