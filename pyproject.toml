@@ -42,6 +42,7 @@ dependencies = [
     "python-crontab ; sys_platform=='linux'",
     "pylibacl ; sys_platform=='linux'",
     "pyxattr ; sys_platform=='linux'",
+    "watchfiles",
 ]
 dynamic = ["version"]
 
